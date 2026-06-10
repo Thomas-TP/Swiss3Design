@@ -1,0 +1,42 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "swiss3design",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-05-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "swiss3design-db",
+      // À remplacer par le vrai ID après `wrangler d1 create swiss3design-db`
+      "database_id": "00000000-0000-0000-0000-000000000000",
+      "migrations_dir": "drizzle"
+    }
+  ],
+  "r2_buckets": [
+    {
+      "binding": "R2",
+      "bucket_name": "swiss3design-files"
+    }
+  ],
+  "kv_namespaces": [
+    {
+      "binding": "KV",
+      // À remplacer par le vrai ID après `wrangler kv namespace create KV`
+      "id": "00000000000000000000000000000000"
+    }
+  ],
+  "services": [
+    {
+      "binding": "WORKER_SELF_REFERENCE",
+      "service": "swiss3design"
+    }
+  ],
+  "observability": {
+    "enabled": true
+  }
+}

@@ -1,0 +1,28 @@
+# Déploiement auto sur Cloudflare Workers à chaque push sur main.
+# Prérequis (Settings → Secrets and variables → Actions) :
+#   CLOUDFLARE_API_TOKEN  — token API avec droits Workers/D1/R2/KV
+#   CLOUDFLARE_ACCOUNT_ID — ID du compte Cloudflare
+# Tant que ces secrets ne sont pas renseignés, ce workflow échouera (sans gravité).
+name: Deploy to Cloudflare
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      # La clé publiable Stripe vient du .env committé (clé publique)
+      - run: npx opennextjs-cloudflare build
+      - run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

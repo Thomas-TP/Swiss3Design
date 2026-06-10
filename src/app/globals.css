@@ -1,0 +1,33 @@
+@import "tailwindcss";
+
+@theme inline {
+  /* Palette sobre "Swiss business" : neutres chauds + rouge suisse en accent */
+  --color-paper: #fafaf9;
+  --color-surface: #ffffff;
+  --color-ink: #1c1917;
+  --color-soft: #78716c;
+  --color-line: #e7e5e4;
+  --color-accent: #da291c;
+  --color-accent-dark: #a81f15;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--color-paper);
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #fff;
+}
