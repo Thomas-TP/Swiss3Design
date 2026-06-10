@@ -30,9 +30,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files — .env committé (clés publiques uniquement), le reste ignoré
+# env files — seules les clés PUBLIQUES sont committées
 .env*
-!.env
+!.env.development
+!.env.production
 
 # vercel
 .vercel

@@ -1,9 +1,12 @@
-# Déploiement auto sur Cloudflare Workers à chaque push sur main.
-# Prérequis (Settings → Secrets and variables → Actions) :
-#   CLOUDFLARE_API_TOKEN  — token API avec droits Workers/D1/R2/KV
-#   CLOUDFLARE_ACCOUNT_ID — ID du compte Cloudflare
-# Tant que ces secrets ne sont pas renseignés, ce workflow échouera (sans gravité).
-name: Deploy to Cloudflare
+# CI/CD : build de validation à chaque push, déploiement Cloudflare si le token existe.
+#
+# Pour activer le déploiement automatique :
+#   1. Cloudflare dashboard → My Profile → API Tokens → Create Token
+#      Modèle « Edit Cloudflare Workers » (scopé au compte, pas besoin de plus)
+#   2. GitHub → repo Swiss3Design → Settings → Secrets and variables → Actions
+#      → New repository secret : CLOUDFLARE_API_TOKEN
+# Sans le secret, le build tourne quand même (validation) et le déploiement est sauté.
+name: CI & Deploy
 
 on:
   push:
@@ -11,8 +14,10 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy:
+  build-and-deploy:
     runs-on: ubuntu-latest
+    env:
+      HAS_CF_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN != '' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -20,9 +25,13 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci
-      # La clé publiable Stripe vient du .env committé (clé publique)
+      # Build OpenNext (webpack — voir open-next.config.ts) : valide le code à chaque push
       - run: npx opennextjs-cloudflare build
-      - run: npx wrangler deploy
+      - name: Deploy to Cloudflare Workers
+        if: env.HAS_CF_TOKEN == 'true'
+        run: npx wrangler deploy
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Déploiement sauté (pas de CLOUDFLARE_API_TOKEN)
+        if: env.HAS_CF_TOKEN != 'true'
+        run: echo "Build OK. Ajoutez le secret CLOUDFLARE_API_TOKEN pour activer le déploiement automatique."
