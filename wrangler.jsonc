@@ -12,8 +12,7 @@
     {
       "binding": "DB",
       "database_name": "swiss3design-db",
-      // À remplacer par le vrai ID après `wrangler d1 create swiss3design-db`
-      "database_id": "00000000-0000-0000-0000-000000000000",
+      "database_id": "a87e4231-6f56-4c18-9ead-42bb9a47d5fe",
       "migrations_dir": "drizzle"
     }
   ],
@@ -26,8 +25,7 @@
   "kv_namespaces": [
     {
       "binding": "KV",
-      // À remplacer par le vrai ID après `wrangler kv namespace create KV`
-      "id": "00000000000000000000000000000000"
+      "id": "4d8b410c8ea743d281c530570668e837"
     }
   ],
   "services": [
