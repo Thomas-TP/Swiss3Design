@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { CheckCircle2, Send } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useSession } from "@/lib/auth-client";
 import { submitQuoteRequest, type QuoteFormState } from "./actions";
 
 const field =
@@ -11,6 +12,7 @@ const field =
 export function QuoteForm() {
   const t = useTranslations("custom");
   const locale = useLocale();
+  const { data: authSession } = useSession();
   const [state, formAction, pending] = useActionState<QuoteFormState, FormData>(
     submitQuoteRequest,
     { status: "idle" },
@@ -34,11 +36,13 @@ export function QuoteForm() {
           {t("email")}
         </label>
         <input
+          key={authSession?.user.email ?? "anon"}
           id="email"
           name="email"
           type="email"
           required
           autoComplete="email"
+          defaultValue={authSession?.user.email ?? ""}
           className={field}
         />
       </div>

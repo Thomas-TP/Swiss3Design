@@ -40,6 +40,7 @@
     "addToCart": "Aggiungi al carrello",
     "added": "Aggiunto ✓",
     "inStock": "Disponibile",
+    "outOfStock": "Esaurito",
     "onDemand": "Stampato per voi · {days} giorni",
     "multicolorBadge": "Multicolore",
     "material": "Materiale",
@@ -118,9 +119,46 @@
     "error": "Si è verificato un errore. Riprovate per favore."
   },
   "account": {
-    "title": "Account",
-    "comingSoon": "Area clienti in preparazione",
-    "comingSoonText": "Presto: monitoraggio degli ordini, preventivi su misura e indirizzi salvati."
+    "title": "Il mio account",
+    "greeting": "Ciao {name}",
+    "myOrders": "I miei ordini",
+    "myQuotes": "I miei preventivi",
+    "noOrders": "Nessun ordine per il momento.",
+    "noQuotes": "Nessuna richiesta di preventivo per il momento.",
+    "quotedPrice": "Prezzo proposto",
+    "status": {
+      "pending": "In attesa",
+      "paid": "Pagato",
+      "in_production": "In produzione",
+      "shipped": "Spedito",
+      "delivered": "Consegnato",
+      "cancelled": "Annullato"
+    },
+    "quoteStatus": {
+      "received": "Ricevuta",
+      "quoted": "Preventivo inviato",
+      "accepted": "Accettato",
+      "paid": "Pagato",
+      "in_production": "In produzione",
+      "done": "Completato",
+      "rejected": "Rifiutato"
+    }
+  },
+  "auth": {
+    "signInTitle": "Accesso",
+    "signUpTitle": "Crea un account",
+    "name": "Nome e cognome",
+    "email": "E-mail",
+    "password": "Password",
+    "passwordHint": "Minimo 8 caratteri",
+    "signInCta": "Accedi",
+    "signUpCta": "Crea il mio account",
+    "noAccount": "Non avete ancora un account?",
+    "haveAccount": "Avete già un account?",
+    "signOut": "Disconnettersi",
+    "errorInvalid": "E-mail o password errati.",
+    "errorExists": "Esiste già un account con questa e-mail.",
+    "errorGeneric": "Si è verificato un errore. Riprovate per favore."
   },
   "footer": {
     "tagline": "Stampa 3D multicolore — Gland, Svizzera",

@@ -1,10 +1,9 @@
 import { CheckCircle2, Clock, XCircle, ArrowRight } from "lucide-react";
-import { eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { Link } from "@/i18n/navigation";
 import { getDb } from "@/db";
-import { orders } from "@/db/schema";
+import { markOrderPaid } from "@/lib/orders";
 import { getStripe } from "@/lib/stripe";
 import { ClearCart } from "./clear-cart";
 
@@ -29,14 +28,11 @@ export default async function CheckoutSuccessPage({
       orderNumber = pi.metadata?.orderNumber ?? null;
       if (pi.status === "succeeded") {
         status = "succeeded";
-        // Filet de sécurité si le webhook n'est pas encore passé
+        // Filet de sécurité si le webhook n'est pas encore passé (idempotent)
         const orderId = pi.metadata?.orderId;
         if (orderId) {
           const db = await getDb();
-          await db
-            .update(orders)
-            .set({ status: "paid" })
-            .where(eq(orders.id, orderId));
+          await markOrderPaid(db, orderId);
         }
       } else if (pi.status === "processing") {
         status = "processing";

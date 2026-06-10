@@ -12,6 +12,7 @@ import { ArrowLeft, ArrowRight, Lock, ShoppingBag } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/lib/cart";
+import { useSession } from "@/lib/auth-client";
 import { formatChf } from "@/lib/format";
 import { shippingFor } from "@/lib/shipping";
 
@@ -26,6 +27,7 @@ export function CheckoutFlow() {
   const t = useTranslations("checkout");
   const locale = useLocale();
   const { items, subtotalCents } = useCart();
+  const { data: authSession } = useSession();
 
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [totalCents, setTotalCents] = useState(0);
@@ -147,10 +149,12 @@ export function CheckoutFlow() {
       <div>
         <p className="mb-3 font-semibold">{t("contactTitle")}</p>
         <input
+          key={authSession?.user.email ?? "anon"}
           name="email"
           type="email"
           required
           autoComplete="email"
+          defaultValue={authSession?.user.email ?? ""}
           placeholder={t("email")}
           className={field}
         />

@@ -40,6 +40,7 @@
     "addToCart": "Ajouter au panier",
     "added": "Ajouté ✓",
     "inStock": "En stock",
+    "outOfStock": "Rupture de stock",
     "onDemand": "Imprimé pour vous · {days} jours",
     "multicolorBadge": "Multicolore",
     "material": "Matière",
@@ -118,9 +119,46 @@
     "error": "Une erreur est survenue. Merci de réessayer."
   },
   "account": {
-    "title": "Compte",
-    "comingSoon": "Espace client en préparation",
-    "comingSoonText": "Bientôt : suivi de vos commandes, devis sur mesure et adresses enregistrées."
+    "title": "Mon compte",
+    "greeting": "Bonjour {name}",
+    "myOrders": "Mes commandes",
+    "myQuotes": "Mes devis",
+    "noOrders": "Aucune commande pour l'instant.",
+    "noQuotes": "Aucune demande de devis pour l'instant.",
+    "quotedPrice": "Prix proposé",
+    "status": {
+      "pending": "En attente",
+      "paid": "Payée",
+      "in_production": "En production",
+      "shipped": "Expédiée",
+      "delivered": "Livrée",
+      "cancelled": "Annulée"
+    },
+    "quoteStatus": {
+      "received": "Reçue",
+      "quoted": "Devis envoyé",
+      "accepted": "Acceptée",
+      "paid": "Payée",
+      "in_production": "En production",
+      "done": "Terminée",
+      "rejected": "Refusée"
+    }
+  },
+  "auth": {
+    "signInTitle": "Connexion",
+    "signUpTitle": "Créer un compte",
+    "name": "Nom complet",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "passwordHint": "8 caractères minimum",
+    "signInCta": "Se connecter",
+    "signUpCta": "Créer mon compte",
+    "noAccount": "Pas encore de compte ?",
+    "haveAccount": "Déjà un compte ?",
+    "signOut": "Se déconnecter",
+    "errorInvalid": "E-mail ou mot de passe incorrect.",
+    "errorExists": "Un compte existe déjà avec cet e-mail.",
+    "errorGeneric": "Une erreur est survenue. Merci de réessayer."
   },
   "footer": {
     "tagline": "Impression 3D multicolore — Gland, Suisse",

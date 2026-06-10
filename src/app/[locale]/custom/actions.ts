@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { getDb } from "@/db";
 import { quoteRequests } from "@/db/schema";
+import { getServerSession } from "@/lib/session";
 
 const schema = z.object({
   email: z.email(),
@@ -35,8 +36,12 @@ export async function submitQuoteRequest(
   }
 
   try {
+    const session = await getServerSession();
     const db = await getDb();
-    await db.insert(quoteRequests).values(parsed.data);
+    await db.insert(quoteRequests).values({
+      ...parsed.data,
+      customerId: session?.user.id ?? null,
+    });
     return { status: "success" };
   } catch {
     return { status: "error" };

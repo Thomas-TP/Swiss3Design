@@ -5,6 +5,7 @@ import { getDb } from "@/db";
 import { orders, orderItems, products, productTranslations } from "@/db/schema";
 import { getSetting } from "@/db/queries";
 import { getStripe } from "@/lib/stripe";
+import { getAuth } from "@/lib/auth";
 import { SHIPPING_CENTS, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
 
 const bodySchema = z.object({
@@ -47,6 +48,7 @@ export async function POST(request: Request) {
     .select({
       id: products.id,
       priceCents: products.priceCents,
+      stock: products.stock,
       name: productTranslations.name,
     })
     .from(products)
@@ -63,6 +65,19 @@ export async function POST(request: Request) {
   if (items.some((i) => !byId.has(i.productId))) {
     return Response.json({ error: "unknown_product" }, { status: 400 });
   }
+  const outOfStock = items.find((i) => {
+    const stock = byId.get(i.productId)!.stock;
+    return stock !== null && stock < i.quantity;
+  });
+  if (outOfStock) {
+    return Response.json(
+      {
+        error: "insufficient_stock",
+        productName: byId.get(outOfStock.productId)!.name,
+      },
+      { status: 409 },
+    );
+  }
 
   const subtotalCents = items.reduce(
     (sum, i) => sum + byId.get(i.productId)!.priceCents * i.quantity,
@@ -78,11 +93,16 @@ export async function POST(request: Request) {
   const shippingCents = subtotalCents >= freeOver ? 0 : shippingFlat;
   const totalCents = subtotalCents + shippingCents;
 
+  // Rattache la commande au compte connecté, le cas échéant
+  const auth = await getAuth();
+  const authSession = await auth.api.getSession({ headers: request.headers });
+
   const orderNumber = makeOrderNumber();
   const [order] = await db
     .insert(orders)
     .values({
       orderNumber,
+      customerId: authSession?.user.id ?? null,
       email,
       status: "pending",
       subtotalCents,

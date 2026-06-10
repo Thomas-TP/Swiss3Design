@@ -37,5 +37,10 @@
   ],
   "observability": {
     "enabled": true
+  },
+  "vars": {
+    "BETTER_AUTH_URL": "https://swiss3design.thomastp.workers.dev",
+    // Les comptes créés avec ces e-mails reçoivent automatiquement le rôle admin
+    "ADMIN_EMAILS": "t@prudhomme.li"
   }
 }

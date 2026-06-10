@@ -31,9 +31,17 @@ export function ProductCard({ product }: { product: ProductListItem }) {
       </div>
       <div className="flex flex-1 flex-col gap-1 p-4">
         <h3 className="font-semibold leading-snug">{product.name}</h3>
-        <p className="text-xs text-soft">
+        <p
+          className={`text-xs ${
+            product.saleType === "stock" && product.stock === 0
+              ? "font-semibold text-accent"
+              : "text-soft"
+          }`}
+        >
           {product.saleType === "stock"
-            ? t("inStock")
+            ? product.stock === 0
+              ? t("outOfStock")
+              : t("inStock")
             : t("onDemand", { days: product.productionDays ?? 3 })}
         </p>
         <p className="mt-2 font-semibold tabular-nums">

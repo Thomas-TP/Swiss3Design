@@ -40,6 +40,7 @@
     "addToCart": "Add to cart",
     "added": "Added ✓",
     "inStock": "In stock",
+    "outOfStock": "Out of stock",
     "onDemand": "Printed for you · {days} days",
     "multicolorBadge": "Multicolor",
     "material": "Material",
@@ -118,9 +119,46 @@
     "error": "Something went wrong. Please try again."
   },
   "account": {
-    "title": "Account",
-    "comingSoon": "Customer area coming soon",
-    "comingSoonText": "Soon: order tracking, custom quotes and saved addresses."
+    "title": "My account",
+    "greeting": "Hello {name}",
+    "myOrders": "My orders",
+    "myQuotes": "My quotes",
+    "noOrders": "No orders yet.",
+    "noQuotes": "No quote requests yet.",
+    "quotedPrice": "Quoted price",
+    "status": {
+      "pending": "Pending",
+      "paid": "Paid",
+      "in_production": "In production",
+      "shipped": "Shipped",
+      "delivered": "Delivered",
+      "cancelled": "Cancelled"
+    },
+    "quoteStatus": {
+      "received": "Received",
+      "quoted": "Quote sent",
+      "accepted": "Accepted",
+      "paid": "Paid",
+      "in_production": "In production",
+      "done": "Done",
+      "rejected": "Declined"
+    }
+  },
+  "auth": {
+    "signInTitle": "Sign in",
+    "signUpTitle": "Create an account",
+    "name": "Full name",
+    "email": "Email",
+    "password": "Password",
+    "passwordHint": "At least 8 characters",
+    "signInCta": "Sign in",
+    "signUpCta": "Create my account",
+    "noAccount": "No account yet?",
+    "haveAccount": "Already have an account?",
+    "signOut": "Sign out",
+    "errorInvalid": "Incorrect email or password.",
+    "errorExists": "An account with this email already exists.",
+    "errorGeneric": "Something went wrong. Please try again."
   },
   "footer": {
     "tagline": "Multicolor 3D printing — Gland, Switzerland",

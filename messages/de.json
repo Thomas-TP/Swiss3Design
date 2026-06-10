@@ -40,6 +40,7 @@
     "addToCart": "In den Warenkorb",
     "added": "Hinzugefügt ✓",
     "inStock": "An Lager",
+    "outOfStock": "Ausverkauft",
     "onDemand": "Für Sie gedruckt · {days} Tage",
     "multicolorBadge": "Mehrfarbig",
     "material": "Material",
@@ -118,9 +119,46 @@
     "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
   },
   "account": {
-    "title": "Konto",
-    "comingSoon": "Kundenbereich in Vorbereitung",
-    "comingSoonText": "Bald verfügbar: Bestellverfolgung, Offerten und gespeicherte Adressen."
+    "title": "Mein Konto",
+    "greeting": "Hallo {name}",
+    "myOrders": "Meine Bestellungen",
+    "myQuotes": "Meine Offerten",
+    "noOrders": "Noch keine Bestellungen.",
+    "noQuotes": "Noch keine Offertanfragen.",
+    "quotedPrice": "Angebotener Preis",
+    "status": {
+      "pending": "Ausstehend",
+      "paid": "Bezahlt",
+      "in_production": "In Produktion",
+      "shipped": "Versendet",
+      "delivered": "Geliefert",
+      "cancelled": "Storniert"
+    },
+    "quoteStatus": {
+      "received": "Erhalten",
+      "quoted": "Offerte gesendet",
+      "accepted": "Akzeptiert",
+      "paid": "Bezahlt",
+      "in_production": "In Produktion",
+      "done": "Abgeschlossen",
+      "rejected": "Abgelehnt"
+    }
+  },
+  "auth": {
+    "signInTitle": "Anmelden",
+    "signUpTitle": "Konto erstellen",
+    "name": "Vor- und Nachname",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "passwordHint": "Mindestens 8 Zeichen",
+    "signInCta": "Anmelden",
+    "signUpCta": "Konto erstellen",
+    "noAccount": "Noch kein Konto?",
+    "haveAccount": "Bereits ein Konto?",
+    "signOut": "Abmelden",
+    "errorInvalid": "E-Mail oder Passwort falsch.",
+    "errorExists": "Mit dieser E-Mail existiert bereits ein Konto.",
+    "errorGeneric": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
   },
   "footer": {
     "tagline": "Mehrfarbiger 3D-Druck — Gland, Schweiz",

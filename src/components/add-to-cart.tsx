@@ -5,10 +5,27 @@ import { Check, ShoppingBag } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useCart, type CartItem } from "@/lib/cart";
 
-export function AddToCart({ item }: { item: Omit<CartItem, "quantity"> }) {
+export function AddToCart({
+  item,
+  disabled = false,
+}: {
+  item: Omit<CartItem, "quantity">;
+  disabled?: boolean;
+}) {
   const t = useTranslations("product");
   const { add } = useCart();
   const [added, setAdded] = useState(false);
+
+  if (disabled) {
+    return (
+      <button
+        disabled
+        className="flex w-full items-center justify-center gap-2 rounded-full bg-line px-6 py-3.5 text-sm font-semibold text-soft"
+      >
+        {t("outOfStock")}
+      </button>
+    );
+  }
 
   return (
     <button

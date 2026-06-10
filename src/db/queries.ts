@@ -20,6 +20,7 @@ export interface ProductListItem {
   productionDays: number | null;
   material: string;
   multicolor: boolean;
+  stock: number | null;
   name: string;
   description: string;
   imageUrl: string | null;
@@ -80,6 +81,7 @@ export async function getProducts(
       productionDays: products.productionDays,
       material: products.material,
       multicolor: products.multicolor,
+      stock: products.stock,
       name: productTranslations.name,
       description: productTranslations.description,
     })
@@ -110,6 +112,7 @@ export async function getProductBySlug(slug: string, locale: Locale) {
       dimensionsMm: products.dimensionsMm,
       weightGrams: products.weightGrams,
       multicolor: products.multicolor,
+      stock: products.stock,
       name: productTranslations.name,
       description: productTranslations.description,
     })

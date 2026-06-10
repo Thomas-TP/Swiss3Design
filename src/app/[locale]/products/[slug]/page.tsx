@@ -65,12 +65,16 @@ export default async function ProductPage({
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold ${
                 product.saleType === "stock"
-                  ? "bg-emerald-50 text-emerald-700"
+                  ? product.stock === 0
+                    ? "bg-red-50 text-red-600"
+                    : "bg-emerald-50 text-emerald-700"
                   : "bg-amber-50 text-amber-700"
               }`}
             >
               {product.saleType === "stock"
-                ? t("inStock")
+                ? product.stock === 0
+                  ? t("outOfStock")
+                  : t("inStock")
                 : t("onDemand", { days: product.productionDays ?? 3 })}
             </span>
           </div>
@@ -87,6 +91,7 @@ export default async function ProductPage({
 
           <div className="mt-8">
             <AddToCart
+              disabled={product.saleType === "stock" && product.stock === 0}
               item={{
                 productId: product.id,
                 slug: product.slug,

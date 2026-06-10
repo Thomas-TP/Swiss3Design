@@ -1,18 +1,166 @@
-import { CircleUser } from "lucide-react";
+import { CircleUser, Package, FileText, Wrench } from "lucide-react";
+import { desc, eq, or } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
+import { Link, redirect } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
+import { getDb } from "@/db";
+import { orders, quoteRequests } from "@/db/schema";
+import { getServerSession } from "@/lib/session";
+import { formatChf } from "@/lib/format";
+import { SignOutButton } from "./sign-out-button";
 
-export default async function AccountPage() {
-  const t = await getTranslations("account");
+export const dynamic = "force-dynamic";
+
+const statusStyle: Record<string, string> = {
+  pending: "bg-amber-50 text-amber-700",
+  paid: "bg-emerald-50 text-emerald-700",
+  in_production: "bg-blue-50 text-blue-700",
+  shipped: "bg-violet-50 text-violet-700",
+  delivered: "bg-emerald-50 text-emerald-700",
+  cancelled: "bg-red-50 text-red-600",
+  received: "bg-amber-50 text-amber-700",
+  quoted: "bg-blue-50 text-blue-700",
+  accepted: "bg-emerald-50 text-emerald-700",
+  done: "bg-emerald-50 text-emerald-700",
+  rejected: "bg-red-50 text-red-600",
+};
+
+export default async function AccountPage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const { locale } = await params;
+  const session = await getServerSession();
+  if (!session) {
+    redirect({ href: "/account/login", locale });
+  }
+  const { user } = session!;
+
+  const db = await getDb();
+  const [myOrders, myQuotes, t] = await Promise.all([
+    db
+      .select()
+      .from(orders)
+      .where(or(eq(orders.customerId, user.id), eq(orders.email, user.email)))
+      .orderBy(desc(orders.createdAt))
+      .limit(20),
+    db
+      .select()
+      .from(quoteRequests)
+      .where(
+        or(
+          eq(quoteRequests.customerId, user.id),
+          eq(quoteRequests.email, user.email),
+        ),
+      )
+      .orderBy(desc(quoteRequests.createdAt))
+      .limit(20),
+    getTranslations("account"),
+  ]);
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-20 sm:px-6">
-      <div className="rounded-card border border-line bg-surface p-10 text-center">
-        <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-paper ring-1 ring-line">
-          <CircleUser size={26} strokeWidth={1.6} className="text-soft" />
-        </span>
-        <h1 className="mt-6 text-2xl font-bold">{t("comingSoon")}</h1>
-        <p className="mt-3 leading-relaxed text-soft">{t("comingSoonText")}</p>
+    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 md:py-16">
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <span className="grid h-12 w-12 place-items-center rounded-full bg-surface ring-1 ring-line">
+            <CircleUser size={24} strokeWidth={1.6} className="text-soft" />
+          </span>
+          <div>
+            <h1 className="text-xl font-bold">
+              {t("greeting", { name: user.name })}
+            </h1>
+            <p className="text-sm text-soft">{user.email}</p>
+          </div>
+        </div>
+        <SignOutButton />
       </div>
+
+      {user.role === "admin" && (
+        <Link
+          href="/admin"
+          className="mt-6 flex items-center gap-2.5 rounded-card border border-ink bg-ink px-5 py-4 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        >
+          <Wrench size={17} />
+          Administration de la boutique
+        </Link>
+      )}
+
+      <section className="mt-8">
+        <h2 className="flex items-center gap-2 font-semibold">
+          <Package size={17} className="text-soft" />
+          {t("myOrders")}
+        </h2>
+        {myOrders.length === 0 ? (
+          <p className="mt-3 rounded-card border border-line bg-surface p-6 text-sm text-soft">
+            {t("noOrders")}
+          </p>
+        ) : (
+          <ul className="mt-3 divide-y divide-line rounded-card border border-line bg-surface px-5">
+            {myOrders.map((o) => (
+              <li
+                key={o.id}
+                className="flex items-center justify-between gap-3 py-4"
+              >
+                <div>
+                  <p className="text-sm font-semibold">{o.orderNumber}</p>
+                  <p className="text-xs text-soft">
+                    {o.createdAt.toLocaleDateString(`${locale}-CH`)}
+                  </p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusStyle[o.status] ?? "bg-line text-soft"}`}
+                  >
+                    {t(`status.${o.status}`)}
+                  </span>
+                  <span className="text-sm font-semibold tabular-nums">
+                    {formatChf(o.totalCents, locale)}
+                  </span>
+                </div>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
+
+      <section className="mt-8">
+        <h2 className="flex items-center gap-2 font-semibold">
+          <FileText size={17} className="text-soft" />
+          {t("myQuotes")}
+        </h2>
+        {myQuotes.length === 0 ? (
+          <p className="mt-3 rounded-card border border-line bg-surface p-6 text-sm text-soft">
+            {t("noQuotes")}
+          </p>
+        ) : (
+          <ul className="mt-3 divide-y divide-line rounded-card border border-line bg-surface px-5">
+            {myQuotes.map((q) => (
+              <li key={q.id} className="py-4">
+                <div className="flex items-center justify-between gap-3">
+                  <p className="line-clamp-1 text-sm font-medium">
+                    {q.description}
+                  </p>
+                  <span
+                    className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusStyle[q.status] ?? "bg-line text-soft"}`}
+                  >
+                    {t(`quoteStatus.${q.status}`)}
+                  </span>
+                </div>
+                {q.quotedPriceCents != null && (
+                  <p className="mt-1 text-xs text-soft">
+                    {t("quotedPrice")} :{" "}
+                    <span className="font-semibold text-ink">
+                      {formatChf(q.quotedPriceCents, locale)}
+                    </span>
+                    {q.adminMessage && <> — {q.adminMessage}</>}
+                  </p>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }

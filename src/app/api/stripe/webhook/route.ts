@@ -3,6 +3,7 @@ import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { orders } from "@/db/schema";
+import { markOrderPaid } from "@/lib/orders";
 import { getStripe, stripeCryptoProvider } from "@/lib/stripe";
 
 export async function POST(request: Request) {
@@ -36,12 +37,14 @@ export async function POST(request: Request) {
     const orderId = paymentIntent.metadata?.orderId;
     if (orderId) {
       const db = await getDb();
-      await db
-        .update(orders)
-        .set({
-          status: event.type === "payment_intent.succeeded" ? "paid" : "cancelled",
-        })
-        .where(eq(orders.id, orderId));
+      if (event.type === "payment_intent.succeeded") {
+        await markOrderPaid(db, orderId);
+      } else {
+        await db
+          .update(orders)
+          .set({ status: "cancelled" })
+          .where(eq(orders.id, orderId));
+      }
     }
   }
 
