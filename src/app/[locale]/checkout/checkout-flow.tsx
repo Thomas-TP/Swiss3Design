@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { loadStripe, type StripeElementLocale } from "@stripe/stripe-js";
 import {
   Elements,
@@ -8,7 +8,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { ArrowLeft, ArrowRight, Lock, ShoppingBag } from "lucide-react";
+import { ArrowLeft, ArrowRight, Lock, MapPin, ShoppingBag } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/lib/cart";
@@ -23,12 +23,165 @@ const stripePromise = loadStripe(
 const field =
   "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
 
-export function CheckoutFlow() {
+const CANTONS: [string, string][] = [
+  ["AG", "Aargau"],
+  ["AI", "Appenzell Rh.-Int."],
+  ["AR", "Appenzell Rh.-Ext."],
+  ["BE", "Bern"],
+  ["BL", "Basel-Landschaft"],
+  ["BS", "Basel-Stadt"],
+  ["FR", "Fribourg"],
+  ["GE", "Genève"],
+  ["GL", "Glarus"],
+  ["GR", "Graubünden"],
+  ["JU", "Jura"],
+  ["LU", "Luzern"],
+  ["NE", "Neuchâtel"],
+  ["NW", "Nidwalden"],
+  ["OW", "Obwalden"],
+  ["SG", "St. Gallen"],
+  ["SH", "Schaffhausen"],
+  ["SO", "Solothurn"],
+  ["SZ", "Schwyz"],
+  ["TG", "Thurgau"],
+  ["TI", "Ticino"],
+  ["UR", "Uri"],
+  ["VD", "Vaud"],
+  ["VS", "Valais"],
+  ["ZG", "Zug"],
+  ["ZH", "Zürich"],
+];
+const CANTON_CODES = new Set(CANTONS.map(([code]) => code));
+
+export interface CheckoutAddress {
+  name: string;
+  street: string;
+  npa: string;
+  city: string;
+  canton: string;
+}
+
+const EMPTY_ADDRESS: CheckoutAddress = {
+  name: "",
+  street: "",
+  npa: "",
+  city: "",
+  canton: "",
+};
+
+// ── Autocomplétion d'adresse via l'API fédérale geo.admin.ch (gratuite) ─────
+
+interface Suggestion extends CheckoutAddress {
+  label: string;
+}
+
+function parseGeoAdminResult(r: {
+  attrs?: { label?: string; detail?: string };
+}): Suggestion | null {
+  const raw = (r.attrs?.label ?? "").replace(/<[^>]+>/g, "").trim();
+  const m = raw.match(/^(.*?)\s+(\d{4})\s+(.+)$/);
+  if (!m) return null;
+  const cantonMatch = (r.attrs?.detail ?? "").trim().match(/\b([a-z]{2})$/);
+  const canton = cantonMatch ? cantonMatch[1].toUpperCase() : "";
+  return {
+    label: raw,
+    name: "",
+    street: m[1],
+    npa: m[2],
+    city: m[3],
+    canton: CANTON_CODES.has(canton) ? canton : "",
+  };
+}
+
+function StreetAutocomplete({
+  value,
+  onChange,
+  onPick,
+  placeholder,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  onPick: (s: Suggestion) => void;
+  placeholder: string;
+}) {
+  const [items, setItems] = useState<Suggestion[]>([]);
+  const [open, setOpen] = useState(false);
+  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  function handleInput(v: string) {
+    onChange(v);
+    if (timer.current) clearTimeout(timer.current);
+    if (v.trim().length < 3) {
+      setOpen(false);
+      setItems([]);
+      return;
+    }
+    timer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=${encodeURIComponent(v)}&type=locations&origins=address&limit=5`,
+        );
+        const data = (await res.json()) as { results?: unknown[] };
+        const parsed = (data.results ?? [])
+          .map((r) => parseGeoAdminResult(r as Parameters<typeof parseGeoAdminResult>[0]))
+          .filter((s): s is Suggestion => s !== null);
+        setItems(parsed);
+        setOpen(parsed.length > 0);
+      } catch {
+        // API indisponible — la saisie manuelle reste possible
+      }
+    }, 250);
+  }
+
+  return (
+    <div className="relative">
+      <input
+        value={value}
+        onChange={(e) => handleInput(e.target.value)}
+        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        required
+        autoComplete="street-address"
+        placeholder={placeholder}
+        className={field}
+      />
+      {open && (
+        <ul className="absolute z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-line bg-surface shadow-lg shadow-ink/5">
+          {items.map((s) => (
+            <li key={s.label}>
+              <button
+                type="button"
+                onMouseDown={() => {
+                  onPick(s);
+                  setOpen(false);
+                }}
+                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper"
+              >
+                <MapPin size={14} className="shrink-0 text-soft" />
+                {s.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+// ── Flux de commande ─────────────────────────────────────────────────────────
+
+export function CheckoutFlow({
+  initialAddress,
+}: {
+  initialAddress: CheckoutAddress | null;
+}) {
   const t = useTranslations("checkout");
   const locale = useLocale();
   const { items, subtotalCents } = useCart();
   const { data: authSession } = useSession();
 
+  const [addr, setAddr] = useState<CheckoutAddress>(
+    initialAddress ?? EMPTY_ADDRESS,
+  );
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [totalCents, setTotalCents] = useState(0);
   const [submitting, setSubmitting] = useState(false);
@@ -65,12 +218,8 @@ export function CheckoutFlow() {
             quantity: i.quantity,
           })),
           email: formData.get("email"),
-          address: {
-            name: formData.get("name"),
-            street: formData.get("street"),
-            npa: formData.get("npa"),
-            city: formData.get("city"),
-          },
+          address: addr,
+          saveAddress: formData.get("saveAddress") === "on",
           locale,
         }),
       });
@@ -170,22 +319,31 @@ export function CheckoutFlow() {
         </div>
         <div className="space-y-3">
           <input
-            name="name"
+            value={addr.name}
+            onChange={(e) => setAddr({ ...addr, name: e.target.value })}
             required
             autoComplete="name"
             placeholder={t("name")}
             className={field}
           />
-          <input
-            name="street"
-            required
-            autoComplete="street-address"
-            placeholder={t("street")}
-            className={field}
+          <StreetAutocomplete
+            value={addr.street}
+            onChange={(street) => setAddr({ ...addr, street })}
+            onPick={(s) =>
+              setAddr({
+                ...addr,
+                street: s.street,
+                npa: s.npa,
+                city: s.city,
+                canton: s.canton || addr.canton,
+              })
+            }
+            placeholder={t("addressSearch")}
           />
           <div className="grid grid-cols-[110px_1fr] gap-3">
             <input
-              name="npa"
+              value={addr.npa}
+              onChange={(e) => setAddr({ ...addr, npa: e.target.value })}
               required
               inputMode="numeric"
               pattern="\d{4}"
@@ -195,19 +353,49 @@ export function CheckoutFlow() {
               className={field}
             />
             <input
-              name="city"
+              value={addr.city}
+              onChange={(e) => setAddr({ ...addr, city: e.target.value })}
               required
               autoComplete="address-level2"
               placeholder={t("city")}
               className={field}
             />
           </div>
-          <input
-            value={t("countrySwiss")}
-            disabled
-            aria-label={t("country")}
-            className={`${field} cursor-not-allowed bg-paper text-soft`}
-          />
+          <div className="grid grid-cols-2 gap-3">
+            <select
+              value={addr.canton}
+              onChange={(e) => setAddr({ ...addr, canton: e.target.value })}
+              required
+              aria-label={t("canton")}
+              className={`${field} ${addr.canton ? "" : "text-soft/60"}`}
+            >
+              <option value="" disabled>
+                {t("canton")}
+              </option>
+              {CANTONS.map(([code, name]) => (
+                <option key={code} value={code}>
+                  {code} — {name}
+                </option>
+              ))}
+            </select>
+            <input
+              value={t("countrySwiss")}
+              disabled
+              aria-label={t("country")}
+              className={`${field} cursor-not-allowed bg-paper text-soft`}
+            />
+          </div>
+          {authSession && (
+            <label className="flex items-center gap-2.5 text-sm font-medium">
+              <input
+                type="checkbox"
+                name="saveAddress"
+                defaultChecked
+                className="h-4 w-4 accent-[#da291c]"
+              />
+              {t("saveAddress")}
+            </label>
+          )}
         </div>
       </div>
 

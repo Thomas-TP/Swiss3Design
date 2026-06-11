@@ -16,7 +16,8 @@ export default async function TermsPage({
         <p>
           Les présentes conditions générales de vente (« CGV ») régissent les
           commandes passées sur la boutique en ligne <strong>swiss3design.ch</strong>,
-          exploitée par Swiss3Design, Gland (Vaud), Suisse (« l'exploitant »),
+          exploitée par <strong>Swiss3Design, Thomas Prud'homme, Chemin de
+          l'Aubépine 9B, 1196 Gland (Vaud), Suisse</strong> (« l'exploitant »),
           joignable à l'adresse contact@swiss3design.ch. En passant commande,
           le client accepte les présentes CGV dans leur version en vigueur au
           moment de la commande.

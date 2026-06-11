@@ -14,6 +14,7 @@ interface Address {
   street?: string;
   npa?: string;
   city?: string;
+  canton?: string;
 }
 
 export default async function AdminOrderDetailPage({
@@ -115,7 +116,8 @@ export default async function AdminOrderDetailPage({
           <br />
           {address.street}
           <br />
-          {address.npa} {address.city}, Suisse
+          {address.npa} {address.city}
+          {address.canton ? ` (${address.canton})` : ""}, Suisse
         </p>
       </section>
 

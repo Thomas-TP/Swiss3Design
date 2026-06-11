@@ -251,6 +251,21 @@ export const account = sqliteTable(
   (t) => [index("account_user_idx").on(t.userId)],
 );
 
+// Adresse de livraison enregistrée (une par client, proposée au checkout)
+export const customerAddresses = sqliteTable("customer_addresses", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  name: text("name").notNull(),
+  street: text("street").notNull(),
+  npa: text("npa").notNull(),
+  city: text("city").notNull(),
+  canton: text("canton").notNull().default(""),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
 export const verification = sqliteTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),

@@ -2,7 +2,13 @@ import { z } from "zod";
 import { and, eq, inArray } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
-import { orders, orderItems, products, productTranslations } from "@/db/schema";
+import {
+  orders,
+  orderItems,
+  products,
+  productTranslations,
+  customerAddresses,
+} from "@/db/schema";
 import { getSetting } from "@/db/queries";
 import { getStripe } from "@/lib/stripe";
 import { getAuth } from "@/lib/auth";
@@ -24,7 +30,13 @@ const bodySchema = z.object({
     street: z.string().min(3).max(200),
     npa: z.string().regex(/^\d{4}$/),
     city: z.string().min(2).max(120),
+    canton: z
+      .string()
+      .regex(/^[A-Z]{2}$/)
+      .or(z.literal(""))
+      .default(""),
   }),
+  saveAddress: z.boolean().optional(),
   locale: z.enum(["fr", "de", "it", "en"]).catch("fr"),
 });
 
@@ -38,7 +50,7 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return Response.json({ error: "invalid_request" }, { status: 400 });
   }
-  const { items, email, address, locale } = parsed.data;
+  const { items, email, address, saveAddress, locale } = parsed.data;
 
   const db = await getDb();
   const ids = items.map((i) => i.productId);
@@ -96,6 +108,17 @@ export async function POST(request: Request) {
   // Rattache la commande au compte connecté, le cas échéant
   const auth = await getAuth();
   const authSession = await auth.api.getSession({ headers: request.headers });
+
+  // Mémorise l'adresse pour les prochaines commandes si demandé
+  if (authSession && saveAddress) {
+    await db
+      .insert(customerAddresses)
+      .values({ userId: authSession.user.id, ...address })
+      .onConflictDoUpdate({
+        target: customerAddresses.userId,
+        set: { ...address, updatedAt: new Date() },
+      });
+  }
 
   const orderNumber = makeOrderNumber();
   const [order] = await db

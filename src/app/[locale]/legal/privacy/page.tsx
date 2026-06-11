@@ -14,9 +14,10 @@ export default async function PrivacyPage({
     <LegalPage locale={locale} title={t("privacy")} updated="11 juin 2026">
       <Section n={1} title="Responsable du traitement">
         <p>
-          Swiss3Design, Gland (Vaud), Suisse — contact@swiss3design.ch. La
-          présente politique décrit le traitement des données personnelles
-          conformément à la loi fédérale sur la protection des données (nLPD).
+          Swiss3Design, Thomas Prud'homme, Chemin de l'Aubépine 9B, 1196 Gland
+          (Vaud), Suisse — contact@swiss3design.ch. La présente politique
+          décrit le traitement des données personnelles conformément à la loi
+          fédérale sur la protection des données (nLPD).
         </p>
       </Section>
 

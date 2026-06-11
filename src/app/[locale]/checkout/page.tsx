@@ -1,8 +1,35 @@
+import { eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
-import { CheckoutFlow } from "./checkout-flow";
+import { getDb } from "@/db";
+import { customerAddresses } from "@/db/schema";
+import { getServerSession } from "@/lib/session";
+import { CheckoutFlow, type CheckoutAddress } from "./checkout-flow";
+
+export const dynamic = "force-dynamic";
 
 export default async function CheckoutPage() {
   const t = await getTranslations("checkout");
+
+  // Adresse enregistrée du client connecté, proposée en préremplissage
+  let initialAddress: CheckoutAddress | null = null;
+  const session = await getServerSession();
+  if (session) {
+    const db = await getDb();
+    const [saved] = await db
+      .select()
+      .from(customerAddresses)
+      .where(eq(customerAddresses.userId, session.user.id))
+      .limit(1);
+    if (saved) {
+      initialAddress = {
+        name: saved.name,
+        street: saved.street,
+        npa: saved.npa,
+        city: saved.city,
+        canton: saved.canton,
+      };
+    }
+  }
 
   return (
     <div className="mx-auto max-w-xl px-4 py-10 sm:px-6 md:py-16">
@@ -10,7 +37,7 @@ export default async function CheckoutPage() {
         {t("title")}
       </h1>
       <div className="mt-8">
-        <CheckoutFlow />
+        <CheckoutFlow initialAddress={initialAddress} />
       </div>
     </div>
   );
