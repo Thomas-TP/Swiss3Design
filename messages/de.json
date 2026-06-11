@@ -84,6 +84,7 @@
     "paymentTitle": "Sichere Zahlung",
     "payNow": "{amount} bezahlen",
     "processing": "Wird verarbeitet…",
+    "termsPrefix": "Mit Ihrer Zahlung akzeptieren Sie unsere",
     "back": "Zurück zum Warenkorb",
     "emptyCart": "Ihr Warenkorb ist leer.",
     "errorGeneric": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",

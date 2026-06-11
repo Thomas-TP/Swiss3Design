@@ -4,6 +4,9 @@ export interface EmailMessage {
   to: string;
   subject: string;
   html: string;
+  // Expéditeur spécifique (sinon EMAIL_FROM) : commandes@ pour les ventes,
+  // contact@ pour les e-mails de compte et les devis.
+  from?: string;
 }
 
 // Envoi via l'API REST Resend. Sans RESEND_API_KEY, l'envoi est ignoré
@@ -22,7 +25,7 @@ export async function sendEmail(message: EmailMessage): Promise<boolean> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: env.EMAIL_FROM || "Swiss3Design <onboarding@resend.dev>",
+      from: message.from || env.EMAIL_FROM || "Swiss3Design <onboarding@resend.dev>",
       to: message.to,
       subject: message.subject,
       html: message.html,

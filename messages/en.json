@@ -84,6 +84,7 @@
     "paymentTitle": "Secure payment",
     "payNow": "Pay {amount}",
     "processing": "Processing…",
+    "termsPrefix": "By paying, you accept our",
     "back": "Back to cart",
     "emptyCart": "Your cart is empty.",
     "errorGeneric": "Something went wrong. Please try again.",

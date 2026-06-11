@@ -84,6 +84,7 @@
     "paymentTitle": "Pagamento sicuro",
     "payNow": "Paga {amount}",
     "processing": "Elaborazione…",
+    "termsPrefix": "Pagando accettate le nostre",
     "back": "Torna al carrello",
     "emptyCart": "Il carrello è vuoto.",
     "errorGeneric": "Si è verificato un errore. Riprovate per favore.",

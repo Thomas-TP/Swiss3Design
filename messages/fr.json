@@ -84,6 +84,7 @@
     "paymentTitle": "Paiement sécurisé",
     "payNow": "Payer {amount}",
     "processing": "Traitement…",
+    "termsPrefix": "En payant, vous acceptez nos",
     "back": "Retour au panier",
     "emptyCart": "Votre panier est vide.",
     "errorGeneric": "Une erreur est survenue. Merci de réessayer.",

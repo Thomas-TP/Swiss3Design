@@ -239,6 +239,7 @@ export function CheckoutFlow() {
 
 function PaymentStep({ totalCents }: { totalCents: number }) {
   const t = useTranslations("checkout");
+  const tFooter = useTranslations("footer");
   const locale = useLocale();
   const stripe = useStripe();
   const elements = useElements();
@@ -281,6 +282,16 @@ function PaymentStep({ totalCents }: { totalCents: number }) {
           ? t("processing")
           : t("payNow", { amount: formatChf(totalCents, locale) })}
       </button>
+      <p className="text-center text-xs text-soft">
+        {t("termsPrefix")}{" "}
+        <Link
+          href="/legal/terms"
+          className="underline transition-colors hover:text-ink"
+        >
+          {tFooter("terms")}
+        </Link>
+        .
+      </p>
     </div>
   );
 }

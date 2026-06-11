@@ -1,4 +1,5 @@
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 export function Footer() {
   const t = useTranslations("footer");
@@ -16,12 +17,26 @@ export function Footer() {
             </p>
             <p className="mt-1 text-sm text-soft">{t("tagline")}</p>
           </div>
-          <a
-            href="mailto:contact@swiss3design.ch"
-            className="text-sm font-medium text-soft transition-colors hover:text-ink"
-          >
-            contact@swiss3design.ch
-          </a>
+          <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium text-soft">
+            <Link
+              href="/legal/terms"
+              className="transition-colors hover:text-ink"
+            >
+              {t("terms")}
+            </Link>
+            <Link
+              href="/legal/privacy"
+              className="transition-colors hover:text-ink"
+            >
+              {t("privacy")}
+            </Link>
+            <a
+              href="mailto:contact@swiss3design.ch"
+              className="transition-colors hover:text-ink"
+            >
+              {t("contact")}
+            </a>
+          </nav>
         </div>
         <p className="mt-8 text-xs text-soft">
           {t("copyright", { year: new Date().getFullYear() })}

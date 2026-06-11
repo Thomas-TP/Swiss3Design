@@ -5,6 +5,11 @@ import type { EmailMessage } from "./email";
 
 type Locale = "fr" | "de" | "it" | "en";
 
+// Expéditeurs : commandes@ pour tout ce qui touche aux ventes,
+// contact@ pour le compte client et les devis.
+const FROM_ORDERS = "Swiss3Design <commandes@swiss3design.ch>";
+const FROM_CONTACT = "Swiss3Design <contact@swiss3design.ch>";
+
 function chf(cents: number): string {
   return (cents / 100).toFixed(2) + " CHF";
 }
@@ -144,6 +149,7 @@ export function orderConfirmationEmail(
 
   return {
     to: order.email,
+    from: FROM_ORDERS,
     subject: t.subject.replace("{n}", order.orderNumber),
     html: layout(t.title, body, FOOTER[locale]),
   };
@@ -185,6 +191,7 @@ export function orderShippedEmail(order: OrderForEmail): EmailMessage {
   const body = `<p style="margin:0;color:#44403c;line-height:1.6;">${t.body.replace("{n}", order.orderNumber)}</p>`;
   return {
     to: order.email,
+    from: FROM_ORDERS,
     subject: t.subject.replace("{n}", order.orderNumber),
     html: layout(t.title, body, FOOTER[locale]),
   };
@@ -257,6 +264,7 @@ export function quoteReplyEmail(quote: {
     <p style="margin:0;font-size:13px;color:#78716c;line-height:1.6;">${t.cta}</p>`;
   return {
     to: quote.email,
+    from: FROM_CONTACT,
     subject: t.subject,
     html: layout(t.title, body, FOOTER[locale]),
   };
@@ -283,6 +291,7 @@ export function resetPasswordEmail(to: string, url: string): EmailMessage {
     </p>`;
   return {
     to,
+    from: FROM_CONTACT,
     subject: "Réinitialisation de votre mot de passe — Swiss3Design",
     html: layout("Nouveau mot de passe", body, FOOTER.fr),
   };
@@ -307,6 +316,7 @@ export function verificationEmail(to: string, url: string): EmailMessage {
     </p>`;
   return {
     to,
+    from: FROM_CONTACT,
     subject: "Confirmez votre e-mail — Swiss3Design",
     html: layout("Confirmez votre adresse", body, FOOTER.fr),
   };
