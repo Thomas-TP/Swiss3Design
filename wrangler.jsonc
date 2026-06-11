@@ -9,6 +9,12 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
+  "routes": [
+    { "pattern": "swiss3design.ch", "custom_domain": true },
+    { "pattern": "www.swiss3design.ch", "custom_domain": true }
+  ],
+  // workers.dev maintenu pendant la transition vers le domaine
+  "workers_dev": true,
   "d1_databases": [
     {
       "binding": "DB",
@@ -39,7 +45,7 @@
     "enabled": true
   },
   "vars": {
-    "BETTER_AUTH_URL": "https://swiss3design.thomastp.workers.dev",
+    "BETTER_AUTH_URL": "https://swiss3design.ch",
     // Les comptes créés avec ces e-mails reçoivent automatiquement le rôle admin
     "ADMIN_EMAILS": "t@prudhomme.li",
     // À passer sur une adresse @swiss3design.ch une fois le domaine vérifié chez Resend
