@@ -262,6 +262,32 @@ export function quoteReplyEmail(quote: {
   };
 }
 
+// ── Réinitialisation du mot de passe (FR + EN, locale inconnue) ──────────────
+
+export function resetPasswordEmail(to: string, url: string): EmailMessage {
+  const body = `
+    <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
+      Vous avez demandé à réinitialiser votre mot de passe Swiss3Design.
+      Cliquez sur le bouton ci-dessous pour en choisir un nouveau.
+      Ce lien expire dans une heure.
+    </p>
+    <p style="margin:0 0 18px;text-align:center;">
+      <a href="${url}" style="display:inline-block;background:#da291c;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:13px 28px;border-radius:999px;">
+        Réinitialiser mon mot de passe
+      </a>
+    </p>
+    <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">
+      You requested a password reset — click the button above (link expires in 1 hour).<br/>
+      Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail :
+      votre mot de passe reste inchangé.
+    </p>`;
+  return {
+    to,
+    subject: "Réinitialisation de votre mot de passe — Swiss3Design",
+    html: layout("Nouveau mot de passe", body, FOOTER.fr),
+  };
+}
+
 // ── Vérification d'adresse e-mail (FR + EN, locale inconnue à l'inscription) ─
 
 export function verificationEmail(to: string, url: string): EmailMessage {

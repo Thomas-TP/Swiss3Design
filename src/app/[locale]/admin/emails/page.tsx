@@ -4,6 +4,7 @@ import {
   orderShippedEmail,
   quoteReplyEmail,
   verificationEmail,
+  resetPasswordEmail,
 } from "@/lib/email-templates";
 
 const PREVIEW_LOCALES = ["fr", "de", "it", "en"] as const;
@@ -67,6 +68,12 @@ export default async function AdminEmailsPage({
       desc: "Envoyé à l'inscription pour confirmer l'adresse (FR/EN, langue inconnue à ce stade).",
       email: verificationEmail("client@example.ch", "#"),
       height: 460,
+    },
+    {
+      title: "Mot de passe oublié",
+      desc: "Envoyé quand un client demande la réinitialisation de son mot de passe (lien valable 1 h).",
+      email: resetPasswordEmail("client@example.ch", "#"),
+      height: 480,
     },
   ];
 

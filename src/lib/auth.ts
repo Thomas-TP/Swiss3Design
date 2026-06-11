@@ -5,7 +5,7 @@ import { drizzle } from "drizzle-orm/d1";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import * as schema from "@/db/schema";
 import { sendEmail } from "./email";
-import { verificationEmail } from "./email-templates";
+import { verificationEmail, resetPasswordEmail } from "./email-templates";
 
 function adminEmails(env: CloudflareEnv): string[] {
   return (env.ADMIN_EMAILS ?? "")
@@ -65,6 +65,9 @@ export async function getAuth() {
       enabled: true,
       minPasswordLength: 8,
       requireEmailVerification: canSendEmails,
+      sendResetPassword: async ({ user, url }) => {
+        await sendEmail(resetPasswordEmail(user.email, url));
+      },
     },
     emailVerification: {
       sendOnSignUp: canSendEmails,
