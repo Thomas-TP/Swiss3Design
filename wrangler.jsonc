@@ -41,6 +41,8 @@
   "vars": {
     "BETTER_AUTH_URL": "https://swiss3design.thomastp.workers.dev",
     // Les comptes créés avec ces e-mails reçoivent automatiquement le rôle admin
-    "ADMIN_EMAILS": "t@prudhomme.li"
+    "ADMIN_EMAILS": "t@prudhomme.li",
+    // À passer sur une adresse @swiss3design.ch une fois le domaine vérifié chez Resend
+    "EMAIL_FROM": "Swiss3Design <onboarding@resend.dev>"
   }
 }

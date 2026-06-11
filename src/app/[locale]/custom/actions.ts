@@ -11,6 +11,8 @@ const schema = z.object({
   material: z.string().max(100).optional(),
   colors: z.string().max(200).optional(),
   dimensions: z.string().max(200).optional(),
+  fileKey: z.string().startsWith("quotes/").max(300).optional(),
+  fileName: z.string().max(200).optional(),
   locale: z.enum(["fr", "de", "it", "en"]).catch("fr"),
 });
 
@@ -28,6 +30,8 @@ export async function submitQuoteRequest(
     material: (formData.get("material") as string) || undefined,
     colors: (formData.get("colors") as string) || undefined,
     dimensions: (formData.get("dimensions") as string) || undefined,
+    fileKey: (formData.get("fileKey") as string) || undefined,
+    fileName: (formData.get("fileName") as string) || undefined,
     locale: formData.get("locale"),
   });
 
@@ -38,8 +42,10 @@ export async function submitQuoteRequest(
   try {
     const session = await getServerSession();
     const db = await getDb();
+    const { fileKey, ...rest } = parsed.data;
     await db.insert(quoteRequests).values({
-      ...parsed.data,
+      ...rest,
+      fileUrl: fileKey ?? null,
       customerId: session?.user.id ?? null,
     });
     return { status: "success" };

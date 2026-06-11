@@ -25,7 +25,13 @@ export function LoginForm() {
       password: String(data.get("password")),
     });
     if (err) {
-      setError(err.status === 401 ? t("errorInvalid") : t("errorGeneric"));
+      setError(
+        err.status === 403
+          ? t("errorUnverified")
+          : err.status === 401
+            ? t("errorInvalid")
+            : t("errorGeneric"),
+      );
       setPending(false);
       return;
     }

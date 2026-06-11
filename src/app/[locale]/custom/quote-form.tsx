@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState } from "react";
-import { CheckCircle2, Send } from "lucide-react";
+import { useActionState, useState } from "react";
+import { CheckCircle2, Send, Paperclip, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useSession } from "@/lib/auth-client";
 import { submitQuoteRequest, type QuoteFormState } from "./actions";
@@ -17,6 +17,29 @@ export function QuoteForm() {
     submitQuoteRequest,
     { status: "idle" },
   );
+  const [file, setFile] = useState<{ key: string; name: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  const [fileError, setFileError] = useState(false);
+
+  async function onFile(input: HTMLInputElement) {
+    const selected = input.files?.[0];
+    if (!selected) return;
+    setUploading(true);
+    setFileError(false);
+    try {
+      const body = new FormData();
+      body.append("file", selected);
+      const res = await fetch("/api/quote-upload", { method: "POST", body });
+      if (!res.ok) throw new Error();
+      const data = (await res.json()) as { key: string; fileName: string };
+      setFile({ key: data.key, name: data.fileName });
+    } catch {
+      setFileError(true);
+    } finally {
+      setUploading(false);
+      input.value = "";
+    }
+  }
 
   if (state.status === "success") {
     return (
@@ -108,6 +131,48 @@ export function QuoteForm() {
           placeholder={t("dimensionsPlaceholder")}
           className={field}
         />
+      </div>
+
+      <div>
+        <span className="mb-1.5 block text-sm font-semibold">
+          {t("file")}{" "}
+          <span className="font-normal text-soft">({t("optional")})</span>
+        </span>
+        {file ? (
+          <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-sm">
+            <span className="flex min-w-0 items-center gap-2">
+              <Paperclip size={15} className="shrink-0 text-soft" />
+              <span className="truncate font-medium">{file.name}</span>
+            </span>
+            <button
+              type="button"
+              onClick={() => setFile(null)}
+              aria-label="×"
+              className="rounded-full p-1 text-soft transition-colors hover:bg-line/60 hover:text-accent"
+            >
+              <X size={15} />
+            </button>
+          </div>
+        ) : (
+          <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line px-4 py-4 text-sm font-medium text-soft transition-colors hover:border-ink hover:text-ink">
+            <Paperclip size={16} />
+            {uploading ? t("fileUploading") : t("fileHint")}
+            <input
+              type="file"
+              accept=".stl,.3mf,.obj,.step,.stp"
+              disabled={uploading}
+              onChange={(e) => onFile(e.currentTarget)}
+              className="hidden"
+            />
+          </label>
+        )}
+        {fileError && (
+          <p className="mt-1.5 text-xs font-medium text-accent">
+            {t("fileError")}
+          </p>
+        )}
+        {file && <input type="hidden" name="fileKey" value={file.key} />}
+        {file && <input type="hidden" name="fileName" value={file.name} />}
       </div>
 
       {state.status === "error" && (

@@ -1,15 +1,17 @@
 import { eq } from "drizzle-orm";
 import type { getDb } from "@/db";
 import { orders, orderItems, products, inventoryLog } from "@/db/schema";
+import { sendEmail } from "./email";
+import { orderConfirmationEmail } from "./email-templates";
 
 type Db = Awaited<ReturnType<typeof getDb>>;
 
-// Passe la commande en "payée" et décrémente le stock — idempotent :
-// appelé par le webhook Stripe ET par la page de confirmation (filet),
-// le premier arrivé fait le travail, le second ne fait rien.
+// Passe la commande en "payée", décrémente le stock et envoie l'e-mail de
+// confirmation — idempotent : appelé par le webhook Stripe ET par la page
+// de confirmation (filet), le premier arrivé fait le travail.
 export async function markOrderPaid(db: Db, orderId: string) {
   const [order] = await db
-    .select({ status: orders.status })
+    .select()
     .from(orders)
     .where(eq(orders.id, orderId))
     .limit(1);
@@ -40,5 +42,12 @@ export async function markOrderPaid(db: Db, orderId: string) {
       delta: -item.quantity,
       reason: "order",
     });
+  }
+
+  // L'échec d'envoi d'e-mail ne doit jamais faire échouer le paiement
+  try {
+    await sendEmail(orderConfirmationEmail(order, items));
+  } catch (e) {
+    console.error("[email confirmation commande]", e);
   }
 }

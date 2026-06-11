@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { UserPlus } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { UserPlus, MailCheck } from "lucide-react";
+import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { signUp } from "@/lib/auth-client";
 
@@ -11,27 +11,47 @@ const field =
 
 export function RegisterForm() {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [verifyNotice, setVerifyNotice] = useState(false);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setPending(true);
     setError(null);
     const data = new FormData(e.currentTarget);
-    const { error: err } = await signUp.email({
+    const { data: result, error: err } = await signUp.email({
       name: String(data.get("name")),
       email: String(data.get("email")),
       password: String(data.get("password")),
+      callbackURL: `/${locale}/account`,
     });
     if (err) {
       setError(err.status === 422 ? t("errorExists") : t("errorGeneric"));
       setPending(false);
       return;
     }
+    // Sans token = vérification d'e-mail requise avant connexion
+    if (!result?.token) {
+      setVerifyNotice(true);
+      setPending(false);
+      return;
+    }
     router.push("/account");
     router.refresh();
+  }
+
+  if (verifyNotice) {
+    return (
+      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+        <MailCheck size={28} className="mx-auto text-emerald-600" />
+        <p className="mt-3 text-sm font-medium leading-relaxed text-emerald-800">
+          {t("verifyNotice")}
+        </p>
+      </div>
+    );
   }
 
   return (

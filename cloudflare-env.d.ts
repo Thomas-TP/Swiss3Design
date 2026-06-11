@@ -16,6 +16,14 @@ declare global {
     BETTER_AUTH_SECRET: string;
     BETTER_AUTH_URL: string;
     ADMIN_EMAILS: string;
+    RESEND_API_KEY?: string;
+    EMAIL_FROM?: string;
+    GOOGLE_CLIENT_ID?: string;
+    GOOGLE_CLIENT_SECRET?: string;
+    APPLE_CLIENT_ID?: string;
+    APPLE_CLIENT_SECRET?: string;
+    FACEBOOK_CLIENT_ID?: string;
+    FACEBOOK_CLIENT_SECRET?: string;
   }
 }
 

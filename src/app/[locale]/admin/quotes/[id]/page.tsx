@@ -65,9 +65,12 @@ export default async function AdminQuoteDetailPage({
         )}
         {quote.fileUrl && (
           <p className="mt-3 border-t border-line pt-3">
-            Fichier :{" "}
-            <a href={quote.fileUrl} className="font-medium underline">
-              {quote.fileName ?? quote.fileUrl}
+            Fichier 3D :{" "}
+            <a
+              href={`/api/admin/files/${quote.fileUrl}`}
+              className="font-medium underline"
+            >
+              {quote.fileName ?? "télécharger"} ⬇
             </a>
           </p>
         )}

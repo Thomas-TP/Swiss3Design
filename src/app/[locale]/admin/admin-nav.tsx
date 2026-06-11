@@ -5,6 +5,7 @@ import {
   Package,
   ShoppingCart,
   FileText,
+  Mail,
   Settings,
 } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
@@ -14,6 +15,7 @@ const tabs = [
   { href: "/admin/products", label: "Produits", Icon: Package },
   { href: "/admin/orders", label: "Commandes", Icon: ShoppingCart },
   { href: "/admin/quotes", label: "Devis", Icon: FileText },
+  { href: "/admin/emails", label: "E-mails", Icon: Mail },
   { href: "/admin/settings", label: "Réglages", Icon: Settings },
 ] as const;
 
