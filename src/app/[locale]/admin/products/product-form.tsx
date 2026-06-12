@@ -1,9 +1,8 @@
 "use client";
 
-import { useActionState, useRef, useState } from "react";
-import { useLocale } from "next-intl";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, Save, Trash2, Upload, X } from "lucide-react";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import {
   saveProduct,
   deleteProduct,
@@ -48,15 +47,23 @@ export function ProductForm({
   categories: { id: string; name: string }[];
   initial?: ProductFormInitial;
 }) {
-  const uiLocale = useLocale();
+  const router = useRouter();
   const [state, formAction, pending] = useActionState<ProductFormState, FormData>(
     saveProduct,
     {},
   );
 
+  // Navigation côté client après succès : redirect() dans l'action
+  // laissait l'interface figée sur Cloudflare Workers.
+  useEffect(() => {
+    if (state.success) {
+      router.push("/admin/products");
+      router.refresh();
+    }
+  }, [state.success, router]);
+
   return (
     <form action={formAction} className="space-y-8">
-      <input type="hidden" name="ui_locale" value={uiLocale} />
       {initial && <input type="hidden" name="id" value={initial.id} />}
 
       {/* Informations générales */}
@@ -259,22 +266,30 @@ export function ProductForm({
         <Link href="/admin/products" className={BTN_GHOST}>
           Annuler
         </Link>
-        {initial && <DeleteButton />}
+        {initial && <DeleteButton id={initial.id} />}
       </div>
     </form>
   );
 }
 
-function DeleteButton() {
-  // L'id et ui_locale viennent des champs cachés du formulaire parent
+function DeleteButton({ id }: { id: string }) {
+  const router = useRouter();
+  const [deleting, setDeleting] = useState(false);
+
   return (
     <button
-      type="submit"
-      formAction={deleteProduct}
-      formNoValidate
-      onClick={(e) => {
-        if (!confirm("Supprimer définitivement ce produit ?")) {
-          e.preventDefault();
+      type="button"
+      disabled={deleting}
+      onClick={async () => {
+        if (!confirm("Supprimer définitivement ce produit ?")) return;
+        setDeleting(true);
+        try {
+          await deleteProduct(id);
+          router.push("/admin/products");
+          router.refresh();
+        } catch {
+          setDeleting(false);
+          alert("Échec de la suppression, réessayez.");
         }
       }}
       className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-red-200 bg-red-50 px-4 py-2 text-xs font-semibold text-accent transition-colors hover:bg-red-100"
@@ -300,11 +315,25 @@ function ImageManager({ initial }: { initial: Img[] }) {
       body.append("file", file);
       try {
         const res = await fetch("/api/admin/upload", { method: "POST", body });
-        if (!res.ok) throw new Error();
+        if (!res.ok) {
+          const reason =
+            res.status === 413
+              ? "fichier trop lourd (max 8 Mo)"
+              : res.status === 415
+                ? "format non supporté (JPG, PNG, WebP, AVIF ou SVG)"
+                : res.status === 403
+                  ? "session expirée — reconnectez-vous"
+                  : `erreur serveur (${res.status})`;
+          throw new Error(reason);
+        }
         const { url } = (await res.json()) as { url: string };
         setImages((prev) => [...prev, { url }]);
-      } catch {
-        setError(`Échec de l'envoi de ${file.name}`);
+      } catch (e) {
+        const reason =
+          e instanceof Error && e.message
+            ? e.message
+            : "connexion interrompue";
+        setError(`Échec de l'envoi de ${file.name} : ${reason}`);
       }
     }
     setUploading(false);

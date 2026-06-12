@@ -13,7 +13,7 @@ export default async function AdminQuoteDetailPage({
 }: {
   params: Promise<{ locale: Locale; id: string }>;
 }) {
-  const { locale, id } = await params;
+  const { id } = await params;
   const db = await getDb();
 
   const [quote] = await db
@@ -82,7 +82,6 @@ export default async function AdminQuoteDetailPage({
       >
         <h3 className="font-semibold">Réponse</h3>
         <input type="hidden" name="id" value={quote.id} />
-        <input type="hidden" name="ui_locale" value={locale} />
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">Statut</span>

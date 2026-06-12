@@ -2,7 +2,6 @@
 
 import { z } from "zod";
 import { eq } from "drizzle-orm";
-import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import {
@@ -16,6 +15,10 @@ import { requireAdmin } from "@/lib/session";
 
 export interface ProductFormState {
   error?: string;
+  // La navigation après succès se fait côté client (router.push) :
+  // redirect() dans une action useActionState peut laisser l'UI figée
+  // sur le runtime Cloudflare Workers.
+  success?: boolean;
 }
 
 const imagesSchema = z
@@ -55,7 +58,6 @@ export async function saveProduct(
 ): Promise<ProductFormState> {
   await requireAdmin();
 
-  const locale = String(formData.get("ui_locale") || "fr");
   const id = String(formData.get("id") || "");
   const nameFr = String(formData.get("name_fr") || "").trim();
   const descFr = String(formData.get("desc_fr") || "").trim();
@@ -68,7 +70,7 @@ export async function saveProduct(
     return { error: "Prix invalide." };
   }
 
-  let slug = slugify(String(formData.get("slug") || "")) || slugify(nameFr);
+  const slug = slugify(String(formData.get("slug") || "")) || slugify(nameFr);
   if (!slug) return { error: "Slug invalide." };
 
   const saleType =
@@ -166,18 +168,19 @@ export async function saveProduct(
     return { error: "Erreur lors de l'enregistrement." };
   }
 
-  redirect(`/${locale}/admin/products`);
+  revalidatePath("/", "layout");
+  return { success: true };
 }
 
-export async function deleteProduct(formData: FormData) {
+// Appelée directement depuis le client (pas via <form>) : la navigation
+// après suppression est gérée par l'appelant.
+export async function deleteProduct(id: string): Promise<void> {
   await requireAdmin();
-  const id = String(formData.get("id") || "");
-  const locale = String(formData.get("ui_locale") || "fr");
   if (id) {
     const db = await getDb();
     await db.delete(products).where(eq(products.id, id));
   }
-  redirect(`/${locale}/admin/products`);
+  revalidatePath("/", "layout");
 }
 
 export async function toggleProductActive(formData: FormData) {

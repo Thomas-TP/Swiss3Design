@@ -2,7 +2,6 @@
 
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
-import { redirect } from "next/navigation";
 import { getDb } from "@/db";
 import { quoteRequests } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
@@ -13,7 +12,6 @@ import { QUOTE_STATUSES } from "../ui";
 export async function updateQuote(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id") || "");
-  const uiLocale = String(formData.get("ui_locale") || "fr");
   const status = String(formData.get("status") || "");
   if (!id || !(QUOTE_STATUSES as readonly string[]).includes(status)) {
     revalidatePath("/", "layout");
@@ -67,5 +65,7 @@ export async function updateQuote(formData: FormData) {
     }
   }
 
-  redirect(`/${uiLocale}/admin/quotes`);
+  // Pas de redirect() ici : dans une action de formulaire, il peut laisser
+  // l'UI figée sur Cloudflare Workers. On reste sur la page, rafraîchie.
+  revalidatePath("/", "layout");
 }
