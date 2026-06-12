@@ -2,7 +2,12 @@ import { Link } from "@/i18n/navigation";
 import {
   orderConfirmationEmail,
   orderShippedEmail,
+  orderDeliveredEmail,
+  orderCancelledEmail,
   quoteReplyEmail,
+  quoteRejectedEmail,
+  adminNewOrderEmail,
+  adminNewQuoteEmail,
   verificationEmail,
   resetPasswordEmail,
 } from "@/lib/email-templates";
@@ -22,6 +27,7 @@ export default async function AdminEmailsPage({
     : "fr";
 
   const sampleOrder = {
+    id: "demo",
     orderNumber: "S3D-DEMO42",
     email: "client@example.ch",
     subtotalCents: 4980,
@@ -40,7 +46,7 @@ export default async function AdminEmailsPage({
     { nameSnapshot: "Porte-clés relief", priceCentsSnapshot: 995, quantity: 2 },
   ];
 
-  const previews = [
+  const customerPreviews = [
     {
       title: "Confirmation de commande",
       desc: "Envoyé automatiquement au client dès que son paiement est validé.",
@@ -49,9 +55,21 @@ export default async function AdminEmailsPage({
     },
     {
       title: "Commande expédiée",
-      desc: "Envoyé quand vous passez une commande au statut « Expédiée ».",
-      email: orderShippedEmail(sampleOrder),
-      height: 360,
+      desc: "Envoyé quand vous passez une commande au statut « Expédiée » — avec le n° de suivi Poste s'il est renseigné.",
+      email: orderShippedEmail(sampleOrder, "99.60.123456.78901234"),
+      height: 560,
+    },
+    {
+      title: "Commande livrée",
+      desc: "Envoyé quand vous passez une commande au statut « Livrée ».",
+      email: orderDeliveredEmail(sampleOrder),
+      height: 380,
+    },
+    {
+      title: "Commande annulée",
+      desc: "Envoyé quand vous annulez une commande déjà payée (le remboursement se fait dans Stripe).",
+      email: orderCancelledEmail(sampleOrder),
+      height: 380,
     },
     {
       title: "Devis prêt",
@@ -64,6 +82,17 @@ export default async function AdminEmailsPage({
           "Impression en PETG noir et rouge, 2 exemplaires, prêts sous 5 jours ouvrés.",
       }),
       height: 520,
+    },
+    {
+      title: "Devis refusé",
+      desc: "Envoyé quand vous passez un devis au statut « Refusée » — votre message au client sert de motif.",
+      email: quoteRejectedEmail({
+        email: "client@example.ch",
+        locale: previewLocale,
+        adminMessage:
+          "La pièce dépasse le volume d'impression de nos machines (256 mm).",
+      }),
+      height: 480,
     },
     {
       title: "Vérification d'e-mail",
@@ -79,13 +108,67 @@ export default async function AdminEmailsPage({
     },
   ];
 
+  const adminPreviews = [
+    {
+      title: "Nouvelle commande (notification interne)",
+      desc: "Envoyé à l'équipe (ADMIN_EMAILS) dès qu'une commande est payée — avec alerte stock bas le cas échéant. « Répondre » écrit directement au client.",
+      email: adminNewOrderEmail(sampleOrder, sampleItems, ["vous@example.ch"], [
+        { name: "Vase Spirale", stock: 1 },
+      ]),
+      height: 760,
+    },
+    {
+      title: "Nouvelle demande de devis (notification interne)",
+      desc: "Envoyé à l'équipe dès qu'une demande de devis arrive, avec un lien direct pour la chiffrer.",
+      email: adminNewQuoteEmail(
+        {
+          id: "demo",
+          email: "client@example.ch",
+          description:
+            "Bonjour, j'aurais besoin d'un support de casque sur mesure, environ 25 cm de haut, si possible en deux couleurs.",
+          material: "PETG",
+          colors: "Noir + rouge",
+          dimensions: "250 × 120 × 80 mm",
+          fileName: "support-casque.stl",
+          locale: previewLocale,
+        },
+        ["vous@example.ch"],
+      ),
+      height: 640,
+    },
+  ];
+
+  const renderPreview = (p: {
+    title: string;
+    desc: string;
+    email: { subject: string; html: string };
+    height: number;
+  }) => (
+    <section key={p.title}>
+      <h3 className="font-semibold">{p.title}</h3>
+      <p className="text-xs text-soft">{p.desc}</p>
+      <p className="mt-1.5 text-xs">
+        <span className="rounded-md bg-line/60 px-2 py-1 font-medium">
+          Objet : {p.email.subject}
+        </span>
+      </p>
+      <iframe
+        srcDoc={p.email.html}
+        title={p.title}
+        sandbox=""
+        className="mt-3 w-full rounded-card border border-line bg-paper"
+        style={{ height: p.height }}
+      />
+    </section>
+  );
+
   return (
     <div className="max-w-2xl">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold">Aperçu des e-mails</h2>
           <p className="text-sm text-soft">
-            Chaque e-mail est envoyé dans la langue du client.
+            Chaque e-mail client est envoyé dans la langue du client.
           </p>
         </div>
         <div className="flex gap-1.5">
@@ -106,24 +189,16 @@ export default async function AdminEmailsPage({
       </div>
 
       <div className="space-y-8">
-        {previews.map((p) => (
-          <section key={p.title}>
-            <h3 className="font-semibold">{p.title}</h3>
-            <p className="text-xs text-soft">{p.desc}</p>
-            <p className="mt-1.5 text-xs">
-              <span className="rounded-md bg-line/60 px-2 py-1 font-medium">
-                Objet : {p.email.subject}
-              </span>
-            </p>
-            <iframe
-              srcDoc={p.email.html}
-              title={p.title}
-              sandbox=""
-              className="mt-3 w-full rounded-card border border-line bg-paper"
-              style={{ height: p.height }}
-            />
-          </section>
-        ))}
+        {customerPreviews.map(renderPreview)}
+
+        <div className="mt-10 border-t border-line pt-6">
+          <h2 className="text-lg font-bold">Notifications internes</h2>
+          <p className="text-sm text-soft">
+            Envoyées à vous uniquement ({"ADMIN_EMAILS"}), toujours en
+            français.
+          </p>
+        </div>
+        {adminPreviews.map(renderPreview)}
       </div>
     </div>
   );

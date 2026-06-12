@@ -4,6 +4,8 @@ import { z } from "zod";
 import { getDb } from "@/db";
 import { quoteRequests } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
+import { sendEmail, getAdminEmails } from "@/lib/email";
+import { adminNewQuoteEmail } from "@/lib/email-templates";
 
 const schema = z.object({
   email: z.email(),
@@ -43,11 +45,40 @@ export async function submitQuoteRequest(
     const session = await getServerSession();
     const db = await getDb();
     const { fileKey, ...rest } = parsed.data;
-    await db.insert(quoteRequests).values({
-      ...rest,
-      fileUrl: fileKey ?? null,
-      customerId: session?.user.id ?? null,
-    });
+    const [created] = await db
+      .insert(quoteRequests)
+      .values({
+        ...rest,
+        fileUrl: fileKey ?? null,
+        customerId: session?.user.id ?? null,
+      })
+      .returning({ id: quoteRequests.id });
+
+    // Notification interne : nouvelle demande à chiffrer.
+    // Ne doit jamais faire échouer l'enregistrement de la demande.
+    try {
+      const adminEmails = await getAdminEmails();
+      if (adminEmails.length > 0) {
+        await sendEmail(
+          adminNewQuoteEmail(
+            {
+              id: created.id,
+              email: rest.email,
+              description: rest.description,
+              material: rest.material ?? null,
+              colors: rest.colors ?? null,
+              dimensions: rest.dimensions ?? null,
+              fileName: rest.fileName ?? null,
+              locale: rest.locale,
+            },
+            adminEmails,
+          ),
+        );
+      }
+    } catch (e) {
+      console.error("[email notif admin devis]", e);
+    }
+
     return { status: "success" };
   } catch {
     return { status: "error" };

@@ -1,12 +1,12 @@
 import { asc, desc, eq, and, inArray } from "drizzle-orm";
-import { Plus, Pencil, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Eye, EyeOff, Check } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { products, productTranslations, productImages } from "@/db/schema";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
-import { toggleProductActive } from "./actions";
+import { toggleProductActive, updateProductStock } from "./actions";
 import { BTN_PRIMARY } from "../ui";
 
 export default async function AdminProductsPage({
@@ -112,6 +112,32 @@ export default async function AdminProductsPage({
                   {p.multicolor && " · Multicolore"}
                 </p>
               </div>
+              {p.saleType === "stock" && (
+                <form
+                  action={updateProductStock}
+                  className="hidden items-center gap-1 sm:flex"
+                  title="Modifier le stock"
+                >
+                  <input type="hidden" name="id" value={p.id} />
+                  <input
+                    name="stock"
+                    inputMode="numeric"
+                    defaultValue={p.stock ?? ""}
+                    placeholder="Stock"
+                    className={`w-16 rounded-xl border px-2.5 py-1.5 text-center text-xs transition-colors focus:border-ink focus:outline-none ${
+                      p.stock !== null && p.stock <= 2
+                        ? "border-amber-300 bg-amber-50"
+                        : "border-line bg-surface"
+                    }`}
+                  />
+                  <button
+                    title="Enregistrer le stock"
+                    className="rounded-full p-1.5 text-soft transition-colors hover:bg-line/60 hover:text-ink"
+                  >
+                    <Check size={15} />
+                  </button>
+                </form>
+              )}
               <form action={toggleProductActive}>
                 <input type="hidden" name="id" value={p.id} />
                 <button

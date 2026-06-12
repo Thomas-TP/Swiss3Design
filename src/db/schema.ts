@@ -132,6 +132,10 @@ export const orders = sqliteTable(
     // Snapshot JSON de l'adresse (Suisse uniquement, validé côté serveur)
     shippingAddress: text("shipping_address").notNull(),
     stripePaymentIntentId: text("stripe_payment_intent_id"),
+    // N° de suivi Poste suisse, inclus dans l'e-mail d'expédition
+    trackingNumber: text("tracking_number"),
+    // Note interne admin, jamais visible par le client
+    adminNote: text("admin_note"),
     locale: text("locale", { enum: LOCALES }).notNull().default("fr"),
     createdAt: createdAt(),
   },
@@ -174,6 +178,8 @@ export const quoteRequests = sqliteTable("quote_requests", {
     .default("received"),
   quotedPriceCents: integer("quoted_price_cents"),
   adminMessage: text("admin_message"),
+  // Note interne admin, jamais visible par le client
+  adminNote: text("admin_note"),
   locale: text("locale", { enum: LOCALES }).notNull().default("fr"),
   createdAt: createdAt(),
 });

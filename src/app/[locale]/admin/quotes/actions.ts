@@ -6,7 +6,7 @@ import { getDb } from "@/db";
 import { quoteRequests } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
 import { sendEmail } from "@/lib/email";
-import { quoteReplyEmail } from "@/lib/email-templates";
+import { quoteReplyEmail, quoteRejectedEmail } from "@/lib/email-templates";
 import { QUOTE_STATUSES } from "../ui";
 
 export async function updateQuote(formData: FormData) {
@@ -29,6 +29,8 @@ export async function updateQuote(formData: FormData) {
 
   const adminMessage =
     String(formData.get("adminMessage") || "").trim() || null;
+  const adminNote =
+    String(formData.get("adminNote") || "").trim().slice(0, 2000) || null;
   const db = await getDb();
   const [previous] = await db
     .select()
@@ -41,17 +43,20 @@ export async function updateQuote(formData: FormData) {
       status: status as (typeof QUOTE_STATUSES)[number],
       quotedPriceCents,
       adminMessage,
+      adminNote,
     })
     .where(eq(quoteRequests.id, id));
 
-  // Envoie le devis au client la première fois qu'il est chiffré
-  if (
-    previous &&
-    status === "quoted" &&
-    previous.status !== "quoted" &&
-    quotedPriceCents != null
-  ) {
-    try {
+  // E-mails au client — envoyés une seule fois, au premier passage dans le
+  // statut. Un échec d'envoi ne bloque jamais la mise à jour.
+  try {
+    if (
+      previous &&
+      status === "quoted" &&
+      previous.status !== "quoted" &&
+      quotedPriceCents != null
+    ) {
+      // Devis chiffré : le client reçoit le prix proposé
       await sendEmail(
         quoteReplyEmail({
           email: previous.email,
@@ -60,9 +65,18 @@ export async function updateQuote(formData: FormData) {
           adminMessage,
         }),
       );
-    } catch (e) {
-      console.error("[email devis]", e);
+    } else if (previous && status === "rejected" && previous.status !== "rejected") {
+      // Devis refusé : le client est prévenu, avec le message en guise de motif
+      await sendEmail(
+        quoteRejectedEmail({
+          email: previous.email,
+          locale: previous.locale,
+          adminMessage,
+        }),
+      );
     }
+  } catch (e) {
+    console.error("[email devis]", e);
   }
 
   // Pas de redirect() ici : dans une action de formulaire, il peut laisser

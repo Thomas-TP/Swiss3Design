@@ -1,8 +1,8 @@
 import { and, eq, ne } from "drizzle-orm";
 import type { getDb } from "@/db";
 import { orders, orderItems, products, inventoryLog } from "@/db/schema";
-import { sendEmail } from "./email";
-import { orderConfirmationEmail } from "./email-templates";
+import { sendEmail, getAdminEmails } from "./email";
+import { orderConfirmationEmail, adminNewOrderEmail } from "./email-templates";
 
 type Db = Awaited<ReturnType<typeof getDb>>;
 
@@ -31,6 +31,8 @@ export async function markOrderPaid(db: Db, orderId: string) {
     .from(orderItems)
     .where(eq(orderItems.orderId, orderId));
 
+  // Stock bas constaté pendant le décrément — signalé dans la notif admin
+  const lowStock: { name: string; stock: number }[] = [];
   for (const item of items) {
     if (!item.productId) continue;
     const [product] = await db
@@ -40,15 +42,19 @@ export async function markOrderPaid(db: Db, orderId: string) {
       .limit(1);
     if (product?.stock == null) continue;
 
+    const newStock = Math.max(0, product.stock - item.quantity);
     await db
       .update(products)
-      .set({ stock: Math.max(0, product.stock - item.quantity) })
+      .set({ stock: newStock })
       .where(eq(products.id, item.productId));
     await db.insert(inventoryLog).values({
       variantId: item.productId,
       delta: -item.quantity,
       reason: "order",
     });
+    if (newStock <= 2) {
+      lowStock.push({ name: item.nameSnapshot, stock: newStock });
+    }
   }
 
   // L'échec d'envoi d'e-mail ne doit jamais faire échouer le paiement
@@ -56,5 +62,15 @@ export async function markOrderPaid(db: Db, orderId: string) {
     await sendEmail(orderConfirmationEmail(order, items));
   } catch (e) {
     console.error("[email confirmation commande]", e);
+  }
+
+  // Notification interne : nouvelle commande à préparer
+  try {
+    const adminEmails = await getAdminEmails();
+    if (adminEmails.length > 0) {
+      await sendEmail(adminNewOrderEmail(order, items, adminEmails, lowStock));
+    }
+  } catch (e) {
+    console.error("[email notif admin commande]", e);
   }
 }

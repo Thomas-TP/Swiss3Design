@@ -1,12 +1,15 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
 export interface EmailMessage {
-  to: string;
+  to: string | string[];
   subject: string;
   html: string;
   // Expéditeur spécifique (sinon EMAIL_FROM) : commandes@ pour les ventes,
   // contact@ pour les e-mails de compte et les devis.
   from?: string;
+  // Adresse de réponse — utilisé pour les notifications admin afin que
+  // « Répondre » écrive directement au client.
+  replyTo?: string;
 }
 
 // Envoi via l'API REST Resend. Sans RESEND_API_KEY, l'envoi est ignoré
@@ -29,6 +32,7 @@ export async function sendEmail(message: EmailMessage): Promise<boolean> {
       to: message.to,
       subject: message.subject,
       html: message.html,
+      ...(message.replyTo ? { reply_to: message.replyTo } : {}),
     }),
   });
 
@@ -37,4 +41,13 @@ export async function sendEmail(message: EmailMessage): Promise<boolean> {
     return false;
   }
   return true;
+}
+
+// Destinataires des notifications boutique (ADMIN_EMAILS, séparés par virgule)
+export async function getAdminEmails(): Promise<string[]> {
+  const { env } = await getCloudflareContext({ async: true });
+  return (env.ADMIN_EMAILS || "")
+    .split(",")
+    .map((s) => s.trim())
+    .filter(Boolean);
 }

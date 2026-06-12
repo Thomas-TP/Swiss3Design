@@ -116,7 +116,7 @@ export default async function AdminQuoteDetailPage({
           <span className="mb-1.5 block font-semibold">
             Message pour le client{" "}
             <span className="font-normal text-soft">
-              (visible dans son espace)
+              (visible dans son espace et dans l&apos;e-mail)
             </span>
           </span>
           <textarea
@@ -126,7 +126,29 @@ export default async function AdminQuoteDetailPage({
             className={FIELD}
           />
         </label>
+        <label className="block text-sm">
+          <span className="mb-1.5 block font-semibold">
+            Note interne{" "}
+            <span className="font-normal text-soft">
+              (jamais visible par le client)
+            </span>
+          </span>
+          <textarea
+            name="adminNote"
+            rows={2}
+            defaultValue={quote.adminNote ?? ""}
+            placeholder="Ex. : temps d'impression estimé 14 h, prévoir supports solubles…"
+            className={FIELD}
+          />
+        </label>
         <button className={BTN_PRIMARY}>Enregistrer la réponse</button>
+        <p className="text-xs leading-relaxed text-soft">
+          E-mails automatiques au client : passer en{" "}
+          <strong>« Devis envoyé »</strong> avec un prix → e-mail avec la
+          proposition · passer en <strong>« Refusée »</strong> → e-mail de
+          refus poli (le message ci-dessus sert de motif). Chaque e-mail
+          n&apos;est envoyé qu&apos;une seule fois.
+        </p>
       </form>
     </div>
   );

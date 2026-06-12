@@ -183,6 +183,28 @@ export async function deleteProduct(id: string): Promise<void> {
   revalidatePath("/", "layout");
 }
 
+// Édition rapide du stock depuis la liste (réimpression terminée, recomptage…)
+export async function updateProductStock(formData: FormData) {
+  await requireAdmin();
+  const id = String(formData.get("id") || "");
+  const raw = String(formData.get("stock") || "").trim();
+  if (!id || raw === "") return;
+  const stock = Number.parseInt(raw, 10);
+  if (!Number.isFinite(stock) || stock < 0 || stock > 100000) return;
+
+  const db = await getDb();
+  const [row] = await db
+    .select({ stock: products.stock, saleType: products.saleType })
+    .from(products)
+    .where(eq(products.id, id))
+    .limit(1);
+  // Uniquement pour les produits vendus sur stock (pas l'impression à la demande)
+  if (!row || row.saleType !== "stock") return;
+
+  await db.update(products).set({ stock }).where(eq(products.id, id));
+  revalidatePath("/", "layout");
+}
+
 export async function toggleProductActive(formData: FormData) {
   await requireAdmin();
   const id = String(formData.get("id") || "");
