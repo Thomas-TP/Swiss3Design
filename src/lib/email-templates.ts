@@ -270,6 +270,59 @@ export function quoteReplyEmail(quote: {
   };
 }
 
+// ── Code de vérification d'e-mail au checkout (commande sans compte) ─────────
+
+const CHECKOUT_CODE_TEXTS: Record<
+  Locale,
+  { subject: string; title: string; intro: string; expiry: string }
+> = {
+  fr: {
+    subject: "{code} — votre code de vérification Swiss3Design",
+    title: "Votre code de vérification",
+    intro: "Saisissez ce code sur la page de commande pour confirmer votre adresse e-mail :",
+    expiry: "Ce code expire dans 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.",
+  },
+  de: {
+    subject: "{code} — Ihr Swiss3Design-Bestätigungscode",
+    title: "Ihr Bestätigungscode",
+    intro: "Geben Sie diesen Code auf der Bestellseite ein, um Ihre E-Mail-Adresse zu bestätigen:",
+    expiry: "Dieser Code läuft in 10 Minuten ab. Falls Sie das nicht angefordert haben, ignorieren Sie diese E-Mail.",
+  },
+  it: {
+    subject: "{code} — il vostro codice di verifica Swiss3Design",
+    title: "Il vostro codice di verifica",
+    intro: "Inserite questo codice nella pagina dell'ordine per confermare il vostro indirizzo e-mail:",
+    expiry: "Questo codice scade tra 10 minuti. Se non avete richiesto nulla, ignorate questa e-mail.",
+  },
+  en: {
+    subject: "{code} — your Swiss3Design verification code",
+    title: "Your verification code",
+    intro: "Enter this code on the checkout page to confirm your email address:",
+    expiry: "This code expires in 10 minutes. If you didn't request it, you can ignore this email.",
+  },
+};
+
+export function checkoutCodeEmail(
+  to: string,
+  code: string,
+  locale: string,
+): EmailMessage {
+  const l = (["fr", "de", "it", "en"].includes(locale) ? locale : "fr") as Locale;
+  const t = CHECKOUT_CODE_TEXTS[l];
+  const body = `
+    <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">${t.intro}</p>
+    <p style="margin:0 0 18px;text-align:center;">
+      <span style="display:inline-block;background:#fafaf9;border:1px solid #e7e5e4;border-radius:12px;padding:14px 28px;font-size:30px;font-weight:700;letter-spacing:8px;font-variant-numeric:tabular-nums;">${code}</span>
+    </p>
+    <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">${t.expiry}</p>`;
+  return {
+    to,
+    from: FROM_ORDERS,
+    subject: t.subject.replace("{code}", code),
+    html: layout(t.title, body, FOOTER[l]),
+  };
+}
+
 // ── Réinitialisation du mot de passe (FR + EN, locale inconnue) ──────────────
 
 export function resetPasswordEmail(to: string, url: string): EmailMessage {

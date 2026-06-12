@@ -12,6 +12,7 @@ import {
 import { getSetting } from "@/db/queries";
 import { getStripe } from "@/lib/stripe";
 import { getAuth } from "@/lib/auth";
+import { verifyEmailProof } from "@/lib/email-proof";
 import { SHIPPING_CENTS, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
 
 const bodySchema = z.object({
@@ -25,6 +26,8 @@ const bodySchema = z.object({
     .min(1)
     .max(50),
   email: z.email(),
+  // Preuve de vérification d'e-mail (invités) émise par /api/checkout/verify-email
+  emailProof: z.string().optional(),
   address: z.object({
     name: z.string().min(2).max(120),
     street: z.string().min(3).max(200),
@@ -50,7 +53,26 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return Response.json({ error: "invalid_request" }, { status: 400 });
   }
-  const { items, email, address, saveAddress, locale } = parsed.data;
+  const { items, address, saveAddress, locale } = parsed.data;
+
+  // Toute commande exige une identité e-mail fiable : un compte connecté
+  // (e-mail déjà vérifié) ou une preuve de vérification par code (invités).
+  const auth = await getAuth();
+  const authSession = await auth.api.getSession({ headers: request.headers });
+  let email: string;
+  if (authSession) {
+    email = authSession.user.email;
+  } else {
+    const claimed = parsed.data.email.trim().toLowerCase();
+    const { env } = await getCloudflareContext({ async: true });
+    const proofValid =
+      parsed.data.emailProof &&
+      (await verifyEmailProof(claimed, parsed.data.emailProof, env.BETTER_AUTH_SECRET));
+    if (!proofValid) {
+      return Response.json({ error: "email_not_verified" }, { status: 403 });
+    }
+    email = claimed;
+  }
 
   const db = await getDb();
   const ids = items.map((i) => i.productId);
@@ -104,10 +126,6 @@ export async function POST(request: Request) {
   );
   const shippingCents = subtotalCents >= freeOver ? 0 : shippingFlat;
   const totalCents = subtotalCents + shippingCents;
-
-  // Rattache la commande au compte connecté, le cas échéant
-  const auth = await getAuth();
-  const authSession = await auth.api.getSession({ headers: request.headers });
 
   // Mémorise l'adresse pour les prochaines commandes si demandé
   if (authSession && saveAddress) {

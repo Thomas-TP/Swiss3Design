@@ -7,10 +7,19 @@ import { LoginForm } from "./login-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ next?: string }>;
+}) {
   const t = await getTranslations("auth");
   const { env } = await getCloudflareContext({ async: true });
   const providers = enabledSocialProviders(env);
+
+  // Destination après connexion (ex. retour au checkout) — chemins internes uniquement
+  const { next } = await searchParams;
+  const nextPath =
+    next && next.startsWith("/") && !next.startsWith("//") ? next : "/account";
 
   return (
     <div className="mx-auto max-w-md px-4 py-14 sm:px-6 md:py-20">
@@ -18,8 +27,8 @@ export default async function LoginPage() {
         {t("signInTitle")}
       </h1>
       <div className="mt-8 rounded-card border border-line bg-surface p-6 sm:p-8">
-        <LoginForm />
-        <SocialButtons providers={providers} />
+        <LoginForm next={nextPath} />
+        <SocialButtons providers={providers} next={nextPath} />
       </div>
       <p className="mt-5 text-center text-sm text-soft">
         {t("noAccount")}{" "}

@@ -45,7 +45,13 @@ const LABELS: Record<string, string> = {
   facebook: "Facebook",
 };
 
-export function SocialButtons({ providers }: { providers: string[] }) {
+export function SocialButtons({
+  providers,
+  next = "/account",
+}: {
+  providers: string[];
+  next?: string;
+}) {
   const t = useTranslations("auth");
   const locale = useLocale();
   if (providers.length === 0) return null;
@@ -65,7 +71,7 @@ export function SocialButtons({ providers }: { providers: string[] }) {
             onClick={() =>
               authClient.signIn.social({
                 provider: p as "google" | "apple" | "facebook",
-                callbackURL: `/${locale}/account`,
+                callbackURL: `/${locale}${next}`,
               })
             }
             className="flex w-full items-center justify-center gap-2.5 rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold transition-colors hover:border-ink"

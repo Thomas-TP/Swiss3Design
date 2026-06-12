@@ -9,7 +9,7 @@ import { signIn } from "@/lib/auth-client";
 const field =
   "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
 
-export function LoginForm() {
+export function LoginForm({ next = "/account" }: { next?: string }) {
   const t = useTranslations("auth");
   const router = useRouter();
   const [pending, setPending] = useState(false);
@@ -35,7 +35,7 @@ export function LoginForm() {
       setPending(false);
       return;
     }
-    router.push("/account");
+    router.push(next);
     router.refresh();
   }
 
