@@ -5,6 +5,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { quoteRequests } from "@/db/schema";
+import { requireAdmin } from "@/lib/session";
 import { updateQuote } from "../actions";
 import { QUOTE_STATUSES, QUOTE_STATUS_FR, FIELD, BTN_PRIMARY } from "../../ui";
 
@@ -13,6 +14,7 @@ export default async function AdminQuoteDetailPage({
 }: {
   params: Promise<{ locale: Locale; id: string }>;
 }) {
+  await requireAdmin();
   const { id } = await params;
   const db = await getDb();
 

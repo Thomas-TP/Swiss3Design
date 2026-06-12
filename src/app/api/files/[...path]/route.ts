@@ -19,12 +19,19 @@ export async function GET(
     return new Response("Not found", { status: 404 });
   }
 
-  return new Response(object.body as unknown as BodyInit, {
-    headers: {
-      "Content-Type":
-        object.httpMetadata?.contentType ?? "application/octet-stream",
-      "Cache-Control": "public, max-age=31536000, immutable",
-      ETag: object.httpEtag,
-    },
-  });
+  const contentType =
+    object.httpMetadata?.contentType ?? "application/octet-stream";
+  const headers: Record<string, string> = {
+    "Content-Type": contentType,
+    "Cache-Control": "public, max-age=31536000, immutable",
+    "X-Content-Type-Options": "nosniff",
+    ETag: object.httpEtag,
+  };
+  // Les SVG historiques peuvent embarquer du script : on bloque toute
+  // exécution si le fichier est ouvert directement dans le navigateur.
+  if (contentType.includes("svg")) {
+    headers["Content-Security-Policy"] = "sandbox";
+  }
+
+  return new Response(object.body as unknown as BodyInit, { headers });
 }

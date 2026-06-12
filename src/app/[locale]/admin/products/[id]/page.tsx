@@ -9,6 +9,7 @@ import {
   categories,
   categoryTranslations,
 } from "@/db/schema";
+import { requireAdmin } from "@/lib/session";
 import { ProductForm, type ProductFormInitial } from "../product-form";
 
 export default async function EditProductPage({
@@ -16,6 +17,7 @@ export default async function EditProductPage({
 }: {
   params: Promise<{ id: string }>;
 }) {
+  await requireAdmin();
   const { id } = await params;
   const db = await getDb();
 

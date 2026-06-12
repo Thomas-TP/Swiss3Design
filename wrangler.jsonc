@@ -13,8 +13,8 @@
     { "pattern": "swiss3design.ch", "custom_domain": true },
     { "pattern": "www.swiss3design.ch", "custom_domain": true }
   ],
-  // workers.dev maintenu pendant la transition vers le domaine
-  "workers_dev": true,
+  // Le domaine est en place : l'URL workers.dev est coupée (contenu dupliqué)
+  "workers_dev": false,
   "d1_databases": [
     {
       "binding": "DB",

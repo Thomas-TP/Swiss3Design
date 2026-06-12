@@ -64,7 +64,9 @@
     "freeShippingHint": "{amount} away from free shipping",
     "freeShippingReached": "Free shipping 🎉",
     "remove": "Remove",
-    "quantity": "Quantity"
+    "quantity": "Quantity",
+    "decrease": "Decrease quantity",
+    "increase": "Increase quantity"
   },
   "checkout": {
     "title": "Checkout",
@@ -212,6 +214,14 @@
     "errorInvalid": "Incorrect email or password.",
     "errorExists": "An account with this email already exists.",
     "errorGeneric": "Something went wrong. Please try again."
+  },
+  "errors": {
+    "notFoundTitle": "Page not found",
+    "notFoundText": "This page doesn't exist or is no longer available.",
+    "notFoundCta": "Back to home",
+    "errorTitle": "Something went wrong",
+    "errorText": "An error occurred on our side. Please try again.",
+    "retry": "Try again"
   },
   "footer": {
     "tagline": "Multicolor 3D printing — Gland, Switzerland",

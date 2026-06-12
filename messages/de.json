@@ -64,7 +64,9 @@
     "freeShippingHint": "Noch {amount} bis zum Gratisversand",
     "freeShippingReached": "Gratisversand 🎉",
     "remove": "Entfernen",
-    "quantity": "Menge"
+    "quantity": "Menge",
+    "decrease": "Menge verringern",
+    "increase": "Menge erhöhen"
   },
   "checkout": {
     "title": "Bestellung",
@@ -212,6 +214,14 @@
     "errorInvalid": "E-Mail oder Passwort falsch.",
     "errorExists": "Mit dieser E-Mail existiert bereits ein Konto.",
     "errorGeneric": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+  },
+  "errors": {
+    "notFoundTitle": "Seite nicht gefunden",
+    "notFoundText": "Diese Seite existiert nicht oder ist nicht mehr verfügbar.",
+    "notFoundCta": "Zurück zur Startseite",
+    "errorTitle": "Ein Fehler ist aufgetreten",
+    "errorText": "Bei uns ist etwas schiefgelaufen. Bitte versuchen Sie es erneut.",
+    "retry": "Erneut versuchen"
   },
   "footer": {
     "tagline": "Mehrfarbiger 3D-Druck — Gland, Schweiz",

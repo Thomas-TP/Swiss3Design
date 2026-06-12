@@ -80,7 +80,7 @@ export default function CartPage() {
                       onClick={() =>
                         setQuantity(item.productId, item.quantity - 1)
                       }
-                      aria-label="−"
+                      aria-label={t("decrease")}
                       className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-line/60"
                     >
                       <Minus size={14} />
@@ -92,7 +92,7 @@ export default function CartPage() {
                       onClick={() =>
                         setQuantity(item.productId, item.quantity + 1)
                       }
-                      aria-label="+"
+                      aria-label={t("increase")}
                       className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-line/60"
                     >
                       <Plus size={14} />

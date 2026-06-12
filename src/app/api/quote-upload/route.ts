@@ -1,4 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
 // Upload des modèles 3D joints aux demandes de devis (clients, y compris invités).
 // Les fichiers vont dans le préfixe privé quotes/ — jamais servi publiquement,
@@ -8,6 +9,11 @@ const ALLOWED_EXTENSIONS = new Set(["stl", "3mf", "obj", "step", "stp"]);
 const MAX_BYTES = 30 * 1024 * 1024; // 30 Mo
 
 export async function POST(request: Request) {
+  // Upload anonyme : sans limite, n'importe qui peut remplir le bucket R2
+  if (!(await rateLimit(request, "quote-upload", { limit: 10, windowS: 3600 }))) {
+    return tooManyRequests();
+  }
+
   const form = await request.formData().catch(() => null);
   const file = form?.get("file");
   if (!(file instanceof File)) {

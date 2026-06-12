@@ -1,6 +1,13 @@
 import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/routing";
 
+export interface LegalSection {
+  title: string;
+  body: ReactNode;
+}
+
+// Les traductions sont fournies à titre de courtoisie : seule la version
+// française engage l'exploitant.
 const NOTICE: Record<string, string | null> = {
   fr: null,
   de: "Massgebend ist die französische Fassung dieses Dokuments.",
@@ -8,10 +15,17 @@ const NOTICE: Record<string, string | null> = {
   en: "The French version of this document prevails.",
 };
 
+const HEADER: Record<string, { country: string; updated: string }> = {
+  fr: { country: "Suisse", updated: "Dernière mise à jour :" },
+  de: { country: "Schweiz", updated: "Letzte Aktualisierung:" },
+  it: { country: "Svizzera", updated: "Ultimo aggiornamento:" },
+  en: { country: "Switzerland", updated: "Last updated:" },
+};
+
 export function LegalPage({
   locale,
   title,
-  updated,
+  updated, // date ISO (ex. "2026-06-11"), formatée dans la langue de la page
   children,
 }: {
   locale: Locale;
@@ -20,12 +34,19 @@ export function LegalPage({
   children: ReactNode;
 }) {
   const notice = NOTICE[locale];
+  const header = HEADER[locale] ?? HEADER.fr;
+  const updatedLabel = new Intl.DateTimeFormat(`${locale}-CH`, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(updated));
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 md:py-16">
       <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
       <p className="mt-2 text-sm text-soft">
-        Swiss3Design — Gland (VD), Suisse · Dernière mise à jour : {updated}
+        Swiss3Design — Gland (VD), {header.country} · {header.updated}{" "}
+        {updatedLabel}
       </p>
       {notice && (
         <p className="mt-4 rounded-xl border border-line bg-surface px-4 py-3 text-xs text-soft">

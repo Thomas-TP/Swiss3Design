@@ -64,7 +64,9 @@
     "freeShippingHint": "Ancora {amount} per la spedizione gratuita",
     "freeShippingReached": "Spedizione gratuita 🎉",
     "remove": "Rimuovi",
-    "quantity": "Quantità"
+    "quantity": "Quantità",
+    "decrease": "Riduci la quantità",
+    "increase": "Aumenta la quantità"
   },
   "checkout": {
     "title": "Ordine",
@@ -212,6 +214,14 @@
     "errorInvalid": "E-mail o password errati.",
     "errorExists": "Esiste già un account con questa e-mail.",
     "errorGeneric": "Si è verificato un errore. Riprovate per favore."
+  },
+  "errors": {
+    "notFoundTitle": "Pagina non trovata",
+    "notFoundText": "Questa pagina non esiste o non è più disponibile.",
+    "notFoundCta": "Torna alla home",
+    "errorTitle": "Si è verificato un errore",
+    "errorText": "Qualcosa è andato storto da parte nostra. La preghiamo di riprovare.",
+    "retry": "Riprova"
   },
   "footer": {
     "tagline": "Stampa 3D multicolore — Gland, Svizzera",

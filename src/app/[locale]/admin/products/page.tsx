@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { products, productTranslations, productImages } from "@/db/schema";
 import { formatChf } from "@/lib/format";
+import { requireAdmin } from "@/lib/session";
 import { toggleProductActive } from "./actions";
 import { BTN_PRIMARY } from "../ui";
 
@@ -13,6 +14,7 @@ export default async function AdminProductsPage({
 }: {
   params: Promise<{ locale: Locale }>;
 }) {
+  await requireAdmin();
   const { locale } = await params;
   const db = await getDb();
 

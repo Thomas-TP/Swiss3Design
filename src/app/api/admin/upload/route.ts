@@ -1,12 +1,12 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getServerSession } from "@/lib/session";
 
+// Formats raster uniquement : le SVG peut embarquer du JavaScript (XSS)
 const ALLOWED = new Map([
   ["image/jpeg", "jpg"],
   ["image/png", "png"],
   ["image/webp", "webp"],
   ["image/avif", "avif"],
-  ["image/svg+xml", "svg"],
 ]);
 const MAX_BYTES = 8 * 1024 * 1024; // 8 Mo
 

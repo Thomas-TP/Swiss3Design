@@ -58,7 +58,6 @@ export async function getAuth() {
     trustedOrigins: [
       "https://swiss3design.ch",
       "https://www.swiss3design.ch",
-      "https://swiss3design.thomastp.workers.dev",
     ],
     database: drizzleAdapter(db, { provider: "sqlite" }),
     emailAndPassword: {

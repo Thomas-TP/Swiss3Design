@@ -5,6 +5,7 @@ import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { orders, quoteRequests, products, productTranslations } from "@/db/schema";
 import { formatChf } from "@/lib/format";
+import { requireAdmin } from "@/lib/session";
 import { ORDER_STATUS_FR, STATUS_STYLE } from "./ui";
 
 export default async function AdminDashboard({
@@ -12,6 +13,9 @@ export default async function AdminDashboard({
 }: {
   params: Promise<{ locale: Locale }>;
 }) {
+  // Défense en profondeur : le layout vérifie déjà, mais il peut être
+  // contourné par une requête RSC ciblant directement la page.
+  await requireAdmin();
   const { locale } = await params;
   const db = await getDb();
 

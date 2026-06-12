@@ -1,8 +1,10 @@
 import { getSetting } from "@/db/queries";
+import { requireAdmin } from "@/lib/session";
 import { SHIPPING_CENTS, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
 import { SettingsForm } from "./settings-form";
 
 export default async function AdminSettingsPage() {
+  await requireAdmin();
   const [shipping, freeOver] = await Promise.all([
     getSetting("shipping_cents"),
     getSetting("free_shipping_over_cents"),

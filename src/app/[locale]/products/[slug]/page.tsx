@@ -8,6 +8,7 @@ import { formatChf } from "@/lib/format";
 import { AddToCart, BuyNow } from "@/components/add-to-cart";
 import { FavoriteButton } from "@/components/favorite-button";
 import { MulticolorDots } from "@/components/multicolor-dots";
+import { ProductGallery } from "@/components/product-gallery";
 
 export const dynamic = "force-dynamic";
 
@@ -44,16 +45,7 @@ export default async function ProductPage({
       </Link>
 
       <div className="grid gap-8 md:grid-cols-2 md:gap-14">
-        <div className="overflow-hidden rounded-card border border-line bg-surface">
-          {image && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={image.url}
-              alt={image.alt ?? product.name}
-              className="aspect-square w-full object-cover"
-            />
-          )}
-        </div>
+        <ProductGallery images={product.images} name={product.name} />
 
         <div className="flex flex-col">
           <div className="flex flex-wrap items-center gap-2">

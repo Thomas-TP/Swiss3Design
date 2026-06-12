@@ -4,6 +4,7 @@ import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { orders } from "@/db/schema";
 import { formatChf } from "@/lib/format";
+import { requireAdmin } from "@/lib/session";
 import { ORDER_STATUS_FR, STATUS_STYLE } from "../ui";
 
 export default async function AdminOrdersPage({
@@ -11,6 +12,7 @@ export default async function AdminOrdersPage({
 }: {
   params: Promise<{ locale: Locale }>;
 }) {
+  await requireAdmin();
   const { locale } = await params;
   const db = await getDb();
   const rows = await db.select().from(orders).orderBy(desc(orders.createdAt));

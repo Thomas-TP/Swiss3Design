@@ -6,6 +6,7 @@ import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { orders, orderItems } from "@/db/schema";
 import { formatChf } from "@/lib/format";
+import { requireAdmin } from "@/lib/session";
 import { updateOrderStatus } from "../actions";
 import { ORDER_STATUSES, ORDER_STATUS_FR, FIELD, BTN_PRIMARY } from "../../ui";
 
@@ -22,6 +23,7 @@ export default async function AdminOrderDetailPage({
 }: {
   params: Promise<{ locale: Locale; id: string }>;
 }) {
+  await requireAdmin();
   const { locale, id } = await params;
   const db = await getDb();
 

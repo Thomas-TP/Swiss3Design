@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, eq, ne } from "drizzle-orm";
 import type { getDb } from "@/db";
 import { orders, orderItems, products, inventoryLog } from "@/db/schema";
 import { sendEmail } from "./email";
@@ -10,14 +10,21 @@ type Db = Awaited<ReturnType<typeof getDb>>;
 // confirmation — idempotent : appelé par le webhook Stripe ET par la page
 // de confirmation (filet), le premier arrivé fait le travail.
 export async function markOrderPaid(db: Db, orderId: string) {
+  // UPDATE conditionnel : si le webhook et la page de succès arrivent en même
+  // temps, un seul des deux passe — pas de double décrément de stock.
+  const claimed = await db
+    .update(orders)
+    .set({ status: "paid" })
+    .where(and(eq(orders.id, orderId), ne(orders.status, "paid")))
+    .returning({ id: orders.id });
+  if (claimed.length === 0) return;
+
   const [order] = await db
     .select()
     .from(orders)
     .where(eq(orders.id, orderId))
     .limit(1);
-  if (!order || order.status === "paid") return;
-
-  await db.update(orders).set({ status: "paid" }).where(eq(orders.id, orderId));
+  if (!order) return;
 
   const items = await db
     .select()

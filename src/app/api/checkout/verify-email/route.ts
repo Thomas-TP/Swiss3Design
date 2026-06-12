@@ -6,6 +6,7 @@ import { verification } from "@/db/schema";
 import { sendEmail } from "@/lib/email";
 import { checkoutCodeEmail } from "@/lib/email-templates";
 import { createEmailProof } from "@/lib/email-proof";
+import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
 // Vérification d'e-mail pour les commandes sans compte : un code à 6 chiffres
 // est envoyé puis échangé contre une preuve signée, exigée par /api/checkout.
@@ -44,6 +45,14 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return Response.json({ error: "invalid_request" }, { status: 400 });
   }
+
+  // Le cooldown par e-mail ne protège pas contre l'envoi massif vers des
+  // adresses différentes : limite par IP en plus.
+  const allowed = await rateLimit(request, "verify-email", {
+    limit: parsed.data.action === "send" ? 8 : 30,
+    windowS: 3600,
+  });
+  if (!allowed) return tooManyRequests();
 
   const db = await getDb();
   const email = parsed.data.email.trim().toLowerCase();

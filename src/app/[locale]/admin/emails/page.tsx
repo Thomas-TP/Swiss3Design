@@ -6,6 +6,7 @@ import {
   verificationEmail,
   resetPasswordEmail,
 } from "@/lib/email-templates";
+import { requireAdmin } from "@/lib/session";
 
 const PREVIEW_LOCALES = ["fr", "de", "it", "en"] as const;
 
@@ -14,6 +15,7 @@ export default async function AdminEmailsPage({
 }: {
   searchParams: Promise<{ l?: string }>;
 }) {
+  await requireAdmin();
   const { l } = await searchParams;
   const previewLocale = (PREVIEW_LOCALES as readonly string[]).includes(l ?? "")
     ? (l as (typeof PREVIEW_LOCALES)[number])
