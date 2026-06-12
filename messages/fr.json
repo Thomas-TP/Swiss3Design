@@ -8,7 +8,8 @@
     "shop": "Catalogue",
     "custom": "Sur mesure",
     "cart": "Panier",
-    "account": "Compte"
+    "account": "Compte",
+    "favorites": "Favoris"
   },
   "home": {
     "heroBadge": "Imprimé à Gland · Livré dans toute la Suisse",
@@ -38,6 +39,7 @@
   },
   "product": {
     "addToCart": "Ajouter au panier",
+    "buyNow": "Acheter",
     "added": "Ajouté ✓",
     "inStock": "En stock",
     "outOfStock": "Rupture de stock",
@@ -92,7 +94,8 @@
     "emptyCart": "Votre panier est vide.",
     "errorGeneric": "Une erreur est survenue. Merci de réessayer.",
     "errorNpa": "NPA invalide (4 chiffres)",
-    "stepDelivery": "Livraison",
+    "errorCanton": "Veuillez sélectionner votre canton.",
+    "stepDelivery": "Coordonnées",
     "stepPayment": "Paiement",
     "accountBadge": "Compte",
     "guestNotice": "Commande sans compte : confirmez votre adresse e-mail pour continuer.",
@@ -144,9 +147,18 @@
     "success": "Demande bien reçue ! Nous revenons vers vous par e-mail sous 48 h.",
     "error": "Une erreur est survenue. Merci de réessayer."
   },
+  "favorites": {
+    "title": "Mes favoris",
+    "empty": "Aucun favori pour l'instant.",
+    "browse": "Parcourir le catalogue",
+    "add": "Ajouter aux favoris",
+    "remove": "Retirer des favoris"
+  },
   "account": {
     "title": "Mon compte",
     "greeting": "Bonjour {name}",
+    "avatarTitle": "Choisir un avatar",
+    "avatarChange": "Changer d'avatar",
     "myOrders": "Mes commandes",
     "myQuotes": "Mes devis",
     "noOrders": "Aucune commande pour l'instant.",

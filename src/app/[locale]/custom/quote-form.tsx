@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { CheckCircle2, Send, Paperclip, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { Select } from "@/components/select";
 import { useSession } from "@/lib/auth-client";
 import { submitQuoteRequest, type QuoteFormState } from "./actions";
 
@@ -17,6 +18,7 @@ export function QuoteForm() {
     submitQuoteRequest,
     { status: "idle" },
   );
+  const [material, setMaterial] = useState("");
   const [file, setFile] = useState<{ key: string; name: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [fileError, setFileError] = useState(false);
@@ -97,11 +99,18 @@ export function QuoteForm() {
             {t("material")}{" "}
             <span className="font-normal text-soft">({t("optional")})</span>
           </label>
-          <select id="material" name="material" className={field} defaultValue="">
-            <option value="">{t("materialAny")}</option>
-            <option value="PLA">PLA</option>
-            <option value="PETG">PETG</option>
-          </select>
+          <Select
+            name="material"
+            value={material}
+            onChange={setMaterial}
+            options={[
+              { value: "", label: t("materialAny") },
+              { value: "PLA", label: "PLA" },
+              { value: "PETG", label: "PETG" },
+            ]}
+            placeholder={t("materialAny")}
+            ariaLabel={t("material")}
+          />
         </div>
         <div>
           <label htmlFor="colors" className="mb-1.5 block text-sm font-semibold">

@@ -5,7 +5,8 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getProductBySlug } from "@/db/queries";
 import { formatChf } from "@/lib/format";
-import { AddToCart } from "@/components/add-to-cart";
+import { AddToCart, BuyNow } from "@/components/add-to-cart";
+import { FavoriteButton } from "@/components/favorite-button";
 import { MulticolorDots } from "@/components/multicolor-dots";
 
 export const dynamic = "force-dynamic";
@@ -89,18 +90,34 @@ export default async function ProductPage({
             {product.description}
           </p>
 
-          <div className="mt-8">
-            <AddToCart
-              disabled={product.saleType === "stock" && product.stock === 0}
-              item={{
+          <div className="mt-8 space-y-3">
+            {(() => {
+              const item = {
                 productId: product.id,
                 slug: product.slug,
                 name: product.name,
                 priceCents: product.priceCents,
                 imageUrl: image?.url ?? null,
                 saleType: product.saleType,
-              }}
-            />
+              };
+              const soldOut =
+                product.saleType === "stock" && product.stock === 0;
+              return (
+                <>
+                  <div className="flex items-stretch gap-3">
+                    <div className="flex-1">
+                      <AddToCart disabled={soldOut} item={item} />
+                    </div>
+                    <FavoriteButton
+                      item={item}
+                      size={20}
+                      className="grid w-[50px] shrink-0 place-items-center rounded-full border border-line bg-surface hover:border-ink/30"
+                    />
+                  </div>
+                  <BuyNow disabled={soldOut} item={item} />
+                </>
+              );
+            })()}
           </div>
 
           {specs.length > 0 && (

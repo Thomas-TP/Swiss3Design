@@ -1,4 +1,4 @@
-import { CircleUser, Package, FileText, Wrench } from "lucide-react";
+import { Package, FileText, Wrench } from "lucide-react";
 import { desc, eq, or } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { Link, redirect } from "@/i18n/navigation";
@@ -8,6 +8,7 @@ import { orders, quoteRequests } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { formatChf } from "@/lib/format";
 import { SignOutButton } from "./sign-out-button";
+import { AvatarPicker } from "./avatar-picker";
 
 export const dynamic = "force-dynamic";
 
@@ -63,9 +64,7 @@ export default async function AccountPage({
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 md:py-16">
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <span className="grid h-12 w-12 place-items-center rounded-full bg-surface ring-1 ring-line">
-            <CircleUser size={24} strokeWidth={1.6} className="text-soft" />
-          </span>
+          <AvatarPicker current={user.image ?? null} />
           <div>
             <h1 className="text-xl font-bold">
               {t("greeting", { name: user.name })}

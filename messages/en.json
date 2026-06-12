@@ -8,7 +8,8 @@
     "shop": "Shop",
     "custom": "Custom",
     "cart": "Cart",
-    "account": "Account"
+    "account": "Account",
+    "favorites": "Favorites"
   },
   "home": {
     "heroBadge": "Printed in Gland · Delivered across Switzerland",
@@ -38,6 +39,7 @@
   },
   "product": {
     "addToCart": "Add to cart",
+    "buyNow": "Buy now",
     "added": "Added ✓",
     "inStock": "In stock",
     "outOfStock": "Out of stock",
@@ -92,7 +94,8 @@
     "emptyCart": "Your cart is empty.",
     "errorGeneric": "Something went wrong. Please try again.",
     "errorNpa": "Invalid postal code (4 digits)",
-    "stepDelivery": "Delivery",
+    "errorCanton": "Please select your canton.",
+    "stepDelivery": "Details",
     "stepPayment": "Payment",
     "accountBadge": "Account",
     "guestNotice": "Ordering without an account: confirm your email address to continue.",
@@ -144,9 +147,18 @@
     "success": "Request received! We'll reply by email within 48 hours.",
     "error": "Something went wrong. Please try again."
   },
+  "favorites": {
+    "title": "My favorites",
+    "empty": "No favorites yet.",
+    "browse": "Browse the shop",
+    "add": "Add to favorites",
+    "remove": "Remove from favorites"
+  },
   "account": {
     "title": "My account",
     "greeting": "Hello {name}",
+    "avatarTitle": "Choose an avatar",
+    "avatarChange": "Change avatar",
     "myOrders": "My orders",
     "myQuotes": "My quotes",
     "noOrders": "No orders yet.",

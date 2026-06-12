@@ -3,10 +3,21 @@ import { Link } from "@/i18n/navigation";
 import { formatChf } from "@/lib/format";
 import type { ProductListItem } from "@/db/queries";
 import { MulticolorDots } from "./multicolor-dots";
+import { AddToCartMini } from "./add-to-cart";
+import { FavoriteButton } from "./favorite-button";
 
 export function ProductCard({ product }: { product: ProductListItem }) {
   const t = useTranslations("product");
   const locale = useLocale();
+
+  const item = {
+    productId: product.id,
+    slug: product.slug,
+    name: product.name,
+    priceCents: product.priceCents,
+    imageUrl: product.imageUrl,
+    saleType: product.saleType,
+  };
 
   return (
     <Link
@@ -28,6 +39,10 @@ export function ProductCard({ product }: { product: ProductListItem }) {
             {t("multicolorBadge")}
           </span>
         )}
+        <FavoriteButton
+          item={item}
+          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-surface/90 backdrop-blur"
+        />
       </div>
       <div className="flex flex-1 flex-col gap-1 p-4">
         <h3 className="font-semibold leading-snug">{product.name}</h3>
@@ -47,6 +62,12 @@ export function ProductCard({ product }: { product: ProductListItem }) {
         <p className="mt-2 font-semibold tabular-nums">
           {formatChf(product.priceCents, locale)}
         </p>
+        <div className="mt-3">
+          <AddToCartMini
+            item={item}
+            disabled={product.saleType === "stock" && product.stock === 0}
+          />
+        </div>
       </div>
     </Link>
   );

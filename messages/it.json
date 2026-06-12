@@ -8,7 +8,8 @@
     "shop": "Catalogo",
     "custom": "Su misura",
     "cart": "Carrello",
-    "account": "Account"
+    "account": "Account",
+    "favorites": "Preferiti"
   },
   "home": {
     "heroBadge": "Stampato a Gland · Consegna in tutta la Svizzera",
@@ -38,6 +39,7 @@
   },
   "product": {
     "addToCart": "Aggiungi al carrello",
+    "buyNow": "Acquista ora",
     "added": "Aggiunto ✓",
     "inStock": "Disponibile",
     "outOfStock": "Esaurito",
@@ -92,7 +94,8 @@
     "emptyCart": "Il carrello è vuoto.",
     "errorGeneric": "Si è verificato un errore. Riprovate per favore.",
     "errorNpa": "NPA non valido (4 cifre)",
-    "stepDelivery": "Consegna",
+    "errorCanton": "Selezionate il vostro cantone.",
+    "stepDelivery": "Dati",
     "stepPayment": "Pagamento",
     "accountBadge": "Account",
     "guestNotice": "Ordine senza account: confermate il vostro indirizzo e-mail per continuare.",
@@ -144,9 +147,18 @@
     "success": "Richiesta ricevuta! Vi ricontattiamo per e-mail entro 48 ore.",
     "error": "Si è verificato un errore. Riprovate per favore."
   },
+  "favorites": {
+    "title": "I miei preferiti",
+    "empty": "Nessun preferito per ora.",
+    "browse": "Sfoglia il catalogo",
+    "add": "Aggiungi ai preferiti",
+    "remove": "Rimuovi dai preferiti"
+  },
   "account": {
     "title": "Il mio account",
     "greeting": "Ciao {name}",
+    "avatarTitle": "Scegli un avatar",
+    "avatarChange": "Cambia avatar",
     "myOrders": "I miei ordini",
     "myQuotes": "I miei preventivi",
     "noOrders": "Nessun ordine per il momento.",

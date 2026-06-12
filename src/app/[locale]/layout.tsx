@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { CartProvider } from "@/lib/cart";
+import { FavoritesProvider } from "@/lib/favorites";
 import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
 import { Footer } from "@/components/footer";
@@ -68,10 +69,12 @@ export default async function LocaleLayout({
       <body className="flex min-h-screen flex-col">
         <NextIntlClientProvider>
           <CartProvider>
-            <Header />
-            <main className="flex-1 pb-24 md:pb-0">{children}</main>
-            <Footer />
-            <BottomNav />
+            <FavoritesProvider>
+              <Header />
+              <main className="flex-1 pb-24 md:pb-0">{children}</main>
+              <Footer />
+              <BottomNav />
+            </FavoritesProvider>
           </CartProvider>
         </NextIntlClientProvider>
       </body>

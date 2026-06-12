@@ -8,7 +8,8 @@
     "shop": "Katalog",
     "custom": "Massanfertigung",
     "cart": "Warenkorb",
-    "account": "Konto"
+    "account": "Konto",
+    "favorites": "Favoriten"
   },
   "home": {
     "heroBadge": "Gedruckt in Gland · Lieferung in die ganze Schweiz",
@@ -38,6 +39,7 @@
   },
   "product": {
     "addToCart": "In den Warenkorb",
+    "buyNow": "Jetzt kaufen",
     "added": "Hinzugefügt ✓",
     "inStock": "An Lager",
     "outOfStock": "Ausverkauft",
@@ -92,7 +94,8 @@
     "emptyCart": "Ihr Warenkorb ist leer.",
     "errorGeneric": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "errorNpa": "Ungültige PLZ (4 Ziffern)",
-    "stepDelivery": "Lieferung",
+    "errorCanton": "Bitte wählen Sie Ihren Kanton.",
+    "stepDelivery": "Angaben",
     "stepPayment": "Zahlung",
     "accountBadge": "Konto",
     "guestNotice": "Bestellung ohne Konto: Bestätigen Sie Ihre E-Mail-Adresse, um fortzufahren.",
@@ -144,9 +147,18 @@
     "success": "Anfrage erhalten! Wir melden uns innerhalb von 48 Stunden per E-Mail.",
     "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
   },
+  "favorites": {
+    "title": "Meine Favoriten",
+    "empty": "Noch keine Favoriten.",
+    "browse": "Katalog entdecken",
+    "add": "Zu Favoriten hinzufügen",
+    "remove": "Aus Favoriten entfernen"
+  },
   "account": {
     "title": "Mein Konto",
     "greeting": "Hallo {name}",
+    "avatarTitle": "Avatar wählen",
+    "avatarChange": "Avatar ändern",
     "myOrders": "Meine Bestellungen",
     "myQuotes": "Meine Offerten",
     "noOrders": "Noch keine Bestellungen.",

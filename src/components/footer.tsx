@@ -20,12 +20,16 @@ export function Footer() {
           <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium text-soft">
             <Link
               href="/legal/terms"
+              target="_blank"
+              rel="noopener noreferrer"
               className="transition-colors hover:text-ink"
             >
               {t("terms")}
             </Link>
             <Link
               href="/legal/privacy"
+              target="_blank"
+              rel="noopener noreferrer"
               className="transition-colors hover:text-ink"
             >
               {t("privacy")}

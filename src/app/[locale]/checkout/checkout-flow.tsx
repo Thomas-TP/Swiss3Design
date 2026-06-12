@@ -24,6 +24,7 @@ import {
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { Select } from "@/components/select";
 import { useCart } from "@/lib/cart";
 import { useSession } from "@/lib/auth-client";
 import { formatChf } from "@/lib/format";
@@ -511,6 +512,11 @@ export function CheckoutFlow({
 
   async function startPayment(formData: FormData) {
     if (!emailReady) return;
+    // Le canton n'est plus un <select> natif : validation manuelle
+    if (!addr.canton) {
+      setError(t("errorCanton"));
+      return;
+    }
     setSubmitting(true);
     setError(null);
     try {
@@ -588,6 +594,23 @@ export function CheckoutFlow({
                     ".Label": {
                       fontWeight: "500",
                       color: "#44403c",
+                    },
+                    ".AccordionItem": {
+                      borderColor: "#e7e5e4",
+                      boxShadow: "none",
+                      borderRadius: "12px",
+                    },
+                    ".Dropdown": {
+                      borderColor: "#e7e5e4",
+                      borderRadius: "12px",
+                      boxShadow: "0 8px 24px rgba(28, 25, 23, 0.08)",
+                    },
+                    ".DropdownItem": {
+                      color: "#1c1917",
+                    },
+                    ".DropdownItem--highlight": {
+                      backgroundColor: "#fafaf9",
+                      color: "#1c1917",
                     },
                   },
                 },
@@ -676,24 +699,16 @@ export function CheckoutFlow({
                     />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
-                    <select
+                    <Select
                       value={addr.canton}
-                      onChange={(e) =>
-                        setAddr({ ...addr, canton: e.target.value })
-                      }
-                      required
-                      aria-label={t("canton")}
-                      className={`${field} ${addr.canton ? "" : "text-soft/60"}`}
-                    >
-                      <option value="" disabled>
-                        {t("canton")}
-                      </option>
-                      {CANTONS.map(([code, name]) => (
-                        <option key={code} value={code}>
-                          {code} — {name}
-                        </option>
-                      ))}
-                    </select>
+                      onChange={(canton) => setAddr({ ...addr, canton })}
+                      options={CANTONS.map(([code, name]) => ({
+                        value: code,
+                        label: `${code} — ${name}`,
+                      }))}
+                      placeholder={t("canton")}
+                      ariaLabel={t("canton")}
+                    />
                     <input
                       value={t("countrySwiss")}
                       disabled
@@ -800,7 +815,17 @@ function PaymentStep({
       <p className="mt-1 text-sm text-soft">{t("paymentSubtitle")}</p>
 
       <div className="mt-5">
-        <PaymentElement options={{ layout: "tabs" }} />
+        {/* Accordéon : tous les moyens de paiement listés proprement,
+            sans le menu déroulant « plus de moyens » du mode tabs */}
+        <PaymentElement
+          options={{
+            layout: {
+              type: "accordion",
+              radios: "never",
+              spacedAccordionItems: true,
+            },
+          }}
+        />
       </div>
 
       {error && (
@@ -824,6 +849,8 @@ function PaymentStep({
         {t("termsPrefix")}{" "}
         <Link
           href="/legal/terms"
+          target="_blank"
+          rel="noopener noreferrer"
           className="underline transition-colors hover:text-ink"
         >
           {tFooter("terms")}
