@@ -183,6 +183,32 @@
       "in_production": "In Produktion",
       "done": "Abgeschlossen",
       "rejected": "Abgelehnt"
+    },
+    "security": {
+      "title": "Sicherheit",
+      "twoFactorTitle": "Zwei-Faktor-Authentifizierung (2FA)",
+      "twoFactorDesc": "Ein zusätzlicher Bestätigungsschritt per App (TOTP) bei der Anmeldung.",
+      "twoFactorActive": "Aktiviert",
+      "twoFactorInactive": "Deaktiviert",
+      "password": "Passwort",
+      "passwordHint": "Erforderlich, wenn Sie sich mit Passwort anmelden.",
+      "enable": "2FA aktivieren",
+      "disable": "Deaktivieren",
+      "scanQr": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App (Google Authenticator, Authy…).",
+      "enterCode": "Geben Sie den 6-stelligen Code aus der App ein:",
+      "codePlaceholder": "6-stelliger Code",
+      "verify": "Prüfen und aktivieren",
+      "backupTitle": "Wiederherstellungscodes",
+      "backupHint": "Sicher aufbewahren: Damit melden Sie sich an, falls Sie Ihr Telefon verlieren. Jeder Code ist einmal gültig.",
+      "copyCodes": "Codes kopieren",
+      "errorPassword": "Falsches Passwort.",
+      "errorCode": "Falscher Code. Bitte erneut versuchen.",
+      "processing": "Wird verarbeitet…",
+      "dangerTitle": "Konto löschen",
+      "dangerDesc": "Ihr Konto und Ihre personenbezogenen Daten werden gelöscht. Bestellungen werden aus buchhalterischen Gründen 10 Jahre aufbewahrt (gesetzliche Pflicht).",
+      "deleteButton": "Mein Konto löschen",
+      "deleteConfirm": "Konto endgültig löschen? Diese Aktion ist unwiderruflich.",
+      "deleteEmailSent": "Bestätigungs-E-Mail gesendet. Klicken Sie auf den Link, um Ihr Konto endgültig zu löschen."
     }
   },
   "auth": {
@@ -214,7 +240,18 @@
     "errorUnverified": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse (Link per E-Mail gesendet).",
     "errorInvalid": "E-Mail oder Passwort falsch.",
     "errorExists": "Mit dieser E-Mail existiert bereits ein Konto.",
-    "errorGeneric": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+    "errorGeneric": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+    "twoFactor": {
+      "title": "Zwei-Faktor-Bestätigung",
+      "prompt": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein.",
+      "code": "6-stelliger Code",
+      "verify": "Bestätigen",
+      "useBackup": "Wiederherstellungscode verwenden",
+      "useTotp": "Authenticator-App verwenden",
+      "backupPrompt": "Geben Sie einen Ihrer Wiederherstellungscodes ein.",
+      "backupCode": "Wiederherstellungscode",
+      "error": "Falscher Code. Bitte erneut versuchen."
+    }
   },
   "errors": {
     "notFoundTitle": "Seite nicht gefunden",

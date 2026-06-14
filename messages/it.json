@@ -183,6 +183,32 @@
       "in_production": "In produzione",
       "done": "Completato",
       "rejected": "Rifiutato"
+    },
+    "security": {
+      "title": "Sicurezza",
+      "twoFactorTitle": "Autenticazione a due fattori (2FA)",
+      "twoFactorDesc": "Un passaggio di verifica tramite app (TOTP) all'accesso.",
+      "twoFactorActive": "Attiva",
+      "twoFactorInactive": "Disattivata",
+      "password": "Password",
+      "passwordHint": "Richiesta se accedete con una password.",
+      "enable": "Attiva la 2FA",
+      "disable": "Disattiva",
+      "scanQr": "Scansionate questo QR code con la vostra app di autenticazione (Google Authenticator, Authy…).",
+      "enterCode": "Inserite il codice a 6 cifre generato dall'app:",
+      "codePlaceholder": "Codice a 6 cifre",
+      "verify": "Verifica e attiva",
+      "backupTitle": "Codici di recupero",
+      "backupHint": "Conservateli al sicuro: vi permettono di accedere se perdete il telefono. Ogni codice è valido una volta.",
+      "copyCodes": "Copia i codici",
+      "errorPassword": "Password errata.",
+      "errorCode": "Codice errato. Riprovate.",
+      "processing": "Elaborazione…",
+      "dangerTitle": "Elimina il mio account",
+      "dangerDesc": "Il vostro account e i dati personali saranno cancellati. Gli ordini sono conservati 10 anni per la contabilità (obbligo legale).",
+      "deleteButton": "Elimina il mio account",
+      "deleteConfirm": "Eliminare definitivamente il vostro account? L'azione è irreversibile.",
+      "deleteEmailSent": "E-mail di conferma inviata. Cliccate sul link per eliminare definitivamente il vostro account."
     }
   },
   "auth": {
@@ -214,7 +240,18 @@
     "errorUnverified": "Confermate prima il vostro indirizzo e-mail (link inviato per e-mail).",
     "errorInvalid": "E-mail o password errati.",
     "errorExists": "Esiste già un account con questa e-mail.",
-    "errorGeneric": "Si è verificato un errore. Riprovate per favore."
+    "errorGeneric": "Si è verificato un errore. Riprovate per favore.",
+    "twoFactor": {
+      "title": "Verifica in due passaggi",
+      "prompt": "Inserite il codice a 6 cifre della vostra app di autenticazione.",
+      "code": "Codice a 6 cifre",
+      "verify": "Verifica",
+      "useBackup": "Usa un codice di recupero",
+      "useTotp": "Usa l'app di autenticazione",
+      "backupPrompt": "Inserite uno dei vostri codici di recupero.",
+      "backupCode": "Codice di recupero",
+      "error": "Codice errato. Riprovate."
+    }
   },
   "errors": {
     "notFoundTitle": "Pagina non trovata",

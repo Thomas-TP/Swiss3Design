@@ -183,6 +183,32 @@
       "in_production": "In production",
       "done": "Done",
       "rejected": "Declined"
+    },
+    "security": {
+      "title": "Security",
+      "twoFactorTitle": "Two-factor authentication (2FA)",
+      "twoFactorDesc": "An extra app-based verification step (TOTP) at sign-in.",
+      "twoFactorActive": "Enabled",
+      "twoFactorInactive": "Disabled",
+      "password": "Password",
+      "passwordHint": "Required if you sign in with a password.",
+      "enable": "Enable 2FA",
+      "disable": "Disable",
+      "scanQr": "Scan this QR code with your authenticator app (Google Authenticator, Authy…).",
+      "enterCode": "Enter the 6-digit code from the app:",
+      "codePlaceholder": "6-digit code",
+      "verify": "Verify and enable",
+      "backupTitle": "Backup codes",
+      "backupHint": "Keep them safe: they sign you in if you lose your phone. Each code works once.",
+      "copyCodes": "Copy codes",
+      "errorPassword": "Incorrect password.",
+      "errorCode": "Incorrect code. Try again.",
+      "processing": "Processing…",
+      "dangerTitle": "Delete my account",
+      "dangerDesc": "Your account and personal data will be erased. Orders are kept for 10 years for accounting (legal obligation).",
+      "deleteButton": "Delete my account",
+      "deleteConfirm": "Permanently delete your account? This cannot be undone.",
+      "deleteEmailSent": "Confirmation email sent. Click the link to permanently delete your account."
     }
   },
   "auth": {
@@ -214,7 +240,18 @@
     "errorUnverified": "Please confirm your email address first (link sent by email).",
     "errorInvalid": "Incorrect email or password.",
     "errorExists": "An account with this email already exists.",
-    "errorGeneric": "Something went wrong. Please try again."
+    "errorGeneric": "Something went wrong. Please try again.",
+    "twoFactor": {
+      "title": "Two-step verification",
+      "prompt": "Enter the 6-digit code from your authenticator app.",
+      "code": "6-digit code",
+      "verify": "Verify",
+      "useBackup": "Use a backup code",
+      "useTotp": "Use authenticator app",
+      "backupPrompt": "Enter one of your backup codes.",
+      "backupCode": "Backup code",
+      "error": "Incorrect code. Try again."
+    }
   },
   "errors": {
     "notFoundTitle": "Page not found",

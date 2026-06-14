@@ -210,9 +210,28 @@ export const user = sqliteTable("user", {
     .default(false),
   image: text("image"),
   role: text("role").notNull().default("customer"),
+  // Géré par le plugin Better Auth twoFactor (jamais modifiable par le client)
+  twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" })
+    .notNull()
+    .default(false),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
+
+// Authentification à deux facteurs (TOTP + codes de récupération) — Better Auth
+export const twoFactor = sqliteTable(
+  "two_factor",
+  {
+    id: text("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    secret: text("secret").notNull(),
+    backupCodes: text("backup_codes").notNull(),
+    verified: integer("verified", { mode: "boolean" }).notNull().default(true),
+  },
+  (t) => [index("two_factor_user_idx").on(t.userId)],
+);
 
 export const session = sqliteTable(
   "session",

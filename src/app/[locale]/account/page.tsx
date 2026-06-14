@@ -9,6 +9,7 @@ import { getServerSession } from "@/lib/session";
 import { formatChf } from "@/lib/format";
 import { SignOutButton } from "./sign-out-button";
 import { AvatarPicker } from "./avatar-picker";
+import { AccountSecurity } from "./account-security";
 
 export const dynamic = "force-dynamic";
 
@@ -160,6 +161,8 @@ export default async function AccountPage({
           </ul>
         )}
       </section>
+
+      <AccountSecurity />
     </div>
   );
 }

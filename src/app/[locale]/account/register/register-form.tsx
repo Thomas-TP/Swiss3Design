@@ -27,35 +27,33 @@ export function RegisterForm() {
   const signedIn = useRef(false);
   useEffect(() => {
     if (!waiting) return;
-    const check = async () => {
-      try {
-        const res = await fetch("/api/verification-status", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: waiting.email }),
-        });
-        const data = (await res.json()) as { verified?: boolean };
-        if (!data.verified || signedIn.current) return;
-        signedIn.current = true;
-        setSigningIn(true);
-        const { error: err } = await signIn.email({
-          email: waiting.email,
-          password: waiting.password,
-        });
-        if (err) {
-          // Cas limite (ex. mot de passe changé entre-temps) : direction la connexion
-          router.push("/account/login");
-          return;
-        }
-        router.push("/account");
-        router.refresh();
-      } catch {
-        // réseau indisponible — on réessaiera au prochain tick
+    // Auto-connexion dès que l'e-mail est confirmé : on retente simplement
+    // signIn (qui échoue tant que l'e-mail n'est pas vérifié). Aucun endpoint
+    // d'énumération, et on espace les tentatives pour rester sous la limite
+    // anti-abus de l'authentification (~1 essai / 55 s).
+    let lastAttempt = 0;
+    const attempt = async () => {
+      if (signedIn.current || Date.now() - lastAttempt < 55_000) return;
+      lastAttempt = Date.now();
+      const { data, error: err } = await signIn.email({
+        email: waiting.email,
+        password: waiting.password,
+      });
+      // err 403 = e-mail pas encore confirmé ; 429 = limite atteinte → on réessaie plus tard
+      if (err || !data) return;
+      if ((data as { twoFactorRedirect?: boolean }).twoFactorRedirect) {
+        router.push("/account/login");
+        return;
       }
+      signedIn.current = true;
+      setSigningIn(true);
+      router.push("/account");
+      router.refresh();
     };
-    const id = setInterval(check, 3000);
+    attempt();
+    const id = setInterval(attempt, 15_000);
     const onVisible = () => {
-      if (document.visibilityState === "visible") check();
+      if (document.visibilityState === "visible") attempt();
     };
     document.addEventListener("visibilitychange", onVisible);
     return () => {

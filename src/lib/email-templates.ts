@@ -702,3 +702,27 @@ export function verificationEmail(to: string, url: string): EmailMessage {
     html: layout("Confirmez votre adresse", body, FOOTER.fr),
   };
 }
+
+// ── Confirmation de suppression de compte (FR + EN) ──────────────────────────
+
+export function deleteAccountEmail(to: string, url: string): EmailMessage {
+  const body = `
+    <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
+      Vous avez demandé la suppression de votre compte Swiss3Design. Cliquez
+      sur le bouton ci-dessous pour confirmer : votre compte et vos données
+      personnelles seront effacés. Vos commandes restent conservées 10 ans
+      pour des raisons comptables (art. 958f CO). Ce lien expire dans 1 heure.
+    </p>
+    ${button(url, "Supprimer définitivement mon compte")}
+    <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">
+      You requested deletion of your Swiss3Design account — click the button above to confirm (link expires in 1 hour).<br/>
+      Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail :
+      votre compte reste inchangé.
+    </p>`;
+  return {
+    to,
+    from: FROM_CONTACT,
+    subject: "Confirmez la suppression de votre compte — Swiss3Design",
+    html: layout("Suppression de compte", body, FOOTER.fr),
+  };
+}

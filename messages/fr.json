@@ -183,6 +183,32 @@
       "in_production": "En production",
       "done": "Terminée",
       "rejected": "Refusée"
+    },
+    "security": {
+      "title": "Sécurité",
+      "twoFactorTitle": "Authentification à deux facteurs (2FA)",
+      "twoFactorDesc": "Une étape de vérification par application (TOTP) à la connexion.",
+      "twoFactorActive": "Activée",
+      "twoFactorInactive": "Désactivée",
+      "password": "Mot de passe",
+      "passwordHint": "Requis si vous vous connectez avec un mot de passe.",
+      "enable": "Activer la 2FA",
+      "disable": "Désactiver",
+      "scanQr": "Scannez ce QR code avec votre application d'authentification (Google Authenticator, Authy…).",
+      "enterCode": "Saisissez le code à 6 chiffres généré par l'application :",
+      "codePlaceholder": "Code à 6 chiffres",
+      "verify": "Vérifier et activer",
+      "backupTitle": "Codes de récupération",
+      "backupHint": "Gardez-les en lieu sûr : ils vous connectent si vous perdez votre téléphone. Chaque code sert une fois.",
+      "copyCodes": "Copier les codes",
+      "errorPassword": "Mot de passe incorrect.",
+      "errorCode": "Code incorrect. Réessayez.",
+      "processing": "Traitement…",
+      "dangerTitle": "Supprimer mon compte",
+      "dangerDesc": "Votre compte et vos données personnelles seront effacés. Vos commandes sont conservées 10 ans pour la comptabilité (obligation légale).",
+      "deleteButton": "Supprimer mon compte",
+      "deleteConfirm": "Supprimer définitivement votre compte ? Cette action est irréversible.",
+      "deleteEmailSent": "E-mail de confirmation envoyé. Cliquez sur le lien pour supprimer définitivement votre compte."
     }
   },
   "auth": {
@@ -214,7 +240,18 @@
     "errorUnverified": "Veuillez d'abord confirmer votre adresse e-mail (lien envoyé par e-mail).",
     "errorInvalid": "E-mail ou mot de passe incorrect.",
     "errorExists": "Un compte existe déjà avec cet e-mail.",
-    "errorGeneric": "Une erreur est survenue. Merci de réessayer."
+    "errorGeneric": "Une erreur est survenue. Merci de réessayer.",
+    "twoFactor": {
+      "title": "Vérification en deux étapes",
+      "prompt": "Saisissez le code à 6 chiffres de votre application d'authentification.",
+      "code": "Code à 6 chiffres",
+      "verify": "Vérifier",
+      "useBackup": "Utiliser un code de récupération",
+      "useTotp": "Utiliser l'application d'authentification",
+      "backupPrompt": "Saisissez l'un de vos codes de récupération.",
+      "backupCode": "Code de récupération",
+      "error": "Code incorrect. Réessayez."
+    }
   },
   "errors": {
     "notFoundTitle": "Page introuvable",
