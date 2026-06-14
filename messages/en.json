@@ -228,6 +228,15 @@
       "tracking": "Tracking",
       "trackOrder": "Track my parcel",
       "back": "Back to my account"
+    },
+    "quotePay": {
+      "title": "Pay your quote",
+      "cta": "Pay this quote",
+      "paidTitle": "Quote paid ✅",
+      "paidText": "Thank you! Your payment is confirmed. We're starting production and will get back to you by email.",
+      "notPayable": "This quote isn't payable right now.",
+      "loading": "Preparing payment…",
+      "error": "Something went wrong. Please try again."
     }
   },
   "auth": {

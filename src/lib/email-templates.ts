@@ -598,6 +598,33 @@ export function adminNewQuoteEmail(
   };
 }
 
+// ── Devis payé (notification interne) ────────────────────────────────────────
+
+export function adminQuotePaidEmail(
+  quote: {
+    id: string;
+    email: string;
+    quotedPriceCents: number | null;
+    locale: string;
+  },
+  adminEmails: string[],
+): EmailMessage {
+  const amount = quote.quotedPriceCents != null ? chf(quote.quotedPriceCents) : "—";
+  const body = `
+    <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
+      Le devis de <strong>${esc(quote.email)}</strong> vient d'être
+      <strong>payé</strong> (${amount}). À produire puis expédier.
+    </p>
+    ${button(`${SITE_URL}/fr/admin/quotes/${quote.id}`, "Voir le devis")}`;
+  return {
+    to: adminEmails,
+    from: FROM_CONTACT,
+    replyTo: quote.email,
+    subject: `💳 Devis payé — ${quote.email} (${amount})`,
+    html: layout("Devis payé", body, "Notification interne Swiss3Design — répondre écrit directement au client."),
+  };
+}
+
 // ── Code de vérification d'e-mail au checkout (commande sans compte) ─────────
 
 const CHECKOUT_CODE_TEXTS: Record<

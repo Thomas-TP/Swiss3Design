@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { orders } from "@/db/schema";
-import { markOrderPaid } from "@/lib/orders";
+import { markOrderPaid, markQuotePaid } from "@/lib/orders";
 import { getStripe, stripeCryptoProvider } from "@/lib/stripe";
 
 export async function POST(request: Request) {
@@ -35,9 +35,11 @@ export async function POST(request: Request) {
   ) {
     const paymentIntent = event.data.object;
     const orderId = paymentIntent.metadata?.orderId;
+    const quoteId = paymentIntent.metadata?.quoteId;
+    const succeeded = event.type === "payment_intent.succeeded";
     if (orderId) {
       const db = await getDb();
-      if (event.type === "payment_intent.succeeded") {
+      if (succeeded) {
         await markOrderPaid(db, orderId);
       } else {
         await db
@@ -45,6 +47,11 @@ export async function POST(request: Request) {
           .set({ status: "cancelled" })
           .where(eq(orders.id, orderId));
       }
+    }
+    // Paiement d'un devis chiffré
+    if (quoteId && succeeded) {
+      const db = await getDb();
+      await markQuotePaid(db, quoteId);
     }
   }
 

@@ -228,6 +228,15 @@
       "tracking": "Suivi",
       "trackOrder": "Suivre mon colis",
       "back": "Retour à mon compte"
+    },
+    "quotePay": {
+      "title": "Payer votre devis",
+      "cta": "Payer ce devis",
+      "paidTitle": "Devis payé ✅",
+      "paidText": "Merci ! Votre paiement est confirmé. Nous lançons la production et revenons vers vous par e-mail.",
+      "notPayable": "Ce devis n'est pas payable pour le moment.",
+      "loading": "Préparation du paiement…",
+      "error": "Une erreur est survenue. Merci de réessayer."
     }
   },
   "auth": {

@@ -228,6 +228,15 @@
       "tracking": "Tracciamento",
       "trackOrder": "Segui il pacco",
       "back": "Torna al mio account"
+    },
+    "quotePay": {
+      "title": "Pagare il preventivo",
+      "cta": "Paga il preventivo",
+      "paidTitle": "Preventivo pagato ✅",
+      "paidText": "Grazie! Il pagamento è confermato. Avviamo la produzione e vi ricontattiamo per e-mail.",
+      "notPayable": "Questo preventivo non è pagabile al momento.",
+      "loading": "Preparazione del pagamento…",
+      "error": "Si è verificato un errore. Riprovate per favore."
     }
   },
   "auth": {

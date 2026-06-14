@@ -158,6 +158,14 @@ export default async function AccountPage({
                     {q.adminMessage && <> — {q.adminMessage}</>}
                   </p>
                 )}
+                {q.status === "quoted" && q.quotedPriceCents != null && (
+                  <Link
+                    href={`/account/quotes/${q.id}/pay`}
+                    className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-accent-dark"
+                  >
+                    {t("quotePay.cta")}
+                  </Link>
+                )}
               </li>
             ))}
           </ul>

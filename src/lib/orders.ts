@@ -1,4 +1,4 @@
-import { and, eq, ne, gte, isNotNull, sql } from "drizzle-orm";
+import { and, eq, ne, gte, inArray, isNotNull, sql } from "drizzle-orm";
 import type { getDb } from "@/db";
 import {
   orders,
@@ -6,9 +6,14 @@ import {
   products,
   productVariants,
   inventoryLog,
+  quoteRequests,
 } from "@/db/schema";
 import { sendEmail, getAdminEmails } from "./email";
-import { orderConfirmationEmail, adminNewOrderEmail } from "./email-templates";
+import {
+  orderConfirmationEmail,
+  adminNewOrderEmail,
+  adminQuotePaidEmail,
+} from "./email-templates";
 
 type Db = Awaited<ReturnType<typeof getDb>>;
 
@@ -148,5 +153,37 @@ export async function markOrderPaid(db: Db, orderId: string) {
     }
   } catch (e) {
     console.error("[email notif admin commande]", e);
+  }
+}
+
+// Passe un devis chiffré en "payé" (idempotent) et notifie l'admin. Appelé par
+// le webhook Stripe ET par la page de retour (filet) — le premier arrivé agit.
+export async function markQuotePaid(db: Db, quoteId: string) {
+  const claimed = await db
+    .update(quoteRequests)
+    .set({ status: "paid" })
+    .where(
+      and(
+        eq(quoteRequests.id, quoteId),
+        inArray(quoteRequests.status, ["quoted", "accepted"]),
+      ),
+    )
+    .returning({ id: quoteRequests.id });
+  if (claimed.length === 0) return;
+
+  const [quote] = await db
+    .select()
+    .from(quoteRequests)
+    .where(eq(quoteRequests.id, quoteId))
+    .limit(1);
+  if (!quote) return;
+
+  try {
+    const adminEmails = await getAdminEmails();
+    if (adminEmails.length > 0) {
+      await sendEmail(adminQuotePaidEmail(quote, adminEmails));
+    }
+  } catch (e) {
+    console.error("[email devis payé]", e);
   }
 }

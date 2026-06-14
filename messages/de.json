@@ -228,6 +228,15 @@
       "tracking": "Sendungsverfolgung",
       "trackOrder": "Paket verfolgen",
       "back": "Zurück zum Konto"
+    },
+    "quotePay": {
+      "title": "Offerte bezahlen",
+      "cta": "Offerte bezahlen",
+      "paidTitle": "Offerte bezahlt ✅",
+      "paidText": "Vielen Dank! Ihre Zahlung ist bestätigt. Wir starten die Produktion und melden uns per E-Mail.",
+      "notPayable": "Diese Offerte ist derzeit nicht zahlbar.",
+      "loading": "Zahlung wird vorbereitet…",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
     }
   },
   "auth": {
