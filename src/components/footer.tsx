@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { BrandMark } from "./brand-mark";
 
 export function Footer() {
   const t = useTranslations("footer");
@@ -9,11 +10,12 @@ export function Footer() {
       <div className="mx-auto max-w-6xl px-4 pt-10 sm:px-6">
         <div className="flex flex-col items-start justify-between gap-6 md:flex-row md:items-center">
           <div>
-            <p className="flex items-center gap-2 font-semibold">
-              <span className="grid h-6 w-6 place-items-center rounded-md bg-accent text-xs font-black text-white">
-                3
+            <p className="flex items-center gap-2 text-ink">
+              <BrandMark className="h-7 w-7 text-ink" />
+              <span>
+                <span className="font-medium">Swiss</span>
+                <span className="font-bold">3Design</span>
               </span>
-              Swiss3Design
             </p>
             <p className="mt-1 text-sm text-soft">{t("tagline")}</p>
           </div>

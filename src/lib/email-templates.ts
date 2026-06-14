@@ -40,10 +40,16 @@ function layout(title: string, body: string, footer: string): string {
 <html>
 <body style="margin:0;padding:0;background:#fafaf9;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1c1917;">
   <div style="max-width:560px;margin:0 auto;padding:32px 16px;">
-    <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px;">
-      <span style="display:inline-block;width:28px;height:28px;border-radius:6px;background:#da291c;color:#ffffff;font-weight:900;font-size:15px;line-height:28px;text-align:center;">3</span>
-      <span style="font-weight:600;font-size:17px;letter-spacing:-0.2px;">&nbsp;Swiss3Design</span>
-    </div>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
+      <tr>
+        <td style="padding-right:9px;line-height:0;vertical-align:middle;">
+          <img src="${SITE_URL}/brand/png/icon-ink-64.png" alt="" width="30" height="30" style="display:block;border:0;outline:none;width:30px;height:30px;" />
+        </td>
+        <td style="vertical-align:middle;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:17px;letter-spacing:-0.2px;color:#1c1917;">
+          <span style="font-weight:500;">Swiss</span><span style="font-weight:700;">3Design</span>
+        </td>
+      </tr>
+    </table>
     <div style="background:#ffffff;border:1px solid #e7e5e4;border-radius:16px;padding:28px;">
       <h1 style="margin:0 0 12px;font-size:21px;letter-spacing:-0.3px;">${title}</h1>
       ${body}

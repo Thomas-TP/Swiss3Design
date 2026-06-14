@@ -6,6 +6,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favorites";
 import { useSession } from "@/lib/auth-client";
+import { BrandMark } from "./brand-mark";
 import { LocaleSwitcher } from "./locale-switcher";
 
 const links = [
@@ -24,12 +25,11 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/80 backdrop-blur-lg">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Link href="/" className="flex items-center gap-2.5">
-          <span className="grid h-7 w-7 place-items-center rounded-md bg-accent text-sm font-black text-white">
-            3
-          </span>
-          <span className="text-[17px] font-semibold tracking-tight">
-            Swiss3Design
+        <Link href="/" className="flex items-center gap-2.5" aria-label="Swiss3Design">
+          <BrandMark className="h-8 w-8 text-ink" />
+          <span className="text-[17px] tracking-tight text-ink">
+            <span className="font-medium">Swiss</span>
+            <span className="font-bold">3Design</span>
           </span>
         </Link>
 

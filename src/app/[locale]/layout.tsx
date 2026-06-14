@@ -45,12 +45,35 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const meta = META[locale] ?? META.fr;
+  const title = `Swiss3Design — ${meta.title}`;
   return {
+    metadataBase: new URL("https://swiss3design.ch"),
     title: {
-      default: `Swiss3Design — ${meta.title}`,
+      default: title,
       template: "%s · Swiss3Design",
     },
     description: meta.description,
+    openGraph: {
+      type: "website",
+      siteName: "Swiss3Design",
+      locale,
+      title,
+      description: meta.description,
+      images: [
+        {
+          url: "/brand/social/og-image.png",
+          width: 1200,
+          height: 630,
+          alt: "Swiss3Design",
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description: meta.description,
+      images: ["/brand/social/og-image.png"],
+    },
   };
 }
 
