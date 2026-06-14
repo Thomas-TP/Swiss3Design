@@ -178,7 +178,7 @@ export default async function AdminEmailsPage({
               href={{ pathname: "/admin/emails", query: { l: pl } }}
               className={`rounded-full px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide transition-colors ${
                 previewLocale === pl
-                  ? "bg-ink text-white"
+                  ? "bg-ink text-paper"
                   : "border border-line bg-surface text-soft hover:text-ink"
               }`}
             >

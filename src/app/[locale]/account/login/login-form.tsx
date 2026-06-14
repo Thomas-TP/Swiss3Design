@@ -76,7 +76,7 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
         </p>
       </div>
       {error && (
-        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
           {error}
         </p>
       )}

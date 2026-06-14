@@ -127,9 +127,9 @@ export default async function AdminDashboard({
       </div>
 
       {lowStock.length > 0 && (
-        <div className="rounded-card border border-amber-200 bg-amber-50 p-4 text-sm">
-          <p className="font-semibold text-amber-800">⚠ Stock bas</p>
-          <ul className="mt-1 text-amber-700">
+        <div className="rounded-card border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
+          <p className="font-semibold text-amber-800 dark:text-amber-200">⚠ Stock bas</p>
+          <ul className="mt-1 text-amber-700 dark:text-amber-300">
             {lowStock.map((p) => (
               <li key={p.id}>
                 <Link href={`/admin/products/${p.id}`} className="underline">

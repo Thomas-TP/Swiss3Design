@@ -94,12 +94,12 @@ export function RegisterForm() {
 
   if (waiting) {
     return (
-      <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-6 text-center">
+      <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-center">
         <MailCheck size={28} className="mx-auto text-emerald-600" />
-        <p className="mt-3 text-sm font-medium leading-relaxed text-emerald-800">
+        <p className="mt-3 text-sm font-medium leading-relaxed text-emerald-800 dark:text-emerald-200">
           {t("verifyNotice")}
         </p>
-        <p className="mt-3 flex items-center justify-center gap-2 text-xs text-emerald-700">
+        <p className="mt-3 flex items-center justify-center gap-2 text-xs text-emerald-700 dark:text-emerald-300">
           <LoaderCircle size={14} className="animate-spin" />
           {signingIn ? t("verifySigningIn") : t("verifyWaiting")}
         </p>
@@ -151,7 +151,7 @@ export function RegisterForm() {
         <p className="mt-1 text-xs text-soft">{t("passwordHint")}</p>
       </div>
       {error && (
-        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
           {error}
         </p>
       )}

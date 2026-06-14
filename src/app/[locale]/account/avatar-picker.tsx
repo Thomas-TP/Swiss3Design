@@ -71,7 +71,7 @@ export function AvatarPicker({ current }: { current: string | null }) {
             <CircleUser size={24} strokeWidth={1.6} className="text-soft" />
           </span>
         )}
-        <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full bg-ink text-white ring-2 ring-paper">
+        <span className="absolute -bottom-0.5 -right-0.5 grid h-5 w-5 place-items-center rounded-full bg-ink text-paper ring-2 ring-paper">
           <Pencil size={10} />
         </span>
       </button>

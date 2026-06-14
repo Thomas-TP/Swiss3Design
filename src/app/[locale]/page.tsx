@@ -104,13 +104,13 @@ export default async function HomePage({
 
       {/* Multicolore */}
       <Reveal inView>
-        <section className="grid gap-8 rounded-card bg-ink p-8 text-white md:grid-cols-[1.2fr_1fr] md:items-center md:p-14">
+        <section className="grid gap-8 rounded-card bg-ink p-8 text-paper md:grid-cols-[1.2fr_1fr] md:items-center md:p-14">
           <div>
             <MulticolorDots size={12} />
             <h2 className="mt-5 text-3xl font-bold tracking-tight md:text-4xl">
               {t("multicolorTitle")}
             </h2>
-            <p className="mt-4 max-w-lg leading-relaxed text-white/70">
+            <p className="mt-4 max-w-lg leading-relaxed text-paper/70">
               {t("multicolorText")}
             </p>
           </div>

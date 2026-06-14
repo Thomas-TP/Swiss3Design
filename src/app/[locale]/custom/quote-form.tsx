@@ -45,9 +45,9 @@ export function QuoteForm() {
 
   if (state.status === "success") {
     return (
-      <div className="rounded-card border border-emerald-200 bg-emerald-50 p-8 text-center">
+      <div className="rounded-card border border-emerald-500/30 bg-emerald-500/10 p-8 text-center">
         <CheckCircle2 size={32} className="mx-auto text-emerald-600" />
-        <p className="mt-4 font-semibold text-emerald-800">{t("success")}</p>
+        <p className="mt-4 font-semibold text-emerald-800 dark:text-emerald-200">{t("success")}</p>
       </div>
     );
   }
@@ -185,7 +185,7 @@ export function QuoteForm() {
       </div>
 
       {state.status === "error" && (
-        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
           {t("error")}
         </p>
       )}

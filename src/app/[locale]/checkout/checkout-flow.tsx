@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 // Import « /pure » : la variante par défaut injecte le script Stripe (et ses
 // iframes antifraude) dès l'import du module, même sans appeler loadStripe.
 import { loadStripe } from "@stripe/stripe-js/pure";
-import type { StripeElementLocale } from "@stripe/stripe-js";
+import type { StripeElementLocale, Appearance } from "@stripe/stripe-js";
 import {
   Elements,
   PaymentElement,
@@ -27,6 +27,7 @@ import { Link } from "@/i18n/navigation";
 import { Select } from "@/components/select";
 import { useCart } from "@/lib/cart";
 import { useSession } from "@/lib/auth-client";
+import { useIsDark } from "@/lib/theme";
 import { formatChf } from "@/lib/format";
 import { shippingFor } from "@/lib/shipping";
 
@@ -43,6 +44,71 @@ function getStripePromise() {
 
 const field =
   "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
+
+// Apparence du Payment Element accordée au thème du site (clair / sombre)
+function stripeAppearance(dark: boolean): Appearance {
+  if (dark) {
+    return {
+      theme: "night",
+      variables: {
+        colorPrimary: "#e5231c",
+        colorText: "#fafaf9",
+        colorTextSecondary: "#a8a29e",
+        colorTextPlaceholder: "#78716c",
+        colorBackground: "#1c1917",
+        colorDanger: "#f87171",
+        borderRadius: "12px",
+        fontFamily: "Geist, system-ui, sans-serif",
+        fontSizeBase: "15px",
+      },
+      rules: {
+        ".Input": { borderColor: "#292524", boxShadow: "none", padding: "12px 16px" },
+        ".Input:focus": { borderColor: "#fafaf9", boxShadow: "none" },
+        ".Label": { fontWeight: "500", color: "#d6d3d1" },
+        ".AccordionItem": {
+          borderColor: "#292524",
+          boxShadow: "none",
+          borderRadius: "12px",
+          backgroundColor: "#1c1917",
+        },
+        ".Dropdown": {
+          borderColor: "#292524",
+          borderRadius: "12px",
+          boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
+        },
+        ".DropdownItem": { color: "#fafaf9" },
+        ".DropdownItem--highlight": { backgroundColor: "#292524", color: "#fafaf9" },
+      },
+    };
+  }
+  return {
+    theme: "stripe",
+    variables: {
+      colorPrimary: "#e5231c",
+      colorText: "#1c1917",
+      colorTextSecondary: "#78716c",
+      colorTextPlaceholder: "#a8a29e",
+      colorBackground: "#ffffff",
+      colorDanger: "#e5231c",
+      borderRadius: "12px",
+      fontFamily: "Geist, system-ui, sans-serif",
+      fontSizeBase: "15px",
+    },
+    rules: {
+      ".Input": { borderColor: "#e7e5e4", boxShadow: "none", padding: "12px 16px" },
+      ".Input:focus": { borderColor: "#1c1917", boxShadow: "none" },
+      ".Label": { fontWeight: "500", color: "#44403c" },
+      ".AccordionItem": { borderColor: "#e7e5e4", boxShadow: "none", borderRadius: "12px" },
+      ".Dropdown": {
+        borderColor: "#e7e5e4",
+        borderRadius: "12px",
+        boxShadow: "0 8px 24px rgba(28, 25, 23, 0.08)",
+      },
+      ".DropdownItem": { color: "#1c1917" },
+      ".DropdownItem--highlight": { backgroundColor: "#fafaf9", color: "#1c1917" },
+    },
+  };
+}
 
 const CANTONS: [string, string][] = [
   ["AG", "Aargau"],
@@ -210,7 +276,7 @@ function Steps({ current }: { current: 1 | 2 }) {
               <span
                 className={`grid h-6 w-6 place-items-center rounded-full text-xs font-bold ${
                   active
-                    ? "bg-ink text-white"
+                    ? "bg-ink text-paper"
                     : done
                       ? "bg-emerald-600 text-white"
                       : "bg-line text-soft"
@@ -350,8 +416,8 @@ function GuestEmailVerification({
 
   if (proof) {
     return (
-      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
-        <span className="flex min-w-0 items-center gap-2.5 text-sm font-medium text-emerald-800">
+      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
+        <span className="flex min-w-0 items-center gap-2.5 text-sm font-medium text-emerald-800 dark:text-emerald-200">
           <CheckCircle2 size={17} className="shrink-0 text-emerald-600" />
           <span className="truncate">{proof.email}</span>
           <span className="hidden shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 sm:inline">
@@ -400,7 +466,7 @@ function GuestEmailVerification({
           type="button"
           onClick={sendCode}
           disabled={!emailValid || pending !== null || cooldown > 0}
-          className="shrink-0 rounded-xl bg-ink px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-ink/85 active:scale-[0.98] disabled:opacity-50"
+          className="shrink-0 rounded-xl bg-ink px-4 py-3 text-sm font-semibold text-paper transition-all hover:bg-ink/85 active:scale-[0.98] disabled:opacity-50"
         >
           {pending === "send"
             ? t("processing")
@@ -446,7 +512,7 @@ function GuestEmailVerification({
         </div>
       )}
       {error && (
-        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
           {error}
         </p>
       )}
@@ -487,6 +553,8 @@ export function CheckoutFlow({
   const [totalCents, setTotalCents] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  // Suit le thème du site pour accorder l'apparence du Payment Element Stripe
+  const isDark = useIsDark();
 
   const shippingCents = clientSecret
     ? Math.max(totalCents - subtotalCents, 0)
@@ -568,52 +636,7 @@ export function CheckoutFlow({
                       "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap",
                   },
                 ],
-                appearance: {
-                  theme: "stripe",
-                  variables: {
-                    colorPrimary: "#e5231c",
-                    colorText: "#1c1917",
-                    colorTextSecondary: "#78716c",
-                    colorTextPlaceholder: "#a8a29e",
-                    colorBackground: "#ffffff",
-                    colorDanger: "#e5231c",
-                    borderRadius: "12px",
-                    fontFamily: "Geist, system-ui, sans-serif",
-                    fontSizeBase: "15px",
-                  },
-                  rules: {
-                    ".Input": {
-                      borderColor: "#e7e5e4",
-                      boxShadow: "none",
-                      padding: "12px 16px",
-                    },
-                    ".Input:focus": {
-                      borderColor: "#1c1917",
-                      boxShadow: "none",
-                    },
-                    ".Label": {
-                      fontWeight: "500",
-                      color: "#44403c",
-                    },
-                    ".AccordionItem": {
-                      borderColor: "#e7e5e4",
-                      boxShadow: "none",
-                      borderRadius: "12px",
-                    },
-                    ".Dropdown": {
-                      borderColor: "#e7e5e4",
-                      borderRadius: "12px",
-                      boxShadow: "0 8px 24px rgba(28, 25, 23, 0.08)",
-                    },
-                    ".DropdownItem": {
-                      color: "#1c1917",
-                    },
-                    ".DropdownItem--highlight": {
-                      backgroundColor: "#fafaf9",
-                      color: "#1c1917",
-                    },
-                  },
-                },
+                appearance: stripeAppearance(isDark),
               }}
             >
               <PaymentStep
@@ -731,7 +754,7 @@ export function CheckoutFlow({
               </div>
 
               {error && (
-                <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-accent">
+                <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
                   {error}
                 </p>
               )}
@@ -829,7 +852,7 @@ function PaymentStep({
       </div>
 
       {error && (
-        <p className="mt-5 rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-accent">
+        <p className="mt-5 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
           {error}
         </p>
       )}

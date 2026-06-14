@@ -8,6 +8,7 @@ import { useFavorites } from "@/lib/favorites";
 import { useSession } from "@/lib/auth-client";
 import { BrandMark } from "./brand-mark";
 import { LocaleSwitcher } from "./locale-switcher";
+import { ThemeToggle } from "./theme-toggle";
 
 const links = [
   { href: "/shop", key: "shop" },
@@ -48,6 +49,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-3">
+          <ThemeToggle />
           <LocaleSwitcher />
           <Link
             href="/favorites"

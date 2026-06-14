@@ -47,12 +47,12 @@ export function SettingsForm({
         />
       </label>
       {state.error && (
-        <p className="rounded-xl bg-red-50 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
           {state.error}
         </p>
       )}
       {state.saved && (
-        <p className="rounded-xl bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700">
+        <p className="rounded-xl bg-emerald-500/15 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-300">
           Réglages enregistrés ✓
         </p>
       )}

@@ -1,12 +1,39 @@
 @import "tailwindcss";
 
+/* Bascule du thème pilotée par la classe .dark sur <html> (toggle manuel,
+   repli sur prefers-color-scheme via le script anti-FOUC du layout). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Couleurs de base — thème clair */
+  --paper: #fafaf9;
+  --surface: #ffffff;
+  --ink: #1c1917;
+  --soft: #78716c;
+  --line: #e7e5e4;
+  color-scheme: light;
+}
+
+.dark {
+  /* Thème sombre — ink/paper restent opposés : les boutons inversés
+     (bg-ink text-paper) gardent leur contraste dans les deux thèmes. */
+  --paper: #0c0a09;
+  --surface: #1c1917;
+  --ink: #fafaf9;
+  --soft: #a8a29e;
+  --line: #292524;
+  color-scheme: dark;
+}
+
 @theme inline {
-  /* Palette sobre "Swiss business" : neutres chauds + rouge suisse en accent */
-  --color-paper: #fafaf9;
-  --color-surface: #ffffff;
-  --color-ink: #1c1917;
-  --color-soft: #78716c;
-  --color-line: #e7e5e4;
+  /* Palette sobre "Swiss business" : neutres chauds + rouge suisse en accent.
+     Les neutres pointent vers les variables thémables ci-dessus. */
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-soft: var(--soft);
+  --color-line: var(--line);
+  /* L'accent rouge marque est constant dans les deux thèmes */
   --color-accent: #e5231c;
   --color-accent-dark: #b81c13;
 

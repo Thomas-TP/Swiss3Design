@@ -88,8 +88,18 @@ export default async function LocaleLayout({
   if (!hasLocale(routing.locales, locale)) notFound();
 
   return (
-    <html lang={locale} className={`${geist.variable} antialiased`}>
+    <html
+      lang={locale}
+      className={`${geist.variable} antialiased`}
+      suppressHydrationWarning
+    >
       <body className="flex min-h-screen flex-col">
+        {/* Applique le thème avant le 1er rendu : évite le flash clair→sombre */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
+          }}
+        />
         <NextIntlClientProvider>
           <CartProvider>
             <FavoritesProvider>

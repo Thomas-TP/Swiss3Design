@@ -58,7 +58,7 @@ export default async function AdminQuotesPage({
             }}
             className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
               statusFilter === c.value
-                ? "bg-ink text-white"
+                ? "bg-ink text-paper"
                 : "border border-line bg-surface text-soft hover:text-ink"
             }`}
           >

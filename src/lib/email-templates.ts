@@ -36,16 +36,35 @@ function esc(input: string): string {
 }
 
 function layout(title: string, body: string, footer: string): string {
+  // Mode sombre e-mail : on assombrit le chrome de la page et on garde la
+  // carte blanche (toujours lisible quel que soit le client mail). Le logo
+  // bascule sur sa variante blanche via prefers-color-scheme.
   return `<!doctype html>
 <html>
-<body style="margin:0;padding:0;background:#fafaf9;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1c1917;">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="color-scheme" content="light dark" />
+<meta name="supported-color-schemes" content="light dark" />
+<style>
+  @media (prefers-color-scheme: dark) {
+    .s3d-body { background:#0c0a09 !important; }
+    .s3d-brand { color:#fafaf9 !important; }
+    .s3d-footer { color:#a8a29e !important; }
+    .s3d-logo-light { display:none !important; }
+    .s3d-logo-dark { display:inline-block !important; }
+  }
+</style>
+</head>
+<body class="s3d-body" style="margin:0;padding:0;background:#fafaf9;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:#1c1917;">
   <div style="max-width:560px;margin:0 auto;padding:32px 16px;">
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
       <tr>
         <td style="padding-right:9px;line-height:0;vertical-align:middle;">
-          <img src="${SITE_URL}/brand/png/icon-ink-64.png" alt="" width="30" height="30" style="display:block;border:0;outline:none;width:30px;height:30px;" />
+          <img class="s3d-logo-light" src="${SITE_URL}/brand/png/icon-ink-64.png" alt="" width="30" height="30" style="display:block;border:0;outline:none;width:30px;height:30px;" />
+          <img class="s3d-logo-dark" src="${SITE_URL}/brand/png/icon-white-64.png" alt="" width="30" height="30" style="display:none;border:0;outline:none;width:30px;height:30px;" />
         </td>
-        <td style="vertical-align:middle;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:17px;letter-spacing:-0.2px;color:#1c1917;">
+        <td class="s3d-brand" style="vertical-align:middle;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:17px;letter-spacing:-0.2px;color:#1c1917;">
           <span style="font-weight:500;">Swiss</span><span style="font-weight:700;">3Design</span>
         </td>
       </tr>
@@ -54,7 +73,7 @@ function layout(title: string, body: string, footer: string): string {
       <h1 style="margin:0 0 12px;font-size:21px;letter-spacing:-0.3px;">${title}</h1>
       ${body}
     </div>
-    <p style="color:#78716c;font-size:12px;line-height:1.6;margin:20px 4px 0;">
+    <p class="s3d-footer" style="color:#78716c;font-size:12px;line-height:1.6;margin:20px 4px 0;">
       ${footer}<br/>Swiss3Design — Gland, Suisse
     </p>
   </div>

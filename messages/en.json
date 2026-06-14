@@ -9,7 +9,8 @@
     "custom": "Custom",
     "cart": "Cart",
     "account": "Account",
-    "favorites": "Favorites"
+    "favorites": "Favorites",
+    "theme": "Toggle theme"
   },
   "home": {
     "heroBadge": "Printed in Gland · Delivered across Switzerland",

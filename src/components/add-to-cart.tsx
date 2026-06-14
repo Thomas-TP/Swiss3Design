@@ -35,8 +35,8 @@ export function AddToCart({
         setAdded(true);
         setTimeout(() => setAdded(false), 1600);
       }}
-      className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold text-white transition-all active:scale-[0.98] ${
-        added ? "bg-ink" : "bg-accent hover:bg-accent-dark"
+      className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold transition-all active:scale-[0.98] ${
+        added ? "bg-ink text-paper" : "bg-accent text-white hover:bg-accent-dark"
       }`}
     >
       {added ? <Check size={18} /> : <ShoppingBag size={18} />}
@@ -77,8 +77,8 @@ export function AddToCartMini({
         setAdded(true);
         setTimeout(() => setAdded(false), 1600);
       }}
-      className={`flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold text-white transition-all active:scale-[0.98] ${
-        added ? "bg-ink" : "bg-accent hover:bg-accent-dark"
+      className={`flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-all active:scale-[0.98] ${
+        added ? "bg-ink text-paper" : "bg-accent text-white hover:bg-accent-dark"
       }`}
     >
       {added ? <Check size={14} /> : <ShoppingBag size={14} />}
@@ -107,7 +107,7 @@ export function BuyNow({
         if (!items.some((i) => i.productId === item.productId)) add(item);
         router.push("/checkout");
       }}
-      className="flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-ink/85 active:scale-[0.98]"
+      className="flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-paper transition-all hover:bg-ink/85 active:scale-[0.98]"
     >
       <CreditCard size={18} />
       {t("buyNow")}

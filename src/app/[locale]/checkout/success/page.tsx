@@ -52,10 +52,10 @@ export default async function CheckoutSuccessPage({
         <span
           className={`mx-auto grid h-16 w-16 place-items-center rounded-full ${
             status === "succeeded"
-              ? "bg-emerald-50 text-emerald-600"
+              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
               : status === "processing"
-                ? "bg-amber-50 text-amber-600"
-                : "bg-red-50 text-accent"
+                ? "bg-amber-500/15 text-amber-600 dark:text-amber-300"
+                : "bg-accent/10 text-accent"
           }`}
         >
           <Icon size={30} strokeWidth={1.8} />
@@ -72,7 +72,7 @@ export default async function CheckoutSuccessPage({
         </p>
         <Link
           href={status === "failed" ? "/cart" : "/shop"}
-          className="mt-7 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="mt-7 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-paper transition-opacity hover:opacity-90"
         >
           {status === "failed" ? t("backCart") : t("backShop")}
           <ArrowRight size={16} />

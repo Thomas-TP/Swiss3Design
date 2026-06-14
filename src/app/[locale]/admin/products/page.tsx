@@ -95,7 +95,7 @@ export default async function AdminProductsPage({
                     </span>
                   )}
                   {p.featured && (
-                    <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-700">
+                    <span className="ml-2 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-700 dark:text-amber-300">
                       Vedette
                     </span>
                   )}
@@ -126,7 +126,7 @@ export default async function AdminProductsPage({
                     placeholder="Stock"
                     className={`w-16 rounded-xl border px-2.5 py-1.5 text-center text-xs transition-colors focus:border-ink focus:outline-none ${
                       p.stock !== null && p.stock <= 2
-                        ? "border-amber-300 bg-amber-50"
+                        ? "border-amber-500/50 bg-amber-500/10"
                         : "border-line bg-surface"
                     }`}
                   />

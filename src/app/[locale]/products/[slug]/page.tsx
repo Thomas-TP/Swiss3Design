@@ -59,9 +59,9 @@ export default async function ProductPage({
               className={`rounded-full px-3 py-1 text-xs font-semibold ${
                 product.saleType === "stock"
                   ? product.stock === 0
-                    ? "bg-red-50 text-red-600"
-                    : "bg-emerald-50 text-emerald-700"
-                  : "bg-amber-50 text-amber-700"
+                    ? "bg-red-500/15 text-red-600 dark:text-red-300"
+                    : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                  : "bg-amber-500/15 text-amber-700 dark:text-amber-300"
               }`}
             >
               {product.saleType === "stock"
