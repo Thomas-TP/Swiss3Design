@@ -3,6 +3,7 @@
 import {
   LayoutDashboard,
   Package,
+  Tags,
   ShoppingCart,
   FileText,
   Users,
@@ -14,6 +15,7 @@ import { Link, usePathname } from "@/i18n/navigation";
 const tabs = [
   { href: "/admin", label: "Tableau de bord", Icon: LayoutDashboard },
   { href: "/admin/products", label: "Produits", Icon: Package },
+  { href: "/admin/categories", label: "Catégories", Icon: Tags },
   { href: "/admin/orders", label: "Commandes", Icon: ShoppingCart },
   { href: "/admin/quotes", label: "Devis", Icon: FileText },
   { href: "/admin/customers", label: "Clients", Icon: Users },

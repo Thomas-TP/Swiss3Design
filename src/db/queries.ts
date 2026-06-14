@@ -50,15 +50,24 @@ async function attachImages(
   }));
 }
 
+export type ProductSort = "new" | "price_asc" | "price_desc";
+
 export async function getProducts(
   locale: Locale,
-  opts: { featuredOnly?: boolean; categorySlug?: string; material?: string } = {},
+  opts: {
+    featuredOnly?: boolean;
+    categorySlug?: string;
+    material?: string;
+    multicolor?: boolean;
+    sort?: ProductSort;
+  } = {},
 ): Promise<ProductListItem[]> {
   const db = await getDb();
 
   const conditions = [eq(products.active, true)];
   if (opts.featuredOnly) conditions.push(eq(products.featured, true));
   if (opts.material) conditions.push(eq(products.material, opts.material));
+  if (opts.multicolor) conditions.push(eq(products.multicolor, true));
 
   let productIdsInCategory: string[] | null = null;
   if (opts.categorySlug) {
@@ -94,9 +103,60 @@ export async function getProducts(
       ),
     )
     .where(and(...conditions))
-    .orderBy(desc(products.createdAt));
+    .orderBy(
+      opts.sort === "price_asc"
+        ? asc(products.priceCents)
+        : opts.sort === "price_desc"
+          ? desc(products.priceCents)
+          : desc(products.createdAt),
+    );
 
   return attachImages(db, rows);
+}
+
+// Filtres réellement utilisables : catégories ayant ≥1 produit actif et
+// matières effectivement présentes dans le catalogue actif.
+export async function getUsedFilters(locale: Locale): Promise<{
+  categories: { id: string; slug: string; name: string }[];
+  materials: string[];
+}> {
+  const db = await getDb();
+
+  const cats = await db
+    .selectDistinct({
+      id: categories.id,
+      slug: categories.slug,
+      name: categoryTranslations.name,
+      sortOrder: categories.sortOrder,
+    })
+    .from(categories)
+    .innerJoin(
+      categoryTranslations,
+      and(
+        eq(categoryTranslations.categoryId, categories.id),
+        eq(categoryTranslations.locale, locale),
+      ),
+    )
+    .innerJoin(productCategories, eq(productCategories.categoryId, categories.id))
+    .innerJoin(
+      products,
+      and(
+        eq(products.id, productCategories.productId),
+        eq(products.active, true),
+      ),
+    )
+    .orderBy(asc(categories.sortOrder));
+
+  const mats = await db
+    .selectDistinct({ material: products.material })
+    .from(products)
+    .where(eq(products.active, true))
+    .orderBy(asc(products.material));
+
+  return {
+    categories: cats.map((c) => ({ id: c.id, slug: c.slug, name: c.name })),
+    materials: mats.map((m) => m.material),
+  };
 }
 
 export async function getProductBySlug(slug: string, locale: Locale) {

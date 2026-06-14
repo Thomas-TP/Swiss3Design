@@ -36,7 +36,12 @@
     "results": "{count, plural, =0 {Keine Produkte} one {# Produkt} other {# Produkte}}",
     "empty": "Keine Produkte entsprechen diesen Filtern.",
     "filterCategory": "Kategorie",
-    "filterMaterial": "Material"
+    "filterMaterial": "Material",
+    "filterMulticolor": "Mehrfarbig",
+    "sortLabel": "Sortieren:",
+    "sortNew": "Neuheiten",
+    "sortPriceAsc": "Preis ↑",
+    "sortPriceDesc": "Preis ↓"
   },
   "product": {
     "addToCart": "In den Warenkorb",
