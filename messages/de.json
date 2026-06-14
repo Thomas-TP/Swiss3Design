@@ -46,6 +46,7 @@
     "outOfStock": "Ausverkauft",
     "onDemand": "Für Sie gedruckt · {days} Tage",
     "multicolorBadge": "Mehrfarbig",
+    "variant": "Variante",
     "material": "Material",
     "dimensions": "Abmessungen",
     "weight": "Gewicht",

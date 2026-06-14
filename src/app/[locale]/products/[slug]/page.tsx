@@ -4,11 +4,9 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getProductBySlug } from "@/db/queries";
-import { formatChf } from "@/lib/format";
-import { AddToCart, BuyNow } from "@/components/add-to-cart";
-import { FavoriteButton } from "@/components/favorite-button";
 import { MulticolorDots } from "@/components/multicolor-dots";
 import { ProductGallery } from "@/components/product-gallery";
+import { ProductPurchase } from "@/components/product-purchase";
 
 export const dynamic = "force-dynamic";
 
@@ -48,69 +46,36 @@ export default async function ProductPage({
         <ProductGallery images={product.images} name={product.name} />
 
         <div className="flex flex-col">
-          <div className="flex flex-wrap items-center gap-2">
-            {product.multicolor && (
-              <span className="flex items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold">
-                <MulticolorDots size={6} />
-                {t("multicolorBadge")}
-              </span>
-            )}
-            <span
-              className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                product.saleType === "stock"
-                  ? product.stock === 0
-                    ? "bg-red-500/15 text-red-600 dark:text-red-300"
-                    : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-                  : "bg-amber-500/15 text-amber-700 dark:text-amber-300"
-              }`}
-            >
-              {product.saleType === "stock"
-                ? product.stock === 0
-                  ? t("outOfStock")
-                  : t("inStock")
-                : t("onDemand", { days: product.productionDays ?? 3 })}
+          {product.multicolor && (
+            <span className="flex w-fit items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold">
+              <MulticolorDots size={6} />
+              {t("multicolorBadge")}
             </span>
-          </div>
+          )}
 
           <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
             {product.name}
           </h1>
-          <p className="mt-3 text-2xl font-semibold tabular-nums">
-            {formatChf(product.priceCents, locale)}
-          </p>
-          <p className="mt-5 leading-relaxed text-soft">
+          <p className="mt-4 leading-relaxed text-soft">
             {product.description}
           </p>
 
-          <div className="mt-8 space-y-3">
-            {(() => {
-              const item = {
-                productId: product.id,
-                slug: product.slug,
-                name: product.name,
-                priceCents: product.priceCents,
-                imageUrl: image?.url ?? null,
-                saleType: product.saleType,
-              };
-              const soldOut =
-                product.saleType === "stock" && product.stock === 0;
-              return (
-                <>
-                  <div className="flex items-stretch gap-3">
-                    <div className="flex-1">
-                      <AddToCart disabled={soldOut} item={item} />
-                    </div>
-                    <FavoriteButton
-                      item={item}
-                      size={20}
-                      className="grid w-[50px] shrink-0 place-items-center rounded-full border border-line bg-surface hover:border-ink/30"
-                    />
-                  </div>
-                  <BuyNow disabled={soldOut} item={item} />
-                </>
-              );
-            })()}
-          </div>
+          <ProductPurchase
+            productId={product.id}
+            slug={product.slug}
+            name={product.name}
+            basePriceCents={product.priceCents}
+            saleType={product.saleType}
+            productionDays={product.productionDays}
+            productStock={product.stock}
+            imageUrl={image?.url ?? null}
+            variants={product.variants.map((v) => ({
+              id: v.id,
+              name: v.name,
+              priceCents: v.priceCents,
+              stock: v.stock,
+            }))}
+          />
 
           {specs.length > 0 && (
             <dl className="mt-10 divide-y divide-line border-t border-line text-sm">

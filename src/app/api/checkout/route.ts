@@ -7,6 +7,7 @@ import {
   orderItems,
   products,
   productTranslations,
+  productVariants,
   customerAddresses,
 } from "@/db/schema";
 import { getSetting } from "@/db/queries";
@@ -21,6 +22,7 @@ const bodySchema = z.object({
     .array(
       z.object({
         productId: z.string().min(1),
+        variantId: z.string().min(1).optional(),
         quantity: z.number().int().min(1).max(99),
       }),
     )
@@ -81,7 +83,10 @@ export async function POST(request: Request) {
   }
 
   const db = await getDb();
-  const ids = items.map((i) => i.productId);
+  const productIds = [...new Set(items.map((i) => i.productId))];
+  const variantIds = [
+    ...new Set(items.map((i) => i.variantId).filter((v): v is string => !!v)),
+  ];
 
   // Prix et noms relus en base : on ne fait jamais confiance au client
   const dbProducts = await db
@@ -99,28 +104,65 @@ export async function POST(request: Request) {
         eq(productTranslations.locale, locale),
       ),
     )
-    .where(and(inArray(products.id, ids), eq(products.active, true)));
-
+    .where(and(inArray(products.id, productIds), eq(products.active, true)));
   const byId = new Map(dbProducts.map((p) => [p.id, p]));
-  if (items.some((i) => !byId.has(i.productId))) {
+
+  const dbVariants = variantIds.length
+    ? await db
+        .select({
+          id: productVariants.id,
+          productId: productVariants.productId,
+          priceCents: productVariants.priceCents,
+          stock: productVariants.stock,
+          name: productVariants.name,
+        })
+        .from(productVariants)
+        .where(inArray(productVariants.id, variantIds))
+    : [];
+  const variantById = new Map(dbVariants.map((v) => [v.id, v]));
+
+  // Ligne effective (prix/stock/nom selon produit ou variante choisie)
+  const lines = items.map((i) => {
+    const product = byId.get(i.productId);
+    if (!product) return null;
+    if (i.variantId) {
+      const v = variantById.get(i.variantId);
+      if (!v || v.productId !== i.productId) return null;
+      return {
+        productId: i.productId,
+        variantId: i.variantId,
+        quantity: i.quantity,
+        priceCents: v.priceCents ?? product.priceCents,
+        stock: v.stock,
+        name: v.name ? `${product.name} — ${v.name}` : product.name,
+      };
+    }
+    return {
+      productId: i.productId,
+      variantId: null as string | null,
+      quantity: i.quantity,
+      priceCents: product.priceCents,
+      stock: product.stock,
+      name: product.name,
+    };
+  });
+  if (lines.some((l) => l === null)) {
     return Response.json({ error: "unknown_product" }, { status: 400 });
   }
-  const outOfStock = items.find((i) => {
-    const stock = byId.get(i.productId)!.stock;
-    return stock !== null && stock < i.quantity;
-  });
+  const validLines = lines as NonNullable<(typeof lines)[number]>[];
+
+  const outOfStock = validLines.find(
+    (l) => l.stock !== null && l.stock < l.quantity,
+  );
   if (outOfStock) {
     return Response.json(
-      {
-        error: "insufficient_stock",
-        productName: byId.get(outOfStock.productId)!.name,
-      },
+      { error: "insufficient_stock", productName: outOfStock.name },
       { status: 409 },
     );
   }
 
-  const subtotalCents = items.reduce(
-    (sum, i) => sum + byId.get(i.productId)!.priceCents * i.quantity,
+  const subtotalCents = validLines.reduce(
+    (sum, l) => sum + l.priceCents * l.quantity,
     0,
   );
 
@@ -161,12 +203,13 @@ export async function POST(request: Request) {
     .returning({ id: orders.id });
 
   await db.insert(orderItems).values(
-    items.map((i) => ({
+    validLines.map((l) => ({
       orderId: order.id,
-      productId: i.productId,
-      nameSnapshot: byId.get(i.productId)!.name,
-      priceCentsSnapshot: byId.get(i.productId)!.priceCents,
-      quantity: i.quantity,
+      productId: l.productId,
+      variantId: l.variantId,
+      nameSnapshot: l.name,
+      priceCentsSnapshot: l.priceCents,
+      quantity: l.quantity,
     })),
   );
 

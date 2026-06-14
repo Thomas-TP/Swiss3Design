@@ -44,7 +44,10 @@ export default function CartPage() {
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
         <ul className="divide-y divide-line rounded-card border border-line bg-surface px-5">
           {items.map((item) => (
-            <li key={item.productId} className="flex gap-4 py-5">
+            <li
+              key={`${item.productId}:${item.variantId ?? ""}`}
+              className="flex gap-4 py-5"
+            >
               <Link
                 href={`/products/${item.slug}`}
                 className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-line/30"
@@ -60,14 +63,19 @@ export default function CartPage() {
               </Link>
               <div className="flex flex-1 flex-col">
                 <div className="flex items-start justify-between gap-3">
-                  <Link
-                    href={`/products/${item.slug}`}
-                    className="font-semibold leading-snug hover:underline"
-                  >
-                    {item.name}
-                  </Link>
+                  <div className="min-w-0">
+                    <Link
+                      href={`/products/${item.slug}`}
+                      className="font-semibold leading-snug hover:underline"
+                    >
+                      {item.name}
+                    </Link>
+                    {item.variantName && (
+                      <p className="text-xs text-soft">{item.variantName}</p>
+                    )}
+                  </div>
                   <button
-                    onClick={() => remove(item.productId)}
+                    onClick={() => remove(item.productId, item.variantId ?? null)}
                     aria-label={t("remove")}
                     className="rounded-full p-1.5 text-soft transition-colors hover:bg-line/60 hover:text-accent"
                   >
@@ -78,7 +86,11 @@ export default function CartPage() {
                   <div className="flex items-center gap-1 rounded-full border border-line">
                     <button
                       onClick={() =>
-                        setQuantity(item.productId, item.quantity - 1)
+                        setQuantity(
+                          item.productId,
+                          item.variantId ?? null,
+                          item.quantity - 1,
+                        )
                       }
                       aria-label={t("decrease")}
                       className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-line/60"
@@ -90,7 +102,11 @@ export default function CartPage() {
                     </span>
                     <button
                       onClick={() =>
-                        setQuantity(item.productId, item.quantity + 1)
+                        setQuantity(
+                          item.productId,
+                          item.variantId ?? null,
+                          item.quantity + 1,
+                        )
                       }
                       aria-label={t("increase")}
                       className="grid h-8 w-8 place-items-center rounded-full transition-colors hover:bg-line/60"

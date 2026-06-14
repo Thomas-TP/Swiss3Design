@@ -8,6 +8,7 @@ import {
   products,
   productTranslations,
   productImages,
+  productVariants,
   productCategories,
   LOCALES,
 } from "@/db/schema";
@@ -35,6 +36,17 @@ const imagesSchema = z
     }),
   )
   .max(8);
+
+const variantsSchema = z
+  .array(
+    z.object({
+      name: z.string().max(80),
+      sku: z.string().max(60).optional(),
+      price: z.string().max(20).optional(),
+      stock: z.string().max(10).optional(),
+    }),
+  )
+  .max(20);
 
 function slugify(input: string): string {
   return input
@@ -101,6 +113,26 @@ export async function saveProduct(
     return { error: "Images invalides." };
   }
 
+  const parsedVariants = variantsSchema.safeParse(
+    JSON.parse(String(formData.get("variants") || "[]")),
+  );
+  if (!parsedVariants.success) {
+    return { error: "Variantes invalides." };
+  }
+  const variantRows = parsedVariants.data
+    .filter((v) => v.name.trim())
+    .map((v, i) => {
+      const priceStr = v.price?.trim() ?? "";
+      const stockStr = v.stock?.trim() ?? "";
+      return {
+        sku: (v.sku?.trim() || `${slug}-${i + 1}`).slice(0, 60),
+        name: v.name.trim().slice(0, 80),
+        // prix vide → hérite du produit ; stock vide → non suivi
+        priceCents: priceStr ? parsePriceToCents(priceStr) : null,
+        stock: stockStr ? Math.max(0, Number.parseInt(stockStr, 10) || 0) : null,
+      };
+    });
+
   const data = {
     slug,
     priceCents,
@@ -135,6 +167,7 @@ export async function saveProduct(
       await db
         .delete(productCategories)
         .where(eq(productCategories.productId, id));
+      await db.delete(productVariants).where(eq(productVariants.productId, id));
     } else {
       const [row] = await db
         .insert(products)
@@ -159,6 +192,11 @@ export async function saveProduct(
     if (categoryIds.length > 0) {
       await db.insert(productCategories).values(
         categoryIds.map((categoryId) => ({ productId, categoryId })),
+      );
+    }
+    if (variantRows.length > 0) {
+      await db.insert(productVariants).values(
+        variantRows.map((v) => ({ ...v, productId })),
       );
     }
   } catch (e) {

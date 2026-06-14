@@ -5,6 +5,7 @@ import {
   products,
   productTranslations,
   productImages,
+  productVariants,
   productCategories,
   categories,
   categoryTranslations,
@@ -28,7 +29,7 @@ export default async function EditProductPage({
     .limit(1);
   if (!product) notFound();
 
-  const [translations, images, links, cats] = await Promise.all([
+  const [translations, images, links, variants, cats] = await Promise.all([
     db
       .select()
       .from(productTranslations)
@@ -42,6 +43,11 @@ export default async function EditProductPage({
       .select()
       .from(productCategories)
       .where(eq(productCategories.productId, id)),
+    db
+      .select()
+      .from(productVariants)
+      .where(eq(productVariants.productId, id))
+      .orderBy(asc(productVariants.name)),
     db
       .select({ id: categories.id, name: categoryTranslations.name })
       .from(categories)
@@ -76,6 +82,12 @@ export default async function EditProductPage({
     ),
     images: images.map((i) => ({ url: i.url, alt: i.alt ?? undefined })),
     categoryIds: links.map((l) => l.categoryId),
+    variants: variants.map((v) => ({
+      name: v.name,
+      sku: v.sku,
+      priceCents: v.priceCents,
+      stock: v.stock,
+    })),
   };
 
   return (

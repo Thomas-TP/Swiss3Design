@@ -1,6 +1,12 @@
 import { and, eq, ne, gte, isNotNull, sql } from "drizzle-orm";
 import type { getDb } from "@/db";
-import { orders, orderItems, products, inventoryLog } from "@/db/schema";
+import {
+  orders,
+  orderItems,
+  products,
+  productVariants,
+  inventoryLog,
+} from "@/db/schema";
 import { sendEmail, getAdminEmails } from "./email";
 import { orderConfirmationEmail, adminNewOrderEmail } from "./email-templates";
 
@@ -34,11 +40,55 @@ export async function markOrderPaid(db: Db, orderId: string) {
   // Stock bas (ou survente) constaté pendant le décrément — signalé à l'admin
   const lowStock: { name: string; stock: number }[] = [];
   for (const item of items) {
-    if (!item.productId) continue;
+    // Décrément atomique (stock >= quantité évalué par SQLite) : empêche la
+    // survente concurrente. On cible la variante si la ligne en a une, sinon
+    // le produit. Si le décrément échoue alors qu'un stock est suivi, le
+    // paiement étant déjà encaissé on tombe à 0 et on alerte l'admin.
+    if (item.variantId) {
+      const dec = await db
+        .update(productVariants)
+        .set({ stock: sql`${productVariants.stock} - ${item.quantity}` })
+        .where(
+          and(
+            eq(productVariants.id, item.variantId),
+            isNotNull(productVariants.stock),
+            gte(productVariants.stock, item.quantity),
+          ),
+        )
+        .returning({ stock: productVariants.stock });
+      if (dec.length > 0) {
+        const newStock = dec[0].stock ?? 0;
+        await db.insert(inventoryLog).values({
+          variantId: item.variantId,
+          delta: -item.quantity,
+          reason: "order",
+        });
+        if (newStock <= 2) {
+          lowStock.push({ name: item.nameSnapshot, stock: newStock });
+        }
+        continue;
+      }
+      const [cur] = await db
+        .select({ stock: productVariants.stock })
+        .from(productVariants)
+        .where(eq(productVariants.id, item.variantId))
+        .limit(1);
+      if (cur?.stock != null) {
+        await db.insert(inventoryLog).values({
+          variantId: item.variantId,
+          delta: -cur.stock,
+          reason: "order",
+        });
+        await db
+          .update(productVariants)
+          .set({ stock: 0 })
+          .where(eq(productVariants.id, item.variantId));
+        lowStock.push({ name: item.nameSnapshot, stock: 0 });
+      }
+      continue;
+    }
 
-    // Décrément atomique : ne s'applique que si le stock suffit encore. Empêche
-    // la survente lorsque deux paiements pour le dernier exemplaire arrivent
-    // en parallèle (la condition stock >= quantité est évaluée par SQLite).
+    if (!item.productId) continue;
     const decremented = await db
       .update(products)
       .set({ stock: sql`${products.stock} - ${item.quantity}` })
@@ -52,7 +102,6 @@ export async function markOrderPaid(db: Db, orderId: string) {
       .returning({ stock: products.stock });
 
     if (decremented.length > 0) {
-      // stock non-null garanti par le filtre isNotNull ci-dessus
       const newStock = decremented[0].stock ?? 0;
       await db.insert(inventoryLog).values({
         variantId: item.productId,
@@ -65,9 +114,6 @@ export async function markOrderPaid(db: Db, orderId: string) {
       continue;
     }
 
-    // Pas de décrément : soit le produit n'est pas suivi (stock null → rien à
-    // faire), soit le stock était insuffisant (survente concurrente). Le
-    // paiement étant déjà encaissé, on tombe le stock à 0 et on alerte l'admin.
     const [current] = await db
       .select({ stock: products.stock })
       .from(products)

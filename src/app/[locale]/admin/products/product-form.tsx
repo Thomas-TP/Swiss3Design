@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Save, Trash2, Upload, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Plus, Save, Trash2, Upload, X } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
   saveProduct,
@@ -31,6 +31,14 @@ export interface ProductFormInitial {
   translations: Record<string, { name: string; description: string }>;
   images: Img[];
   categoryIds: string[];
+  variants: VariantInitial[];
+}
+
+interface VariantInitial {
+  name: string;
+  sku: string;
+  priceCents: number | null;
+  stock: number | null;
 }
 
 const LOCALE_LABELS: Record<string, string> = {
@@ -246,6 +254,16 @@ export function ProductForm({
         </div>
       </section>
 
+      {/* Variantes */}
+      <section className="rounded-card border border-line bg-surface p-5 sm:p-6">
+        <h2 className="mb-1 font-semibold">Variantes</h2>
+        <p className="mb-4 text-xs text-soft">
+          Couleurs, tailles… Laissez vide si le produit n&apos;a qu&apos;une
+          seule version. Prix vide = prix du produit, stock vide = non suivi.
+        </p>
+        <VariantManager initial={initial?.variants ?? []} />
+      </section>
+
       {/* Images */}
       <section className="rounded-card border border-line bg-surface p-5 sm:p-6">
         <h2 className="mb-4 font-semibold">Photos</h2>
@@ -297,6 +315,99 @@ function DeleteButton({ id }: { id: string }) {
       <Trash2 size={14} />
       Supprimer
     </button>
+  );
+}
+
+interface VariantRow {
+  name: string;
+  sku: string;
+  price: string;
+  stock: string;
+}
+
+function VariantManager({ initial }: { initial: VariantInitial[] }) {
+  const [rows, setRows] = useState<VariantRow[]>(
+    initial.map((v) => ({
+      name: v.name,
+      sku: v.sku,
+      price: v.priceCents != null ? (v.priceCents / 100).toFixed(2) : "",
+      stock: v.stock != null ? String(v.stock) : "",
+    })),
+  );
+
+  const update = (i: number, patch: Partial<VariantRow>) =>
+    setRows((prev) => prev.map((r, j) => (j === i ? { ...r, ...patch } : r)));
+
+  return (
+    <div>
+      <input
+        type="hidden"
+        name="variants"
+        value={JSON.stringify(rows.filter((r) => r.name.trim()))}
+      />
+      {rows.length > 0 && (
+        <div className="space-y-2">
+          <div className="hidden gap-2 px-1 text-[11px] font-semibold uppercase tracking-wide text-soft sm:grid sm:grid-cols-[1fr_1fr_90px_80px_36px]">
+            <span>Nom</span>
+            <span>SKU</span>
+            <span>Prix</span>
+            <span>Stock</span>
+            <span />
+          </div>
+          {rows.map((r, i) => (
+            <div
+              key={i}
+              className="grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_90px_80px_36px]"
+            >
+              <input
+                value={r.name}
+                onChange={(e) => update(i, { name: e.target.value })}
+                placeholder="Rouge"
+                className={FIELD}
+              />
+              <input
+                value={r.sku}
+                onChange={(e) => update(i, { sku: e.target.value })}
+                placeholder="auto"
+                className={FIELD}
+              />
+              <input
+                value={r.price}
+                onChange={(e) => update(i, { price: e.target.value })}
+                inputMode="decimal"
+                placeholder="prix"
+                className={FIELD}
+              />
+              <input
+                value={r.stock}
+                onChange={(e) => update(i, { stock: e.target.value })}
+                inputMode="numeric"
+                placeholder="stock"
+                className={FIELD}
+              />
+              <button
+                type="button"
+                onClick={() => setRows((prev) => prev.filter((_, j) => j !== i))}
+                aria-label="Retirer la variante"
+                className="grid place-items-center rounded-xl border border-line text-soft transition-colors hover:border-accent hover:text-accent"
+              >
+                <X size={15} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+      <button
+        type="button"
+        onClick={() =>
+          setRows((prev) => [...prev, { name: "", sku: "", price: "", stock: "" }])
+        }
+        className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold text-soft transition-colors hover:border-ink hover:text-ink"
+      >
+        <Plus size={15} />
+        Ajouter une variante
+      </button>
+    </div>
   );
 }
 

@@ -46,6 +46,7 @@
     "outOfStock": "Esaurito",
     "onDemand": "Stampato per voi · {days} giorni",
     "multicolorBadge": "Multicolore",
+    "variant": "Variante",
     "material": "Materiale",
     "dimensions": "Dimensioni",
     "weight": "Peso",

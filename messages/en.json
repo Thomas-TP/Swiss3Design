@@ -46,6 +46,7 @@
     "outOfStock": "Out of stock",
     "onDemand": "Printed for you · {days} days",
     "multicolorBadge": "Multicolor",
+    "variant": "Variant",
     "material": "Material",
     "dimensions": "Dimensions",
     "weight": "Weight",

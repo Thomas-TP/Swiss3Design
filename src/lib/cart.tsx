@@ -10,6 +10,9 @@ import {
 
 export interface CartItem {
   productId: string;
+  // Variante choisie (couleur/taille). null = produit sans variante.
+  variantId?: string | null;
+  variantName?: string | null;
   slug: string;
   name: string;
   priceCents: number;
@@ -18,11 +21,21 @@ export interface CartItem {
   quantity: number;
 }
 
+// Une ligne de panier est identifiée par le couple produit + variante
+type LineRef = { productId: string; variantId?: string | null };
+const sameLine = (a: LineRef, b: LineRef) =>
+  a.productId === b.productId && (a.variantId ?? null) === (b.variantId ?? null);
+
 type CartAction =
   | { type: "hydrate"; items: CartItem[] }
   | { type: "add"; item: Omit<CartItem, "quantity"> }
-  | { type: "setQuantity"; productId: string; quantity: number }
-  | { type: "remove"; productId: string }
+  | {
+      type: "setQuantity";
+      productId: string;
+      variantId: string | null;
+      quantity: number;
+    }
+  | { type: "remove"; productId: string; variantId: string | null }
   | { type: "clear" };
 
 const STORAGE_KEY = "s3d-cart-v1";
@@ -32,27 +45,23 @@ function reducer(state: CartItem[], action: CartAction): CartItem[] {
     case "hydrate":
       return action.items;
     case "add": {
-      const existing = state.find((i) => i.productId === action.item.productId);
+      const existing = state.find((i) => sameLine(i, action.item));
       if (existing) {
         return state.map((i) =>
-          i.productId === action.item.productId
-            ? { ...i, quantity: i.quantity + 1 }
-            : i,
+          sameLine(i, action.item) ? { ...i, quantity: i.quantity + 1 } : i,
         );
       }
       return [...state, { ...action.item, quantity: 1 }];
     }
     case "setQuantity":
       if (action.quantity <= 0) {
-        return state.filter((i) => i.productId !== action.productId);
+        return state.filter((i) => !sameLine(i, action));
       }
       return state.map((i) =>
-        i.productId === action.productId
-          ? { ...i, quantity: action.quantity }
-          : i,
+        sameLine(i, action) ? { ...i, quantity: action.quantity } : i,
       );
     case "remove":
-      return state.filter((i) => i.productId !== action.productId);
+      return state.filter((i) => !sameLine(i, action));
     case "clear":
       return [];
   }
@@ -63,8 +72,12 @@ interface CartContextValue {
   count: number;
   subtotalCents: number;
   add: (item: Omit<CartItem, "quantity">) => void;
-  setQuantity: (productId: string, quantity: number) => void;
-  remove: (productId: string) => void;
+  setQuantity: (
+    productId: string,
+    variantId: string | null,
+    quantity: number,
+  ) => void;
+  remove: (productId: string, variantId: string | null) => void;
   clear: () => void;
 }
 
@@ -91,9 +104,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     count: items.reduce((sum, i) => sum + i.quantity, 0),
     subtotalCents: items.reduce((sum, i) => sum + i.priceCents * i.quantity, 0),
     add: (item) => dispatch({ type: "add", item }),
-    setQuantity: (productId, quantity) =>
-      dispatch({ type: "setQuantity", productId, quantity }),
-    remove: (productId) => dispatch({ type: "remove", productId }),
+    setQuantity: (productId, variantId, quantity) =>
+      dispatch({ type: "setQuantity", productId, variantId, quantity }),
+    remove: (productId, variantId) =>
+      dispatch({ type: "remove", productId, variantId }),
     clear: () => dispatch({ type: "clear" }),
   };
 
