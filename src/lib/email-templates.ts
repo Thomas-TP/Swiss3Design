@@ -18,7 +18,7 @@ function trackingUrl(trackingNumber: string): string {
 
 function button(href: string, label: string): string {
   return `<p style="margin:0 0 18px;text-align:center;">
-      <a href="${href}" style="display:inline-block;background:#da291c;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:13px 28px;border-radius:999px;">${label}</a>
+      <a href="${href}" style="display:inline-block;background:#e5231c;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:13px 28px;border-radius:999px;">${label}</a>
     </p>`;
 }
 
@@ -642,7 +642,7 @@ export function resetPasswordEmail(to: string, url: string): EmailMessage {
       Ce lien expire dans une heure.
     </p>
     <p style="margin:0 0 18px;text-align:center;">
-      <a href="${url}" style="display:inline-block;background:#da291c;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:13px 28px;border-radius:999px;">
+      <a href="${url}" style="display:inline-block;background:#e5231c;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:13px 28px;border-radius:999px;">
         Réinitialiser mon mot de passe
       </a>
     </p>
@@ -668,7 +668,7 @@ export function verificationEmail(to: string, url: string): EmailMessage {
       votre adresse e-mail et activer votre compte.
     </p>
     <p style="margin:0 0 18px;text-align:center;">
-      <a href="${url}" style="display:inline-block;background:#da291c;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:13px 28px;border-radius:999px;">
+      <a href="${url}" style="display:inline-block;background:#e5231c;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:13px 28px;border-radius:999px;">
         Confirmer mon e-mail
       </a>
     </p>

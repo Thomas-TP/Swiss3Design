@@ -13,6 +13,7 @@ import { getSetting } from "@/db/queries";
 import { getStripe } from "@/lib/stripe";
 import { getAuth } from "@/lib/auth";
 import { verifyEmailProof } from "@/lib/email-proof";
+import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { SHIPPING_CENTS, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
 
 const bodySchema = z.object({
@@ -49,6 +50,11 @@ function makeOrderNumber(): string {
 }
 
 export async function POST(request: Request) {
+  // Anti-abus : plafonne la création de PaymentIntents/commandes par IP
+  if (!(await rateLimit(request, "checkout", { limit: 20, windowS: 600 }))) {
+    return tooManyRequests();
+  }
+
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
     return Response.json({ error: "invalid_request" }, { status: 400 });

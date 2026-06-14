@@ -1,5 +1,5 @@
 // Signature visuelle "4 couleurs AMS" — utilisée sur badges et sections
-const COLORS = ["#da291c", "#1d4ed8", "#f59e0b", "#1c1917"];
+const COLORS = ["#e5231c", "#1d4ed8", "#f59e0b", "#1c1917"];
 
 export function MulticolorDots({ size = 8 }: { size?: number }) {
   return (

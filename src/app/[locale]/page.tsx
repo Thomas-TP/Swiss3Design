@@ -118,7 +118,7 @@ export default async function HomePage({
             aria-hidden
             className="hidden h-44 items-end gap-3 md:flex"
           >
-            {["#da291c", "#1d4ed8", "#f59e0b", "#fafaf9"].map((c, i) => (
+            {["#e5231c", "#1d4ed8", "#f59e0b", "#fafaf9"].map((c, i) => (
               <span
                 key={c}
                 className="flex-1 rounded-t-xl"

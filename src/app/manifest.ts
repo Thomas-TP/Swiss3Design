@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Impression 3D multicolore en Suisse",
     start_url: "/",
     display: "standalone",
-    background_color: "#0e0e0f",
-    theme_color: "#0e0e0f",
+    background_color: "#fafaf9",
+    theme_color: "#1c1917",
     icons: [
       {
         src: "/brand/app/icon-192.png",

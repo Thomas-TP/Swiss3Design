@@ -13,6 +13,34 @@ const SECURITY_HEADERS: Record<string, string> = {
   "Permissions-Policy": "camera=(), microphone=(), geolocation=()",
 };
 
+// Content-Security-Policy : limite les origines autorisées sans casser les
+// services réellement utilisés —
+//  • Stripe (script + iframes 3DS + appels réseau)
+//  • autocomplétion d'adresse geo.admin.ch (connect)
+//  • avatars Google et images produits (img https:)
+// Next 16 injecte des scripts inline sans nonce → 'unsafe-inline' nécessaire.
+// En dev, Next a besoin d'eval (HMR) et de websockets : on assouplit pour ne
+// pas casser `npm run dev`, la politique stricte ne vaut qu'en production.
+function buildCsp(): string {
+  const dev = process.env.NODE_ENV !== "production";
+  return [
+    "default-src 'self'",
+    "base-uri 'self'",
+    "object-src 'none'",
+    "frame-ancestors 'none'",
+    "form-action 'self'",
+    `script-src 'self' 'unsafe-inline'${dev ? " 'unsafe-eval'" : ""} https://js.stripe.com`,
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com data:",
+    "img-src 'self' data: blob: https:",
+    `connect-src 'self' https://*.stripe.com https://m.stripe.network https://api3.geo.admin.ch${dev ? " ws: wss:" : ""}`,
+    "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://m.stripe.network",
+    "worker-src 'self' blob:",
+    "manifest-src 'self'",
+    "upgrade-insecure-requests",
+  ].join("; ");
+}
+
 export default function middleware(request: NextRequest) {
   // www.swiss3design.ch → swiss3design.ch (canonique)
   const host = request.headers.get("host") ?? "";
@@ -25,6 +53,7 @@ export default function middleware(request: NextRequest) {
   for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
     response.headers.set(name, value);
   }
+  response.headers.set("Content-Security-Policy", buildCsp());
   return response;
 }
 

@@ -1,4 +1,4 @@
-import { and, eq, ne } from "drizzle-orm";
+import { and, eq, ne, gte, isNotNull, sql } from "drizzle-orm";
 import type { getDb } from "@/db";
 import { orders, orderItems, products, inventoryLog } from "@/db/schema";
 import { sendEmail, getAdminEmails } from "./email";
@@ -31,29 +31,59 @@ export async function markOrderPaid(db: Db, orderId: string) {
     .from(orderItems)
     .where(eq(orderItems.orderId, orderId));
 
-  // Stock bas constaté pendant le décrément — signalé dans la notif admin
+  // Stock bas (ou survente) constaté pendant le décrément — signalé à l'admin
   const lowStock: { name: string; stock: number }[] = [];
   for (const item of items) {
     if (!item.productId) continue;
-    const [product] = await db
+
+    // Décrément atomique : ne s'applique que si le stock suffit encore. Empêche
+    // la survente lorsque deux paiements pour le dernier exemplaire arrivent
+    // en parallèle (la condition stock >= quantité est évaluée par SQLite).
+    const decremented = await db
+      .update(products)
+      .set({ stock: sql`${products.stock} - ${item.quantity}` })
+      .where(
+        and(
+          eq(products.id, item.productId),
+          isNotNull(products.stock),
+          gte(products.stock, item.quantity),
+        ),
+      )
+      .returning({ stock: products.stock });
+
+    if (decremented.length > 0) {
+      // stock non-null garanti par le filtre isNotNull ci-dessus
+      const newStock = decremented[0].stock ?? 0;
+      await db.insert(inventoryLog).values({
+        variantId: item.productId,
+        delta: -item.quantity,
+        reason: "order",
+      });
+      if (newStock <= 2) {
+        lowStock.push({ name: item.nameSnapshot, stock: newStock });
+      }
+      continue;
+    }
+
+    // Pas de décrément : soit le produit n'est pas suivi (stock null → rien à
+    // faire), soit le stock était insuffisant (survente concurrente). Le
+    // paiement étant déjà encaissé, on tombe le stock à 0 et on alerte l'admin.
+    const [current] = await db
       .select({ stock: products.stock })
       .from(products)
       .where(eq(products.id, item.productId))
       .limit(1);
-    if (product?.stock == null) continue;
-
-    const newStock = Math.max(0, product.stock - item.quantity);
-    await db
-      .update(products)
-      .set({ stock: newStock })
-      .where(eq(products.id, item.productId));
-    await db.insert(inventoryLog).values({
-      variantId: item.productId,
-      delta: -item.quantity,
-      reason: "order",
-    });
-    if (newStock <= 2) {
-      lowStock.push({ name: item.nameSnapshot, stock: newStock });
+    if (current?.stock != null) {
+      await db.insert(inventoryLog).values({
+        variantId: item.productId,
+        delta: -current.stock,
+        reason: "order",
+      });
+      await db
+        .update(products)
+        .set({ stock: 0 })
+        .where(eq(products.id, item.productId));
+      lowStock.push({ name: item.nameSnapshot, stock: 0 });
     }
   }
 

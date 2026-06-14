@@ -183,7 +183,7 @@ export function ProductForm({
                 type="checkbox"
                 name={name}
                 defaultChecked={checked}
-                className="h-4 w-4 accent-[#da291c]"
+                className="h-4 w-4 accent-accent"
               />
               {label}
             </label>
@@ -238,7 +238,7 @@ export function ProductForm({
                 name="categories"
                 value={c.id}
                 defaultChecked={initial?.categoryIds.includes(c.id)}
-                className="h-4 w-4 accent-[#da291c]"
+                className="h-4 w-4 accent-accent"
               />
               {c.name}
             </label>

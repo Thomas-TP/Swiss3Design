@@ -571,12 +571,12 @@ export function CheckoutFlow({
                 appearance: {
                   theme: "stripe",
                   variables: {
-                    colorPrimary: "#da291c",
+                    colorPrimary: "#e5231c",
                     colorText: "#1c1917",
                     colorTextSecondary: "#78716c",
                     colorTextPlaceholder: "#a8a29e",
                     colorBackground: "#ffffff",
-                    colorDanger: "#da291c",
+                    colorDanger: "#e5231c",
                     borderRadius: "12px",
                     fontFamily: "Geist, system-ui, sans-serif",
                     fontSizeBase: "15px",
@@ -722,7 +722,7 @@ export function CheckoutFlow({
                         type="checkbox"
                         name="saveAddress"
                         defaultChecked
-                        className="h-4 w-4 accent-[#da291c]"
+                        className="h-4 w-4 accent-accent"
                       />
                       {t("saveAddress")}
                     </label>
