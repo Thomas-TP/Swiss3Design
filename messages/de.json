@@ -215,6 +215,19 @@
       "deleteButton": "Mein Konto löschen",
       "deleteConfirm": "Konto endgültig löschen? Diese Aktion ist unwiderruflich.",
       "deleteEmailSent": "Bestätigungs-E-Mail gesendet. Klicken Sie auf den Link, um Ihr Konto endgültig zu löschen."
+    },
+    "orderDetail": {
+      "title": "Bestellung {n}",
+      "placedOn": "Aufgegeben am {date}",
+      "items": "Artikel",
+      "subtotal": "Zwischensumme",
+      "shipping": "Versand",
+      "shippingFree": "Gratis",
+      "total": "Total",
+      "shippingAddress": "Lieferadresse",
+      "tracking": "Sendungsverfolgung",
+      "trackOrder": "Paket verfolgen",
+      "back": "Zurück zum Konto"
     }
   },
   "auth": {

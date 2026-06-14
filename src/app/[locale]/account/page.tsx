@@ -98,26 +98,28 @@ export default async function AccountPage({
         ) : (
           <ul className="mt-3 divide-y divide-line rounded-card border border-line bg-surface px-5">
             {myOrders.map((o) => (
-              <li
-                key={o.id}
-                className="flex items-center justify-between gap-3 py-4"
-              >
-                <div>
-                  <p className="text-sm font-semibold">{o.orderNumber}</p>
-                  <p className="text-xs text-soft">
-                    {o.createdAt.toLocaleDateString(`${locale}-CH`)}
-                  </p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusStyle[o.status] ?? "bg-line text-soft"}`}
-                  >
-                    {t(`status.${o.status}`)}
-                  </span>
-                  <span className="text-sm font-semibold tabular-nums">
-                    {formatChf(o.totalCents, locale)}
-                  </span>
-                </div>
+              <li key={o.id}>
+                <Link
+                  href={`/account/orders/${o.id}`}
+                  className="flex items-center justify-between gap-3 py-4 transition-opacity hover:opacity-70"
+                >
+                  <div>
+                    <p className="text-sm font-semibold">{o.orderNumber}</p>
+                    <p className="text-xs text-soft">
+                      {o.createdAt.toLocaleDateString(`${locale}-CH`)}
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusStyle[o.status] ?? "bg-line text-soft"}`}
+                    >
+                      {t(`status.${o.status}`)}
+                    </span>
+                    <span className="text-sm font-semibold tabular-nums">
+                      {formatChf(o.totalCents, locale)}
+                    </span>
+                  </div>
+                </Link>
               </li>
             ))}
           </ul>

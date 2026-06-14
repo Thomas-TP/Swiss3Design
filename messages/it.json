@@ -215,6 +215,19 @@
       "deleteButton": "Elimina il mio account",
       "deleteConfirm": "Eliminare definitivamente il vostro account? L'azione è irreversibile.",
       "deleteEmailSent": "E-mail di conferma inviata. Cliccate sul link per eliminare definitivamente il vostro account."
+    },
+    "orderDetail": {
+      "title": "Ordine {n}",
+      "placedOn": "Effettuato il {date}",
+      "items": "Articoli",
+      "subtotal": "Subtotale",
+      "shipping": "Spedizione",
+      "shippingFree": "Gratuita",
+      "total": "Totale",
+      "shippingAddress": "Indirizzo di consegna",
+      "tracking": "Tracciamento",
+      "trackOrder": "Segui il pacco",
+      "back": "Torna al mio account"
     }
   },
   "auth": {

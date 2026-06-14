@@ -215,6 +215,19 @@
       "deleteButton": "Delete my account",
       "deleteConfirm": "Permanently delete your account? This cannot be undone.",
       "deleteEmailSent": "Confirmation email sent. Click the link to permanently delete your account."
+    },
+    "orderDetail": {
+      "title": "Order {n}",
+      "placedOn": "Placed on {date}",
+      "items": "Items",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping",
+      "shippingFree": "Free",
+      "total": "Total",
+      "shippingAddress": "Shipping address",
+      "tracking": "Tracking",
+      "trackOrder": "Track my parcel",
+      "back": "Back to my account"
     }
   },
   "auth": {
