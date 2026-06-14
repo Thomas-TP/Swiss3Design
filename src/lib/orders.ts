@@ -9,6 +9,7 @@ import {
   quoteRequests,
 } from "@/db/schema";
 import { sendEmail, getAdminEmails } from "./email";
+import { incrementDiscountUse } from "./discounts";
 import {
   orderConfirmationEmail,
   adminNewOrderEmail,
@@ -36,6 +37,15 @@ export async function markOrderPaid(db: Db, orderId: string) {
     .where(eq(orders.id, orderId))
     .limit(1);
   if (!order) return;
+
+  // Comptabilise l'utilisation du code promo (paiement confirmé)
+  if (order.discountCode) {
+    try {
+      await incrementDiscountUse(db, order.discountCode);
+    } catch (e) {
+      console.error("[usage code promo]", e);
+    }
+  }
 
   const items = await db
     .select()

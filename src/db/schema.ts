@@ -128,6 +128,9 @@ export const orders = sqliteTable(
       .default("pending"),
     subtotalCents: integer("subtotal_cents").notNull(),
     shippingCents: integer("shipping_cents").notNull(),
+    // Remise appliquée (code promo) — 0 si aucune
+    discountCents: integer("discount_cents").notNull().default(0),
+    discountCode: text("discount_code"),
     totalCents: integer("total_cents").notNull(),
     // Snapshot JSON de l'adresse (Suisse uniquement, validé côté serveur)
     shippingAddress: text("shipping_address").notNull(),
@@ -197,6 +200,21 @@ export const inventoryLog = sqliteTable("inventory_log", {
 export const settings = sqliteTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),
+});
+
+// Codes promo : pourcentage ou montant fixe, avec garde-fous optionnels
+export const discountCodes = sqliteTable("discount_codes", {
+  id: uuid(),
+  code: text("code").notNull().unique(), // stocké en MAJUSCULES
+  type: text("type", { enum: ["percent", "fixed"] }).notNull(),
+  // percent : 1–100 ; fixed : centimes de remise
+  value: integer("value").notNull(),
+  minSubtotalCents: integer("min_subtotal_cents"),
+  maxUses: integer("max_uses"), // null = illimité
+  usedCount: integer("used_count").notNull().default(0),
+  active: integer("active", { mode: "boolean" }).notNull().default(true),
+  expiresAt: integer("expires_at", { mode: "timestamp" }), // null = sans expiration
+  createdAt: createdAt(),
 });
 
 // ── Auth (Better Auth) ───────────────────────────────────────────────────────

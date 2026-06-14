@@ -231,10 +231,56 @@ function Steps({ current }: { current: 1 | 2 }) {
 
 // ── Récapitulatif (colonne latérale) ─────────────────────────────────────────
 
-function SummaryCard({ shippingCents }: { shippingCents: number }) {
+function SummaryCard({
+  shippingCents,
+  discountCents,
+  discount,
+  setDiscount,
+  editable,
+}: {
+  shippingCents: number;
+  discountCents: number;
+  discount: { code: string; discountCents: number } | null;
+  setDiscount: (d: { code: string; discountCents: number } | null) => void;
+  editable: boolean;
+}) {
   const t = useTranslations("checkout");
   const locale = useLocale();
   const { items, subtotalCents } = useCart();
+  const [code, setCode] = useState(discount?.code ?? "");
+  const [applying, setApplying] = useState(false);
+  const [promoError, setPromoError] = useState<string | null>(null);
+
+  async function applyCode() {
+    const c = code.trim();
+    if (!c || applying) return;
+    setApplying(true);
+    setPromoError(null);
+    try {
+      const res = await fetch("/api/discount/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: c, subtotalCents }),
+      });
+      const data = (await res.json()) as {
+        valid: boolean;
+        code?: string;
+        discountCents?: number;
+      };
+      if (data.valid && data.code && data.discountCents) {
+        setDiscount({ code: data.code, discountCents: data.discountCents });
+      } else {
+        setDiscount(null);
+        setPromoError(t("promoInvalid"));
+      }
+    } catch {
+      setPromoError(t("promoInvalid"));
+    } finally {
+      setApplying(false);
+    }
+  }
+
+  const total = subtotalCents - discountCents + shippingCents;
 
   return (
     <div className="rounded-card border border-line bg-surface p-5 sm:p-6">
@@ -257,7 +303,22 @@ function SummaryCard({ shippingCents }: { shippingCents: number }) {
             </span>
           </li>
         ))}
-        <li className="flex justify-between gap-3 border-t border-line pt-2">
+        {discountCents > 0 && (
+          <li className="flex justify-between gap-3 border-t border-line pt-2 text-emerald-600 dark:text-emerald-400">
+            <span>
+              {t("discountLine")}
+              {discount?.code ? ` (${discount.code})` : ""}
+            </span>
+            <span className="font-medium tabular-nums">
+              −{formatChf(discountCents, locale)}
+            </span>
+          </li>
+        )}
+        <li
+          className={`flex justify-between gap-3 ${
+            discountCents > 0 ? "" : "border-t border-line pt-2"
+          }`}
+        >
           <span className="text-soft">{t("shippingLine")}</span>
           <span className="font-medium tabular-nums">
             {shippingCents === 0
@@ -267,11 +328,62 @@ function SummaryCard({ shippingCents }: { shippingCents: number }) {
         </li>
         <li className="flex justify-between gap-3 font-bold">
           <span>{t("totalLine")}</span>
-          <span className="tabular-nums">
-            {formatChf(subtotalCents + shippingCents, locale)}
-          </span>
+          <span className="tabular-nums">{formatChf(total, locale)}</span>
         </li>
       </ul>
+
+      {editable && (
+        <div className="mt-4 border-t border-line pt-4">
+          {discount ? (
+            <div className="flex items-center justify-between gap-2 rounded-xl bg-emerald-500/10 px-3.5 py-2.5 text-sm">
+              <span className="font-semibold text-emerald-700 dark:text-emerald-300">
+                {discount.code}
+              </span>
+              <button
+                type="button"
+                onClick={() => {
+                  setDiscount(null);
+                  setCode("");
+                  setPromoError(null);
+                }}
+                className="text-xs font-semibold text-soft transition-colors hover:text-accent"
+              >
+                {t("promoRemove")}
+              </button>
+            </div>
+          ) : (
+            <>
+              <div className="flex gap-2">
+                <input
+                  value={code}
+                  onChange={(e) => setCode(e.target.value.toUpperCase())}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      applyCode();
+                    }
+                  }}
+                  placeholder={t("promoPlaceholder")}
+                  className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm uppercase transition-colors placeholder:normal-case placeholder:text-soft/60 focus:border-ink focus:outline-none"
+                />
+                <button
+                  type="button"
+                  onClick={applyCode}
+                  disabled={!code.trim() || applying}
+                  className="shrink-0 rounded-xl bg-ink px-4 text-sm font-semibold text-paper transition-opacity hover:opacity-90 disabled:opacity-50"
+                >
+                  {applying ? "…" : t("promoApply")}
+                </button>
+              </div>
+              {promoError && (
+                <p className="mt-2 text-xs font-medium text-accent">
+                  {promoError}
+                </p>
+              )}
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -491,14 +603,23 @@ export function CheckoutFlow({
   const [proof, setProof] = useState<EmailProof | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [totalCents, setTotalCents] = useState(0);
+  const [discount, setDiscount] = useState<{
+    code: string;
+    discountCents: number;
+  } | null>(null);
+  const [serverShipping, setServerShipping] = useState(0);
+  const [serverDiscount, setServerDiscount] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // Suit le thème du site pour accorder l'apparence du Payment Element Stripe
   const isDark = useIsDark();
 
   const shippingCents = clientSecret
-    ? Math.max(totalCents - subtotalCents, 0)
+    ? serverShipping
     : shippingFor(subtotalCents);
+  const discountCents = clientSecret
+    ? serverDiscount
+    : (discount?.discountCents ?? 0);
 
   if (items.length === 0 && !clientSecret) {
     return (
@@ -542,14 +663,19 @@ export function CheckoutFlow({
           address: addr,
           saveAddress: formData.get("saveAddress") === "on",
           locale,
+          discountCode: discount?.code,
         }),
       });
       if (!res.ok) throw new Error("checkout_failed");
       const data = (await res.json()) as {
         clientSecret: string;
         totalCents: number;
+        shippingCents: number;
+        discountCents: number;
       };
       setTotalCents(data.totalCents);
+      setServerShipping(data.shippingCents);
+      setServerDiscount(data.discountCents);
       setClientSecret(data.clientSecret);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
@@ -728,7 +854,13 @@ export function CheckoutFlow({
         </div>
 
         <aside className="order-1 lg:order-2 lg:sticky lg:top-24">
-          <SummaryCard shippingCents={shippingCents} />
+          <SummaryCard
+            shippingCents={shippingCents}
+            discountCents={discountCents}
+            discount={discount}
+            setDiscount={setDiscount}
+            editable={!clientSecret}
+          />
         </aside>
       </div>
     </div>

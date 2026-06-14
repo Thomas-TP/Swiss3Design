@@ -95,6 +95,8 @@ interface OrderForEmail {
   email: string;
   subtotalCents: number;
   shippingCents: number;
+  discountCents?: number;
+  discountCode?: string | null;
   totalCents: number;
   shippingAddress: string;
   locale: string;
@@ -108,7 +110,7 @@ interface ItemForEmail {
 
 const ORDER_TEXTS: Record<
   Locale,
-  { subject: string; title: string; intro: string; shipping: string; free: string; total: string; address: string }
+  { subject: string; title: string; intro: string; shipping: string; free: string; discount: string; total: string; address: string }
 > = {
   fr: {
     subject: "Commande {n} confirmée — Swiss3Design",
@@ -117,6 +119,7 @@ const ORDER_TEXTS: Record<
     shipping: "Livraison",
     free: "Offerte",
     total: "Total",
+    discount: "Remise",
     address: "Adresse de livraison",
   },
   de: {
@@ -126,6 +129,7 @@ const ORDER_TEXTS: Record<
     shipping: "Versand",
     free: "Gratis",
     total: "Total",
+    discount: "Rabatt",
     address: "Lieferadresse",
   },
   it: {
@@ -135,6 +139,7 @@ const ORDER_TEXTS: Record<
     shipping: "Spedizione",
     free: "Gratuita",
     total: "Totale",
+    discount: "Sconto",
     address: "Indirizzo di consegna",
   },
   en: {
@@ -144,6 +149,7 @@ const ORDER_TEXTS: Record<
     shipping: "Shipping",
     free: "Free",
     total: "Total",
+    discount: "Discount",
     address: "Shipping address",
   },
 };
@@ -177,6 +183,14 @@ export function orderConfirmationEmail(
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">${t.intro.replace("{n}", order.orderNumber)}</p>
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
       ${rows}
+      ${
+        order.discountCents && order.discountCents > 0
+          ? `<tr>
+        <td style="padding:8px 0;color:#059669;">${t.discount}${order.discountCode ? ` (${esc(order.discountCode)})` : ""}</td>
+        <td style="padding:8px 0;text-align:right;color:#059669;">−${chf(order.discountCents)}</td>
+      </tr>`
+          : ""
+      }
       <tr>
         <td style="padding:8px 0;color:#78716c;">${t.shipping}</td>
         <td style="padding:8px 0;text-align:right;color:${order.shippingCents === 0 ? "#059669" : "#1c1917"};">

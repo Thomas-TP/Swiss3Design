@@ -14,6 +14,7 @@ import { getSetting } from "@/db/queries";
 import { getStripe } from "@/lib/stripe";
 import { getAuth } from "@/lib/auth";
 import { verifyEmailProof } from "@/lib/email-proof";
+import { validateDiscount } from "@/lib/discounts";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { SHIPPING_CENTS, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
 
@@ -31,6 +32,7 @@ const bodySchema = z.object({
   email: z.email(),
   // Preuve de vérification d'e-mail (invités) émise par /api/checkout/verify-email
   emailProof: z.string().optional(),
+  discountCode: z.string().max(40).optional(),
   address: z.object({
     name: z.string().min(2).max(120),
     street: z.string().min(3).max(200),
@@ -173,7 +175,19 @@ export async function POST(request: Request) {
     (await getSetting("free_shipping_over_cents")) ?? FREE_SHIPPING_OVER_CENTS,
   );
   const shippingCents = subtotalCents >= freeOver ? 0 : shippingFlat;
-  const totalCents = subtotalCents + shippingCents;
+
+  // Remise (code promo) revalidée côté serveur sur le sous-total réel
+  let discountCents = 0;
+  let appliedCode: string | null = null;
+  if (parsed.data.discountCode) {
+    const d = await validateDiscount(db, parsed.data.discountCode, subtotalCents);
+    if (d) {
+      discountCents = d.discountCents;
+      appliedCode = d.code;
+    }
+  }
+
+  const totalCents = subtotalCents - discountCents + shippingCents;
 
   // Mémorise l'adresse pour les prochaines commandes si demandé
   if (authSession && saveAddress) {
@@ -196,6 +210,8 @@ export async function POST(request: Request) {
       status: "pending",
       subtotalCents,
       shippingCents,
+      discountCents,
+      discountCode: appliedCode,
       totalCents,
       shippingAddress: JSON.stringify({ ...address, country: "CH" }),
       locale,
@@ -241,5 +257,7 @@ export async function POST(request: Request) {
     clientSecret: paymentIntent.client_secret,
     orderNumber,
     totalCents,
+    shippingCents,
+    discountCents,
   });
 }

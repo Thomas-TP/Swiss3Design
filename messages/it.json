@@ -122,7 +122,12 @@
     "verifyToContinue": "Confermate la vostra e-mail per passare al pagamento.",
     "paymentSubtitle": "TWINT, carte, Apple Pay & Google Pay — transazione cifrata.",
     "securedByStripe": "Protetto da Stripe",
-    "backToAddress": "Modificare l'ordine"
+    "backToAddress": "Modificare l'ordine",
+    "discountLine": "Sconto",
+    "promoPlaceholder": "Codice promo",
+    "promoApply": "Applica",
+    "promoRemove": "Rimuovi",
+    "promoInvalid": "Codice non valido o scaduto."
   },
   "orderSuccess": {
     "title": "Grazie per il vostro ordine!",
@@ -224,6 +229,7 @@
       "shipping": "Spedizione",
       "shippingFree": "Gratuita",
       "total": "Totale",
+      "discount": "Sconto",
       "shippingAddress": "Indirizzo di consegna",
       "tracking": "Tracciamento",
       "trackOrder": "Segui il pacco",

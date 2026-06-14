@@ -140,6 +140,17 @@ export default async function OrderDetailPage({
               {formatChf(order.subtotalCents, locale)}
             </dd>
           </div>
+          {order.discountCents > 0 && (
+            <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+              <dt>
+                {t("orderDetail.discount")}
+                {order.discountCode ? ` (${order.discountCode})` : ""}
+              </dt>
+              <dd className="tabular-nums">
+                −{formatChf(order.discountCents, locale)}
+              </dd>
+            </div>
+          )}
           <div className="flex justify-between">
             <dt className="text-soft">{t("orderDetail.shipping")}</dt>
             <dd className="tabular-nums">
