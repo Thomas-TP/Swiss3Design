@@ -21,6 +21,7 @@ const SECURITY_HEADERS: Record<string, string> = {
 // Content-Security-Policy : limite les origines sans casser les services
 // réellement utilisés —
 //  • Stripe (script + iframes 3DS + appels réseau)
+//  • Google Fonts (CSS lu par Stripe Elements pour la police Geist des iframes)
 //  • autocomplétion d'adresse geo.admin.ch (connect)
 //  • Cloudflare Web Analytics (beacon, sans cookie) — à activer dans le dashboard
 //  • avatars Google et images produits (img https:)
@@ -39,7 +40,7 @@ function buildCsp(): string {
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
     "img-src 'self' data: blob: https:",
-    `connect-src 'self' https://*.stripe.com https://m.stripe.network https://api3.geo.admin.ch https://cloudflareinsights.com${dev ? " ws: wss:" : ""}`,
+    `connect-src 'self' https://*.stripe.com https://m.stripe.network https://fonts.googleapis.com https://api3.geo.admin.ch https://cloudflareinsights.com${dev ? " ws: wss:" : ""}`,
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://m.stripe.network",
     "worker-src 'self' blob:",
     "manifest-src 'self'",

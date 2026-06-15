@@ -32,9 +32,11 @@ import { stripeAppearance } from "@/lib/stripe-appearance";
 import { formatChf } from "@/lib/format";
 import { shippingFor } from "@/lib/shipping";
 
-// Stripe.js n'est chargé qu'au moment du paiement : ses iframes (js.stripe.com,
-// m.stripe.network) comptent comme des processus Chrome — inutile de les créer
-// pendant la saisie de l'adresse.
+// Stripe.js est préchargé dès l'arrivée sur le checkout (voir le useEffect dans
+// CheckoutFlow) : le download du script + iframes (js.stripe.com, m.stripe.network)
+// se fait pendant la saisie de l'adresse, pour que le passage à l'étape paiement
+// soit immédiat — plus d'attente du téléchargement après la création du
+// PaymentIntent. La variante « /pure » nous laisse choisir ce moment.
 let stripePromise: ReturnType<typeof loadStripe> | null = null;
 function getStripePromise() {
   stripePromise ??= loadStripe(
@@ -613,6 +615,20 @@ export function CheckoutFlow({
   const [error, setError] = useState<string | null>(null);
   // Suit le thème du site pour accorder l'apparence du Payment Element Stripe
   const isDark = useIsDark();
+
+  // Préchargement de stripe.js dès le montage du checkout : le script se
+  // télécharge en parallèle de la saisie de l'adresse, donc le passage à
+  // l'étape paiement n'attend plus que le PaymentIntent. Différé en idle pour
+  // ne pas concurrencer le premier rendu de la page.
+  useEffect(() => {
+    const warm = () => void getStripePromise();
+    if ("requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(warm);
+      return () => window.cancelIdleCallback(id);
+    }
+    const timer = setTimeout(warm, 1200);
+    return () => clearTimeout(timer);
+  }, []);
 
   const shippingCents = clientSecret
     ? serverShipping
