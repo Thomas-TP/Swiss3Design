@@ -180,6 +180,7 @@
     "noOrders": "Aucune commande pour l'instant.",
     "noQuotes": "Aucune demande de devis pour l'instant.",
     "quotedPrice": "Prix proposé",
+    "quoteActionRequired": "Action requise",
     "status": {
       "pending": "En attente",
       "paid": "Payée",
@@ -191,11 +192,13 @@
     "quoteStatus": {
       "received": "Reçue",
       "quoted": "Devis envoyé",
+      "revision_requested": "Modification demandée",
       "accepted": "Acceptée",
+      "declined": "Refusé",
       "paid": "Payée",
       "in_production": "En production",
       "done": "Terminée",
-      "rejected": "Refusée"
+      "rejected": "Non retenue"
     },
     "security": {
       "title": "Sécurité",
@@ -243,7 +246,48 @@
       "paidTitle": "Devis payé ✅",
       "paidText": "Merci ! Votre paiement est confirmé. Nous lançons la production et revenons vers vous par e-mail.",
       "notPayable": "Ce devis n'est pas payable pour le moment.",
+      "expired": "Ce devis a expiré. Demandez une mise à jour depuis la page du devis pour le régler.",
       "loading": "Préparation du paiement…",
+      "error": "Une erreur est survenue. Merci de réessayer."
+    },
+    "quoteDetail": {
+      "title": "Votre devis",
+      "submittedOn": "Demande envoyée le {date}",
+      "requestTitle": "Votre demande",
+      "specMaterial": "Matière",
+      "specColors": "Couleurs",
+      "specDimensions": "Dimensions",
+      "validUntil": "Valable jusqu'au {date}",
+      "expired": "Devis expiré — demandez une mise à jour",
+      "threadTitle": "Échanges",
+      "you": "Vous",
+      "studio": "Swiss3Design",
+      "receivedNote": "Votre demande est en cours d'étude. Vous recevrez un devis par e-mail sous 48 h.",
+      "revisionPendingNote": "Votre demande de modification a bien été transmise. Nous revenons vers vous avec un devis ajusté.",
+      "paidNote": "Devis payé — la production est lancée. Merci !",
+      "declinedNote": "Vous avez refusé ce devis.",
+      "rejectedNote": "Cette demande n'a pas été retenue cette fois-ci.",
+      "newRequest": "Faire une nouvelle demande"
+    },
+    "quoteActions": {
+      "accept": "Accepter et payer",
+      "revise": "Demander une modification",
+      "reviseExpired": "Demander une mise à jour",
+      "decline": "Refuser le devis",
+      "reviseTitle": "Demander une modification",
+      "reviseDesc": "Décrivez le changement souhaité (matière, taille, quantité, budget…).",
+      "revisePlaceholder": "Ex. : serait-il possible de le faire en PETG noir, hauteur 15 cm ?",
+      "fileHint": "Joindre un fichier 3D corrigé (facultatif)",
+      "fileUploading": "Envoi du fichier…",
+      "fileError": "Échec de l'envoi du fichier. Réessayez ou vérifiez le format.",
+      "reviseSubmit": "Envoyer la demande",
+      "declineTitle": "Refuser ce devis",
+      "declineDesc": "Vous pouvez nous en indiquer la raison (facultatif).",
+      "declineReasonPlaceholder": "Ex. : budget dépassé, projet reporté…",
+      "declineConfirm": "Confirmer le refus",
+      "keep": "Garder le devis",
+      "cancel": "Annuler",
+      "sending": "Envoi…",
       "error": "Une erreur est survenue. Merci de réessayer."
     }
   },

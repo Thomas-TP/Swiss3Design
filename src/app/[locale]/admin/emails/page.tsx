@@ -8,6 +8,8 @@ import {
   quoteRejectedEmail,
   adminNewOrderEmail,
   adminNewQuoteEmail,
+  adminQuoteRevisionEmail,
+  adminQuoteDeclinedEmail,
   verificationEmail,
   resetPasswordEmail,
 } from "@/lib/email-templates";
@@ -45,6 +47,9 @@ export default async function AdminEmailsPage({
     { nameSnapshot: "Vase Spirale", priceCentsSnapshot: 2990, quantity: 1 },
     { nameSnapshot: "Porte-clés relief", priceCentsSnapshot: 995, quantity: 2 },
   ];
+  // Aperçu : validité fictive à +30 j (horloge stable sur la durée du rendu)
+  // eslint-disable-next-line react-hooks/purity
+  const validUntilPreview = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
   const customerPreviews = [
     {
@@ -75,13 +80,15 @@ export default async function AdminEmailsPage({
       title: "Devis prêt",
       desc: "Envoyé quand vous chiffrez un devis (statut « Devis envoyé »).",
       email: quoteReplyEmail({
+        id: "demo",
         email: "client@example.ch",
         locale: previewLocale,
         quotedPriceCents: 4900,
         adminMessage:
           "Impression en PETG noir et rouge, 2 exemplaires, prêts sous 5 jours ouvrés.",
+        validUntil: validUntilPreview,
       }),
-      height: 520,
+      height: 560,
     },
     {
       title: "Devis refusé",
@@ -135,6 +142,32 @@ export default async function AdminEmailsPage({
         ["vous@example.ch"],
       ),
       height: 640,
+    },
+    {
+      title: "Modification de devis demandée (notification interne)",
+      desc: "Envoyé à l'équipe quand le client demande une modification depuis son espace — avec son message et le fichier joint éventuel.",
+      email: adminQuoteRevisionEmail(
+        { id: "demo", email: "client@example.ch", locale: previewLocale },
+        "Serait-il possible de l'avoir en PETG noir plutôt qu'en PLA, et 2 cm plus haut ?",
+        "support-casque-v2.stl",
+        ["vous@example.ch"],
+      ),
+      height: 520,
+    },
+    {
+      title: "Devis refusé par le client (notification interne)",
+      desc: "Envoyé à l'équipe quand le client refuse un devis depuis son espace — avec le motif s'il en a indiqué un.",
+      email: adminQuoteDeclinedEmail(
+        {
+          id: "demo",
+          email: "client@example.ch",
+          locale: previewLocale,
+          quotedPriceCents: 4900,
+        },
+        "Budget dépassé pour ce trimestre, je reviendrai vers vous plus tard.",
+        ["vous@example.ch"],
+      ),
+      height: 480,
     },
   ];
 

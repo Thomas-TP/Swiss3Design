@@ -44,8 +44,11 @@ export async function POST(request: Request) {
     return Response.json({ error: "forbidden" }, { status: 403 });
   }
 
-  // Seuls les devis chiffrés et non encore payés sont payables
+  // Seuls les devis chiffrés, non expirés et non encore payés sont payables
+  const expired =
+    !!quote.validUntil && quote.validUntil.getTime() < Date.now();
   if (
+    expired ||
     (quote.status !== "quoted" && quote.status !== "accepted") ||
     !quote.quotedPriceCents ||
     quote.quotedPriceCents <= 0

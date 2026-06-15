@@ -183,17 +183,49 @@ export const quoteRequests = sqliteTable("quote_requests", {
   fileUrl: text("file_url"), // clé R2 du STL/3MF (phase upload)
   fileName: text("file_name"),
   status: text("status", {
-    enum: ["received", "quoted", "accepted", "paid", "in_production", "done", "rejected"],
+    enum: [
+      "received",
+      "quoted",
+      "revision_requested", // le client demande un changement → à re-chiffrer
+      "accepted",
+      "declined", // le client a refusé le devis
+      "paid",
+      "in_production",
+      "done",
+      "rejected", // l'atelier ne donne pas suite à la demande
+    ],
   })
     .notNull()
     .default("received"),
   quotedPriceCents: integer("quoted_price_cents"),
   adminMessage: text("admin_message"),
+  // Validité du devis : posée à +30 j au chiffrage, réinitialisée à chaque re-devis
+  validUntil: integer("valid_until", { mode: "timestamp" }),
   // Note interne admin, jamais visible par le client
   adminNote: text("admin_note"),
   locale: text("locale", { enum: LOCALES }).notNull().default("fr"),
   createdAt: createdAt(),
 });
+
+// Fil de discussion d'un devis : échanges client ↔ atelier, historique des
+// re-devis et demandes de modification. Un message admin peut porter un prix
+// (re-)proposé (priceCents) et un message client un fichier 3D corrigé.
+export const quoteMessages = sqliteTable(
+  "quote_messages",
+  {
+    id: uuid(),
+    quoteId: text("quote_id")
+      .notNull()
+      .references(() => quoteRequests.id, { onDelete: "cascade" }),
+    sender: text("sender", { enum: ["customer", "admin"] }).notNull(),
+    body: text("body").notNull(),
+    priceCents: integer("price_cents"), // null sauf message portant un (re-)devis
+    fileUrl: text("file_url"), // clé R2 d'un fichier joint (optionnel)
+    fileName: text("file_name"),
+    createdAt: createdAt(),
+  },
+  (t) => [index("quote_messages_quote_idx").on(t.quoteId)],
+);
 
 // ── Stock & réglages ─────────────────────────────────────────────────────────
 

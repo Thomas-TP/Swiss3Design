@@ -21,7 +21,9 @@ export const ORDER_STATUS_FR: Record<string, string> = {
 export const QUOTE_STATUSES = [
   "received",
   "quoted",
+  "revision_requested",
   "accepted",
+  "declined",
   "paid",
   "in_production",
   "done",
@@ -31,11 +33,13 @@ export const QUOTE_STATUSES = [
 export const QUOTE_STATUS_FR: Record<string, string> = {
   received: "Reçue",
   quoted: "Devis envoyé",
+  revision_requested: "Modif. demandée",
   accepted: "Acceptée",
+  declined: "Refusé par le client",
   paid: "Payée",
   in_production: "En production",
   done: "Terminée",
-  rejected: "Refusée",
+  rejected: "Déclinée",
 };
 
 export const STATUS_STYLE: Record<string, string> = {
@@ -47,9 +51,11 @@ export const STATUS_STYLE: Record<string, string> = {
   cancelled: "bg-red-500/15 text-red-600 dark:text-red-300",
   received: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
   quoted: "bg-blue-500/15 text-blue-700 dark:text-blue-300",
+  revision_requested: "bg-orange-500/15 text-orange-700 dark:text-orange-300",
   accepted: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  declined: "bg-red-500/15 text-red-600 dark:text-red-300",
   done: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  rejected: "bg-red-500/15 text-red-600 dark:text-red-300",
+  rejected: "bg-stone-500/15 text-stone-600 dark:text-stone-300",
 };
 
 export const FIELD =

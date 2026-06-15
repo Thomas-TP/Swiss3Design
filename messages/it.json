@@ -180,6 +180,7 @@
     "noOrders": "Nessun ordine per il momento.",
     "noQuotes": "Nessuna richiesta di preventivo per il momento.",
     "quotedPrice": "Prezzo proposto",
+    "quoteActionRequired": "Azione richiesta",
     "status": {
       "pending": "In attesa",
       "paid": "Pagato",
@@ -191,11 +192,13 @@
     "quoteStatus": {
       "received": "Ricevuta",
       "quoted": "Preventivo inviato",
+      "revision_requested": "Modifica richiesta",
       "accepted": "Accettato",
+      "declined": "Rifiutato",
       "paid": "Pagato",
       "in_production": "In produzione",
       "done": "Completato",
-      "rejected": "Rifiutato"
+      "rejected": "Non selezionata"
     },
     "security": {
       "title": "Sicurezza",
@@ -243,7 +246,48 @@
       "paidTitle": "Preventivo pagato ✅",
       "paidText": "Grazie! Il pagamento è confermato. Avviamo la produzione e vi ricontattiamo per e-mail.",
       "notPayable": "Questo preventivo non è pagabile al momento.",
+      "expired": "Questo preventivo è scaduto. Richiedete un aggiornamento dalla pagina del preventivo per pagarlo.",
       "loading": "Preparazione del pagamento…",
+      "error": "Si è verificato un errore. Riprovate per favore."
+    },
+    "quoteDetail": {
+      "title": "Il vostro preventivo",
+      "submittedOn": "Richiesta inviata il {date}",
+      "requestTitle": "La vostra richiesta",
+      "specMaterial": "Materiale",
+      "specColors": "Colori",
+      "specDimensions": "Dimensioni",
+      "validUntil": "Valido fino al {date}",
+      "expired": "Preventivo scaduto — richiedete un aggiornamento",
+      "threadTitle": "Scambi",
+      "you": "Voi",
+      "studio": "Swiss3Design",
+      "receivedNote": "La vostra richiesta è in fase di studio. Riceverete un preventivo via e-mail entro 48 ore.",
+      "revisionPendingNote": "La vostra richiesta di modifica è stata trasmessa. Vi ricontattiamo con un preventivo aggiornato.",
+      "paidNote": "Preventivo pagato — la produzione è avviata. Grazie!",
+      "declinedNote": "Avete rifiutato questo preventivo.",
+      "rejectedNote": "Questa richiesta non è stata selezionata questa volta.",
+      "newRequest": "Invia una nuova richiesta"
+    },
+    "quoteActions": {
+      "accept": "Accetta e paga",
+      "revise": "Richiedi una modifica",
+      "reviseExpired": "Richiedi un aggiornamento",
+      "decline": "Rifiuta il preventivo",
+      "reviseTitle": "Richiedi una modifica",
+      "reviseDesc": "Descrivete la modifica desiderata (materiale, dimensione, quantità, budget…).",
+      "revisePlaceholder": "Es.: sarebbe possibile in PETG nero, alto 15 cm?",
+      "fileHint": "Allega un file 3D corretto (facoltativo)",
+      "fileUploading": "Caricamento del file…",
+      "fileError": "Caricamento del file non riuscito. Riprovate o verificate il formato.",
+      "reviseSubmit": "Invia la richiesta",
+      "declineTitle": "Rifiuta questo preventivo",
+      "declineDesc": "Potete indicarci il motivo (facoltativo).",
+      "declineReasonPlaceholder": "Es.: budget superato, progetto rinviato…",
+      "declineConfirm": "Conferma il rifiuto",
+      "keep": "Mantieni il preventivo",
+      "cancel": "Annulla",
+      "sending": "Invio…",
       "error": "Si è verificato un errore. Riprovate per favore."
     }
   },

@@ -64,8 +64,14 @@ export default async function QuotePayPage({
     }
   }
 
+  // Server component dynamique : l'horloge est stable sur la durée du rendu
+  // eslint-disable-next-line react-hooks/purity
+  const now = Date.now();
+  const expired =
+    !!quote.validUntil && quote.validUntil.getTime() < now;
   const payable =
     !paid &&
+    !expired &&
     (quote.status === "quoted" || quote.status === "accepted") &&
     !!quote.quotedPriceCents &&
     quote.quotedPriceCents > 0;
@@ -113,7 +119,7 @@ export default async function QuotePayPage({
         </div>
       ) : (
         <p className="rounded-card border border-line bg-surface p-8 text-center text-soft">
-          {t("quotePay.notPayable")}
+          {expired ? t("quotePay.expired") : t("quotePay.notPayable")}
         </p>
       )}
     </div>

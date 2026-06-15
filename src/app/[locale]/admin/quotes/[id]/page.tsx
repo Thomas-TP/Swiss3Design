@@ -1,13 +1,20 @@
 import { notFound } from "next/navigation";
-import { eq } from "drizzle-orm";
-import { ArrowLeft } from "lucide-react";
+import { asc, eq } from "drizzle-orm";
+import { ArrowLeft, Paperclip } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
-import { quoteRequests } from "@/db/schema";
+import { quoteRequests, quoteMessages } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
+import { formatChf } from "@/lib/format";
 import { updateQuote } from "../actions";
-import { QUOTE_STATUSES, QUOTE_STATUS_FR, FIELD, BTN_PRIMARY } from "../../ui";
+import {
+  QUOTE_STATUSES,
+  QUOTE_STATUS_FR,
+  STATUS_STYLE,
+  FIELD,
+  BTN_PRIMARY,
+} from "../../ui";
 
 export default async function AdminQuoteDetailPage({
   params,
@@ -15,7 +22,7 @@ export default async function AdminQuoteDetailPage({
   params: Promise<{ locale: Locale; id: string }>;
 }) {
   await requireAdmin();
-  const { id } = await params;
+  const { locale, id } = await params;
   const db = await getDb();
 
   const [quote] = await db
@@ -25,11 +32,22 @@ export default async function AdminQuoteDetailPage({
     .limit(1);
   if (!quote) notFound();
 
+  const messages = await db
+    .select()
+    .from(quoteMessages)
+    .where(eq(quoteMessages.quoteId, id))
+    .orderBy(asc(quoteMessages.createdAt));
+
   const specs = [
     ["Matière", quote.material],
     ["Couleurs", quote.colors],
     ["Dimensions", quote.dimensions],
   ].filter(([, v]) => v);
+
+  // Server component dynamique : l'horloge est stable sur la durée du rendu
+  // eslint-disable-next-line react-hooks/purity
+  const now = Date.now();
+  const quoteExpired = !!quote.validUntil && quote.validUntil.getTime() < now;
 
   return (
     <div className="max-w-2xl">
@@ -41,7 +59,14 @@ export default async function AdminQuoteDetailPage({
         Tous les devis
       </Link>
 
-      <h2 className="text-xl font-bold">Demande de devis</h2>
+      <div className="flex flex-wrap items-center gap-3">
+        <h2 className="text-xl font-bold">Demande de devis</h2>
+        <span
+          className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLE[quote.status] ?? "bg-line text-soft"}`}
+        >
+          {QUOTE_STATUS_FR[quote.status]}
+        </span>
+      </div>
       <p className="text-sm text-soft">
         {quote.createdAt.toLocaleString("fr-CH")} ·{" "}
         <a href={`mailto:${quote.email}`} className="underline">
@@ -49,6 +74,15 @@ export default async function AdminQuoteDetailPage({
         </a>{" "}
         · langue client : {quote.locale.toUpperCase()}
       </p>
+      {quote.validUntil && (
+        <p className="mt-1 text-xs text-soft">
+          Devis valable jusqu&apos;au{" "}
+          {quote.validUntil.toLocaleDateString("fr-CH")}
+          {quoteExpired && (
+            <span className="font-semibold text-accent"> · expiré</span>
+          )}
+        </p>
+      )}
 
       <section className="mt-5 rounded-card border border-line bg-surface p-5 text-sm">
         <h3 className="mb-2 font-semibold">Description du client</h3>
@@ -77,6 +111,54 @@ export default async function AdminQuoteDetailPage({
           </p>
         )}
       </section>
+
+      {messages.length > 0 && (
+        <section className="mt-5">
+          <h3 className="mb-3 text-sm font-semibold">Fil de discussion</h3>
+          <ul className="space-y-3">
+            {messages.map((m) => {
+              const fromAdmin = m.sender === "admin";
+              return (
+                <li
+                  key={m.id}
+                  className={`flex flex-col ${fromAdmin ? "items-end" : "items-start"}`}
+                >
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                      fromAdmin
+                        ? "rounded-br-sm bg-ink/5 text-ink"
+                        : "rounded-bl-sm border border-orange-500/30 bg-orange-500/5 text-ink"
+                    }`}
+                  >
+                    {m.priceCents != null && (
+                      <p className="mb-1 text-base font-bold tabular-nums">
+                        {formatChf(m.priceCents, locale)}
+                      </p>
+                    )}
+                    {m.body && <p className="whitespace-pre-wrap">{m.body}</p>}
+                    {m.fileName && (
+                      <a
+                        href={`/api/admin/files/${m.fileUrl}`}
+                        className="mt-1.5 inline-flex items-center gap-1.5 text-xs font-medium text-soft underline"
+                      >
+                        <Paperclip size={12} className="shrink-0" />
+                        {m.fileName}
+                      </a>
+                    )}
+                  </div>
+                  <span className="mt-1 px-1 text-[11px] text-soft">
+                    {fromAdmin ? "Vous" : "Client"} ·{" "}
+                    {m.createdAt.toLocaleDateString("fr-CH", {
+                      day: "numeric",
+                      month: "short",
+                    })}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      )}
 
       <form
         action={updateQuote}

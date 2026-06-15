@@ -375,7 +375,7 @@ export function orderCancelledEmail(order: OrderForEmail): EmailMessage {
 
 const QUOTE_TEXTS: Record<
   Locale,
-  { subject: string; title: string; intro: string; price: string; note: string; cta: string }
+  { subject: string; title: string; intro: string; price: string; note: string; valid: string; cta: string; review: string }
 > = {
   fr: {
     subject: "Votre devis Swiss3Design est prêt",
@@ -383,7 +383,9 @@ const QUOTE_TEXTS: Record<
     intro: "Nous avons étudié votre projet d'impression sur mesure. Voici notre proposition :",
     price: "Prix proposé",
     note: "Notre message",
-    cta: "Pour accepter ce devis ou poser une question, répondez simplement à cet e-mail. Vous retrouvez aussi ce devis dans votre espace client.",
+    valid: "Valable jusqu'au {date}",
+    cta: "Depuis votre espace client, vous pouvez accepter et payer ce devis, demander une modification ou le refuser — en un clic.",
+    review: "Voir mon devis",
   },
   de: {
     subject: "Ihre Swiss3Design-Offerte ist bereit",
@@ -391,7 +393,9 @@ const QUOTE_TEXTS: Record<
     intro: "Wir haben Ihr Projekt geprüft. Hier unser Vorschlag:",
     price: "Angebotener Preis",
     note: "Unsere Nachricht",
-    cta: "Um die Offerte anzunehmen oder Fragen zu stellen, antworten Sie einfach auf diese E-Mail. Sie finden die Offerte auch in Ihrem Kundenkonto.",
+    valid: "Gültig bis {date}",
+    cta: "In Ihrem Kundenkonto können Sie diese Offerte mit einem Klick annehmen und bezahlen, eine Anpassung anfragen oder ablehnen.",
+    review: "Meine Offerte ansehen",
   },
   it: {
     subject: "Il vostro preventivo Swiss3Design è pronto",
@@ -399,7 +403,9 @@ const QUOTE_TEXTS: Record<
     intro: "Abbiamo esaminato il vostro progetto. Ecco la nostra proposta:",
     price: "Prezzo proposto",
     note: "Il nostro messaggio",
-    cta: "Per accettare il preventivo o fare domande, rispondete a questa e-mail. Lo trovate anche nel vostro account cliente.",
+    valid: "Valido fino al {date}",
+    cta: "Dal vostro account cliente potete accettare e pagare questo preventivo, chiedere una modifica o rifiutarlo — con un clic.",
+    review: "Vedi il mio preventivo",
   },
   en: {
     subject: "Your Swiss3Design quote is ready",
@@ -407,15 +413,27 @@ const QUOTE_TEXTS: Record<
     intro: "We've reviewed your custom printing project. Here is our proposal:",
     price: "Quoted price",
     note: "Our message",
-    cta: "To accept this quote or ask a question, simply reply to this email. You can also find it in your customer account.",
+    valid: "Valid until {date}",
+    cta: "From your customer account you can accept and pay this quote, request a change or decline it — in one click.",
+    review: "View my quote",
   },
 };
 
+function formatDate(date: Date, locale: Locale): string {
+  return date.toLocaleDateString(`${locale}-CH`, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
 export function quoteReplyEmail(quote: {
+  id: string;
   email: string;
   locale: string;
   quotedPriceCents: number | null;
   adminMessage: string | null;
+  validUntil?: Date | null;
 }): EmailMessage {
   const locale = (["fr", "de", "it", "en"].includes(quote.locale)
     ? quote.locale
@@ -432,9 +450,15 @@ export function quoteReplyEmail(quote: {
     ${
       quote.adminMessage
         ? `<p style="margin:0 0 16px;padding:12px 16px;background:#fafaf9;border-radius:10px;color:#44403c;line-height:1.6;">
-            <strong style="color:#1c1917;">${t.note} :</strong><br/>${quote.adminMessage}</p>`
+            <strong style="color:#1c1917;">${t.note} :</strong><br/>${esc(quote.adminMessage)}</p>`
         : ""
     }
+    ${
+      quote.validUntil
+        ? `<p style="margin:0 0 18px;font-size:13px;color:#78716c;">${t.valid.replace("{date}", formatDate(quote.validUntil, locale))}</p>`
+        : ""
+    }
+    ${button(`${SITE_URL}/${locale}/account/quotes/${quote.id}`, t.review)}
     <p style="margin:0;font-size:13px;color:#78716c;line-height:1.6;">${t.cta}</p>`;
   return {
     to: quote.email,
@@ -636,6 +660,63 @@ export function adminQuotePaidEmail(
     replyTo: quote.email,
     subject: `💳 Devis payé — ${quote.email} (${amount})`,
     html: layout("Devis payé", body, "Notification interne Swiss3Design — répondre écrit directement au client."),
+  };
+}
+
+// ── Devis : le client demande une modification (notification interne) ────────
+
+export function adminQuoteRevisionEmail(
+  quote: { id: string; email: string; locale: string },
+  message: string,
+  fileName: string | null,
+  adminEmails: string[],
+): EmailMessage {
+  const body = `
+    <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">
+      <strong>${esc(quote.email)}</strong> (langue : ${quote.locale.toUpperCase()})
+      demande une <strong>modification</strong> de son devis.
+    </p>
+    <p style="margin:0 0 16px;padding:12px 16px;background:#fafaf9;border-radius:10px;color:#44403c;line-height:1.6;white-space:pre-wrap;">${esc(message)}</p>
+    ${
+      fileName
+        ? `<p style="margin:0 0 18px;font-size:13px;color:#78716c;">📎 Fichier joint : ${esc(fileName)} (à télécharger depuis la fiche)</p>`
+        : ""
+    }
+    ${button(`${SITE_URL}/fr/admin/quotes/${quote.id}`, "Re-chiffrer le devis")}`;
+  return {
+    to: adminEmails,
+    from: FROM_CONTACT,
+    replyTo: quote.email,
+    subject: `✏️ Modification demandée — ${quote.email}`,
+    html: layout("Demande de modification", body, "Notification interne Swiss3Design — répondre écrit directement au client."),
+  };
+}
+
+// ── Devis : le client refuse le devis (notification interne) ─────────────────
+
+export function adminQuoteDeclinedEmail(
+  quote: { id: string; email: string; locale: string; quotedPriceCents: number | null },
+  reason: string | null,
+  adminEmails: string[],
+): EmailMessage {
+  const amount = quote.quotedPriceCents != null ? chf(quote.quotedPriceCents) : "—";
+  const body = `
+    <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">
+      <strong>${esc(quote.email)}</strong> (langue : ${quote.locale.toUpperCase()})
+      a <strong>refusé</strong> le devis (${amount}).
+    </p>
+    ${
+      reason
+        ? `<p style="margin:0 0 18px;padding:12px 16px;background:#fafaf9;border-radius:10px;color:#44403c;line-height:1.6;white-space:pre-wrap;"><strong style="color:#1c1917;">Motif :</strong><br/>${esc(reason)}</p>`
+        : ""
+    }
+    ${button(`${SITE_URL}/fr/admin/quotes/${quote.id}`, "Voir le devis")}`;
+  return {
+    to: adminEmails,
+    from: FROM_CONTACT,
+    replyTo: quote.email,
+    subject: `🚫 Devis refusé — ${quote.email}`,
+    html: layout("Devis refusé par le client", body, "Notification interne Swiss3Design — répondre écrit directement au client."),
   };
 }
 

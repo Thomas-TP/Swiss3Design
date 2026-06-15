@@ -22,9 +22,11 @@ const statusStyle: Record<string, string> = {
   cancelled: "bg-red-500/15 text-red-600 dark:text-red-300",
   received: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
   quoted: "bg-blue-500/15 text-blue-700 dark:text-blue-300",
+  revision_requested: "bg-orange-500/15 text-orange-700 dark:text-orange-300",
   accepted: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  declined: "bg-red-500/15 text-red-600 dark:text-red-300",
   done: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  rejected: "bg-red-500/15 text-red-600 dark:text-red-300",
+  rejected: "bg-stone-500/15 text-stone-600 dark:text-stone-300",
 };
 
 export default async function AccountPage({
@@ -138,34 +140,35 @@ export default async function AccountPage({
         ) : (
           <ul className="mt-3 divide-y divide-line rounded-card border border-line bg-surface px-5">
             {myQuotes.map((q) => (
-              <li key={q.id} className="py-4">
-                <div className="flex items-center justify-between gap-3">
-                  <p className="line-clamp-1 text-sm font-medium">
-                    {q.description}
-                  </p>
-                  <span
-                    className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusStyle[q.status] ?? "bg-line text-soft"}`}
-                  >
-                    {t(`quoteStatus.${q.status}`)}
-                  </span>
-                </div>
-                {q.quotedPriceCents != null && (
-                  <p className="mt-1 text-xs text-soft">
-                    {t("quotedPrice")} :{" "}
-                    <span className="font-semibold text-ink">
-                      {formatChf(q.quotedPriceCents, locale)}
+              <li key={q.id}>
+                <Link
+                  href={`/account/quotes/${q.id}`}
+                  className="block py-4 transition-opacity hover:opacity-70"
+                >
+                  <div className="flex items-center justify-between gap-3">
+                    <p className="line-clamp-1 text-sm font-medium">
+                      {q.description}
+                    </p>
+                    <span
+                      className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusStyle[q.status] ?? "bg-line text-soft"}`}
+                    >
+                      {t(`quoteStatus.${q.status}`)}
                     </span>
-                    {q.adminMessage && <> — {q.adminMessage}</>}
-                  </p>
-                )}
-                {q.status === "quoted" && q.quotedPriceCents != null && (
-                  <Link
-                    href={`/account/quotes/${q.id}/pay`}
-                    className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-semibold text-white transition-colors hover:bg-accent-dark"
-                  >
-                    {t("quotePay.cta")}
-                  </Link>
-                )}
+                  </div>
+                  {q.quotedPriceCents != null && (
+                    <p className="mt-1 text-xs text-soft">
+                      {t("quotedPrice")} :{" "}
+                      <span className="font-semibold text-ink">
+                        {formatChf(q.quotedPriceCents, locale)}
+                      </span>
+                    </p>
+                  )}
+                  {q.status === "quoted" && q.quotedPriceCents != null && (
+                    <span className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-accent px-4 py-2 text-xs font-semibold text-white">
+                      {t("quoteActionRequired")}
+                    </span>
+                  )}
+                </Link>
               </li>
             ))}
           </ul>

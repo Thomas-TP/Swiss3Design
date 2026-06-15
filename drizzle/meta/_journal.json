@@ -50,6 +50,13 @@
       "when": 1781505604958,
       "tag": "0006_add_materials",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "6",
+      "when": 1781539888562,
+      "tag": "0007_silky_joystick",
+      "breakpoints": true
     }
   ]
 }

@@ -180,6 +180,7 @@
     "noOrders": "Noch keine Bestellungen.",
     "noQuotes": "Noch keine Offertanfragen.",
     "quotedPrice": "Angebotener Preis",
+    "quoteActionRequired": "Aktion erforderlich",
     "status": {
       "pending": "Ausstehend",
       "paid": "Bezahlt",
@@ -191,11 +192,13 @@
     "quoteStatus": {
       "received": "Erhalten",
       "quoted": "Offerte gesendet",
+      "revision_requested": "Änderung angefragt",
       "accepted": "Akzeptiert",
+      "declined": "Abgelehnt",
       "paid": "Bezahlt",
       "in_production": "In Produktion",
       "done": "Abgeschlossen",
-      "rejected": "Abgelehnt"
+      "rejected": "Nicht berücksichtigt"
     },
     "security": {
       "title": "Sicherheit",
@@ -243,7 +246,48 @@
       "paidTitle": "Offerte bezahlt ✅",
       "paidText": "Vielen Dank! Ihre Zahlung ist bestätigt. Wir starten die Produktion und melden uns per E-Mail.",
       "notPayable": "Diese Offerte ist derzeit nicht zahlbar.",
+      "expired": "Diese Offerte ist abgelaufen. Fordern Sie auf der Offertenseite eine Aktualisierung an, um sie zu bezahlen.",
       "loading": "Zahlung wird vorbereitet…",
+      "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
+    },
+    "quoteDetail": {
+      "title": "Ihre Offerte",
+      "submittedOn": "Anfrage gesendet am {date}",
+      "requestTitle": "Ihre Anfrage",
+      "specMaterial": "Material",
+      "specColors": "Farben",
+      "specDimensions": "Abmessungen",
+      "validUntil": "Gültig bis {date}",
+      "expired": "Offerte abgelaufen — Aktualisierung anfordern",
+      "threadTitle": "Verlauf",
+      "you": "Sie",
+      "studio": "Swiss3Design",
+      "receivedNote": "Ihre Anfrage wird geprüft. Sie erhalten innerhalb von 48 Std. eine Offerte per E-Mail.",
+      "revisionPendingNote": "Ihre Änderungsanfrage wurde übermittelt. Wir melden uns mit einer angepassten Offerte.",
+      "paidNote": "Offerte bezahlt — die Produktion läuft. Vielen Dank!",
+      "declinedNote": "Sie haben diese Offerte abgelehnt.",
+      "rejectedNote": "Diese Anfrage wurde dieses Mal nicht berücksichtigt.",
+      "newRequest": "Neue Anfrage stellen"
+    },
+    "quoteActions": {
+      "accept": "Annehmen und bezahlen",
+      "revise": "Änderung anfragen",
+      "reviseExpired": "Aktualisierung anfordern",
+      "decline": "Offerte ablehnen",
+      "reviseTitle": "Änderung anfragen",
+      "reviseDesc": "Beschreiben Sie die gewünschte Änderung (Material, Grösse, Menge, Budget…).",
+      "revisePlaceholder": "Z. B.: Wäre es in schwarzem PETG, 15 cm hoch, möglich?",
+      "fileHint": "Korrigierte 3D-Datei anhängen (optional)",
+      "fileUploading": "Datei wird hochgeladen…",
+      "fileError": "Datei-Upload fehlgeschlagen. Erneut versuchen oder Format prüfen.",
+      "reviseSubmit": "Anfrage senden",
+      "declineTitle": "Diese Offerte ablehnen",
+      "declineDesc": "Sie können uns gerne den Grund nennen (optional).",
+      "declineReasonPlaceholder": "Z. B.: Budget überschritten, Projekt verschoben…",
+      "declineConfirm": "Ablehnung bestätigen",
+      "keep": "Offerte behalten",
+      "cancel": "Abbrechen",
+      "sending": "Wird gesendet…",
       "error": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut."
     }
   },
