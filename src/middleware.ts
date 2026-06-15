@@ -2,7 +2,11 @@ import { NextResponse, type NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 
-// Next 16 : le middleware s'appelle désormais « proxy » (même fonctionnement).
+// Next 16 a renommé « middleware » en « proxy », mais proxy.ts impose le
+// runtime Node.js, que l'adaptateur OpenNext Cloudflare ne supporte pas encore
+// (« Node.js middleware is not currently supported »). On conserve donc la
+// convention middleware.ts, qui reste compilée en Edge runtime — seul format
+// déployable sur Cloudflare Workers.
 const intlMiddleware = createMiddleware(routing);
 
 // En-têtes de sécurité de base (Cloudflare ne les ajoute pas par défaut)
@@ -43,7 +47,7 @@ function buildCsp(): string {
   ].join("; ");
 }
 
-export default function proxy(request: NextRequest) {
+export default function middleware(request: NextRequest) {
   // www.swiss3design.ch → swiss3design.ch (canonique)
   const host = request.headers.get("host") ?? "";
   if (host.startsWith("www.")) {
