@@ -59,6 +59,7 @@ export default async function AdminOrdersPage({
 
   return (
     <div>
+      <h2 className="mb-4 text-xl font-bold tracking-tight">Commandes</h2>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
         <div className="flex flex-wrap gap-1.5">
           {chips.map((c) => (

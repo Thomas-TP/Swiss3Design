@@ -10,7 +10,7 @@ import {
   categories,
   categoryTranslations,
 } from "@/db/schema";
-import { getMaterials } from "@/db/queries";
+import { getMaterialsWithColors, getProductColorIds } from "@/db/queries";
 import { requireAdmin } from "@/lib/session";
 import { ProductForm, type ProductFormInitial } from "../product-form";
 
@@ -30,7 +30,7 @@ export default async function EditProductPage({
     .limit(1);
   if (!product) notFound();
 
-  const [translations, images, links, variants, cats, materials] =
+  const [translations, images, links, variants, cats, materials, colorIds] =
     await Promise.all([
       db
         .select()
@@ -61,7 +61,8 @@ export default async function EditProductPage({
           ),
         )
         .orderBy(asc(categories.sortOrder)),
-      getMaterials(),
+      getMaterialsWithColors(),
+      getProductColorIds(id),
     ]);
 
   const initial: ProductFormInitial = {
@@ -85,6 +86,7 @@ export default async function EditProductPage({
     ),
     images: images.map((i) => ({ url: i.url, alt: i.alt ?? undefined })),
     categoryIds: links.map((l) => l.categoryId),
+    colorIds,
     variants: variants.map((v) => ({
       name: v.name,
       sku: v.sku,

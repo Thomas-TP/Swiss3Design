@@ -8,6 +8,8 @@ import {
   products,
   productTranslations,
   productVariants,
+  productColors,
+  filamentColors,
   customerAddresses,
 } from "@/db/schema";
 import { getSetting } from "@/db/queries";
@@ -24,6 +26,7 @@ const bodySchema = z.object({
       z.object({
         productId: z.string().min(1),
         variantId: z.string().min(1).optional(),
+        color: z.string().min(1).max(60).optional(),
         quantity: z.number().int().min(1).max(99),
       }),
     )
@@ -91,8 +94,8 @@ export async function POST(request: Request) {
   ];
 
   // Prix et noms relus en base : on ne fait jamais confiance au client.
-  // Produits et variantes sont des lectures indépendantes → en parallèle.
-  const [dbProducts, dbVariants] = await Promise.all([
+  // Produits, variantes et couleurs sont des lectures indépendantes → en parallèle.
+  const [dbProducts, dbVariants, dbColors] = await Promise.all([
     db
       .select({
         id: products.id,
@@ -129,14 +132,41 @@ export async function POST(request: Request) {
             name: string;
           }[],
         ),
+    db
+      .select({
+        productId: productColors.productId,
+        name: filamentColors.name,
+        hex: filamentColors.hex,
+      })
+      .from(productColors)
+      .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
+      .where(inArray(productColors.productId, productIds)),
   ]);
   const byId = new Map(dbProducts.map((p) => [p.id, p]));
   const variantById = new Map(dbVariants.map((v) => [v.id, v]));
+  // Couleurs autorisées par produit : nom → hex (le hex vient de la base, jamais
+  // du client). Permet de figer la couleur choisie dans la commande.
+  const colorsByProduct = new Map<string, Map<string, string>>();
+  for (const c of dbColors) {
+    const m = colorsByProduct.get(c.productId) ?? new Map<string, string>();
+    m.set(c.name, c.hex);
+    colorsByProduct.set(c.productId, m);
+  }
+
+  // Couleur choisie : validée contre la palette du produit, hex relu en base.
+  const resolveColor = (productId: string, requested?: string) => {
+    if (!requested) return { colorName: null, colorHex: null };
+    const hex = colorsByProduct.get(productId)?.get(requested);
+    return hex
+      ? { colorName: requested, colorHex: hex }
+      : { colorName: null, colorHex: null };
+  };
 
   // Ligne effective (prix/stock/nom selon produit ou variante choisie)
   const lines = items.map((i) => {
     const product = byId.get(i.productId);
     if (!product) return null;
+    const { colorName, colorHex } = resolveColor(i.productId, i.color);
     if (i.variantId) {
       const v = variantById.get(i.variantId);
       if (!v || v.productId !== i.productId) return null;
@@ -147,6 +177,8 @@ export async function POST(request: Request) {
         priceCents: v.priceCents ?? product.priceCents,
         stock: v.stock,
         name: v.name ? `${product.name} — ${v.name}` : product.name,
+        colorName,
+        colorHex,
       };
     }
     return {
@@ -156,6 +188,8 @@ export async function POST(request: Request) {
       priceCents: product.priceCents,
       stock: product.stock,
       name: product.name,
+      colorName,
+      colorHex,
     };
   });
   if (lines.some((l) => l === null)) {
@@ -235,6 +269,8 @@ export async function POST(request: Request) {
       productId: l.productId,
       variantId: l.variantId,
       nameSnapshot: l.name,
+      colorName: l.colorName,
+      colorHex: l.colorHex,
       priceCentsSnapshot: l.priceCents,
       quantity: l.quantity,
     })),

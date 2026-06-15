@@ -5,6 +5,8 @@ import {
   productTranslations,
   productImages,
   productVariants,
+  productColors,
+  filamentColors,
   categories,
   categoryTranslations,
   productCategories,
@@ -12,6 +14,11 @@ import {
   settings,
 } from "./schema";
 import type { Locale } from "@/i18n/routing";
+
+export interface ColorSwatch {
+  name: string;
+  hex: string;
+}
 
 export interface ProductListItem {
   id: string;
@@ -26,28 +33,54 @@ export interface ProductListItem {
   description: string;
   imageUrl: string | null;
   imageAlt: string | null;
+  colors: ColorSwatch[];
 }
 
-async function attachImages(
+// Récupère, pour une liste de produits, la première image et les pastilles de
+// couleur (palette du filament) — deux lectures groupées plutôt qu'une par produit.
+async function attachImagesAndColors(
   db: Awaited<ReturnType<typeof getDb>>,
-  rows: Omit<ProductListItem, "imageUrl" | "imageAlt">[],
+  rows: Omit<ProductListItem, "imageUrl" | "imageAlt" | "colors">[],
 ): Promise<ProductListItem[]> {
   if (rows.length === 0) return [];
-  const images = await db
-    .select()
-    .from(productImages)
-    .where(inArray(productImages.productId, rows.map((r) => r.id)))
-    .orderBy(asc(productImages.sortOrder));
+  const ids = rows.map((r) => r.id);
+  const [images, colorRows] = await Promise.all([
+    db
+      .select()
+      .from(productImages)
+      .where(inArray(productImages.productId, ids))
+      .orderBy(asc(productImages.sortOrder)),
+    db
+      .select({
+        productId: productColors.productId,
+        name: filamentColors.name,
+        hex: filamentColors.hex,
+        sortOrder: productColors.sortOrder,
+      })
+      .from(productColors)
+      .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
+      .where(inArray(productColors.productId, ids))
+      .orderBy(asc(productColors.sortOrder)),
+  ]);
+
   const firstImage = new Map<string, { url: string; alt: string | null }>();
   for (const img of images) {
     if (!firstImage.has(img.productId)) {
       firstImage.set(img.productId, { url: img.url, alt: img.alt });
     }
   }
+  const colorsByProduct = new Map<string, ColorSwatch[]>();
+  for (const c of colorRows) {
+    const list = colorsByProduct.get(c.productId) ?? [];
+    list.push({ name: c.name, hex: c.hex });
+    colorsByProduct.set(c.productId, list);
+  }
+
   return rows.map((r) => ({
     ...r,
     imageUrl: firstImage.get(r.id)?.url ?? null,
     imageAlt: firstImage.get(r.id)?.alt ?? null,
+    colors: colorsByProduct.get(r.id) ?? [],
   }));
 }
 
@@ -59,6 +92,7 @@ export async function getProducts(
     featuredOnly?: boolean;
     categorySlug?: string;
     material?: string;
+    color?: string;
     multicolor?: boolean;
     sort?: ProductSort;
   } = {},
@@ -70,16 +104,26 @@ export async function getProducts(
   if (opts.material) conditions.push(eq(products.material, opts.material));
   if (opts.multicolor) conditions.push(eq(products.multicolor, true));
 
-  let productIdsInCategory: string[] | null = null;
   if (opts.categorySlug) {
     const rows = await db
       .select({ productId: productCategories.productId })
       .from(productCategories)
       .innerJoin(categories, eq(categories.id, productCategories.categoryId))
       .where(eq(categories.slug, opts.categorySlug));
-    productIdsInCategory = rows.map((r) => r.productId);
-    if (productIdsInCategory.length === 0) return [];
-    conditions.push(inArray(products.id, productIdsInCategory));
+    const ids = rows.map((r) => r.productId);
+    if (ids.length === 0) return [];
+    conditions.push(inArray(products.id, ids));
+  }
+
+  if (opts.color) {
+    const rows = await db
+      .selectDistinct({ productId: productColors.productId })
+      .from(productColors)
+      .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
+      .where(eq(filamentColors.name, opts.color));
+    const ids = rows.map((r) => r.productId);
+    if (ids.length === 0) return [];
+    conditions.push(inArray(products.id, ids));
   }
 
   const rows = await db
@@ -112,7 +156,7 @@ export async function getProducts(
           : desc(products.createdAt),
     );
 
-  return attachImages(db, rows);
+  return attachImagesAndColors(db, rows);
 }
 
 // Palette de filaments éditable en admin (proposée à la création produit).
@@ -125,12 +169,51 @@ export async function getMaterials(): Promise<string[]> {
   return rows.map((r) => r.name);
 }
 
+export interface MaterialWithColors {
+  id: string;
+  name: string;
+  colors: { id: string; name: string; hex: string }[];
+}
+
+// Filaments avec leur palette de couleurs — pour l'admin (gestion + formulaire
+// produit). Les couleurs sont rattachées en mémoire après deux lectures.
+export async function getMaterialsWithColors(): Promise<MaterialWithColors[]> {
+  const db = await getDb();
+  const [mats, colors] = await Promise.all([
+    db
+      .select({ id: materials.id, name: materials.name })
+      .from(materials)
+      .orderBy(asc(materials.name)),
+    db
+      .select({
+        id: filamentColors.id,
+        materialId: filamentColors.materialId,
+        name: filamentColors.name,
+        hex: filamentColors.hex,
+      })
+      .from(filamentColors)
+      .orderBy(asc(filamentColors.sortOrder), asc(filamentColors.name)),
+  ]);
+  const byMaterial = new Map<string, { id: string; name: string; hex: string }[]>();
+  for (const c of colors) {
+    const list = byMaterial.get(c.materialId) ?? [];
+    list.push({ id: c.id, name: c.name, hex: c.hex });
+    byMaterial.set(c.materialId, list);
+  }
+  return mats.map((m) => ({
+    id: m.id,
+    name: m.name,
+    colors: byMaterial.get(m.id) ?? [],
+  }));
+}
+
 // Filtres réellement utilisables : catégories ayant ≥1 produit actif,
 // matières effectivement présentes dans le catalogue actif, et le filtre
 // multicolore seulement si au moins un produit actif l'est.
 export async function getUsedFilters(locale: Locale): Promise<{
   categories: { id: string; slug: string; name: string }[];
   materials: string[];
+  colors: ColorSwatch[];
   multicolor: boolean;
 }> {
   const db = await getDb();
@@ -172,9 +255,29 @@ export async function getUsedFilters(locale: Locale): Promise<{
     .where(and(eq(products.active, true), eq(products.multicolor, true)))
     .limit(1);
 
+  // Couleurs réellement proposées par des produits actifs. On dédoublonne par
+  // nom (deux filaments peuvent partager « Rouge ») en gardant le premier hex.
+  const colorRows = await db
+    .selectDistinct({ name: filamentColors.name, hex: filamentColors.hex })
+    .from(productColors)
+    .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
+    .innerJoin(
+      products,
+      and(eq(products.id, productColors.productId), eq(products.active, true)),
+    )
+    .orderBy(asc(filamentColors.name));
+  const seenColor = new Set<string>();
+  const colors: ColorSwatch[] = [];
+  for (const c of colorRows) {
+    if (seenColor.has(c.name)) continue;
+    seenColor.add(c.name);
+    colors.push({ name: c.name, hex: c.hex });
+  }
+
   return {
     categories: cats.map((c) => ({ id: c.id, slug: c.slug, name: c.name })),
     materials: mats.map((m) => m.material),
+    colors,
     multicolor: multicolorRow.length > 0,
   };
 }
@@ -210,7 +313,7 @@ export async function getProductBySlug(slug: string, locale: Locale) {
   const product = rows[0];
   if (!product) return null;
 
-  const [images, variants] = await Promise.all([
+  const [images, variants, colors] = await Promise.all([
     db
       .select()
       .from(productImages)
@@ -220,9 +323,30 @@ export async function getProductBySlug(slug: string, locale: Locale) {
       .select()
       .from(productVariants)
       .where(eq(productVariants.productId, product.id)),
+    db
+      .select({
+        id: filamentColors.id,
+        name: filamentColors.name,
+        hex: filamentColors.hex,
+      })
+      .from(productColors)
+      .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
+      .where(eq(productColors.productId, product.id))
+      .orderBy(asc(productColors.sortOrder)),
   ]);
 
-  return { ...product, images, variants };
+  return { ...product, images, variants, colors };
+}
+
+// IDs des couleurs cochées pour un produit (pré-remplissage du formulaire admin).
+export async function getProductColorIds(productId: string): Promise<string[]> {
+  const db = await getDb();
+  const rows = await db
+    .select({ colorId: productColors.colorId })
+    .from(productColors)
+    .where(eq(productColors.productId, productId))
+    .orderBy(asc(productColors.sortOrder));
+  return rows.map((r) => r.colorId);
 }
 
 export async function getCategories(locale: Locale) {

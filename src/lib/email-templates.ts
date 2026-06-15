@@ -104,6 +104,8 @@ interface OrderForEmail {
 
 interface ItemForEmail {
   nameSnapshot: string;
+  colorName?: string | null;
+  colorHex?: string | null;
   priceCentsSnapshot: number;
   quantity: number;
 }
@@ -173,7 +175,7 @@ export function orderConfirmationEmail(
   const rows = items
     .map(
       (it) => `<tr>
-        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${it.nameSnapshot}</td>
+        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${it.nameSnapshot}${it.colorName ? ` — <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${it.colorHex ?? "#cccccc"};vertical-align:middle;margin:0 3px 1px 0;"></span>${it.colorName}` : ""}</td>
         <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;text-align:right;white-space:nowrap;">${chf(it.priceCentsSnapshot * it.quantity)}</td>
       </tr>`,
     )
@@ -548,7 +550,7 @@ export function adminNewOrderEmail(
   const rows = items
     .map(
       (it) => `<tr>
-        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${esc(it.nameSnapshot)}</td>
+        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${esc(it.nameSnapshot)}${it.colorName ? ` — <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${esc(it.colorHex ?? "#cccccc")};vertical-align:middle;margin:0 3px 1px 0;"></span>${esc(it.colorName)}` : ""}</td>
         <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;text-align:right;white-space:nowrap;">${chf(it.priceCentsSnapshot * it.quantity)}</td>
       </tr>`,
     )

@@ -1,8 +1,14 @@
 import { getTranslations } from "next-intl/server";
+import { getMaterials } from "@/db/queries";
 import { QuoteForm } from "./quote-form";
 
+export const dynamic = "force-dynamic";
+
 export default async function CustomPage() {
-  const t = await getTranslations("custom");
+  const [t, materials] = await Promise.all([
+    getTranslations("custom"),
+    getMaterials(),
+  ]);
 
   return (
     <div className="mx-auto max-w-xl px-4 py-10 sm:px-6 md:py-16">
@@ -13,7 +19,7 @@ export default async function CustomPage() {
       <p className="mt-3 leading-relaxed text-soft">{t("intro")}</p>
 
       <div className="mt-8">
-        <QuoteForm />
+        <QuoteForm materials={materials} />
       </div>
     </div>
   );

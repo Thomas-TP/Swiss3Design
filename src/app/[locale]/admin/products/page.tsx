@@ -1,5 +1,5 @@
 import { asc, desc, eq, and, inArray } from "drizzle-orm";
-import { Plus, Pencil, Eye, EyeOff, Check } from "lucide-react";
+import { Plus, Pencil, Eye, EyeOff, Check, Search } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
@@ -7,18 +7,39 @@ import { products, productTranslations, productImages } from "@/db/schema";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { toggleProductActive, updateProductStock } from "./actions";
-import { BTN_PRIMARY } from "../ui";
+import { BTN_PRIMARY, FIELD } from "../ui";
+
+const FILTERS = ["published", "hidden", "featured", "low"] as const;
+type ProductFilter = (typeof FILTERS)[number];
+
+const FILTER_LABELS: Record<ProductFilter, string> = {
+  published: "Publiés",
+  hidden: "Masqués",
+  featured: "Vedette",
+  low: "Stock bas",
+};
+
+const isLowStock = (saleType: string, stock: number | null) =>
+  saleType === "stock" && stock !== null && stock <= 2;
 
 export default async function AdminProductsPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: Locale }>;
+  searchParams: Promise<{ q?: string; f?: string }>;
 }) {
   await requireAdmin();
   const { locale } = await params;
+  const { q, f } = await searchParams;
+  const query = (q ?? "").trim().slice(0, 100);
+  const filter = (FILTERS as readonly string[]).includes(f ?? "")
+    ? (f as ProductFilter)
+    : null;
+
   const db = await getDb();
 
-  const rows = await db
+  const allRows = await db
     .select({
       id: products.id,
       slug: products.slug,
@@ -40,6 +61,32 @@ export default async function AdminProductsPage({
     )
     .orderBy(desc(products.createdAt));
 
+  const counts: Record<ProductFilter, number> = {
+    published: allRows.filter((r) => r.active).length,
+    hidden: allRows.filter((r) => !r.active).length,
+    featured: allRows.filter((r) => r.featured).length,
+    low: allRows.filter((r) => isLowStock(r.saleType, r.stock)).length,
+  };
+
+  const rows = allRows.filter((r) => {
+    if (filter === "published" && !r.active) return false;
+    if (filter === "hidden" && r.active) return false;
+    if (filter === "featured" && !r.featured) return false;
+    if (filter === "low" && !isLowStock(r.saleType, r.stock)) return false;
+    if (query && !r.name.toLowerCase().includes(query.toLowerCase()))
+      return false;
+    return true;
+  });
+
+  const chips: { value: string | null; label: string; count: number }[] = [
+    { value: null, label: "Tous", count: allRows.length },
+    ...FILTERS.map((key) => ({
+      value: key as string,
+      label: FILTER_LABELS[key],
+      count: counts[key],
+    })).filter((c) => c.count > 0),
+  ];
+
   const images =
     rows.length > 0
       ? await db
@@ -55,22 +102,62 @@ export default async function AdminProductsPage({
 
   return (
     <div>
-      <div className="mb-5 flex items-center justify-between">
-        <p className="text-sm text-soft">
-          {rows.length} produit{rows.length > 1 ? "s" : ""}
-        </p>
+      <h2 className="mb-4 text-xl font-bold tracking-tight">Produits</h2>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-1.5">
+          {chips.map((c) => (
+            <Link
+              key={c.label}
+              href={{
+                pathname: "/admin/products",
+                query: {
+                  ...(c.value ? { f: c.value } : {}),
+                  ...(query ? { q: query } : {}),
+                },
+              }}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                filter === c.value
+                  ? "bg-ink text-paper"
+                  : "border border-line bg-surface text-soft hover:text-ink"
+              }`}
+            >
+              {c.label}
+              <span className="ml-1.5 opacity-60 tabular-nums">{c.count}</span>
+            </Link>
+          ))}
+        </div>
         <Link href="/admin/products/new" className={BTN_PRIMARY}>
           <Plus size={16} />
           Nouveau produit
         </Link>
       </div>
 
+      <form className="relative mb-4" action="">
+        {filter && <input type="hidden" name="f" value={filter} />}
+        <Search
+          size={15}
+          className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-soft"
+        />
+        <input
+          name="q"
+          defaultValue={query}
+          placeholder="Rechercher un produit…"
+          className={`${FIELD} pl-9`}
+        />
+      </form>
+
       {rows.length === 0 ? (
         <div className="rounded-card border border-line bg-surface p-10 text-center text-soft">
-          <p className="font-medium">Aucun produit pour l&apos;instant.</p>
-          <p className="mt-1 text-sm">
-            Créez votre premier produit pour remplir la boutique.
+          <p className="font-medium">
+            {query || filter
+              ? "Aucun produit ne correspond à ces critères."
+              : "Aucun produit pour l'instant."}
           </p>
+          {!query && !filter && (
+            <p className="mt-1 text-sm">
+              Créez votre premier produit pour remplir la boutique.
+            </p>
+          )}
         </div>
       ) : (
         <ul className="divide-y divide-line rounded-card border border-line bg-surface px-4">

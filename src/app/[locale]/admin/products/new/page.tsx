@@ -1,7 +1,7 @@
 import { asc, and, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { categories, categoryTranslations } from "@/db/schema";
-import { getMaterials } from "@/db/queries";
+import { getMaterialsWithColors } from "@/db/queries";
 import { requireAdmin } from "@/lib/session";
 import { ProductForm } from "../product-form";
 
@@ -20,7 +20,7 @@ export default async function NewProductPage() {
         ),
       )
       .orderBy(asc(categories.sortOrder)),
-    getMaterials(),
+    getMaterialsWithColors(),
   ]);
 
   return (

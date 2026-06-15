@@ -10,6 +10,9 @@ import {
   productImages,
   productVariants,
   productCategories,
+  productColors,
+  filamentColors,
+  materials,
   LOCALES,
 } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
@@ -47,6 +50,8 @@ const variantsSchema = z
     }),
   )
   .max(20);
+
+const colorsSchema = z.array(z.string().max(60)).max(50);
 
 function slugify(input: string): string {
   return input
@@ -155,7 +160,34 @@ export async function saveProduct(
 
   const categoryIds = formData.getAll("categories").map(String);
 
+  const parsedColors = colorsSchema.safeParse(
+    JSON.parse(String(formData.get("colors") || "[]")),
+  );
+  if (!parsedColors.success) {
+    return { error: "Couleurs invalides." };
+  }
+
   const db = await getDb();
+
+  // On ne garde que les couleurs appartenant réellement à la palette du
+  // filament choisi : le formulaire ne doit pas pouvoir injecter d'id arbitraire.
+  let validColorIds: string[] = [];
+  if (parsedColors.data.length > 0) {
+    const [materialRow] = await db
+      .select({ id: materials.id })
+      .from(materials)
+      .where(eq(materials.name, data.material))
+      .limit(1);
+    if (materialRow) {
+      const palette = await db
+        .select({ id: filamentColors.id })
+        .from(filamentColors)
+        .where(eq(filamentColors.materialId, materialRow.id));
+      const allowed = new Set(palette.map((p) => p.id));
+      validColorIds = parsedColors.data.filter((id) => allowed.has(id));
+    }
+  }
+
   let productId = id;
   try {
     if (id) {
@@ -168,6 +200,7 @@ export async function saveProduct(
         .delete(productCategories)
         .where(eq(productCategories.productId, id));
       await db.delete(productVariants).where(eq(productVariants.productId, id));
+      await db.delete(productColors).where(eq(productColors.productId, id));
     } else {
       const [row] = await db
         .insert(products)
@@ -197,6 +230,11 @@ export async function saveProduct(
     if (variantRows.length > 0) {
       await db.insert(productVariants).values(
         variantRows.map((v) => ({ ...v, productId })),
+      );
+    }
+    if (validColorIds.length > 0) {
+      await db.insert(productColors).values(
+        validColorIds.map((colorId, i) => ({ productId, colorId, sortOrder: i })),
       );
     }
   } catch (e) {

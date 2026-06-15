@@ -13,8 +13,15 @@ interface Variant {
   stock: number | null;
 }
 
-// Bloc d'achat de la fiche produit : prix, disponibilité, sélection de
-// variante (couleur/taille) et boutons — le tout réactif à la variante choisie.
+interface ColorOption {
+  id: string;
+  name: string;
+  hex: string;
+}
+
+// Bloc d'achat de la fiche produit : prix, disponibilité, sélection de couleur
+// (palette du filament) et de variante (taille/finition), puis boutons — le
+// tout réactif aux choix.
 export function ProductPurchase({
   productId,
   slug,
@@ -25,6 +32,7 @@ export function ProductPurchase({
   productStock,
   imageUrl,
   variants,
+  colors,
 }: {
   productId: string;
   slug: string;
@@ -35,6 +43,7 @@ export function ProductPurchase({
   productStock: number | null;
   imageUrl: string | null;
   variants: Variant[];
+  colors: ColorOption[];
 }) {
   const t = useTranslations("product");
   const locale = useLocale();
@@ -42,6 +51,9 @@ export function ProductPurchase({
     variants[0]?.id ?? null,
   );
   const selected = variants.find((v) => v.id === selectedId) ?? null;
+
+  const [colorId, setColorId] = useState<string | null>(colors[0]?.id ?? null);
+  const selectedColor = colors.find((c) => c.id === colorId) ?? null;
 
   const priceCents = selected?.priceCents ?? basePriceCents;
   const stock = variants.length > 0 ? (selected?.stock ?? null) : productStock;
@@ -56,8 +68,10 @@ export function ProductPurchase({
     saleType,
     variantId: selected?.id ?? null,
     variantName: selected?.name ?? null,
+    colorName: selectedColor?.name ?? null,
+    colorHex: selectedColor?.hex ?? null,
   };
-  // Le favori reste au niveau produit (prix de base, sans variante)
+  // Le favori reste au niveau produit (prix de base, sans variante ni couleur)
   const favoriteItem = { productId, slug, name, priceCents: basePriceCents, imageUrl, saleType };
 
   const badgeClass =
@@ -82,6 +96,40 @@ export function ProductPurchase({
       <p className="mt-3 text-2xl font-semibold tabular-nums">
         {formatChf(priceCents, locale)}
       </p>
+
+      {colors.length > 0 && (
+        <div className="mt-5">
+          <p className="mb-2 text-sm font-semibold">
+            {t("color")}
+            {selectedColor && (
+              <span className="ml-1.5 font-normal text-soft">
+                · {selectedColor.name}
+              </span>
+            )}
+          </p>
+          <div className="flex flex-wrap gap-2.5">
+            {colors.map((c) => {
+              const active = c.id === colorId;
+              return (
+                <button
+                  key={c.id}
+                  type="button"
+                  onClick={() => setColorId(c.id)}
+                  aria-pressed={active}
+                  aria-label={c.name}
+                  title={c.name}
+                  className={`h-9 w-9 rounded-full border transition-transform ${
+                    active
+                      ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-paper"
+                      : "border-black/10 hover:scale-110"
+                  }`}
+                  style={{ backgroundColor: c.hex }}
+                />
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {variants.length > 0 && (
         <div className="mt-5">

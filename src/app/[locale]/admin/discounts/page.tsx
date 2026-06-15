@@ -21,6 +21,7 @@ export default async function AdminDiscountsPage() {
 
   return (
     <div>
+      <h2 className="mb-4 text-xl font-bold tracking-tight">Codes promo</h2>
       <div className="mb-5 flex items-center justify-between">
         <p className="text-sm text-soft">
           {rows.length} code{rows.length > 1 ? "s" : ""}

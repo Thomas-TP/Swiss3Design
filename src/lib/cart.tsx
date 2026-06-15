@@ -10,9 +10,12 @@ import {
 
 export interface CartItem {
   productId: string;
-  // Variante choisie (couleur/taille). null = produit sans variante.
+  // Variante choisie (taille/finition). null = produit sans variante.
   variantId?: string | null;
   variantName?: string | null;
+  // Couleur choisie (palette du filament). null = produit sans couleur.
+  colorName?: string | null;
+  colorHex?: string | null;
   slug: string;
   name: string;
   priceCents: number;
@@ -21,10 +24,16 @@ export interface CartItem {
   quantity: number;
 }
 
-// Une ligne de panier est identifiée par le couple produit + variante
-type LineRef = { productId: string; variantId?: string | null };
+// Une ligne de panier est identifiée par le triplet produit + variante + couleur
+type LineRef = {
+  productId: string;
+  variantId?: string | null;
+  colorName?: string | null;
+};
 const sameLine = (a: LineRef, b: LineRef) =>
-  a.productId === b.productId && (a.variantId ?? null) === (b.variantId ?? null);
+  a.productId === b.productId &&
+  (a.variantId ?? null) === (b.variantId ?? null) &&
+  (a.colorName ?? null) === (b.colorName ?? null);
 
 type CartAction =
   | { type: "hydrate"; items: CartItem[] }
@@ -33,9 +42,15 @@ type CartAction =
       type: "setQuantity";
       productId: string;
       variantId: string | null;
+      colorName: string | null;
       quantity: number;
     }
-  | { type: "remove"; productId: string; variantId: string | null }
+  | {
+      type: "remove";
+      productId: string;
+      variantId: string | null;
+      colorName: string | null;
+    }
   | { type: "clear" };
 
 const STORAGE_KEY = "s3d-cart-v1";
@@ -75,9 +90,14 @@ interface CartContextValue {
   setQuantity: (
     productId: string,
     variantId: string | null,
+    colorName: string | null,
     quantity: number,
   ) => void;
-  remove: (productId: string, variantId: string | null) => void;
+  remove: (
+    productId: string,
+    variantId: string | null,
+    colorName: string | null,
+  ) => void;
   clear: () => void;
 }
 
@@ -104,10 +124,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
     count: items.reduce((sum, i) => sum + i.quantity, 0),
     subtotalCents: items.reduce((sum, i) => sum + i.priceCents * i.quantity, 0),
     add: (item) => dispatch({ type: "add", item }),
-    setQuantity: (productId, variantId, quantity) =>
-      dispatch({ type: "setQuantity", productId, variantId, quantity }),
-    remove: (productId, variantId) =>
-      dispatch({ type: "remove", productId, variantId }),
+    setQuantity: (productId, variantId, colorName, quantity) =>
+      dispatch({ type: "setQuantity", productId, variantId, colorName, quantity }),
+    remove: (productId, variantId, colorName) =>
+      dispatch({ type: "remove", productId, variantId, colorName }),
     clear: () => dispatch({ type: "clear" }),
   };
 

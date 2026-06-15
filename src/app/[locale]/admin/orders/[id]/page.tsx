@@ -152,8 +152,17 @@ export default async function AdminOrderDetailPage({
         <ul className="divide-y divide-line text-sm">
           {items.map((it) => (
             <li key={it.id} className="flex justify-between gap-3 py-2.5">
-              <span>
+              <span className="flex items-center gap-2">
                 {it.quantity} × {it.nameSnapshot}
+                {it.colorName && (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-soft">
+                    <span
+                      className="h-3 w-3 shrink-0 rounded-full border border-black/10"
+                      style={{ backgroundColor: it.colorHex ?? undefined }}
+                    />
+                    {it.colorName}
+                  </span>
+                )}
               </span>
               <span className="font-medium tabular-nums">
                 {formatChf(it.priceCentsSnapshot * it.quantity, locale)}

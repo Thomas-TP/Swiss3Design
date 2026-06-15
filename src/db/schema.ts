@@ -4,6 +4,7 @@ import {
   integer,
   primaryKey,
   index,
+  uniqueIndex,
 } from "drizzle-orm/sqlite-core";
 
 const uuid = () =>
@@ -89,6 +90,49 @@ export const materials = sqliteTable("materials", {
   name: text("name").notNull().unique(),
 });
 
+// Couleurs disponibles pour un filament (palette éditable en admin). Chaque
+// couleur a un nom (« Rouge feu ») et un code hex affiché en pastille. Un
+// produit choisit ensuite parmi les couleurs de son filament (productColors).
+export const filamentColors = sqliteTable(
+  "filament_colors",
+  {
+    id: uuid(),
+    materialId: text("material_id")
+      .notNull()
+      .references(() => materials.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    hex: text("hex").notNull(), // "#RRGGBB"
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => [
+    index("filament_colors_material_idx").on(t.materialId),
+    uniqueIndex("filament_colors_material_name_unique").on(
+      t.materialId,
+      t.name,
+    ),
+  ],
+);
+
+// Couleurs proposées par un produit, choisies dans la palette de son filament.
+// Le client sélectionne une pastille à l'achat ; la couleur retenue est figée
+// dans order_items (snapshot), donc l'historique survit aux changements de palette.
+export const productColors = sqliteTable(
+  "product_colors",
+  {
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    colorId: text("color_id")
+      .notNull()
+      .references(() => filamentColors.id, { onDelete: "cascade" }),
+    sortOrder: integer("sort_order").notNull().default(0),
+  },
+  (t) => [
+    primaryKey({ columns: [t.productId, t.colorId] }),
+    index("product_colors_product_idx").on(t.productId),
+  ],
+);
+
 export const categories = sqliteTable("categories", {
   id: uuid(),
   slug: text("slug").notNull().unique(),
@@ -164,6 +208,9 @@ export const orderItems = sqliteTable(
     variantId: text("variant_id"),
     // Snapshots : le produit peut changer, pas l'historique de commande
     nameSnapshot: text("name_snapshot").notNull(),
+    // Couleur choisie au moment de l'achat (snapshot, null si non applicable)
+    colorName: text("color_name"),
+    colorHex: text("color_hex"),
     priceCentsSnapshot: integer("price_cents_snapshot").notNull(),
     quantity: integer("quantity").notNull(),
   },

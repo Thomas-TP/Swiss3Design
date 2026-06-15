@@ -1,24 +1,29 @@
 import { desc } from "drizzle-orm";
-import { BadgeCheck, ShieldUser } from "lucide-react";
+import { BadgeCheck, ShieldUser, Search } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { orders, user } from "@/db/schema";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
+import { FIELD } from "../ui";
 
 const PAID_STATUSES = new Set(["paid", "in_production", "shipped", "delivered"]);
 
 export default async function AdminCustomersPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: Locale }>;
+  searchParams: Promise<{ q?: string }>;
 }) {
   await requireAdmin();
   const { locale } = await params;
+  const { q } = await searchParams;
+  const query = (q ?? "").trim().slice(0, 100).toLowerCase();
   const db = await getDb();
 
-  const [customers, allOrders] = await Promise.all([
+  const [allCustomers, allOrders] = await Promise.all([
     db
       .select({
         id: user.id,
@@ -48,23 +53,51 @@ export default async function AdminCustomersPage({
     const cur = stats.get(key) ?? { count: 0, totalCents: 0 };
     stats.set(key, { count: cur.count + 1, totalCents: cur.totalCents + totalCents });
   };
-  const emailToUserId = new Map(customers.map((c) => [c.email.toLowerCase(), c.id]));
+  const emailToUserId = new Map(
+    allCustomers.map((c) => [c.email.toLowerCase(), c.id]),
+  );
   for (const o of allOrders) {
     if (!PAID_STATUSES.has(o.status)) continue;
     const key = o.customerId ?? emailToUserId.get(o.email.toLowerCase());
     if (key) add(key, o.totalCents);
   }
 
+  const customers = query
+    ? allCustomers.filter(
+        (c) =>
+          c.name.toLowerCase().includes(query) ||
+          c.email.toLowerCase().includes(query),
+      )
+    : allCustomers;
+
   return (
     <div>
-      <p className="mb-5 text-sm text-soft">
-        {customers.length} compte{customers.length > 1 ? "s" : ""} client — le
-        total ne compte que les commandes payées.
-      </p>
+      <h2 className="mb-4 text-xl font-bold tracking-tight">Clients</h2>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <p className="text-sm text-soft">
+          {customers.length} compte{customers.length > 1 ? "s" : ""} client
+          {query ? ` sur ${allCustomers.length}` : ""} — le total ne compte que
+          les commandes payées.
+        </p>
+        <form className="relative" action="">
+          <Search
+            size={15}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-soft"
+          />
+          <input
+            name="q"
+            defaultValue={q ?? ""}
+            placeholder="Nom ou e-mail…"
+            className={`${FIELD} w-56 pl-9`}
+          />
+        </form>
+      </div>
 
       {customers.length === 0 ? (
         <p className="rounded-card border border-line bg-surface p-10 text-center text-soft">
-          Aucun compte client pour l&apos;instant.
+          {query
+            ? "Aucun client ne correspond à cette recherche."
+            : "Aucun compte client pour l'instant."}
         </p>
       ) : (
         <ul className="divide-y divide-line rounded-card border border-line bg-surface px-4">

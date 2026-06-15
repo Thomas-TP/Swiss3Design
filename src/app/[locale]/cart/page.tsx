@@ -46,7 +46,7 @@ export default function CartPage() {
         <ul className="divide-y divide-line rounded-card border border-line bg-surface px-5">
           {items.map((item) => (
             <li
-              key={`${item.productId}:${item.variantId ?? ""}`}
+              key={`${item.productId}:${item.variantId ?? ""}:${item.colorName ?? ""}`}
               className="flex gap-4 py-5"
             >
               <Link
@@ -74,9 +74,24 @@ export default function CartPage() {
                     {item.variantName && (
                       <p className="text-xs text-soft">{item.variantName}</p>
                     )}
+                    {item.colorName && (
+                      <p className="mt-0.5 flex items-center gap-1.5 text-xs text-soft">
+                        <span
+                          className="h-3 w-3 shrink-0 rounded-full border border-black/10"
+                          style={{ backgroundColor: item.colorHex ?? undefined }}
+                        />
+                        {item.colorName}
+                      </p>
+                    )}
                   </div>
                   <button
-                    onClick={() => remove(item.productId, item.variantId ?? null)}
+                    onClick={() =>
+                      remove(
+                        item.productId,
+                        item.variantId ?? null,
+                        item.colorName ?? null,
+                      )
+                    }
                     aria-label={t("remove")}
                     className="rounded-full p-1.5 text-soft transition-colors hover:bg-line/60 hover:text-accent"
                   >
@@ -90,6 +105,7 @@ export default function CartPage() {
                         setQuantity(
                           item.productId,
                           item.variantId ?? null,
+                          item.colorName ?? null,
                           item.quantity - 1,
                         )
                       }
@@ -106,6 +122,7 @@ export default function CartPage() {
                         setQuantity(
                           item.productId,
                           item.variantId ?? null,
+                          item.colorName ?? null,
                           item.quantity + 1,
                         )
                       }

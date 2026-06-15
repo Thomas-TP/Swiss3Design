@@ -293,12 +293,13 @@ function SummaryCard({
       <ul className="mt-3 space-y-2 text-sm">
         {items.map((i) => (
           <li
-            key={`${i.productId}:${i.variantId ?? ""}`}
+            key={`${i.productId}:${i.variantId ?? ""}:${i.colorName ?? ""}`}
             className="flex justify-between gap-3"
           >
             <span className="text-soft">
               {i.quantity} × {i.name}
               {i.variantName ? ` (${i.variantName})` : ""}
+              {i.colorName ? ` — ${i.colorName}` : ""}
             </span>
             <span className="font-medium tabular-nums">
               {formatChf(i.priceCents * i.quantity, locale)}
@@ -672,6 +673,7 @@ export function CheckoutFlow({
           items: items.map((i) => ({
             productId: i.productId,
             variantId: i.variantId ?? undefined,
+            color: i.colorName ?? undefined,
             quantity: i.quantity,
           })),
           email: accountEmail ?? proof!.email,

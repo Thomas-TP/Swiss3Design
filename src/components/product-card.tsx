@@ -10,6 +10,9 @@ export function ProductCard({ product }: { product: ProductListItem }) {
   const t = useTranslations("product");
   const locale = useLocale();
 
+  // Ajout rapide depuis la carte : si le produit a des couleurs, on prend la
+  // première par défaut (le choix fin se fait sur la fiche produit).
+  const firstColor = product.colors[0];
   const item = {
     productId: product.id,
     slug: product.slug,
@@ -17,6 +20,8 @@ export function ProductCard({ product }: { product: ProductListItem }) {
     priceCents: product.priceCents,
     imageUrl: product.imageUrl,
     saleType: product.saleType,
+    colorName: firstColor?.name ?? null,
+    colorHex: firstColor?.hex ?? null,
   };
 
   return (
@@ -62,6 +67,23 @@ export function ProductCard({ product }: { product: ProductListItem }) {
         <p className="mt-2 font-semibold tabular-nums">
           {formatChf(product.priceCents, locale)}
         </p>
+        {product.colors.length > 0 && (
+          <div className="mt-2 flex items-center gap-1.5">
+            {product.colors.slice(0, 5).map((c) => (
+              <span
+                key={c.name}
+                title={c.name}
+                className="h-3.5 w-3.5 rounded-full border border-black/10"
+                style={{ backgroundColor: c.hex }}
+              />
+            ))}
+            {product.colors.length > 5 && (
+              <span className="text-[11px] font-medium text-soft">
+                +{product.colors.length - 5}
+              </span>
+            )}
+          </div>
+        )}
         <div className="mt-3">
           <AddToCartMini
             item={item}

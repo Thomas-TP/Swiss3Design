@@ -1,26 +1,27 @@
 import { desc, eq } from "drizzle-orm";
-import { FileBox } from "lucide-react";
+import { FileBox, Search } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { quoteRequests } from "@/db/schema";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
-import { QUOTE_STATUSES, QUOTE_STATUS_FR, STATUS_STYLE } from "../ui";
+import { QUOTE_STATUSES, QUOTE_STATUS_FR, STATUS_STYLE, FIELD } from "../ui";
 
 export default async function AdminQuotesPage({
   params,
   searchParams,
 }: {
   params: Promise<{ locale: Locale }>;
-  searchParams: Promise<{ s?: string }>;
+  searchParams: Promise<{ s?: string; q?: string }>;
 }) {
   await requireAdmin();
   const { locale } = await params;
-  const { s } = await searchParams;
+  const { s, q } = await searchParams;
   const statusFilter = (QUOTE_STATUSES as readonly string[]).includes(s ?? "")
     ? (s as (typeof QUOTE_STATUSES)[number])
     : null;
+  const query = (q ?? "").trim().slice(0, 100).toLowerCase();
 
   const db = await getDb();
   const all = await db
@@ -31,11 +32,18 @@ export default async function AdminQuotesPage({
     countByStatus.set(row.status, (countByStatus.get(row.status) ?? 0) + 1);
   }
 
-  const rows = await db
+  const fetched = await db
     .select()
     .from(quoteRequests)
     .where(statusFilter ? eq(quoteRequests.status, statusFilter) : undefined)
     .orderBy(desc(quoteRequests.createdAt));
+  const rows = query
+    ? fetched.filter(
+        (r) =>
+          r.email.toLowerCase().includes(query) ||
+          r.description.toLowerCase().includes(query),
+      )
+    : fetched;
 
   const chips: { value: string | null; label: string; count: number }[] = [
     { value: null, label: "Toutes", count: all.length },
@@ -48,30 +56,49 @@ export default async function AdminQuotesPage({
 
   return (
     <div>
-      <div className="mb-5 flex flex-wrap gap-1.5">
-        {chips.map((c) => (
-          <Link
-            key={c.label}
-            href={{
-              pathname: "/admin/quotes",
-              query: c.value ? { s: c.value } : {},
-            }}
-            className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-              statusFilter === c.value
-                ? "bg-ink text-paper"
-                : "border border-line bg-surface text-soft hover:text-ink"
-            }`}
-          >
-            {c.label}
-            <span className="ml-1.5 opacity-60 tabular-nums">{c.count}</span>
-          </Link>
-        ))}
+      <h2 className="mb-4 text-xl font-bold tracking-tight">Devis</h2>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap gap-1.5">
+          {chips.map((c) => (
+            <Link
+              key={c.label}
+              href={{
+                pathname: "/admin/quotes",
+                query: {
+                  ...(c.value ? { s: c.value } : {}),
+                  ...(query ? { q } : {}),
+                },
+              }}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                statusFilter === c.value
+                  ? "bg-ink text-paper"
+                  : "border border-line bg-surface text-soft hover:text-ink"
+              }`}
+            >
+              {c.label}
+              <span className="ml-1.5 opacity-60 tabular-nums">{c.count}</span>
+            </Link>
+          ))}
+        </div>
+        <form className="relative" action="">
+          {statusFilter && <input type="hidden" name="s" value={statusFilter} />}
+          <Search
+            size={15}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-soft"
+          />
+          <input
+            name="q"
+            defaultValue={q ?? ""}
+            placeholder="E-mail ou description…"
+            className={`${FIELD} w-56 pl-9`}
+          />
+        </form>
       </div>
 
       {rows.length === 0 ? (
         <p className="rounded-card border border-line bg-surface p-10 text-center text-soft">
-          {statusFilter
-            ? "Aucune demande avec ce statut."
+          {statusFilter || query
+            ? "Aucune demande ne correspond à ces critères."
             : "Aucune demande de devis pour l'instant."}
         </p>
       ) : (

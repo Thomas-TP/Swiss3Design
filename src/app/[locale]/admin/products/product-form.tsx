@@ -15,6 +15,18 @@ interface Img {
   alt?: string;
 }
 
+export interface FilamentColor {
+  id: string;
+  name: string;
+  hex: string;
+}
+
+export interface FilamentOption {
+  id: string;
+  name: string;
+  colors: FilamentColor[];
+}
+
 export interface ProductFormInitial {
   id: string;
   slug: string;
@@ -31,6 +43,7 @@ export interface ProductFormInitial {
   translations: Record<string, { name: string; description: string }>;
   images: Img[];
   categoryIds: string[];
+  colorIds: string[];
   variants: VariantInitial[];
 }
 
@@ -54,20 +67,38 @@ export function ProductForm({
   initial,
 }: {
   categories: { id: string; name: string }[];
-  materials: string[];
+  materials: FilamentOption[];
   initial?: ProductFormInitial;
 }) {
   // La matière du produit en cours peut avoir été retirée de la palette :
   // on l'ajoute aux options pour ne pas la perdre silencieusement.
-  const materialOptions = Array.from(
+  const materialNames = Array.from(
     new Set([
-      ...materials,
+      ...materials.map((m) => m.name),
       ...(initial?.material ? [initial.material] : []),
     ]),
   );
   const defaultMaterial =
     initial?.material ??
-    (materialOptions.includes("PLA") ? "PLA" : materialOptions[0]);
+    (materialNames.includes("PLA") ? "PLA" : materialNames[0]);
+
+  const [material, setMaterial] = useState(defaultMaterial ?? "");
+  const colorsForMaterial =
+    materials.find((m) => m.name === material)?.colors ?? [];
+  const [selectedColors, setSelectedColors] = useState<string[]>(
+    initial?.colorIds ?? [],
+  );
+  // Au changement de filament, ne garder que les couleurs de sa palette.
+  const visibleColorIds = colorsForMaterial.map((c) => c.id);
+  const activeColors = selectedColors.filter((id) =>
+    visibleColorIds.includes(id),
+  );
+
+  const toggleColor = (id: string) =>
+    setSelectedColors((prev) =>
+      prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
+    );
+
   const router = useRouter();
   const [state, formAction, pending] = useActionState<ProductFormState, FormData>(
     saveProduct,
@@ -158,13 +189,14 @@ export function ProductForm({
           </label>
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">Matière</span>
-            {materialOptions.length > 0 ? (
+            {materialNames.length > 0 ? (
               <select
                 name="material"
-                defaultValue={defaultMaterial}
+                value={material}
+                onChange={(e) => setMaterial(e.target.value)}
                 className={FIELD}
               >
-                {materialOptions.map((m) => (
+                {materialNames.map((m) => (
                   <option key={m} value={m}>
                     {m}
                   </option>
@@ -200,6 +232,56 @@ export function ProductForm({
             />
           </label>
         </div>
+
+        {/* Couleurs proposées (palette du filament choisi) */}
+        <div className="mt-5 border-t border-line pt-4">
+          <input
+            type="hidden"
+            name="colors"
+            value={JSON.stringify(activeColors)}
+          />
+          <p className="text-sm font-semibold">
+            Couleurs proposées{" "}
+            <span className="font-normal text-soft">
+              (palette « {material || "—"} »)
+            </span>
+          </p>
+          {colorsForMaterial.length === 0 ? (
+            <p className="mt-2 text-xs text-soft">
+              Ce filament n&apos;a pas encore de couleur.{" "}
+              <Link href="/admin/materials" className="underline">
+                Gérer les couleurs
+              </Link>
+              .
+            </p>
+          ) : (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {colorsForMaterial.map((c) => {
+                const on = activeColors.includes(c.id);
+                return (
+                  <button
+                    key={c.id}
+                    type="button"
+                    onClick={() => toggleColor(c.id)}
+                    aria-pressed={on}
+                    className={`inline-flex items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 text-sm font-medium transition-colors ${
+                      on
+                        ? "border-ink bg-ink text-paper"
+                        : "border-line bg-surface text-soft hover:border-ink hover:text-ink"
+                    }`}
+                  >
+                    <span
+                      className="h-5 w-5 shrink-0 rounded-full border border-black/10"
+                      style={{ backgroundColor: c.hex }}
+                    />
+                    {c.name}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </div>
+
         <div className="mt-4 flex flex-wrap gap-5 text-sm">
           {(
             [
@@ -280,8 +362,9 @@ export function ProductForm({
       <section className="rounded-card border border-line bg-surface p-5 sm:p-6">
         <h2 className="mb-1 font-semibold">Variantes</h2>
         <p className="mb-4 text-xs text-soft">
-          Couleurs, tailles… Laissez vide si le produit n&apos;a qu&apos;une
-          seule version. Prix vide = prix du produit, stock vide = non suivi.
+          Tailles, finitions… (les couleurs se gèrent ci-dessus). Laissez vide
+          si le produit n&apos;a qu&apos;une seule version. Prix vide = prix du
+          produit, stock vide = non suivi.
         </p>
         <VariantManager initial={initial?.variants ?? []} />
       </section>

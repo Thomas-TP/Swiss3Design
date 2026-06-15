@@ -10,7 +10,7 @@ import { submitQuoteRequest, type QuoteFormState } from "./actions";
 const field =
   "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
 
-export function QuoteForm() {
+export function QuoteForm({ materials }: { materials: string[] }) {
   const t = useTranslations("custom");
   const locale = useLocale();
   const { data: authSession } = useSession();
@@ -105,8 +105,7 @@ export function QuoteForm() {
             onChange={setMaterial}
             options={[
               { value: "", label: t("materialAny") },
-              { value: "PLA", label: "PLA" },
-              { value: "PETG", label: "PETG" },
+              ...materials.map((m) => ({ value: m, label: m })),
             ]}
             placeholder={t("materialAny")}
             ariaLabel={t("material")}

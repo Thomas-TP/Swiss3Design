@@ -22,12 +22,13 @@ export default async function ShopPage({
   searchParams: Promise<{
     category?: string;
     material?: string;
+    color?: string;
     multicolor?: string;
     sort?: string;
   }>;
 }) {
   const { locale } = await params;
-  const { category, material, multicolor, sort } = await searchParams;
+  const { category, material, color, multicolor, sort } = await searchParams;
   const multicolorOn = multicolor === "1";
   // Le filtre multicolore n'apparaît que si un produit l'utilise — ou s'il est
   // déjà actif, pour pouvoir le désélectionner.
@@ -43,6 +44,7 @@ export default async function ShopPage({
     getProducts(locale, {
       categorySlug: category,
       material,
+      color,
       multicolor: multicolorOn,
       sort: activeSort,
     }),
@@ -73,7 +75,7 @@ export default async function ShopPage({
       <div className="mt-8 rounded-card border border-line bg-surface/60 p-3 backdrop-blur-sm sm:p-4">
         <div className="flex flex-wrap gap-2">
           <Link
-            href={hrefFor({ material, multicolor: multicolorParam, sort: sortParam })}
+            href={hrefFor({ material, color, multicolor: multicolorParam, sort: sortParam })}
             className={chip(!category)}
           >
             {t("all")}
@@ -84,6 +86,7 @@ export default async function ShopPage({
               href={hrefFor({
                 category: c.slug,
                 material,
+                color,
                 multicolor: multicolorParam,
                 sort: sortParam,
               })}
@@ -103,6 +106,7 @@ export default async function ShopPage({
               href={hrefFor({
                 category,
                 material: material === m ? undefined : m,
+                color,
                 multicolor: multicolorParam,
                 sort: sortParam,
               })}
@@ -116,6 +120,7 @@ export default async function ShopPage({
               href={hrefFor({
                 category,
                 material,
+                color,
                 multicolor: multicolorOn ? undefined : "1",
                 sort: sortParam,
               })}
@@ -125,6 +130,37 @@ export default async function ShopPage({
             </Link>
           )}
         </div>
+
+        {(filters.colors.length > 0 || color) && (
+          <div className="mt-3 flex flex-wrap items-center gap-2.5 border-t border-line pt-3">
+            <span className="text-xs font-medium text-soft">
+              {t("filterColor")}
+            </span>
+            {filters.colors.map((c) => {
+              const active = color === c.name;
+              return (
+                <Link
+                  key={c.name}
+                  href={hrefFor({
+                    category,
+                    material,
+                    color: active ? undefined : c.name,
+                    multicolor: multicolorParam,
+                    sort: sortParam,
+                  })}
+                  title={c.name}
+                  aria-label={c.name}
+                  className={`h-7 w-7 rounded-full border transition-transform hover:scale-110 ${
+                    active
+                      ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-surface"
+                      : "border-black/10"
+                  }`}
+                  style={{ backgroundColor: c.hex }}
+                />
+              );
+            })}
+          </div>
+        )}
 
         <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
           <p className="text-sm text-soft">
@@ -139,6 +175,7 @@ export default async function ShopPage({
                   href={hrefFor({
                     category,
                     material,
+                    color,
                     multicolor: multicolorParam,
                     sort: s === "new" ? undefined : s,
                   })}

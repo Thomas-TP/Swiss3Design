@@ -123,9 +123,18 @@ export default async function OrderDetailPage({
         <ul className="mt-3 divide-y divide-line rounded-card border border-line bg-surface px-5">
           {items.map((i) => (
             <li key={i.id} className="flex items-center justify-between gap-3 py-4">
-              <span className="text-sm">
+              <span className="flex items-center gap-2 text-sm">
                 <span className="font-medium tabular-nums">{i.quantity}×</span>{" "}
                 {i.nameSnapshot}
+                {i.colorName && (
+                  <span className="inline-flex items-center gap-1.5 text-xs text-soft">
+                    <span
+                      className="h-3 w-3 shrink-0 rounded-full border border-black/10"
+                      style={{ backgroundColor: i.colorHex ?? undefined }}
+                    />
+                    {i.colorName}
+                  </span>
+                )}
               </span>
               <span className="shrink-0 text-sm font-semibold tabular-nums">
                 {formatChf(i.priceCentsSnapshot * i.quantity, locale)}

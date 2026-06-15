@@ -88,7 +88,12 @@ export default async function AdminDashboard({
   const toShip = allOrders.filter((o) => o.status === "in_production").length;
   const recent = allOrders.slice(0, 6);
 
-  const cards = [
+  const cards: {
+    Icon: typeof TrendingUp;
+    label: string;
+    value: string;
+    href?: string;
+  }[] = [
     {
       Icon: TrendingUp,
       label: "Chiffre d'affaires total",
@@ -104,26 +109,67 @@ export default async function AdminDashboard({
       label: "Panier moyen",
       value: formatChf(avgBasketCents, "fr"),
     },
-    { Icon: Users, label: "Comptes clients", value: String(customerCount.value) },
-    { Icon: ShoppingCart, label: "Commandes à traiter", value: String(toProcess) },
-    { Icon: PackageCheck, label: "À expédier", value: String(toShip) },
-    { Icon: FileText, label: "Devis en attente", value: String(pendingQuotes.length) },
-    { Icon: AlertTriangle, label: "Stock bas", value: String(lowStock.length) },
+    {
+      Icon: Users,
+      label: "Comptes clients",
+      value: String(customerCount.value),
+      href: "/admin/customers",
+    },
+    {
+      Icon: ShoppingCart,
+      label: "Commandes à traiter",
+      value: String(toProcess),
+      href: "/admin/orders?s=paid",
+    },
+    {
+      Icon: PackageCheck,
+      label: "À expédier",
+      value: String(toShip),
+      href: "/admin/orders?s=in_production",
+    },
+    {
+      Icon: FileText,
+      label: "Devis en attente",
+      value: String(pendingQuotes.length),
+      href: "/admin/quotes?s=received",
+    },
+    {
+      Icon: AlertTriangle,
+      label: "Stock bas",
+      value: String(lowStock.length),
+      href: "/admin/products?f=low",
+    },
   ];
 
   return (
     <div className="space-y-8">
+      <h2 className="text-xl font-bold tracking-tight">Tableau de bord</h2>
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {cards.map(({ Icon, label, value }) => (
-          <div
-            key={label}
-            className="rounded-card border border-line bg-surface p-4"
-          >
-            <Icon size={18} className="text-soft" />
-            <p className="mt-2 text-2xl font-bold tabular-nums">{value}</p>
-            <p className="text-xs text-soft">{label}</p>
-          </div>
-        ))}
+        {cards.map(({ Icon, label, value, href }) => {
+          const inner = (
+            <>
+              <Icon size={18} className="text-soft" />
+              <p className="mt-2 text-2xl font-bold tabular-nums">{value}</p>
+              <p className="text-xs text-soft">{label}</p>
+            </>
+          );
+          return href ? (
+            <Link
+              key={label}
+              href={href}
+              className="rounded-card border border-line bg-surface p-4 transition-colors hover:border-ink/30 hover:bg-line/20"
+            >
+              {inner}
+            </Link>
+          ) : (
+            <div
+              key={label}
+              className="rounded-card border border-line bg-surface p-4"
+            >
+              {inner}
+            </div>
+          );
+        })}
       </div>
 
       {lowStock.length > 0 && (

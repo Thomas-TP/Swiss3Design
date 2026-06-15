@@ -75,6 +75,7 @@ export default async function ProductPage({
               priceCents: v.priceCents,
               stock: v.stock,
             }))}
+            colors={product.colors}
           />
 
           {specs.length > 0 && (
