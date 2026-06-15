@@ -127,7 +127,9 @@
     "promoPlaceholder": "Promo code",
     "promoApply": "Apply",
     "promoRemove": "Remove",
-    "promoInvalid": "Invalid or expired code."
+    "promoInvalid": "Invalid or expired code.",
+    "totalToPay": "Total to pay",
+    "paymentReassurance": "Encrypted payment. Your card details never touch our servers."
   },
   "orderSuccess": {
     "title": "Thank you for your order!",

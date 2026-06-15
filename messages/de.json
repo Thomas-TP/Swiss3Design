@@ -127,7 +127,9 @@
     "promoPlaceholder": "Gutscheincode",
     "promoApply": "Anwenden",
     "promoRemove": "Entfernen",
-    "promoInvalid": "Code ungültig oder abgelaufen."
+    "promoInvalid": "Code ungültig oder abgelaufen.",
+    "totalToPay": "Zu zahlender Betrag",
+    "paymentReassurance": "Verschlüsselte Zahlung. Ihre Kartendaten erreichen unsere Server nie."
   },
   "orderSuccess": {
     "title": "Vielen Dank für Ihre Bestellung!",

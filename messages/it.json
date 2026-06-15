@@ -127,7 +127,9 @@
     "promoPlaceholder": "Codice promo",
     "promoApply": "Applica",
     "promoRemove": "Rimuovi",
-    "promoInvalid": "Codice non valido o scaduto."
+    "promoInvalid": "Codice non valido o scaduto.",
+    "totalToPay": "Totale da pagare",
+    "paymentReassurance": "Pagamento cifrato. I dati della tua carta non passano mai dai nostri server."
   },
   "orderSuccess": {
     "title": "Grazie per il vostro ordine!",

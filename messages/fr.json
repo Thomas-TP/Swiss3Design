@@ -127,7 +127,9 @@
     "promoPlaceholder": "Code promo",
     "promoApply": "Appliquer",
     "promoRemove": "Retirer",
-    "promoInvalid": "Code invalide ou expiré."
+    "promoInvalid": "Code invalide ou expiré.",
+    "totalToPay": "Total à payer",
+    "paymentReassurance": "Paiement chiffré. Vos données bancaires ne transitent jamais par nos serveurs."
   },
   "orderSuccess": {
     "title": "Merci pour votre commande !",
