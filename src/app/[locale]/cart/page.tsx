@@ -26,7 +26,7 @@ export default function CartPage() {
         <p className="mt-2 text-soft">{t("empty")}</p>
         <Link
           href="/shop"
-          className="mt-7 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-accent-dark"
+          className="mt-7 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent-dark active:scale-[0.98]"
         >
           {t("emptyCta")}
           <ArrowRight size={16} />
@@ -37,7 +37,8 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-16">
-      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
+      <span className="flex h-1 w-10 rounded-full bg-accent" />
+      <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
         {t("title")}
       </h1>
 
@@ -50,7 +51,7 @@ export default function CartPage() {
             >
               <Link
                 href={`/products/${item.slug}`}
-                className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-line/30"
+                className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-paper to-line/40"
               >
                 {item.imageUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -135,7 +136,9 @@ export default function CartPage() {
               <dt className="text-soft">{t("shipping")}</dt>
               <dd className="font-medium tabular-nums">
                 {shippingCents === 0 ? (
-                  <span className="text-emerald-600">{t("shippingFree")}</span>
+                  <span className="text-emerald-600 dark:text-emerald-400">
+                    {t("shippingFree")}
+                  </span>
                 ) : (
                   formatChf(shippingCents, locale)
                 )}
@@ -157,7 +160,7 @@ export default function CartPage() {
 
           <Link
             href="/checkout"
-            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98]"
+            className="mt-5 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent-dark active:scale-[0.98]"
           >
             {t("checkout")}
             <ArrowRight size={16} />

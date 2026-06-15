@@ -36,7 +36,9 @@ export function AddToCart({
         setTimeout(() => setAdded(false), 1600);
       }}
       className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold transition-all active:scale-[0.98] ${
-        added ? "bg-ink text-paper" : "bg-accent text-white hover:bg-accent-dark"
+        added
+          ? "bg-ink text-paper"
+          : "bg-accent text-white shadow-lg shadow-accent/25 hover:bg-accent-dark"
       }`}
     >
       {added ? <Check size={18} /> : <ShoppingBag size={18} />}

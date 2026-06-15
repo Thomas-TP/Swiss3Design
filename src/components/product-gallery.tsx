@@ -20,7 +20,7 @@ export function ProductGallery({
 
   return (
     <div>
-      <div className="overflow-hidden rounded-card border border-line bg-surface">
+      <div className="overflow-hidden rounded-card border border-line bg-gradient-to-br from-paper to-line/40">
         {current && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
