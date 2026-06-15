@@ -22,9 +22,9 @@ export function ProductCard({ product }: { product: ProductListItem }) {
   return (
     <Link
       href={`/products/${product.slug}`}
-      className="group flex flex-col overflow-hidden rounded-card border border-line bg-surface transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-ink/5"
+      className="group flex flex-col overflow-hidden rounded-card border border-line bg-surface transition-all duration-300 hover:-translate-y-1 hover:border-soft/30 hover:shadow-xl hover:shadow-ink/[0.07] dark:hover:shadow-black/40"
     >
-      <div className="relative aspect-square overflow-hidden bg-line/30">
+      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-paper to-line/40">
         {product.imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img

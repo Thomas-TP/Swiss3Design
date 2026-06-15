@@ -8,20 +8,23 @@
   /* Couleurs de base — thème clair */
   --paper: #fafaf9;
   --surface: #ffffff;
-  --ink: #1c1917;
-  --soft: #78716c;
-  --line: #e7e5e4;
+  /* Surface "élevée" : cartes posées sur une autre carte / fonds de scène */
+  --elevated: #ffffff;
+  --ink: #1a1614;
+  --soft: #6f6962;
+  --line: #e8e5e1;
   color-scheme: light;
 }
 
 .dark {
   /* Thème sombre — ink/paper restent opposés : les boutons inversés
      (bg-ink text-paper) gardent leur contraste dans les deux thèmes. */
-  --paper: #0c0a09;
-  --surface: #1c1917;
-  --ink: #fafaf9;
-  --soft: #a8a29e;
-  --line: #292524;
+  --paper: #0b0a09;
+  --surface: #1a1714;
+  --elevated: #221e1b;
+  --ink: #f4f1ed;
+  --soft: #a39c92;
+  --line: #2a2622;
   color-scheme: dark;
 }
 
@@ -30,12 +33,19 @@
      Les neutres pointent vers les variables thémables ci-dessus. */
   --color-paper: var(--paper);
   --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
   --color-ink: var(--ink);
   --color-soft: var(--soft);
   --color-line: var(--line);
   /* L'accent rouge marque est constant dans les deux thèmes */
   --color-accent: #e5231c;
-  --color-accent-dark: #b81c13;
+  --color-accent-dark: #c01d14;
+  /* Panneau « nuit » : fond sombre constant dans les deux thèmes, réservé
+     aux blocs de mise en avant. Évite le pavé blanc éblouissant en mode
+     sombre que produisait l'inversion bg-ink. */
+  --color-night: #121110;
+  --color-night-soft: #a8a29b;
+  --color-night-line: #2c2825;
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
 
@@ -47,7 +57,15 @@ html {
 }
 
 body {
-  background: var(--color-paper);
+  /* Halo discret en haut de page : donne de la profondeur sans casser la
+     sobriété. Très faible teinte rouge marque, adaptée aux deux thèmes. */
+  background-color: var(--color-paper);
+  background-image: radial-gradient(
+    920px 460px at 50% -10%,
+    color-mix(in srgb, var(--color-accent) 5%, transparent),
+    transparent 70%
+  );
+  background-repeat: no-repeat;
   color: var(--color-ink);
   font-family: var(--font-sans);
   text-rendering: optimizeLegibility;

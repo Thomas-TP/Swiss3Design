@@ -52,112 +52,118 @@ export default async function ShopPage({
     `rounded-full px-4 py-2 text-sm font-medium transition-colors ${
       active
         ? "bg-ink text-paper"
-        : "border border-line bg-surface text-soft hover:text-ink"
+        : "border border-line bg-surface text-soft hover:border-soft/40 hover:text-ink"
     }`;
   const sortChip = (active: boolean) =>
     `rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-      active
-        ? "bg-ink text-paper"
-        : "border border-line bg-surface text-soft hover:text-ink"
+      active ? "bg-ink text-paper shadow-sm" : "text-soft hover:text-ink"
     }`;
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-16">
-      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-        {t("title")}
-      </h1>
-      <p className="mt-2 text-soft">{t("subtitle")}</p>
+      <header>
+        <span className="flex h-1 w-10 rounded-full bg-accent" />
+        <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+          {t("title")}
+        </h1>
+        <p className="mt-2 max-w-prose text-soft">{t("subtitle")}</p>
+      </header>
 
-      <div className="mt-7 flex flex-wrap gap-2">
-        <Link
-          href={hrefFor({ material, multicolor: multicolorParam, sort: sortParam })}
-          className={chip(!category)}
-        >
-          {t("all")}
-        </Link>
-        {filters.categories.map((c) => (
+      {/* Barre de filtres groupée */}
+      <div className="mt-8 rounded-card border border-line bg-surface/60 p-3 backdrop-blur-sm sm:p-4">
+        <div className="flex flex-wrap gap-2">
           <Link
-            key={c.id}
-            href={hrefFor({
-              category: c.slug,
-              material,
-              multicolor: multicolorParam,
-              sort: sortParam,
-            })}
-            className={chip(category === c.slug)}
+            href={hrefFor({ material, multicolor: multicolorParam, sort: sortParam })}
+            className={chip(!category)}
           >
-            {c.name}
+            {t("all")}
           </Link>
-        ))}
-        {(filters.materials.length > 0 ||
-          filters.multicolor ||
-          multicolorOn) && (
-          <span className="mx-1 hidden w-px bg-line sm:block" />
-        )}
-        {filters.materials.map((m) => (
-          <Link
-            key={m}
-            href={hrefFor({
-              category,
-              material: material === m ? undefined : m,
-              multicolor: multicolorParam,
-              sort: sortParam,
-            })}
-            className={chip(material === m)}
-          >
-            {m}
-          </Link>
-        ))}
-        {(filters.multicolor || multicolorOn) && (
-          <Link
-            href={hrefFor({
-              category,
-              material,
-              multicolor: multicolorOn ? undefined : "1",
-              sort: sortParam,
-            })}
-            className={chip(multicolorOn)}
-          >
-            {t("filterMulticolor")}
-          </Link>
-        )}
-      </div>
-
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-        <p className="text-sm text-soft">
-          {t("results", { count: products.length })}
-        </p>
-        <div className="flex items-center gap-1.5">
-          <span className="text-xs font-medium text-soft">{t("sortLabel")}</span>
-          {SORTS.map((s) => (
+          {filters.categories.map((c) => (
             <Link
-              key={s}
+              key={c.id}
+              href={hrefFor({
+                category: c.slug,
+                material,
+                multicolor: multicolorParam,
+                sort: sortParam,
+              })}
+              className={chip(category === c.slug)}
+            >
+              {c.name}
+            </Link>
+          ))}
+          {(filters.materials.length > 0 ||
+            filters.multicolor ||
+            multicolorOn) && (
+            <span className="mx-1 hidden w-px self-stretch bg-line sm:block" />
+          )}
+          {filters.materials.map((m) => (
+            <Link
+              key={m}
+              href={hrefFor({
+                category,
+                material: material === m ? undefined : m,
+                multicolor: multicolorParam,
+                sort: sortParam,
+              })}
+              className={chip(material === m)}
+            >
+              {m}
+            </Link>
+          ))}
+          {(filters.multicolor || multicolorOn) && (
+            <Link
               href={hrefFor({
                 category,
                 material,
-                multicolor: multicolorParam,
-                sort: s === "new" ? undefined : s,
+                multicolor: multicolorOn ? undefined : "1",
+                sort: sortParam,
               })}
-              className={sortChip(activeSort === s)}
+              className={chip(multicolorOn)}
             >
-              {t(
-                s === "new"
-                  ? "sortNew"
-                  : s === "price_asc"
-                    ? "sortPriceAsc"
-                    : "sortPriceDesc",
-              )}
+              {t("filterMulticolor")}
             </Link>
-          ))}
+          )}
+        </div>
+
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
+          <p className="text-sm text-soft">
+            {t("results", { count: products.length })}
+          </p>
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-soft">{t("sortLabel")}</span>
+            <div className="inline-flex items-center rounded-full border border-line bg-paper p-1">
+              {SORTS.map((s) => (
+                <Link
+                  key={s}
+                  href={hrefFor({
+                    category,
+                    material,
+                    multicolor: multicolorParam,
+                    sort: s === "new" ? undefined : s,
+                  })}
+                  className={sortChip(activeSort === s)}
+                >
+                  {t(
+                    s === "new"
+                      ? "sortNew"
+                      : s === "price_asc"
+                        ? "sortPriceAsc"
+                        : "sortPriceDesc",
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
       {products.length === 0 ? (
-        <p className="mt-10 rounded-card border border-line bg-surface p-10 text-center text-soft">
+        <p className="mt-8 rounded-card border border-line bg-surface p-12 text-center text-soft">
           {t("empty")}
         </p>
       ) : (
-        <div className="mt-4 grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
+        <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
           {products.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}

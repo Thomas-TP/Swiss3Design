@@ -7,6 +7,7 @@ import { formatChf } from "@/lib/format";
 import { FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
 import { ProductCard } from "@/components/product-card";
 import { MulticolorDots } from "@/components/multicolor-dots";
+import { HeroPrint } from "@/components/hero-print";
 import { Reveal } from "@/components/reveal";
 
 export const dynamic = "force-dynamic";
@@ -41,7 +42,7 @@ export default async function HomePage({
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
       {/* Hero */}
-      <section className="grid items-center gap-10 py-14 md:grid-cols-2 md:py-24">
+      <section className="grid items-center gap-10 py-14 md:grid-cols-2 md:gap-14 md:py-24">
         <div>
           <Reveal>
             <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-medium text-soft">
@@ -50,7 +51,7 @@ export default async function HomePage({
             </span>
           </Reveal>
           <Reveal delay={0.08}>
-            <h1 className="mt-5 text-4xl font-bold leading-[1.08] tracking-tight md:text-6xl">
+            <h1 className="mt-6 text-[2.6rem] font-bold leading-[1.05] tracking-tight md:text-6xl">
               {t("heroTitle")}
             </h1>
           </Reveal>
@@ -63,7 +64,7 @@ export default async function HomePage({
             <div className="mt-8 flex flex-wrap gap-3">
               <Link
                 href="/shop"
-                className="flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98]"
+                className="flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent-dark hover:shadow-accent/30 active:scale-[0.98]"
               >
                 {t("ctaShop")}
                 <ArrowRight size={16} />
@@ -78,21 +79,22 @@ export default async function HomePage({
           </Reveal>
         </div>
         <Reveal delay={0.15} className="hidden md:block">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src="/hero.svg"
-            alt=""
-            className="w-full rounded-card border border-line"
-          />
+          {/* Scène produit thémée : le fond suit le thème, fini le pavé clair */}
+          <div className="relative overflow-hidden rounded-card border border-line bg-gradient-to-br from-surface to-paper p-6 shadow-xl shadow-ink/[0.06] ring-1 ring-line/60 dark:shadow-black/40">
+            <HeroPrint className="w-full text-ink" />
+          </div>
         </Reveal>
       </section>
 
       {/* Réassurance */}
-      <section className="grid gap-4 border-t border-line py-10 sm:grid-cols-3">
+      <section className="grid gap-3 border-t border-line py-10 sm:grid-cols-3 sm:gap-4">
         {trust.map(({ Icon, title, text }) => (
-          <div key={title} className="flex items-start gap-3.5">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-surface ring-1 ring-line">
-              <Icon size={19} strokeWidth={1.8} className="text-ink" />
+          <div
+            key={title}
+            className="flex items-start gap-3.5 rounded-2xl border border-line bg-surface p-4 transition-colors hover:border-soft/40"
+          >
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-paper ring-1 ring-line">
+              <Icon size={19} strokeWidth={1.8} className="text-accent" />
             </span>
             <div>
               <p className="text-sm font-semibold">{title}</p>
@@ -102,22 +104,24 @@ export default async function HomePage({
         ))}
       </section>
 
-      {/* Multicolore */}
+      {/* Multicolore — panneau « nuit » constant (lisible dans les deux thèmes) */}
       <Reveal inView>
-        <section className="grid gap-8 rounded-card bg-ink p-8 text-paper md:grid-cols-[1.2fr_1fr] md:items-center md:p-14">
-          <div>
+        <section className="relative grid gap-8 overflow-hidden rounded-card bg-night p-8 text-white ring-1 ring-night-line md:grid-cols-[1.2fr_1fr] md:items-center md:p-14">
+          {/* Lueur d'accent discrète */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-accent/20 blur-3xl"
+          />
+          <div className="relative">
             <MulticolorDots size={12} />
             <h2 className="mt-5 text-3xl font-bold tracking-tight md:text-4xl">
               {t("multicolorTitle")}
             </h2>
-            <p className="mt-4 max-w-lg leading-relaxed text-paper/70">
+            <p className="mt-4 max-w-lg leading-relaxed text-night-soft">
               {t("multicolorText")}
             </p>
           </div>
-          <div
-            aria-hidden
-            className="hidden h-44 items-end gap-3 md:flex"
-          >
+          <div aria-hidden className="relative hidden h-44 items-end gap-3 md:flex">
             {["#e5231c", "#1d4ed8", "#f59e0b", "#fafaf9"].map((c, i) => (
               <span
                 key={c}
@@ -131,13 +135,16 @@ export default async function HomePage({
 
       {/* Sélection */}
       <section className="py-16">
-        <div className="mb-7 flex items-end justify-between">
-          <h2 className="text-2xl font-bold tracking-tight md:text-3xl">
-            {t("featuredTitle")}
-          </h2>
+        <div className="mb-7 flex items-end justify-between gap-4">
+          <div>
+            <span className="flex h-1 w-10 rounded-full bg-accent" />
+            <h2 className="mt-3 text-2xl font-bold tracking-tight md:text-3xl">
+              {t("featuredTitle")}
+            </h2>
+          </div>
           <Link
             href="/shop"
-            className="flex items-center gap-1.5 text-sm font-semibold text-soft transition-colors hover:text-ink"
+            className="flex shrink-0 items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold text-soft transition-colors hover:border-ink hover:text-ink"
           >
             {t("featuredAll")}
             <ArrowRight size={15} />
