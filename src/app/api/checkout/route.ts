@@ -90,37 +90,47 @@ export async function POST(request: Request) {
     ...new Set(items.map((i) => i.variantId).filter((v): v is string => !!v)),
   ];
 
-  // Prix et noms relus en base : on ne fait jamais confiance au client
-  const dbProducts = await db
-    .select({
-      id: products.id,
-      priceCents: products.priceCents,
-      stock: products.stock,
-      name: productTranslations.name,
-    })
-    .from(products)
-    .innerJoin(
-      productTranslations,
-      and(
-        eq(productTranslations.productId, products.id),
-        eq(productTranslations.locale, locale),
-      ),
-    )
-    .where(and(inArray(products.id, productIds), eq(products.active, true)));
+  // Prix et noms relus en base : on ne fait jamais confiance au client.
+  // Produits et variantes sont des lectures indépendantes → en parallèle.
+  const [dbProducts, dbVariants] = await Promise.all([
+    db
+      .select({
+        id: products.id,
+        priceCents: products.priceCents,
+        stock: products.stock,
+        name: productTranslations.name,
+      })
+      .from(products)
+      .innerJoin(
+        productTranslations,
+        and(
+          eq(productTranslations.productId, products.id),
+          eq(productTranslations.locale, locale),
+        ),
+      )
+      .where(and(inArray(products.id, productIds), eq(products.active, true))),
+    variantIds.length
+      ? db
+          .select({
+            id: productVariants.id,
+            productId: productVariants.productId,
+            priceCents: productVariants.priceCents,
+            stock: productVariants.stock,
+            name: productVariants.name,
+          })
+          .from(productVariants)
+          .where(inArray(productVariants.id, variantIds))
+      : Promise.resolve(
+          [] as {
+            id: string;
+            productId: string;
+            priceCents: number | null;
+            stock: number | null;
+            name: string;
+          }[],
+        ),
+  ]);
   const byId = new Map(dbProducts.map((p) => [p.id, p]));
-
-  const dbVariants = variantIds.length
-    ? await db
-        .select({
-          id: productVariants.id,
-          productId: productVariants.productId,
-          priceCents: productVariants.priceCents,
-          stock: productVariants.stock,
-          name: productVariants.name,
-        })
-        .from(productVariants)
-        .where(inArray(productVariants.id, variantIds))
-    : [];
   const variantById = new Map(dbVariants.map((v) => [v.id, v]));
 
   // Ligne effective (prix/stock/nom selon produit ou variante choisie)
@@ -168,12 +178,13 @@ export async function POST(request: Request) {
     0,
   );
 
-  const shippingFlat = Number(
-    (await getSetting("shipping_cents")) ?? SHIPPING_CENTS,
-  );
-  const freeOver = Number(
-    (await getSetting("free_shipping_over_cents")) ?? FREE_SHIPPING_OVER_CENTS,
-  );
+  // Les deux réglages de livraison sont indépendants → lus en parallèle.
+  const [shippingSetting, freeOverSetting] = await Promise.all([
+    getSetting("shipping_cents"),
+    getSetting("free_shipping_over_cents"),
+  ]);
+  const shippingFlat = Number(shippingSetting ?? SHIPPING_CENTS);
+  const freeOver = Number(freeOverSetting ?? FREE_SHIPPING_OVER_CENTS);
   const shippingCents = subtotalCents >= freeOver ? 0 : shippingFlat;
 
   // Remise (code promo) revalidée côté serveur sur le sous-total réel
