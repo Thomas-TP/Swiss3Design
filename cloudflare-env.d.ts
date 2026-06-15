@@ -16,6 +16,8 @@ declare global {
     BETTER_AUTH_SECRET: string;
     BETTER_AUTH_URL: string;
     ADMIN_EMAILS: string;
+    // Secret pour déclencher la maintenance planifiée (purge R2 + rétention)
+    CRON_SECRET?: string;
     RESEND_API_KEY?: string;
     EMAIL_FROM?: string;
     GOOGLE_CLIENT_ID?: string;

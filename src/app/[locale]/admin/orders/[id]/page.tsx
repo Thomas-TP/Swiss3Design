@@ -160,6 +160,16 @@ export default async function AdminOrderDetailPage({
               </span>
             </li>
           ))}
+          {order.discountCents > 0 && (
+            <li className="flex justify-between gap-3 py-2.5 text-emerald-600 dark:text-emerald-400">
+              <span>
+                Remise{order.discountCode ? ` (${order.discountCode})` : ""}
+              </span>
+              <span className="tabular-nums">
+                −{formatChf(order.discountCents, locale)}
+              </span>
+            </li>
+          )}
           <li className="flex justify-between gap-3 py-2.5 text-soft">
             <span>Livraison</span>
             <span className="tabular-nums">
