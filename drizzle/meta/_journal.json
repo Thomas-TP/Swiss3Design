@@ -43,6 +43,13 @@
       "when": 1781467695516,
       "tag": "0005_rare_cobalt_man",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "6",
+      "when": 1781505604958,
+      "tag": "0006_add_materials",
+      "breakpoints": true
     }
   ]
 }

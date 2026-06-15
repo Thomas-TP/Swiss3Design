@@ -50,11 +50,24 @@ const LOCALE_LABELS: Record<string, string> = {
 
 export function ProductForm({
   categories,
+  materials,
   initial,
 }: {
   categories: { id: string; name: string }[];
+  materials: string[];
   initial?: ProductFormInitial;
 }) {
+  // La matière du produit en cours peut avoir été retirée de la palette :
+  // on l'ajoute aux options pour ne pas la perdre silencieusement.
+  const materialOptions = Array.from(
+    new Set([
+      ...materials,
+      ...(initial?.material ? [initial.material] : []),
+    ]),
+  );
+  const defaultMaterial =
+    initial?.material ??
+    (materialOptions.includes("PLA") ? "PLA" : materialOptions[0]);
   const router = useRouter();
   const [state, formAction, pending] = useActionState<ProductFormState, FormData>(
     saveProduct,
@@ -145,18 +158,27 @@ export function ProductForm({
           </label>
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">Matière</span>
-            <input
-              name="material"
-              list="materials"
-              defaultValue={initial?.material ?? "PLA"}
-              className={FIELD}
-            />
-            <datalist id="materials">
-              <option value="PLA" />
-              <option value="PETG" />
-              <option value="PLA-CF" />
-              <option value="TPU" />
-            </datalist>
+            {materialOptions.length > 0 ? (
+              <select
+                name="material"
+                defaultValue={defaultMaterial}
+                className={FIELD}
+              >
+                {materialOptions.map((m) => (
+                  <option key={m} value={m}>
+                    {m}
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <p className="rounded-xl border border-line bg-line/20 px-3 py-2 text-xs text-soft">
+                Aucun filament.{" "}
+                <Link href="/admin/materials" className="underline">
+                  Ajoutez-en un
+                </Link>{" "}
+                pour pouvoir le choisir.
+              </p>
+            )}
           </label>
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">Dimensions</span>

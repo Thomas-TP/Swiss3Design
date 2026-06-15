@@ -29,6 +29,8 @@ export default async function ShopPage({
   const { locale } = await params;
   const { category, material, multicolor, sort } = await searchParams;
   const multicolorOn = multicolor === "1";
+  // Le filtre multicolore n'apparaît que si un produit l'utilise — ou s'il est
+  // déjà actif, pour pouvoir le désélectionner.
   const activeSort: ProductSort = SORTS.includes(sort as ProductSort)
     ? (sort as ProductSort)
     : "new";
@@ -87,7 +89,9 @@ export default async function ShopPage({
             {c.name}
           </Link>
         ))}
-        {(filters.materials.length > 0 || multicolorOn) && (
+        {(filters.materials.length > 0 ||
+          filters.multicolor ||
+          multicolorOn) && (
           <span className="mx-1 hidden w-px bg-line sm:block" />
         )}
         {filters.materials.map((m) => (
@@ -104,17 +108,19 @@ export default async function ShopPage({
             {m}
           </Link>
         ))}
-        <Link
-          href={hrefFor({
-            category,
-            material,
-            multicolor: multicolorOn ? undefined : "1",
-            sort: sortParam,
-          })}
-          className={chip(multicolorOn)}
-        >
-          {t("filterMulticolor")}
-        </Link>
+        {(filters.multicolor || multicolorOn) && (
+          <Link
+            href={hrefFor({
+              category,
+              material,
+              multicolor: multicolorOn ? undefined : "1",
+              sort: sortParam,
+            })}
+            className={chip(multicolorOn)}
+          >
+            {t("filterMulticolor")}
+          </Link>
+        )}
       </div>
 
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3">

@@ -81,6 +81,14 @@ export const productVariants = sqliteTable(
   (t) => [index("product_variants_product_idx").on(t.productId)],
 );
 
+// Types de filament proposés à la création d'un produit (palette éditable
+// en admin). Le produit stocke le nom retenu en texte (products.material),
+// donc les filtres boutique restent dérivés de l'usage réel du catalogue.
+export const materials = sqliteTable("materials", {
+  id: uuid(),
+  name: text("name").notNull().unique(),
+});
+
 export const categories = sqliteTable("categories", {
   id: uuid(),
   slug: text("slug").notNull().unique(),

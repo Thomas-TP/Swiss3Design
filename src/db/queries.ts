@@ -8,6 +8,7 @@ import {
   categories,
   categoryTranslations,
   productCategories,
+  materials,
   settings,
 } from "./schema";
 import type { Locale } from "@/i18n/routing";
@@ -114,11 +115,23 @@ export async function getProducts(
   return attachImages(db, rows);
 }
 
-// Filtres réellement utilisables : catégories ayant ≥1 produit actif et
-// matières effectivement présentes dans le catalogue actif.
+// Palette de filaments éditable en admin (proposée à la création produit).
+export async function getMaterials(): Promise<string[]> {
+  const db = await getDb();
+  const rows = await db
+    .select({ name: materials.name })
+    .from(materials)
+    .orderBy(asc(materials.name));
+  return rows.map((r) => r.name);
+}
+
+// Filtres réellement utilisables : catégories ayant ≥1 produit actif,
+// matières effectivement présentes dans le catalogue actif, et le filtre
+// multicolore seulement si au moins un produit actif l'est.
 export async function getUsedFilters(locale: Locale): Promise<{
   categories: { id: string; slug: string; name: string }[];
   materials: string[];
+  multicolor: boolean;
 }> {
   const db = await getDb();
 
@@ -153,9 +166,16 @@ export async function getUsedFilters(locale: Locale): Promise<{
     .where(eq(products.active, true))
     .orderBy(asc(products.material));
 
+  const multicolorRow = await db
+    .select({ id: products.id })
+    .from(products)
+    .where(and(eq(products.active, true), eq(products.multicolor, true)))
+    .limit(1);
+
   return {
     categories: cats.map((c) => ({ id: c.id, slug: c.slug, name: c.name })),
     materials: mats.map((m) => m.material),
+    multicolor: multicolorRow.length > 0,
   };
 }
 

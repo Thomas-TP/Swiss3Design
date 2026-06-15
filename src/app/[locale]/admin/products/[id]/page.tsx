@@ -10,6 +10,7 @@ import {
   categories,
   categoryTranslations,
 } from "@/db/schema";
+import { getMaterials } from "@/db/queries";
 import { requireAdmin } from "@/lib/session";
 import { ProductForm, type ProductFormInitial } from "../product-form";
 
@@ -29,37 +30,39 @@ export default async function EditProductPage({
     .limit(1);
   if (!product) notFound();
 
-  const [translations, images, links, variants, cats] = await Promise.all([
-    db
-      .select()
-      .from(productTranslations)
-      .where(eq(productTranslations.productId, id)),
-    db
-      .select()
-      .from(productImages)
-      .where(eq(productImages.productId, id))
-      .orderBy(asc(productImages.sortOrder)),
-    db
-      .select()
-      .from(productCategories)
-      .where(eq(productCategories.productId, id)),
-    db
-      .select()
-      .from(productVariants)
-      .where(eq(productVariants.productId, id))
-      .orderBy(asc(productVariants.name)),
-    db
-      .select({ id: categories.id, name: categoryTranslations.name })
-      .from(categories)
-      .innerJoin(
-        categoryTranslations,
-        and(
-          eq(categoryTranslations.categoryId, categories.id),
-          eq(categoryTranslations.locale, "fr"),
-        ),
-      )
-      .orderBy(asc(categories.sortOrder)),
-  ]);
+  const [translations, images, links, variants, cats, materials] =
+    await Promise.all([
+      db
+        .select()
+        .from(productTranslations)
+        .where(eq(productTranslations.productId, id)),
+      db
+        .select()
+        .from(productImages)
+        .where(eq(productImages.productId, id))
+        .orderBy(asc(productImages.sortOrder)),
+      db
+        .select()
+        .from(productCategories)
+        .where(eq(productCategories.productId, id)),
+      db
+        .select()
+        .from(productVariants)
+        .where(eq(productVariants.productId, id))
+        .orderBy(asc(productVariants.name)),
+      db
+        .select({ id: categories.id, name: categoryTranslations.name })
+        .from(categories)
+        .innerJoin(
+          categoryTranslations,
+          and(
+            eq(categoryTranslations.categoryId, categories.id),
+            eq(categoryTranslations.locale, "fr"),
+          ),
+        )
+        .orderBy(asc(categories.sortOrder)),
+      getMaterials(),
+    ]);
 
   const initial: ProductFormInitial = {
     id: product.id,
@@ -93,7 +96,7 @@ export default async function EditProductPage({
   return (
     <div>
       <h2 className="mb-5 text-xl font-bold">Modifier le produit</h2>
-      <ProductForm categories={cats} initial={initial} />
+      <ProductForm categories={cats} materials={materials} initial={initial} />
     </div>
   );
 }
