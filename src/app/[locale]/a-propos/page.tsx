@@ -105,14 +105,28 @@ export default async function AboutPage({
         <Reveal inView>
           <SectionHeading kicker={c.equipmentKicker} title={c.equipmentTitle} />
         </Reveal>
-        <div className="grid gap-8 md:grid-cols-2 md:gap-10">
+        <div className="grid gap-8 md:grid-cols-2 md:gap-10 md:items-start">
           <Reveal inView>
+            <figure className="overflow-hidden rounded-card border border-line bg-white shadow-sm shadow-ink/[0.06] dark:shadow-black/30">
+              {/* Photo produit officielle Bambu Lab, recadrée (badge promo retiré).
+                  Remplaçable par une vraie photo de l'atelier : déposer le fichier
+                  dans public/about/ et adapter le src. */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/about/p1s-ams2-pro.jpg"
+                alt={c.equipmentTitle}
+                width={1340}
+                height={1420}
+                loading="lazy"
+                className="block h-auto w-full"
+              />
+            </figure>
+          </Reveal>
+          <Reveal inView delay={0.1}>
             <p className="text-[15px] leading-relaxed text-soft">
               {c.equipmentText}
             </p>
-          </Reveal>
-          <Reveal inView delay={0.1}>
-            <div className="rounded-card border border-line bg-elevated p-6 shadow-sm shadow-ink/[0.04]">
+            <div className="mt-6 rounded-card border border-line bg-elevated p-6 shadow-sm shadow-ink/[0.04]">
               <div className="mb-4 flex items-center gap-3">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-paper ring-1 ring-line">
                   <Printer size={19} strokeWidth={1.8} className="text-accent" />
