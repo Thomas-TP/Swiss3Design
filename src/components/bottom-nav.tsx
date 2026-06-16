@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, LayoutGrid, Sparkles, Info, ShoppingBag, CircleUser } from "lucide-react";
+import { Home, LayoutGrid, Sparkles, ShoppingBag, CircleUser } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useCart } from "@/lib/cart";
@@ -10,7 +10,6 @@ const items = [
   { href: "/", key: "home", Icon: Home },
   { href: "/shop", key: "shop", Icon: LayoutGrid },
   { href: "/custom", key: "custom", Icon: Sparkles },
-  { href: "/a-propos", key: "about", Icon: Info },
   { href: "/cart", key: "cart", Icon: ShoppingBag },
   { href: "/account", key: "account", Icon: CircleUser },
 ] as const;
@@ -27,7 +26,7 @@ export function BottomNav() {
       className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-surface/90 backdrop-blur-lg md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
-      <ul className="grid grid-cols-6">
+      <ul className="grid grid-cols-5">
         {items.map(({ href, key, Icon }) => {
           const active =
             href === "/" ? pathname === "/" : pathname.startsWith(href);

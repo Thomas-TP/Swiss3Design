@@ -1,4 +1,4 @@
-import { ArrowRight, Truck, Factory, ShieldCheck } from "lucide-react";
+import { ArrowRight, Truck, Factory, ShieldCheck, Info } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -18,8 +18,9 @@ export default async function HomePage({
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
-  const [t, featured] = await Promise.all([
+  const [t, tNav, featured] = await Promise.all([
     getTranslations("home"),
+    getTranslations("nav"),
     getProducts(locale, { featuredOnly: true }),
   ]);
 
@@ -75,6 +76,14 @@ export default async function HomePage({
               >
                 {t("ctaCustom")}
               </Link>
+              {/* « À propos » — mobile uniquement (sur PC il reste dans la navbar) */}
+              <Link
+                href="/a-propos"
+                className="flex items-center gap-2 rounded-full border border-line bg-surface px-7 py-3.5 text-sm font-semibold transition-colors hover:border-ink md:hidden"
+              >
+                <Info size={16} />
+                {tNav("about")}
+              </Link>
             </div>
           </Reveal>
         </div>
@@ -121,7 +130,7 @@ export default async function HomePage({
             className="pointer-events-none absolute -left-16 -top-16 h-64 w-64 rounded-full bg-accent/20 blur-3xl"
           />
           <div className="relative">
-            <MulticolorDots size={12} />
+            <MulticolorDots size={12} onDark />
             <h2 className="mt-5 text-3xl font-bold tracking-tight md:text-4xl">
               {t("multicolorTitle")}
             </h2>
