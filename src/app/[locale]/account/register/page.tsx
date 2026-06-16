@@ -7,10 +7,19 @@ import { RegisterForm } from "./register-form";
 
 export const dynamic = "force-dynamic";
 
-export default async function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ email?: string }>;
+}) {
   const t = await getTranslations("auth");
   const { env } = await getCloudflareContext({ async: true });
   const providers = enabledSocialProviders(env);
+
+  // Pré-remplissage de l'e-mail depuis la conversion invité → compte
+  const { email } = await searchParams;
+  const defaultEmail =
+    email && /^\S+@\S+\.\S+$/.test(email) ? email.toLowerCase() : "";
 
   return (
     <div className="mx-auto max-w-md px-4 py-14 sm:px-6 md:py-20">
@@ -18,7 +27,7 @@ export default async function RegisterPage() {
         {t("signUpTitle")}
       </h1>
       <div className="mt-8 rounded-card border border-line bg-surface p-6 sm:p-8">
-        <RegisterForm />
+        <RegisterForm defaultEmail={defaultEmail} />
         <SocialButtons providers={providers} />
       </div>
       <p className="mt-5 text-center text-sm text-soft">
@@ -28,6 +37,11 @@ export default async function RegisterPage() {
           className="font-semibold text-accent hover:underline"
         >
           {t("signInTitle")}
+        </Link>
+      </p>
+      <p className="mt-3 text-center text-sm text-soft">
+        <Link href="/track" className="font-medium hover:text-ink hover:underline">
+          {t("trackOrderLink")}
         </Link>
       </p>
     </div>

@@ -3,7 +3,7 @@ import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
 import { twoFactor } from "better-auth/plugins";
 import { drizzle } from "drizzle-orm/d1";
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import * as schema from "@/db/schema";
 import { sendEmail } from "./email";
@@ -140,6 +140,38 @@ export async function getAuth() {
                 : "customer",
             },
           }),
+          // Rattache au nouveau compte les commandes et devis passés en invité
+          // avec la même adresse. Sûr avant vérification d'e-mail : un compte
+          // non vérifié ne peut pas se connecter, donc personne ne consulte ces
+          // données tant que la possession de l'adresse n'est pas prouvée.
+          after: async (u) => {
+            const emailLc = u.email.toLowerCase();
+            try {
+              await db
+                .update(schema.orders)
+                .set({ customerId: u.id })
+                .where(
+                  and(
+                    eq(schema.orders.email, emailLc),
+                    isNull(schema.orders.customerId),
+                  ),
+                );
+              await db
+                .update(schema.quoteRequests)
+                .set({ customerId: u.id })
+                .where(
+                  and(
+                    eq(schema.quoteRequests.email, emailLc),
+                    isNull(schema.quoteRequests.customerId),
+                  ),
+                );
+            } catch (e) {
+              // Le rattachement ne doit jamais faire échouer l'inscription :
+              // l'affichage du compte retombe de toute façon sur le filet par
+              // e-mail (orders.email === user.email).
+              console.error("[rattachement commandes invité]", e);
+            }
+          },
         },
       },
     },

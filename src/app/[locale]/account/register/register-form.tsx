@@ -9,7 +9,7 @@ import { signUp, signIn } from "@/lib/auth-client";
 const field =
   "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
 
-export function RegisterForm() {
+export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
   const t = useTranslations("auth");
   const locale = useLocale();
   const router = useRouter();
@@ -131,6 +131,7 @@ export function RegisterForm() {
           type="email"
           required
           autoComplete="email"
+          defaultValue={defaultEmail}
           className={field}
         />
       </div>

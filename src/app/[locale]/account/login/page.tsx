@@ -39,6 +39,11 @@ export default async function LoginPage({
           {t("signUpTitle")}
         </Link>
       </p>
+      <p className="mt-3 text-center text-sm text-soft">
+        <Link href="/track" className="font-medium hover:text-ink hover:underline">
+          {t("trackOrderLink")}
+        </Link>
+      </p>
     </div>
   );
 }
