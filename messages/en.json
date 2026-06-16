@@ -7,6 +7,7 @@
     "home": "Home",
     "shop": "Shop",
     "custom": "Custom",
+    "about": "About",
     "cart": "Cart",
     "account": "Account",
     "favorites": "Favorites",
@@ -343,8 +344,23 @@
     "errorText": "An error occurred on our side. Please try again.",
     "retry": "Try again"
   },
+  "contact": {
+    "name": "Your name",
+    "email": "Your email",
+    "subject": "Subject",
+    "optional": "optional",
+    "message": "Your message",
+    "messagePlaceholder": "A question, a project, some feedback…",
+    "send": "Send message",
+    "sending": "Sending…",
+    "success": "Message sent! We’ll get back to you within 24 to 48 hours.",
+    "error": "Something went wrong. Please try again or email us at contact@swiss3design.ch.",
+    "directEmail": "By email:",
+    "quoteCta": "Custom project"
+  },
   "footer": {
     "tagline": "Multicolor 3D printing — Gland, Switzerland",
+    "about": "About",
     "shop": "Shop",
     "legalTitle": "Information",
     "terms": "Terms & conditions",

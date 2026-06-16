@@ -7,6 +7,7 @@
     "home": "Start",
     "shop": "Katalog",
     "custom": "Massanfertigung",
+    "about": "Über uns",
     "cart": "Warenkorb",
     "account": "Konto",
     "favorites": "Favoriten",
@@ -343,8 +344,23 @@
     "errorText": "Bei uns ist etwas schiefgelaufen. Bitte versuchen Sie es erneut.",
     "retry": "Erneut versuchen"
   },
+  "contact": {
+    "name": "Ihr Name",
+    "email": "Ihre E-Mail",
+    "subject": "Betreff",
+    "optional": "optional",
+    "message": "Ihre Nachricht",
+    "messagePlaceholder": "Eine Frage, ein Projekt, eine Anmerkung…",
+    "send": "Nachricht senden",
+    "sending": "Senden…",
+    "success": "Nachricht gesendet! Wir melden uns innert 24 bis 48 Std.",
+    "error": "Ein Fehler ist aufgetreten. Versuchen Sie es erneut oder schreiben Sie an contact@swiss3design.ch.",
+    "directEmail": "Per E-Mail:",
+    "quoteCta": "Massanfertigung"
+  },
   "footer": {
     "tagline": "Mehrfarbiger 3D-Druck — Gland, Schweiz",
+    "about": "Über uns",
     "shop": "Shop",
     "legalTitle": "Informationen",
     "terms": "AGB",

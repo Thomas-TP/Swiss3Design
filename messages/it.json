@@ -7,6 +7,7 @@
     "home": "Home",
     "shop": "Catalogo",
     "custom": "Su misura",
+    "about": "Chi siamo",
     "cart": "Carrello",
     "account": "Account",
     "favorites": "Preferiti",
@@ -343,8 +344,23 @@
     "errorText": "Qualcosa è andato storto da parte nostra. La preghiamo di riprovare.",
     "retry": "Riprova"
   },
+  "contact": {
+    "name": "Il vostro nome",
+    "email": "La vostra e-mail",
+    "subject": "Oggetto",
+    "optional": "facoltativo",
+    "message": "Il vostro messaggio",
+    "messagePlaceholder": "Una domanda, un progetto, un'osservazione…",
+    "send": "Invia il messaggio",
+    "sending": "Invio…",
+    "success": "Messaggio inviato! Vi rispondiamo entro 24–48 h.",
+    "error": "Si è verificato un errore. Riprovate o scriveteci a contact@swiss3design.ch.",
+    "directEmail": "Per e-mail:",
+    "quoteCta": "Su misura"
+  },
   "footer": {
     "tagline": "Stampa 3D multicolore — Gland, Svizzera",
+    "about": "Chi siamo",
     "shop": "Negozio",
     "legalTitle": "Informazioni",
     "terms": "Condizioni generali",

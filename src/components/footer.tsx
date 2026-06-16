@@ -21,6 +21,12 @@ export function Footer() {
           </div>
           <nav className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm font-medium text-soft">
             <Link
+              href="/a-propos"
+              className="transition-colors hover:text-ink"
+            >
+              {t("about")}
+            </Link>
+            <Link
               href="/legal/terms"
               target="_blank"
               rel="noopener noreferrer"

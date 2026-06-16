@@ -850,3 +850,99 @@ export function deleteAccountEmail(to: string, url: string): EmailMessage {
     html: layout("Suppression de compte", body, FOOTER.fr),
   };
 }
+
+// ── Formulaire de contact : notification interne ─────────────────────────────
+
+export function adminContactEmail(
+  message: {
+    name: string;
+    email: string;
+    subject: string | null;
+    body: string;
+    locale: string;
+  },
+  adminEmails: string[],
+): EmailMessage {
+  const rows = [
+    ["Nom", message.name],
+    ["E-mail", message.email],
+    ["Sujet", message.subject],
+    ["Langue", message.locale.toUpperCase()],
+  ].filter((entry): entry is [string, string] => Boolean(entry[1]));
+
+  const body = `
+    <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">
+      Nouveau message via le formulaire de contact.
+    </p>
+    <table style="border-collapse:collapse;font-size:13px;color:#44403c;margin:0 0 16px;">
+      ${rows
+        .map(
+          ([k, v]) =>
+            `<tr><td style="padding:3px 16px 3px 0;color:#78716c;">${k}</td><td style="padding:3px 0;">${esc(v)}</td></tr>`,
+        )
+        .join("")}
+    </table>
+    <p style="margin:0;padding:12px 16px;background:#fafaf9;border-radius:10px;color:#44403c;line-height:1.6;white-space:pre-wrap;">${esc(message.body)}</p>`;
+
+  return {
+    to: adminEmails,
+    from: FROM_CONTACT,
+    replyTo: message.email,
+    subject: `✉️ Nouveau message — ${message.name}`,
+    html: layout("Nouveau message de contact", body, "Notification interne Swiss3Design — répondre écrit directement au client."),
+  };
+}
+
+// ── Formulaire de contact : accusé de réception au client ────────────────────
+
+const CONTACT_CONFIRM_TEXTS: Record<
+  Locale,
+  { subject: string; title: string; intro: string; yourMessage: string }
+> = {
+  fr: {
+    subject: "Nous avons bien reçu votre message — Swiss3Design",
+    title: "Message bien reçu ✅",
+    intro:
+      "Merci de nous avoir écrit ! Nous avons bien reçu votre message et revenons vers vous au plus vite, généralement sous 24 à 48 h. Voici une copie de votre message :",
+    yourMessage: "Votre message",
+  },
+  de: {
+    subject: "Wir haben Ihre Nachricht erhalten — Swiss3Design",
+    title: "Nachricht erhalten ✅",
+    intro:
+      "Danke für Ihre Nachricht! Wir haben sie erhalten und melden uns so rasch wie möglich, in der Regel innert 24 bis 48 Std. Hier eine Kopie Ihrer Nachricht:",
+    yourMessage: "Ihre Nachricht",
+  },
+  it: {
+    subject: "Abbiamo ricevuto il vostro messaggio — Swiss3Design",
+    title: "Messaggio ricevuto ✅",
+    intro:
+      "Grazie per averci scritto! Abbiamo ricevuto il vostro messaggio e vi risponderemo al più presto, di solito entro 24–48 h. Ecco una copia del vostro messaggio:",
+    yourMessage: "Il vostro messaggio",
+  },
+  en: {
+    subject: "We’ve received your message — Swiss3Design",
+    title: "Message received ✅",
+    intro:
+      "Thanks for writing to us! We’ve received your message and will get back to you as soon as possible, usually within 24 to 48 hours. Here’s a copy of your message:",
+    yourMessage: "Your message",
+  },
+};
+
+export function contactConfirmationEmail(
+  to: string,
+  body: string,
+  locale: string,
+): EmailMessage {
+  const l = (["fr", "de", "it", "en"].includes(locale) ? locale : "fr") as Locale;
+  const t = CONTACT_CONFIRM_TEXTS[l];
+  const html = `
+    <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">${t.intro}</p>
+    <p style="margin:0;padding:12px 16px;background:#fafaf9;border-radius:10px;color:#44403c;line-height:1.6;white-space:pre-wrap;"><strong style="color:#1c1917;">${t.yourMessage} :</strong><br/>${esc(body)}</p>`;
+  return {
+    to,
+    from: FROM_CONTACT,
+    subject: t.subject,
+    html: layout(t.title, html, FOOTER[l]),
+  };
+}
