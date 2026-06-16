@@ -13,7 +13,7 @@ export default async function PrivacyPage({
   const sections = PRIVACY_CONTENT[locale] ?? PRIVACY_CONTENT.fr;
 
   return (
-    <LegalPage locale={locale} title={t("privacy")} updated="2026-06-11">
+    <LegalPage locale={locale} title={t("privacy")} updated="2026-06-16">
       {sections.map((section, i) => (
         <Section key={section.title} n={i + 1} title={section.title}>
           {section.body}

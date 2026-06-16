@@ -29,7 +29,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Stripe ; nous ne voyons ni ne stockons aucune donnée de carte.{" "}
           <strong>Devis sur mesure</strong> : description du projet et
           fichiers 3D transmis. <strong>Échanges</strong> : e-mails et
-          correspondance.
+          correspondance.{" "}
+          <strong>Données techniques</strong> : lors de la consultation du
+          site, votre adresse IP, le type de navigateur et des journaux de
+          connexion sont traités automatiquement à des fins de sécurité, de
+          prévention des abus et de bon fonctionnement du site.
         </p>
       ),
     },
@@ -41,7 +45,19 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           envoi des e-mails transactionnels (confirmation, expédition, devis,
           sécurité du compte), respect des obligations légales (conservation
           comptable) et prévention des abus. Aucune donnée n’est vendue ni
-          utilisée à des fins publicitaires.
+          utilisée à des fins publicitaires. Nous n’envoyons aucun e-mail
+          publicitaire ou de marketing ; seuls des e-mails transactionnels
+          liés à vos commandes et à votre compte vous sont adressés.
+        </p>
+      ),
+    },
+    {
+      title: "Profilage et décisions automatisées",
+      body: (
+        <p>
+          Nous ne procédons à aucun profilage ni à aucune décision
+          individuelle automatisée produisant des effets juridiques à votre
+          égard ou vous affectant de manière significative.
         </p>
       ),
     },
@@ -52,9 +68,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Nous recourons à des prestataires techniques : Cloudflare
           (hébergement et base de données), Stripe (paiement), Resend (envoi
           d’e-mails), Google (connexion Google, si utilisée). Certains de ces
-          prestataires traitent des données aux États-Unis ou dans l’UE ; les
-          transferts reposent sur des garanties reconnues (Swiss-U.S. Data
-          Privacy Framework ou clauses contractuelles types).
+          prestataires traitent des données à l’étranger, en particulier aux
+          États-Unis ; ces transferts reposent sur des garanties reconnues
+          (Swiss-U.S. Data Privacy Framework pour les prestataires certifiés,
+          ou clauses contractuelles types).
         </p>
       ),
     },
@@ -88,7 +105,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           données, leur rectification, leur effacement ou leur remise dans un
           format usuel, en écrivant à contact@swiss3design.ch. Vous pouvez
           également saisir le Préposé fédéral à la protection des données et à
-          la transparence (PFPDT).
+          la transparence (PFPDT). Nous répondons en principe dans les
+          30 jours et pouvons demander une preuve d’identité avant de donner
+          suite, afin de protéger vos données.
         </p>
       ),
     },
@@ -99,6 +118,16 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Les échanges sont chiffrés (TLS), les mots de passe sont hachés et
           l’accès aux données est restreint à l’exploitant. Les fichiers des
           devis sont stockés dans un espace privé non accessible publiquement.
+        </p>
+      ),
+    },
+    {
+      title: "Mineurs",
+      body: (
+        <p>
+          La boutique s’adresse à des personnes majeures. Les mineurs ne
+          peuvent commander qu’avec l’accord de leur représentant légal. Nous
+          ne collectons pas sciemment de données concernant des enfants.
         </p>
       ),
     },
@@ -136,7 +165,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           verarbeitet; wir sehen und speichern keinerlei Kartendaten.{" "}
           <strong>Offerten für Massanfertigungen</strong>: Projektbeschreibung
           und übermittelte 3D-Dateien. <strong>Korrespondenz</strong>: E-Mails
-          und Schriftverkehr.
+          und Schriftverkehr.{" "}
+          <strong>Technische Daten</strong>: Beim Besuch der Website werden
+          Ihre IP-Adresse, der Browsertyp und Verbindungsprotokolle
+          automatisch zu Zwecken der Sicherheit, der Missbrauchsprävention und
+          des einwandfreien Betriebs bearbeitet.
         </p>
       ),
     },
@@ -148,7 +181,20 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Kundenkontos, Versand von Transaktions-E-Mails (Bestätigung,
           Versand, Offerte, Kontosicherheit), Erfüllung gesetzlicher Pflichten
           (buchhalterische Aufbewahrung) und Missbrauchsprävention. Es werden
-          keine Daten verkauft oder zu Werbezwecken verwendet.
+          keine Daten verkauft oder zu Werbezwecken verwendet. Wir versenden
+          keine Werbe- oder Marketing-E-Mails; Sie erhalten ausschliesslich
+          Transaktions-E-Mails im Zusammenhang mit Ihren Bestellungen und
+          Ihrem Konto.
+        </p>
+      ),
+    },
+    {
+      title: "Profiling und automatisierte Entscheidungen",
+      body: (
+        <p>
+          Wir nehmen kein Profiling und keine automatisierten
+          Einzelentscheidungen vor, die Ihnen gegenüber rechtliche Wirkungen
+          entfalten oder Sie erheblich beeinträchtigen.
         </p>
       ),
     },
@@ -159,9 +205,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Wir setzen technische Dienstleister ein: Cloudflare (Hosting und
           Datenbank), Stripe (Zahlung), Resend (E-Mail-Versand), Google
           (Google-Anmeldung, falls genutzt). Einige dieser Anbieter bearbeiten
-          Daten in den USA oder in der EU; die Übermittlungen stützen sich auf
-          anerkannte Garantien (Swiss-U.S. Data Privacy Framework oder
-          Standardvertragsklauseln).
+          Daten im Ausland, insbesondere in den USA; diese Übermittlungen
+          stützen sich auf anerkannte Garantien (Swiss-U.S. Data Privacy
+          Framework für zertifizierte Anbieter oder Standardvertragsklauseln).
         </p>
       ),
     },
@@ -195,7 +241,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           deren Berichtigung, Löschung oder Herausgabe in einem gängigen
           Format verlangen, per E-Mail an contact@swiss3design.ch. Sie können
           sich zudem an den Eidgenössischen Datenschutz- und
-          Öffentlichkeitsbeauftragten (EDÖB) wenden.
+          Öffentlichkeitsbeauftragten (EDÖB) wenden. Wir antworten
+          grundsätzlich innert 30 Tagen und können vor der Bearbeitung einen
+          Identitätsnachweis verlangen, um Ihre Daten zu schützen.
         </p>
       ),
     },
@@ -207,6 +255,16 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           und der Zugriff auf die Daten ist auf den Betreiber beschränkt. Die
           Dateien der Offerten werden in einem privaten, öffentlich nicht
           zugänglichen Bereich gespeichert.
+        </p>
+      ),
+    },
+    {
+      title: "Minderjährige",
+      body: (
+        <p>
+          Der Shop richtet sich an volljährige Personen. Minderjährige dürfen
+          nur mit Zustimmung ihrer gesetzlichen Vertretung bestellen. Wir
+          erheben wissentlich keine Daten von Kindern.
         </p>
       ),
     },
@@ -243,7 +301,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           cronologia. <strong>Pagamento</strong>: trattato esclusivamente da
           Stripe; non vediamo né memorizziamo alcun dato della carta.{" "}
           <strong>Preventivi su misura</strong>: descrizione del progetto e
-          file 3D trasmessi. <strong>Scambi</strong>: e-mail e corrispondenza.
+          file 3D trasmessi. <strong>Scambi</strong>: e-mail e corrispondenza.{" "}
+          <strong>Dati tecnici</strong>: durante la consultazione del sito, il
+          vostro indirizzo IP, il tipo di browser e i registri di connessione
+          sono trattati automaticamente a fini di sicurezza, prevenzione degli
+          abusi e corretto funzionamento del sito.
         </p>
       ),
     },
@@ -255,7 +317,20 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           cliente, invio delle e-mail transazionali (conferma, spedizione,
           preventivo, sicurezza del conto), rispetto degli obblighi legali
           (conservazione contabile) e prevenzione degli abusi. Nessun dato
-          viene venduto né utilizzato a fini pubblicitari.
+          viene venduto né utilizzato a fini pubblicitari. Non inviamo alcuna
+          e-mail pubblicitaria o di marketing; vi vengono inviate
+          esclusivamente e-mail transazionali relative ai vostri ordini e al
+          vostro conto.
+        </p>
+      ),
+    },
+    {
+      title: "Profilazione e decisioni automatizzate",
+      body: (
+        <p>
+          Non effettuiamo alcuna profilazione né alcuna decisione individuale
+          automatizzata che produca effetti giuridici nei vostri confronti o
+          che vi riguardi in modo significativo.
         </p>
       ),
     },
@@ -266,9 +341,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Ricorriamo a fornitori tecnici: Cloudflare (hosting e banca dati),
           Stripe (pagamento), Resend (invio di e-mail), Google (accesso
           Google, se utilizzato). Alcuni di questi fornitori trattano dati
-          negli Stati Uniti o nell’UE; i trasferimenti si basano su garanzie
-          riconosciute (Swiss-U.S. Data Privacy Framework o clausole
-          contrattuali tipo).
+          all’estero, in particolare negli Stati Uniti; tali trasferimenti si
+          basano su garanzie riconosciute (Swiss-U.S. Data Privacy Framework
+          per i fornitori certificati o clausole contrattuali tipo).
         </p>
       ),
     },
@@ -303,6 +378,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           consegna in un formato corrente, scrivendo a
           contact@swiss3design.ch. Potete inoltre rivolgervi all’Incaricato
           federale della protezione dei dati e della trasparenza (IFPDT).
+          Rispondiamo in linea di principio entro 30 giorni e possiamo
+          richiedere una prova d’identità prima di dar seguito, al fine di
+          proteggere i vostri dati.
         </p>
       ),
     },
@@ -313,6 +391,16 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Gli scambi sono cifrati (TLS), le password sono sottoposte a hash e
           l’accesso ai dati è limitato al gestore. I file dei preventivi sono
           conservati in uno spazio privato non accessibile pubblicamente.
+        </p>
+      ),
+    },
+    {
+      title: "Minori",
+      body: (
+        <p>
+          Il negozio si rivolge a persone maggiorenni. I minori possono
+          ordinare solo con il consenso del loro rappresentante legale. Non
+          raccogliamo consapevolmente dati relativi a minori.
         </p>
       ),
     },
@@ -349,7 +437,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           <strong>Payment</strong>: processed exclusively by Stripe; we
           neither see nor store any card data. <strong>Custom quotes</strong>:
           project description and 3D files submitted.{" "}
-          <strong>Correspondence</strong>: e-mails and exchanges.
+          <strong>Correspondence</strong>: e-mails and exchanges.{" "}
+          <strong>Technical data</strong>: when you browse the site, your IP
+          address, browser type and connection logs are processed
+          automatically for security, abuse-prevention and proper operation of
+          the site.
         </p>
       ),
     },
@@ -361,7 +453,19 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           transactional e-mails (confirmation, shipping, quotes, account
           security), complying with legal obligations (accounting retention)
           and preventing abuse. No data is sold or used for advertising
-          purposes.
+          purposes. We do not send any advertising or marketing e-mails; you
+          only receive transactional e-mails relating to your orders and your
+          account.
+        </p>
+      ),
+    },
+    {
+      title: "Profiling and automated decisions",
+      body: (
+        <p>
+          We do not carry out any profiling or automated individual decisions
+          producing legal effects concerning you or significantly affecting
+          you.
         </p>
       ),
     },
@@ -371,10 +475,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           We use technical service providers: Cloudflare (hosting and
           database), Stripe (payment), Resend (e-mail delivery), Google
-          (Google sign-in, if used). Some of these providers process data in
-          the United States or the EU; transfers are based on recognised
-          safeguards (Swiss-U.S. Data Privacy Framework or standard
-          contractual clauses).
+          (Google sign-in, if used). Some of these providers process data
+          abroad, in particular in the United States; these transfers are
+          based on recognised safeguards (Swiss-U.S. Data Privacy Framework for
+          certified providers, or standard contractual clauses).
         </p>
       ),
     },
@@ -408,7 +512,8 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           your data, as well as its rectification, erasure or delivery in a
           common format, by writing to contact@swiss3design.ch. You may also
           contact the Federal Data Protection and Information Commissioner
-          (FDPIC).
+          (FDPIC). We generally respond within 30 days and may request proof of
+          identity before acting, in order to protect your data.
         </p>
       ),
     },
@@ -419,6 +524,16 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Connections are encrypted (TLS), passwords are hashed and access to
           the data is restricted to the Operator. Quote files are stored in a
           private area that is not publicly accessible.
+        </p>
+      ),
+    },
+    {
+      title: "Minors",
+      body: (
+        <p>
+          The shop is intended for adults. Minors may only order with the
+          consent of their legal representative. We do not knowingly collect
+          data concerning children.
         </p>
       ),
     },

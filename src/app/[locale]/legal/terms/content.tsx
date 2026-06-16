@@ -17,7 +17,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           l’Aubépine 9B, 1196 Gland (Vaud), Suisse</strong> (« l’exploitant »),
           joignable à l’adresse contact@swiss3design.ch. En passant commande,
           le client accepte les présentes CGV dans leur version en vigueur au
-          moment de la commande.
+          moment de la commande. Le client confirme être majeur ou agir avec
+          l’accord de son représentant légal.
         </p>
       ),
     },
@@ -77,7 +78,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           délai de production indiqué sur la fiche produit. Les frais de port
           et le seuil de livraison offerte applicables sont affichés dans le
           panier. Les délais de livraison sont indicatifs ; un retard ne donne
-          pas droit à des dommages-intérêts.
+          pas droit à des dommages-intérêts. Le risque de perte ou de dommage
+          pendant le transport est supporté par l’exploitant jusqu’à la remise
+          du produit au client.
         </p>
       ),
     },
@@ -88,10 +91,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Les prestations personnalisées (fichiers fournis par le client ou
           projets spécifiques) font l’objet d’un devis. Le contrat est conclu à
           l’acceptation du devis et au paiement. Les articles personnalisés ne
-          sont ni repris ni échangés (ch. 8). Le client garantit détenir les
-          droits sur les fichiers transmis et que leur impression ne viole
-          aucun droit de tiers ni aucune disposition légale ; l’exploitant peut
-          refuser tout fichier sans justification.
+          sont ni repris ni échangés (voir « Retours »). Le client garantit
+          détenir les droits sur les fichiers transmis et que leur impression
+          ne viole aucun droit de tiers ni aucune disposition légale ;
+          l’exploitant peut refuser tout fichier sans justification. Le client
+          indemnise l’exploitant contre toute prétention de tiers découlant de
+          ses fichiers. Sont notamment exclus les fichiers d’armes ou de pièces
+          d’armes, de contrefaçons et de tout objet illicite.
         </p>
       ),
     },
@@ -116,8 +122,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           La garantie légale pour les défauts de la chose vendue
           (art. 197 ss CO) s’applique pendant deux ans dès la livraison. Le
           client signale tout défaut dans les meilleurs délais à
-          contact@swiss3design.ch, photos à l’appui. L’exploitant procède, à
-          son choix, à la réparation, au remplacement ou au remboursement.
+          contact@swiss3design.ch, photos à l’appui. L’exploitant propose en
+          priorité la réparation ou le remplacement ; si cela s’avère
+          impossible ou disproportionné, le client conserve ses droits légaux
+          (réduction du prix ou remboursement).
         </p>
       ),
     },
@@ -130,7 +138,47 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           la commande concernée. Sauf indication contraire expresse, les
           objets imprimés en 3D ne sont pas destinés à un usage de sécurité,
           au contact alimentaire prolongé, ni à un usage médical, et ne sont
-          pas des jouets pour enfants de moins de 3 ans.
+          pas des jouets pour enfants de moins de 3 ans. Les limitations qui
+          précèdent ne s’appliquent pas dans les cas où la loi exclut toute
+          limitation, notamment en cas de dommages corporels ou au titre de la
+          loi fédérale sur la responsabilité du fait des produits (LRFP).
+        </p>
+      ),
+    },
+    {
+      title: "Propriété intellectuelle",
+      body: (
+        <p>
+          Les contenus du site (textes, photographies, mise en page, identité
+          visuelle et logo Swiss3Design) sont protégés et ne peuvent être
+          reproduits sans autorisation. La vente porte sur un objet physique :
+          elle ne confère au client aucun droit sur les modèles 3D numériques
+          sous-jacents, ni aucune licence de reproduction, de réédition ou de
+          revente en série. Les droits de propriété intellectuelle relatifs aux
+          modèles imprimés demeurent réservés à leurs titulaires respectifs.
+        </p>
+      ),
+    },
+    {
+      title: "Force majeure",
+      body: (
+        <p>
+          L’exploitant n’est pas responsable des retards ou empêchements
+          résultant de circonstances échappant à son contrôle raisonnable
+          (force majeure, défaillance d’un fournisseur ou du transporteur,
+          interruption technique, etc.). Les délais concernés sont suspendus
+          pour la durée de l’événement.
+        </p>
+      ),
+    },
+    {
+      title: "Divisibilité",
+      body: (
+        <p>
+          Si une disposition des présentes CGV est nulle ou inapplicable, les
+          autres dispositions demeurent valables ; la disposition concernée est
+          remplacée par une règle valable dont l’effet se rapproche le plus de
+          l’intention initiale.
         </p>
       ),
     },
@@ -156,7 +204,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           l’Aubépine 9B, 1196 Gland (Waadt), Schweiz</strong> («der
           Betreiber»), erreichbar unter contact@swiss3design.ch. Mit der
           Bestellung akzeptiert der Kunde diese AGB in der zum Zeitpunkt der
-          Bestellung gültigen Fassung.
+          Bestellung gültigen Fassung. Der Kunde bestätigt, volljährig zu sein
+          oder mit Zustimmung seiner gesetzlichen Vertretung zu handeln.
         </p>
       ),
     },
@@ -220,7 +269,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Produktionszeit. Die anwendbaren Versandkosten und die Schwelle für
           den Gratisversand werden im Warenkorb angezeigt. Lieferfristen sind
           unverbindlich; eine Verzögerung begründet keinen Anspruch auf
-          Schadenersatz.
+          Schadenersatz. Das Risiko von Verlust oder Beschädigung während des
+          Transports trägt der Betreiber bis zur Übergabe des Produkts an den
+          Kunden.
         </p>
       ),
     },
@@ -232,10 +283,14 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           spezifische Projekte) erfolgen auf der Grundlage einer Offerte. Der
           Vertrag kommt mit der Annahme der Offerte und der Zahlung zustande.
           Personalisierte Artikel werden weder zurückgenommen noch umgetauscht
-          (Ziff. 8). Der Kunde gewährleistet, dass er über die Rechte an den
-          übermittelten Dateien verfügt und deren Druck weder Rechte Dritter
-          noch gesetzliche Bestimmungen verletzt; der Betreiber kann jede
-          Datei ohne Begründung ablehnen.
+          (siehe «Rücksendungen»). Der Kunde gewährleistet, dass er über die
+          Rechte an den übermittelten Dateien verfügt und deren Druck weder
+          Rechte Dritter noch gesetzliche Bestimmungen verletzt; der Betreiber
+          kann jede Datei ohne Begründung ablehnen. Der Kunde stellt den
+          Betreiber von sämtlichen Ansprüchen Dritter frei, die sich aus seinen
+          Dateien ergeben. Ausgeschlossen sind insbesondere Dateien von Waffen
+          oder Waffenteilen, von Fälschungen sowie von jeglichen
+          widerrechtlichen Gegenständen.
         </p>
       ),
     },
@@ -260,8 +315,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Es gilt die gesetzliche Gewährleistung für Mängel der Kaufsache
           (Art. 197 ff. OR) während zwei Jahren ab Lieferung. Der Kunde meldet
           jeden Mangel so rasch wie möglich an contact@swiss3design.ch, mit
-          Fotos als Beleg. Der Betreiber leistet nach seiner Wahl
-          Nachbesserung, Ersatz oder Rückerstattung.
+          Fotos als Beleg. Der Betreiber bietet vorrangig Nachbesserung oder
+          Ersatz an; erweist sich dies als unmöglich oder unverhältnismässig,
+          behält der Kunde seine gesetzlichen Rechte (Minderung oder
+          Rückerstattung).
         </p>
       ),
     },
@@ -275,7 +332,48 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Bestellung. Sofern nicht ausdrücklich anders angegeben, sind
           3D-gedruckte Objekte weder für sicherheitsrelevante Anwendungen noch
           für längeren Lebensmittelkontakt oder medizinische Zwecke bestimmt
-          und sind kein Spielzeug für Kinder unter 3 Jahren.
+          und sind kein Spielzeug für Kinder unter 3 Jahren. Die vorstehenden
+          Beschränkungen gelten nicht, soweit das Gesetz jegliche Beschränkung
+          ausschliesst, insbesondere bei Personenschäden oder nach dem
+          Produktehaftpflichtgesetz (PrHG).
+        </p>
+      ),
+    },
+    {
+      title: "Geistiges Eigentum",
+      body: (
+        <p>
+          Die Inhalte der Website (Texte, Fotografien, Layout, visuelle
+          Identität und Logo Swiss3Design) sind geschützt und dürfen ohne
+          Genehmigung nicht reproduziert werden. Der Verkauf betrifft einen
+          physischen Gegenstand: Er verleiht dem Kunden keinerlei Rechte an den
+          zugrunde liegenden digitalen 3D-Modellen und keine Lizenz zur
+          Vervielfältigung, Neuauflage oder zum Weiterverkauf in Serie. Die
+          Rechte des geistigen Eigentums an den gedruckten Modellen bleiben
+          ihren jeweiligen Inhabern vorbehalten.
+        </p>
+      ),
+    },
+    {
+      title: "Höhere Gewalt",
+      body: (
+        <p>
+          Der Betreiber haftet nicht für Verzögerungen oder Verhinderungen
+          infolge von Umständen ausserhalb seiner zumutbaren Kontrolle (höhere
+          Gewalt, Ausfall eines Lieferanten oder des Transporteurs, technischer
+          Unterbruch usw.). Die betroffenen Fristen werden für die Dauer des
+          Ereignisses ausgesetzt.
+        </p>
+      ),
+    },
+    {
+      title: "Salvatorische Klausel",
+      body: (
+        <p>
+          Ist eine Bestimmung dieser AGB nichtig oder undurchführbar, bleiben
+          die übrigen Bestimmungen gültig; die betreffende Bestimmung wird
+          durch eine gültige Regelung ersetzt, die der ursprünglichen Absicht
+          möglichst nahekommt.
         </p>
       ),
     },
@@ -301,7 +399,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           l’Aubépine 9B, 1196 Gland (Vaud), Svizzera</strong> («il gestore»),
           raggiungibile all’indirizzo contact@swiss3design.ch. Effettuando un
           ordine, il cliente accetta le presenti CGV nella versione in vigore
-          al momento dell’ordine.
+          al momento dell’ordine. Il cliente conferma di essere maggiorenne o
+          di agire con il consenso del proprio rappresentante legale.
         </p>
       ),
     },
@@ -364,7 +463,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           prodotto. Le spese di spedizione e la soglia per la consegna
           gratuita applicabili sono visualizzate nel carrello. I termini di
           consegna sono indicativi; un ritardo non dà diritto a risarcimento
-          danni.
+          danni. Il rischio di perdita o danneggiamento durante il trasporto è
+          a carico del gestore fino alla consegna del prodotto al cliente.
         </p>
       ),
     },
@@ -375,11 +475,14 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Le prestazioni personalizzate (file forniti dal cliente o progetti
           specifici) sono oggetto di un preventivo. Il contratto è concluso
           all’accettazione del preventivo e al pagamento. Gli articoli
-          personalizzati non vengono né ripresi né cambiati (punto 8). Il
+          personalizzati non vengono né ripresi né cambiati (vedere «Resi»). Il
           cliente garantisce di detenere i diritti sui file trasmessi e che la
           loro stampa non viola alcun diritto di terzi né alcuna disposizione
           legale; il gestore può rifiutare qualsiasi file senza
-          giustificazione.
+          giustificazione. Il cliente tiene indenne il gestore da qualsiasi
+          pretesa di terzi derivante dai suoi file. Sono in particolare esclusi
+          i file di armi o di parti di armi, di contraffazioni e di qualsiasi
+          oggetto illecito.
         </p>
       ),
     },
@@ -404,8 +507,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           La garanzia legale per i difetti della cosa venduta
           (art. 197 segg. CO) si applica per due anni dalla consegna. Il
           cliente segnala qualsiasi difetto il prima possibile a
-          contact@swiss3design.ch, allegando fotografie. Il gestore procede, a
-          sua scelta, alla riparazione, alla sostituzione o al rimborso.
+          contact@swiss3design.ch, allegando fotografie. Il gestore propone in
+          via prioritaria la riparazione o la sostituzione; qualora ciò risulti
+          impossibile o sproporzionato, il cliente conserva i propri diritti
+          legali (riduzione del prezzo o rimborso).
         </p>
       ),
     },
@@ -418,7 +523,47 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           dell’ordine interessato. Salvo indicazione contraria espressa, gli
           oggetti stampati in 3D non sono destinati a un uso di sicurezza, al
           contatto alimentare prolungato né a un uso medico, e non sono
-          giocattoli per bambini di età inferiore a 3 anni.
+          giocattoli per bambini di età inferiore a 3 anni. Le limitazioni che
+          precedono non si applicano nei casi in cui la legge esclude qualsiasi
+          limitazione, in particolare in caso di danni alle persone o ai sensi
+          della legge sulla responsabilità per danno da prodotti (LRDP).
+        </p>
+      ),
+    },
+    {
+      title: "Proprietà intellettuale",
+      body: (
+        <p>
+          I contenuti del sito (testi, fotografie, impaginazione, identità
+          visiva e logo Swiss3Design) sono protetti e non possono essere
+          riprodotti senza autorizzazione. La vendita riguarda un oggetto
+          fisico: non conferisce al cliente alcun diritto sui modelli 3D
+          digitali sottostanti, né alcuna licenza di riproduzione, riedizione o
+          rivendita in serie. I diritti di proprietà intellettuale relativi ai
+          modelli stampati restano riservati ai rispettivi titolari.
+        </p>
+      ),
+    },
+    {
+      title: "Forza maggiore",
+      body: (
+        <p>
+          Il gestore non è responsabile dei ritardi o degli impedimenti dovuti
+          a circostanze che sfuggono al suo ragionevole controllo (forza
+          maggiore, inadempienza di un fornitore o del trasportatore,
+          interruzione tecnica, ecc.). I termini interessati sono sospesi per
+          la durata dell’evento.
+        </p>
+      ),
+    },
+    {
+      title: "Clausola di salvaguardia",
+      body: (
+        <p>
+          Qualora una disposizione delle presenti CGV sia nulla o
+          inapplicabile, le altre disposizioni restano valide; la disposizione
+          interessata è sostituita da una regola valida il cui effetto si
+          avvicina il più possibile all’intenzione iniziale.
         </p>
       ),
     },
@@ -444,6 +589,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           1196 Gland (Vaud), Switzerland</strong> (the “Operator”), reachable
           at contact@swiss3design.ch. By placing an order, the customer
           accepts these GTC in the version in force at the time of the order.
+          The customer confirms that they are of legal age or are acting with
+          the consent of their legal representative.
         </p>
       ),
     },
@@ -502,7 +649,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           business days; made-to-order products after the production time
           indicated on the product page. The applicable shipping costs and
           free-shipping threshold are shown in the cart. Delivery times are
-          indicative; a delay does not give rise to any claim for damages.
+          indicative; a delay does not give rise to any claim for damages. The
+          risk of loss or damage during transport is borne by the Operator
+          until the product is handed over to the customer.
         </p>
       ),
     },
@@ -513,10 +662,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Customised services (files supplied by the customer or specific
           projects) are subject to a quote. The contract is concluded upon
           acceptance of the quote and payment. Customised items can be neither
-          returned nor exchanged (sec. 8). The customer warrants that they
-          hold the rights to the files submitted and that printing them does
-          not infringe any third-party rights or legal provisions; the
-          Operator may refuse any file without justification.
+          returned nor exchanged (see “Returns”). The customer warrants that
+          they hold the rights to the files submitted and that printing them
+          does not infringe any third-party rights or legal provisions; the
+          Operator may refuse any file without justification. The customer
+          shall indemnify the Operator against any third-party claim arising
+          from their files. Files of weapons or weapon parts, counterfeits and
+          any unlawful object are in particular excluded.
         </p>
       ),
     },
@@ -541,8 +693,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           The statutory warranty for defects in the goods sold (Art. 197 et
           seq. of the Swiss Code of Obligations) applies for two years from
           delivery. The customer shall report any defect as soon as possible
-          to contact@swiss3design.ch, with supporting photos. The Operator
-          will, at its discretion, repair, replace or refund.
+          to contact@swiss3design.ch, with supporting photos. The Operator will
+          primarily offer repair or replacement; if this proves impossible or
+          disproportionate, the customer retains their statutory rights (price
+          reduction or refund).
         </p>
       ),
     },
@@ -555,7 +709,45 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           the amount of the order concerned. Unless expressly stated
           otherwise, 3D-printed objects are not intended for safety-related
           use, prolonged food contact or medical use, and are not toys for
-          children under 3 years of age.
+          children under 3 years of age. The foregoing limitations do not apply
+          where the law excludes any limitation, in particular in the event of
+          personal injury or under the Swiss Product Liability Act.
+        </p>
+      ),
+    },
+    {
+      title: "Intellectual property",
+      body: (
+        <p>
+          The contents of the site (texts, photographs, layout, visual
+          identity and the Swiss3Design logo) are protected and may not be
+          reproduced without authorisation. The sale concerns a physical
+          object: it grants the customer no rights in the underlying digital
+          3D models, nor any licence to reproduce, re-edit or resell in series.
+          The intellectual-property rights in the printed models remain
+          reserved to their respective holders.
+        </p>
+      ),
+    },
+    {
+      title: "Force majeure",
+      body: (
+        <p>
+          The Operator is not liable for delays or impediments resulting from
+          circumstances beyond its reasonable control (force majeure, failure
+          of a supplier or carrier, technical interruption, etc.). The affected
+          time limits are suspended for the duration of the event.
+        </p>
+      ),
+    },
+    {
+      title: "Severability",
+      body: (
+        <p>
+          If any provision of these GTC is void or unenforceable, the remaining
+          provisions remain valid; the provision concerned is replaced by a
+          valid rule whose effect comes as close as possible to the original
+          intent.
         </p>
       ),
     },
