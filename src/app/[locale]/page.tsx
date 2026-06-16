@@ -7,7 +7,7 @@ import { formatChf } from "@/lib/format";
 import { FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
 import { ProductCard } from "@/components/product-card";
 import { MulticolorDots } from "@/components/multicolor-dots";
-import { HeroPrint } from "@/components/hero-print";
+import { HeroScene } from "@/components/hero-scene";
 import { Reveal } from "@/components/reveal";
 
 export const dynamic = "force-dynamic";
@@ -78,10 +78,18 @@ export default async function HomePage({
             </div>
           </Reveal>
         </div>
-        <Reveal delay={0.15} className="hidden md:block">
-          {/* Scène produit thémée : le fond suit le thème, fini le pavé clair */}
-          <div className="relative overflow-hidden rounded-card border border-line bg-gradient-to-br from-surface to-paper p-6 shadow-xl shadow-ink/[0.06] ring-1 ring-line/60 dark:shadow-black/40">
-            <HeroPrint className="w-full text-ink" />
+        <Reveal delay={0.15}>
+          {/* Scène d'impression animée — thémée, fini le pavé clair figé */}
+          <div className="relative flex items-center justify-center overflow-hidden rounded-card border border-line bg-gradient-to-br from-surface to-paper p-4 shadow-xl shadow-ink/[0.06] ring-1 ring-line/60 dark:shadow-black/40 sm:p-6 md:min-h-[440px]">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 opacity-70"
+              style={{
+                backgroundImage:
+                  "radial-gradient(60% 60% at 50% 42%, color-mix(in srgb, var(--color-accent) 8%, transparent), transparent 70%)",
+              }}
+            />
+            <HeroScene className="relative w-full" />
           </div>
         </Reveal>
       </section>

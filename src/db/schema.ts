@@ -34,6 +34,9 @@ export const products = sqliteTable("products", {
   weightGrams: integer("weight_grams"),
   multicolor: integer("multicolor", { mode: "boolean" }).notNull().default(false),
   featured: integer("featured", { mode: "boolean" }).notNull().default(false),
+  // Rang dans la « Sélection du moment » (page d'accueil) : plus petit = plus
+  // tôt. Édité depuis l'admin /admin/featured ; ignoré si featured = false.
+  featuredOrder: integer("featured_order").notNull().default(0),
   active: integer("active", { mode: "boolean" }).notNull().default(true),
   // null = pas de suivi de stock (ex. à la demande) ; 0 = rupture
   stock: integer("stock"),

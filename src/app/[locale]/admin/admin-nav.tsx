@@ -3,6 +3,7 @@
 import {
   LayoutDashboard,
   Package,
+  Sparkles,
   Tags,
   Layers,
   ShoppingCart,
@@ -29,6 +30,7 @@ const groups: { title?: string; items: NavItem[] }[] = [
     title: "Catalogue",
     items: [
       { href: "/admin/products", label: "Produits", Icon: Package },
+      { href: "/admin/featured", label: "Sélection du moment", Icon: Sparkles },
       { href: "/admin/categories", label: "Catégories", Icon: Tags },
       { href: "/admin/materials", label: "Filaments & couleurs", Icon: Layers },
     ],

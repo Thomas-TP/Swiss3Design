@@ -149,11 +149,15 @@ export async function getProducts(
     )
     .where(and(...conditions))
     .orderBy(
-      opts.sort === "price_asc"
-        ? asc(products.priceCents)
-        : opts.sort === "price_desc"
-          ? desc(products.priceCents)
-          : desc(products.createdAt),
+      // La « Sélection du moment » suit l'ordre curé en admin (featuredOrder),
+      // les listes boutique le tri demandé, à défaut les nouveautés.
+      ...(opts.featuredOnly
+        ? [asc(products.featuredOrder), desc(products.createdAt)]
+        : opts.sort === "price_asc"
+          ? [asc(products.priceCents)]
+          : opts.sort === "price_desc"
+            ? [desc(products.priceCents)]
+            : [desc(products.createdAt)]),
     );
 
   return attachImagesAndColors(db, rows);

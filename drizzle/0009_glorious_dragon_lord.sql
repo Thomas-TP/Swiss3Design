@@ -1,0 +1,1 @@
+ALTER TABLE `products` ADD `featured_order` integer DEFAULT 0 NOT NULL;

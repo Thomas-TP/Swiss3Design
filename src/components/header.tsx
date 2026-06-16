@@ -1,6 +1,7 @@
 "use client";
 
 import { ShoppingBag, CircleUser, Heart } from "lucide-react";
+import { motion } from "motion/react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useCart } from "@/lib/cart";
@@ -11,6 +12,7 @@ import { LocaleSwitcher } from "./locale-switcher";
 import { ThemeToggle } from "./theme-toggle";
 
 const links = [
+  { href: "/", key: "home" },
   { href: "/shop", key: "shop" },
   { href: "/custom", key: "custom" },
 ] as const;
@@ -25,7 +27,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/80 backdrop-blur-lg">
-      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link href="/" className="flex items-center gap-2.5" aria-label="Swiss3Design">
           <BrandMark className="h-8 w-8 text-ink" />
           <span className="text-[17px] tracking-tight text-ink">
@@ -34,18 +36,30 @@ export function Header() {
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-8 md:flex">
-          {links.map(({ href, key }) => (
-            <Link
-              key={key}
-              href={href}
-              className={`text-sm font-medium transition-colors hover:text-ink ${
-                pathname.startsWith(href) ? "text-ink" : "text-soft"
-              }`}
-            >
-              {t(key)}
-            </Link>
-          ))}
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border border-line/70 bg-surface/60 p-1 backdrop-blur md:flex">
+          {links.map(({ href, key }) => {
+            const active =
+              href === "/" ? pathname === "/" : pathname.startsWith(href);
+            return (
+              <Link
+                key={key}
+                href={href}
+                aria-current={active ? "page" : undefined}
+                className={`relative rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                  active ? "text-ink" : "text-soft hover:text-ink"
+                }`}
+              >
+                {active && (
+                  <motion.span
+                    layoutId="nav-pill"
+                    transition={{ type: "spring", stiffness: 400, damping: 34 }}
+                    className="absolute inset-0 rounded-full bg-paper shadow-sm ring-1 ring-line"
+                  />
+                )}
+                <span className="relative">{t(key)}</span>
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="flex items-center gap-3">
