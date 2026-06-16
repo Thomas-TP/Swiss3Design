@@ -106,7 +106,8 @@ export function RegisterForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    // method="post" : repli natif sans JS qui n'expose pas le mot de passe en URL
+    <form method="post" onSubmit={onSubmit} className="space-y-4">
       <div>
         <label htmlFor="name" className="mb-1.5 block text-sm font-semibold">
           {t("name")}

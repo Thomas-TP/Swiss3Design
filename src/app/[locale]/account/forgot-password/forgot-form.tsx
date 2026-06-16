@@ -38,7 +38,8 @@ export function ForgotForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    // method="post" : repli natif sans JS (cohérence avec les autres formulaires)
+    <form method="post" onSubmit={onSubmit} className="space-y-4">
       <div>
         <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
           {t("email")}

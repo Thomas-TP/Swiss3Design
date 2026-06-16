@@ -12,6 +12,9 @@ const LIMITED_PREFIXES = [
   "/api/auth/reset-password",
   "/api/auth/send-verification-email",
   "/api/auth/change-password",
+  // Vérification 2FA : sans limite, le code TOTP à 6 chiffres (1 M de
+  // combinaisons) et les codes de secours seraient forçables par bruteforce.
+  "/api/auth/two-factor",
 ];
 
 async function handler(request: Request) {

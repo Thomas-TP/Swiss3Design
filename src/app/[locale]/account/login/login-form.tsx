@@ -125,7 +125,9 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-4">
+    // method="post" : si JS est indisponible, le repli natif n'envoie jamais le
+    // mot de passe dans l'URL (sinon GET par défaut → fuite via Referer/logs).
+    <form method="post" onSubmit={onSubmit} className="space-y-4">
       <div>
         <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
           {t("email")}
