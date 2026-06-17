@@ -25,6 +25,6 @@ if errorlevel 1 (
     echo ECHEC du push — verifiez votre connexion ou vos droits.
 ) else (
     echo.
-    echo Pousse ! Le deploiement en production demarre automatiquement (GitHub Actions).
+    echo Pousse ! Le deploiement en production demarre automatiquement (Cloudflare Workers Builds).
 )
 pause

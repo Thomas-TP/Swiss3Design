@@ -12,11 +12,11 @@ fabriqués à **Gland (VD)** et livrés dans toute la Suisse.
 
 🌐 **[swiss3design.ch](https://swiss3design.ch)**
 
-[![CI & Deploy](https://github.com/Thomas-TP/Swiss3Design/actions/workflows/deploy.yml/badge.svg)](https://github.com/Thomas-TP/Swiss3Design/actions/workflows/deploy.yml)
+[![Site en ligne](https://img.shields.io/website?url=https%3A%2F%2Fswiss3design.ch&label=swiss3design.ch&up_message=en%20ligne&down_message=hors%20ligne&color=E5231C)](https://swiss3design.ch)
 &nbsp;
 ![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=000)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38BDF8?logo=tailwindcss&logoColor=white)
 ![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)
 ![Stripe](https://img.shields.io/badge/Stripe-LIVE-635BFF?logo=stripe&logoColor=white)
@@ -117,7 +117,7 @@ Le **kit de marque** complet est versionné dans [`public/brand/`](public/brand)
 | --- | --- |
 | Framework | **Next.js 16** (App Router, React Server Components) |
 | UI | **React 19**, **Tailwind CSS 4**, [`motion`](https://motion.dev), `lucide-react` |
-| Langage | **TypeScript 5** (strict) |
+| Langage | **TypeScript 6** (strict) |
 | Base de données | **Cloudflare D1** (SQLite) via **Drizzle ORM** |
 | Authentification | **better-auth** (e-mail + Google OAuth) |
 | Paiement | **Stripe** (Payment Element + webhooks) |
@@ -146,7 +146,7 @@ Le **kit de marque** complet est versionné dans [`public/brand/`](public/brand)
 
 ```text
 Swiss3Design/
-├─ .github/workflows/deploy.yml   # CI/CD : build + migrations D1 + déploiement
+├─ docs/                          # Doc interne : architecture, conventions, déploiement
 ├─ drizzle/                       # Migrations SQL (drizzle-kit) + snapshots — NE PAS éditer à la main
 ├─ messages/                      # Traductions next-intl (fr, de, it, en)
 ├─ public/
@@ -175,6 +175,7 @@ Swiss3Design/
 ├─ open-next.config.ts            # Adaptateur Cloudflare (build webpack)
 ├─ wrangler.jsonc                 # Bindings Cloudflare (D1, R2, KV) + domaine
 ├─ drizzle.config.ts              # Config drizzle-kit
+├─ AGENTS.md                      # Guide pour agents IA (CLAUDE.md l'importe)
 └─ ROADMAP.md                     # Feuille de route
 ```
 
@@ -279,9 +280,9 @@ npm run db:migrate:local
 ```
 
 Les migrations sont stockées dans [`drizzle/`](drizzle) et **appliquées
-automatiquement à la base de production** par la CI à chaque push sur `main`
-(voir [Déploiement](#déploiement)). Ne jamais éditer un fichier de migration
-déjà appliqué.
+automatiquement à la base de production** par Cloudflare Workers Builds à chaque
+push sur `main` (voir [Déploiement](#déploiement)). Ne jamais éditer un fichier de
+migration déjà appliqué.
 
 ---
 
@@ -293,14 +294,18 @@ OpenNext).
 
 ### Automatique (recommandé)
 
-Tout push sur `main` déclenche [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml) :
+Le dépôt est connecté à **Cloudflare Workers Builds** (intégration Git native).
+Tout push sur `main` déclenche, côté Cloudflare et avec ses propres identifiants :
 
-1. `npm ci` puis build OpenNext (validation du code) ;
+1. build OpenNext (`opennextjs-cloudflare build`) ;
 2. application des **migrations D1** manquantes sur la base de production ;
 3. **déploiement** sur Cloudflare Workers.
 
-> Les étapes 2 et 3 ne s'exécutent que si le secret `CLOUDFLARE_API_TOKEN` est
-> présent dans les *GitHub Secrets*. Sans lui, seule la validation du build tourne.
+> Il n'y a **plus de workflow GitHub Actions** : le statut de déploiement est porté
+> par le *check* « Cloudflare Workers Builds » sur le commit (vert = build **et**
+> deploy réussis ; rouge = l'ancienne version reste en ligne, rien n'est cassé).
+> Détails et procédure de (re)connexion Git :
+> [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
 
 Pour publier en un clic : double-cliquer sur [`scripts/push.bat`](scripts/push.bat)
 (commit + push), et la mise en production démarre automatiquement.
