@@ -356,13 +356,18 @@ reflétée dans l'URL (`/fr`, `/de`, `/it`, `/en`). Les traductions vivent dans
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contributeurs | Mise en route & conventions |
 | [`SECURITY.md`](SECURITY.md) | Sécurité | Signalement de vulnérabilité |
 | [`ROADMAP.md`](ROADMAP.md) | Produit | État du projet & suite envisagée |
+| [`LICENSE.md`](LICENSE.md) | Légal | Propriété & interdictions (tous droits réservés) |
 
 ## Propriété & licences
 
-Projet **privé** — © 2026 Swiss3Design. Tous droits réservés.
+Projet **privé** — © 2026 Swiss3Design. **Tous droits réservés.** Aucune reprise,
+modification, redistribution ou contribution externe n'est autorisée — voir
+[`LICENSE.md`](LICENSE.md).
 
-Les modèles 3D proposés à la vente sont des **produits tiers sous licence** ; chaque
-licence doit autoriser la vente d'impressions physiques.
+Les modèles 3D proposés à la vente sont des **produits tiers sous licence** (libres
+pour un usage commercial) : ils **n'appartiennent pas** à Swiss3Design et restent
+soumis à la licence de leurs auteurs ; chacune doit autoriser la vente
+d'impressions physiques.
 
 <div align="center">
 
