@@ -32,6 +32,9 @@ export const products = sqliteTable("products", {
   material: text("material").notNull().default("PLA"),
   dimensionsMm: text("dimensions_mm"),
   weightGrams: integer("weight_grams"),
+  // Clé R2 d'un modèle 3D (.stl ou .glb) affiché dans le viewer interactif de
+  // la fiche produit (teinté dans chaque couleur proposée). null = pas de 3D.
+  model3dUrl: text("model_3d_url"),
   multicolor: integer("multicolor", { mode: "boolean" }).notNull().default(false),
   featured: integer("featured", { mode: "boolean" }).notNull().default(false),
   // Rang dans la « Sélection du moment » (page d'accueil) : plus petit = plus
@@ -220,6 +223,37 @@ export const orderItems = sqliteTable(
   (t) => [index("order_items_order_idx").on(t.orderId)],
 );
 
+// ── Avis produits ────────────────────────────────────────────────────────────
+
+// Avis client : ouverts UNIQUEMENT pour un produit présent dans une commande
+// LIVRÉE de l'auteur (acheteur vérifié, contrôlé côté serveur). Modérés avant
+// publication (status). Le nom affiché est un snapshot du nom du compte.
+export const reviews = sqliteTable(
+  "reviews",
+  {
+    id: uuid(),
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    orderId: text("order_id")
+      .notNull()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    customerId: text("customer_id"), // utilisateur Better Auth (auteur)
+    authorName: text("author_name").notNull(),
+    rating: integer("rating").notNull(), // 1–5
+    body: text("body"),
+    status: text("status", { enum: ["pending", "published", "rejected"] })
+      .notNull()
+      .default("pending"),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("reviews_product_idx").on(t.productId),
+    // Un seul avis par (commande, produit) : empêche les doublons.
+    uniqueIndex("reviews_order_product_unique").on(t.orderId, t.productId),
+  ],
+);
+
 // ── Devis sur mesure ─────────────────────────────────────────────────────────
 
 export const quoteRequests = sqliteTable("quote_requests", {
@@ -306,6 +340,30 @@ export const discountCodes = sqliteTable("discount_codes", {
   expiresAt: integer("expires_at", { mode: "timestamp" }), // null = sans expiration
   createdAt: createdAt(),
 });
+
+// ── Panier abandonné (relance e-mail, opt-in nLPD) ───────────────────────────
+
+// Relance de panier : enregistrée UNIQUEMENT sur consentement EXPLICITE du
+// client (case à cocher décochée par défaut, au panier). `token` permet la
+// désinscription en un clic (retrait du consentement). Une seule relance par
+// panier (reminderSentAt). Purge à 30 jours = minimisation des données (nLPD).
+export const abandonedCarts = sqliteTable(
+  "abandoned_carts",
+  {
+    id: uuid(),
+    email: text("email").notNull(),
+    token: text("token").notNull().unique(),
+    itemsJson: text("items_json").notNull(), // snapshot affiché dans l'e-mail
+    subtotalCents: integer("subtotal_cents").notNull(),
+    locale: text("locale", { enum: LOCALES }).notNull().default("fr"),
+    consentAt: integer("consent_at", { mode: "timestamp" }).notNull(),
+    reminderSentAt: integer("reminder_sent_at", { mode: "timestamp" }),
+    recoveredAt: integer("recovered_at", { mode: "timestamp" }), // commande passée
+    unsubscribedAt: integer("unsubscribed_at", { mode: "timestamp" }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("abandoned_carts_email_idx").on(t.email)],
+);
 
 // ── Auth (Better Auth) ───────────────────────────────────────────────────────
 

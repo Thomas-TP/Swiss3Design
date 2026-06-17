@@ -71,6 +71,27 @@
       "when": 1781552200374,
       "tag": "0009_glorious_dragon_lord",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1781718419896,
+      "tag": "0010_stormy_xorn",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "6",
+      "when": 1781719979220,
+      "tag": "0011_brave_random",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "6",
+      "when": 1781720552570,
+      "tag": "0012_bright_valkyrie",
+      "breakpoints": true
     }
   ]
 }

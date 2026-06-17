@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { cfImage } from "@/lib/cf-image";
 
 interface GalleryImage {
   url: string;
@@ -24,8 +25,10 @@ export function ProductGallery({
         {current && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={current.url}
+            src={cfImage(current.url, { width: 1200 })}
             alt={current.alt ?? name}
+            decoding="async"
+            fetchPriority="high"
             className="aspect-square w-full object-cover"
           />
         )}
@@ -45,8 +48,10 @@ export function ProductGallery({
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={img.url}
+                src={cfImage(img.url, { width: 200 })}
                 alt=""
+                loading="lazy"
+                decoding="async"
                 className="aspect-square w-full object-cover"
               />
             </button>

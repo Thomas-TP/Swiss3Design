@@ -6,6 +6,7 @@ import { Link } from "@/i18n/navigation";
 import { useCart } from "@/lib/cart";
 import { formatChf } from "@/lib/format";
 import { shippingFor, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
+import { CartReminder } from "@/components/cart-reminder";
 
 export default function CartPage() {
   const t = useTranslations("cart");
@@ -182,6 +183,8 @@ export default function CartPage() {
             {t("checkout")}
             <ArrowRight size={16} />
           </Link>
+
+          <CartReminder />
         </aside>
       </div>
     </div>

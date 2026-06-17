@@ -1,7 +1,10 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { eq, inArray, isNotNull, lt } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lt } from "drizzle-orm";
 import { getDb } from "@/db";
-import { quoteRequests } from "@/db/schema";
+import { quoteRequests, abandonedCarts } from "@/db/schema";
+import { sendEmail } from "./email";
+import { abandonedCartEmail } from "./email-templates";
+import { SITE_URL } from "./seo";
 
 // Rétention (politique de confidentialité) : fichiers/devis supprimés au plus
 // tard 2 ans après la demande. On garde la ligne pour les devis payés/produits
@@ -12,10 +15,17 @@ const ORPHAN_GRACE_MS = 24 * 60 * 60 * 1000;
 // Statuts dont la ligne de devis peut être entièrement supprimée après 2 ans
 const DELETABLE_STATUSES = ["received", "quoted", "rejected"];
 
+// Relance panier : envoyée 1 h après le consentement (laisse le temps de
+// finaliser), une seule fois. Purge des paniers à 30 jours (minimisation nLPD).
+const ABANDONED_REMINDER_DELAY_MS = 60 * 60 * 1000;
+const ABANDONED_PURGE_MS = 30 * 24 * 60 * 60 * 1000;
+
 export interface MaintenanceReport {
   retentionFilesDeleted: number;
   quotesDeleted: number;
   orphansDeleted: number;
+  cartRemindersSent: number;
+  abandonedCartsPurged: number;
 }
 
 export async function runMaintenance(): Promise<MaintenanceReport> {
@@ -91,9 +101,60 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
     cursor = listing.truncated ? listing.cursor : undefined;
   } while (cursor);
 
+  // 3) Relance des paniers abandonnés (opt-in) : 1 h après le consentement, une
+  //    seule fois, sauf si déjà récupéré (commande) ou désinscrit.
+  const reminderCutoff = new Date(now - ABANDONED_REMINDER_DELAY_MS);
+  const pendingCarts = await db
+    .select()
+    .from(abandonedCarts)
+    .where(
+      and(
+        isNull(abandonedCarts.reminderSentAt),
+        isNull(abandonedCarts.recoveredAt),
+        isNull(abandonedCarts.unsubscribedAt),
+        lt(abandonedCarts.consentAt, reminderCutoff),
+      ),
+    );
+
+  let cartRemindersSent = 0;
+  for (const c of pendingCarts) {
+    try {
+      const items = JSON.parse(c.itemsJson) as {
+        name: string;
+        quantity: number;
+        priceCents: number;
+      }[];
+      await sendEmail(
+        abandonedCartEmail({
+          to: c.email,
+          items,
+          locale: c.locale,
+          cartUrl: `${SITE_URL}/${c.locale}/cart`,
+          unsubscribeUrl: `${SITE_URL}/api/cart-reminder/unsubscribe?token=${c.token}`,
+        }),
+      );
+      await db
+        .update(abandonedCarts)
+        .set({ reminderSentAt: new Date() })
+        .where(eq(abandonedCarts.id, c.id));
+      cartRemindersSent++;
+    } catch {
+      // échec d'envoi : reminderSentAt non posé → réessayé au prochain passage
+    }
+  }
+
+  // 4) Purge des paniers abandonnés de plus de 30 jours (minimisation nLPD)
+  const cartPurgeCutoff = new Date(now - ABANDONED_PURGE_MS);
+  const purgedCarts = await db
+    .delete(abandonedCarts)
+    .where(lt(abandonedCarts.createdAt, cartPurgeCutoff))
+    .returning({ id: abandonedCarts.id });
+
   return {
     retentionFilesDeleted,
     quotesDeleted: rowsToDelete.length,
     orphansDeleted,
+    cartRemindersSent,
+    abandonedCartsPurged: purgedCarts.length,
   };
 }

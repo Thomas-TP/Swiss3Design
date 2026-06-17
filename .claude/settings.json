@@ -23,6 +23,7 @@
       "Bash(git pull:*)",
       "Bash(git branch:*)",
       "Bash(git checkout:*)",
+      "Bash(git ls-files:*)",
       "PowerShell(git status:*)",
       "PowerShell(git diff:*)",
       "PowerShell(git log:*)",
@@ -33,7 +34,19 @@
       "PowerShell(git fetch:*)",
       "PowerShell(git pull:*)",
       "PowerShell(npm run lint)",
-      "PowerShell(npm run build)"
+      "PowerShell(npm run build)",
+      "PowerShell(git ls-files:*)",
+      "PowerShell(git branch:*)",
+      "PowerShell(git checkout:*)",
+      "PowerShell(npm run dev)",
+      "PowerShell(npm run preview)",
+      "PowerShell(npm run cf-typegen)",
+      "PowerShell(npm run db:generate)",
+      "PowerShell(npm run db:migrate:local)",
+      "PowerShell(npm run db:seed:local)",
+      "PowerShell(npm ci)",
+      "PowerShell(npm install)",
+      "PowerShell(npx drizzle-kit:*)"
     ],
     "deny": [
       "Bash(npm run deploy)",

@@ -1,4 +1,15 @@
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import {
+  and,
+  asc,
+  desc,
+  eq,
+  inArray,
+  like,
+  ne,
+  notInArray,
+  or,
+  sql,
+} from "drizzle-orm";
 import { getDb } from "./index";
 import {
   products,
@@ -12,6 +23,7 @@ import {
   productCategories,
   materials,
   settings,
+  reviews,
 } from "./schema";
 import type { Locale } from "@/i18n/routing";
 
@@ -95,6 +107,7 @@ export async function getProducts(
     color?: string;
     multicolor?: boolean;
     sort?: ProductSort;
+    q?: string;
   } = {},
 ): Promise<ProductListItem[]> {
   const db = await getDb();
@@ -103,6 +116,21 @@ export async function getProducts(
   if (opts.featuredOnly) conditions.push(eq(products.featured, true));
   if (opts.material) conditions.push(eq(products.material, opts.material));
   if (opts.multicolor) conditions.push(eq(products.multicolor, true));
+
+  // Recherche plein-texte simple sur le nom + la description traduits. On
+  // neutralise les jokers LIKE (% _) saisis par l'utilisateur. Insensible à la
+  // casse pour l'ASCII (comportement LIKE de SQLite).
+  if (opts.q) {
+    const term = opts.q.trim().replace(/[%_]/g, "");
+    if (term) {
+      const pattern = `%${term}%`;
+      const match = or(
+        like(productTranslations.name, pattern),
+        like(productTranslations.description, pattern),
+      );
+      if (match) conditions.push(match);
+    }
+  }
 
   if (opts.categorySlug) {
     const rows = await db
@@ -298,6 +326,7 @@ export async function getProductBySlug(slug: string, locale: Locale) {
       material: products.material,
       dimensionsMm: products.dimensionsMm,
       weightGrams: products.weightGrams,
+      model3dUrl: products.model3dUrl,
       multicolor: products.multicolor,
       stock: products.stock,
       name: productTranslations.name,
@@ -343,6 +372,73 @@ export async function getProductBySlug(slug: string, locale: Locale) {
 }
 
 // IDs des couleurs cochées pour un produit (pré-remplissage du formulaire admin).
+// Produits « Vous aimerez aussi » : d'abord ceux partageant une catégorie avec
+// le produit courant (hors lui-même), complétés par les nouveautés si besoin.
+export async function getRelatedProducts(
+  productId: string,
+  locale: Locale,
+  limit = 4,
+): Promise<ProductListItem[]> {
+  const db = await getDb();
+
+  const cols = {
+    id: products.id,
+    slug: products.slug,
+    priceCents: products.priceCents,
+    saleType: products.saleType,
+    productionDays: products.productionDays,
+    material: products.material,
+    multicolor: products.multicolor,
+    stock: products.stock,
+    name: productTranslations.name,
+    description: productTranslations.description,
+  };
+  const withTranslation = and(
+    eq(productTranslations.productId, products.id),
+    eq(productTranslations.locale, locale),
+  );
+
+  const catRows = await db
+    .select({ categoryId: productCategories.categoryId })
+    .from(productCategories)
+    .where(eq(productCategories.productId, productId));
+  const catIds = catRows.map((c) => c.categoryId);
+
+  let rows: Omit<ProductListItem, "imageUrl" | "imageAlt" | "colors">[] = [];
+
+  if (catIds.length > 0) {
+    rows = await db
+      .selectDistinct(cols)
+      .from(products)
+      .innerJoin(productTranslations, withTranslation)
+      .innerJoin(productCategories, eq(productCategories.productId, products.id))
+      .where(
+        and(
+          eq(products.active, true),
+          ne(products.id, productId),
+          inArray(productCategories.categoryId, catIds),
+        ),
+      )
+      .orderBy(desc(products.createdAt))
+      .limit(limit);
+  }
+
+  // Complète avec les nouveautés (hors produit courant et déjà sélectionnés).
+  if (rows.length < limit) {
+    const exclude = [productId, ...rows.map((r) => r.id)];
+    const fillers = await db
+      .select(cols)
+      .from(products)
+      .innerJoin(productTranslations, withTranslation)
+      .where(and(eq(products.active, true), notInArray(products.id, exclude)))
+      .orderBy(desc(products.createdAt))
+      .limit(limit - rows.length);
+    rows = [...rows, ...fillers];
+  }
+
+  return attachImagesAndColors(db, rows);
+}
+
 export async function getProductColorIds(productId: string): Promise<string[]> {
   const db = await getDb();
   const rows = await db
@@ -372,8 +468,83 @@ export async function getCategories(locale: Locale) {
     .orderBy(asc(categories.sortOrder));
 }
 
+// Slugs des produits actifs pour le sitemap : lecture légère (ni traduction ni
+// jointure d'images). Relue à chaque requête du sitemap (route force-dynamic),
+// donc toujours à jour à la création/suppression d'un produit.
+export async function getSitemapProducts(): Promise<
+  { slug: string; createdAt: Date }[]
+> {
+  const db = await getDb();
+  return db
+    .select({ slug: products.slug, createdAt: products.createdAt })
+    .from(products)
+    .where(eq(products.active, true))
+    .orderBy(desc(products.createdAt));
+}
+
 export async function getSetting(key: string): Promise<string | null> {
   const db = await getDb();
   const rows = await db.select().from(settings).where(eq(settings.key, key)).limit(1);
   return rows[0]?.value ?? null;
+}
+
+// ── Avis produits ────────────────────────────────────────────────────────────
+
+export interface ReviewItem {
+  id: string;
+  authorName: string;
+  rating: number;
+  body: string | null;
+  createdAt: Date;
+}
+
+// Avis publiés d'un produit (les plus récents d'abord).
+export async function getPublishedReviews(
+  productId: string,
+): Promise<ReviewItem[]> {
+  const db = await getDb();
+  return db
+    .select({
+      id: reviews.id,
+      authorName: reviews.authorName,
+      rating: reviews.rating,
+      body: reviews.body,
+      createdAt: reviews.createdAt,
+    })
+    .from(reviews)
+    .where(
+      and(eq(reviews.productId, productId), eq(reviews.status, "published")),
+    )
+    .orderBy(desc(reviews.createdAt));
+}
+
+// Synthèse de notation (avis publiés) pour l'affichage + le JSON-LD AggregateRating.
+export async function getRatingSummary(
+  productId: string,
+): Promise<{ count: number; average: number }> {
+  const db = await getDb();
+  const [row] = await db
+    .select({
+      count: sql<number>`count(*)`,
+      average: sql<number>`avg(${reviews.rating})`,
+    })
+    .from(reviews)
+    .where(
+      and(eq(reviews.productId, productId), eq(reviews.status, "published")),
+    );
+  const count = Number(row?.count ?? 0);
+  return { count, average: count > 0 ? Number(row?.average ?? 0) : 0 };
+}
+
+// IDs des produits déjà notés pour une commande (tout statut) : masque le
+// formulaire d'avis une fois soumis.
+export async function getReviewedProductIds(
+  orderId: string,
+): Promise<string[]> {
+  const db = await getDb();
+  const rows = await db
+    .select({ productId: reviews.productId })
+    .from(reviews)
+    .where(eq(reviews.orderId, orderId));
+  return rows.map((r) => r.productId);
 }

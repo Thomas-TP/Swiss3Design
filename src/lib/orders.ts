@@ -7,6 +7,7 @@ import {
   productVariants,
   inventoryLog,
   quoteRequests,
+  abandonedCarts,
 } from "@/db/schema";
 import { sendEmail, getAdminEmails } from "./email";
 import { incrementDiscountUse } from "./discounts";
@@ -163,6 +164,17 @@ export async function markOrderPaid(db: Db, orderId: string) {
     }
   } catch (e) {
     console.error("[email notif admin commande]", e);
+  }
+
+  // La commande est passée → on neutralise toute relance de panier pour cet
+  // e-mail (les e-mails de relance sont stockés en minuscules).
+  try {
+    await db
+      .update(abandonedCarts)
+      .set({ recoveredAt: new Date() })
+      .where(eq(abandonedCarts.email, order.email.toLowerCase()));
+  } catch (e) {
+    console.error("[panier abandonné — récupération]", e);
   }
 }
 

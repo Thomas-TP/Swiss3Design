@@ -9,6 +9,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 # Swiss3Design — Agent guide
 
 > Operational brief for AI coding agents. Keep it short and high-signal.
+> **Need to locate code? Read [`docs/codemap.md`](docs/codemap.md) first** — it maps
+> "I need to do X" → exact file(s), so you find things in one read instead of grepping.
 > Deep references: [`docs/architecture.md`](docs/architecture.md) ·
 > [`docs/conventions.md`](docs/conventions.md) ·
 > [`docs/playbook.md`](docs/playbook.md) ·
@@ -71,6 +73,9 @@ LIVE mode** — treat checkout/webhook code as production-critical.
 ```bash
 npm run dev               # dev server :3000 (loads D1/R2/KV bindings via OpenNext)
 npm run lint              # ESLint (run before declaring a change done)
+npm run typecheck         # tsc --noEmit — fast type check (no heavy OpenNext build)
+npm run test              # Vitest (unit tests for pure domain logic in src/lib)
+npm run format            # Prettier --write (format:check to verify only)
 npm run preview           # OpenNext build + local Workers preview — tests prod CSP/nonce
 npm run deploy            # OpenNext build + deploy from local machine (manual)
 npm run cf-typegen        # regenerate cloudflare-env.d.ts after editing wrangler.jsonc

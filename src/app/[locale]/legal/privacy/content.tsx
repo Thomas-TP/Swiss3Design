@@ -45,9 +45,25 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           envoi des e-mails transactionnels (confirmation, expédition, devis,
           sécurité du compte), respect des obligations légales (conservation
           comptable) et prévention des abus. Aucune donnée n’est vendue ni
-          utilisée à des fins publicitaires. Nous n’envoyons aucun e-mail
-          publicitaire ou de marketing ; seuls des e-mails transactionnels
-          liés à vos commandes et à votre compte vous sont adressés.
+          utilisée à des fins publicitaires. À la seule exception d’un rappel
+          de panier que vous auriez <strong>expressément demandé</strong> (voir
+          ci-dessous), nous n’envoyons aucun e-mail publicitaire : les autres
+          e-mails sont strictement transactionnels (commandes, compte).
+        </p>
+      ),
+    },
+    {
+      title: "Rappel de panier (sur consentement)",
+      body: (
+        <p>
+          Si — et seulement si — vous le demandez explicitement en cochant la
+          case prévue dans le panier, nous conservons votre adresse e-mail et le
+          contenu de votre panier pour vous envoyer <strong>un seul</strong>{" "}
+          rappel lorsque vous n’avez pas finalisé votre commande. La base légale
+          est votre <strong>consentement</strong>, que vous pouvez retirer à
+          tout moment via le lien de désinscription présent dans cet e-mail. Ces
+          données sont supprimées dès la commande passée, dès la désinscription,
+          et au plus tard <strong>30 jours</strong> après leur enregistrement.
         </p>
       ),
     },
@@ -181,10 +197,26 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Kundenkontos, Versand von Transaktions-E-Mails (Bestätigung,
           Versand, Offerte, Kontosicherheit), Erfüllung gesetzlicher Pflichten
           (buchhalterische Aufbewahrung) und Missbrauchsprävention. Es werden
-          keine Daten verkauft oder zu Werbezwecken verwendet. Wir versenden
-          keine Werbe- oder Marketing-E-Mails; Sie erhalten ausschliesslich
-          Transaktions-E-Mails im Zusammenhang mit Ihren Bestellungen und
-          Ihrem Konto.
+          keine Daten verkauft oder zu Werbezwecken verwendet. Mit alleiniger
+          Ausnahme einer Warenkorb-Erinnerung, die Sie{" "}
+          <strong>ausdrücklich angefordert</strong> haben (siehe unten),
+          versenden wir keine Werbe-E-Mails; alle übrigen E-Mails sind rein
+          transaktionsbezogen (Bestellungen, Konto).
+        </p>
+      ),
+    },
+    {
+      title: "Warenkorb-Erinnerung (mit Einwilligung)",
+      body: (
+        <p>
+          Nur wenn Sie dies im Warenkorb ausdrücklich durch Ankreuzen des
+          entsprechenden Felds verlangen, speichern wir Ihre E-Mail-Adresse und
+          den Inhalt Ihres Warenkorbs, um Ihnen <strong>eine einzige</strong>{" "}
+          Erinnerung zu senden, falls Sie Ihre Bestellung nicht abgeschlossen
+          haben. Rechtsgrundlage ist Ihre <strong>Einwilligung</strong>, die
+          Sie jederzeit über den Abmeldelink in dieser E-Mail widerrufen können.
+          Diese Daten werden bei Bestellung, bei Abmeldung und spätestens nach{" "}
+          <strong>30 Tagen</strong> gelöscht.
         </p>
       ),
     },
@@ -317,10 +349,26 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           cliente, invio delle e-mail transazionali (conferma, spedizione,
           preventivo, sicurezza del conto), rispetto degli obblighi legali
           (conservazione contabile) e prevenzione degli abusi. Nessun dato
-          viene venduto né utilizzato a fini pubblicitari. Non inviamo alcuna
-          e-mail pubblicitaria o di marketing; vi vengono inviate
-          esclusivamente e-mail transazionali relative ai vostri ordini e al
-          vostro conto.
+          viene venduto né utilizzato a fini pubblicitari. Con la sola
+          eccezione di un promemoria del carrello che abbiate{" "}
+          <strong>espressamente richiesto</strong> (vedi sotto), non inviamo
+          alcuna e-mail pubblicitaria; le altre e-mail sono strettamente
+          transazionali (ordini, conto).
+        </p>
+      ),
+    },
+    {
+      title: "Promemoria del carrello (con consenso)",
+      body: (
+        <p>
+          Solo se lo richiedete esplicitamente spuntando l’apposita casella nel
+          carrello, conserviamo il vostro indirizzo e-mail e il contenuto del
+          carrello per inviarvi <strong>un solo</strong> promemoria se non avete
+          completato l’ordine. La base giuridica è il vostro{" "}
+          <strong>consenso</strong>, che potete revocare in qualsiasi momento
+          tramite il link di disiscrizione presente nell’e-mail. Questi dati
+          vengono eliminati al momento dell’ordine, alla disiscrizione e al più
+          tardi dopo <strong>30 giorni</strong>.
         </p>
       ),
     },
@@ -453,9 +501,24 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           transactional e-mails (confirmation, shipping, quotes, account
           security), complying with legal obligations (accounting retention)
           and preventing abuse. No data is sold or used for advertising
-          purposes. We do not send any advertising or marketing e-mails; you
-          only receive transactional e-mails relating to your orders and your
-          account.
+          purposes. With the sole exception of a cart reminder you have{" "}
+          <strong>explicitly requested</strong> (see below), we do not send any
+          advertising e-mails; all other e-mails are strictly transactional
+          (orders, account).
+        </p>
+      ),
+    },
+    {
+      title: "Cart reminders (with consent)",
+      body: (
+        <p>
+          Only if you explicitly request it by ticking the dedicated box in the
+          cart do we keep your e-mail address and cart contents to send you{" "}
+          <strong>a single</strong> reminder if you have not completed your
+          order. The legal basis is your <strong>consent</strong>, which you can
+          withdraw at any time via the unsubscribe link in that e-mail. This
+          data is deleted once the order is placed, upon unsubscribing, and at
+          the latest after <strong>30 days</strong>.
         </p>
       ),
     },

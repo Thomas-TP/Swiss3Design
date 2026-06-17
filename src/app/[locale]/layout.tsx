@@ -10,6 +10,7 @@ import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
 import { Footer } from "@/components/footer";
 import { ThemeManager } from "@/components/theme-manager";
+import { organizationJsonLd } from "@/lib/seo";
 import "../globals.css";
 
 const geist = Geist({
@@ -107,6 +108,14 @@ export default async function LocaleLayout({
           nonce={nonce}
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;var r=document.documentElement;r.classList.toggle('dark',d);r.style.colorScheme=d?'dark':'light';}catch(e){}})();`,
+          }}
+        />
+        {/* Données structurées de l'entreprise (Organization) — rich results. */}
+        <script
+          type="application/ld+json"
+          nonce={nonce}
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(organizationJsonLd()),
           }}
         />
         <ThemeManager />

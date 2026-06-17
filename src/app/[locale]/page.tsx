@@ -9,8 +9,19 @@ import { ProductCard } from "@/components/product-card";
 import { MulticolorDots } from "@/components/multicolor-dots";
 import { HeroScene } from "@/components/hero-scene";
 import { Reveal } from "@/components/reveal";
+import type { Metadata } from "next";
+import { alternatesFor } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  return { alternates: alternatesFor(locale, "") };
+}
 
 export default async function HomePage({
   params,

@@ -25,7 +25,11 @@ export async function POST(request: Request) {
       undefined,
       stripeCryptoProvider,
     );
-  } catch {
+  } catch (err) {
+    console.error(
+      "[stripe webhook] signature invalide",
+      err instanceof Error ? err.message : err,
+    );
     return new Response("Invalid signature", { status: 400 });
   }
 
@@ -37,21 +41,36 @@ export async function POST(request: Request) {
     const orderId = paymentIntent.metadata?.orderId;
     const quoteId = paymentIntent.metadata?.quoteId;
     const succeeded = event.type === "payment_intent.succeeded";
-    if (orderId) {
-      const db = await getDb();
-      if (succeeded) {
-        await markOrderPaid(db, orderId);
-      } else {
-        await db
-          .update(orders)
-          .set({ status: "cancelled" })
-          .where(eq(orders.id, orderId));
+    try {
+      if (orderId) {
+        const db = await getDb();
+        if (succeeded) {
+          await markOrderPaid(db, orderId);
+        } else {
+          await db
+            .update(orders)
+            .set({ status: "cancelled" })
+            .where(eq(orders.id, orderId));
+        }
       }
-    }
-    // Paiement d'un devis chiffré
-    if (quoteId && succeeded) {
-      const db = await getDb();
-      await markQuotePaid(db, quoteId);
+      // Paiement d'un devis chiffré
+      if (quoteId && succeeded) {
+        const db = await getDb();
+        await markQuotePaid(db, quoteId);
+      }
+    } catch (err) {
+      // Échec de finalisation (D1, etc.) après encaissement : on journalise
+      // avec contexte (capté par l'Observability Cloudflare) et on renvoie 500
+      // → Stripe réessaiera la livraison du webhook. La finalisation étant
+      // idempotente, le rejeu reprend là où il s'est arrêté sans double effet.
+      console.error("[stripe webhook] échec de finalisation", {
+        eventType: event.type,
+        eventId: event.id,
+        orderId,
+        quoteId,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      return new Response("Webhook handler error", { status: 500 });
     }
   }
 

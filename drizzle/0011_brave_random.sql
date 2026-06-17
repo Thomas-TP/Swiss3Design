@@ -1,0 +1,1 @@
+ALTER TABLE `products` ADD `model_3d_url` text;

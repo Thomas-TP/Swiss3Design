@@ -1,10 +1,23 @@
+import type { Metadata } from "next";
+import { Search } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getUsedFilters, getProducts, type ProductSort } from "@/db/queries";
+import { alternatesFor } from "@/lib/seo";
 import { ProductCard } from "@/components/product-card";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "shop" });
+  return { title: t("title"), alternates: alternatesFor(locale, "/shop") };
+}
 
 const SORTS: ProductSort[] = ["new", "price_asc", "price_desc"];
 
@@ -25,10 +38,13 @@ export default async function ShopPage({
     color?: string;
     multicolor?: string;
     sort?: string;
+    q?: string;
   }>;
 }) {
   const { locale } = await params;
-  const { category, material, color, multicolor, sort } = await searchParams;
+  const { category, material, color, multicolor, sort, q } =
+    await searchParams;
+  const searchParam = q?.trim() || undefined;
   const multicolorOn = multicolor === "1";
   // Le filtre multicolore n'apparaît que si un produit l'utilise — ou s'il est
   // déjà actif, pour pouvoir le désélectionner.
@@ -37,6 +53,10 @@ export default async function ShopPage({
     : "new";
   const sortParam = activeSort === "new" ? undefined : activeSort;
   const multicolorParam = multicolorOn ? "1" : undefined;
+
+  // Tous les liens de filtre conservent la recherche courante (?q=).
+  const linkFor = (query: Parameters<typeof hrefFor>[0]) =>
+    hrefFor({ ...query, q: searchParam });
 
   const [t, filters, products] = await Promise.all([
     getTranslations("shop"),
@@ -47,6 +67,7 @@ export default async function ShopPage({
       color,
       multicolor: multicolorOn,
       sort: activeSort,
+      q: searchParam,
     }),
   ]);
 
@@ -73,9 +94,32 @@ export default async function ShopPage({
 
       {/* Barre de filtres groupée */}
       <div className="mt-8 rounded-card border border-line bg-surface/60 p-3 backdrop-blur-sm sm:p-4">
+        {/* Recherche : formulaire GET (sans JS) ; les filtres actifs sont
+            conservés via des champs cachés. */}
+        <form action={`/${locale}/shop`} className="relative mb-3">
+          <Search
+            size={16}
+            className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-soft"
+          />
+          <input
+            type="search"
+            name="q"
+            defaultValue={searchParam ?? ""}
+            placeholder={t("searchPlaceholder")}
+            aria-label={t("searchPlaceholder")}
+            className="w-full rounded-full border border-line bg-paper py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-soft/50"
+          />
+          {category && <input type="hidden" name="category" value={category} />}
+          {material && <input type="hidden" name="material" value={material} />}
+          {color && <input type="hidden" name="color" value={color} />}
+          {multicolorParam && (
+            <input type="hidden" name="multicolor" value={multicolorParam} />
+          )}
+          {sortParam && <input type="hidden" name="sort" value={sortParam} />}
+        </form>
         <div className="flex flex-wrap gap-2">
           <Link
-            href={hrefFor({ material, color, multicolor: multicolorParam, sort: sortParam })}
+            href={linkFor({ material, color, multicolor: multicolorParam, sort: sortParam })}
             className={chip(!category)}
           >
             {t("all")}
@@ -83,7 +127,7 @@ export default async function ShopPage({
           {filters.categories.map((c) => (
             <Link
               key={c.id}
-              href={hrefFor({
+              href={linkFor({
                 category: c.slug,
                 material,
                 color,
@@ -103,7 +147,7 @@ export default async function ShopPage({
           {filters.materials.map((m) => (
             <Link
               key={m}
-              href={hrefFor({
+              href={linkFor({
                 category,
                 material: material === m ? undefined : m,
                 color,
@@ -117,7 +161,7 @@ export default async function ShopPage({
           ))}
           {(filters.multicolor || multicolorOn) && (
             <Link
-              href={hrefFor({
+              href={linkFor({
                 category,
                 material,
                 color,
@@ -141,7 +185,7 @@ export default async function ShopPage({
               return (
                 <Link
                   key={c.name}
-                  href={hrefFor({
+                  href={linkFor({
                     category,
                     material,
                     color: active ? undefined : c.name,
@@ -172,7 +216,7 @@ export default async function ShopPage({
               {SORTS.map((s) => (
                 <Link
                   key={s}
-                  href={hrefFor({
+                  href={linkFor({
                     category,
                     material,
                     color,

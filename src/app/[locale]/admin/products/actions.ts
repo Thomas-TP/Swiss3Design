@@ -146,6 +146,7 @@ export async function saveProduct(
     material: String(formData.get("material") || "PLA").trim() || "PLA",
     dimensionsMm: String(formData.get("dimensionsMm") || "").trim() || null,
     weightGrams: weightRaw ? Number.parseInt(weightRaw, 10) || null : null,
+    model3dUrl: String(formData.get("model3dUrl") || "").trim() || null,
     multicolor: formData.get("multicolor") === "on",
     featured: formData.get("featured") === "on",
     active: formData.get("active") === "on",

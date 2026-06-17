@@ -10,6 +10,7 @@ import {
   FileText,
   Ticket,
   Users,
+  Star,
   Mail,
   Settings,
   type LucideIcon,
@@ -45,7 +46,10 @@ const groups: { title?: string; items: NavItem[] }[] = [
   },
   {
     title: "Clients",
-    items: [{ href: "/admin/customers", label: "Clients", Icon: Users }],
+    items: [
+      { href: "/admin/customers", label: "Clients", Icon: Users },
+      { href: "/admin/reviews", label: "Avis", Icon: Star },
+    ],
   },
   {
     title: "Système",

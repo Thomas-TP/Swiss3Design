@@ -1,7 +1,16 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, Plus, Save, Trash2, Upload, X } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Box,
+  Plus,
+  Save,
+  Trash2,
+  Upload,
+  X,
+} from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import {
   saveProduct,
@@ -36,6 +45,7 @@ export interface ProductFormInitial {
   material: string;
   dimensionsMm: string | null;
   weightGrams: number | null;
+  model3dUrl: string | null;
   stock: number | null;
   multicolor: boolean;
   featured: boolean;
@@ -375,6 +385,16 @@ export function ProductForm({
         <ImageManager initial={initial?.images ?? []} />
       </section>
 
+      {/* Modèle 3D */}
+      <section className="rounded-card border border-line bg-surface p-5 sm:p-6">
+        <h2 className="mb-1 font-semibold">Modèle 3D</h2>
+        <p className="mb-4 text-xs text-soft">
+          Fichier .stl ou .glb affiché dans le viewer interactif de la fiche
+          (teinté dans chaque couleur du produit). Facultatif.
+        </p>
+        <ModelManager initial={initial?.model3dUrl ?? null} />
+      </section>
+
       {state.error && (
         <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
           {state.error}
@@ -392,6 +412,82 @@ export function ProductForm({
         {initial && <DeleteButton id={initial.id} />}
       </div>
     </form>
+  );
+}
+
+function ModelManager({ initial }: { initial: string | null }) {
+  const [url, setUrl] = useState<string | null>(initial);
+  const [uploading, setUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function onFile(file: File | undefined) {
+    if (!file) return;
+    setUploading(true);
+    setError(null);
+    const body = new FormData();
+    body.append("file", file);
+    try {
+      const res = await fetch("/api/admin/model-upload", {
+        method: "POST",
+        body,
+      });
+      if (!res.ok) {
+        const reason =
+          res.status === 413
+            ? "fichier trop lourd (max 25 Mo)"
+            : res.status === 415
+              ? "format non supporté (.stl ou .glb)"
+              : res.status === 403
+                ? "session expirée — reconnectez-vous"
+                : `erreur serveur (${res.status})`;
+        throw new Error(reason);
+      }
+      const json = (await res.json()) as { url: string };
+      setUrl(json.url);
+    } catch (e) {
+      setError(
+        e instanceof Error && e.message ? e.message : "connexion interrompue",
+      );
+    }
+    setUploading(false);
+    if (inputRef.current) inputRef.current.value = "";
+  }
+
+  return (
+    <div>
+      <input type="hidden" name="model3dUrl" value={url ?? ""} />
+      {url ? (
+        <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-paper px-4 py-3 text-sm">
+          <span className="flex min-w-0 items-center gap-2">
+            <Box size={16} className="shrink-0 text-soft" />
+            <span className="truncate">{url.split("/").pop()}</span>
+          </span>
+          <button
+            type="button"
+            onClick={() => setUrl(null)}
+            className="shrink-0 text-xs font-semibold text-accent hover:underline"
+          >
+            Retirer
+          </button>
+        </div>
+      ) : (
+        <label className="inline-flex cursor-pointer items-center gap-2 rounded-full border border-line bg-paper px-4 py-2 text-sm font-semibold text-soft transition-colors hover:border-ink hover:text-ink">
+          <Upload size={15} />
+          {uploading ? "Envoi…" : "Ajouter un modèle"}
+          <input
+            ref={inputRef}
+            type="file"
+            accept=".stl,.glb"
+            className="hidden"
+            disabled={uploading}
+            onChange={(e) => onFile(e.target.files?.[0])}
+          />
+        </label>
+      )}
+      {error && <p className="mt-2 text-xs text-accent">{`Échec : ${error}`}</p>}
+      <p className="mt-2 text-xs text-soft">STL ou GLB, 25 Mo max.</p>
+    </div>
   );
 }
 

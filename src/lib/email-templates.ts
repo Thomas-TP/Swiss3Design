@@ -88,6 +88,99 @@ const FOOTER: Record<Locale, string> = {
   en: "Questions? Just reply to this email.",
 };
 
+// ── Relance de panier abandonné (opt-in nLPD) ────────────────────────────────
+
+interface CartReminderItem {
+  name: string;
+  quantity: number;
+  priceCents: number;
+}
+
+const CART_REMINDER_TEXTS: Record<
+  Locale,
+  {
+    subject: string;
+    title: string;
+    intro: string;
+    cta: string;
+    outro: string;
+    unsubscribe: string;
+    consentNote: string;
+  }
+> = {
+  fr: {
+    subject: "Votre panier vous attend",
+    title: "Vous avez oublié quelque chose ?",
+    intro: "Votre sélection est toujours là — reprenez votre commande quand vous voulez :",
+    cta: "Reprendre mon panier",
+    outro: "Les articles restent disponibles dans la limite des stocks.",
+    unsubscribe: "Ne plus recevoir de rappel",
+    consentNote: "Vous recevez cet e-mail car vous avez demandé un rappel de votre panier.",
+  },
+  de: {
+    subject: "Ihr Warenkorb wartet auf Sie",
+    title: "Haben Sie etwas vergessen?",
+    intro: "Ihre Auswahl ist noch da — setzen Sie Ihre Bestellung fort, wann Sie möchten:",
+    cta: "Zum Warenkorb",
+    outro: "Die Artikel bleiben verfügbar, solange der Vorrat reicht.",
+    unsubscribe: "Keine Erinnerungen mehr erhalten",
+    consentNote: "Sie erhalten diese E-Mail, weil Sie eine Erinnerung an Ihren Warenkorb angefordert haben.",
+  },
+  it: {
+    subject: "Il tuo carrello ti aspetta",
+    title: "Hai dimenticato qualcosa?",
+    intro: "La tua selezione è ancora qui — riprendi l'ordine quando vuoi:",
+    cta: "Riprendi il carrello",
+    outro: "Gli articoli restano disponibili fino a esaurimento scorte.",
+    unsubscribe: "Non ricevere più promemoria",
+    consentNote: "Ricevi questa e-mail perché hai richiesto un promemoria del carrello.",
+  },
+  en: {
+    subject: "Your cart is waiting",
+    title: "Did you forget something?",
+    intro: "Your selection is still here — pick up where you left off whenever you like:",
+    cta: "Back to my cart",
+    outro: "Items remain available while stocks last.",
+    unsubscribe: "Stop receiving reminders",
+    consentNote: "You're receiving this because you asked for a cart reminder.",
+  },
+};
+
+export function abandonedCartEmail(params: {
+  to: string;
+  items: CartReminderItem[];
+  locale: string;
+  cartUrl: string;
+  unsubscribeUrl: string;
+}): EmailMessage {
+  const loc = (["fr", "de", "it", "en"].includes(params.locale)
+    ? params.locale
+    : "fr") as Locale;
+  const t = CART_REMINDER_TEXTS[loc];
+  const rows = params.items
+    .map(
+      (it) => `<tr>
+        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${esc(it.name)}</td>
+        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;text-align:right;white-space:nowrap;">${chf(it.priceCents * it.quantity)}</td>
+      </tr>`,
+    )
+    .join("");
+  const body = `
+    <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">${t.intro}</p>
+    <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 22px;font-size:14px;color:#1c1917;">
+      ${rows}
+    </table>
+    ${button(params.cartUrl, t.cta)}
+    <p style="margin:0;font-size:13px;color:#78716c;line-height:1.6;">${t.outro}</p>`;
+  const footer = `${t.consentNote}<br/><a href="${params.unsubscribeUrl}" style="color:#78716c;text-decoration:underline;">${t.unsubscribe}</a>`;
+  return {
+    to: params.to,
+    from: FROM_ORDERS,
+    subject: t.subject,
+    html: layout(t.title, body, footer),
+  };
+}
+
 // ── Confirmation de commande ─────────────────────────────────────────────────
 
 interface OrderForEmail {

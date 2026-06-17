@@ -1,0 +1,10 @@
+# Généré / dépendances — ne pas reformater
+node_modules
+.next
+.open-next
+.wrangler
+drizzle
+package-lock.json
+cloudflare-env.d.ts
+next-env.d.ts
+public

@@ -32,6 +32,7 @@
   },
   "shop": {
     "title": "Catalogo",
+    "searchPlaceholder": "Cerca un prodotto…",
     "subtitle": "Tutti i nostri pezzi, stampati su ordinazione o pronti a partire.",
     "all": "Tutti",
     "results": "{count, plural, =0 {Nessun prodotto} one {# prodotto} other {# prodotti}}",
@@ -46,6 +47,7 @@
     "sortPriceDesc": "Prezzo ↓"
   },
   "product": {
+    "relatedTitle": "Potrebbe piacerti anche",
     "addToCart": "Aggiungi al carrello",
     "buyNow": "Acquista ora",
     "added": "Aggiunto ✓",
@@ -61,6 +63,31 @@
     "details": "Caratteristiche",
     "backToShop": "Torna al catalogo",
     "notFound": "Prodotto non trovato."
+  },
+  "reviews": {
+    "title": "Recensioni dei clienti",
+    "count": "{count, plural, one {# recensione} other {# recensioni}}",
+    "rateThis": "Valuta questo prodotto",
+    "ratingLabel": "La tua valutazione",
+    "placeholder": "La tua recensione (facoltativa)…",
+    "submit": "Pubblica la recensione",
+    "thanks": "Grazie! La recensione sarà pubblicata dopo la moderazione.",
+    "error": "Impossibile salvare la recensione.",
+    "alreadyReviewed": "✓ Hai già valutato questo prodotto."
+  },
+  "viewer": {
+    "view3d": "Vedi in 3D",
+    "close": "Chiudi",
+    "error": "Anteprima 3D non disponibile.",
+    "colorLabel": "Colore:"
+  },
+  "cartReminder": {
+    "title": "Non hai tempo ora?",
+    "emailPlaceholder": "La tua e-mail",
+    "consent": "Inviami un promemoria del carrello via e-mail. Posso annullare l'iscrizione in qualsiasi momento.",
+    "cta": "Inviami un promemoria",
+    "done": "Fatto — ti ricorderemo il tuo carrello.",
+    "error": "Si è verificato un errore, riprova."
   },
   "cart": {
     "title": "Carrello",

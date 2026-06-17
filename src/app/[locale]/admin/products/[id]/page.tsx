@@ -74,6 +74,7 @@ export default async function EditProductPage({
     material: product.material,
     dimensionsMm: product.dimensionsMm,
     weightGrams: product.weightGrams,
+    model3dUrl: product.model3dUrl,
     stock: product.stock,
     multicolor: product.multicolor,
     featured: product.featured,

@@ -32,6 +32,7 @@
   },
   "shop": {
     "title": "Katalog",
+    "searchPlaceholder": "Produkt suchen…",
     "subtitle": "Alle unsere Stücke – auf Bestellung gedruckt oder sofort versandbereit.",
     "all": "Alle",
     "results": "{count, plural, =0 {Keine Produkte} one {# Produkt} other {# Produkte}}",
@@ -46,6 +47,7 @@
     "sortPriceDesc": "Preis ↓"
   },
   "product": {
+    "relatedTitle": "Das könnte Ihnen auch gefallen",
     "addToCart": "In den Warenkorb",
     "buyNow": "Jetzt kaufen",
     "added": "Hinzugefügt ✓",
@@ -61,6 +63,31 @@
     "details": "Eigenschaften",
     "backToShop": "Zurück zum Katalog",
     "notFound": "Produkt nicht gefunden."
+  },
+  "reviews": {
+    "title": "Kundenbewertungen",
+    "count": "{count, plural, one {# Bewertung} other {# Bewertungen}}",
+    "rateThis": "Dieses Produkt bewerten",
+    "ratingLabel": "Ihre Bewertung",
+    "placeholder": "Ihre Bewertung (optional)…",
+    "submit": "Bewertung absenden",
+    "thanks": "Danke! Ihre Bewertung wird nach Prüfung veröffentlicht.",
+    "error": "Bewertung konnte nicht gespeichert werden.",
+    "alreadyReviewed": "✓ Sie haben dieses Produkt bereits bewertet."
+  },
+  "viewer": {
+    "view3d": "In 3D ansehen",
+    "close": "Schließen",
+    "error": "3D-Vorschau nicht verfügbar.",
+    "colorLabel": "Farbe:"
+  },
+  "cartReminder": {
+    "title": "Gerade keine Zeit?",
+    "emailPlaceholder": "Ihre E-Mail",
+    "consent": "Senden Sie mir eine Erinnerung an meinen Warenkorb. Ich kann mich jederzeit abmelden.",
+    "cta": "Erinnerung senden",
+    "done": "Notiert — wir erinnern Sie an Ihren Warenkorb.",
+    "error": "Ein Fehler ist aufgetreten, bitte erneut versuchen."
   },
   "cart": {
     "title": "Warenkorb",

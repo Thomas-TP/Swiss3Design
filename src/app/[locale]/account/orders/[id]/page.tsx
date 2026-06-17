@@ -7,7 +7,9 @@ import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { orders, orderItems } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
+import { getReviewedProductIds } from "@/db/queries";
 import { formatChf } from "@/lib/format";
+import { ReviewForm } from "./review-form";
 
 export const dynamic = "force-dynamic";
 
@@ -57,6 +59,11 @@ export default async function OrderDetailPage({
       .orderBy(desc(orderItems.id)),
     getTranslations("account"),
   ]);
+
+  // Les avis ne s'ouvrent que pour une commande LIVRÉE, et par article.
+  const canReview = order.status === "delivered";
+  const reviewedIds = canReview ? await getReviewedProductIds(order.id) : [];
+  const tReviews = await getTranslations("reviews");
 
   let address = { name: "", street: "", npa: "", city: "", canton: "" };
   try {
@@ -122,23 +129,43 @@ export default async function OrderDetailPage({
         </h2>
         <ul className="mt-3 divide-y divide-line rounded-card border border-line bg-surface px-5">
           {items.map((i) => (
-            <li key={i.id} className="flex items-center justify-between gap-3 py-4">
-              <span className="flex items-center gap-2 text-sm">
-                <span className="font-medium tabular-nums">{i.quantity}×</span>{" "}
-                {i.nameSnapshot}
-                {i.colorName && (
-                  <span className="inline-flex items-center gap-1.5 text-xs text-soft">
-                    <span
-                      className="h-3 w-3 shrink-0 rounded-full border border-black/10"
-                      style={{ backgroundColor: i.colorHex ?? undefined }}
-                    />
-                    {i.colorName}
-                  </span>
-                )}
-              </span>
-              <span className="shrink-0 text-sm font-semibold tabular-nums">
-                {formatChf(i.priceCentsSnapshot * i.quantity, locale)}
-              </span>
+            <li key={i.id} className="py-4">
+              <div className="flex items-center justify-between gap-3">
+                <span className="flex items-center gap-2 text-sm">
+                  <span className="font-medium tabular-nums">
+                    {i.quantity}×
+                  </span>{" "}
+                  {i.nameSnapshot}
+                  {i.colorName && (
+                    <span className="inline-flex items-center gap-1.5 text-xs text-soft">
+                      <span
+                        className="h-3 w-3 shrink-0 rounded-full border border-black/10"
+                        style={{ backgroundColor: i.colorHex ?? undefined }}
+                      />
+                      {i.colorName}
+                    </span>
+                  )}
+                </span>
+                <span className="shrink-0 text-sm font-semibold tabular-nums">
+                  {formatChf(i.priceCentsSnapshot * i.quantity, locale)}
+                </span>
+              </div>
+              {canReview && i.productId && (
+                <div className="mt-3 border-t border-line pt-3">
+                  {reviewedIds.includes(i.productId) ? (
+                    <p className="text-xs text-soft">
+                      {tReviews("alreadyReviewed")}
+                    </p>
+                  ) : (
+                    <>
+                      <p className="mb-2 text-xs font-medium text-soft">
+                        {tReviews("rateThis")}
+                      </p>
+                      <ReviewForm orderId={order.id} productId={i.productId} />
+                    </>
+                  )}
+                </div>
+              )}
             </li>
           ))}
         </ul>

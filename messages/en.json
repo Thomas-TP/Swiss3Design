@@ -32,6 +32,7 @@
   },
   "shop": {
     "title": "Shop",
+    "searchPlaceholder": "Search products…",
     "subtitle": "All our pieces — printed on demand or ready to ship.",
     "all": "All",
     "results": "{count, plural, =0 {No products} one {# product} other {# products}}",
@@ -46,6 +47,7 @@
     "sortPriceDesc": "Price ↓"
   },
   "product": {
+    "relatedTitle": "You may also like",
     "addToCart": "Add to cart",
     "buyNow": "Buy now",
     "added": "Added ✓",
@@ -61,6 +63,31 @@
     "details": "Specifications",
     "backToShop": "Back to shop",
     "notFound": "Product not found."
+  },
+  "reviews": {
+    "title": "Customer reviews",
+    "count": "{count, plural, one {# review} other {# reviews}}",
+    "rateThis": "Rate this product",
+    "ratingLabel": "Your rating",
+    "placeholder": "Your review (optional)…",
+    "submit": "Submit review",
+    "thanks": "Thanks! Your review will be published after moderation.",
+    "error": "Could not save your review.",
+    "alreadyReviewed": "✓ You already reviewed this product."
+  },
+  "viewer": {
+    "view3d": "View in 3D",
+    "close": "Close",
+    "error": "3D preview unavailable.",
+    "colorLabel": "Color:"
+  },
+  "cartReminder": {
+    "title": "No time right now?",
+    "emailPlaceholder": "Your email",
+    "consent": "Email me a reminder of my cart. I can unsubscribe at any time.",
+    "cta": "Send me a reminder",
+    "done": "Done — we'll remind you about your cart.",
+    "error": "Something went wrong, please try again."
   },
   "cart": {
     "title": "Cart",

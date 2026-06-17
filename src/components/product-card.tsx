@@ -1,6 +1,7 @@
 import { useTranslations, useLocale } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { formatChf } from "@/lib/format";
+import { cfImage } from "@/lib/cf-image";
 import type { ProductListItem } from "@/db/queries";
 import { MulticolorDots } from "./multicolor-dots";
 import { AddToCartMini } from "./add-to-cart";
@@ -33,8 +34,10 @@ export function ProductCard({ product }: { product: ProductListItem }) {
         {product.imageUrl && (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={product.imageUrl}
+            src={cfImage(product.imageUrl, { width: 600 })}
             alt={product.imageAlt ?? product.name}
+            loading="lazy"
+            decoding="async"
             className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
           />
         )}

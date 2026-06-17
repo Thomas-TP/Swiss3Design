@@ -32,6 +32,7 @@
   },
   "shop": {
     "title": "Catalogue",
+    "searchPlaceholder": "Rechercher un produit…",
     "subtitle": "Toutes nos pièces, imprimées à la demande ou prêtes à partir.",
     "all": "Tout",
     "results": "{count, plural, =0 {Aucun produit} one {# produit} other {# produits}}",
@@ -46,6 +47,7 @@
     "sortPriceDesc": "Prix ↓"
   },
   "product": {
+    "relatedTitle": "Vous aimerez aussi",
     "addToCart": "Ajouter au panier",
     "buyNow": "Acheter",
     "added": "Ajouté ✓",
@@ -61,6 +63,31 @@
     "details": "Caractéristiques",
     "backToShop": "Retour au catalogue",
     "notFound": "Produit introuvable."
+  },
+  "reviews": {
+    "title": "Avis clients",
+    "count": "{count, plural, one {# avis} other {# avis}}",
+    "rateThis": "Noter ce produit",
+    "ratingLabel": "Votre note",
+    "placeholder": "Votre avis (facultatif)…",
+    "submit": "Publier mon avis",
+    "thanks": "Merci ! Votre avis sera publié après modération.",
+    "error": "Impossible d’enregistrer votre avis.",
+    "alreadyReviewed": "✓ Vous avez déjà noté ce produit."
+  },
+  "viewer": {
+    "view3d": "Voir en 3D",
+    "close": "Fermer",
+    "error": "Aperçu 3D indisponible.",
+    "colorLabel": "Couleur :"
+  },
+  "cartReminder": {
+    "title": "Pas le temps maintenant ?",
+    "emailPlaceholder": "Votre e-mail",
+    "consent": "Envoyez-moi un rappel de mon panier par e-mail. Je peux me désinscrire à tout moment.",
+    "cta": "M'envoyer un rappel",
+    "done": "C'est noté — nous vous rappellerons votre panier.",
+    "error": "Une erreur est survenue, réessayez."
   },
   "cart": {
     "title": "Panier",
