@@ -13,8 +13,10 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
   (**Workers Builds**). À chaque push sur `main`, Cloudflare **build + applique
   les migrations D1 + déploie**, avec ses propres identifiants — plus aucun token
   à gérer ni à renouveler.
-- GitHub Actions (`.github/workflows/deploy.yml`) ne fait plus QUE **valider le
-  build** (aucun secret), pour attraper une erreur avant même le déploiement.
+- Le **statut de déploiement** est porté par Cloudflare : Workers Builds publie sur
+  chaque commit un **check GitHub** qui n'est vert que si le build **et** le deploy
+  ont réellement réussi. L'ancien workflow GitHub Actions a été **supprimé** pour ne
+  pas afficher un second « vert » trompeur.
 
 ## Pré-requis (déjà en place)
 
@@ -74,8 +76,9 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
   automatiquement.
 - Les branches / PR génèrent des **builds de preview** avec une URL de test
   (commentée directement sur la PR GitHub).
-- GitHub Actions tourne en parallèle juste pour valider le build : une croix rouge
-  signale un build cassé avant même le déploiement Cloudflare.
+- Le statut s'affiche directement sur le commit via le **check Cloudflare Workers
+  Builds** : vert = build + deploy réussis ; rouge = échec (l'ancienne version reste
+  en ligne, rien n'est cassé).
 
 ## Réessayer / revenir en arrière
 
@@ -88,5 +91,5 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 
 - GitHub → repo → *Settings → Secrets and variables → Actions* : le secret
   `CLOUDFLARE_API_TOKEN` n'est plus utilisé, tu peux le **supprimer**.
-- Pour désactiver complètement GitHub Actions, supprimer
-  `.github/workflows/deploy.yml`.
+- Le workflow `.github/workflows/deploy.yml` a été supprimé : le check de
+  déploiement vient désormais de Cloudflare. Plus aucun workflow GitHub Actions.
