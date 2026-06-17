@@ -106,6 +106,9 @@ src/
 drizzle/          generated SQL migrations + snapshots — NEVER hand-edit
 messages/         next-intl translations (fr/de/it/en)
 scripts/          push.bat (one-click publish), seed*.sql
+workers/cron/     standalone Cloudflare Cron Worker → POST /api/cron/maintenance
+                  (purge R2 + cart reminders); deployed separately, excluded from
+                  the app's tsconfig/eslint/OpenNext build
 ```
 
 Server-side data access patterns to reuse: `getDb()` ([src/db/index.ts](src/db/index.ts)),

@@ -46,14 +46,17 @@
 | Fichiers (images, STL/3MF) | **Cloudflare R2** (servis via route handlers, jamais publics) |
 | Optimisation images | **Cloudflare Images** (`images.unoptimized` côté Next, délégué au déploiement) |
 | Sessions / cache / rate-limit | **Workers KV** |
-| Tâches planifiées (purge R2) | **Route cron** `/api/cron/maintenance` protégée par `CRON_SECRET` (pas de Cloudflare Queues) |
+| Tâches planifiées | **Route cron** `/api/cron/maintenance` (purge R2 + relances panier) protégée par `CRON_SECRET`, déclenchée par un **Worker Cron dédié** (`workers/cron`, horaire) — pas de Cloudflare Queues |
 | Auth clients & admin | **Better Auth** (D1/Drizzle) — rôle `admin` via `ADMIN_EMAILS` |
 | Paiement | **Stripe Payment Element** (PaymentIntents + webhook) en CHF |
 | i18n | **next-intl** (routing `/fr` `/de` `/it` `/en`, détection auto) |
 | Emails | **Resend** (réponses clients vers l'alias Infomaniak `contact@swiss3design.ch`) |
 | UI | **Tailwind CSS 4** + composants maison + **Lucide** (pas de shadcn/ui) |
 | Sécurité | En-têtes durcis + **CSP à nonce par requête** (prod) + rate-limiting KV |
-| Analytics | **Cloudflare Web Analytics** (sans cookie) — à activer au dashboard |
+| Analytics | **Cloudflare Web Analytics** (sans cookie) — activé |
+| SEO | sitemap/robots dynamiques, metadata + JSON-LD (Product/AggregateRating/Organization), hreflang |
+| Images | **Cloudflare Transformations** (`/cdn-cgi/image`) — resize + `format=auto` |
+| 3D | Viewer produit **Three.js** (`.stl`/`.glb`), chargé à la demande |
 
 ---
 
@@ -143,14 +146,28 @@ paiement idempotent, devis, rattachement invité, sécurité). Résumé :
 ## 9. Suite envisagée (post-lancement)
 
 Déjà fait après lancement : favoris, **suivi invité `/track`** + conversion
-invité → compte (rattachement des commandes), codes promo, durcissement sécurité.
+invité → compte (rattachement des commandes), codes promo, durcissement
+sécurité, **TWINT** (activé), **Cloudflare Web Analytics** (activé).
+
+Lot SEO / perf / conversion (livré) :
+
+- ✅ **SEO** : `sitemap.ts` dynamique (D1, ×4 locales + hreflang), `robots.ts`,
+  `generateMetadata` produit + **JSON-LD** Product/AggregateRating + Organization.
+- ✅ **Perf** : images via **Cloudflare Transformations** (`/cdn-cgi/image`),
+  lazy-loading, `fetchPriority` sur l'image LCP.
+- ✅ **Avis produits** : ouverts **après livraison** sur les articles de la
+  commande (acheteur vérifié), modération admin, étoiles + rich snippet.
+- ✅ **Viewer 3D** produit (`.stl`/`.glb`, Three.js à la demande, teinté dans
+  chaque couleur proposée) — champ `products.model3dUrl`.
+- ✅ **Recherche** catalogue (`?q=`) + **produits liés** (« Vous aimerez aussi »).
+- ✅ **Relance panier abandonné** : opt-in **nLPD**, table `abandoned_carts`,
+  e-mail de relance (4 langues) + désinscription, déclenché par un **Worker Cron
+  Cloudflare dédié** (`workers/cron`).
+- ✅ **Outillage** : Vitest, `typecheck`, Prettier.
 
 À étudier :
 
-- **Avis produits** (table + modération admin).
 - **API Poste Suisse** : génération d'étiquettes + suivi automatique.
-- **Activation TWINT** dans le dashboard Stripe.
-- **Cloudflare Web Analytics** : activer le beacon (CSP déjà prête).
 - **TVA** : si le seuil de 100 000 CHF/an approche (champ taux déjà prévu).
 
 ---

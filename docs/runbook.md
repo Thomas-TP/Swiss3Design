@@ -88,8 +88,13 @@ npx wrangler d1 execute swiss3design-db --remote --command "SELECT count(*) FROM
 
 - R2 (`swiss3design-files`) is private; files are served via route handlers, never
   public URLs. Quote files are deleted on account deletion (nLPD).
-- Orphan purge: scheduled route `GET /api/cron/maintenance` protected by
-  `CRON_SECRET`. Trigger manually with that bearer token if needed.
+- **Maintenance route** `POST /api/cron/maintenance` (bearer `CRON_SECRET`):
+  purges orphan R2 files + quote retention, **sends abandoned-cart reminders and
+  purges old carts**. Triggered by the admin Settings button, a manual bearer
+  call, or — in prod — the **dedicated Worker Cron** (`workers/cron`, hourly).
+  `CRON_SECRET` must be set on **both** workers (`swiss3design` and
+  `swiss3design-cron`). Deploy the cron worker once:
+  `cd workers/cron && npx wrangler deploy && npx wrangler secret put CRON_SECRET`.
 
 ## Local dev setup
 

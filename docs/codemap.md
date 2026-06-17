@@ -46,6 +46,8 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | `email-proof.ts` | Aperçu d'e-mails pour `/admin/emails` | — |
 | `maintenance.ts` | Mode maintenance | — |
 | `theme.ts` | Constantes/aides de thème (clair/sombre) | — |
+| `seo.ts` | Helpers SEO : hreflang + JSON-LD produit/Organization | `alternatesFor()`, `productJsonLd()`, `organizationJsonLd()` |
+| `cf-image.ts` | URL image Cloudflare Transformations (`/cdn-cgi/image`, prod only) | `cfImage()` |
 
 ## `src/db` & `src/i18n`
 
@@ -73,6 +75,8 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | `auth/[...all]/route.ts` | Handler Better Auth |
 | `cron/maintenance/route.ts` | Purge R2 orphelins (bearer `CRON_SECRET`) |
 | `csp-report/route.ts` | Réception des violations CSP |
+| `cart-reminder/route.ts` · `cart-reminder/unsubscribe/route.ts` | Opt-in relance panier (nLPD) + désinscription par token |
+| `admin/model-upload/route.ts` | Upload d'un modèle 3D (.stl/.glb) → R2 |
 
 ## « Je dois… » → où commencer
 
@@ -87,6 +91,11 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | Ajouter une chaîne UI | les 4 `messages/*.json` (cherche la clé dans `fr.json`, recopie partout) |
 | Sécurité / en-têtes / CSP nonce | `src/middleware.ts` |
 | Auth / rôle admin | `lib/auth.ts` + `lib/session.ts` |
+| Toucher aux avis | `db/schema.ts` (`reviews`) + `account/orders/[id]/` (dépôt, livré) + `admin/reviews/` (modération) + `products/[slug]` (affichage) |
+| Viewer 3D produit | `components/product-viewer-3d.tsx` + `api/admin/model-upload` + champ `products.model3dUrl` |
+| Recherche / produits liés | `db/queries.ts` (`getProducts` param `q`, `getRelatedProducts`) + `shop/page.tsx` |
+| SEO d'une page | `app/sitemap.ts` · `app/robots.ts` · `lib/seo.ts` + `generateMetadata` de la page |
+| Tâches planifiées (purge R2, relances) | `lib/maintenance.ts` + `api/cron/maintenance` ← déclenché par `workers/cron` (Worker Cron horaire, déployé à part) |
 
 ## Gros fichiers — **ne pas lire en entier** sauf si tu édites le contenu
 
