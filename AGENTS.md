@@ -85,6 +85,12 @@ npm run db:migrate:remote # apply migrations to the PROD D1 (normally automatic 
 npm run db:seed:local     # seed local D1 from scripts/seed.sql
 ```
 
+> **Lockfile / npm:** the Cloudflare build runs `npm ci` with **npm 10**. A
+> `package-lock.json` written by **npm 11** breaks it (`Missing: @esbuild/*… from
+> lock file`, optional-dep handling differs). After any dependency change,
+> regenerate the lock with npm 10: `npx -y npm@10 install --package-lock-only`
+> and validate with `npx -y npm@10 ci --dry-run` before pushing.
+
 Cloudflare bindings (`wrangler.jsonc`): `DB` (D1 `swiss3design-db`),
 `R2` (`swiss3design-files`), `KV`, `ASSETS`, `WORKER_SELF_REFERENCE`.
 
