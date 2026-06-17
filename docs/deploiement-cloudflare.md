@@ -30,7 +30,9 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 
 1. Aller sur https://dash.cloudflare.com → **Workers & Pages** (ou **Compute**).
 2. Ouvrir le Worker existant **swiss3design**.
-3. Onglet **Settings** → section **Build** → cliquer **Connect** (connexion à Git).
+3. Onglet **Settings** → section **Builds** → cliquer **Connect** (connexion à Git).
+   *(Le nom du Worker doit correspondre au `name` de `wrangler.jsonc` — ici les deux
+   valent `swiss3design`, donc OK.)*
 4. **Autoriser** l'app GitHub « Cloudflare Workers & Pages » (popup GitHub).
    Choisir *Only select repositories* → **Swiss3Design** → valider.
 5. De retour sur Cloudflare :
