@@ -203,7 +203,9 @@
     "empty": "Aucun favori pour l'instant.",
     "browse": "Parcourir le catalogue",
     "add": "Ajouter aux favoris",
-    "remove": "Retirer des favoris"
+    "remove": "Retirer des favoris",
+    "addAll": "Tout ajouter au panier",
+    "addedAll": "Ajouté au panier"
   },
   "account": {
     "title": "Mon compte",

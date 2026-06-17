@@ -9,6 +9,7 @@ import { FavoritesProvider } from "@/lib/favorites";
 import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
 import { Footer } from "@/components/footer";
+import { ThemeManager } from "@/components/theme-manager";
 import "../globals.css";
 
 const geist = Geist({
@@ -99,13 +100,16 @@ export default async function LocaleLayout({
       suppressHydrationWarning
     >
       <body className="flex min-h-screen flex-col">
-        {/* Applique le thème avant le 1er rendu : évite le flash clair→sombre */}
+        {/* Applique le thème avant le 1er rendu : évite le flash clair→sombre.
+            Sur les navigations sans rechargement (langue, retour arrière), le
+            relais est pris par <ThemeManager>. */}
         <script
           nonce={nonce}
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;if(d)document.documentElement.classList.add('dark');}catch(e){}})();`,
+            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;var r=document.documentElement;r.classList.toggle('dark',d);r.style.colorScheme=d?'dark':'light';}catch(e){}})();`,
           }}
         />
+        <ThemeManager />
         <NextIntlClientProvider>
           <CartProvider>
             <FavoritesProvider>

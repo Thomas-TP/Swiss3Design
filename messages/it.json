@@ -203,7 +203,9 @@
     "empty": "Nessun preferito per ora.",
     "browse": "Sfoglia il catalogo",
     "add": "Aggiungi ai preferiti",
-    "remove": "Rimuovi dai preferiti"
+    "remove": "Rimuovi dai preferiti",
+    "addAll": "Aggiungi tutto al carrello",
+    "addedAll": "Aggiunto al carrello"
   },
   "account": {
     "title": "Il mio account",

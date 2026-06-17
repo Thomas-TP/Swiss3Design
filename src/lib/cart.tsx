@@ -128,7 +128,19 @@ export function CartProvider({ children }: { children: ReactNode }) {
       dispatch({ type: "setQuantity", productId, variantId, colorName, quantity }),
     remove: (productId, variantId, colorName) =>
       dispatch({ type: "remove", productId, variantId, colorName }),
-    clear: () => dispatch({ type: "clear" }),
+    clear: () => {
+      dispatch({ type: "clear" });
+      // Supprime aussi la copie persistée. Sur /checkout/success, chargée via
+      // la redirection plein écran de Stripe, le provider se re-monte : son
+      // effet d'hydratation lit le localStorage APRÈS ce clear (effet enfant
+      // avant effet parent). Sans cette suppression, il re-remplirait le
+      // panier qu'on vient de vider.
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+        // stockage indisponible — sans gravité
+      }
+    },
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;

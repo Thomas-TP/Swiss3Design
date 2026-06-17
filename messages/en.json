@@ -203,7 +203,9 @@
     "empty": "No favorites yet.",
     "browse": "Browse the shop",
     "add": "Add to favorites",
-    "remove": "Remove from favorites"
+    "remove": "Remove from favorites",
+    "addAll": "Add all to cart",
+    "addedAll": "Added to cart"
   },
   "account": {
     "title": "My account",

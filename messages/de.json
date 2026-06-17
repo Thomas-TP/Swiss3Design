@@ -203,7 +203,9 @@
     "empty": "Noch keine Favoriten.",
     "browse": "Katalog entdecken",
     "add": "Zu Favoriten hinzufügen",
-    "remove": "Aus Favoriten entfernen"
+    "remove": "Aus Favoriten entfernen",
+    "addAll": "Alles in den Warenkorb",
+    "addedAll": "Zum Warenkorb hinzugefügt"
   },
   "account": {
     "title": "Mein Konto",
