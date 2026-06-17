@@ -1,0 +1,35 @@
+# .dev.vars — secrets de DÉVELOPPEMENT LOCAL
+# ---------------------------------------------------------------------------
+# Copier ce fichier en « .dev.vars » (gitignoré) et remplir avec des valeurs
+# de TEST. En production, ces secrets sont gérés côté Cloudflare
+# (`npx wrangler secret put <NOM>` ou dashboard), JAMAIS committés.
+#
+# Les clés PUBLIQUES (NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) sont dans .env.development.
+# Les variables NON secrètes (BETTER_AUTH_URL prod, ADMIN_EMAILS, EMAIL_FROM)
+# sont dans wrangler.jsonc.
+# ---------------------------------------------------------------------------
+
+# Stripe — mode TEST en local (clé publiable correspondante dans .env.development)
+STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_WEBHOOK_SECRET="whsec_..."
+
+# Better Auth
+BETTER_AUTH_SECRET="change-me"               # ex. openssl rand -base64 32
+BETTER_AUTH_URL="http://localhost:3000"      # override local (prod = wrangler.jsonc)
+
+# Emails (Resend) — optionnel : sans clé, l'envoi est ignoré et la
+# vérification d'e-mail est désactivée automatiquement.
+RESEND_API_KEY="re_..."
+
+# Connexion Google — optionnel en local (laisser vide pour désactiver le bouton)
+GOOGLE_CLIENT_ID=""
+GOOGLE_CLIENT_SECRET=""
+
+# Fournisseurs sociaux additionnels — optionnels
+APPLE_CLIENT_ID=""
+APPLE_CLIENT_SECRET=""
+FACEBOOK_CLIENT_ID=""
+FACEBOOK_CLIENT_SECRET=""
+
+# Maintenance planifiée (purge des fichiers R2 orphelins via /api/cron/maintenance)
+CRON_SECRET="change-me"

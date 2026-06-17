@@ -1,0 +1,17 @@
+# https://editorconfig.org — style cohérent entre éditeurs/agents
+root = true
+
+[*]
+charset = utf-8
+indent_style = space
+indent_size = 2
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# Markdown : deux espaces en fin de ligne = saut de ligne volontaire
+[*.md]
+trim_trailing_whitespace = false
+
+# Scripts Windows : CRLF requis
+[*.bat]
+end_of_line = crlf

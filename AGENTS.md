@@ -11,6 +11,8 @@ This version has breaking changes — APIs, conventions, and file structure may 
 > Operational brief for AI coding agents. Keep it short and high-signal.
 > Deep references: [`docs/architecture.md`](docs/architecture.md) ·
 > [`docs/conventions.md`](docs/conventions.md) ·
+> [`docs/playbook.md`](docs/playbook.md) ·
+> [`docs/runbook.md`](docs/runbook.md) ·
 > [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
 > Human-facing overview lives in [`README.md`](README.md).
 

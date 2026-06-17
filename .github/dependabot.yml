@@ -1,0 +1,23 @@
+# Mises à jour de dépendances automatisées.
+# Chaque PR Dependabot génère un build de preview Cloudflare Workers Builds.
+version: 2
+updates:
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    commit-message:
+      prefix: "deps"
+    groups:
+      # Regroupe les MAJ mineures et correctives en une seule PR.
+      minor-and-patch:
+        update-types:
+          - "minor"
+          - "patch"
+    # Les MAJ MAJEURES restent en PR isolées : Next.js, React et OpenNext sont
+    # sensibles (cf. AGENTS.md), elles demandent une revue manuelle + preview.
+    ignore:
+      - dependency-name: "*"
+        update-types: ["version-update:semver-major"]

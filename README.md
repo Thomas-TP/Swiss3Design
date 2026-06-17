@@ -40,6 +40,7 @@ fabriqués à **Gland (VD)** et livrés dans toute la Suisse.
 - [Déploiement](#déploiement)
 - [Sécurité](#sécurité)
 - [Internationalisation](#internationalisation)
+- [Documentation](#documentation)
 - [Propriété & licences](#propriété--licences)
 
 ---
@@ -146,7 +147,7 @@ Le **kit de marque** complet est versionné dans [`public/brand/`](public/brand)
 
 ```text
 Swiss3Design/
-├─ docs/                          # Doc interne : architecture, conventions, déploiement
+├─ docs/                          # Doc interne : architecture, conventions, playbook, runbook, déploiement
 ├─ drizzle/                       # Migrations SQL (drizzle-kit) + snapshots — NE PAS éditer à la main
 ├─ messages/                      # Traductions next-intl (fr, de, it, en)
 ├─ public/
@@ -341,6 +342,20 @@ reflétée dans l'URL (`/fr`, `/de`, `/it`, `/en`). Les traductions vivent dans
 [`messages/`](messages).
 
 ---
+
+## Documentation
+
+| Document | Pour qui | Contenu |
+| --- | --- | --- |
+| [`AGENTS.md`](AGENTS.md) | Agents IA | Brief opérationnel + règles d'or (chargé via `CLAUDE.md`) |
+| [`docs/architecture.md`](docs/architecture.md) | Agents / dev | Modèle de données, flux, runtime |
+| [`docs/conventions.md`](docs/conventions.md) | Agents / dev | Patterns de code & pièges |
+| [`docs/playbook.md`](docs/playbook.md) | Humain ↔ IA | Comment demander et réaliser une tâche efficacement |
+| [`docs/runbook.md`](docs/runbook.md) | Ops | Déploiement, rollback, incidents, secrets |
+| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md) | Ops | Connexion Git ↔ Cloudflare Workers Builds |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contributeurs | Mise en route & conventions |
+| [`SECURITY.md`](SECURITY.md) | Sécurité | Signalement de vulnérabilité |
+| [`ROADMAP.md`](ROADMAP.md) | Produit | État du projet & suite envisagée |
 
 ## Propriété & licences
 
