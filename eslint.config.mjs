@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Worker Cron autonome (déployé séparément, types Workers propres)
+    "workers/**",
   ]),
 ]);
 
