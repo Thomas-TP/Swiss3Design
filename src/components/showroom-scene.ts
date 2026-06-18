@@ -185,7 +185,10 @@ export async function buildShowroomScene(
   // Socle plus grand et plus haut.
   const podiumRadius = footprintR * 1.7 + maxDim * 0.3;
   const podiumHeight = maxDim * 0.6;
-  const floorY = -podiumHeight;
+  const rugThickness = maxDim * 0.05;
+  // Empilement vertical : base du modèle à y = 0 = sommet du socle. Socle, tapis
+  // puis sol descendent en dessous → le modèle REPOSE sur le socle, jamais dedans.
+  const floorY = -(podiumHeight + rugThickness);
 
   // ---- Pièce fermée : 4 murs + plafond. Le bas de la coque descend SOUS le sol
   // pour qu'aucune face ne soit coplanaire au parquet (sinon clignotement
@@ -249,8 +252,7 @@ export async function buildShowroomScene(
   floor.receiveShadow = true;
   scene.add(floor);
 
-  // ---- Tapis rouge marque, épais (cylindre posé sur le sol → pas de z-fight).
-  const rugThickness = maxDim * 0.05;
+  // ---- Tapis rouge marque, épais. Posé sur le sol, sous le socle.
   const rug = new THREE.Mesh(
     new THREE.CylinderGeometry(podiumRadius * 2.3, podiumRadius * 2.3, rugThickness, 80),
     new THREE.MeshStandardMaterial({
@@ -259,7 +261,7 @@ export async function buildShowroomScene(
       metalness: 0,
     }),
   );
-  rug.position.y = floorY + rugThickness / 2 + maxDim * 0.002;
+  rug.position.y = -podiumHeight - rugThickness / 2 + maxDim * 0.002;
   rug.receiveShadow = true;
   scene.add(rug);
 
@@ -272,7 +274,7 @@ export async function buildShowroomScene(
       metalness: 0.05,
     }),
   );
-  podium.position.y = -podiumHeight / 2 + rugThickness;
+  podium.position.y = -podiumHeight / 2; // sommet à y = 0, sous la base du modèle
   podium.castShadow = true;
   podium.receiveShadow = true;
   scene.add(podium);
@@ -285,7 +287,7 @@ export async function buildShowroomScene(
       metalness: 0.1,
     }),
   );
-  plinth.position.y = floorY + rugThickness + plinthHeight / 2;
+  plinth.position.y = -podiumHeight + plinthHeight / 2;
   plinth.castShadow = true;
   plinth.receiveShadow = true;
   scene.add(plinth);
