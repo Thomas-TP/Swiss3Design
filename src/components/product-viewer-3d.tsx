@@ -7,23 +7,17 @@ import { Box, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useProductColor } from "./product-color-context";
 
-// Lit une variable CSS de thème (#hex) pour teinter la scène 3D au ton courant.
-function cssColor(name: string, fallback: string): string {
-  if (typeof window === "undefined") return fallback;
-  const v = getComputedStyle(document.documentElement).getPropertyValue(name).trim();
-  return v || fallback;
-}
-
 // Viewer 3D **embarqué** dans la galerie produit (dernier "slot"). Three.js est
 // chargé dynamiquement au montage (hors bundle initial) — la galerie ne monte ce
 // composant que lorsque la vignette 3D est sélectionnée, donc le coût n'est payé
 // qu'à la demande. La teinte du modèle suit la couleur choisie dans le bloc
 // d'achat (contexte partagé) : un seul sélecteur de couleur sur la fiche.
 //
-// Mise en scène : plutôt qu'un objet flottant, le modèle est posé sur un socle
-// dans un mini-studio (sol + ombres portées douces + éclairage clé/remplissage).
-// Tout est procédural et teinté aux couleurs du thème → aucun asset externe à
-// valider, et s'adapte automatiquement au mode clair/sombre.
+// Mise en scène : un mini-studio photo **fixe** (identique en thème clair et
+// sombre) — fond dégradé neutre type cyclorama, éclairage image-based réaliste
+// (RoomEnvironment), socle gris neutre et sol mat avec ombres portées douces.
+// Les tons sont volontairement « 18 % gris » : universels, ils mettent en valeur
+// n'importe quel modèle, clair comme foncé, sans que la scène change.
 export function ModelViewer({ modelUrl }: { modelUrl: string }) {
   const t = useTranslations("viewer");
   const { selected, colors } = useProductColor();
@@ -43,34 +37,74 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
     let renderer: THREE.WebGLRenderer | undefined;
     let controls: OrbitControls | undefined;
     let onResize: (() => void) | undefined;
+    let envTexture: THREE.Texture | undefined;
+    let bgTexture: THREE.Texture | undefined;
 
     (async () => {
       const THREE = await import("three");
       const { OrbitControls } = await import(
         "three/addons/controls/OrbitControls.js"
       );
+      const { RoomEnvironment } = await import(
+        "three/addons/environments/RoomEnvironment.js"
+      );
       if (disposed) return;
 
-      // Couleurs de scène prises sur le thème courant (clair/sombre).
-      const floorHex = cssColor("--paper", "#fafaf9");
-      const podiumHex = cssColor("--surface", "#ffffff");
+      // Dégradé "cyclorama" peint dans un canvas → fond studio fixe (jamais lié
+      // au thème). Léger halo radial = spot derrière l'objet.
+      const makeBackdrop = (): THREE.Texture => {
+        const s = 512;
+        const cv = document.createElement("canvas");
+        cv.width = s;
+        cv.height = s;
+        const ctx = cv.getContext("2d")!;
+        const grad = ctx.createLinearGradient(0, 0, 0, s);
+        grad.addColorStop(0, "#e7e4df");
+        grad.addColorStop(0.55, "#d8d4ce");
+        grad.addColorStop(1, "#c4bfb8");
+        ctx.fillStyle = grad;
+        ctx.fillRect(0, 0, s, s);
+        const halo = ctx.createRadialGradient(
+          s * 0.5,
+          s * 0.42,
+          s * 0.04,
+          s * 0.5,
+          s * 0.42,
+          s * 0.62,
+        );
+        halo.addColorStop(0, "rgba(255,252,247,0.45)");
+        halo.addColorStop(1, "rgba(255,252,247,0)");
+        ctx.fillStyle = halo;
+        ctx.fillRect(0, 0, s, s);
+        const tex = new THREE.CanvasTexture(cv);
+        tex.colorSpace = THREE.SRGBColorSpace;
+        return tex;
+      };
 
       const scene = new THREE.Scene();
+      bgTexture = makeBackdrop();
+      scene.background = bgTexture;
 
       const camera = new THREE.PerspectiveCamera(
-        40,
+        38,
         el.clientWidth / el.clientHeight,
         0.1,
-        1000,
+        2000,
       );
-      renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(el.clientWidth, el.clientHeight);
       renderer.shadowMap.enabled = true;
       renderer.shadowMap.type = THREE.PCFSoftShadowMap;
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.05;
+      renderer.toneMappingExposure = 1.0;
       el.appendChild(renderer.domElement);
+
+      // Éclairage image-based réaliste (réflexions/ombrage doux) sans fichier HDR.
+      const pmrem = new THREE.PMREMGenerator(renderer);
+      envTexture = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+      scene.environment = envTexture;
+      pmrem.dispose();
 
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
@@ -79,7 +113,7 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
       const material = new THREE.MeshStandardMaterial({
         color: new THREE.Color(color),
         metalness: 0.05,
-        roughness: 0.6,
+        roughness: 0.55,
       });
 
       let object: THREE.Object3D;
@@ -139,16 +173,16 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
 
       const maxDim = Math.max(size.x, size.y, size.z) || 1;
       const footprintR = Math.hypot(size.x, size.z) / 2 || maxDim / 2;
-      const podiumRadius = footprintR * 1.35 + maxDim * 0.05;
-      const podiumHeight = maxDim * 0.16;
+      const podiumRadius = footprintR * 1.5 + maxDim * 0.1;
+      const podiumHeight = maxDim * 0.14;
 
-      // Socle (le « meuble ») : cylindre mat, sommet à y = 0 sous l'objet.
+      // Socle (le « meuble ») : cylindre mat gris neutre, sommet à y = 0.
       const podium = new THREE.Mesh(
-        new THREE.CylinderGeometry(podiumRadius, podiumRadius * 1.05, podiumHeight, 72),
+        new THREE.CylinderGeometry(podiumRadius, podiumRadius * 1.06, podiumHeight, 96),
         new THREE.MeshStandardMaterial({
-          color: new THREE.Color(podiumHex),
-          roughness: 0.85,
-          metalness: 0,
+          color: new THREE.Color("#d2cfc9"),
+          roughness: 0.5,
+          metalness: 0.05,
         }),
       );
       podium.position.y = -podiumHeight / 2;
@@ -156,13 +190,14 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
       podium.receiveShadow = true;
       scene.add(podium);
 
-      // Sol infini : ancre la scène (fin du « flottement ») et reçoit l'ombre.
+      // Sol mat neutre : ancre la scène (fin du « flottement ») et reçoit l'ombre.
+      // Léger sheen (roughness < 1 + IBL) → reflet doux réaliste.
       const floor = new THREE.Mesh(
-        new THREE.PlaneGeometry(maxDim * 60, maxDim * 60),
+        new THREE.PlaneGeometry(maxDim * 80, maxDim * 80),
         new THREE.MeshStandardMaterial({
-          color: new THREE.Color(floorHex),
-          roughness: 1,
-          metalness: 0,
+          color: new THREE.Color("#c7c2bb"),
+          roughness: 0.6,
+          metalness: 0.08,
         }),
       );
       floor.rotation.x = -Math.PI / 2;
@@ -170,46 +205,45 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
       floor.receiveShadow = true;
       scene.add(floor);
 
-      // Brume couleur du sol : fond le sol dans l'arrière-plan (sweep studio),
-      // évite une ligne d'horizon dure entre sol et fond transparent.
-      const dist = maxDim * 2.6;
-      scene.fog = new THREE.Fog(new THREE.Color(floorHex), dist * 1.4, dist * 4.5);
+      const dist = maxDim * 2.8;
+      // Brume couleur du bas de fond : fond le sol dans le cyclorama (sweep
+      // studio sans ligne d'horizon dure).
+      scene.fog = new THREE.Fog(new THREE.Color("#c4bfb8"), dist * 1.5, dist * 5);
 
-      // Éclairage studio : ambiant doux + hémisphérique + clé (ombres) + remplissage.
-      scene.add(new THREE.AmbientLight(0xffffff, 0.5));
-      scene.add(
-        new THREE.HemisphereLight(0xffffff, new THREE.Color(floorHex), 0.55),
-      );
-      const keyLight = new THREE.DirectionalLight(0xffffff, 2.2);
-      keyLight.position.set(maxDim * 2.5, maxDim * 4, maxDim * 2.2);
+      // Éclairage : IBL doux (RoomEnvironment) + clé (ombre) + contour (sépare
+      // l'objet du fond, utile pour les modèles très clairs ou très foncés).
+      scene.add(new THREE.AmbientLight(0xffffff, 0.15));
+      const keyLight = new THREE.DirectionalLight(0xffffff, 1.7);
+      keyLight.position.set(maxDim * 2.2, maxDim * 4, maxDim * 2.6);
       keyLight.castShadow = true;
       keyLight.shadow.mapSize.set(2048, 2048);
+      keyLight.shadow.radius = 8;
       keyLight.shadow.bias = -0.0004;
       keyLight.shadow.normalBias = 0.02;
       const sc = keyLight.shadow.camera;
-      const r = podiumRadius * 2.4;
+      const r = podiumRadius * 2.6;
       sc.left = -r;
       sc.right = r;
       sc.top = r;
       sc.bottom = -r;
       sc.near = maxDim * 0.1;
-      sc.far = maxDim * 14;
+      sc.far = maxDim * 16;
       keyLight.target.position.set(0, size.y * 0.4, 0);
       scene.add(keyLight.target);
       scene.add(keyLight);
-      const fillLight = new THREE.DirectionalLight(0xffffff, 0.5);
-      fillLight.position.set(-maxDim * 3, maxDim * 1.5, -maxDim * 2.5);
-      scene.add(fillLight);
+      const rimLight = new THREE.DirectionalLight(0xffffff, 1.1);
+      rimLight.position.set(-maxDim * 2.4, maxDim * 2.6, -maxDim * 3);
+      scene.add(rimLight);
 
       // Cadrage : vue 3/4 légèrement plongeante, orbite autour du centre objet.
       const targetY = size.y * 0.5;
       controls.target.set(0, targetY, 0);
       controls.maxPolarAngle = Math.PI / 2 - 0.05; // reste au-dessus du sol
-      controls.minDistance = maxDim * 1.1;
-      controls.maxDistance = maxDim * 5;
-      camera.position.set(dist * 0.7, targetY + maxDim * 0.9, dist * 0.95);
+      controls.minDistance = maxDim * 1.2;
+      controls.maxDistance = maxDim * 5.5;
+      camera.position.set(dist * 0.68, targetY + maxDim * 0.85, dist * 0.95);
       camera.near = maxDim / 100;
-      camera.far = maxDim * 100;
+      camera.far = maxDim * 120;
       camera.updateProjectionMatrix();
       controls.update();
       setLoading(false);
@@ -235,6 +269,8 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
       cancelAnimationFrame(frame);
       if (onResize) window.removeEventListener("resize", onResize);
       controls?.dispose();
+      envTexture?.dispose();
+      bgTexture?.dispose();
       if (renderer) {
         renderer.dispose();
         renderer.domElement.remove();
