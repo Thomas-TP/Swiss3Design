@@ -121,7 +121,7 @@ export function ProductPurchase({
                   className={`h-9 w-9 rounded-full border transition-transform ${
                     active
                       ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-paper"
-                      : "border-black/10 hover:scale-110"
+                      : "border-swatch-ring hover:scale-110"
                   }`}
                   style={{ backgroundColor: c.hex }}
                 />

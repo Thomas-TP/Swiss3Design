@@ -125,7 +125,7 @@ function ColorChip({ color }: { color: ColorItem }) {
   return (
     <span className="inline-flex items-center gap-2 rounded-full border border-line bg-paper py-1 pl-1.5 pr-2 text-xs font-medium">
       <span
-        className="h-4 w-4 shrink-0 rounded-full border border-black/10"
+        className="h-4 w-4 shrink-0 rounded-full border border-swatch-ring"
         style={{ backgroundColor: color.hex }}
       />
       {color.name}

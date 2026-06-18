@@ -40,6 +40,12 @@
   /* L'accent rouge marque est constant dans les deux thèmes */
   --color-accent: #e5231c;
   --color-accent-dark: #c01d14;
+  /* Contour des pastilles de couleur : gris medium constant, ~4.4:1 aussi bien
+     sur fond clair (#fff) que sombre (#1a1714) → bordure toujours visible quel
+     que soit le remplissage (noir sur noir, blanc sur blanc). WCAG 1.4.11 (3:1).
+     Un gris plus clair échouerait sur fond clair, plus foncé sur fond sombre :
+     #767676 est le point d'équilibre qui passe AA des deux côtés. */
+  --color-swatch-ring: #767676;
   /* Panneau « nuit » : fond sombre constant dans les deux thèmes, réservé
      aux blocs de mise en avant. Évite le pavé blanc éblouissant en mode
      sombre que produisait l'inversion bg-ink. */

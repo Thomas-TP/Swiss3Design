@@ -197,7 +197,7 @@ export default async function ShopPage({
                   className={`h-7 w-7 rounded-full border transition-transform hover:scale-110 ${
                     active
                       ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-surface"
-                      : "border-black/10"
+                      : "border-swatch-ring"
                   }`}
                   style={{ backgroundColor: c.hex }}
                 />

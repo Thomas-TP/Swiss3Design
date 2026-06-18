@@ -79,7 +79,9 @@
     "view3d": "In 3D ansehen",
     "close": "Schließen",
     "error": "3D-Vorschau nicht verfügbar.",
-    "colorLabel": "Farbe:"
+    "colorLabel": "Farbe:",
+    "badge3d": "3D-Ansicht",
+    "dragHint": "Zum Drehen ziehen"
   },
   "cartReminder": {
     "title": "Gerade keine Zeit?",

@@ -281,7 +281,7 @@ export function ProductForm({
                     }`}
                   >
                     <span
-                      className="h-5 w-5 shrink-0 rounded-full border border-black/10"
+                      className="h-5 w-5 shrink-0 rounded-full border border-swatch-ring"
                       style={{ backgroundColor: c.hex }}
                     />
                     {c.name}

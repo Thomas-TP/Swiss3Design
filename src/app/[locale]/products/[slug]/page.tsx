@@ -18,7 +18,6 @@ import { ProductGallery } from "@/components/product-gallery";
 import { ProductPurchase } from "@/components/product-purchase";
 import { ProductCard } from "@/components/product-card";
 import { StarRating } from "@/components/star-rating";
-import { ProductViewer3D } from "@/components/product-viewer-3d";
 
 export const dynamic = "force-dynamic";
 
@@ -113,13 +112,12 @@ export default async function ProductPage({
 
       <div className="grid gap-8 md:grid-cols-2 md:gap-14">
         <div>
-          <ProductGallery images={product.images} name={product.name} />
-          {product.model3dUrl && (
-            <ProductViewer3D
-              modelUrl={product.model3dUrl}
-              colors={product.colors}
-            />
-          )}
+          <ProductGallery
+            images={product.images}
+            name={product.name}
+            model3dUrl={product.model3dUrl}
+            colors={product.colors}
+          />
         </div>
 
         <div className="flex flex-col">

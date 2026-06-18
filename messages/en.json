@@ -79,7 +79,9 @@
     "view3d": "View in 3D",
     "close": "Close",
     "error": "3D preview unavailable.",
-    "colorLabel": "Color:"
+    "colorLabel": "Color:",
+    "badge3d": "3D view",
+    "dragHint": "Drag to rotate"
   },
   "cartReminder": {
     "title": "No time right now?",

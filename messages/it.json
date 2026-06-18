@@ -79,7 +79,9 @@
     "view3d": "Vedi in 3D",
     "close": "Chiudi",
     "error": "Anteprima 3D non disponibile.",
-    "colorLabel": "Colore:"
+    "colorLabel": "Colore:",
+    "badge3d": "Vista 3D",
+    "dragHint": "Trascina per ruotare"
   },
   "cartReminder": {
     "title": "Non hai tempo ora?",

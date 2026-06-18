@@ -76,7 +76,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
               <span
                 key={c.name}
                 title={c.name}
-                className="h-3.5 w-3.5 rounded-full border border-black/10"
+                className="h-3.5 w-3.5 rounded-full border border-swatch-ring"
                 style={{ backgroundColor: c.hex }}
               />
             ))}

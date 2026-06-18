@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type * as THREE from "three";
 import type { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { Box, X, Loader2 } from "lucide-react";
+import { Box, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 interface Swatch {
@@ -11,43 +11,17 @@ interface Swatch {
   hex: string;
 }
 
-// Viewer 3D de la fiche produit. Three.js est chargé **dynamiquement** à
-// l'activation (hors bundle initial). Le modèle (.stl géométrie pure, ou .glb)
-// est teinté dans la couleur choisie parmi celles proposées par le produit.
-export function ProductViewer3D({
+// Viewer 3D **embarqué** dans la galerie produit (dernier "slot"). Three.js est
+// chargé dynamiquement au montage (hors bundle initial) — la galerie ne monte ce
+// composant que lorsque la vignette 3D est sélectionnée, donc le coût n'est payé
+// qu'à la demande. Le modèle (.stl géométrie pure, ou .glb) est teinté dans la
+// couleur choisie parmi celles proposées par le produit.
+export function ModelViewer({
   modelUrl,
   colors,
 }: {
   modelUrl: string;
   colors: Swatch[];
-}) {
-  const t = useTranslations("viewer");
-  const [active, setActive] = useState(false);
-
-  if (!active) {
-    return (
-      <button
-        type="button"
-        onClick={() => setActive(true)}
-        className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-card border border-line bg-surface py-2.5 text-sm font-semibold text-soft transition-colors hover:border-ink hover:text-ink"
-      >
-        <Box size={16} />
-        {t("view3d")}
-      </button>
-    );
-  }
-
-  return <Viewer modelUrl={modelUrl} colors={colors} onClose={() => setActive(false)} />;
-}
-
-function Viewer({
-  modelUrl,
-  colors,
-  onClose,
-}: {
-  modelUrl: string;
-  colors: Swatch[];
-  onClose: () => void;
 }) {
   const t = useTranslations("viewer");
   const mountRef = useRef<HTMLDivElement>(null);
@@ -193,9 +167,14 @@ function Viewer({
   }, [color]);
 
   return (
-    <div className="mt-3 overflow-hidden rounded-card border border-line bg-gradient-to-br from-paper to-line/40">
+    <>
       <div className="relative">
         <div ref={mountRef} className="aspect-square w-full cursor-grab" />
+        {/* Pastille permanente : rappelle qu'on est dans la vue interactive 3D */}
+        <span className="pointer-events-none absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-surface/90 px-2.5 py-1 text-[11px] font-semibold backdrop-blur">
+          <Box size={12} />
+          {t("badge3d")}
+        </span>
         {loading && !error && (
           <div className="absolute inset-0 grid place-items-center text-soft">
             <Loader2 size={22} className="animate-spin" />
@@ -206,14 +185,11 @@ function Viewer({
             {t("error")}
           </div>
         )}
-        <button
-          type="button"
-          onClick={onClose}
-          aria-label={t("close")}
-          className="absolute right-3 top-3 grid h-8 w-8 place-items-center rounded-full bg-surface/90 text-soft backdrop-blur transition-colors hover:text-ink"
-        >
-          <X size={16} />
-        </button>
+        {!loading && !error && (
+          <span className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 rounded-full bg-ink/75 px-2.5 py-1 text-[11px] font-medium text-paper">
+            {t("dragHint")}
+          </span>
+        )}
       </div>
 
       {colors.length > 0 && (
@@ -230,13 +206,13 @@ function Viewer({
               className={`h-6 w-6 rounded-full border transition-transform hover:scale-110 ${
                 color === c.hex
                   ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-surface"
-                  : "border-black/10"
+                  : "border-swatch-ring"
               }`}
               style={{ backgroundColor: c.hex }}
             />
           ))}
         </div>
       )}
-    </div>
+    </>
   );
 }

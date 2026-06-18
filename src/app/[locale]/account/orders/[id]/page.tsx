@@ -139,7 +139,7 @@ export default async function OrderDetailPage({
                   {i.colorName && (
                     <span className="inline-flex items-center gap-1.5 text-xs text-soft">
                       <span
-                        className="h-3 w-3 shrink-0 rounded-full border border-black/10"
+                        className="h-3 w-3 shrink-0 rounded-full border border-swatch-ring"
                         style={{ backgroundColor: i.colorHex ?? undefined }}
                       />
                       {i.colorName}
