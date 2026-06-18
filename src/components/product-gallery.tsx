@@ -1,10 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Box } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cfImage } from "@/lib/cf-image";
 import { ModelViewer } from "./product-viewer-3d";
+import { useProductColor } from "./product-color-context";
+import { buildShowroomScene } from "./showroom-scene";
 
 interface GalleryImage {
   url: string;
@@ -13,10 +15,10 @@ interface GalleryImage {
 
 // Galerie de la page produit : grande image + vignettes. Quand le produit a un
 // modèle 3D, celui-ci devient le **dernier slot** de la galerie — une vignette
-// (la 1re image assombrie + badge « 3D ») qui, sélectionnée, remplace la grande
-// image par le viewer interactif. Plus de bouton « Voir en 3D » séparé : la 3D
-// vit parmi les images, signalée par son badge. La teinte du modèle suit la
-// couleur choisie dans le bloc d'achat (contexte ProductColor).
+// qui, sélectionnée, remplace la grande image par le viewer interactif. Plus de
+// bouton « Voir en 3D » séparé : la 3D vit parmi les images. La vignette est un
+// **vrai rendu de la scène 3D** (snapshot hors-écran de `showroom-scene`), pas
+// la photo produit. La teinte du modèle suit la couleur du bloc d'achat.
 export function ProductGallery({
   images,
   name,
@@ -27,6 +29,7 @@ export function ProductGallery({
   model3dUrl?: string | null;
 }) {
   const t = useTranslations("viewer");
+  const { colors } = useProductColor();
   const has3d = Boolean(model3dUrl);
   // Le slot 3D occupe l'index juste après la dernière image.
   const slot3dIndex = images.length;
@@ -35,9 +38,46 @@ export function ProductGallery({
   const [index, setIndex] = useState(0);
   const is3d = has3d && index === slot3dIndex;
   const current = images[index] ?? images[0];
-  // Vignette du slot 3D : on réutilise la 1re photo du produit, assombrie, pour
-  // donner un aperçu « du modèle » sans rendu 3D coûteux dans la grille.
-  const thumb3dSrc = images[0]?.url;
+
+  // Vignette 3D : on rend une fois la scène showroom hors-écran et on capture
+  // l'image (toDataURL). Donne un aperçu fidèle de la visualisation interactive.
+  const [thumb3d, setThumb3d] = useState<string | null>(null);
+  useEffect(() => {
+    if (!model3dUrl) return;
+    let cancelled = false;
+    (async () => {
+      const THREE = await import("three");
+      const renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        preserveDrawingBuffer: true,
+      });
+      try {
+        renderer.setPixelRatio(1);
+        renderer.setSize(384, 384);
+        const built = await buildShowroomScene(
+          renderer,
+          model3dUrl,
+          colors[0]?.hex ?? "#E5231C",
+          1,
+        );
+        renderer.render(built.scene, built.camera);
+        const url = renderer.domElement.toDataURL("image/png");
+        built.dispose();
+        if (!cancelled) setThumb3d(url);
+      } catch {
+        // En cas d'échec, la vignette de repli (dégradé + badge) reste affichée.
+      } finally {
+        // Toujours libérer le contexte WebGL hors-écran (ressource limitée).
+        renderer.dispose();
+        renderer.forceContextLoss();
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+    // Snapshot unique : couleur par défaut, ne se régénère pas au changement de teinte.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [model3dUrl]);
 
   return (
     <div>
@@ -90,24 +130,21 @@ export function ProductGallery({
                 is3d ? "border-ink" : "border-line hover:border-ink/40"
               }`}
             >
-              {thumb3dSrc ? (
+              {thumb3d ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={cfImage(thumb3dSrc, { width: 200 })}
+                  src={thumb3d}
                   alt=""
-                  loading="lazy"
                   decoding="async"
                   className="aspect-square w-full object-cover"
                 />
               ) : (
-                <span className="block aspect-square w-full bg-gradient-to-br from-paper to-line/40" />
+                <span className="block aspect-square w-full animate-pulse bg-gradient-to-br from-ink/80 to-black" />
               )}
-              {/* Voile + pastille : signale une visualisation 3D interactive. */}
-              <span className="absolute inset-0 grid place-items-center bg-ink/45">
-                <span className="flex items-center gap-1 rounded-full bg-surface/95 px-2 py-1 text-[10px] font-bold text-ink shadow-sm">
-                  <Box size={11} />
-                  3D
-                </span>
+              {/* Petite pastille : signale une visualisation 3D interactive. */}
+              <span className="absolute bottom-1 right-1 flex items-center gap-0.5 rounded-md bg-black/60 px-1.5 py-0.5 text-[9px] font-bold text-white backdrop-blur">
+                <Box size={9} />
+                3D
               </span>
             </button>
           )}
