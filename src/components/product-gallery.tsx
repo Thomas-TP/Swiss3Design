@@ -11,26 +11,20 @@ interface GalleryImage {
   alt: string | null;
 }
 
-interface Swatch {
-  name: string;
-  hex: string;
-}
-
 // Galerie de la page produit : grande image + vignettes. Quand le produit a un
 // modèle 3D, celui-ci devient le **dernier slot** de la galerie — une vignette
 // (la 1re image assombrie + badge « 3D ») qui, sélectionnée, remplace la grande
 // image par le viewer interactif. Plus de bouton « Voir en 3D » séparé : la 3D
-// vit parmi les images, signalée par son badge.
+// vit parmi les images, signalée par son badge. La teinte du modèle suit la
+// couleur choisie dans le bloc d'achat (contexte ProductColor).
 export function ProductGallery({
   images,
   name,
   model3dUrl,
-  colors = [],
 }: {
   images: GalleryImage[];
   name: string;
   model3dUrl?: string | null;
-  colors?: Swatch[];
 }) {
   const t = useTranslations("viewer");
   const has3d = Boolean(model3dUrl);
@@ -49,7 +43,7 @@ export function ProductGallery({
     <div>
       <div className="overflow-hidden rounded-card border border-line bg-gradient-to-br from-paper to-line/40">
         {is3d && model3dUrl ? (
-          <ModelViewer modelUrl={model3dUrl} colors={colors} />
+          <ModelViewer modelUrl={model3dUrl} />
         ) : (
           current && (
             // eslint-disable-next-line @next/next/no-img-element

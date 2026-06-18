@@ -15,6 +15,7 @@ import {
 import { alternatesFor, productJsonLd } from "@/lib/seo";
 import { MulticolorDots } from "@/components/multicolor-dots";
 import { ProductGallery } from "@/components/product-gallery";
+import { ProductColorProvider } from "@/components/product-color-context";
 import { ProductPurchase } from "@/components/product-purchase";
 import { ProductCard } from "@/components/product-card";
 import { StarRating } from "@/components/star-rating";
@@ -110,13 +111,13 @@ export default async function ProductPage({
         {t("backToShop")}
       </Link>
 
-      <div className="grid gap-8 md:grid-cols-2 md:gap-14">
+      <ProductColorProvider colors={product.colors}>
+       <div className="grid gap-8 md:grid-cols-2 md:gap-14">
         <div>
           <ProductGallery
             images={product.images}
             name={product.name}
             model3dUrl={product.model3dUrl}
-            colors={product.colors}
           />
         </div>
 
@@ -159,7 +160,6 @@ export default async function ProductPage({
               priceCents: v.priceCents,
               stock: v.stock,
             }))}
-            colors={product.colors}
           />
 
           {specs.length > 0 && (
@@ -174,7 +174,8 @@ export default async function ProductPage({
             </dl>
           )}
         </div>
-      </div>
+       </div>
+      </ProductColorProvider>
 
       {productReviews.length > 0 && (
         <section className="mt-16 md:mt-24">

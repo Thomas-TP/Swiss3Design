@@ -5,18 +5,13 @@ import { useLocale, useTranslations } from "next-intl";
 import { formatChf } from "@/lib/format";
 import { AddToCart, BuyNow } from "@/components/add-to-cart";
 import { FavoriteButton } from "@/components/favorite-button";
+import { useProductColor } from "@/components/product-color-context";
 
 interface Variant {
   id: string;
   name: string;
   priceCents: number | null;
   stock: number | null;
-}
-
-interface ColorOption {
-  id: string;
-  name: string;
-  hex: string;
 }
 
 // Bloc d'achat de la fiche produit : prix, disponibilité, sélection de couleur
@@ -32,7 +27,6 @@ export function ProductPurchase({
   productStock,
   imageUrl,
   variants,
-  colors,
 }: {
   productId: string;
   slug: string;
@@ -43,7 +37,6 @@ export function ProductPurchase({
   productStock: number | null;
   imageUrl: string | null;
   variants: Variant[];
-  colors: ColorOption[];
 }) {
   const t = useTranslations("product");
   const locale = useLocale();
@@ -52,8 +45,14 @@ export function ProductPurchase({
   );
   const selected = variants.find((v) => v.id === selectedId) ?? null;
 
-  const [colorId, setColorId] = useState<string | null>(colors[0]?.id ?? null);
-  const selectedColor = colors.find((c) => c.id === colorId) ?? null;
+  // Couleur : source unique partagée avec le viewer 3D (contexte). Le sélecteur
+  // ci-dessous est donc le seul de la fiche — il pilote aussi la teinte 3D.
+  const {
+    colors,
+    selectedId: colorId,
+    setSelectedId: setColorId,
+    selected: selectedColor,
+  } = useProductColor();
 
   const priceCents = selected?.priceCents ?? basePriceCents;
   const stock = variants.length > 0 ? (selected?.stock ?? null) : productStock;
