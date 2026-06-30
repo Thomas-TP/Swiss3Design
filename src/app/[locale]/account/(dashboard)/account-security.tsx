@@ -30,6 +30,7 @@ function TwoFactor() {
   const [code, setCode] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [newBackupCodes, setNewBackupCodes] = useState<string[] | null>(null);
 
   async function onEnable() {
     setPending(true);
@@ -69,6 +70,21 @@ function TwoFactor() {
     }
     setPassword("");
     router.refresh();
+  }
+
+  async function onRegenerateBackupCodes() {
+    setPending(true);
+    setError(null);
+    const { data: res, error: err } = await twoFactor.generateBackupCodes({
+      password,
+    });
+    setPending(false);
+    if (err || !res) {
+      setError(t("security.errorPassword"));
+      return;
+    }
+    setNewBackupCodes(res.backupCodes);
+    setPassword("");
   }
 
   return (
@@ -149,24 +165,68 @@ function TwoFactor() {
         </div>
       ) : enabled ? (
         <div className="mt-4 space-y-3">
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
-            placeholder={t("security.password")}
-            className={field}
-          />
-          {error && <p className="text-sm font-medium text-accent">{error}</p>}
-          <button
-            type="button"
-            onClick={onDisable}
-            disabled={pending}
-            className={btnGhost}
-          >
-            <ShieldOff size={15} />
-            {pending ? t("security.processing") : t("security.disable")}
-          </button>
+          {newBackupCodes ? (
+            <div className="rounded-xl bg-paper p-4">
+              <p className="text-xs font-semibold text-soft">
+                {t("security.backupTitle")}
+              </p>
+              <p className="mt-1 text-xs text-soft">{t("security.backupHint")}</p>
+              <ul className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-sm tabular-nums">
+                {newBackupCodes.map((c) => (
+                  <li key={c}>{c}</li>
+                ))}
+              </ul>
+              <button
+                type="button"
+                onClick={() =>
+                  navigator.clipboard?.writeText(newBackupCodes.join("\n"))
+                }
+                className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-soft hover:text-ink"
+              >
+                <Copy size={13} />
+                {t("security.copyCodes")}
+              </button>
+              <button
+                type="button"
+                onClick={() => setNewBackupCodes(null)}
+                className="mt-3 block text-xs font-semibold text-soft hover:text-ink"
+              >
+                {t("security.backupDone")}
+              </button>
+            </div>
+          ) : (
+            <>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="current-password"
+                placeholder={t("security.password")}
+                className={field}
+              />
+              {error && <p className="text-sm font-medium text-accent">{error}</p>}
+              <div className="flex flex-wrap gap-2.5">
+                <button
+                  type="button"
+                  onClick={onDisable}
+                  disabled={pending || !password}
+                  className={btnGhost}
+                >
+                  <ShieldOff size={15} />
+                  {pending ? t("security.processing") : t("security.disable")}
+                </button>
+                <button
+                  type="button"
+                  onClick={onRegenerateBackupCodes}
+                  disabled={pending || !password}
+                  className={btnGhost}
+                >
+                  <KeyRound size={15} />
+                  {pending ? t("security.processing") : t("security.regenerateBackupCodes")}
+                </button>
+              </div>
+            </>
+          )}
         </div>
       ) : (
         <div className="mt-4 space-y-3">

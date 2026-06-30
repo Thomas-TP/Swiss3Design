@@ -82,7 +82,24 @@ export async function getAuth() {
       },
     },
     socialProviders: socialProviders(env),
+    // Session valable 7 j (défaut Better Auth) ; freshAge alignée dessus —
+    // sinon le défaut (24 h) bloque listSessions/unlinkAccount (« session pas
+    // assez fraîche ») pour un client connecté depuis plus d'un jour, alors
+    // que sa session est toujours valide.
+    session: {
+      freshAge: 60 * 60 * 24 * 7,
+    },
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google"],
+      },
+    },
     user: {
+      // Changement d'e-mail : réutilise emailVerification.sendVerificationEmail
+      // ci-dessus (Better Auth route dessus automatiquement) — la nouvelle
+      // adresse n'est appliquée qu'après clic sur le lien envoyé.
+      changeEmail: { enabled: true },
       additionalFields: {
         role: {
           type: "string",
