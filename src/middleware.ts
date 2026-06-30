@@ -99,6 +99,14 @@ export default function middleware(request: NextRequest) {
   response.headers.set("Content-Security-Policy", csp);
   response.headers.set("Reporting-Endpoints", `csp="${origin}/api/csp-report"`);
 
+  // Environnement de preview (wrangler.jsonc → env.preview.vars.APP_ENV) :
+  // désindexation complète, indépendante de robots.txt qui ne couvre que la
+  // prod. Le Worker preview tourne sur sa propre URL *.workers.dev — jamais
+  // de contenu dupliqué indexable.
+  if (process.env.APP_ENV === "preview") {
+    response.headers.set("X-Robots-Tag", "noindex, nofollow, noarchive");
+  }
+
   // next-intl pose le cookie de langue NEXT_LOCALE sans drapeau de sécurité.
   // On le re-pose durci (Secure en prod, HttpOnly, SameSite=Lax). Ce cookie ne
   // contient qu'un code de langue : la synchro côté client de next-intl n'est

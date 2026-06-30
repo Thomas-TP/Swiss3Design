@@ -50,5 +50,56 @@
     "ADMIN_EMAILS": "t@prudhomme.li",
     // Alias Infomaniak : les réponses des clients arrivent dans contact@swiss3design.ch
     "EMAIL_FROM": "Swiss3Design <commandes@swiss3design.ch>"
+  },
+  // Environnement de preview : Worker séparé (swiss3design-preview), bindings
+  // isolés (D1/R2/KV propres, vides — aucune donnée client), sans route sur le
+  // domaine custom (routes/workers_dev sont des clés héritables : on les
+  // RÉÉCRIT explicitement ici pour ne jamais hériter des routes prod par
+  // accident). Déployé via `wrangler deploy --env preview` (build command
+  // « non-production » du dashboard Cloudflare Workers Builds).
+  "env": {
+    "preview": {
+      "name": "swiss3design-preview",
+      "workers_dev": true,
+      // Une seule URL stable et prévisible (pas une URL aléatoire par version).
+      "preview_urls": false,
+      "routes": [],
+      "d1_databases": [
+        {
+          "binding": "DB",
+          "database_name": "swiss3design-preview-db",
+          "database_id": "f4b2c6c5-0fe8-42a3-9aad-5a7a22378d6d",
+          "migrations_dir": "drizzle"
+        }
+      ],
+      "r2_buckets": [
+        {
+          "binding": "R2",
+          "bucket_name": "swiss3design-preview-files"
+        }
+      ],
+      "kv_namespaces": [
+        {
+          "binding": "KV",
+          "id": "8893ee22e6cf4ccca1b5c2a5dd23ef86"
+        }
+      ],
+      "services": [
+        {
+          "binding": "WORKER_SELF_REFERENCE",
+          "service": "swiss3design-preview"
+        }
+      ],
+      "observability": {
+        "enabled": true
+      },
+      "vars": {
+        // Lu par middleware.ts pour désindexer (X-Robots-Tag) tout l'environnement.
+        "APP_ENV": "preview",
+        "BETTER_AUTH_URL": "https://swiss3design-preview.thomastp.workers.dev",
+        "ADMIN_EMAILS": "t@prudhomme.li",
+        "EMAIL_FROM": "Swiss3Design Preview <commandes@swiss3design.ch>"
+      }
+    }
   }
 }

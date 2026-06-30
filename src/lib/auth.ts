@@ -61,10 +61,10 @@ export async function getAuth() {
   return betterAuth({
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
-    trustedOrigins: [
-      "https://swiss3design.ch",
-      "https://www.swiss3design.ch",
-    ],
+    trustedOrigins:
+      env.APP_ENV === "preview"
+        ? [env.BETTER_AUTH_URL]
+        : ["https://swiss3design.ch", "https://www.swiss3design.ch"],
     database: drizzleAdapter(db, { provider: "sqlite" }),
     emailAndPassword: {
       enabled: true,

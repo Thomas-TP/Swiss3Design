@@ -16,6 +16,9 @@ declare global {
     BETTER_AUTH_SECRET: string;
     BETTER_AUTH_URL: string;
     ADMIN_EMAILS: string;
+    // "preview" sur l'environnement de preview (wrangler.jsonc → env.preview),
+    // absent en production. Lu par middleware.ts pour désindexer le site.
+    APP_ENV?: string;
     // Secret pour déclencher la maintenance planifiée (purge R2 + rétention)
     CRON_SECRET?: string;
     RESEND_API_KEY?: string;
