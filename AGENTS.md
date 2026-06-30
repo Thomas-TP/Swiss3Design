@@ -85,11 +85,15 @@ npm run db:migrate:remote # apply migrations to the PROD D1 (normally automatic 
 npm run db:seed:local     # seed local D1 from scripts/seed.sql
 ```
 
-> **Lockfile / npm:** the Cloudflare build runs `npm ci` with **npm 10**. A
-> `package-lock.json` written by **npm 11** breaks it (`Missing: @esbuild/*… from
-> lock file`, optional-dep handling differs). After any dependency change,
-> regenerate the lock with npm 10: `npx -y npm@10 install --package-lock-only`
-> and validate with `npx -y npm@10 ci --dry-run` before pushing.
+> **Lockfile / npm:** the project is on **npm 11**. The Cloudflare build image is
+> pinned to **Node 24** via the repo's `.node-version` file (Node 24 ships npm 11;
+> the image default is Node 22 / npm 10). That makes the CI `npm ci` match the
+> npm 11 `package-lock.json` written locally and by Dependabot — no more
+> `Missing: @esbuild/*… from lock file`. **Don't downgrade to npm 10 or delete
+> `.node-version`**: npm 10's `npm ci` is strict about the per-platform optional
+> packages (`@esbuild/*`) that npm 11 prunes from the lock, so the mismatch comes
+> straight back. Regenerate the lock with the repo's npm (`npm install`) and
+> validate with `npm ci` before pushing.
 
 Cloudflare bindings (`wrangler.jsonc`): `DB` (D1 `swiss3design-db`),
 `R2` (`swiss3design-files`), `KV`, `ASSETS`, `WORKER_SELF_REFERENCE`.
