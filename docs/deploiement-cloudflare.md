@@ -73,12 +73,63 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 ## Au quotidien
 
 - `git push` sur `main` (ou merge d'une PR) → Cloudflare build + migre + déploie
-  automatiquement.
-- Les branches / PR génèrent des **builds de preview** avec une URL de test
-  (commentée directement sur la PR GitHub).
+  automatiquement **en prod**.
+- Les branches / PR (avec « Builds for non-production branches » activé dans
+  Settings → Builds) génèrent un **build de preview** — voir section suivante
+  pour le déployer vers l'environnement isolé plutôt que la prod.
 - Le statut s'affiche directement sur le commit via le **check Cloudflare Workers
   Builds** : vert = build + deploy réussis ; rouge = échec (l'ancienne version reste
   en ligne, rien n'est cassé).
+
+## Environnement de preview (isolé de la prod)
+
+Worker séparé **`swiss3design-preview`**, accessible en permanence à
+**https://swiss3design-preview.thomastp.workers.dev** — toujours la dernière
+branche déployée. Totalement isolé de la prod :
+
+| | Production (`swiss3design`) | Preview (`swiss3design-preview`) |
+| --- | --- | --- |
+| D1 | `swiss3design-db` (données clients réelles) | `swiss3design-preview-db` (vide, migrée) |
+| R2 | `swiss3design-files` | `swiss3design-preview-files` (vide) |
+| KV | namespace prod | namespace preview dédié |
+| Stripe | clé **LIVE** | aucune clé définie (checkout désactivé en preview) |
+| E-mails | Resend actif | `RESEND_API_KEY` non définie → e-mails no-op |
+| SEO | indexable | `X-Robots-Tag: noindex, nofollow, noarchive` sur tout |
+| Secrets | secrets prod | `BETTER_AUTH_SECRET` dédié, généré à part |
+| Routes | `swiss3design.ch` + `www` | aucune (uniquement `*.workers.dev`) |
+
+Config dans [`wrangler.jsonc`](../wrangler.jsonc) → bloc `env.preview`. **Important** :
+`routes` et `workers_dev` sont des clés *héritables* — le bloc `env.preview` les
+réécrit explicitement (`routes: []`, `workers_dev: true`) pour ne jamais hériter
+des routes du domaine custom par accident.
+
+### Déployer une branche vers la preview
+
+**Manuellement** (n'importe quand) :
+```
+npx opennextjs-cloudflare build
+npx wrangler deploy --env preview
+```
+
+**Automatiquement à chaque push de branche** (à activer une fois) :
+1. Dashboard Cloudflare → Worker **swiss3design** → **Settings → Builds**.
+2. Vérifier que **Builds for non-production branches** est activé.
+3. Renseigner le **Non-production branch deploy command** :
+   ```
+   npx wrangler deploy --env preview
+   ```
+   (Le build command reste le même : `npx opennextjs-cloudflare build`.)
+
+Avec ce réglage, chaque push sur une branche autre que `main` redéploie
+automatiquement `swiss3design-preview` — toujours la même URL, dernier push
+gagnant (pas une URL par branche : volontairement simple, un seul endroit à
+ouvrir pour voir l'état du travail en cours).
+
+### Si un jour la preview a besoin de Stripe ou Google OAuth
+Définir les secrets/vars sur l'environnement preview précisément (jamais ceux
+de prod) : `npx wrangler secret put STRIPE_SECRET_KEY --env preview` avec une
+clé **test** Stripe, `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` avec un client
+OAuth de test autorisant `https://swiss3design-preview.thomastp.workers.dev`.
 
 ## Réessayer / revenir en arrière
 
