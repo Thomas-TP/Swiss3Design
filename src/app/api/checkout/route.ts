@@ -14,6 +14,7 @@ import {
 } from "@/db/schema";
 import { getSetting } from "@/db/queries";
 import { getStripe } from "@/lib/stripe";
+import { getOrCreateStripeCustomer } from "@/lib/stripe-customer";
 import { getAuth } from "@/lib/auth";
 import { verifyEmailProof } from "@/lib/email-proof";
 import { validateDiscount } from "@/lib/discounts";
@@ -295,11 +296,25 @@ export async function POST(request: Request) {
 
   const { env } = await getCloudflareContext({ async: true });
   const stripe = getStripe(env.STRIPE_SECRET_KEY);
+
+  // Client connecté : rattache le paiement à son identité Stripe (Customer).
+  // Stripe Link peut alors proposer en 1 clic les cartes déjà enregistrées
+  // par ce client — aucun coffre-fort de moyens de paiement côté serveur.
+  const stripeCustomerId = authSession
+    ? await getOrCreateStripeCustomer(stripe, db, {
+        id: authSession.user.id,
+        email: authSession.user.email,
+        name: authSession.user.name,
+        stripeCustomerId: authSession.user.stripeCustomerId ?? null,
+      })
+    : undefined;
+
   const paymentIntent = await stripe.paymentIntents.create({
     amount: totalCents,
     currency: "chf",
     automatic_payment_methods: { enabled: true },
     receipt_email: email,
+    ...(stripeCustomerId ? { customer: stripeCustomerId } : {}),
     shipping: {
       name: address.name,
       address: {

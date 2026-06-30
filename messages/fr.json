@@ -245,6 +245,7 @@
       "quotes": "Devis",
       "profile": "Profil",
       "addresses": "Adresses",
+      "payment": "Paiement",
       "security": "Sécurité",
       "admin": "Administration"
     },
@@ -292,6 +293,14 @@
       "add": "Ajouter une adresse",
       "save": "Enregistrer",
       "error": "Une erreur est survenue. Vérifiez les champs et réessayez."
+    },
+    "payment": {
+      "title": "Paiement",
+      "subtitle": "Vos moyens de paiement, gérés en sécurité par Stripe Link.",
+      "linkTitle": "Stripe Link",
+      "linkDesc": "Vos cartes sont enregistrées en sécurité par Link, le portefeuille de Stripe — Swiss3Design ne stocke jamais vos numéros de carte. À votre prochain achat, payez en un clic.",
+      "manageOnLink": "Gérer mes moyens de paiement sur Link",
+      "cardsTitle": "Cartes enregistrées"
     },
     "myOrders": "Mes commandes",
     "myQuotes": "Mes devis",

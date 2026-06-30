@@ -245,6 +245,7 @@
       "quotes": "Offerten",
       "profile": "Profil",
       "addresses": "Adressen",
+      "payment": "Zahlung",
       "security": "Sicherheit",
       "admin": "Verwaltung"
     },
@@ -292,6 +293,14 @@
       "add": "Adresse hinzufügen",
       "save": "Speichern",
       "error": "Ein Fehler ist aufgetreten. Prüfen Sie die Felder und versuchen Sie es erneut."
+    },
+    "payment": {
+      "title": "Zahlung",
+      "subtitle": "Ihre Zahlungsmittel, sicher verwaltet von Stripe Link.",
+      "linkTitle": "Stripe Link",
+      "linkDesc": "Ihre Karten werden sicher von Link, der Wallet-Lösung von Stripe, gespeichert — Swiss3Design speichert niemals Ihre Kartennummern. Bei Ihrem nächsten Einkauf zahlen Sie mit einem Klick.",
+      "manageOnLink": "Zahlungsmittel auf Link verwalten",
+      "cardsTitle": "Gespeicherte Karten"
     },
     "myOrders": "Meine Bestellungen",
     "myQuotes": "Meine Offerten",

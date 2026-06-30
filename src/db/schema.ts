@@ -380,6 +380,11 @@ export const user = sqliteTable("user", {
   twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" })
     .notNull()
     .default(false),
+  // Identité Stripe du client (Customer), créée paresseusement au premier
+  // checkout connecté — voir src/lib/stripe-customer.ts. Permet à Stripe Link
+  // de proposer les cartes déjà enregistrées par ce client (1-clic), sans
+  // coffre-fort de cartes maison.
+  stripeCustomerId: text("stripe_customer_id"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });

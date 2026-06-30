@@ -115,6 +115,11 @@ export async function getAuth() {
           defaultValue: "customer",
           input: false, // jamais modifiable par le client
         },
+        stripeCustomerId: {
+          type: "string",
+          required: false,
+          input: false, // géré uniquement par src/lib/stripe-customer.ts
+        },
       },
       // Suppression de compte (droit à l'effacement nLPD), confirmée par e-mail.
       deleteUser: {

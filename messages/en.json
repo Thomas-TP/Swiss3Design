@@ -245,6 +245,7 @@
       "quotes": "Quotes",
       "profile": "Profile",
       "addresses": "Addresses",
+      "payment": "Payment",
       "security": "Security",
       "admin": "Administration"
     },
@@ -292,6 +293,14 @@
       "add": "Add an address",
       "save": "Save",
       "error": "Something went wrong. Check the fields and try again."
+    },
+    "payment": {
+      "title": "Payment",
+      "subtitle": "Your payment methods, securely managed by Stripe Link.",
+      "linkTitle": "Stripe Link",
+      "linkDesc": "Your cards are securely saved by Link, Stripe's wallet — Swiss3Design never stores your card numbers. On your next purchase, pay in one click.",
+      "manageOnLink": "Manage my payment methods on Link",
+      "cardsTitle": "Saved cards"
     },
     "myOrders": "My orders",
     "myQuotes": "My quotes",
