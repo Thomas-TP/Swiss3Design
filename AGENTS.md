@@ -135,8 +135,9 @@ reconnect Git: [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md
 
 ## Workflow & etiquette
 
-- **End of task:** auto-push to `main` and start the dev server (`npm run dev`);
-  Thomas tests in his own browser — don't run automated browser verification.
+- **End of task:** auto-push to `main` and start the dev server (`npm run dev`).
+  Verify in a browser preview whenever it helps confirm the change — you're free
+  to use the preview/verification tools as you see fit.
 - Branch `main` is the deploy branch; a push goes live. Be deliberate.
 - Match the surrounding style: **comments and user-facing copy are in French**;
   code identifiers in English. Keep the dense, explanatory comment style already

@@ -239,6 +239,22 @@
   "account": {
     "title": "Il mio account",
     "greeting": "Ciao {name}",
+    "nav": {
+      "overview": "Panoramica",
+      "orders": "Ordini",
+      "quotes": "Preventivi",
+      "security": "Sicurezza",
+      "admin": "Amministrazione"
+    },
+    "overview": {
+      "subtitle": "Panoramica della tua attività e del tuo account.",
+      "openOrders": "Ordini in corso",
+      "actionQuotes": "Preventivi in sospeso",
+      "seeAll": "Vedi tutto",
+      "emptyTitle": "Benvenuto su Swiss3Design",
+      "emptyDesc": "Non hai ancora ordini o preventivi. Scopri le nostre stampe 3D multicolore.",
+      "emptyCta": "Esplora il negozio"
+    },
     "avatarTitle": "Scegli un avatar",
     "avatarChange": "Cambia avatar",
     "myOrders": "I miei ordini",
@@ -268,6 +284,7 @@
     },
     "security": {
       "title": "Sicurezza",
+      "subtitle": "Password, autenticazione a due fattori ed eliminazione dell'account.",
       "twoFactorTitle": "Autenticazione a due fattori (2FA)",
       "twoFactorDesc": "Un passaggio di verifica tramite app (TOTP) all'accesso.",
       "twoFactorActive": "Attiva",

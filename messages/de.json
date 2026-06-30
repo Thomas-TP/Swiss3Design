@@ -239,6 +239,22 @@
   "account": {
     "title": "Mein Konto",
     "greeting": "Hallo {name}",
+    "nav": {
+      "overview": "Übersicht",
+      "orders": "Bestellungen",
+      "quotes": "Offerten",
+      "security": "Sicherheit",
+      "admin": "Verwaltung"
+    },
+    "overview": {
+      "subtitle": "Überblick über Ihre Aktivität und Ihr Konto.",
+      "openOrders": "Laufende Bestellungen",
+      "actionQuotes": "Offene Offerten",
+      "seeAll": "Alle anzeigen",
+      "emptyTitle": "Willkommen bei Swiss3Design",
+      "emptyDesc": "Sie haben noch keine Bestellung oder Offerte. Entdecken Sie unsere mehrfarbigen 3D-Drucke.",
+      "emptyCta": "Zum Shop"
+    },
     "avatarTitle": "Avatar wählen",
     "avatarChange": "Avatar ändern",
     "myOrders": "Meine Bestellungen",
@@ -268,6 +284,7 @@
     },
     "security": {
       "title": "Sicherheit",
+      "subtitle": "Passwort, Zwei-Faktor-Authentifizierung und Kontolöschung.",
       "twoFactorTitle": "Zwei-Faktor-Authentifizierung (2FA)",
       "twoFactorDesc": "Ein zusätzlicher Bestätigungsschritt per App (TOTP) bei der Anmeldung.",
       "twoFactorActive": "Aktiviert",
