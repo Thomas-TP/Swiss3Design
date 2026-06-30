@@ -21,25 +21,25 @@
     "db:seed:local": "wrangler d1 execute swiss3design-db --local --file=./scripts/seed.sql"
   },
   "dependencies": {
-    "@opennextjs/cloudflare": "^1.19.11",
+    "@opennextjs/cloudflare": "^1.20.1",
     "@stripe/react-stripe-js": "^6.6.0",
     "@stripe/stripe-js": "^9.8.0",
-    "@types/three": "^0.184.1",
-    "better-auth": "^1.6.19",
+    "@types/three": "^0.185.0",
+    "better-auth": "^1.6.22",
     "drizzle-orm": "^0.45.2",
-    "lucide-react": "^1.20.0",
-    "motion": "^12.40.0",
+    "lucide-react": "^1.22.0",
+    "motion": "^12.42.0",
     "next": "16.2.9",
     "next-intl": "^4.13.0",
     "qrcode.react": "^4.2.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",
-    "stripe": "^22.2.1",
-    "three": "^0.184.0",
+    "stripe": "^22.3.0",
+    "three": "^0.185.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20260617.1",
+    "@cloudflare/workers-types": "^4.20260629.1",
     "@swc/helpers": "^0.5.23",
     "@tailwindcss/postcss": "^4.3.1",
     "@types/node": "^20",
@@ -48,10 +48,10 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
-    "prettier": "^3.8.4",
+    "prettier": "^3.9.1",
     "tailwindcss": "^4.3.1",
     "typescript": "^6",
     "vitest": "^4.1.9",
-    "wrangler": "^4.101.0"
+    "wrangler": "^4.105.0"
   }
 }
