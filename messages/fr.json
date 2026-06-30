@@ -327,7 +327,7 @@
         "new": "Nouveau mot de passe (8 caractères min.)",
         "submit": "Mettre à jour",
         "saved": "Mot de passe mis à jour.",
-        "errorCurrent": "Mot de passe actuel incorrect.",
+        "errorChange": "Mot de passe actuel incorrect, ou le nouveau mot de passe est trop faible ou a déjà fuité.",
         "errorGeneric": "Une erreur est survenue. Réessayez."
       },
       "sessions": {
@@ -345,6 +345,15 @@
         "link": "Lier",
         "unlink": "Délier",
         "errorUnlink": "Impossible de délier ce compte (c'est peut-être votre seul moyen de connexion)."
+      },
+      "passkeys": {
+        "title": "Clés d'accès",
+        "desc": "Connectez-vous avec Face ID, Windows Hello ou une clé de sécurité, sans mot de passe.",
+        "add": "Ajouter une clé d'accès",
+        "unnamed": "Clé d'accès",
+        "delete": "Supprimer",
+        "errorAdd": "Impossible d'ajouter cette clé d'accès. Réessayez.",
+        "errorDelete": "Impossible de supprimer cette clé d'accès."
       },
       "backupTitle": "Codes de récupération",
       "backupHint": "Gardez-les en lieu sûr : ils vous connectent si vous perdez votre téléphone. Chaque code sert une fois.",
@@ -446,13 +455,14 @@
     "resetTitle": "Nouveau mot de passe",
     "resetCta": "Changer le mot de passe",
     "resetSuccess": "Mot de passe modifié ! Vous pouvez maintenant vous connecter.",
-    "resetInvalid": "Lien invalide ou expiré. Refaites une demande.",
+    "resetInvalid": "Lien invalide/expiré, ou ce mot de passe est trop faible ou a déjà fuité. Refaites une demande ou choisissez un autre mot de passe.",
     "verifyNotice": "Compte créé ! Consultez votre boîte mail et cliquez sur le lien pour confirmer votre adresse.",
     "verifyWaiting": "En attente de confirmation… La connexion se fera automatiquement.",
     "verifySigningIn": "E-mail confirmé ! Connexion…",
     "errorUnverified": "Veuillez d'abord confirmer votre adresse e-mail (lien envoyé par e-mail).",
     "errorInvalid": "E-mail ou mot de passe incorrect.",
     "errorExists": "Un compte existe déjà avec cet e-mail.",
+    "errorWeakPassword": "Ce mot de passe ne peut pas être utilisé (trop faible ou déjà fuité lors d'une violation de données connue). Choisissez-en un autre.",
     "errorGeneric": "Une erreur est survenue. Merci de réessayer.",
     "twoFactor": {
       "title": "Vérification en deux étapes",
@@ -464,6 +474,16 @@
       "backupPrompt": "Saisissez l'un de vos codes de récupération.",
       "backupCode": "Code de récupération",
       "error": "Code incorrect. Réessayez."
+    },
+    "passwordless": {
+      "toggle": "Se connecter sans mot de passe",
+      "usePasskey": "Se connecter avec une clé d'accès",
+      "sendLink": "Recevoir un lien de connexion",
+      "sendCode": "Recevoir un code par e-mail",
+      "back": "Retour",
+      "error": "Impossible d'envoyer l'e-mail. Vérifiez l'adresse saisie.",
+      "magicSent": "Lien envoyé ! Consultez votre boîte mail et cliquez dessus pour vous connecter.",
+      "otpSentTo": "Code envoyé à {email}. Saisissez-le ci-dessous :"
     }
   },
   "errors": {

@@ -895,6 +895,59 @@ export function resetPasswordEmail(to: string, url: string): EmailMessage {
   };
 }
 
+// ── Connexion sans mot de passe (FR + EN) ────────────────────────────────────
+
+export function magicLinkEmail(to: string, url: string): EmailMessage {
+  const body = `
+    <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
+      Cliquez sur le bouton ci-dessous pour vous connecter à votre compte
+      Swiss3Design. Ce lien expire dans 5 minutes et ne sert qu'une fois.
+    </p>
+    ${button(url, "Me connecter")}
+    <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">
+      Click the button above to sign in to your Swiss3Design account (link expires in 5 minutes).<br/>
+      Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.
+    </p>`;
+  return {
+    to,
+    from: FROM_CONTACT,
+    subject: "Votre lien de connexion — Swiss3Design",
+    html: layout("Connexion à Swiss3Design", body, FOOTER.fr),
+  };
+}
+
+export function otpEmail(
+  to: string,
+  code: string,
+  type: "sign-in" | "email-verification" | "forget-password" | "change-email",
+): EmailMessage {
+  const intro =
+    type === "sign-in"
+      ? "Voici votre code de connexion Swiss3Design :"
+      : type === "forget-password"
+        ? "Voici votre code pour réinitialiser votre mot de passe Swiss3Design :"
+        : type === "change-email"
+          ? "Voici votre code pour confirmer votre nouvelle adresse e-mail :"
+          : "Voici votre code de vérification Swiss3Design :";
+  const body = `
+    <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">${intro}</p>
+    <p style="margin:0 0 18px;text-align:center;">
+      <span style="display:inline-block;background:#f5f5f4;border-radius:12px;padding:14px 22px;font-size:28px;font-weight:700;letter-spacing:0.3em;color:#1c1917;">
+        ${esc(code)}
+      </span>
+    </p>
+    <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">
+      Here is your Swiss3Design verification code (valid 5 minutes).<br/>
+      Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.
+    </p>`;
+  return {
+    to,
+    from: FROM_CONTACT,
+    subject: `${code} — votre code Swiss3Design`,
+    html: layout("Votre code de vérification", body, FOOTER.fr),
+  };
+}
+
 // ── Vérification d'adresse e-mail (FR + EN, locale inconnue à l'inscription) ─
 
 export function verificationEmail(to: string, url: string): EmailMessage {

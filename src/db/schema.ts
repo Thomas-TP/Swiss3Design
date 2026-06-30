@@ -399,6 +399,31 @@ export const twoFactor = sqliteTable(
   (t) => [index("two_factor_user_idx").on(t.userId)],
 );
 
+// Clés d'accès WebAuthn (Touch ID, Windows Hello, clé de sécurité…) — Better Auth
+export const passkey = sqliteTable(
+  "passkey",
+  {
+    id: text("id").primaryKey(),
+    name: text("name"),
+    publicKey: text("public_key").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    credentialID: text("credential_id").notNull(),
+    counter: integer("counter").notNull(),
+    deviceType: text("device_type").notNull(),
+    backedUp: integer("backed_up", { mode: "boolean" }).notNull(),
+    transports: text("transports"),
+    createdAt: integer("created_at", { mode: "timestamp" }),
+    updatedAt: integer("updated_at", { mode: "timestamp" }),
+    aaguid: text("aaguid"),
+  },
+  (t) => [
+    index("passkey_user_idx").on(t.userId),
+    index("passkey_credential_idx").on(t.credentialID),
+  ],
+);
+
 export const session = sqliteTable(
   "session",
   {

@@ -76,7 +76,13 @@ export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
       callbackURL: `/${locale}/account`,
     });
     if (err) {
-      setError(err.status === 422 ? t("errorExists") : t("errorGeneric"));
+      setError(
+        err.status === 422
+          ? t("errorExists")
+          : err.status === 400
+            ? t("errorWeakPassword")
+            : t("errorGeneric"),
+      );
       setPending(false);
       return;
     }

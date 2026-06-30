@@ -327,7 +327,7 @@
         "new": "New password (8 characters min.)",
         "submit": "Update",
         "saved": "Password updated.",
-        "errorCurrent": "Current password is incorrect.",
+        "errorChange": "Current password is incorrect, or the new password is too weak or already leaked.",
         "errorGeneric": "Something went wrong. Please try again."
       },
       "sessions": {
@@ -345,6 +345,15 @@
         "link": "Connect",
         "unlink": "Disconnect",
         "errorUnlink": "Couldn't disconnect this account (it may be your only way to sign in)."
+      },
+      "passkeys": {
+        "title": "Passkeys",
+        "desc": "Sign in with Face ID, Windows Hello, or a security key — no password needed.",
+        "add": "Add a passkey",
+        "unnamed": "Passkey",
+        "delete": "Delete",
+        "errorAdd": "Couldn't add this passkey. Please try again.",
+        "errorDelete": "Couldn't delete this passkey."
       },
       "backupTitle": "Backup codes",
       "backupHint": "Keep them safe: they sign you in if you lose your phone. Each code works once.",
@@ -446,13 +455,14 @@
     "resetTitle": "New password",
     "resetCta": "Change password",
     "resetSuccess": "Password changed! You can now sign in.",
-    "resetInvalid": "Invalid or expired link. Please request a new one.",
+    "resetInvalid": "Invalid/expired link, or this password is too weak or already leaked. Request a new link or choose another password.",
     "verifyNotice": "Account created! Check your inbox and click the link to confirm your address.",
     "verifyWaiting": "Waiting for confirmation… You'll be signed in automatically.",
     "verifySigningIn": "Email confirmed! Signing in…",
     "errorUnverified": "Please confirm your email address first (link sent by email).",
     "errorInvalid": "Incorrect email or password.",
     "errorExists": "An account with this email already exists.",
+    "errorWeakPassword": "This password can't be used (too weak, or it was found in a known data breach). Please choose another one.",
     "errorGeneric": "Something went wrong. Please try again.",
     "twoFactor": {
       "title": "Two-step verification",
@@ -464,6 +474,16 @@
       "backupPrompt": "Enter one of your backup codes.",
       "backupCode": "Backup code",
       "error": "Incorrect code. Try again."
+    },
+    "passwordless": {
+      "toggle": "Sign in without a password",
+      "usePasskey": "Sign in with a passkey",
+      "sendLink": "Get a sign-in link",
+      "sendCode": "Get a code by email",
+      "back": "Back",
+      "error": "Couldn't send the email. Check the address you entered.",
+      "magicSent": "Link sent! Check your inbox and click it to sign in.",
+      "otpSentTo": "Code sent to {email}. Enter it below:"
     }
   },
   "errors": {

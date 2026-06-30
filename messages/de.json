@@ -327,7 +327,7 @@
         "new": "Neues Passwort (mind. 8 Zeichen)",
         "submit": "Aktualisieren",
         "saved": "Passwort aktualisiert.",
-        "errorCurrent": "Aktuelles Passwort falsch.",
+        "errorChange": "Aktuelles Passwort falsch, oder das neue Passwort ist zu schwach oder bereits durchgesickert.",
         "errorGeneric": "Ein Fehler ist aufgetreten. Bitte erneut versuchen."
       },
       "sessions": {
@@ -345,6 +345,15 @@
         "link": "Verbinden",
         "unlink": "Trennen",
         "errorUnlink": "Dieses Konto kann nicht getrennt werden (es ist möglicherweise Ihre einzige Anmeldemöglichkeit)."
+      },
+      "passkeys": {
+        "title": "Passkeys",
+        "desc": "Anmeldung mit Face ID, Windows Hello oder einem Sicherheitsschlüssel — ganz ohne Passwort.",
+        "add": "Passkey hinzufügen",
+        "unnamed": "Passkey",
+        "delete": "Löschen",
+        "errorAdd": "Dieser Passkey konnte nicht hinzugefügt werden. Bitte erneut versuchen.",
+        "errorDelete": "Dieser Passkey konnte nicht gelöscht werden."
       },
       "backupTitle": "Wiederherstellungscodes",
       "backupHint": "Sicher aufbewahren: Damit melden Sie sich an, falls Sie Ihr Telefon verlieren. Jeder Code ist einmal gültig.",
@@ -446,13 +455,14 @@
     "resetTitle": "Neues Passwort",
     "resetCta": "Passwort ändern",
     "resetSuccess": "Passwort geändert! Sie können sich jetzt anmelden.",
-    "resetInvalid": "Ungültiger oder abgelaufener Link. Bitte fordern Sie einen neuen an.",
+    "resetInvalid": "Ungültiger/abgelaufener Link, oder dieses Passwort ist zu schwach oder bereits durchgesickert. Fordern Sie einen neuen Link an oder wählen Sie ein anderes Passwort.",
     "verifyNotice": "Konto erstellt! Prüfen Sie Ihren Posteingang und klicken Sie auf den Link, um Ihre Adresse zu bestätigen.",
     "verifyWaiting": "Warten auf Bestätigung… Die Anmeldung erfolgt automatisch.",
     "verifySigningIn": "E-Mail bestätigt! Anmeldung…",
     "errorUnverified": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse (Link per E-Mail gesendet).",
     "errorInvalid": "E-Mail oder Passwort falsch.",
     "errorExists": "Mit dieser E-Mail existiert bereits ein Konto.",
+    "errorWeakPassword": "Dieses Passwort kann nicht verwendet werden (zu schwach oder bereits bei einem bekannten Datenleck durchgesickert). Wählen Sie ein anderes.",
     "errorGeneric": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "twoFactor": {
       "title": "Zwei-Faktor-Bestätigung",
@@ -464,6 +474,16 @@
       "backupPrompt": "Geben Sie einen Ihrer Wiederherstellungscodes ein.",
       "backupCode": "Wiederherstellungscode",
       "error": "Falscher Code. Bitte erneut versuchen."
+    },
+    "passwordless": {
+      "toggle": "Ohne Passwort anmelden",
+      "usePasskey": "Mit Passkey anmelden",
+      "sendLink": "Anmeldelink erhalten",
+      "sendCode": "Code per E-Mail erhalten",
+      "back": "Zurück",
+      "error": "E-Mail konnte nicht gesendet werden. Prüfen Sie die eingegebene Adresse.",
+      "magicSent": "Link gesendet! Prüfen Sie Ihr Postfach und klicken Sie darauf, um sich anzumelden.",
+      "otpSentTo": "Code an {email} gesendet. Geben Sie ihn unten ein:"
     }
   },
   "errors": {

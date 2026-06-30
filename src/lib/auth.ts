@@ -1,7 +1,14 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { twoFactor } from "better-auth/plugins";
+import {
+  twoFactor,
+  magicLink,
+  emailOTP,
+  haveIBeenPwned,
+  captcha,
+} from "better-auth/plugins";
+import { passkey } from "@better-auth/passkey";
 import { drizzle } from "drizzle-orm/d1";
 import { and, eq, isNull } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -11,6 +18,8 @@ import {
   verificationEmail,
   resetPasswordEmail,
   deleteAccountEmail,
+  magicLinkEmail,
+  otpEmail,
 } from "./email-templates";
 
 function adminEmails(env: CloudflareEnv): string[] {
@@ -192,6 +201,39 @@ export async function getAuth() {
         },
       },
     },
-    plugins: [twoFactor({ issuer: "Swiss3Design" }), nextCookies()],
+    plugins: [
+      twoFactor({ issuer: "Swiss3Design" }),
+      magicLink({
+        expiresIn: 60 * 5,
+        sendMagicLink: async ({ email, url }) => {
+          await sendEmail(magicLinkEmail(email, url));
+        },
+      }),
+      emailOTP({
+        expiresIn: 60 * 5,
+        sendVerificationOnSignUp: false, // déjà couvert par emailVerification ci-dessus
+        sendVerificationOTP: async ({ email, otp, type }) => {
+          await sendEmail(otpEmail(email, otp, type));
+        },
+      }),
+      // Mots de passe compromis (k-anonymat — seul un préfixe SHA-1 à 5
+      // caractères part vers l'API HIBP, jamais le mot de passe en clair).
+      haveIBeenPwned(),
+      // rpID dérivé automatiquement de baseURL (env.BETTER_AUTH_URL) : pas de
+      // configuration manuelle, fonctionne tel quel en prod comme en preview.
+      passkey(),
+      // Anti-bot sur inscription/connexion/mot de passe oublié — actif
+      // uniquement si un widget Turnstile est configuré (sinon désactivé,
+      // pour ne pas casser le dev local sans clé).
+      ...(env.TURNSTILE_SECRET_KEY
+        ? [
+            captcha({
+              provider: "cloudflare-turnstile",
+              secretKey: env.TURNSTILE_SECRET_KEY,
+            }),
+          ]
+        : []),
+      nextCookies(),
+    ],
   });
 }

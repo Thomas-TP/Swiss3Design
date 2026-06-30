@@ -327,7 +327,7 @@
         "new": "Nuova password (min. 8 caratteri)",
         "submit": "Aggiorna",
         "saved": "Password aggiornata.",
-        "errorCurrent": "Password attuale errata.",
+        "errorChange": "Password attuale errata, oppure la nuova password è troppo debole o già trapelata.",
         "errorGeneric": "Si è verificato un errore. Riprovate."
       },
       "sessions": {
@@ -345,6 +345,15 @@
         "link": "Collega",
         "unlink": "Scollega",
         "errorUnlink": "Impossibile scollegare questo account (potrebbe essere il vostro unico metodo di accesso)."
+      },
+      "passkeys": {
+        "title": "Passkey",
+        "desc": "Accedete con Face ID, Windows Hello o una chiave di sicurezza, senza password.",
+        "add": "Aggiungi una passkey",
+        "unnamed": "Passkey",
+        "delete": "Elimina",
+        "errorAdd": "Impossibile aggiungere questa passkey. Riprovate.",
+        "errorDelete": "Impossibile eliminare questa passkey."
       },
       "backupTitle": "Codici di recupero",
       "backupHint": "Conservateli al sicuro: vi permettono di accedere se perdete il telefono. Ogni codice è valido una volta.",
@@ -446,13 +455,14 @@
     "resetTitle": "Nuova password",
     "resetCta": "Cambia la password",
     "resetSuccess": "Password modificata! Ora potete accedere.",
-    "resetInvalid": "Link non valido o scaduto. Fate una nuova richiesta.",
+    "resetInvalid": "Link non valido/scaduto, oppure questa password è troppo debole o già trapelata. Fate una nuova richiesta o sceglietene un'altra.",
     "verifyNotice": "Account creato! Controllate la vostra casella e cliccate sul link per confermare l'indirizzo.",
     "verifyWaiting": "In attesa di conferma… L'accesso avverrà automaticamente.",
     "verifySigningIn": "E-mail confermata! Accesso…",
     "errorUnverified": "Confermate prima il vostro indirizzo e-mail (link inviato per e-mail).",
     "errorInvalid": "E-mail o password errati.",
     "errorExists": "Esiste già un account con questa e-mail.",
+    "errorWeakPassword": "Questa password non può essere usata (troppo debole o già trapelata in una violazione di dati nota). Sceglietene un'altra.",
     "errorGeneric": "Si è verificato un errore. Riprovate per favore.",
     "twoFactor": {
       "title": "Verifica in due passaggi",
@@ -464,6 +474,16 @@
       "backupPrompt": "Inserite uno dei vostri codici di recupero.",
       "backupCode": "Codice di recupero",
       "error": "Codice errato. Riprovate."
+    },
+    "passwordless": {
+      "toggle": "Accedi senza password",
+      "usePasskey": "Accedi con una passkey",
+      "sendLink": "Ricevi un link di accesso",
+      "sendCode": "Ricevi un codice via e-mail",
+      "back": "Indietro",
+      "error": "Impossibile inviare l'e-mail. Controllate l'indirizzo inserito.",
+      "magicSent": "Link inviato! Controllate la vostra casella di posta e cliccateci sopra per accedere.",
+      "otpSentTo": "Codice inviato a {email}. Inseritelo qui sotto:"
     }
   },
   "errors": {

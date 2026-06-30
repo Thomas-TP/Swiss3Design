@@ -44,7 +44,7 @@ export function PasswordSection() {
       });
       setPending(false);
       if (err) {
-        setError(t("security.passwordSection.errorCurrent"));
+        setError(t("security.passwordSection.errorChange"));
         return;
       }
     } else {
