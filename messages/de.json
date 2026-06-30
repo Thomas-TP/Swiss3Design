@@ -247,6 +247,8 @@
       "addresses": "Adressen",
       "payment": "Zahlung",
       "security": "Sicherheit",
+      "notifications": "Benachrichtigungen",
+      "privacy": "Datenschutz",
       "admin": "Verwaltung"
     },
     "overview": {
@@ -302,6 +304,23 @@
       "manageOnLink": "Zahlungsmittel auf Link verwalten",
       "cardsTitle": "Gespeicherte Karten"
     },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "subtitle": "Wählen Sie aus, welche E-Mails Sie erhalten möchten.",
+      "newsletter": "Newsletter",
+      "newsletterDesc": "Neuigkeiten aus der Werkstatt, Angebote und Swiss3Design-Updates.",
+      "productNews": "Neue Produkte",
+      "productNewsDesc": "Werden Sie benachrichtigt, wenn neue Artikel im Katalog erscheinen.",
+      "transactionalNote": "E-Mails zu Ihren Bestellungen, Offerten und zur Kontosicherheit werden unabhängig von diesen Einstellungen immer gesendet."
+    },
+    "privacy": {
+      "title": "Datenschutz",
+      "subtitle": "Ihre persönlichen Daten: Export und Kontolöschung.",
+      "exportTitle": "Meine Daten exportieren",
+      "exportDesc": "Laden Sie eine Datei mit Ihren von Swiss3Design gespeicherten persönlichen Daten herunter (Profil, Bestellungen, Offerten, Adressen).",
+      "exportButton": "Meine Daten herunterladen",
+      "exportError": "Export konnte nicht vorbereitet werden. Bitte erneut versuchen."
+    },
     "myOrders": "Meine Bestellungen",
     "myQuotes": "Meine Offerten",
     "noOrders": "Noch keine Bestellungen.",
@@ -329,7 +348,7 @@
     },
     "security": {
       "title": "Sicherheit",
-      "subtitle": "Passwort, Zwei-Faktor-Authentifizierung und Kontolöschung.",
+      "subtitle": "Passwort, Zwei-Faktor-Authentifizierung, Passkeys und verbundene Geräte.",
       "twoFactorTitle": "Zwei-Faktor-Authentifizierung (2FA)",
       "twoFactorDesc": "Ein zusätzlicher Bestätigungsschritt per App (TOTP) bei der Anmeldung.",
       "twoFactorActive": "Aktiviert",

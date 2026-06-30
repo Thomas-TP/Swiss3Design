@@ -247,6 +247,8 @@
       "addresses": "Addresses",
       "payment": "Payment",
       "security": "Security",
+      "notifications": "Notifications",
+      "privacy": "Privacy",
       "admin": "Administration"
     },
     "overview": {
@@ -302,6 +304,23 @@
       "manageOnLink": "Manage my payment methods on Link",
       "cardsTitle": "Saved cards"
     },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Choose which emails you'd like to receive.",
+      "newsletter": "Newsletter",
+      "newsletterDesc": "Workshop news, offers and Swiss3Design updates.",
+      "productNews": "New products",
+      "productNewsDesc": "Get notified when new catalogue items are released.",
+      "transactionalNote": "Emails about your orders, quotes and account security are always sent, regardless of these settings."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "subtitle": "Your personal data: export and account deletion.",
+      "exportTitle": "Export my data",
+      "exportDesc": "Download a file with your personal data held by Swiss3Design (profile, orders, quotes, addresses).",
+      "exportButton": "Download my data",
+      "exportError": "Couldn't prepare the export. Please try again."
+    },
     "myOrders": "My orders",
     "myQuotes": "My quotes",
     "noOrders": "No orders yet.",
@@ -329,7 +348,7 @@
     },
     "security": {
       "title": "Security",
-      "subtitle": "Password, two-factor authentication and account deletion.",
+      "subtitle": "Password, two-factor authentication, passkeys and connected devices.",
       "twoFactorTitle": "Two-factor authentication (2FA)",
       "twoFactorDesc": "An extra app-based verification step (TOTP) at sign-in.",
       "twoFactorActive": "Enabled",

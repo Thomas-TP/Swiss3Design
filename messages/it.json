@@ -247,6 +247,8 @@
       "addresses": "Indirizzi",
       "payment": "Pagamento",
       "security": "Sicurezza",
+      "notifications": "Notifiche",
+      "privacy": "Privacy",
       "admin": "Amministrazione"
     },
     "overview": {
@@ -302,6 +304,23 @@
       "manageOnLink": "Gestisci i metodi di pagamento su Link",
       "cardsTitle": "Carte salvate"
     },
+    "notifications": {
+      "title": "Notifiche",
+      "subtitle": "Scegliete quali e-mail desiderate ricevere.",
+      "newsletter": "Newsletter",
+      "newsletterDesc": "Novità dall'atelier, offerte e aggiornamenti Swiss3Design.",
+      "productNews": "Nuovi prodotti",
+      "productNewsDesc": "Siate avvisati quando escono nuovi pezzi nel catalogo.",
+      "transactionalNote": "Le e-mail relative ai vostri ordini, preventivi e alla sicurezza dell'account vengono sempre inviate, indipendentemente da queste impostazioni."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "subtitle": "I vostri dati personali: esportazione ed eliminazione dell'account.",
+      "exportTitle": "Esporta i miei dati",
+      "exportDesc": "Scaricate un file con i vostri dati personali detenuti da Swiss3Design (profilo, ordini, preventivi, indirizzi).",
+      "exportButton": "Scarica i miei dati",
+      "exportError": "Impossibile preparare l'esportazione. Riprovate."
+    },
     "myOrders": "I miei ordini",
     "myQuotes": "I miei preventivi",
     "noOrders": "Nessun ordine per il momento.",
@@ -329,7 +348,7 @@
     },
     "security": {
       "title": "Sicurezza",
-      "subtitle": "Password, autenticazione a due fattori ed eliminazione dell'account.",
+      "subtitle": "Password, autenticazione a due fattori, passkey e dispositivi connessi.",
       "twoFactorTitle": "Autenticazione a due fattori (2FA)",
       "twoFactorDesc": "Un passaggio di verifica tramite app (TOTP) all'accesso.",
       "twoFactorActive": "Attiva",

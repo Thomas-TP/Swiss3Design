@@ -499,6 +499,23 @@ export const customerAddresses = sqliteTable(
   (t) => [index("customer_addresses_user_idx").on(t.userId)],
 );
 
+// Préférences de communication (opt-in). Les e-mails transactionnels
+// (confirmation de commande, expédition, devis, sécurité…) sont TOUJOURS
+// envoyés et ne dépendent pas de ces réglages — seul le contenu marketing
+// (newsletter, nouveautés produits) est concerné.
+export const notificationPreferences = sqliteTable("notification_preferences", {
+  userId: text("user_id")
+    .primaryKey()
+    .references(() => user.id, { onDelete: "cascade" }),
+  newsletter: integer("newsletter", { mode: "boolean" }).notNull().default(false),
+  productNews: integer("product_news", { mode: "boolean" })
+    .notNull()
+    .default(false),
+  updatedAt: integer("updated_at", { mode: "timestamp" })
+    .notNull()
+    .$defaultFn(() => new Date()),
+});
+
 export const verification = sqliteTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),
