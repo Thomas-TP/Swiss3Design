@@ -244,6 +244,7 @@
       "orders": "Ordini",
       "quotes": "Preventivi",
       "profile": "Profilo",
+      "addresses": "Indirizzi",
       "security": "Sicurezza",
       "admin": "Amministrazione"
     },
@@ -276,6 +277,21 @@
       "emailResendSent": "E-mail inviata di nuovo",
       "languageTitle": "Lingua",
       "languageDesc": "La lingua usata per l'interfaccia e le e-mail."
+    },
+    "addresses": {
+      "title": "Indirizzi",
+      "subtitle": "I vostri indirizzi di consegna salvati (solo Svizzera).",
+      "empty": "Nessun indirizzo salvato per il momento.",
+      "labelPlaceholder": "Nome dell'indirizzo (facoltativo) — es. Casa, Ufficio",
+      "unnamed": "Indirizzo",
+      "default": "Predefinito",
+      "makeDefault": "Imposta come predefinito",
+      "edit": "Modifica",
+      "delete": "Elimina",
+      "deleteConfirm": "Eliminare questo indirizzo?",
+      "add": "Aggiungi un indirizzo",
+      "save": "Salva",
+      "error": "Si è verificato un errore. Controllate i campi e riprovate."
     },
     "myOrders": "I miei ordini",
     "myQuotes": "I miei preventivi",
@@ -379,7 +395,10 @@
       "shippingAddress": "Indirizzo di consegna",
       "tracking": "Tracciamento",
       "trackOrder": "Segui il pacco",
-      "back": "Torna al mio account"
+      "back": "Torna al mio account",
+      "reorder": "Riacquista questi articoli",
+      "reorderError": "Impossibile ricaricare questo ordine. Riprovate.",
+      "reorderUnavailable": "Questi articoli non sono più disponibili."
     },
     "quotePay": {
       "title": "Pagare il preventivo",

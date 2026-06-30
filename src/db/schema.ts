@@ -467,20 +467,32 @@ export const account = sqliteTable(
   (t) => [index("account_user_idx").on(t.userId)],
 );
 
-// Adresse de livraison enregistrée (une par client, proposée au checkout)
-export const customerAddresses = sqliteTable("customer_addresses", {
-  userId: text("user_id")
-    .primaryKey()
-    .references(() => user.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  street: text("street").notNull(),
-  npa: text("npa").notNull(),
-  city: text("city").notNull(),
-  canton: text("canton").notNull().default(""),
-  updatedAt: integer("updated_at", { mode: "timestamp" })
-    .notNull()
-    .$defaultFn(() => new Date()),
-});
+// Carnet d'adresses de livraison (plusieurs par client, une marquée par
+// défaut). Anciennement une seule adresse par client (PK = userId) ; voir
+// drizzle/0014 pour la migration qui transforme chaque adresse existante en
+// adresse par défaut, sans perte de données.
+export const customerAddresses = sqliteTable(
+  "customer_addresses",
+  {
+    id: uuid(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    label: text("label"), // ex. "Maison", "Bureau" — facultatif
+    name: text("name").notNull(),
+    street: text("street").notNull(),
+    npa: text("npa").notNull(),
+    city: text("city").notNull(),
+    canton: text("canton").notNull().default(""),
+    isDefault: integer("is_default", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  (t) => [index("customer_addresses_user_idx").on(t.userId)],
+);
 
 export const verification = sqliteTable("verification", {
   id: text("id").primaryKey(),

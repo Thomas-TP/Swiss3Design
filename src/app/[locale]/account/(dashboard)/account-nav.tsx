@@ -5,6 +5,7 @@ import {
   Package,
   FileText,
   User,
+  MapPin,
   ShieldCheck,
   Wrench,
   type LucideIcon,
@@ -12,13 +13,14 @@ import {
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 
-// Onglets disponibles. Adresses / Paiements / Notifications / Confidentialité
+// Onglets disponibles. Paiements / Notifications / Confidentialité
 // s'ajouteront ici au fil des phases suivantes.
 const tabs: { href: string; key: string; icon: LucideIcon; exact?: boolean }[] = [
   { href: "/account", key: "overview", icon: LayoutDashboard, exact: true },
   { href: "/account/orders", key: "orders", icon: Package },
   { href: "/account/quotes", key: "quotes", icon: FileText },
   { href: "/account/profile", key: "profile", icon: User },
+  { href: "/account/addresses", key: "addresses", icon: MapPin },
   { href: "/account/security", key: "security", icon: ShieldCheck },
 ];
 

@@ -31,6 +31,7 @@ import { useIsDark } from "@/lib/theme";
 import { stripeAppearance } from "@/lib/stripe-appearance";
 import { formatChf } from "@/lib/format";
 import { shippingFor } from "@/lib/shipping";
+import { CANTONS, CANTON_CODES } from "@/lib/cantons";
 
 // Stripe.js est préchargé dès l'arrivée sur le checkout (voir le useEffect dans
 // CheckoutFlow) : le download du script + iframes (js.stripe.com, m.stripe.network)
@@ -48,35 +49,8 @@ function getStripePromise() {
 const field =
   "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
 
-const CANTONS: [string, string][] = [
-  ["AG", "Aargau"],
-  ["AI", "Appenzell Rh.-Int."],
-  ["AR", "Appenzell Rh.-Ext."],
-  ["BE", "Bern"],
-  ["BL", "Basel-Landschaft"],
-  ["BS", "Basel-Stadt"],
-  ["FR", "Fribourg"],
-  ["GE", "Genève"],
-  ["GL", "Glarus"],
-  ["GR", "Graubünden"],
-  ["JU", "Jura"],
-  ["LU", "Luzern"],
-  ["NE", "Neuchâtel"],
-  ["NW", "Nidwalden"],
-  ["OW", "Obwalden"],
-  ["SG", "St. Gallen"],
-  ["SH", "Schaffhausen"],
-  ["SO", "Solothurn"],
-  ["SZ", "Schwyz"],
-  ["TG", "Thurgau"],
-  ["TI", "Ticino"],
-  ["UR", "Uri"],
-  ["VD", "Vaud"],
-  ["VS", "Valais"],
-  ["ZG", "Zug"],
-  ["ZH", "Zürich"],
-];
-const CANTON_CODES = new Set(CANTONS.map(([code]) => code));
+// CANTONS/CANTON_CODES déplacés vers src/lib/cantons.ts (réutilisés par le
+// carnet d'adresses du compte).
 
 export interface CheckoutAddress {
   name: string;

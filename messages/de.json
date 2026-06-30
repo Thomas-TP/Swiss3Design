@@ -244,6 +244,7 @@
       "orders": "Bestellungen",
       "quotes": "Offerten",
       "profile": "Profil",
+      "addresses": "Adressen",
       "security": "Sicherheit",
       "admin": "Verwaltung"
     },
@@ -276,6 +277,21 @@
       "emailResendSent": "E-Mail erneut gesendet",
       "languageTitle": "Sprache",
       "languageDesc": "Die Sprache der Oberfläche und der E-Mails."
+    },
+    "addresses": {
+      "title": "Adressen",
+      "subtitle": "Ihre gespeicherten Lieferadressen (nur Schweiz).",
+      "empty": "Noch keine Adresse gespeichert.",
+      "labelPlaceholder": "Name der Adresse (optional) — z. B. Zuhause, Büro",
+      "unnamed": "Adresse",
+      "default": "Standard",
+      "makeDefault": "Als Standard festlegen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "deleteConfirm": "Diese Adresse löschen?",
+      "add": "Adresse hinzufügen",
+      "save": "Speichern",
+      "error": "Ein Fehler ist aufgetreten. Prüfen Sie die Felder und versuchen Sie es erneut."
     },
     "myOrders": "Meine Bestellungen",
     "myQuotes": "Meine Offerten",
@@ -379,7 +395,10 @@
       "shippingAddress": "Lieferadresse",
       "tracking": "Sendungsverfolgung",
       "trackOrder": "Paket verfolgen",
-      "back": "Zurück zum Konto"
+      "back": "Zurück zum Konto",
+      "reorder": "Diese Artikel erneut kaufen",
+      "reorderError": "Diese Bestellung konnte nicht neu geladen werden. Bitte erneut versuchen.",
+      "reorderUnavailable": "Diese Artikel sind nicht mehr verfügbar."
     },
     "quotePay": {
       "title": "Offerte bezahlen",

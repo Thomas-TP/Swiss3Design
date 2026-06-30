@@ -244,6 +244,7 @@
       "orders": "Orders",
       "quotes": "Quotes",
       "profile": "Profile",
+      "addresses": "Addresses",
       "security": "Security",
       "admin": "Administration"
     },
@@ -276,6 +277,21 @@
       "emailResendSent": "Email resent",
       "languageTitle": "Language",
       "languageDesc": "The language used for the interface and emails."
+    },
+    "addresses": {
+      "title": "Addresses",
+      "subtitle": "Your saved delivery addresses (Switzerland only).",
+      "empty": "No saved address yet.",
+      "labelPlaceholder": "Address name (optional) — e.g. Home, Office",
+      "unnamed": "Address",
+      "default": "Default",
+      "makeDefault": "Set as default",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this address?",
+      "add": "Add an address",
+      "save": "Save",
+      "error": "Something went wrong. Check the fields and try again."
     },
     "myOrders": "My orders",
     "myQuotes": "My quotes",
@@ -379,7 +395,10 @@
       "shippingAddress": "Shipping address",
       "tracking": "Tracking",
       "trackOrder": "Track my parcel",
-      "back": "Back to my account"
+      "back": "Back to my account",
+      "reorder": "Buy these items again",
+      "reorderError": "Couldn't reload this order. Please try again.",
+      "reorderUnavailable": "These items are no longer available."
     },
     "quotePay": {
       "title": "Pay your quote",

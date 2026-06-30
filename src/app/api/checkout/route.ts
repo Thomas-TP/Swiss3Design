@@ -234,15 +234,32 @@ export async function POST(request: Request) {
 
   const totalCents = subtotalCents - discountCents + shippingCents;
 
-  // Mémorise l'adresse pour les prochaines commandes si demandé
+  // Mémorise l'adresse par défaut pour les prochaines commandes si demandé.
+  // Plusieurs adresses sont possibles (carnet d'adresses, espace compte) :
+  // ici on met à jour l'adresse par défaut existante, ou on en crée une.
   if (authSession && saveAddress) {
-    await db
-      .insert(customerAddresses)
-      .values({ userId: authSession.user.id, ...address })
-      .onConflictDoUpdate({
-        target: customerAddresses.userId,
-        set: { ...address, updatedAt: new Date() },
+    const [existingDefault] = await db
+      .select({ id: customerAddresses.id })
+      .from(customerAddresses)
+      .where(
+        and(
+          eq(customerAddresses.userId, authSession.user.id),
+          eq(customerAddresses.isDefault, true),
+        ),
+      )
+      .limit(1);
+    if (existingDefault) {
+      await db
+        .update(customerAddresses)
+        .set({ ...address, updatedAt: new Date() })
+        .where(eq(customerAddresses.id, existingDefault.id));
+    } else {
+      await db.insert(customerAddresses).values({
+        userId: authSession.user.id,
+        isDefault: true,
+        ...address,
       });
+    }
   }
 
   const orderNumber = makeOrderNumber();

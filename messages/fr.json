@@ -244,6 +244,7 @@
       "orders": "Commandes",
       "quotes": "Devis",
       "profile": "Profil",
+      "addresses": "Adresses",
       "security": "Sécurité",
       "admin": "Administration"
     },
@@ -276,6 +277,21 @@
       "emailResendSent": "E-mail renvoyé",
       "languageTitle": "Langue",
       "languageDesc": "La langue utilisée pour l'interface et les e-mails."
+    },
+    "addresses": {
+      "title": "Adresses",
+      "subtitle": "Vos adresses de livraison enregistrées (Suisse uniquement).",
+      "empty": "Aucune adresse enregistrée pour l'instant.",
+      "labelPlaceholder": "Nom de l'adresse (facultatif) — ex. Maison, Bureau",
+      "unnamed": "Adresse",
+      "default": "Par défaut",
+      "makeDefault": "Définir par défaut",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer cette adresse ?",
+      "add": "Ajouter une adresse",
+      "save": "Enregistrer",
+      "error": "Une erreur est survenue. Vérifiez les champs et réessayez."
     },
     "myOrders": "Mes commandes",
     "myQuotes": "Mes devis",
@@ -379,7 +395,10 @@
       "shippingAddress": "Adresse de livraison",
       "tracking": "Suivi",
       "trackOrder": "Suivre mon colis",
-      "back": "Retour à mon compte"
+      "back": "Retour à mon compte",
+      "reorder": "Racheter ces articles",
+      "reorderError": "Impossible de recharger cette commande. Réessayez.",
+      "reorderUnavailable": "Ces articles ne sont plus disponibles."
     },
     "quotePay": {
       "title": "Payer votre devis",
