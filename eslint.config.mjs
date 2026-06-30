@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Sortie de build OpenNext (code généré, jamais commité)
+    ".open-next/**",
     // Worker Cron autonome (déployé séparément, types Workers propres)
     "workers/**",
   ]),
