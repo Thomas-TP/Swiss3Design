@@ -86,7 +86,7 @@ npm run db:seed:local     # seed local D1 from scripts/seed.sql
 ```
 
 > **Lockfile / npm:** the project is on **npm 11**. The Cloudflare build image is
-> pinned to **Node 24** via the repo's `.node-version` file (Node 24 ships npm 11;
+> pinned to **Node 26** via the repo's `.node-version` file (Node 26 ships npm 11;
 > the image default is Node 22 / npm 10). That makes the CI `npm ci` match the
 > npm 11 `package-lock.json` written locally and by Dependabot — no more
 > `Missing: @esbuild/*… from lock file`. **Don't downgrade to npm 10 or delete
