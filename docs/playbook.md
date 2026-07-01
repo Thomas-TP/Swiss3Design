@@ -22,7 +22,8 @@ works) and [`conventions.md`](conventions.md) (how to write code here).
 3. Runs `npm run lint`; runs `npm run preview` when the change touches CSP, inline
    scripts, runtime, or anything prod-only.
 4. **Pushes to `main`** (this triggers the Cloudflare deploy) and starts
-   `npm run dev` so Thomas tests in his own browser. No automated browser checks.
+   `npm run dev` so Thomas can test. Browser verification with the preview tools is
+   allowed whenever it helps confirm the change.
 
 If you do **not** want an auto-push (e.g. risky change), say so up front.
 

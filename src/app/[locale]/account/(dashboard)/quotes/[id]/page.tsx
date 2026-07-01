@@ -97,7 +97,7 @@ export default async function QuoteDetailPage({
     decisionPending || quote.status === "revision_requested";
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-10 sm:px-6 md:py-16">
+    <div className="max-w-xl">
       <Link
         href="/account"
         className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"

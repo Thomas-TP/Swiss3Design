@@ -13,13 +13,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useSession, twoFactor, deleteUser } from "@/lib/auth-client";
-
-const field =
-  "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
-const btnPrimary =
-  "inline-flex items-center justify-center gap-2 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition-opacity hover:opacity-90 disabled:opacity-60";
-const btnGhost =
-  "inline-flex items-center justify-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2.5 text-sm font-semibold text-soft transition-colors hover:border-ink hover:text-ink disabled:opacity-60";
+import { field, btnPrimary, btnGhost } from "./_ui";
 
 function TwoFactor() {
   const t = useTranslations("account");
@@ -241,15 +235,12 @@ function DeleteAccount() {
   );
 }
 
+// Le titre de section est désormais porté par la page de l'onglet Sécurité.
 export function AccountSecurity() {
-  const t = useTranslations("account");
   return (
-    <section className="mt-8">
-      <h2 className="mb-3 font-semibold">{t("security.title")}</h2>
-      <div className="space-y-4">
-        <TwoFactor />
-        <DeleteAccount />
-      </div>
-    </section>
+    <div className="space-y-4">
+      <TwoFactor />
+      <DeleteAccount />
+    </div>
   );
 }

@@ -239,6 +239,22 @@
   "account": {
     "title": "My account",
     "greeting": "Hello {name}",
+    "nav": {
+      "overview": "Overview",
+      "orders": "Orders",
+      "quotes": "Quotes",
+      "security": "Security",
+      "admin": "Administration"
+    },
+    "overview": {
+      "subtitle": "An overview of your activity and account.",
+      "openOrders": "Orders in progress",
+      "actionQuotes": "Quotes awaiting action",
+      "seeAll": "See all",
+      "emptyTitle": "Welcome to Swiss3Design",
+      "emptyDesc": "You don't have any orders or quotes yet. Discover our multicolour 3D prints.",
+      "emptyCta": "Explore the shop"
+    },
     "avatarTitle": "Choose an avatar",
     "avatarChange": "Change avatar",
     "myOrders": "My orders",
@@ -268,6 +284,7 @@
     },
     "security": {
       "title": "Security",
+      "subtitle": "Password, two-factor authentication and account deletion.",
       "twoFactorTitle": "Two-factor authentication (2FA)",
       "twoFactorDesc": "An extra app-based verification step (TOTP) at sign-in.",
       "twoFactorActive": "Enabled",
