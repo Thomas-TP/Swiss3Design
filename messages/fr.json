@@ -525,6 +525,7 @@
     "passwordless": {
       "toggle": "Se connecter sans mot de passe",
       "usePasskey": "Se connecter avec une clé d'accès",
+      "orEmail": "ou par e-mail",
       "sendLink": "Recevoir un lien de connexion",
       "sendCode": "Recevoir un code par e-mail",
       "back": "Retour",

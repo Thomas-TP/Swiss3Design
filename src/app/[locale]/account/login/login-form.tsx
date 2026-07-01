@@ -1,11 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import {
   LogIn,
   ShieldCheck,
   Mail,
-  KeyRound,
   MailCheck,
   Fingerprint,
 } from "lucide-react";
@@ -31,6 +30,15 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
   >("login");
   const [code, setCode] = useState("");
   const [plEmail, setPlEmail] = useState("");
+  // Clé d'accès proposée seulement si le navigateur sait s'en servir —
+  // évite un bouton mort sur les navigateurs/OS sans WebAuthn. Rendu côté
+  // serveur : false (pas de window) ; useSyncExternalStore fait la mise à
+  // jour post-hydratation sans avertissement d'incohérence SSR/client.
+  const passkeySupported = useSyncExternalStore(
+    () => () => {},
+    () => typeof window !== "undefined" && !!window.PublicKeyCredential,
+    () => false,
+  );
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -262,6 +270,24 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
   if (stage === "passwordless") {
     return (
       <div className="space-y-4">
+        {passkeySupported && (
+          <>
+            <button
+              type="button"
+              onClick={onPasskeySignIn}
+              disabled={pending}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+            >
+              <Fingerprint size={16} />
+              {t("passwordless.usePasskey")}
+            </button>
+            <div className="flex items-center gap-3 text-xs text-soft">
+              <span className="h-px flex-1 bg-line" />
+              {t("passwordless.orEmail")}
+              <span className="h-px flex-1 bg-line" />
+            </div>
+          </>
+        )}
         <input
           type="email"
           value={plEmail}
@@ -280,7 +306,7 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
           type="button"
           onClick={sendMagicLink}
           disabled={pending || !plEmail.trim()}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+          className={passkeySupported ? btnGhost : "flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"}
         >
           <Mail size={16} />
           {pending ? t("processing") : t("passwordless.sendLink")}
@@ -289,9 +315,8 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
           type="button"
           onClick={sendOtp}
           disabled={pending || !plEmail.trim()}
-          className={btnGhost}
+          className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink disabled:opacity-60"
         >
-          <KeyRound size={16} />
           {t("passwordless.sendCode")}
         </button>
         <button
@@ -358,15 +383,6 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
       >
         <LogIn size={16} />
         {t("signInCta")}
-      </button>
-      <button
-        type="button"
-        onClick={onPasskeySignIn}
-        disabled={pending}
-        className={btnGhost}
-      >
-        <Fingerprint size={16} />
-        {t("passwordless.usePasskey")}
       </button>
       <button
         type="button"
