@@ -1,6 +1,8 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 
-// Sert les fichiers publics du bucket R2 (images produits)
+// Sert les fichiers publics du bucket R2 (images produits, bannières newsletter)
+const PUBLIC_PREFIXES = ["products/", "newsletter/"];
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ path: string[] }> },
@@ -8,8 +10,8 @@ export async function GET(
   const { path } = await params;
   const key = path.join("/");
 
-  // Seul le préfixe public est servi ; les fichiers clients (devis) restent privés
-  if (!key.startsWith("products/")) {
+  // Seuls ces préfixes publics sont servis ; les fichiers clients (devis) restent privés
+  if (!PUBLIC_PREFIXES.some((prefix) => key.startsWith(prefix))) {
     return new Response("Not found", { status: 404 });
   }
 

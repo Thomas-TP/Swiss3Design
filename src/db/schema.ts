@@ -527,7 +527,12 @@ export const newsletterSends = sqliteTable("newsletter_sends", {
   audience: text("audience", {
     enum: ["newsletter", "product_news", "both"],
   }).notNull(),
-  productId: text("product_id"), // snapshot informatif — pas de FK (produit peut disparaître)
+  // JSON (tableau d'ids) — snapshot informatif, pas de FK (un produit peut
+  // disparaître du catalogue sans invalider l'historique d'envoi).
+  productIds: text("product_ids"),
+  bannerImageUrl: text("banner_image_url"),
+  ctaLabel: text("cta_label"),
+  ctaUrl: text("cta_url"),
   recipientCount: integer("recipient_count").notNull(),
   sentBy: text("sent_by")
     .notNull()

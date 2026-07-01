@@ -127,6 +127,13 @@
       "when": 1782901242092,
       "tag": "0017_unique_havok",
       "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "6",
+      "when": 1782940401990,
+      "tag": "0018_newsletter_sends_multi_product",
+      "breakpoints": true
     }
   ]
 }

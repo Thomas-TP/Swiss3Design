@@ -1,7 +1,7 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, inArray, asc } from "drizzle-orm";
 import { Link } from "@/i18n/navigation";
 import { getDb } from "@/db";
-import { products, productTranslations, newsletterSends } from "@/db/schema";
+import { products, productTranslations, productImages, newsletterSends } from "@/db/schema";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { ComposeForm } from "./compose-form";
@@ -29,6 +29,18 @@ export default async function AnnouncementsPage() {
     )
     .where(eq(products.active, true))
     .orderBy(products.slug);
+
+  const images = productRows.length
+    ? await db
+        .select({ productId: productImages.productId, url: productImages.url })
+        .from(productImages)
+        .where(inArray(productImages.productId, productRows.map((p) => p.id)))
+        .orderBy(asc(productImages.sortOrder))
+    : [];
+  const firstImage = new Map<string, string>();
+  for (const img of images) {
+    if (!firstImage.has(img.productId)) firstImage.set(img.productId, img.url);
+  }
 
   const history = await db
     .select()
@@ -59,7 +71,9 @@ export default async function AnnouncementsPage() {
       <ComposeForm
         products={productRows.map((p) => ({
           id: p.id,
-          label: `${p.name} — ${formatChf(p.priceCents, "fr")}`,
+          name: p.name,
+          priceLabel: formatChf(p.priceCents, "fr"),
+          imageUrl: firstImage.get(p.id) ?? null,
         }))}
       />
 
