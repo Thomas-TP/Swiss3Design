@@ -516,6 +516,25 @@ export const notificationPreferences = sqliteTable("notification_preferences", {
     .$defaultFn(() => new Date()),
 });
 
+// Journal des annonces newsletter envoyées depuis l'admin (audit — Resend a
+// son propre historique, celui-ci reste consultable directement dans le
+// back-office). bodyHtml = HTML final envoyé, pour retrouver exactement ce
+// qui a été reçu.
+export const newsletterSends = sqliteTable("newsletter_sends", {
+  id: uuid(),
+  subject: text("subject").notNull(),
+  bodyHtml: text("body_html").notNull(),
+  audience: text("audience", {
+    enum: ["newsletter", "product_news", "both"],
+  }).notNull(),
+  productId: text("product_id"), // snapshot informatif — pas de FK (produit peut disparaître)
+  recipientCount: integer("recipient_count").notNull(),
+  sentBy: text("sent_by")
+    .notNull()
+    .references(() => user.id),
+  createdAt: createdAt(),
+});
+
 export const verification = sqliteTable("verification", {
   id: text("id").primaryKey(),
   identifier: text("identifier").notNull(),

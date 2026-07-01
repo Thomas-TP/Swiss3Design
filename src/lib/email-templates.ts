@@ -1092,3 +1092,59 @@ export function contactConfirmationEmail(
     html: layout(t.title, html, FOOTER[l]),
   };
 }
+
+// ── Annonce newsletter (admin) ───────────────────────────────────────────────
+// Composée en français uniquement (back-office non traduit, comme le reste
+// de l'admin) — envoyée telle quelle aux abonnés, quelle que soit leur
+// langue de compte. Lien de désabonnement en un clic (jeton HMAC signé,
+// voir src/lib/newsletter.ts), sans connexion requise.
+
+export function newsletterAnnouncementEmail(params: {
+  to: string;
+  subject: string;
+  bodyText: string; // texte de l'admin, paragraphes séparés par des lignes vides
+  product?: {
+    name: string;
+    priceCents: number;
+    imageUrl?: string | null;
+    url: string;
+  };
+  unsubscribeUrl: string;
+}): EmailMessage {
+  const paragraphs = params.bodyText
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map(
+      (p) =>
+        `<p style="margin:0 0 14px;color:#44403c;line-height:1.6;">${esc(p).replace(/\n/g, "<br/>")}</p>`,
+    )
+    .join("");
+
+  const productCard = params.product
+    ? `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:18px 0;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;">
+        <tr>
+          ${
+            params.product.imageUrl
+              ? `<td style="width:88px;padding:0;"><img src="${params.product.imageUrl}" alt="" width="88" height="88" style="display:block;width:88px;height:88px;object-fit:cover;" /></td>`
+              : ""
+          }
+          <td style="padding:14px 16px;vertical-align:middle;">
+            <p style="margin:0 0 4px;font-weight:600;color:#1c1917;">${esc(params.product.name)}</p>
+            <p style="margin:0 0 10px;color:#78716c;font-size:13px;">${chf(params.product.priceCents)}</p>
+            <a href="${params.product.url}" style="color:#e5231c;font-weight:600;font-size:13px;text-decoration:none;">Découvrir →</a>
+          </td>
+        </tr>
+      </table>`
+    : "";
+
+  const body = `${paragraphs}${productCard}`;
+  const footer = `Vous recevez cet e-mail car vous êtes inscrit·e aux communications Swiss3Design.<br/><a href="${params.unsubscribeUrl}" style="color:#78716c;text-decoration:underline;">Se désabonner en un clic</a>`;
+
+  return {
+    to: params.to,
+    from: FROM_ORDERS,
+    subject: params.subject,
+    html: layout(params.subject, body, footer),
+  };
+}

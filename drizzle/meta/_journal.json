@@ -120,6 +120,13 @@
       "when": 1782855732147,
       "tag": "0016_lucky_bloodaxe",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "6",
+      "when": 1782901242092,
+      "tag": "0017_unique_havok",
+      "breakpoints": true
     }
   ]
 }

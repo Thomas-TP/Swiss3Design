@@ -197,6 +197,18 @@ export default async function AdminEmailsPage({
 
   return (
     <div className="max-w-2xl">
+      <div className="mb-6 flex gap-1.5 border-b border-line pb-3">
+        <span className="rounded-full bg-ink px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-paper">
+          Aperçu
+        </span>
+        <Link
+          href="/admin/emails/announcements"
+          className="rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-bold uppercase tracking-wide text-soft hover:text-ink"
+        >
+          Annonces
+        </Link>
+      </div>
+
       <div className="mb-2 flex flex-wrap items-center justify-between gap-3">
         <div>
           <h2 className="text-xl font-bold">Aperçu des e-mails</h2>
