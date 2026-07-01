@@ -2,7 +2,7 @@
 
 import { eq, or } from "drizzle-orm";
 import { getDb } from "@/db";
-import { orders, quoteRequests, customerAddresses } from "@/db/schema";
+import { orders, quoteRequests, customerAddresses, passkey } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 
 // Export de mes données (droit d'accès nLPD/RGPD) : agrège les données
@@ -17,7 +17,7 @@ export async function exportMyData(): Promise<
   const { user } = session;
 
   const db = await getDb();
-  const [myOrders, myQuotes, myAddresses] = await Promise.all([
+  const [myOrders, myQuotes, myAddresses, myPasskeys] = await Promise.all([
     db
       .select({
         orderNumber: orders.orderNumber,
@@ -54,6 +54,17 @@ export async function exportMyData(): Promise<
       })
       .from(customerAddresses)
       .where(eq(customerAddresses.userId, user.id)),
+    // Métadonnées uniquement — jamais la clé publique ni l'identifiant de
+    // credential, qui n'ont pas de valeur pour l'utilisateur et ne doivent
+    // pas quitter le serveur.
+    db
+      .select({
+        name: passkey.name,
+        deviceType: passkey.deviceType,
+        createdAt: passkey.createdAt,
+      })
+      .from(passkey)
+      .where(eq(passkey.userId, user.id)),
   ]);
 
   return {
@@ -63,11 +74,13 @@ export async function exportMyData(): Promise<
         name: user.name,
         email: user.email,
         emailVerified: user.emailVerified,
+        twoFactorEnabled: user.twoFactorEnabled,
         createdAt: user.createdAt,
       },
       orders: myOrders,
       quotes: myQuotes,
       addresses: myAddresses,
+      passkeys: myPasskeys,
     },
   };
 }
