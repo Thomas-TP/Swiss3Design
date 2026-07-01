@@ -23,7 +23,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           <strong>Compte client</strong> : nom, adresse e-mail, mot de passe
-          (haché, jamais en clair) ou identifiant de connexion Google.{" "}
+          (haché, jamais en clair), identifiant de connexion Google ou clé
+          d’accès (passkey) — dans ce dernier cas, seules la clé publique et
+          des métadonnées techniques de l’appareil sont stockées sur nos
+          serveurs ; votre empreinte digitale ou la reconnaissance faciale ne
+          quittent jamais votre appareil.{" "}
           <strong>Commandes</strong> : adresse de livraison, articles,
           historique. <strong>Paiement</strong> : traité exclusivement par
           Stripe ; nous ne voyons ni ne stockons aucune donnée de carte.{" "}
@@ -68,6 +72,21 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Préférences de communication",
+      body: (
+        <p>
+          Si vous activez la newsletter ou les alertes de nouveaux produits
+          depuis votre espace client (<strong>Mon compte → Notifications</strong>),
+          nous utilisons votre adresse e-mail pour vous envoyer ces
+          communications. La base légale est votre <strong>consentement</strong>,
+          donné en activant la case correspondante ; vous pouvez le retirer à
+          tout moment depuis votre compte ou via le lien de désabonnement en
+          un clic présent dans chaque e-mail. Resend (sous-traitant déjà cité
+          ci-dessous) est utilisé pour l’envoi de ces e-mails.
+        </p>
+      ),
+    },
+    {
       title: "Profilage et décisions automatisées",
       body: (
         <p>
@@ -82,8 +101,12 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Nous recourons à des prestataires techniques : Cloudflare
-          (hébergement et base de données), Stripe (paiement), Resend (envoi
-          d’e-mails), Google (connexion Google, si utilisée). Certains de ces
+          (hébergement et base de données), Stripe (paiement — y compris, le
+          cas échéant, la fonctionnalité <strong>Stripe Link</strong> qui permet
+          de réutiliser une carte déjà enregistrée auprès d’un autre marchand
+          utilisant Stripe ; nous ne conservons nous-mêmes aucune donnée de
+          carte), Resend (envoi d’e-mails), Google (connexion Google, si
+          utilisée). Certains de ces
           prestataires traitent des données à l’étranger, en particulier aux
           États-Unis ; ces transferts reposent sur des garanties reconnues
           (Swiss-U.S. Data Privacy Framework pour les prestataires certifiés,
@@ -119,7 +142,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Conformément aux art. 25 ss nLPD, vous pouvez demander l’accès à vos
           données, leur rectification, leur effacement ou leur remise dans un
-          format usuel, en écrivant à contact@swiss3design.ch. Vous pouvez
+          format usuel. Un export instantané de vos données (profil,
+          commandes, devis, adresses) est disponible depuis{" "}
+          <strong>Mon compte → Confidentialité</strong> ; pour toute autre
+          demande, écrivez à contact@swiss3design.ch. Vous pouvez
           également saisir le Préposé fédéral à la protection des données et à
           la transparence (PFPDT). Nous répondons en principe dans les
           30 jours et pouvons demander une preuve d’identité avant de donner
@@ -175,7 +201,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           <strong>Kundenkonto</strong>: Name, E-Mail-Adresse, Passwort
-          (gehasht, nie im Klartext) oder Google-Anmeldekennung.{" "}
+          (gehasht, nie im Klartext), Google-Anmeldekennung oder Passkey — in
+          letzterem Fall werden nur der öffentliche Schlüssel und technische
+          Gerätemetadaten auf unseren Servern gespeichert; Ihr Fingerabdruck
+          oder Ihre Gesichtserkennung verlassen Ihr Gerät nie.{" "}
           <strong>Bestellungen</strong>: Lieferadresse, Artikel, Verlauf.{" "}
           <strong>Zahlung</strong>: wird ausschliesslich von Stripe
           verarbeitet; wir sehen und speichern keinerlei Kartendaten.{" "}
@@ -221,6 +250,21 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Kommunikationspräferenzen",
+      body: (
+        <p>
+          Wenn Sie den Newsletter oder Benachrichtigungen zu neuen Produkten in
+          Ihrem Kundenkonto aktivieren (<strong>Mein Konto → Benachrichtigungen</strong>),
+          verwenden wir Ihre E-Mail-Adresse, um Ihnen diese Mitteilungen zu
+          senden. Rechtsgrundlage ist Ihre <strong>Einwilligung</strong>, die Sie
+          jederzeit über Ihr Konto oder über den Abmeldelink mit einem Klick in
+          jeder E-Mail widerrufen können. Resend (weiter unten als
+          Auftragsbearbeiter genannt) wird für den Versand dieser E-Mails
+          eingesetzt.
+        </p>
+      ),
+    },
+    {
       title: "Profiling und automatisierte Entscheidungen",
       body: (
         <p>
@@ -235,8 +279,12 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Wir setzen technische Dienstleister ein: Cloudflare (Hosting und
-          Datenbank), Stripe (Zahlung), Resend (E-Mail-Versand), Google
-          (Google-Anmeldung, falls genutzt). Einige dieser Anbieter bearbeiten
+          Datenbank), Stripe (Zahlung — einschliesslich, falls zutreffend, der
+          Funktion <strong>Stripe Link</strong>, die es ermöglicht, eine bereits
+          bei einem anderen Stripe-Händler gespeicherte Karte
+          wiederzuverwenden; wir selbst speichern keinerlei Kartendaten),
+          Resend (E-Mail-Versand), Google (Google-Anmeldung, falls genutzt).
+          Einige dieser Anbieter bearbeiten
           Daten im Ausland, insbesondere in den USA; diese Übermittlungen
           stützen sich auf anerkannte Garantien (Swiss-U.S. Data Privacy
           Framework für zertifizierte Anbieter oder Standardvertragsklauseln).
@@ -271,7 +319,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Gemäss Art. 25 ff. revDSG können Sie Auskunft über Ihre Daten sowie
           deren Berichtigung, Löschung oder Herausgabe in einem gängigen
-          Format verlangen, per E-Mail an contact@swiss3design.ch. Sie können
+          Format verlangen. Ein sofortiger Export Ihrer Daten (Profil,
+          Bestellungen, Offerten, Adressen) steht unter{" "}
+          <strong>Mein Konto → Datenschutz</strong> zur Verfügung; für alle
+          weiteren Anliegen schreiben Sie an contact@swiss3design.ch. Sie können
           sich zudem an den Eidgenössischen Datenschutz- und
           Öffentlichkeitsbeauftragten (EDÖB) wenden. Wir antworten
           grundsätzlich innert 30 Tagen und können vor der Bearbeitung einen
@@ -328,8 +379,12 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           <strong>Conto cliente</strong>: nome, indirizzo e-mail, password
-          (sottoposta a hash, mai in chiaro) o identificativo di accesso
-          Google. <strong>Ordini</strong>: indirizzo di consegna, articoli,
+          (sottoposta a hash, mai in chiaro), identificativo di accesso Google
+          o chiave di accesso (passkey) — in quest’ultimo caso, sui nostri
+          server sono memorizzati solo la chiave pubblica e alcuni metadati
+          tecnici del dispositivo; la vostra impronta digitale o il
+          riconoscimento facciale non lasciano mai il vostro dispositivo.{" "}
+          <strong>Ordini</strong>: indirizzo di consegna, articoli,
           cronologia. <strong>Pagamento</strong>: trattato esclusivamente da
           Stripe; non vediamo né memorizziamo alcun dato della carta.{" "}
           <strong>Preventivi su misura</strong>: descrizione del progetto e
@@ -373,6 +428,21 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Preferenze di comunicazione",
+      body: (
+        <p>
+          Se attivate la newsletter o gli avvisi sui nuovi prodotti dal vostro
+          spazio cliente (<strong>Il mio conto → Notifiche</strong>),
+          utilizziamo il vostro indirizzo e-mail per inviarvi queste
+          comunicazioni. La base giuridica è il vostro{" "}
+          <strong>consenso</strong>, che potete revocare in qualsiasi momento
+          dal vostro conto oppure tramite il link di disiscrizione con un
+          clic presente in ogni e-mail. Resend (responsabile del trattamento
+          già citato di seguito) è utilizzato per l’invio di queste e-mail.
+        </p>
+      ),
+    },
+    {
       title: "Profilazione e decisioni automatizzate",
       body: (
         <p>
@@ -387,8 +457,12 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Ricorriamo a fornitori tecnici: Cloudflare (hosting e banca dati),
-          Stripe (pagamento), Resend (invio di e-mail), Google (accesso
-          Google, se utilizzato). Alcuni di questi fornitori trattano dati
+          Stripe (pagamento — inclusa, se applicabile, la funzione{" "}
+          <strong>Stripe Link</strong> che consente di riutilizzare una carta
+          già registrata presso un altro esercente che utilizza Stripe; noi
+          stessi non conserviamo alcun dato della carta), Resend (invio di
+          e-mail), Google (accesso Google, se utilizzato). Alcuni di questi
+          fornitori trattano dati
           all’estero, in particolare negli Stati Uniti; tali trasferimenti si
           basano su garanzie riconosciute (Swiss-U.S. Data Privacy Framework
           per i fornitori certificati o clausole contrattuali tipo).
@@ -423,8 +497,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Conformemente agli art. 25 segg. nLPD, potete chiedere l’accesso ai
           vostri dati, la loro rettifica, la loro cancellazione o la loro
-          consegna in un formato corrente, scrivendo a
-          contact@swiss3design.ch. Potete inoltre rivolgervi all’Incaricato
+          consegna in un formato corrente. Un’esportazione immediata dei
+          vostri dati (profilo, ordini, preventivi, indirizzi) è disponibile
+          da <strong>Il mio conto → Riservatezza</strong>; per qualsiasi altra
+          richiesta, scrivete a contact@swiss3design.ch. Potete inoltre
+          rivolgervi all’Incaricato
           federale della protezione dei dati e della trasparenza (IFPDT).
           Rispondiamo in linea di principio entro 30 giorni e possiamo
           richiedere una prova d’identità prima di dar seguito, al fine di
@@ -480,7 +557,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           <strong>Customer account</strong>: name, e-mail address, password
-          (hashed, never in plain text) or Google sign-in identifier.{" "}
+          (hashed, never in plain text), Google sign-in identifier, or passkey
+          — in the latter case, only the public key and technical device
+          metadata are stored on our servers; your fingerprint or facial
+          recognition data never leaves your device.{" "}
           <strong>Orders</strong>: delivery address, items, history.{" "}
           <strong>Payment</strong>: processed exclusively by Stripe; we
           neither see nor store any card data. <strong>Custom quotes</strong>:
@@ -523,6 +603,20 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Communication preferences",
+      body: (
+        <p>
+          If you enable the newsletter or new-product alerts from your account
+          area (<strong>My account → Notifications</strong>), we use your
+          e-mail address to send you these communications. The legal basis is
+          your <strong>consent</strong>, given by turning on the relevant
+          toggle — you can withdraw it at any time from your account, or via
+          the one-click unsubscribe link included in every e-mail. Resend
+          (listed as a processor below) is used to send these e-mails.
+        </p>
+      ),
+    },
+    {
       title: "Profiling and automated decisions",
       body: (
         <p>
@@ -537,8 +631,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           We use technical service providers: Cloudflare (hosting and
-          database), Stripe (payment), Resend (e-mail delivery), Google
-          (Google sign-in, if used). Some of these providers process data
+          database), Stripe (payment — including, where applicable,{" "}
+          <strong>Stripe Link</strong>, which lets you reuse a card already
+          saved with another merchant using Stripe; we ourselves never store
+          any card data), Resend (e-mail delivery), Google (Google sign-in, if
+          used). Some of these providers process data
           abroad, in particular in the United States; these transfers are
           based on recognised safeguards (Swiss-U.S. Data Privacy Framework for
           certified providers, or standard contractual clauses).
@@ -573,7 +670,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           In accordance with Art. 25 et seq. FADP, you may request access to
           your data, as well as its rectification, erasure or delivery in a
-          common format, by writing to contact@swiss3design.ch. You may also
+          common format. An instant export of your data (profile, orders,
+          quotes, addresses) is available from{" "}
+          <strong>My account → Privacy</strong>; for any other request, write
+          to contact@swiss3design.ch. You may also
           contact the Federal Data Protection and Information Commissioner
           (FDPIC). We generally respond within 30 days and may request proof of
           identity before acting, in order to protect your data.

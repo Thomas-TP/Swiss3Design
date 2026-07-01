@@ -63,8 +63,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Le paiement s’effectue en ligne via le prestataire Stripe (carte de
-          crédit/débit, TWINT, Apple Pay, Google Pay). L’exploitant n’a jamais
-          accès aux données de carte et ne les stocke pas.
+          crédit/débit, TWINT, Apple Pay, Google Pay), y compris via Stripe
+          Link pour réutiliser une carte déjà enregistrée. L’exploitant n’a
+          jamais accès aux données de carte et ne les stocke pas.
         </p>
       ),
     },
@@ -252,9 +253,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Die Zahlung erfolgt online über den Zahlungsdienstleister Stripe
-          (Kredit-/Debitkarte, TWINT, Apple Pay, Google Pay). Der Betreiber
-          hat zu keinem Zeitpunkt Zugriff auf Kartendaten und speichert diese
-          nicht.
+          (Kredit-/Debitkarte, TWINT, Apple Pay, Google Pay), einschliesslich
+          Stripe Link zur Wiederverwendung einer bereits gespeicherten Karte.
+          Der Betreiber hat zu keinem Zeitpunkt Zugriff auf Kartendaten und
+          speichert diese nicht.
         </p>
       ),
     },
@@ -447,7 +449,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Il pagamento avviene online tramite il prestatore Stripe (carta di
-          credito/debito, TWINT, Apple Pay, Google Pay). Il gestore non ha mai
+          credito/debito, TWINT, Apple Pay, Google Pay), inclusa Stripe Link
+          per riutilizzare una carta già registrata. Il gestore non ha mai
           accesso ai dati della carta e non li memorizza.
         </p>
       ),
@@ -635,8 +638,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Payment is made online via the payment provider Stripe
-          (credit/debit card, TWINT, Apple Pay, Google Pay). The Operator
-          never has access to card data and does not store it.
+          (credit/debit card, TWINT, Apple Pay, Google Pay), including Stripe
+          Link to reuse a card already saved. The Operator never has access
+          to card data and does not store it.
         </p>
       ),
     },
