@@ -380,6 +380,11 @@ export const user = sqliteTable("user", {
   twoFactorEnabled: integer("two_factor_enabled", { mode: "boolean" })
     .notNull()
     .default(false),
+  // Identité Stripe du client (Customer), créée paresseusement au premier
+  // checkout connecté — voir src/lib/stripe-customer.ts. Permet à Stripe Link
+  // de proposer les cartes déjà enregistrées par ce client (1-clic), sans
+  // coffre-fort de cartes maison.
+  stripeCustomerId: text("stripe_customer_id"),
   createdAt: integer("created_at", { mode: "timestamp" }).notNull(),
   updatedAt: integer("updated_at", { mode: "timestamp" }).notNull(),
 });
@@ -397,6 +402,31 @@ export const twoFactor = sqliteTable(
     verified: integer("verified", { mode: "boolean" }).notNull().default(true),
   },
   (t) => [index("two_factor_user_idx").on(t.userId)],
+);
+
+// Clés d'accès WebAuthn (Touch ID, Windows Hello, clé de sécurité…) — Better Auth
+export const passkey = sqliteTable(
+  "passkey",
+  {
+    id: text("id").primaryKey(),
+    name: text("name"),
+    publicKey: text("public_key").notNull(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    credentialID: text("credential_id").notNull(),
+    counter: integer("counter").notNull(),
+    deviceType: text("device_type").notNull(),
+    backedUp: integer("backed_up", { mode: "boolean" }).notNull(),
+    transports: text("transports"),
+    createdAt: integer("created_at", { mode: "timestamp" }),
+    updatedAt: integer("updated_at", { mode: "timestamp" }),
+    aaguid: text("aaguid"),
+  },
+  (t) => [
+    index("passkey_user_idx").on(t.userId),
+    index("passkey_credential_idx").on(t.credentialID),
+  ],
 );
 
 export const session = sqliteTable(
@@ -442,19 +472,72 @@ export const account = sqliteTable(
   (t) => [index("account_user_idx").on(t.userId)],
 );
 
-// Adresse de livraison enregistrée (une par client, proposée au checkout)
-export const customerAddresses = sqliteTable("customer_addresses", {
+// Carnet d'adresses de livraison (plusieurs par client, une marquée par
+// défaut). Anciennement une seule adresse par client (PK = userId) ; voir
+// drizzle/0014 pour la migration qui transforme chaque adresse existante en
+// adresse par défaut, sans perte de données.
+export const customerAddresses = sqliteTable(
+  "customer_addresses",
+  {
+    id: uuid(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    label: text("label"), // ex. "Maison", "Bureau" — facultatif
+    name: text("name").notNull(),
+    street: text("street").notNull(),
+    npa: text("npa").notNull(),
+    city: text("city").notNull(),
+    canton: text("canton").notNull().default(""),
+    isDefault: integer("is_default", { mode: "boolean" })
+      .notNull()
+      .default(false),
+    updatedAt: integer("updated_at", { mode: "timestamp" })
+      .notNull()
+      .$defaultFn(() => new Date()),
+  },
+  (t) => [index("customer_addresses_user_idx").on(t.userId)],
+);
+
+// Préférences de communication (opt-in). Les e-mails transactionnels
+// (confirmation de commande, expédition, devis, sécurité…) sont TOUJOURS
+// envoyés et ne dépendent pas de ces réglages — seul le contenu marketing
+// (newsletter, nouveautés produits) est concerné.
+export const notificationPreferences = sqliteTable("notification_preferences", {
   userId: text("user_id")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
-  name: text("name").notNull(),
-  street: text("street").notNull(),
-  npa: text("npa").notNull(),
-  city: text("city").notNull(),
-  canton: text("canton").notNull().default(""),
+  newsletter: integer("newsletter", { mode: "boolean" }).notNull().default(false),
+  productNews: integer("product_news", { mode: "boolean" })
+    .notNull()
+    .default(false),
   updatedAt: integer("updated_at", { mode: "timestamp" })
     .notNull()
     .$defaultFn(() => new Date()),
+});
+
+// Journal des annonces newsletter envoyées depuis l'admin (audit — Resend a
+// son propre historique, celui-ci reste consultable directement dans le
+// back-office). bodyHtml = HTML final envoyé, pour retrouver exactement ce
+// qui a été reçu.
+export const newsletterSends = sqliteTable("newsletter_sends", {
+  id: uuid(),
+  subject: text("subject").notNull(),
+  bodyHtml: text("body_html").notNull(),
+  audience: text("audience", {
+    enum: ["newsletter", "product_news", "both"],
+  }).notNull(),
+  // JSON (tableau d'ids) — snapshot informatif, pas de FK (un produit peut
+  // disparaître du catalogue sans invalider l'historique d'envoi).
+  productIds: text("product_ids"),
+  bannerImageUrl: text("banner_image_url"),
+  ctaLabel: text("cta_label"),
+  ctaUrl: text("cta_url"),
+  recipientCount: integer("recipient_count").notNull(),
+  sentBy: text("sent_by")
+    .notNull()
+    .references(() => user.id),
+  createdAt: createdAt(),
 });
 
 export const verification = sqliteTable("verification", {

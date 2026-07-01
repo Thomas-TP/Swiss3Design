@@ -10,6 +10,7 @@ import { getServerSession } from "@/lib/session";
 import { getReviewedProductIds } from "@/db/queries";
 import { formatChf } from "@/lib/format";
 import { ReviewForm } from "./review-form";
+import { ReorderButton } from "./reorder-button";
 
 export const dynamic = "force-dynamic";
 
@@ -98,6 +99,10 @@ export default async function OrderDetailPage({
         >
           {t(`status.${order.status}`)}
         </span>
+      </div>
+
+      <div className="mt-4">
+        <ReorderButton orderId={order.id} />
       </div>
 
       {order.trackingNumber && (

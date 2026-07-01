@@ -4,20 +4,28 @@ import {
   LayoutDashboard,
   Package,
   FileText,
+  User,
+  MapPin,
+  CreditCard,
+  Bell,
   ShieldCheck,
+  Lock,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 
-// Onglets disponibles en Phase 0. Les onglets Profil / Adresses / Paiements /
-// Notifications / Confidentialité s'ajouteront ici au fil des phases suivantes.
 const tabs: { href: string; key: string; icon: LucideIcon; exact?: boolean }[] = [
   { href: "/account", key: "overview", icon: LayoutDashboard, exact: true },
   { href: "/account/orders", key: "orders", icon: Package },
   { href: "/account/quotes", key: "quotes", icon: FileText },
+  { href: "/account/profile", key: "profile", icon: User },
+  { href: "/account/addresses", key: "addresses", icon: MapPin },
+  { href: "/account/payment", key: "payment", icon: CreditCard },
   { href: "/account/security", key: "security", icon: ShieldCheck },
+  { href: "/account/notifications", key: "notifications", icon: Bell },
+  { href: "/account/privacy", key: "privacy", icon: Lock },
 ];
 
 export function AccountNav({ isAdmin }: { isAdmin: boolean }) {

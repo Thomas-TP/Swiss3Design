@@ -243,7 +243,12 @@
       "overview": "Overview",
       "orders": "Orders",
       "quotes": "Quotes",
+      "profile": "Profile",
+      "addresses": "Addresses",
+      "payment": "Payment",
       "security": "Security",
+      "notifications": "Notifications",
+      "privacy": "Privacy",
       "admin": "Administration"
     },
     "overview": {
@@ -257,6 +262,65 @@
     },
     "avatarTitle": "Choose an avatar",
     "avatarChange": "Change avatar",
+    "profile": {
+      "title": "Profile",
+      "subtitle": "Your name, email and interface language.",
+      "nameTitle": "Full name",
+      "save": "Save",
+      "saved": "Saved",
+      "emailTitle": "Email address",
+      "emailVerified": "Verified",
+      "emailUnverified": "Unverified",
+      "emailChange": "Change",
+      "emailNewPlaceholder": "New email address",
+      "emailSend": "Send verification link",
+      "emailChangeSent": "Verification email sent to the new address. Click the link to confirm the change.",
+      "emailError": "Couldn't send verification. Check the address you entered.",
+      "emailResend": "Resend verification email",
+      "emailResendSent": "Email resent",
+      "languageTitle": "Language",
+      "languageDesc": "The language used for the interface and emails."
+    },
+    "addresses": {
+      "title": "Addresses",
+      "subtitle": "Your saved delivery addresses (Switzerland only).",
+      "empty": "No saved address yet.",
+      "labelPlaceholder": "Address name (optional) — e.g. Home, Office",
+      "unnamed": "Address",
+      "default": "Default",
+      "makeDefault": "Set as default",
+      "edit": "Edit",
+      "delete": "Delete",
+      "deleteConfirm": "Delete this address?",
+      "add": "Add an address",
+      "save": "Save",
+      "error": "Something went wrong. Check the fields and try again."
+    },
+    "payment": {
+      "title": "Payment",
+      "subtitle": "Your payment methods, securely managed by Stripe Link.",
+      "linkTitle": "Stripe Link",
+      "linkDesc": "Your cards are securely saved by Link, Stripe's wallet — Swiss3Design never stores your card numbers. On your next purchase, pay in one click.",
+      "manageOnLink": "Manage my payment methods on Link",
+      "cardsTitle": "Saved cards"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Choose which emails you'd like to receive.",
+      "newsletter": "Newsletter",
+      "newsletterDesc": "Workshop news, offers and Swiss3Design updates.",
+      "productNews": "New products",
+      "productNewsDesc": "Get notified when new catalogue items are released.",
+      "transactionalNote": "Emails about your orders, quotes and account security are always sent, regardless of these settings."
+    },
+    "privacy": {
+      "title": "Privacy",
+      "subtitle": "Your personal data: export and account deletion.",
+      "exportTitle": "Export my data",
+      "exportDesc": "Download a file with your personal data held by Swiss3Design (profile, orders, quotes, addresses).",
+      "exportButton": "Download my data",
+      "exportError": "Couldn't prepare the export. Please try again."
+    },
     "myOrders": "My orders",
     "myQuotes": "My quotes",
     "noOrders": "No orders yet.",
@@ -284,7 +348,7 @@
     },
     "security": {
       "title": "Security",
-      "subtitle": "Password, two-factor authentication and account deletion.",
+      "subtitle": "Password, two-factor authentication, passkeys and connected devices.",
       "twoFactorTitle": "Two-factor authentication (2FA)",
       "twoFactorDesc": "An extra app-based verification step (TOTP) at sign-in.",
       "twoFactorActive": "Enabled",
@@ -293,10 +357,49 @@
       "passwordHint": "Required if you sign in with a password.",
       "enable": "Enable 2FA",
       "disable": "Disable",
+      "regenerateBackupCodes": "Regenerate backup codes",
+      "backupDone": "Done",
       "scanQr": "Scan this QR code with your authenticator app (Google Authenticator, Authy…).",
       "enterCode": "Enter the 6-digit code from the app:",
       "codePlaceholder": "6-digit code",
       "verify": "Verify and enable",
+      "passwordSection": {
+        "title": "Password",
+        "descChange": "Change your account's password.",
+        "descSet": "Your account is connected via Google. Set a password so you can also sign in with your email.",
+        "current": "Current password",
+        "new": "New password (8 characters min.)",
+        "submit": "Update",
+        "saved": "Password updated.",
+        "errorChange": "Current password is incorrect, or the new password is too weak or already leaked.",
+        "errorGeneric": "Something went wrong. Please try again."
+      },
+      "sessions": {
+        "title": "Sessions and devices",
+        "desc": "Devices currently signed in to your account.",
+        "thisDevice": "This device",
+        "browserOn": "{browser} on {os}",
+        "unknownDevice": "Unknown device",
+        "revoke": "Sign out",
+        "revokeAllOthers": "Sign out other devices",
+        "otherSessions": "{count, plural, one {+ # other session on this device} other {+ # other sessions on this device}}"
+      },
+      "connected": {
+        "title": "Connected accounts",
+        "desc": "Sign in with another service in one click.",
+        "link": "Connect",
+        "unlink": "Disconnect",
+        "errorUnlink": "Couldn't disconnect this account (it may be your only way to sign in)."
+      },
+      "passkeys": {
+        "title": "Passkeys",
+        "desc": "Sign in with Face ID, Windows Hello, or a security key — no password needed.",
+        "add": "Add a passkey",
+        "unnamed": "Passkey",
+        "delete": "Delete",
+        "errorAdd": "Couldn't add this passkey. Please try again.",
+        "errorDelete": "Couldn't delete this passkey."
+      },
       "backupTitle": "Backup codes",
       "backupHint": "Keep them safe: they sign you in if you lose your phone. Each code works once.",
       "copyCodes": "Copy codes",
@@ -321,7 +424,10 @@
       "shippingAddress": "Shipping address",
       "tracking": "Tracking",
       "trackOrder": "Track my parcel",
-      "back": "Back to my account"
+      "back": "Back to my account",
+      "reorder": "Buy these items again",
+      "reorderError": "Couldn't reload this order. Please try again.",
+      "reorderUnavailable": "These items are no longer available."
     },
     "quotePay": {
       "title": "Pay your quote",
@@ -397,13 +503,14 @@
     "resetTitle": "New password",
     "resetCta": "Change password",
     "resetSuccess": "Password changed! You can now sign in.",
-    "resetInvalid": "Invalid or expired link. Please request a new one.",
+    "resetInvalid": "Invalid/expired link, or this password is too weak or already leaked. Request a new link or choose another password.",
     "verifyNotice": "Account created! Check your inbox and click the link to confirm your address.",
     "verifyWaiting": "Waiting for confirmation… You'll be signed in automatically.",
     "verifySigningIn": "Email confirmed! Signing in…",
     "errorUnverified": "Please confirm your email address first (link sent by email).",
     "errorInvalid": "Incorrect email or password.",
     "errorExists": "An account with this email already exists.",
+    "errorWeakPassword": "This password can't be used (too weak, or it was found in a known data breach). Please choose another one.",
     "errorGeneric": "Something went wrong. Please try again.",
     "twoFactor": {
       "title": "Two-step verification",
@@ -415,6 +522,17 @@
       "backupPrompt": "Enter one of your backup codes.",
       "backupCode": "Backup code",
       "error": "Incorrect code. Try again."
+    },
+    "passwordless": {
+      "toggle": "Sign in without a password",
+      "usePasskey": "Sign in with a passkey",
+      "orEmail": "or by email",
+      "sendLink": "Get a sign-in link",
+      "sendCode": "Get a code by email",
+      "back": "Back",
+      "error": "Couldn't send the email. Check the address you entered.",
+      "magicSent": "Link sent! Check your inbox and click it to sign in.",
+      "otpSentTo": "Code sent to {email}. Enter it below:"
     }
   },
   "errors": {

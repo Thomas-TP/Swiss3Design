@@ -1,7 +1,14 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
-import { twoFactor } from "better-auth/plugins";
+import {
+  twoFactor,
+  magicLink,
+  emailOTP,
+  haveIBeenPwned,
+  captcha,
+} from "better-auth/plugins";
+import { passkey } from "@better-auth/passkey";
 import { drizzle } from "drizzle-orm/d1";
 import { and, eq, isNull } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -11,6 +18,8 @@ import {
   verificationEmail,
   resetPasswordEmail,
   deleteAccountEmail,
+  magicLinkEmail,
+  otpEmail,
 } from "./email-templates";
 
 function adminEmails(env: CloudflareEnv): string[] {
@@ -82,12 +91,34 @@ export async function getAuth() {
       },
     },
     socialProviders: socialProviders(env),
+    // Session valable 7 j (défaut Better Auth) ; freshAge alignée dessus —
+    // sinon le défaut (24 h) bloque listSessions/unlinkAccount (« session pas
+    // assez fraîche ») pour un client connecté depuis plus d'un jour, alors
+    // que sa session est toujours valide.
+    session: {
+      freshAge: 60 * 60 * 24 * 7,
+    },
+    account: {
+      accountLinking: {
+        enabled: true,
+        trustedProviders: ["google"],
+      },
+    },
     user: {
+      // Changement d'e-mail : réutilise emailVerification.sendVerificationEmail
+      // ci-dessus (Better Auth route dessus automatiquement) — la nouvelle
+      // adresse n'est appliquée qu'après clic sur le lien envoyé.
+      changeEmail: { enabled: true },
       additionalFields: {
         role: {
           type: "string",
           defaultValue: "customer",
           input: false, // jamais modifiable par le client
+        },
+        stripeCustomerId: {
+          type: "string",
+          required: false,
+          input: false, // géré uniquement par src/lib/stripe-customer.ts
         },
       },
       // Suppression de compte (droit à l'effacement nLPD), confirmée par e-mail.
@@ -175,6 +206,39 @@ export async function getAuth() {
         },
       },
     },
-    plugins: [twoFactor({ issuer: "Swiss3Design" }), nextCookies()],
+    plugins: [
+      twoFactor({ issuer: "Swiss3Design" }),
+      magicLink({
+        expiresIn: 60 * 5,
+        sendMagicLink: async ({ email, url }) => {
+          await sendEmail(magicLinkEmail(email, url));
+        },
+      }),
+      emailOTP({
+        expiresIn: 60 * 5,
+        sendVerificationOnSignUp: false, // déjà couvert par emailVerification ci-dessus
+        sendVerificationOTP: async ({ email, otp, type }) => {
+          await sendEmail(otpEmail(email, otp, type));
+        },
+      }),
+      // Mots de passe compromis (k-anonymat — seul un préfixe SHA-1 à 5
+      // caractères part vers l'API HIBP, jamais le mot de passe en clair).
+      haveIBeenPwned(),
+      // rpID dérivé automatiquement de baseURL (env.BETTER_AUTH_URL) : pas de
+      // configuration manuelle, fonctionne tel quel en prod comme en preview.
+      passkey(),
+      // Anti-bot sur inscription/connexion/mot de passe oublié — actif
+      // uniquement si un widget Turnstile est configuré (sinon désactivé,
+      // pour ne pas casser le dev local sans clé).
+      ...(env.TURNSTILE_SECRET_KEY
+        ? [
+            captcha({
+              provider: "cloudflare-turnstile",
+              secretKey: env.TURNSTILE_SECRET_KEY,
+            }),
+          ]
+        : []),
+      nextCookies(),
+    ],
   });
 }

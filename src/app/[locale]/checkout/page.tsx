@@ -1,4 +1,4 @@
-import { eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { getDb } from "@/db";
 import { customerAddresses } from "@/db/schema";
@@ -10,7 +10,8 @@ export const dynamic = "force-dynamic";
 export default async function CheckoutPage() {
   const t = await getTranslations("checkout");
 
-  // Adresse enregistrée du client connecté, proposée en préremplissage
+  // Adresse par défaut du client connecté, proposée en préremplissage
+  // (carnet d'adresses complet géré depuis /account/addresses).
   let initialAddress: CheckoutAddress | null = null;
   const session = await getServerSession();
   if (session) {
@@ -18,7 +19,13 @@ export default async function CheckoutPage() {
     const [saved] = await db
       .select()
       .from(customerAddresses)
-      .where(eq(customerAddresses.userId, session.user.id))
+      .where(
+        and(
+          eq(customerAddresses.userId, session.user.id),
+          eq(customerAddresses.isDefault, true),
+        ),
+      )
+      .orderBy(desc(customerAddresses.updatedAt))
       .limit(1);
     if (saved) {
       initialAddress = {

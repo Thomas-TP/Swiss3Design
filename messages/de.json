@@ -243,7 +243,12 @@
       "overview": "Übersicht",
       "orders": "Bestellungen",
       "quotes": "Offerten",
+      "profile": "Profil",
+      "addresses": "Adressen",
+      "payment": "Zahlung",
       "security": "Sicherheit",
+      "notifications": "Benachrichtigungen",
+      "privacy": "Datenschutz",
       "admin": "Verwaltung"
     },
     "overview": {
@@ -257,6 +262,65 @@
     },
     "avatarTitle": "Avatar wählen",
     "avatarChange": "Avatar ändern",
+    "profile": {
+      "title": "Profil",
+      "subtitle": "Ihr Name, Ihre E-Mail-Adresse und die Sprache der Oberfläche.",
+      "nameTitle": "Vollständiger Name",
+      "save": "Speichern",
+      "saved": "Gespeichert",
+      "emailTitle": "E-Mail-Adresse",
+      "emailVerified": "Bestätigt",
+      "emailUnverified": "Nicht bestätigt",
+      "emailChange": "Ändern",
+      "emailNewPlaceholder": "Neue E-Mail-Adresse",
+      "emailSend": "Bestätigungslink senden",
+      "emailChangeSent": "Bestätigungs-E-Mail an die neue Adresse gesendet. Klicken Sie auf den Link, um die Änderung zu bestätigen.",
+      "emailError": "Bestätigung konnte nicht gesendet werden. Prüfen Sie die eingegebene Adresse.",
+      "emailResend": "Bestätigungs-E-Mail erneut senden",
+      "emailResendSent": "E-Mail erneut gesendet",
+      "languageTitle": "Sprache",
+      "languageDesc": "Die Sprache der Oberfläche und der E-Mails."
+    },
+    "addresses": {
+      "title": "Adressen",
+      "subtitle": "Ihre gespeicherten Lieferadressen (nur Schweiz).",
+      "empty": "Noch keine Adresse gespeichert.",
+      "labelPlaceholder": "Name der Adresse (optional) — z. B. Zuhause, Büro",
+      "unnamed": "Adresse",
+      "default": "Standard",
+      "makeDefault": "Als Standard festlegen",
+      "edit": "Bearbeiten",
+      "delete": "Löschen",
+      "deleteConfirm": "Diese Adresse löschen?",
+      "add": "Adresse hinzufügen",
+      "save": "Speichern",
+      "error": "Ein Fehler ist aufgetreten. Prüfen Sie die Felder und versuchen Sie es erneut."
+    },
+    "payment": {
+      "title": "Zahlung",
+      "subtitle": "Ihre Zahlungsmittel, sicher verwaltet von Stripe Link.",
+      "linkTitle": "Stripe Link",
+      "linkDesc": "Ihre Karten werden sicher von Link, der Wallet-Lösung von Stripe, gespeichert — Swiss3Design speichert niemals Ihre Kartennummern. Bei Ihrem nächsten Einkauf zahlen Sie mit einem Klick.",
+      "manageOnLink": "Zahlungsmittel auf Link verwalten",
+      "cardsTitle": "Gespeicherte Karten"
+    },
+    "notifications": {
+      "title": "Benachrichtigungen",
+      "subtitle": "Wählen Sie aus, welche E-Mails Sie erhalten möchten.",
+      "newsletter": "Newsletter",
+      "newsletterDesc": "Neuigkeiten aus der Werkstatt, Angebote und Swiss3Design-Updates.",
+      "productNews": "Neue Produkte",
+      "productNewsDesc": "Werden Sie benachrichtigt, wenn neue Artikel im Katalog erscheinen.",
+      "transactionalNote": "E-Mails zu Ihren Bestellungen, Offerten und zur Kontosicherheit werden unabhängig von diesen Einstellungen immer gesendet."
+    },
+    "privacy": {
+      "title": "Datenschutz",
+      "subtitle": "Ihre persönlichen Daten: Export und Kontolöschung.",
+      "exportTitle": "Meine Daten exportieren",
+      "exportDesc": "Laden Sie eine Datei mit Ihren von Swiss3Design gespeicherten persönlichen Daten herunter (Profil, Bestellungen, Offerten, Adressen).",
+      "exportButton": "Meine Daten herunterladen",
+      "exportError": "Export konnte nicht vorbereitet werden. Bitte erneut versuchen."
+    },
     "myOrders": "Meine Bestellungen",
     "myQuotes": "Meine Offerten",
     "noOrders": "Noch keine Bestellungen.",
@@ -284,7 +348,7 @@
     },
     "security": {
       "title": "Sicherheit",
-      "subtitle": "Passwort, Zwei-Faktor-Authentifizierung und Kontolöschung.",
+      "subtitle": "Passwort, Zwei-Faktor-Authentifizierung, Passkeys und verbundene Geräte.",
       "twoFactorTitle": "Zwei-Faktor-Authentifizierung (2FA)",
       "twoFactorDesc": "Ein zusätzlicher Bestätigungsschritt per App (TOTP) bei der Anmeldung.",
       "twoFactorActive": "Aktiviert",
@@ -293,10 +357,49 @@
       "passwordHint": "Erforderlich, wenn Sie sich mit Passwort anmelden.",
       "enable": "2FA aktivieren",
       "disable": "Deaktivieren",
+      "regenerateBackupCodes": "Wiederherstellungscodes neu generieren",
+      "backupDone": "Fertig",
       "scanQr": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App (Google Authenticator, Authy…).",
       "enterCode": "Geben Sie den 6-stelligen Code aus der App ein:",
       "codePlaceholder": "6-stelliger Code",
       "verify": "Prüfen und aktivieren",
+      "passwordSection": {
+        "title": "Passwort",
+        "descChange": "Ändern Sie das Passwort Ihres Kontos.",
+        "descSet": "Ihr Konto ist mit Google verbunden. Legen Sie ein Passwort fest, um sich auch mit Ihrer E-Mail-Adresse anmelden zu können.",
+        "current": "Aktuelles Passwort",
+        "new": "Neues Passwort (mind. 8 Zeichen)",
+        "submit": "Aktualisieren",
+        "saved": "Passwort aktualisiert.",
+        "errorChange": "Aktuelles Passwort falsch, oder das neue Passwort ist zu schwach oder bereits durchgesickert.",
+        "errorGeneric": "Ein Fehler ist aufgetreten. Bitte erneut versuchen."
+      },
+      "sessions": {
+        "title": "Sitzungen und Geräte",
+        "desc": "Die derzeit mit Ihrem Konto verbundenen Geräte.",
+        "thisDevice": "Dieses Gerät",
+        "browserOn": "{browser} unter {os}",
+        "unknownDevice": "Unbekanntes Gerät",
+        "revoke": "Abmelden",
+        "revokeAllOthers": "Andere Geräte abmelden",
+        "otherSessions": "{count, plural, one {+ # weitere Sitzung auf diesem Gerät} other {+ # weitere Sitzungen auf diesem Gerät}}"
+      },
+      "connected": {
+        "title": "Verbundene Konten",
+        "desc": "Melden Sie sich mit einem anderen Dienst per Klick an.",
+        "link": "Verbinden",
+        "unlink": "Trennen",
+        "errorUnlink": "Dieses Konto kann nicht getrennt werden (es ist möglicherweise Ihre einzige Anmeldemöglichkeit)."
+      },
+      "passkeys": {
+        "title": "Passkeys",
+        "desc": "Anmeldung mit Face ID, Windows Hello oder einem Sicherheitsschlüssel — ganz ohne Passwort.",
+        "add": "Passkey hinzufügen",
+        "unnamed": "Passkey",
+        "delete": "Löschen",
+        "errorAdd": "Dieser Passkey konnte nicht hinzugefügt werden. Bitte erneut versuchen.",
+        "errorDelete": "Dieser Passkey konnte nicht gelöscht werden."
+      },
       "backupTitle": "Wiederherstellungscodes",
       "backupHint": "Sicher aufbewahren: Damit melden Sie sich an, falls Sie Ihr Telefon verlieren. Jeder Code ist einmal gültig.",
       "copyCodes": "Codes kopieren",
@@ -321,7 +424,10 @@
       "shippingAddress": "Lieferadresse",
       "tracking": "Sendungsverfolgung",
       "trackOrder": "Paket verfolgen",
-      "back": "Zurück zum Konto"
+      "back": "Zurück zum Konto",
+      "reorder": "Diese Artikel erneut kaufen",
+      "reorderError": "Diese Bestellung konnte nicht neu geladen werden. Bitte erneut versuchen.",
+      "reorderUnavailable": "Diese Artikel sind nicht mehr verfügbar."
     },
     "quotePay": {
       "title": "Offerte bezahlen",
@@ -397,13 +503,14 @@
     "resetTitle": "Neues Passwort",
     "resetCta": "Passwort ändern",
     "resetSuccess": "Passwort geändert! Sie können sich jetzt anmelden.",
-    "resetInvalid": "Ungültiger oder abgelaufener Link. Bitte fordern Sie einen neuen an.",
+    "resetInvalid": "Ungültiger/abgelaufener Link, oder dieses Passwort ist zu schwach oder bereits durchgesickert. Fordern Sie einen neuen Link an oder wählen Sie ein anderes Passwort.",
     "verifyNotice": "Konto erstellt! Prüfen Sie Ihren Posteingang und klicken Sie auf den Link, um Ihre Adresse zu bestätigen.",
     "verifyWaiting": "Warten auf Bestätigung… Die Anmeldung erfolgt automatisch.",
     "verifySigningIn": "E-Mail bestätigt! Anmeldung…",
     "errorUnverified": "Bitte bestätigen Sie zuerst Ihre E-Mail-Adresse (Link per E-Mail gesendet).",
     "errorInvalid": "E-Mail oder Passwort falsch.",
     "errorExists": "Mit dieser E-Mail existiert bereits ein Konto.",
+    "errorWeakPassword": "Dieses Passwort kann nicht verwendet werden (zu schwach oder bereits bei einem bekannten Datenleck durchgesickert). Wählen Sie ein anderes.",
     "errorGeneric": "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "twoFactor": {
       "title": "Zwei-Faktor-Bestätigung",
@@ -415,6 +522,17 @@
       "backupPrompt": "Geben Sie einen Ihrer Wiederherstellungscodes ein.",
       "backupCode": "Wiederherstellungscode",
       "error": "Falscher Code. Bitte erneut versuchen."
+    },
+    "passwordless": {
+      "toggle": "Ohne Passwort anmelden",
+      "usePasskey": "Mit Passkey anmelden",
+      "orEmail": "oder per E-Mail",
+      "sendLink": "Anmeldelink erhalten",
+      "sendCode": "Code per E-Mail erhalten",
+      "back": "Zurück",
+      "error": "E-Mail konnte nicht gesendet werden. Prüfen Sie die eingegebene Adresse.",
+      "magicSent": "Link gesendet! Prüfen Sie Ihr Postfach und klicken Sie darauf, um sich anzumelden.",
+      "otpSentTo": "Code an {email} gesendet. Geben Sie ihn unten ein:"
     }
   },
   "errors": {

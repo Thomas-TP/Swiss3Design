@@ -29,7 +29,11 @@ export async function POST(request: Request) {
     return Response.json({ error: "too_large" }, { status: 413 });
   }
 
-  const key = `products/${crypto.randomUUID()}.${ext}`;
+  // "products" par défaut (usages existants) — les nouveaux appelants
+  // peuvent préciser un dossier de rangement (ex. "newsletter").
+  const folderRaw = String(form?.get("folder") || "products");
+  const folder = /^[a-z-]+$/.test(folderRaw) ? folderRaw : "products";
+  const key = `${folder}/${crypto.randomUUID()}.${ext}`;
   const { env } = await getCloudflareContext({ async: true });
   await env.R2.put(key, await file.arrayBuffer(), {
     httpMetadata: { contentType: file.type },

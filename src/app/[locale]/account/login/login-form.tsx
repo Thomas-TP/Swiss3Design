@@ -1,22 +1,44 @@
 "use client";
 
-import { useState } from "react";
-import { LogIn, ShieldCheck } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useState, useSyncExternalStore } from "react";
+import {
+  LogIn,
+  ShieldCheck,
+  Mail,
+  MailCheck,
+  Fingerprint,
+} from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
-import { signIn, twoFactor } from "@/lib/auth-client";
+import { signIn, twoFactor, emailOtp } from "@/lib/auth-client";
 
 const field =
   "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
+const btnGhost =
+  "flex w-full items-center justify-center gap-2 rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-ink disabled:opacity-60";
 
 export function LoginForm({ next = "/account" }: { next?: string }) {
   const t = useTranslations("auth");
+  const locale = useLocale();
   const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Étape de vérification 2FA après un mot de passe correct sur un compte protégé
-  const [stage, setStage] = useState<"login" | "totp" | "backup">("login");
+  // login : mot de passe · totp/backup : code 2FA · passwordless : choix
+  // lien/code · magicSent : lien envoyé · otpVerify : saisie du code reçu
+  const [stage, setStage] = useState<
+    "login" | "totp" | "backup" | "passwordless" | "magicSent" | "otpVerify"
+  >("login");
   const [code, setCode] = useState("");
+  const [plEmail, setPlEmail] = useState("");
+  // Clé d'accès proposée seulement si le navigateur sait s'en servir —
+  // évite un bouton mort sur les navigateurs/OS sans WebAuthn. Rendu côté
+  // serveur : false (pas de window) ; useSyncExternalStore fait la mise à
+  // jour post-hydratation sans avertissement d'incohérence SSR/client.
+  const passkeySupported = useSyncExternalStore(
+    () => () => {},
+    () => typeof window !== "undefined" && !!window.PublicKeyCredential,
+    () => false,
+  );
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -64,7 +86,73 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
     router.refresh();
   }
 
-  if (stage !== "login") {
+  async function sendMagicLink() {
+    setPending(true);
+    setError(null);
+    const { error: err } = await signIn.magicLink({
+      email: plEmail,
+      callbackURL: `/${locale}${next}`,
+    });
+    setPending(false);
+    if (err) {
+      setError(t("passwordless.error"));
+      return;
+    }
+    setStage("magicSent");
+  }
+
+  async function onPasskeySignIn() {
+    setPending(true);
+    setError(null);
+    const { error: err } = await signIn.passkey();
+    setPending(false);
+    if (err) {
+      // Annulation par l'utilisateur (boîte de dialogue système) : silencieux
+      if (("code" in err ? err.code : null) !== "AUTH_CANCELLED") {
+        setError(t("errorGeneric"));
+      }
+      return;
+    }
+    router.push(next);
+    router.refresh();
+  }
+
+  async function sendOtp() {
+    setPending(true);
+    setError(null);
+    const { error: err } = await emailOtp.sendVerificationOtp({
+      email: plEmail,
+      type: "sign-in",
+    });
+    setPending(false);
+    if (err) {
+      setError(t("passwordless.error"));
+      return;
+    }
+    setStage("otpVerify");
+  }
+
+  async function verifyOtp() {
+    setPending(true);
+    setError(null);
+    const { data: res, error: err } = await signIn.emailOtp({
+      email: plEmail,
+      otp: code,
+    });
+    setPending(false);
+    if (err) {
+      setError(t("twoFactor.error"));
+      return;
+    }
+    if ((res as { twoFactorRedirect?: boolean } | null)?.twoFactorRedirect) {
+      setStage("totp");
+      return;
+    }
+    router.push(next);
+    router.refresh();
+  }
+
+  if (stage === "totp" || stage === "backup") {
     const isBackup = stage === "backup";
     return (
       <div className="space-y-4">
@@ -124,6 +212,127 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
     );
   }
 
+  if (stage === "magicSent") {
+    return (
+      <p className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-300">
+        <MailCheck size={16} className="shrink-0" />
+        {t("passwordless.magicSent")}
+      </p>
+    );
+  }
+
+  if (stage === "otpVerify") {
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-soft">{t("passwordless.otpSentTo", { email: plEmail })}</p>
+        <input
+          value={code}
+          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              verifyOtp();
+            }
+          }}
+          inputMode="numeric"
+          autoComplete="one-time-code"
+          placeholder={t("twoFactor.code")}
+          className={`${field} tracking-[0.3em]`}
+        />
+        {error && (
+          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+            {error}
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={verifyOtp}
+          disabled={pending || code.length < 6}
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+        >
+          {pending ? t("processing") : t("twoFactor.verify")}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setStage("passwordless");
+            setCode("");
+            setError(null);
+          }}
+          className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink"
+        >
+          {t("passwordless.back")}
+        </button>
+      </div>
+    );
+  }
+
+  if (stage === "passwordless") {
+    return (
+      <div className="space-y-4">
+        {passkeySupported && (
+          <>
+            <button
+              type="button"
+              onClick={onPasskeySignIn}
+              disabled={pending}
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+            >
+              <Fingerprint size={16} />
+              {t("passwordless.usePasskey")}
+            </button>
+            <div className="flex items-center gap-3 text-xs text-soft">
+              <span className="h-px flex-1 bg-line" />
+              {t("passwordless.orEmail")}
+              <span className="h-px flex-1 bg-line" />
+            </div>
+          </>
+        )}
+        <input
+          type="email"
+          value={plEmail}
+          onChange={(e) => setPlEmail(e.target.value)}
+          placeholder={t("email")}
+          autoComplete="email"
+          required
+          className={field}
+        />
+        {error && (
+          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+            {error}
+          </p>
+        )}
+        <button
+          type="button"
+          onClick={sendMagicLink}
+          disabled={pending || !plEmail.trim()}
+          className={passkeySupported ? btnGhost : "flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"}
+        >
+          <Mail size={16} />
+          {pending ? t("processing") : t("passwordless.sendLink")}
+        </button>
+        <button
+          type="button"
+          onClick={sendOtp}
+          disabled={pending || !plEmail.trim()}
+          className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink disabled:opacity-60"
+        >
+          {t("passwordless.sendCode")}
+        </button>
+        <button
+          type="button"
+          onClick={() => {
+            setStage("login");
+            setError(null);
+          }}
+          className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink"
+        >
+          {t("passwordless.back")}
+        </button>
+      </div>
+    );
+  }
+
   return (
     // method="post" : si JS est indisponible, le repli natif n'envoie jamais le
     // mot de passe dans l'URL (sinon GET par défaut → fuite via Referer/logs).
@@ -174,6 +383,16 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
       >
         <LogIn size={16} />
         {t("signInCta")}
+      </button>
+      <button
+        type="button"
+        onClick={() => {
+          setStage("passwordless");
+          setError(null);
+        }}
+        className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink"
+      >
+        {t("passwordless.toggle")}
       </button>
     </form>
   );

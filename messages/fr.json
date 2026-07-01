@@ -243,7 +243,12 @@
       "overview": "Vue d'ensemble",
       "orders": "Commandes",
       "quotes": "Devis",
+      "profile": "Profil",
+      "addresses": "Adresses",
+      "payment": "Paiement",
       "security": "Sécurité",
+      "notifications": "Notifications",
+      "privacy": "Confidentialité",
       "admin": "Administration"
     },
     "overview": {
@@ -257,6 +262,65 @@
     },
     "avatarTitle": "Choisir un avatar",
     "avatarChange": "Changer d'avatar",
+    "profile": {
+      "title": "Profil",
+      "subtitle": "Votre nom, votre e-mail et la langue de l'interface.",
+      "nameTitle": "Nom complet",
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "emailTitle": "Adresse e-mail",
+      "emailVerified": "Vérifiée",
+      "emailUnverified": "Non vérifiée",
+      "emailChange": "Modifier",
+      "emailNewPlaceholder": "Nouvelle adresse e-mail",
+      "emailSend": "Envoyer le lien de vérification",
+      "emailChangeSent": "E-mail de vérification envoyé à la nouvelle adresse. Cliquez sur le lien pour confirmer le changement.",
+      "emailError": "Impossible d'envoyer la vérification. Vérifiez l'adresse saisie.",
+      "emailResend": "Renvoyer l'e-mail de vérification",
+      "emailResendSent": "E-mail renvoyé",
+      "languageTitle": "Langue",
+      "languageDesc": "La langue utilisée pour l'interface et les e-mails."
+    },
+    "addresses": {
+      "title": "Adresses",
+      "subtitle": "Vos adresses de livraison enregistrées (Suisse uniquement).",
+      "empty": "Aucune adresse enregistrée pour l'instant.",
+      "labelPlaceholder": "Nom de l'adresse (facultatif) — ex. Maison, Bureau",
+      "unnamed": "Adresse",
+      "default": "Par défaut",
+      "makeDefault": "Définir par défaut",
+      "edit": "Modifier",
+      "delete": "Supprimer",
+      "deleteConfirm": "Supprimer cette adresse ?",
+      "add": "Ajouter une adresse",
+      "save": "Enregistrer",
+      "error": "Une erreur est survenue. Vérifiez les champs et réessayez."
+    },
+    "payment": {
+      "title": "Paiement",
+      "subtitle": "Vos moyens de paiement, gérés en sécurité par Stripe Link.",
+      "linkTitle": "Stripe Link",
+      "linkDesc": "Vos cartes sont enregistrées en sécurité par Link, le portefeuille de Stripe — Swiss3Design ne stocke jamais vos numéros de carte. À votre prochain achat, payez en un clic.",
+      "manageOnLink": "Gérer mes moyens de paiement sur Link",
+      "cardsTitle": "Cartes enregistrées"
+    },
+    "notifications": {
+      "title": "Notifications",
+      "subtitle": "Choisissez les e-mails que vous souhaitez recevoir.",
+      "newsletter": "Newsletter",
+      "newsletterDesc": "Actualités de l'atelier, offres et nouveautés Swiss3Design.",
+      "productNews": "Nouveaux produits",
+      "productNewsDesc": "Soyez averti·e à la sortie de nouvelles pièces du catalogue.",
+      "transactionalNote": "Les e-mails liés à vos commandes, devis et à la sécurité de votre compte sont toujours envoyés, indépendamment de ces réglages."
+    },
+    "privacy": {
+      "title": "Confidentialité",
+      "subtitle": "Vos données personnelles : export et suppression de compte.",
+      "exportTitle": "Exporter mes données",
+      "exportDesc": "Téléchargez un fichier contenant vos données personnelles détenues par Swiss3Design (profil, commandes, devis, adresses).",
+      "exportButton": "Télécharger mes données",
+      "exportError": "Impossible de préparer l'export. Réessayez."
+    },
     "myOrders": "Mes commandes",
     "myQuotes": "Mes devis",
     "noOrders": "Aucune commande pour l'instant.",
@@ -284,7 +348,7 @@
     },
     "security": {
       "title": "Sécurité",
-      "subtitle": "Mot de passe, double authentification et suppression du compte.",
+      "subtitle": "Mot de passe, double authentification, clés d'accès et appareils connectés.",
       "twoFactorTitle": "Authentification à deux facteurs (2FA)",
       "twoFactorDesc": "Une étape de vérification par application (TOTP) à la connexion.",
       "twoFactorActive": "Activée",
@@ -293,10 +357,49 @@
       "passwordHint": "Requis si vous vous connectez avec un mot de passe.",
       "enable": "Activer la 2FA",
       "disable": "Désactiver",
+      "regenerateBackupCodes": "Régénérer les codes de secours",
+      "backupDone": "Terminé",
       "scanQr": "Scannez ce QR code avec votre application d'authentification (Google Authenticator, Authy…).",
       "enterCode": "Saisissez le code à 6 chiffres généré par l'application :",
       "codePlaceholder": "Code à 6 chiffres",
       "verify": "Vérifier et activer",
+      "passwordSection": {
+        "title": "Mot de passe",
+        "descChange": "Modifiez le mot de passe de votre compte.",
+        "descSet": "Votre compte est connecté via Google. Définissez un mot de passe pour pouvoir aussi vous connecter avec votre e-mail.",
+        "current": "Mot de passe actuel",
+        "new": "Nouveau mot de passe (8 caractères min.)",
+        "submit": "Mettre à jour",
+        "saved": "Mot de passe mis à jour.",
+        "errorChange": "Mot de passe actuel incorrect, ou le nouveau mot de passe est trop faible ou a déjà fuité.",
+        "errorGeneric": "Une erreur est survenue. Réessayez."
+      },
+      "sessions": {
+        "title": "Sessions et appareils",
+        "desc": "Les appareils actuellement connectés à votre compte.",
+        "thisDevice": "Cet appareil",
+        "browserOn": "{browser} sur {os}",
+        "unknownDevice": "Appareil inconnu",
+        "revoke": "Déconnecter",
+        "revokeAllOthers": "Déconnecter les autres appareils",
+        "otherSessions": "{count, plural, one {+ # autre connexion sur cet appareil} other {+ # autres connexions sur cet appareil}}"
+      },
+      "connected": {
+        "title": "Comptes connectés",
+        "desc": "Connectez-vous avec un autre service en un clic.",
+        "link": "Lier",
+        "unlink": "Délier",
+        "errorUnlink": "Impossible de délier ce compte (c'est peut-être votre seul moyen de connexion)."
+      },
+      "passkeys": {
+        "title": "Clés d'accès",
+        "desc": "Connectez-vous avec Face ID, Windows Hello ou une clé de sécurité, sans mot de passe.",
+        "add": "Ajouter une clé d'accès",
+        "unnamed": "Clé d'accès",
+        "delete": "Supprimer",
+        "errorAdd": "Impossible d'ajouter cette clé d'accès. Réessayez.",
+        "errorDelete": "Impossible de supprimer cette clé d'accès."
+      },
       "backupTitle": "Codes de récupération",
       "backupHint": "Gardez-les en lieu sûr : ils vous connectent si vous perdez votre téléphone. Chaque code sert une fois.",
       "copyCodes": "Copier les codes",
@@ -321,7 +424,10 @@
       "shippingAddress": "Adresse de livraison",
       "tracking": "Suivi",
       "trackOrder": "Suivre mon colis",
-      "back": "Retour à mon compte"
+      "back": "Retour à mon compte",
+      "reorder": "Racheter ces articles",
+      "reorderError": "Impossible de recharger cette commande. Réessayez.",
+      "reorderUnavailable": "Ces articles ne sont plus disponibles."
     },
     "quotePay": {
       "title": "Payer votre devis",
@@ -397,13 +503,14 @@
     "resetTitle": "Nouveau mot de passe",
     "resetCta": "Changer le mot de passe",
     "resetSuccess": "Mot de passe modifié ! Vous pouvez maintenant vous connecter.",
-    "resetInvalid": "Lien invalide ou expiré. Refaites une demande.",
+    "resetInvalid": "Lien invalide/expiré, ou ce mot de passe est trop faible ou a déjà fuité. Refaites une demande ou choisissez un autre mot de passe.",
     "verifyNotice": "Compte créé ! Consultez votre boîte mail et cliquez sur le lien pour confirmer votre adresse.",
     "verifyWaiting": "En attente de confirmation… La connexion se fera automatiquement.",
     "verifySigningIn": "E-mail confirmé ! Connexion…",
     "errorUnverified": "Veuillez d'abord confirmer votre adresse e-mail (lien envoyé par e-mail).",
     "errorInvalid": "E-mail ou mot de passe incorrect.",
     "errorExists": "Un compte existe déjà avec cet e-mail.",
+    "errorWeakPassword": "Ce mot de passe ne peut pas être utilisé (trop faible ou déjà fuité lors d'une violation de données connue). Choisissez-en un autre.",
     "errorGeneric": "Une erreur est survenue. Merci de réessayer.",
     "twoFactor": {
       "title": "Vérification en deux étapes",
@@ -415,6 +522,17 @@
       "backupPrompt": "Saisissez l'un de vos codes de récupération.",
       "backupCode": "Code de récupération",
       "error": "Code incorrect. Réessayez."
+    },
+    "passwordless": {
+      "toggle": "Se connecter sans mot de passe",
+      "usePasskey": "Se connecter avec une clé d'accès",
+      "orEmail": "ou par e-mail",
+      "sendLink": "Recevoir un lien de connexion",
+      "sendCode": "Recevoir un code par e-mail",
+      "back": "Retour",
+      "error": "Impossible d'envoyer l'e-mail. Vérifiez l'adresse saisie.",
+      "magicSent": "Lien envoyé ! Consultez votre boîte mail et cliquez dessus pour vous connecter.",
+      "otpSentTo": "Code envoyé à {email}. Saisissez-le ci-dessous :"
     }
   },
   "errors": {

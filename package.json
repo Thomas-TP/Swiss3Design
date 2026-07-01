@@ -21,6 +21,7 @@
     "db:seed:local": "wrangler d1 execute swiss3design-db --local --file=./scripts/seed.sql"
   },
   "dependencies": {
+    "@better-auth/passkey": "^1.6.23",
     "@opennextjs/cloudflare": "^1.20.1",
     "@stripe/react-stripe-js": "^6.6.0",
     "@stripe/stripe-js": "^9.8.0",

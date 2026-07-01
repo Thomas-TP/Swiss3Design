@@ -14,6 +14,7 @@ import {
 } from "@/db/schema";
 import { getSetting } from "@/db/queries";
 import { getStripe } from "@/lib/stripe";
+import { getOrCreateStripeCustomer } from "@/lib/stripe-customer";
 import { getAuth } from "@/lib/auth";
 import { verifyEmailProof } from "@/lib/email-proof";
 import { validateDiscount } from "@/lib/discounts";
@@ -234,15 +235,32 @@ export async function POST(request: Request) {
 
   const totalCents = subtotalCents - discountCents + shippingCents;
 
-  // Mémorise l'adresse pour les prochaines commandes si demandé
+  // Mémorise l'adresse par défaut pour les prochaines commandes si demandé.
+  // Plusieurs adresses sont possibles (carnet d'adresses, espace compte) :
+  // ici on met à jour l'adresse par défaut existante, ou on en crée une.
   if (authSession && saveAddress) {
-    await db
-      .insert(customerAddresses)
-      .values({ userId: authSession.user.id, ...address })
-      .onConflictDoUpdate({
-        target: customerAddresses.userId,
-        set: { ...address, updatedAt: new Date() },
+    const [existingDefault] = await db
+      .select({ id: customerAddresses.id })
+      .from(customerAddresses)
+      .where(
+        and(
+          eq(customerAddresses.userId, authSession.user.id),
+          eq(customerAddresses.isDefault, true),
+        ),
+      )
+      .limit(1);
+    if (existingDefault) {
+      await db
+        .update(customerAddresses)
+        .set({ ...address, updatedAt: new Date() })
+        .where(eq(customerAddresses.id, existingDefault.id));
+    } else {
+      await db.insert(customerAddresses).values({
+        userId: authSession.user.id,
+        isDefault: true,
+        ...address,
       });
+    }
   }
 
   const orderNumber = makeOrderNumber();
@@ -278,11 +296,25 @@ export async function POST(request: Request) {
 
   const { env } = await getCloudflareContext({ async: true });
   const stripe = getStripe(env.STRIPE_SECRET_KEY);
+
+  // Client connecté : rattache le paiement à son identité Stripe (Customer).
+  // Stripe Link peut alors proposer en 1 clic les cartes déjà enregistrées
+  // par ce client — aucun coffre-fort de moyens de paiement côté serveur.
+  const stripeCustomerId = authSession
+    ? await getOrCreateStripeCustomer(stripe, db, {
+        id: authSession.user.id,
+        email: authSession.user.email,
+        name: authSession.user.name,
+        stripeCustomerId: authSession.user.stripeCustomerId ?? null,
+      })
+    : undefined;
+
   const paymentIntent = await stripe.paymentIntents.create({
     amount: totalCents,
     currency: "chf",
     automatic_payment_methods: { enabled: true },
     receipt_email: email,
+    ...(stripeCustomerId ? { customer: stripeCustomerId } : {}),
     shipping: {
       name: address.name,
       address: {

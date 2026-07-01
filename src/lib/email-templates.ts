@@ -895,6 +895,59 @@ export function resetPasswordEmail(to: string, url: string): EmailMessage {
   };
 }
 
+// ── Connexion sans mot de passe (FR + EN) ────────────────────────────────────
+
+export function magicLinkEmail(to: string, url: string): EmailMessage {
+  const body = `
+    <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
+      Cliquez sur le bouton ci-dessous pour vous connecter à votre compte
+      Swiss3Design. Ce lien expire dans 5 minutes et ne sert qu'une fois.
+    </p>
+    ${button(url, "Me connecter")}
+    <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">
+      Click the button above to sign in to your Swiss3Design account (link expires in 5 minutes).<br/>
+      Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.
+    </p>`;
+  return {
+    to,
+    from: FROM_CONTACT,
+    subject: "Votre lien de connexion — Swiss3Design",
+    html: layout("Connexion à Swiss3Design", body, FOOTER.fr),
+  };
+}
+
+export function otpEmail(
+  to: string,
+  code: string,
+  type: "sign-in" | "email-verification" | "forget-password" | "change-email",
+): EmailMessage {
+  const intro =
+    type === "sign-in"
+      ? "Voici votre code de connexion Swiss3Design :"
+      : type === "forget-password"
+        ? "Voici votre code pour réinitialiser votre mot de passe Swiss3Design :"
+        : type === "change-email"
+          ? "Voici votre code pour confirmer votre nouvelle adresse e-mail :"
+          : "Voici votre code de vérification Swiss3Design :";
+  const body = `
+    <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">${intro}</p>
+    <p style="margin:0 0 18px;text-align:center;">
+      <span style="display:inline-block;background:#f5f5f4;border-radius:12px;padding:14px 22px;font-size:28px;font-weight:700;letter-spacing:0.3em;color:#1c1917;">
+        ${esc(code)}
+      </span>
+    </p>
+    <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">
+      Here is your Swiss3Design verification code (valid 5 minutes).<br/>
+      Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.
+    </p>`;
+  return {
+    to,
+    from: FROM_CONTACT,
+    subject: `${code} — votre code Swiss3Design`,
+    html: layout("Votre code de vérification", body, FOOTER.fr),
+  };
+}
+
 // ── Vérification d'adresse e-mail (FR + EN, locale inconnue à l'inscription) ─
 
 export function verificationEmail(to: string, url: string): EmailMessage {
@@ -1037,5 +1090,75 @@ export function contactConfirmationEmail(
     from: FROM_CONTACT,
     subject: t.subject,
     html: layout(t.title, html, FOOTER[l]),
+  };
+}
+
+// ── Annonce newsletter (admin) ───────────────────────────────────────────────
+// Composée en français uniquement (back-office non traduit, comme le reste
+// de l'admin) — envoyée telle quelle aux abonnés, quelle que soit leur
+// langue de compte. Lien de désabonnement en un clic (jeton HMAC signé,
+// voir src/lib/newsletter.ts), sans connexion requise.
+
+interface AnnouncementProduct {
+  name: string;
+  priceCents: number;
+  imageUrl?: string | null;
+  url: string;
+}
+
+export function newsletterAnnouncementEmail(params: {
+  to: string;
+  subject: string;
+  bodyText: string; // texte de l'admin, paragraphes séparés par des lignes vides
+  bannerImageUrl?: string | null;
+  products?: AnnouncementProduct[];
+  cta?: { label: string; url: string } | null;
+  unsubscribeUrl: string;
+}): EmailMessage {
+  const banner = params.bannerImageUrl
+    ? `<img src="${params.bannerImageUrl}" alt="" width="504" style="display:block;width:100%;max-width:504px;height:auto;border-radius:10px;margin:0 0 18px;" />`
+    : "";
+
+  const paragraphs = params.bodyText
+    .split(/\n{2,}/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map(
+      (p) =>
+        `<p style="margin:0 0 14px;color:#44403c;line-height:1.6;">${esc(p).replace(/\n/g, "<br/>")}</p>`,
+    )
+    .join("");
+
+  const productCards = (params.products ?? [])
+    .map(
+      (product) => `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 12px;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;">
+        <tr>
+          ${
+            product.imageUrl
+              ? `<td style="width:88px;padding:0;"><img src="${product.imageUrl}" alt="" width="88" height="88" style="display:block;width:88px;height:88px;object-fit:cover;" /></td>`
+              : ""
+          }
+          <td style="padding:14px 16px;vertical-align:middle;">
+            <p style="margin:0 0 4px;font-weight:600;color:#1c1917;">${esc(product.name)}</p>
+            <p style="margin:0 0 10px;color:#78716c;font-size:13px;">${chf(product.priceCents)}</p>
+            <a href="${product.url}" style="color:#e5231c;font-weight:600;font-size:13px;text-decoration:none;">Découvrir →</a>
+          </td>
+        </tr>
+      </table>`,
+    )
+    .join("");
+
+  const cta = params.cta
+    ? button(params.cta.url, params.cta.label)
+    : "";
+
+  const body = `${banner}${paragraphs}${productCards}${cta}`;
+  const footer = `Vous recevez cet e-mail car vous êtes inscrit·e aux communications Swiss3Design.<br/><a href="${params.unsubscribeUrl}" style="color:#78716c;text-decoration:underline;">Se désabonner en un clic</a>`;
+
+  return {
+    to: params.to,
+    from: FROM_ORDERS,
+    subject: params.subject,
+    html: layout(params.subject, body, footer),
   };
 }

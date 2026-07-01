@@ -29,6 +29,10 @@ declare global {
     APPLE_CLIENT_SECRET?: string;
     FACEBOOK_CLIENT_ID?: string;
     FACEBOOK_CLIENT_SECRET?: string;
+    // Anti-bot (login/register/forgot-password) ; captcha désactivé si absente.
+    TURNSTILE_SECRET_KEY?: string;
+    // Clé publique du widget — lue côté client (NEXT_PUBLIC_, voir .env.production).
+    NEXT_PUBLIC_TURNSTILE_SITE_KEY?: string;
   }
 }
 

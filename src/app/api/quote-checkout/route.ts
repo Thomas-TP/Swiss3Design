@@ -4,6 +4,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { quoteRequests } from "@/db/schema";
 import { getStripe } from "@/lib/stripe";
+import { getOrCreateStripeCustomer } from "@/lib/stripe-customer";
 import { getServerSession } from "@/lib/session";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
@@ -58,11 +59,22 @@ export async function POST(request: Request) {
 
   const { env } = await getCloudflareContext({ async: true });
   const stripe = getStripe(env.STRIPE_SECRET_KEY);
+
+  // Toujours un client connecté ici (garde plus haut) : rattache le paiement
+  // à son identité Stripe, comme le checkout panier (Link 1-clic).
+  const stripeCustomerId = await getOrCreateStripeCustomer(stripe, db, {
+    id: session.user.id,
+    email: session.user.email,
+    name: session.user.name,
+    stripeCustomerId: session.user.stripeCustomerId ?? null,
+  });
+
   const paymentIntent = await stripe.paymentIntents.create({
     amount: quote.quotedPriceCents,
     currency: "chf",
     automatic_payment_methods: { enabled: true },
     receipt_email: quote.email,
+    customer: stripeCustomerId,
     metadata: { quoteId: quote.id },
   });
 
