@@ -9,16 +9,10 @@ import {
   revokeSession,
   revokeOtherSessions,
 } from "@/lib/auth-client";
-import { describeUserAgent } from "@/lib/user-agent";
+import { groupByDevice, type SessionLike } from "@/lib/session-groups";
 import { card, btnGhost } from "../_ui";
 
-type SessionRow = {
-  id: string;
-  token: string;
-  ipAddress?: string | null;
-  userAgent?: string | null;
-  createdAt: string | Date;
-};
+type SessionRow = SessionLike & { id: string };
 
 export function SessionsSection() {
   const t = useTranslations("account");
@@ -44,9 +38,11 @@ export function SessionsSection() {
     };
   }, []);
 
-  async function onRevoke(token: string) {
-    setRevoking(token);
-    await revokeSession({ token });
+  async function onRevokeGroup(tokens: string[]) {
+    setRevoking(tokens[0]);
+    for (const token of tokens) {
+      await revokeSession({ token });
+    }
     await load();
     setRevoking(null);
   }
@@ -60,7 +56,8 @@ export function SessionsSection() {
 
   if (sessions === null) return null;
 
-  const others = sessions.filter((s) => s.token !== currentToken);
+  const groups = groupByDevice(sessions, currentToken);
+  const hasOtherSessions = sessions.some((s) => s.token !== currentToken);
 
   return (
     <div className={card}>
@@ -72,7 +69,7 @@ export function SessionsSection() {
             <p className="mt-0.5 text-xs text-soft">{t("security.sessions.desc")}</p>
           </div>
         </div>
-        {others.length > 0 && (
+        {hasOtherSessions && (
           <button
             type="button"
             onClick={onRevokeOthers}
@@ -86,44 +83,50 @@ export function SessionsSection() {
       </div>
 
       <ul className="mt-4 divide-y divide-line">
-        {sessions.map((s) => {
-          const { browser, os } = describeUserAgent(s.userAgent);
-          const isCurrent = s.token === currentToken;
+        {groups.map((g) => {
           const label =
-            browser && os
-              ? t("security.sessions.browserOn", { browser, os })
+            g.browser && g.os
+              ? t("security.sessions.browserOn", { browser: g.browser, os: g.os })
               : t("security.sessions.unknownDevice");
+          // Sur le groupe de l'appareil courant, seules les AUTRES sessions du
+          // même appareil sont révocables (jamais la session en cours).
+          const revocableTokens = g.sessions
+            .filter((s) => s.token !== currentToken)
+            .map((s) => s.token);
+          const otherCount = g.sessions.length - (g.isCurrent ? 1 : 0);
+
           return (
-            <li key={s.id} className="flex items-center justify-between gap-3 py-3">
+            <li key={g.key} className="flex items-center justify-between gap-3 py-3">
               <div className="min-w-0">
                 <p className="flex items-center gap-2 text-sm font-medium">
                   {label}
-                  {isCurrent && (
+                  {g.isCurrent && (
                     <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
                       {t("security.sessions.thisDevice")}
                     </span>
                   )}
                 </p>
-                <p className="mt-0.5 flex items-center gap-2 text-xs text-soft">
-                  {s.ipAddress && (
+                <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-soft">
+                  {g.ipAddress && (
                     <span className="flex items-center gap-1">
                       <MapPin size={11} />
-                      {s.ipAddress}
+                      {g.ipAddress}
                     </span>
                   )}
-                  <span>
-                    {new Date(s.createdAt).toLocaleDateString(`${locale}-CH`)}
-                  </span>
+                  <span>{g.lastActive.toLocaleDateString(`${locale}-CH`)}</span>
+                  {otherCount > 0 && (
+                    <span>{t("security.sessions.otherSessions", { count: otherCount })}</span>
+                  )}
                 </p>
               </div>
-              {!isCurrent && (
+              {revocableTokens.length > 0 && (
                 <button
                   type="button"
-                  onClick={() => onRevoke(s.token)}
+                  onClick={() => onRevokeGroup(revocableTokens)}
                   disabled={revoking !== null}
                   className="shrink-0 text-xs font-semibold text-accent transition-opacity hover:opacity-70 disabled:opacity-40"
                 >
-                  {revoking === s.token
+                  {revoking === revocableTokens[0]
                     ? t("security.processing")
                     : t("security.sessions.revoke")}
                 </button>

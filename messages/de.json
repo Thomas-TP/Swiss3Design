@@ -381,7 +381,8 @@
         "browserOn": "{browser} unter {os}",
         "unknownDevice": "Unbekanntes Gerät",
         "revoke": "Abmelden",
-        "revokeAllOthers": "Andere Geräte abmelden"
+        "revokeAllOthers": "Andere Geräte abmelden",
+        "otherSessions": "{count, plural, one {+ # weitere Sitzung auf diesem Gerät} other {+ # weitere Sitzungen auf diesem Gerät}}"
       },
       "connected": {
         "title": "Verbundene Konten",

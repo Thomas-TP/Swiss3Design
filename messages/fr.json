@@ -381,7 +381,8 @@
         "browserOn": "{browser} sur {os}",
         "unknownDevice": "Appareil inconnu",
         "revoke": "Déconnecter",
-        "revokeAllOthers": "Déconnecter les autres appareils"
+        "revokeAllOthers": "Déconnecter les autres appareils",
+        "otherSessions": "{count, plural, one {+ # autre connexion sur cet appareil} other {+ # autres connexions sur cet appareil}}"
       },
       "connected": {
         "title": "Comptes connectés",

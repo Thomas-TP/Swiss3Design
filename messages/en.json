@@ -381,7 +381,8 @@
         "browserOn": "{browser} on {os}",
         "unknownDevice": "Unknown device",
         "revoke": "Sign out",
-        "revokeAllOthers": "Sign out other devices"
+        "revokeAllOthers": "Sign out other devices",
+        "otherSessions": "{count, plural, one {+ # other session on this device} other {+ # other sessions on this device}}"
       },
       "connected": {
         "title": "Connected accounts",
