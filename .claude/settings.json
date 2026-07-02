@@ -46,10 +46,10 @@
       "PowerShell(npm run db:seed:local)",
       "PowerShell(npm ci)",
       "PowerShell(npm install)",
-      "PowerShell(npx drizzle-kit:*)"
+      "PowerShell(npx drizzle-kit:*)",
+      "Bash(npm run deploy)"
     ],
     "deny": [
-      "Bash(npm run deploy)",
       "Bash(npm run db:migrate:remote)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",

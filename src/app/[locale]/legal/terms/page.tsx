@@ -13,7 +13,7 @@ export default async function TermsPage({
   const sections = TERMS_CONTENT[locale] ?? TERMS_CONTENT.fr;
 
   return (
-    <LegalPage locale={locale} title={t("terms")} updated="2026-07-01">
+    <LegalPage locale={locale} title={t("terms")} updated="2026-07-02">
       {sections.map((section, i) => (
         <Section key={section.title} n={i + 1} title={section.title}>
           {section.body}

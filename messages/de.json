@@ -162,7 +162,7 @@
     "errorCodeInvalid": "Falscher oder abgelaufener Code.",
     "errorSendCode": "Code konnte nicht gesendet werden. Prüfen Sie die E-Mail-Adresse.",
     "verifyToContinue": "Bestätigen Sie Ihre E-Mail, um zur Zahlung zu gelangen.",
-    "paymentSubtitle": "TWINT, Karten, Apple Pay & Google Pay — verschlüsselte Transaktion.",
+    "paymentSubtitle": "TWINT, Karten, Samsung Pay & Google Pay — verschlüsselte Transaktion.",
     "securedByStripe": "Gesichert durch Stripe",
     "backToAddress": "Bestellung ändern",
     "discountLine": "Rabatt",
