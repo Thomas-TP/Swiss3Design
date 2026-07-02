@@ -167,6 +167,10 @@ Lot SEO / perf / conversion (livré) :
 
 À étudier :
 
+- **Refonte plateforme 2026** — devis instantané (« la Forge »), homepage à
+  double intention, suivi de fabrication, bibliothèque de pièces : plan
+  complet et phasé dans
+  [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md).
 - **API Poste Suisse** : génération d'étiquettes + suivi automatique.
 - **TVA** : si le seuil de 100 000 CHF/an approche (champ taux déjà prévu).
 
