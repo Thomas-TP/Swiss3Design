@@ -13,7 +13,7 @@ import {
   customerAddresses,
 } from "@/db/schema";
 import { getSetting } from "@/db/queries";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, createPaymentIntent } from "@/lib/stripe";
 import { getOrCreateStripeCustomer } from "@/lib/stripe-customer";
 import { getAuth } from "@/lib/auth";
 import { verifyEmailProof } from "@/lib/email-proof";
@@ -309,23 +309,27 @@ export async function POST(request: Request) {
       })
     : undefined;
 
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: totalCents,
-    currency: "chf",
-    automatic_payment_methods: { enabled: true },
-    receipt_email: email,
-    ...(stripeCustomerId ? { customer: stripeCustomerId } : {}),
-    shipping: {
-      name: address.name,
-      address: {
-        line1: address.street,
-        postal_code: address.npa,
-        city: address.city,
-        country: "CH",
+  const paymentIntent = await createPaymentIntent(
+    stripe,
+    {
+      amount: totalCents,
+      currency: "chf",
+      automatic_payment_methods: { enabled: true },
+      receipt_email: email,
+      ...(stripeCustomerId ? { customer: stripeCustomerId } : {}),
+      shipping: {
+        name: address.name,
+        address: {
+          line1: address.street,
+          postal_code: address.npa,
+          city: address.city,
+          country: "CH",
+        },
       },
+      metadata: { orderId: order.id, orderNumber },
     },
-    metadata: { orderId: order.id, orderNumber },
-  });
+    env.STRIPE_PAYMENT_METHOD_CONFIGURATION,
+  );
 
   await db
     .update(orders)

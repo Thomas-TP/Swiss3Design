@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { quoteRequests } from "@/db/schema";
-import { getStripe } from "@/lib/stripe";
+import { getStripe, createPaymentIntent } from "@/lib/stripe";
 import { getOrCreateStripeCustomer } from "@/lib/stripe-customer";
 import { getServerSession } from "@/lib/session";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
@@ -69,14 +69,18 @@ export async function POST(request: Request) {
     stripeCustomerId: session.user.stripeCustomerId ?? null,
   });
 
-  const paymentIntent = await stripe.paymentIntents.create({
-    amount: quote.quotedPriceCents,
-    currency: "chf",
-    automatic_payment_methods: { enabled: true },
-    receipt_email: quote.email,
-    customer: stripeCustomerId,
-    metadata: { quoteId: quote.id },
-  });
+  const paymentIntent = await createPaymentIntent(
+    stripe,
+    {
+      amount: quote.quotedPriceCents,
+      currency: "chf",
+      automatic_payment_methods: { enabled: true },
+      receipt_email: quote.email,
+      customer: stripeCustomerId,
+      metadata: { quoteId: quote.id },
+    },
+    env.STRIPE_PAYMENT_METHOD_CONFIGURATION,
+  );
 
   return Response.json({
     clientSecret: paymentIntent.client_secret,

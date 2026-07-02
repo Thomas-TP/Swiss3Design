@@ -28,7 +28,17 @@
     "trustMadeTitle": "Fatto a Gland",
     "trustMadeText": "Ogni pezzo è stampato e controllato nel nostro atelier vodese.",
     "trustPaymentTitle": "Pagamento sicuro",
-    "trustPaymentText": "TWINT, carte, Apple Pay e Google Pay."
+    "trustPaymentText": "TWINT, carte, Samsung Pay e Google Pay.",
+    "processTitle": "Come funziona",
+    "processStep1Title": "Scegliete o descrivete",
+    "processStep1Text": "Un oggetto dal catalogo o la vostra idea su misura.",
+    "processStep2Title": "Stampato a Gland",
+    "processStep2Text": "Ogni pezzo è realizzato, controllato e imballato in atelier.",
+    "processStep3Title": "Consegnato a casa vostra",
+    "processStep3Text": "Spedizione con la Posta Svizzera, gratuita da {amount}.",
+    "customBandTitle": "Un pezzo su misura in mente?",
+    "customBandText": "Inviate il vostro file 3D o descrivete il progetto: preventivo personalizzato entro 48 ore.",
+    "customBandCta": "Richiedere un preventivo"
   },
   "shop": {
     "title": "Catalogo",

@@ -29,6 +29,9 @@ declare global {
     APPLE_CLIENT_SECRET?: string;
     FACEBOOK_CLIENT_ID?: string;
     FACEBOOK_CLIENT_SECRET?: string;
+    // « Payment method configuration » Stripe (pmc_…) appliquée aux
+    // PaymentIntents ; vide/absente → config par défaut du compte.
+    STRIPE_PAYMENT_METHOD_CONFIGURATION?: string;
     // Anti-bot (login/register/forgot-password) ; captcha désactivé si absente.
     TURNSTILE_SECRET_KEY?: string;
     // Clé publique du widget — lue côté client (NEXT_PUBLIC_, voir .env.production).

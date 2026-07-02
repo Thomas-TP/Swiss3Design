@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { cache } from "react";
 import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Truck, Factory, ShieldCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
@@ -62,12 +62,14 @@ export default async function ProductPage({
   ]);
   if (!product) notFound();
 
-  const [related, productReviews, ratingSummary, tReviews] = await Promise.all([
-    getRelatedProducts(product.id, locale),
-    getPublishedReviews(product.id),
-    getRatingSummary(product.id),
-    getTranslations("reviews"),
-  ]);
+  const [related, productReviews, ratingSummary, tReviews, tHome] =
+    await Promise.all([
+      getRelatedProducts(product.id, locale),
+      getPublishedReviews(product.id),
+      getRatingSummary(product.id),
+      getTranslations("reviews"),
+      getTranslations("home"),
+    ]);
 
   // Données structurées Product (prix/dispo CHF) → résultats enrichis Google.
   // Le nonce est requis en prod (CSP sans 'unsafe-inline'), cf. golden rule #4.
@@ -121,7 +123,7 @@ export default async function ProductPage({
           />
         </div>
 
-        <div className="flex flex-col">
+        <div className="flex flex-col md:sticky md:top-24 md:self-start">
           {product.multicolor && (
             <span className="flex w-fit items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold">
               <MulticolorDots size={6} />
@@ -162,8 +164,29 @@ export default async function ProductPage({
             }))}
           />
 
+          {/* Réassurance au plus près du bouton d'achat : lève les trois
+              objections classiques (délai, provenance, paiement) sans quitter
+              la page. Libellés partagés avec la homepage. */}
+          <ul className="mt-6 grid gap-2 text-sm sm:grid-cols-3">
+            {[
+              { Icon: Truck, label: tHome("trustShippingTitle") },
+              { Icon: Factory, label: tHome("trustMadeTitle") },
+              { Icon: ShieldCheck, label: tHome("trustPaymentTitle") },
+            ].map(({ Icon, label }) => (
+              <li
+                key={label}
+                className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5"
+              >
+                <Icon size={16} strokeWidth={1.8} className="shrink-0 text-accent" />
+                <span className="text-xs font-semibold leading-tight">
+                  {label}
+                </span>
+              </li>
+            ))}
+          </ul>
+
           {specs.length > 0 && (
-            <dl className="mt-10 divide-y divide-line border-t border-line text-sm">
+            <dl className="mt-8 divide-y divide-line border-t border-line text-sm">
               <p className="pt-4 font-semibold">{t("details")}</p>
               {specs.map((s) => (
                 <div key={s.label} className="flex justify-between py-3">
@@ -179,9 +202,21 @@ export default async function ProductPage({
 
       {productReviews.length > 0 && (
         <section className="mt-16 md:mt-24">
-          <h2 className="text-2xl font-bold tracking-tight">
-            {tReviews("title")}
-          </h2>
+          <span className="flex h-1 w-10 rounded-full bg-accent" />
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <h2 className="text-2xl font-bold tracking-tight">
+              {tReviews("title")}
+            </h2>
+            <span className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1">
+              <StarRating value={ratingSummary.average} size={14} />
+              <span className="text-sm font-semibold tabular-nums">
+                {ratingSummary.average.toFixed(1)}
+              </span>
+              <span className="text-xs text-soft">
+                {tReviews("count", { count: ratingSummary.count })}
+              </span>
+            </span>
+          </div>
           <ul className="mt-6 space-y-4">
             {productReviews.map((r) => (
               <li
@@ -206,7 +241,8 @@ export default async function ProductPage({
 
       {related.length > 0 && (
         <section className="mt-16 md:mt-24">
-          <h2 className="text-2xl font-bold tracking-tight">
+          <span className="flex h-1 w-10 rounded-full bg-accent" />
+          <h2 className="mt-3 text-2xl font-bold tracking-tight">
             {t("relatedTitle")}
           </h2>
           <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">

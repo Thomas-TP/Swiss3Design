@@ -28,7 +28,17 @@
     "trustMadeTitle": "Made in Gland",
     "trustMadeText": "Every piece is printed and inspected in our Vaud workshop.",
     "trustPaymentTitle": "Secure payment",
-    "trustPaymentText": "TWINT, cards, Apple Pay and Google Pay."
+    "trustPaymentText": "TWINT, cards, Samsung Pay and Google Pay.",
+    "processTitle": "How it works",
+    "processStep1Title": "Choose or describe",
+    "processStep1Text": "An object from the catalogue, or your own custom idea.",
+    "processStep2Title": "Printed in Gland",
+    "processStep2Text": "Every piece is made, checked and packed in our workshop.",
+    "processStep3Title": "Delivered to your door",
+    "processStep3Text": "Swiss Post shipping, free from {amount}.",
+    "customBandTitle": "Have a custom piece in mind?",
+    "customBandText": "Send your 3D file or describe your project: personalised quote within 48 h.",
+    "customBandCta": "Request a quote"
   },
   "shop": {
     "title": "Shop",

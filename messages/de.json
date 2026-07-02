@@ -28,7 +28,17 @@
     "trustMadeTitle": "Gefertigt in Gland",
     "trustMadeText": "Jedes Stück wird in unserem Waadtländer Atelier gedruckt und geprüft.",
     "trustPaymentTitle": "Sichere Zahlung",
-    "trustPaymentText": "TWINT, Karten, Apple Pay und Google Pay."
+    "trustPaymentText": "TWINT, Karten, Samsung Pay und Google Pay.",
+    "processTitle": "So funktioniert's",
+    "processStep1Title": "Wählen oder beschreiben",
+    "processStep1Text": "Ein Objekt aus dem Katalog oder Ihre eigene Idee nach Mass.",
+    "processStep2Title": "Gedruckt in Gland",
+    "processStep2Text": "Jedes Stück wird im Atelier gefertigt, geprüft und verpackt.",
+    "processStep3Title": "Zu Ihnen geliefert",
+    "processStep3Text": "Versand mit der Schweizer Post, gratis ab {amount}.",
+    "customBandTitle": "Eine Massanfertigung im Kopf?",
+    "customBandText": "Senden Sie Ihre 3D-Datei oder beschreiben Sie Ihr Projekt: persönliche Offerte innert 48 h.",
+    "customBandCta": "Offerte anfragen"
   },
   "shop": {
     "title": "Katalog",

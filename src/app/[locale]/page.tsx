@@ -161,8 +161,36 @@ export default async function HomePage({
         </section>
       </Reveal>
 
+      {/* Comment ça marche — 3 étapes numérotées, du choix à la livraison */}
+      <Reveal inView>
+        <section className="py-16">
+          <span className="flex h-1 w-10 rounded-full bg-accent" />
+          <h2 className="mt-3 text-2xl font-bold tracking-tight md:text-3xl">
+            {t("processTitle")}
+          </h2>
+          <ol className="mt-8 grid gap-4 sm:grid-cols-3">
+            {([1, 2, 3] as const).map((n) => (
+              <li
+                key={n}
+                className="relative rounded-card border border-line bg-surface p-6"
+              >
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-accent/10 text-base font-bold tabular-nums text-accent">
+                  {n}
+                </span>
+                <p className="mt-4 font-semibold">{t(`processStep${n}Title`)}</p>
+                <p className="mt-1.5 text-sm leading-relaxed text-soft">
+                  {t(`processStep${n}Text`, {
+                    amount: formatChf(FREE_SHIPPING_OVER_CENTS, locale),
+                  })}
+                </p>
+              </li>
+            ))}
+          </ol>
+        </section>
+      </Reveal>
+
       {/* Sélection */}
-      <section className="py-16">
+      <section className="pb-16">
         <div className="mb-7 flex items-end justify-between gap-4">
           <div>
             <span className="flex h-1 w-10 rounded-full bg-accent" />
@@ -184,6 +212,26 @@ export default async function HomePage({
           ))}
         </div>
       </section>
+
+      {/* Bandeau sur mesure — dernier appel avant le footer */}
+      <Reveal inView>
+        <section className="mb-16 rounded-card border border-line bg-surface p-8 text-center md:p-12">
+          <span className="mx-auto flex h-1 w-10 rounded-full bg-accent" />
+          <h2 className="mt-4 text-2xl font-bold tracking-tight md:text-3xl">
+            {t("customBandTitle")}
+          </h2>
+          <p className="mx-auto mt-3 max-w-xl leading-relaxed text-soft">
+            {t("customBandText")}
+          </p>
+          <Link
+            href="/custom"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-white shadow-lg shadow-accent/25 transition-all hover:bg-accent-dark active:scale-[0.98]"
+          >
+            {t("customBandCta")}
+            <ArrowRight size={16} />
+          </Link>
+        </section>
+      </Reveal>
     </div>
   );
 }

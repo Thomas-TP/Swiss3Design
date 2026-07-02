@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   LogIn,
   ShieldCheck,
@@ -39,6 +39,32 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
     () => typeof window !== "undefined" && !!window.PublicKeyCredential,
     () => false,
   );
+
+  // WebAuthn « conditional UI » : arme une demande de clé d'accès silencieuse
+  // dès l'arrivée sur le formulaire. Le navigateur propose alors la clé
+  // enregistrée directement dans la liste d'autocomplétion du champ e-mail
+  // (autoComplete="username webauthn") — sans ça, une clé créée dans le compte
+  // n'est jamais proposée et reste lettre morte.
+  useEffect(() => {
+    if (!passkeySupported) return;
+    let cancelled = false;
+    window.PublicKeyCredential.isConditionalMediationAvailable?.().then(
+      (available) => {
+        if (!available || cancelled) return;
+        signIn.passkey({ autoFill: true }).then((res) => {
+          if (!cancelled && res && !res.error) {
+            router.push(next);
+            router.refresh();
+          }
+        });
+      },
+    );
+    return () => {
+      cancelled = true;
+    };
+    // router/next stables sur la durée de vie du formulaire
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passkeySupported]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -346,7 +372,7 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
           name="email"
           type="email"
           required
-          autoComplete="email"
+          autoComplete="email webauthn"
           className={field}
         />
       </div>
@@ -384,6 +410,19 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
         <LogIn size={16} />
         {t("signInCta")}
       </button>
+      {/* Clé d'accès visible dès le premier écran : la cacher derrière
+          « sans mot de passe » la rendait introuvable en pratique. */}
+      {passkeySupported && (
+        <button
+          type="button"
+          onClick={onPasskeySignIn}
+          disabled={pending}
+          className={btnGhost}
+        >
+          <Fingerprint size={16} />
+          {t("passwordless.usePasskey")}
+        </button>
+      )}
       <button
         type="button"
         onClick={() => {

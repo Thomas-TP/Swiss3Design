@@ -49,7 +49,11 @@
     // Les comptes créés avec ces e-mails reçoivent automatiquement le rôle admin
     "ADMIN_EMAILS": "t@prudhomme.li",
     // Alias Infomaniak : les réponses des clients arrivent dans contact@swiss3design.ch
-    "EMAIL_FROM": "Swiss3Design <commandes@swiss3design.ch>"
+    "EMAIL_FROM": "Swiss3Design <commandes@swiss3design.ch>",
+    // « Payment method configuration » Stripe (dashboard → Paramètres de
+    // paiement) appliquée aux PaymentIntents. Id public, pas un secret.
+    // Vide ou invalide → repli sur la config par défaut (cf. lib/stripe.ts).
+    "STRIPE_PAYMENT_METHOD_CONFIGURATION": "pmc_1TopVdK4o7ey3lG5MC6tgy1t"
   },
   // Environnement de preview : Worker séparé (swiss3design-preview), bindings
   // isolés (D1/R2/KV propres, vides — aucune donnée client), sans route sur le
@@ -98,7 +102,9 @@
         "APP_ENV": "preview",
         "BETTER_AUTH_URL": "https://swiss3design-preview.thomastp.workers.dev",
         "ADMIN_EMAILS": "t@prudhomme.li",
-        "EMAIL_FROM": "Swiss3Design Preview <commandes@swiss3design.ch>"
+        "EMAIL_FROM": "Swiss3Design Preview <commandes@swiss3design.ch>",
+        // Vide : la preview (clés Stripe test) garde la config par défaut
+        "STRIPE_PAYMENT_METHOD_CONFIGURATION": ""
       }
     }
   }
