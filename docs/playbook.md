@@ -21,9 +21,12 @@ works) and [`conventions.md`](conventions.md) (how to write code here).
 2. Implements, matching existing style (French comments, English identifiers).
 3. Runs `npm run lint`; runs `npm run preview` when the change touches CSP, inline
    scripts, runtime, or anything prod-only.
-4. **Pushes to `main`** (this triggers the Cloudflare deploy) and starts
-   `npm run dev` so Thomas can test. Browser verification with the preview tools is
-   allowed whenever it helps confirm the change.
+4. **Pushes to `main`** (this *should* trigger the Cloudflare deploy, but that
+   auto-trigger has proven unreliable — see `AGENTS.md` golden rule 9) and
+   starts `npm run dev` so Thomas can test. **Verifies the deploy actually
+   happened** (Worker `modified_on` moved) and deploys manually if not. Browser
+   verification with the preview tools is allowed whenever it helps confirm
+   the change.
 
 If you do **not** want an auto-push (e.g. risky change), say so up front.
 
@@ -73,9 +76,16 @@ Almost always the **CSP nonce** (inline script without `x-nonce`) — invisible 
 ## Don't ask the agent to (without saying so explicitly)
 
 - Force-push, or push when you wanted to review first.
-- Run `npm run deploy` / `db:migrate:remote` by hand (prod is automatic on push).
 - Edit an already-applied migration in `drizzle/`.
 - Hardcode UI text, or commit a secret.
+- Run `wrangler secret put` on an env with real users without a very good
+  reason and an explicit `--env` — a shared secret like `BETTER_AUTH_SECRET`
+  encrypts existing 2FA data; getting the target wrong locks users out with no
+  self-service recovery (real incident, see `deploiement-cloudflare.md`).
+
+Note: `npm run deploy` / `db:migrate:remote` by hand are no longer "don't ask
+for" — the auto-deploy-on-push is unreliable enough that a manual deploy is
+often the right call; see `AGENTS.md` golden rule 9.
 
 ## Prompt templates
 

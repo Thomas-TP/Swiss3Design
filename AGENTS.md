@@ -49,9 +49,23 @@ LIVE mode** — treat checkout/webhook code as production-critical.
    level.
 7. **Never commit secrets.** Local secrets live in `.dev.vars`; prod secrets in
    Cloudflare (`wrangler secret put` / dashboard). The committed `.env.*` files
-   hold only the **public** Stripe publishable key.
+   hold only the **public** Stripe publishable key. **Never run `wrangler secret
+   put` on an environment with real users without `--env <name>` explicitly
+   set and double-checked** — a shared secret like `BETTER_AUTH_SECRET`
+   encrypts existing 2FA/backup-code data; overwriting it silently locks users
+   out with no self-service recovery (real incident, see
+   [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md#secrets--règles-après-lincident-2fa-juillet-2026)).
 8. **All user-facing text is translated** in `messages/{fr,de,it,en}.json`
    (fr = default/fallback). Don't hardcode UI strings.
+9. **Don't trust a `git push`/PR-merge to `main` as proof of deployment.**
+   Cloudflare's auto-build has misfired in both directions (deployed to the
+   wrong Worker; silently not fired at all) — after anything that matters,
+   confirm the prod Worker's `modified_on` actually changed and fall back to
+   a manual deploy if not (see
+   [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)). For
+   **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
+   updates its own base branch, not `main`, unless that PR's base literally is
+   `main` — see the same doc's PR-stack section before merging a phased feature.
 
 ## Tech stack
 
@@ -127,18 +141,30 @@ Server-side data access patterns to reuse: `getDb()` ([src/db/index.ts](src/db/i
 
 ## Deployment
 
-`git push` to `main` triggers **Cloudflare Workers Builds** (Git-native): build +
-**D1 migrations** + deploy, with Cloudflare's own credentials. **There is no
-GitHub Actions workflow** — the green commit check comes from Cloudflare. One-click
-publish: run [`scripts/push.bat`](scripts/push.bat). Full details + how to
-reconnect Git: [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
+`git push` to `main` is *supposed* to trigger **Cloudflare Workers Builds**
+(Git-native): build + **D1 migrations** + deploy, with Cloudflare's own
+credentials — but this has proven unreliable in practice (see golden rule 9).
+**Always verify the push actually deployed**; fall back to a manual deploy
+(`npx opennextjs-cloudflare build && npx wrangler d1 migrations apply
+swiss3design-db --remote && npx wrangler deploy`) if it didn't. **There is no
+GitHub Actions workflow** — the green commit check, when it appears, comes from
+Cloudflare. One-click publish: run [`scripts/push.bat`](scripts/push.bat). Full
+details, the two-separate-Worker preview setup, the stacked-PR merge pitfall,
+and the secrets-rotation incident: [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
 
 ## Workflow & etiquette
 
 - **End of task:** auto-push to `main` and start the dev server (`npm run dev`).
   Verify in a browser preview whenever it helps confirm the change — you're free
-  to use the preview/verification tools as you see fit.
+  to use the preview/verification tools as you see fit. **Then confirm it's
+  actually live** (golden rule 9) — don't report done on faith that the push
+  triggered a deploy.
 - Branch `main` is the deploy branch; a push goes live. Be deliberate.
+- **Multi-phase features on stacked branches**: merge the top-of-stack branch
+  directly into `main` (`git merge <branch> --no-ff`) once every phase is
+  approved, rather than merging each PR one by one — see the PR-stack pitfall
+  in [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md). Verify
+  with `git log --oneline main -- <file only the last phase adds>` afterwards.
 - Match the surrounding style: **comments and user-facing copy are in French**;
   code identifiers in English. Keep the dense, explanatory comment style already
   in the codebase (the *why*, not the *what*).
