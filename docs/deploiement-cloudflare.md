@@ -193,6 +193,26 @@ tourné sans erreur » = « c'est en ligne ») :
 - Comparer le `Current Version ID` affiché par `wrangler deploy` avec celui du
   dashboard (Worker → Deployments) si un doute persiste.
 
+### Échec transitoire du build prod + commit vide inefficace (2 juillet 2026)
+
+Symptôme vécu : sur un même commit, le check « Workers Builds:
+swiss3design-preview » passe au **vert** mais « Workers Builds: swiss3design »
+(prod) sort en **failure** — alors que `next build` passe en local et que le
+code n'a aucun rapport avec l'échec. C'est un échec **transitoire côté
+Cloudflare** ; l'ancienne version reste en ligne, rien n'est cassé.
+
+Deux enseignements :
+
+1. **Un commit vide (`git commit --allow-empty`) ne relance PAS le build** :
+   la check-suite « Cloudflare Workers and Pages » reste indéfiniment en
+   `queued` avec 0 run. Pour relancer le pipeline Git, il faut un commit avec
+   un **vrai diff** (n'importe quel fichier suivi — une note de doc suffit),
+   ou utiliser « Retry build » dans le dashboard Cloudflare (Workers & Pages →
+   swiss3design → Deployments/Builds).
+2. Le filet reste le déploiement manuel ci-dessus — à lancer par un humain :
+   les agents IA de ce dépôt ont l'interdiction (règle de permissions) de
+   déployer depuis la machine locale.
+
 ## Merger une pile de PR empilées (piège à éviter)
 
 Le développement du compte (2026) a utilisé des branches **empilées** : chaque
