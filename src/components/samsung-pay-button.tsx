@@ -21,11 +21,6 @@ import { useRouter } from "@/i18n/navigation";
  * Payment Element).
  */
 
-const SERVICE_ID = process.env.NEXT_PUBLIC_SAMSUNG_PAY_SERVICE_ID ?? "";
-const SP_ENV =
-  process.env.NEXT_PUBLIC_SAMSUNG_PAY_ENV === "PRODUCTION"
-    ? "PRODUCTION"
-    : "STAGE";
 const SDK_URL = "https://img.mpay.samsung.com/gsmpi/sdk/samsungpay_web_sdk.js";
 
 // Le SDK expose un constructeur global ; typé au minimum nécessaire.
@@ -61,12 +56,18 @@ function loadSdk(): Promise<void> {
   return sdkPromise;
 }
 
+// serviceId / environment viennent du serveur (wrangler.jsonc : vides en
+// prod tant que le service Samsung n'est pas approuvé, STAGE sur la preview).
 export function SamsungPayButton({
   orderNumber,
   totalCents,
+  serviceId,
+  environment,
 }: {
   orderNumber: string;
   totalCents: number;
+  serviceId: string;
+  environment: string;
 }) {
   const t = useTranslations("checkout");
   const locale = useLocale();
@@ -78,19 +79,21 @@ export function SamsungPayButton({
 
   const paymentMethods = {
     version: "2",
-    serviceId: SERVICE_ID,
+    serviceId,
     protocol: "PROTOCOL_3DS",
     allowedBrands: ["visa", "mastercard"],
   };
 
   useEffect(() => {
-    if (!SERVICE_ID) return;
+    if (!serviceId) return;
     let cancelled = false;
     loadSdk()
       .then(() => {
         const Ctor = window.SamsungPayClient;
         if (!Ctor || cancelled) return;
-        const c = new Ctor({ environment: SP_ENV });
+        const c = new Ctor({
+          environment: environment === "PRODUCTION" ? "PRODUCTION" : "STAGE",
+        });
         return Promise.resolve(c.isReadyToPay(paymentMethods)).then((ready) => {
           const ok = typeof ready === "boolean" ? ready : ready?.result;
           if (ok && !cancelled) setClient(c);
@@ -101,11 +104,11 @@ export function SamsungPayButton({
     return () => {
       cancelled = true;
     };
-    // paymentMethods est constant à SERVICE_ID donné
+    // paymentMethods est constant à serviceId donné
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [serviceId, environment]);
 
-  if (!SERVICE_ID || !client) return null;
+  if (!serviceId || !client) return null;
 
   async function pay() {
     if (!client) return;

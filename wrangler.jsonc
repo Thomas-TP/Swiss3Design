@@ -57,7 +57,12 @@
     // celle gérée par un service tiers connecté (ex. Samsung Electronics
     // America, pmc_1TopVd…) : ses moyens de paiement ne sont pas contrôlables
     // depuis le dashboard et ne correspondent pas à la boutique.
-    "STRIPE_PAYMENT_METHOD_CONFIGURATION": "pmc_1TgkcKK4o7ey3lG5alpRZU3l"
+    "STRIPE_PAYMENT_METHOD_CONFIGURATION": "pmc_1TgkcKK4o7ey3lG5alpRZU3l",
+    // Samsung Pay Web Checkout : DORMANT en prod tant que le service
+    // partenaire (pay.samsung.com/developer) n'est pas approuvé. Le banc
+    // d'essai est l'environnement preview ci-dessous (STAGE).
+    "SAMSUNG_PAY_SERVICE_ID": "",
+    "SAMSUNG_PAY_ENV": ""
   },
   // Environnement de preview : Worker séparé (swiss3design-preview), bindings
   // isolés (D1/R2/KV propres, vides — aucune donnée client), sans route sur le
@@ -108,7 +113,11 @@
         "ADMIN_EMAILS": "t@prudhomme.li",
         "EMAIL_FROM": "Swiss3Design Preview <commandes@swiss3design.ch>",
         // Vide : la preview (clés Stripe test) garde la config par défaut
-        "STRIPE_PAYMENT_METHOD_CONFIGURATION": ""
+        "STRIPE_PAYMENT_METHOD_CONFIGURATION": "",
+        // Banc d'essai Samsung Pay : mode STAGE (appareil Samsung connecté à
+        // un compte de test du portail + debug date active requis)
+        "SAMSUNG_PAY_SERVICE_ID": "798f1369c01a48659e89bf",
+        "SAMSUNG_PAY_ENV": "STAGE"
       }
     }
   }

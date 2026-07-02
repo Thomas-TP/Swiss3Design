@@ -1,5 +1,6 @@
 import { and, desc, eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { customerAddresses } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
@@ -9,6 +10,16 @@ export const dynamic = "force-dynamic";
 
 export default async function CheckoutPage() {
   const t = await getTranslations("checkout");
+
+  // Interrupteur Samsung Pay côté serveur (wrangler.jsonc) : vide en prod
+  // (service partenaire pas encore approuvé), STAGE sur le Worker preview —
+  // le banc d'essai suit ainsi le workflow branche → preview sans toucher
+  // au checkout LIVE.
+  const { env } = await getCloudflareContext({ async: true });
+  const samsungPay = {
+    serviceId: env.SAMSUNG_PAY_SERVICE_ID ?? "",
+    environment: env.SAMSUNG_PAY_ENV ?? "",
+  };
 
   // Adresse par défaut du client connecté, proposée en préremplissage
   // (carnet d'adresses complet géré depuis /account/addresses).
@@ -47,6 +58,7 @@ export default async function CheckoutPage() {
         <CheckoutFlow
           initialAddress={initialAddress}
           sessionEmail={session?.user.email ?? null}
+          samsungPay={samsungPay}
         />
       </div>
     </div>

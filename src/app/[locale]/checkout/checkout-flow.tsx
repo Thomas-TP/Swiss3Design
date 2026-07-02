@@ -561,12 +561,19 @@ function GuestEmailVerification({
 
 // ── Flux de commande ─────────────────────────────────────────────────────────
 
+export interface SamsungPayConfig {
+  serviceId: string;
+  environment: string;
+}
+
 export function CheckoutFlow({
   initialAddress,
   sessionEmail,
+  samsungPay,
 }: {
   initialAddress: CheckoutAddress | null;
   sessionEmail: string | null;
+  samsungPay: SamsungPayConfig;
 }) {
   const t = useTranslations("checkout");
   const locale = useLocale();
@@ -706,6 +713,7 @@ export function CheckoutFlow({
               <PaymentStep
                 totalCents={totalCents}
                 orderNumber={orderNumber}
+                samsungPay={samsungPay}
                 onBack={() => setClientSecret(null)}
               />
             </Elements>
@@ -868,10 +876,12 @@ export function CheckoutFlow({
 function PaymentStep({
   totalCents,
   orderNumber,
+  samsungPay,
   onBack,
 }: {
   totalCents: number;
   orderNumber: string | null;
+  samsungPay: SamsungPayConfig;
   onBack: () => void;
 }) {
   const t = useTranslations("checkout");
@@ -921,8 +931,13 @@ function PaymentStep({
       <div className="mt-5">
         {/* Samsung Pay (Web Checkout partenaire) — rendu uniquement si le
             service est activé ET que l'appareil y est éligible */}
-        {orderNumber && (
-          <SamsungPayButton orderNumber={orderNumber} totalCents={totalCents} />
+        {orderNumber && samsungPay.serviceId && (
+          <SamsungPayButton
+            orderNumber={orderNumber}
+            totalCents={totalCents}
+            serviceId={samsungPay.serviceId}
+            environment={samsungPay.environment}
+          />
         )}
         {/* Accordéon : tous les moyens de paiement listés proprement,
             sans le menu déroulant « plus de moyens » du mode tabs */}
