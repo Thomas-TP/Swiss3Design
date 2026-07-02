@@ -53,7 +53,11 @@
     // « Payment method configuration » Stripe (dashboard → Paramètres de
     // paiement) appliquée aux PaymentIntents. Id public, pas un secret.
     // Vide ou invalide → repli sur la config par défaut (cf. lib/stripe.ts).
-    "STRIPE_PAYMENT_METHOD_CONFIGURATION": "pmc_1TopVdK4o7ey3lG5MC6tgy1t"
+    // ⚠️ Toujours pointer la config DU SITE (« Default » / pmc_1Tgkc…), jamais
+    // celle gérée par un service tiers connecté (ex. Samsung Electronics
+    // America, pmc_1TopVd…) : ses moyens de paiement ne sont pas contrôlables
+    // depuis le dashboard et ne correspondent pas à la boutique.
+    "STRIPE_PAYMENT_METHOD_CONFIGURATION": "pmc_1TgkcKK4o7ey3lG5alpRZU3l"
   },
   // Environnement de preview : Worker séparé (swiss3design-preview), bindings
   // isolés (D1/R2/KV propres, vides — aucune donnée client), sans route sur le
