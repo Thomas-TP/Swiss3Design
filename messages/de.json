@@ -405,6 +405,7 @@
       "copyCodes": "Codes kopieren",
       "errorPassword": "Falsches Passwort.",
       "errorCode": "Falscher Code. Bitte erneut versuchen.",
+      "errorRateLimit": "Zu viele Versuche — warten Sie einige Sekunden und versuchen Sie es erneut.",
       "processing": "Wird verarbeitet…",
       "dangerTitle": "Konto löschen",
       "dangerDesc": "Ihr Konto und Ihre personenbezogenen Daten werden gelöscht. Bestellungen werden aus buchhalterischen Gründen 10 Jahre aufbewahrt (gesetzliche Pflicht).",

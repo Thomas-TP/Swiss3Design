@@ -25,13 +25,21 @@ function TwoFactor() {
   const [error, setError] = useState<string | null>(null);
   const [newBackupCodes, setNewBackupCodes] = useState<string[] | null>(null);
 
+  // Le endpoint /two-factor/* est limité à 3 requêtes / 10 s côté better-auth
+  // (protection anti brute-force sur le mot de passe/code) — un 429 ressemble
+  // à une erreur "normale" si on ne le distingue pas, et affiche à tort
+  // "mot de passe incorrect" sur un mot de passe pourtant correct.
+  function errorMessage(err: { status?: number } | null, fallback: string) {
+    return err?.status === 429 ? t("security.errorRateLimit") : fallback;
+  }
+
   async function onEnable() {
     setPending(true);
     setError(null);
     const { data: res, error: err } = await twoFactor.enable({ password });
     setPending(false);
     if (err || !res) {
-      setError(t("security.errorPassword"));
+      setError(errorMessage(err, t("security.errorPassword")));
       return;
     }
     setSetup({ uri: res.totpURI, codes: res.backupCodes });
@@ -43,7 +51,7 @@ function TwoFactor() {
     const { error: err } = await twoFactor.verifyTotp({ code });
     setPending(false);
     if (err) {
-      setError(t("security.errorCode"));
+      setError(errorMessage(err, t("security.errorCode")));
       return;
     }
     setSetup(null);
@@ -58,7 +66,7 @@ function TwoFactor() {
     const { error: err } = await twoFactor.disable({ password });
     setPending(false);
     if (err) {
-      setError(t("security.errorPassword"));
+      setError(errorMessage(err, t("security.errorPassword")));
       return;
     }
     setPassword("");
@@ -73,7 +81,7 @@ function TwoFactor() {
     });
     setPending(false);
     if (err || !res) {
-      setError(t("security.errorPassword"));
+      setError(errorMessage(err, t("security.errorPassword")));
       return;
     }
     setNewBackupCodes(res.backupCodes);

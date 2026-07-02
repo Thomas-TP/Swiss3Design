@@ -405,6 +405,7 @@
       "copyCodes": "Copia i codici",
       "errorPassword": "Password errata.",
       "errorCode": "Codice errato. Riprovate.",
+      "errorRateLimit": "Troppi tentativi — attendete qualche secondo prima di riprovare.",
       "processing": "Elaborazione…",
       "dangerTitle": "Elimina il mio account",
       "dangerDesc": "Il vostro account e i dati personali saranno cancellati. Gli ordini sono conservati 10 anni per la contabilità (obbligo legale).",

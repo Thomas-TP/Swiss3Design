@@ -405,6 +405,7 @@
       "copyCodes": "Copy codes",
       "errorPassword": "Incorrect password.",
       "errorCode": "Incorrect code. Try again.",
+      "errorRateLimit": "Too many attempts — wait a few seconds before trying again.",
       "processing": "Processing…",
       "dangerTitle": "Delete my account",
       "dangerDesc": "Your account and personal data will be erased. Orders are kept for 10 years for accounting (legal obligation).",

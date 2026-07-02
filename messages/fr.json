@@ -405,6 +405,7 @@
       "copyCodes": "Copier les codes",
       "errorPassword": "Mot de passe incorrect.",
       "errorCode": "Code incorrect. Réessayez.",
+      "errorRateLimit": "Trop de tentatives — attendez quelques secondes avant de réessayer.",
       "processing": "Traitement…",
       "dangerTitle": "Supprimer mon compte",
       "dangerDesc": "Votre compte et vos données personnelles seront effacés. Vos commandes sont conservées 10 ans pour la comptabilité (obligation légale).",
