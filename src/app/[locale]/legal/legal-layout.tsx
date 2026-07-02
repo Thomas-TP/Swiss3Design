@@ -43,7 +43,10 @@ export function LegalPage({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 md:py-16">
-      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">{title}</h1>
+      <span className="flex h-1 w-10 rounded-full bg-accent" />
+      <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
+        {title}
+      </h1>
       <p className="mt-2 text-sm text-soft">
         Swiss3Design — Gland (VD), {header.country} · {header.updated}{" "}
         {updatedLabel}
@@ -53,7 +56,7 @@ export function LegalPage({
           {notice}
         </p>
       )}
-      <div className="legal-prose mt-8 space-y-6 text-[15px] leading-relaxed text-ink">
+      <div className="legal-prose mt-10 space-y-8 text-[15px] leading-relaxed text-ink">
         {children}
       </div>
     </div>
@@ -71,10 +74,13 @@ export function Section({
 }) {
   return (
     <section>
-      <h2 className="mb-2 text-lg font-bold">
-        {n}. {title}
+      <h2 className="mb-3 flex items-center gap-2.5 text-lg font-bold">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-accent/10 text-sm font-bold tabular-nums text-accent">
+          {n}
+        </span>
+        {title}
       </h2>
-      <div className="space-y-2 text-soft">{children}</div>
+      <div className="space-y-2 pl-9 text-soft">{children}</div>
     </section>
   );
 }

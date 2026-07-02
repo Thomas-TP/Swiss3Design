@@ -13,7 +13,8 @@ export default async function TrackPage({
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-14 sm:px-6 md:py-20">
-      <h1 className="text-center text-3xl font-bold tracking-tight">
+      <span className="mx-auto flex h-1 w-10 rounded-full bg-accent" />
+      <h1 className="mt-3 text-center text-3xl font-bold tracking-tight md:text-4xl">
         {t("title")}
       </h1>
       <p className="mx-auto mt-3 max-w-md text-center text-soft">

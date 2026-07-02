@@ -568,6 +568,10 @@
     "privacy": "Privacy",
     "shippingReturns": "Shipping & returns",
     "contact": "Contact",
+    "helpTitle": "Account & help",
+    "track": "Track your order",
+    "madeIn": "Designed and printed in Gland (VD), delivered across Switzerland.",
+    "securePayment": "Secure payment",
     "copyright": "© {year} Swiss3Design — Gland, Switzerland"
   }
 }

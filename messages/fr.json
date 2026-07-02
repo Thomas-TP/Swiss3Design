@@ -568,6 +568,10 @@
     "privacy": "Confidentialité",
     "shippingReturns": "Livraison & retours",
     "contact": "Contact",
+    "helpTitle": "Compte & aide",
+    "track": "Suivre une commande",
+    "madeIn": "Conçu et imprimé à Gland (VD), livré dans toute la Suisse.",
+    "securePayment": "Paiement sécurisé",
     "copyright": "© {year} Swiss3Design — Gland, Suisse"
   }
 }

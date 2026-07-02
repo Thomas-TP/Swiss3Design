@@ -9,6 +9,7 @@ import { useCart } from "@/lib/cart";
 import { formatChf } from "@/lib/format";
 import { AddToCartMini } from "@/components/add-to-cart";
 import { FavoriteButton } from "@/components/favorite-button";
+import { PageHeader } from "@/components/page-header";
 
 export function FavoritesList() {
   const t = useTranslations("favorites");
@@ -47,11 +48,10 @@ export function FavoritesList() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-16">
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-          {t("title")}
-        </h1>
-        <button
+      <PageHeader
+        title={t("title")}
+        actions={
+          <button
           type="button"
           onClick={addAllToCart}
           className={`inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] ${
@@ -60,10 +60,11 @@ export function FavoritesList() {
               : "bg-accent text-white shadow-lg shadow-accent/25 hover:bg-accent-dark"
           }`}
         >
-          {addedAll ? <Check size={16} /> : <ShoppingBag size={16} />}
-          {addedAll ? t("addedAll") : t("addAll")}
-        </button>
-      </div>
+            {addedAll ? <Check size={16} /> : <ShoppingBag size={16} />}
+            {addedAll ? t("addedAll") : t("addAll")}
+          </button>
+        }
+      />
 
       <div className="mt-8 grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
         {items.map((item) => (

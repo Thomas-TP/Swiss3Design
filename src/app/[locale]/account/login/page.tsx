@@ -4,6 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { enabledSocialProviders } from "@/lib/auth";
 import { SocialButtons } from "../social-buttons";
 import { LoginForm } from "./login-form";
+import { BrandMark } from "@/components/brand-mark";
 
 export const dynamic = "force-dynamic";
 
@@ -23,7 +24,8 @@ export default async function LoginPage({
 
   return (
     <div className="mx-auto max-w-md px-4 py-14 sm:px-6 md:py-20">
-      <h1 className="text-center text-3xl font-bold tracking-tight">
+      <BrandMark className="mx-auto h-10 w-10 text-ink" />
+      <h1 className="mt-5 text-center text-3xl font-bold tracking-tight">
         {t("signInTitle")}
       </h1>
       <div className="mt-8 rounded-card border border-line bg-surface p-6 sm:p-8">

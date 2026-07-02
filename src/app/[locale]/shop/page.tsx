@@ -6,6 +6,7 @@ import type { Locale } from "@/i18n/routing";
 import { getUsedFilters, getProducts, type ProductSort } from "@/db/queries";
 import { alternatesFor } from "@/lib/seo";
 import { ProductCard } from "@/components/product-card";
+import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
@@ -84,13 +85,7 @@ export default async function ShopPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-16">
-      <header>
-        <span className="flex h-1 w-10 rounded-full bg-accent" />
-        <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-          {t("title")}
-        </h1>
-        <p className="mt-2 max-w-prose text-soft">{t("subtitle")}</p>
-      </header>
+      <PageHeader title={t("title")} intro={t("subtitle")} />
 
       {/* Barre de filtres groupée */}
       <div className="mt-8 rounded-card border border-line bg-surface/60 p-3 backdrop-blur-sm sm:p-4">
@@ -240,9 +235,18 @@ export default async function ShopPage({
       </div>
 
       {products.length === 0 ? (
-        <p className="mt-8 rounded-card border border-line bg-surface p-12 text-center text-soft">
-          {t("empty")}
-        </p>
+        <div className="mt-8 rounded-card border border-line bg-surface p-12 text-center">
+          <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-paper ring-1 ring-line">
+            <Search size={22} strokeWidth={1.6} className="text-soft" />
+          </span>
+          <p className="mt-4 text-soft">{t("empty")}</p>
+          <Link
+            href="/shop"
+            className="mt-5 inline-flex items-center rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-semibold transition-colors hover:border-ink"
+          >
+            {t("all")}
+          </Link>
+        </div>
       ) : (
         <div className="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
           {products.map((p) => (

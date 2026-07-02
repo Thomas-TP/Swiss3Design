@@ -7,6 +7,7 @@ import { useCart } from "@/lib/cart";
 import { formatChf } from "@/lib/format";
 import { shippingFor, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
 import { CartReminder } from "@/components/cart-reminder";
+import { PageHeader } from "@/components/page-header";
 
 export default function CartPage() {
   const t = useTranslations("cart");
@@ -38,10 +39,7 @@ export default function CartPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-16">
-      <span className="flex h-1 w-10 rounded-full bg-accent" />
-      <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-        {t("title")}
-      </h1>
+      <PageHeader title={t("title")} />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_360px] lg:items-start">
         <ul className="divide-y divide-line rounded-card border border-line bg-surface px-5">
@@ -142,7 +140,7 @@ export default function CartPage() {
           ))}
         </ul>
 
-        <aside className="rounded-card border border-line bg-surface p-6">
+        <aside className="rounded-card border border-line bg-surface p-6 lg:sticky lg:top-24">
           <dl className="space-y-3 text-sm">
             <div className="flex justify-between">
               <dt className="text-soft">{t("subtotal")}</dt>
@@ -168,13 +166,25 @@ export default function CartPage() {
             </div>
           </dl>
 
-          <p className="mt-4 rounded-xl bg-paper px-4 py-3 text-xs font-medium text-soft">
-            {remainingForFree > 0
-              ? t("freeShippingHint", {
-                  amount: formatChf(remainingForFree, locale),
-                })
-              : t("freeShippingReached")}
-          </p>
+          {/* Progression vers la livraison offerte : rendre le seuil visible
+              incite à compléter le panier bien mieux qu'une phrase seule. */}
+          <div className="mt-4 rounded-xl bg-paper px-4 py-3">
+            <div className="h-1.5 overflow-hidden rounded-full bg-line">
+              <div
+                className="h-full rounded-full bg-accent transition-[width] duration-500"
+                style={{
+                  width: `${Math.min(100, Math.round((subtotalCents / FREE_SHIPPING_OVER_CENTS) * 100))}%`,
+                }}
+              />
+            </div>
+            <p className="mt-2 text-xs font-medium text-soft">
+              {remainingForFree > 0
+                ? t("freeShippingHint", {
+                    amount: formatChf(remainingForFree, locale),
+                  })
+                : t("freeShippingReached")}
+            </p>
+          </div>
 
           <Link
             href="/checkout"

@@ -221,7 +221,8 @@ défaut, zéro re-saisie. Transposé ici :
 /shop                    Catalogue (inchangé structurellement)
 /products/[slug]         Fiche produit (inchangée)
 /forge                   ★ NOUVEAU — devis instantané : upload → analyse → prix → panier
-/forge/aide-atelier      ★ Escalade humaine (remplace /custom, hérite du fil de discussion)
+/custom                  CONSERVÉ — demande accompagnée (fil de discussion) ; la Forge
+                         s'y ajoute, elle ne le remplace pas
 /matieres                ★ NOUVEAU — comparateur PLA/PETG/TPU + assistant de choix
 /aide                    ★ NOUVEAU — comment ça marche, FAQ, délais, retours
 /cart → /checkout        Tunnel unique catalogue + Forge (inchangé)
@@ -234,11 +235,10 @@ défaut, zéro re-saisie. Transposé ici :
 /a-propos, /legal/*      inchangés
 ```
 
-**Pages supprimées / fusionnées :** `/custom` (redirige 301 vers `/forge` ;
-le formulaire libre survit en `/forge/aide-atelier` pour les cas sans
-fichier ou hors gabarit). `/favorites` est conservé mais rétrogradé dans le
-compte — un favori d'objet déco n'a pas mérité un onglet de navigation
-principal ; la place libérée va à la Forge.
+**Aucune page ni fonctionnalité supprimée** (décision produit du
+2 juillet 2026) : `/custom` reste la demande accompagnée avec fil de
+discussion, `/favorites` garde sa place dans la navigation. La Forge et les
+nouvelles pages sont **purement additives**.
 
 ### 3.2 Navigation
 
@@ -505,10 +505,9 @@ DROITE (45 %) : configurateur à PRIX VIVANT
   toujours visibles ensemble ; c'est la co-présence pièce/prix qui crée la
   confiance, un wizard la casserait.
 
-### 6.3 Aide-atelier `/forge/aide-atelier`
+### 6.3 Demande accompagnée `/custom` (conservée, améliorée)
 
-L'actuel `/custom` recyclé : mêmes actions serveur, même fil de discussion,
-mais (1) l'analyse de la Forge pré-remplit la demande quand elle existe,
+Mêmes actions serveur, même fil de discussion, mais (1) l'analyse de la Forge pré-remplit la demande quand elle existe,
 (2) un **SLA affiché** (« réponse sous 24 h ouvrées » + fourchette de prix
 indicative), (3) e-mail masqué si connecté. Le statut `received → quoted →
 paid` existant continue de fonctionner tel quel.
@@ -623,7 +622,7 @@ de travail IA (~une demi-journée équivalent).
 |---|---|---|---|
 | **0 — Quick wins** | Badges stock/délai sur cartes produit · SLA + fourchette de prix affichés sur `/custom` · exemples de prix réels sur la homepage · e-mail masqué si connecté | 1–2 | — |
 | **1 — Moteur de prix** | Parseur STL (lib pure + tests fixtures) · formule + table `pricing_params` + admin · calibration sur historique Bambu Studio | 3–4 | — |
-| **2 — La Forge v1** | Page `/forge` : upload → analyse Web Worker → viewer → config → prix vivant → article de panier snapshot · re-parse serveur · redirect 301 `/custom` → `/forge` · `/forge/aide-atelier` | 5–7 | 1 |
+| **2 — La Forge v1** | Page `/forge` : upload → analyse Web Worker → viewer → config → prix vivant → article de panier snapshot · re-parse serveur · passerelles Forge ↔ `/custom` (conservé) | 5–7 | 1 |
 | **3 — Homepage & nav** | Hero double intention · drop global · démo multicolore interactive · nav (Forge au centre mobile) · pages `/matieres` + `/aide` | 3–4 | 2 |
 | **4 — Fabrication visible** | Statuts + horodatages sur `orders` · timeline compte + `/track` · 2 e-mails · admin 2-taps | 2–3 | — |
 | **5 — Bibliothèque & récurrence** | `/account/library` · re-commande 1 clic · rattachement fichier à l'inscription · synchro panier D1 | 2–3 | 2 |

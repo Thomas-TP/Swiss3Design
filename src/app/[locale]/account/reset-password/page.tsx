@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { ResetForm } from "./reset-form";
+import { BrandMark } from "@/components/brand-mark";
 
 export default async function ResetPasswordPage({
   searchParams,
@@ -12,7 +13,8 @@ export default async function ResetPasswordPage({
 
   return (
     <div className="mx-auto max-w-md px-4 py-14 sm:px-6 md:py-20">
-      <h1 className="text-center text-3xl font-bold tracking-tight">
+      <BrandMark className="mx-auto h-10 w-10 text-ink" />
+      <h1 className="mt-5 text-center text-3xl font-bold tracking-tight">
         {t("resetTitle")}
       </h1>
       <div className="mt-8 rounded-card border border-line bg-surface p-6 sm:p-8">
