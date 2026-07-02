@@ -25,6 +25,7 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Select } from "@/components/select";
+import { SamsungPayButton } from "@/components/samsung-pay-button";
 import { useCart } from "@/lib/cart";
 import { useSession } from "@/lib/auth-client";
 import { useIsDark } from "@/lib/theme";
@@ -579,6 +580,8 @@ export function CheckoutFlow({
   );
   const [proof, setProof] = useState<EmailProof | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
+  // Numéro de commande créé avec le PaymentIntent — requis par Samsung Pay
+  const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [totalCents, setTotalCents] = useState(0);
   const [discount, setDiscount] = useState<{
     code: string;
@@ -661,6 +664,7 @@ export function CheckoutFlow({
       if (!res.ok) throw new Error("checkout_failed");
       const data = (await res.json()) as {
         clientSecret: string;
+        orderNumber: string;
         totalCents: number;
         shippingCents: number;
         discountCents: number;
@@ -668,6 +672,7 @@ export function CheckoutFlow({
       setTotalCents(data.totalCents);
       setServerShipping(data.shippingCents);
       setServerDiscount(data.discountCents);
+      setOrderNumber(data.orderNumber);
       setClientSecret(data.clientSecret);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
@@ -700,6 +705,7 @@ export function CheckoutFlow({
             >
               <PaymentStep
                 totalCents={totalCents}
+                orderNumber={orderNumber}
                 onBack={() => setClientSecret(null)}
               />
             </Elements>
@@ -861,9 +867,11 @@ export function CheckoutFlow({
 
 function PaymentStep({
   totalCents,
+  orderNumber,
   onBack,
 }: {
   totalCents: number;
+  orderNumber: string | null;
   onBack: () => void;
 }) {
   const t = useTranslations("checkout");
@@ -911,6 +919,11 @@ function PaymentStep({
       </div>
 
       <div className="mt-5">
+        {/* Samsung Pay (Web Checkout partenaire) — rendu uniquement si le
+            service est activé ET que l'appareil y est éligible */}
+        {orderNumber && (
+          <SamsungPayButton orderNumber={orderNumber} totalCents={totalCents} />
+        )}
         {/* Accordéon : tous les moyens de paiement listés proprement,
             sans le menu déroulant « plus de moyens » du mode tabs */}
         <PaymentElement

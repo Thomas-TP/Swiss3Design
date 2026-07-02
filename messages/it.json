@@ -163,6 +163,7 @@
     "errorSendCode": "Impossibile inviare il codice. Verificate l'indirizzo e-mail.",
     "verifyToContinue": "Confermate la vostra e-mail per passare al pagamento.",
     "paymentSubtitle": "TWINT, carte, Samsung Pay & Google Pay — transazione cifrata.",
+    "samsungPay": "Paga {amount} CHF con Samsung Pay",
     "securedByStripe": "Protetto da Stripe",
     "backToAddress": "Modificare l'ordine",
     "discountLine": "Sconto",
