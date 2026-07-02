@@ -225,18 +225,51 @@ présent sur `main` après le merge — ne jamais se fier uniquement au badge
 
 ## Secrets — règles après l'incident 2FA (juillet 2026)
 
-**Incident** : après un déploiement, la 2FA (TOTP) de l'admin s'est mise à
-échouer avec une erreur serveur (500) au lieu d'un simple « code invalide ».
-Cause : Better Auth **chiffre** le secret TOTP (et les codes de secours) avec
-`BETTER_AUTH_SECRET` ; si cette valeur diffère de celle utilisée au moment de
-l'activation de la 2FA, le déchiffrement échoue avec une exception — l'admin
-est bloqué **sans recours côté UI** (les codes de secours sont chiffrés pareil).
-La cause exacte du changement de secret n'a pas pu être confirmée avec
-certitude (aucun historique de valeur côté Cloudflare), mais un `wrangler
-secret put BETTER_AUTH_SECRET` lancé sans `--env preview` en est le suspect
-le plus probable.
+**Incident (2 épisodes, même semaine)** : après un déploiement, la 2FA (TOTP)
+de l'admin s'est mise à échouer avec une erreur serveur (500) au lieu d'un
+simple « code invalide ». Un premier correctif à chaud (suppression de la
+ligne `two_factor` de l'admin en base + reset du mot de passe) a redonné
+l'accès mais n'a pas réglé la cause réelle : la 2FA est restée impossible à
+réactiver, avec un message « mot de passe incorrect » alors que le mot de
+passe était bon.
 
-**Règles pour éviter que ça se reproduise** :
+**Cause confirmée** (lue dans les logs Cloudflare réels, pas supposée) : le
+plugin `twoFactor` de Better Auth embarque un verrouillage de compte après
+échecs répétés (NIST SP 800-63B §5.2.2), **actif par défaut**
+(`accountLockout.enabled ?? true`). Il exige deux colonnes sur la table
+`two_factor` — `failed_verification_count` et `locked_until` — dès qu'une
+requête touche ce modèle (enable **autant que** verify/disable), pas
+seulement quand le verrouillage se déclenche vraiment. Ces colonnes
+n'avaient jamais été ajoutées à `src/db/schema.ts` : Better Auth loggait
+`The field "failedVerificationCount" does not exist in the "twoFactor"
+Drizzle schema` et renvoyait un 500 brut sur **toute** requête
+`/two-factor/*` — enable, verify-totp, disable, generate-backup-codes.
+Corrigé par la migration `drizzle/0019_ambitious_bedlam.sql` (deux `ALTER
+TABLE ... ADD COLUMN`, additif, sans perte de données).
+
+**La piste initialement suivie était fausse** : le premier diagnostic
+soupçonnait un `BETTER_AUTH_SECRET` changé entre l'activation de la 2FA et
+la vérification (le chiffrement du secret TOTP échouerait alors au
+déchiffrement). Plausible sur le papier, mais jamais confirmé par un
+vrai message d'erreur — et le vrai message d'erreur, une fois lu, pointait
+ailleurs. **Leçon : sur un site en prod, ne pas itérer sur une théorie non
+confirmée par les logs réels — aller chercher la vraie erreur avant de
+corriger.** Voir aussi la note sur `wrangler tail`/logs prod plus bas.
+
+**Prévention (schéma) — à faire après toute mise à jour de `better-auth` ou
+d'un de ses plugins** (`package.json` → version de `better-auth` a bougé) :
+comparer les fichiers `schema.mjs` sous
+`node_modules/better-auth/dist/plugins/*/**/schema.mjs` (et
+`node_modules/@better-auth/*/dist/**/schema.mjs` pour les plugins hors
+paquet principal, ex. `passkey`) avec les tables correspondantes dans
+`src/db/schema.ts` — chaque champ déclaré côté plugin doit avoir une colonne
+en face. Un `npm run typecheck` ou `npm run build` **ne détecte pas** ce
+genre de dérive : la validation de schéma de Better Auth est faite au
+runtime, pas à la compilation. (Le message d'erreur suggère aussi `npx
+auth@latest generate` — non testé par nous, à vérifier avant de s'y fier.)
+
+**Règles secrets, toujours valables** (hygiène générale, même si ce n'était
+pas la cause cette fois) :
 - **Ne jamais faire tourner `wrangler secret put BETTER_AUTH_SECRET`** (ou tout
   secret partagé par plusieurs comptes réels) **sur un environnement qui a déjà
   des utilisateurs actifs**, sauf rotation planifiée et assumée (voir plus bas).
@@ -255,6 +288,14 @@ le plus probable.
   concerné directement en base (`DELETE FROM two_factor WHERE user_id=...` +
   `UPDATE user SET two_factor_enabled=0 WHERE id=...`) pour redonner l'accès
   par mot de passe seul, puis réactiver une 2FA neuve depuis le compte.
+
+**Obtenir la vraie erreur serveur sans risque** : `wrangler tail` sur le
+Worker de prod est bloqué par défaut (il peut streamer des tokens/secrets en
+clair). Plus simple et à risque nul : dashboard Cloudflare → Workers & Pages
+→ `swiss3design` → onglet **Logs** → *Begin log stream*, reproduire l'action
+une fois, lire l'erreur affichée. C'est ce qui a permis de trouver la vraie
+cause ci-dessus en quelques secondes, après plusieurs allers-retours à
+deviner depuis le code seul.
 
 ## Réessayer / revenir en arrière
 
