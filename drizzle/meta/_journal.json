@@ -134,6 +134,13 @@
       "when": 1782940401990,
       "tag": "0018_newsletter_sends_multi_product",
       "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "6",
+      "when": 1782994123950,
+      "tag": "0019_ambitious_bedlam",
+      "breakpoints": true
     }
   ]
 }

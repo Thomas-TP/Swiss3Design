@@ -406,6 +406,7 @@
       "errorPassword": "Falsches Passwort.",
       "errorCode": "Falscher Code. Bitte erneut versuchen.",
       "errorRateLimit": "Zu viele Versuche — warten Sie einige Sekunden und versuchen Sie es erneut.",
+      "errorGeneric": "Auf unserer Seite ist ein Fehler aufgetreten. Versuchen Sie es gleich noch einmal; falls es weiterhin auftritt, kontaktieren Sie uns.",
       "processing": "Wird verarbeitet…",
       "dangerTitle": "Konto löschen",
       "dangerDesc": "Ihr Konto und Ihre personenbezogenen Daten werden gelöscht. Bestellungen werden aus buchhalterischen Gründen 10 Jahre aufbewahrt (gesetzliche Pflicht).",

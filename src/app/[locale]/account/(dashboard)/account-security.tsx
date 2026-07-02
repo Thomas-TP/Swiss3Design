@@ -26,11 +26,15 @@ function TwoFactor() {
   const [newBackupCodes, setNewBackupCodes] = useState<string[] | null>(null);
 
   // Le endpoint /two-factor/* est limité à 3 requêtes / 10 s côté better-auth
-  // (protection anti brute-force sur le mot de passe/code) — un 429 ressemble
-  // à une erreur "normale" si on ne le distingue pas, et affiche à tort
-  // "mot de passe incorrect" sur un mot de passe pourtant correct.
-  function errorMessage(err: { status?: number } | null, fallback: string) {
-    return err?.status === 429 ? t("security.errorRateLimit") : fallback;
+  // (protection anti brute-force) → 429. Seul un vrai mot de passe/code
+  // erroné répond 400 (BAD_REQUEST/INVALID_PASSWORD côté better-auth) : tout
+  // le reste (500, réseau, session expirée...) n'a rien à voir avec le mot de
+  // passe et ne doit jamais afficher "mot de passe incorrect" — un 500 étiqueté
+  // à tort a fait perdre du temps de debug pendant l'incident du 2026-07-02.
+  function errorMessage(err: { status?: number } | null, wrongFallback: string) {
+    if (err?.status === 429) return t("security.errorRateLimit");
+    if (err?.status === 400) return wrongFallback;
+    return t("security.errorGeneric");
   }
 
   async function onEnable() {

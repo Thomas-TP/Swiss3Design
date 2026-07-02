@@ -406,6 +406,7 @@
       "errorPassword": "Incorrect password.",
       "errorCode": "Incorrect code. Try again.",
       "errorRateLimit": "Too many attempts — wait a few seconds before trying again.",
+      "errorGeneric": "Something went wrong on our end. Try again in a moment; contact us if it persists.",
       "processing": "Processing…",
       "dangerTitle": "Delete my account",
       "dangerDesc": "Your account and personal data will be erased. Orders are kept for 10 years for accounting (legal obligation).",

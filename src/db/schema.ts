@@ -390,6 +390,13 @@ export const user = sqliteTable("user", {
 });
 
 // Authentification à deux facteurs (TOTP + codes de récupération) — Better Auth
+// failedVerificationCount / lockedUntil : verrouillage de compte après échecs
+// répétés (NIST SP 800-63B §5.2.2), intégré au plugin twoFactor et actif par
+// défaut (accountLockout.enabled ?? true) — colonnes exigées par le plugin
+// dès qu'il touche ce modèle (enable/verify/disable...), pas seulement quand
+// le verrouillage se déclenche. Leur absence faisait échouer TOUTE requête
+// /two-factor/* avec "field does not exist in the twoFactor Drizzle schema"
+// (500 côté client) — incident du 2026-07-02, voir docs/deploiement-cloudflare.md.
 export const twoFactor = sqliteTable(
   "two_factor",
   {
@@ -400,6 +407,10 @@ export const twoFactor = sqliteTable(
     secret: text("secret").notNull(),
     backupCodes: text("backup_codes").notNull(),
     verified: integer("verified", { mode: "boolean" }).notNull().default(true),
+    failedVerificationCount: integer("failed_verification_count")
+      .notNull()
+      .default(0),
+    lockedUntil: integer("locked_until", { mode: "timestamp" }),
   },
   (t) => [index("two_factor_user_idx").on(t.userId)],
 );
