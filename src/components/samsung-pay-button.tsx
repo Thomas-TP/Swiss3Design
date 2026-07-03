@@ -6,19 +6,23 @@ import { useStripe } from "@stripe/react-stripe-js";
 import { useRouter } from "@/i18n/navigation";
 
 /*
- * Bouton Samsung Pay — intégration « Web Checkout » officielle
+ * Samsung Pay — intégration « Web Checkout » officielle
  * (https://developer.samsung.com/pay/web/overview.html), service partenaire
  * configuré avec Stripe comme passerelle sur pay.samsung.com/developer.
  *
- * Entièrement DORMANT tant que NEXT_PUBLIC_SAMSUNG_PAY_SERVICE_ID est vide :
- * aucun script chargé, aucun rendu. Une fois activé, le bouton ne s'affiche
- * que si le SDK Samsung répond à isReadyToPay() — jamais de bouton mort.
+ * Deux modes d'affichage, même flux de paiement :
+ *  • tuile « SAMSUNG Pay » DANS le Payment Element (custom payment method
+ *    Stripe, cpmt_…) quand SAMSUNG_PAY_CPMT_ID est configuré — interface
+ *    unifiée ; la sélection est détectée via elements.submit() et le bouton
+ *    « Payer » du checkout appelle launch() du hook ci-dessous ;
+ *  • bouton autonome (SamsungPayButton) en repli quand seul le service est
+ *    configuré (ex. preview tant que le cpmt de mode test n'existe pas).
  *
- * Flux : loadPaymentSheet() (feuille Samsung Wallet — app sur mobile, QR code
- * sur desktop) → credential retourné par Samsung → POST /api/samsung-pay/charge
- * qui confirme le PaymentIntent Stripe existant côté serveur → notify() puis
- * redirection vers la page de succès (même finalisation idempotente que le
- * Payment Element).
+ * Entièrement DORMANT tant que serviceId est vide : aucun script chargé,
+ * aucun rendu. Flux : loadPaymentSheet() (app Wallet sur mobile, QR code sur
+ * desktop) → credential Samsung → POST /api/samsung-pay/charge qui confirme
+ * le PaymentIntent Stripe existant côté serveur → notify() → page de succès
+ * (même finalisation idempotente que le Payment Element).
  */
 
 const SDK_URL = "https://img.mpay.samsung.com/gsmpi/sdk/samsungpay_web_sdk.js";
@@ -56,9 +60,9 @@ function loadSdk(): Promise<void> {
   return sdkPromise;
 }
 
-// serviceId / environment viennent du serveur (wrangler.jsonc : vides en
-// prod tant que le service Samsung n'est pas approuvé, STAGE sur la preview).
-export function SamsungPayButton({
+// Charge le SDK, vérifie l'éligibilité de l'appareil et expose launch() :
+// la feuille Samsung Pay + l'encaissement serveur + la redirection succès.
+export function useSamsungPay({
   orderNumber,
   totalCents,
   serviceId,
@@ -70,7 +74,6 @@ export function SamsungPayButton({
   environment: string;
 }) {
   const t = useTranslations("checkout");
-  const locale = useLocale();
   const router = useRouter();
   const stripe = useStripe();
   const [client, setClient] = useState<SamsungPayClientLike | null>(null);
@@ -108,9 +111,7 @@ export function SamsungPayButton({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serviceId, environment]);
 
-  if (!serviceId || !client) return null;
-
-  async function pay() {
+  async function launch() {
     if (!client) return;
     setPaying(true);
     setError(null);
@@ -168,11 +169,38 @@ export function SamsungPayButton({
     }
   }
 
+  return { available: !!client, paying, error, launch };
+}
+
+// Bouton autonome (repli quand la tuile cpmt du Payment Element n'est pas
+// configurée). serviceId / environment viennent du serveur (wrangler.jsonc).
+export function SamsungPayButton({
+  orderNumber,
+  totalCents,
+  serviceId,
+  environment,
+}: {
+  orderNumber: string;
+  totalCents: number;
+  serviceId: string;
+  environment: string;
+}) {
+  const t = useTranslations("checkout");
+  const locale = useLocale();
+  const { available, paying, error, launch } = useSamsungPay({
+    orderNumber,
+    totalCents,
+    serviceId,
+    environment,
+  });
+
+  if (!available) return null;
+
   return (
     <div className="mb-5">
       <button
         type="button"
-        onClick={pay}
+        onClick={launch}
         disabled={paying}
         // Charte bouton Samsung Pay : fond noir constant, texte blanc
         className="flex w-full items-center justify-center gap-2 rounded-full bg-black px-6 py-3.5 text-sm font-semibold text-white transition-opacity hover:opacity-90 active:scale-[0.99] disabled:opacity-60"

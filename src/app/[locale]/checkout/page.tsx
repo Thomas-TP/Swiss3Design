@@ -19,6 +19,9 @@ export default async function CheckoutPage() {
   const samsungPay = {
     serviceId: env.SAMSUNG_PAY_SERVICE_ID ?? "",
     environment: env.SAMSUNG_PAY_ENV ?? "",
+    // « Custom payment method » Stripe (cpmt_…) : tuile SAMSUNG Pay affichée
+    // DANS le Payment Element. Vide → repli sur le bouton autonome.
+    cpmtId: env.SAMSUNG_PAY_CPMT_ID ?? "",
   };
 
   // Adresse par défaut du client connecté, proposée en préremplissage

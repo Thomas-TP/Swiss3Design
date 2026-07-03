@@ -62,7 +62,10 @@
     // partenaire (pay.samsung.com/developer) n'est pas approuvé. Le banc
     // d'essai est l'environnement preview ci-dessous (STAGE).
     "SAMSUNG_PAY_SERVICE_ID": "",
-    "SAMSUNG_PAY_ENV": ""
+    "SAMSUNG_PAY_ENV": "",
+    // Tuile « SAMSUNG Pay » dans le Payment Element (custom payment method
+    // du dashboard Stripe, mode LIVE). Inerte tant que SERVICE_ID est vide.
+    "SAMSUNG_PAY_CPMT_ID": "cpmt_1TiWhCK4o7ey3lG5zScp9iou"
   },
   // Environnement de preview : Worker séparé (swiss3design-preview), bindings
   // isolés (D1/R2/KV propres, vides — aucune donnée client), sans route sur le
@@ -117,7 +120,12 @@
         // Banc d'essai Samsung Pay : mode STAGE (appareil Samsung connecté à
         // un compte de test du portail + debug date active requis)
         "SAMSUNG_PAY_SERVICE_ID": "798f1369c01a48659e89bf",
-        "SAMSUNG_PAY_ENV": "STAGE"
+        "SAMSUNG_PAY_ENV": "STAGE",
+        // Vide = bouton autonome en preview : le cpmt du dashboard est en
+        // mode LIVE, invalide avec les clés TEST de la preview. Pour tester
+        // la tuile unifiée ici : créer le même custom payment method en mode
+        // test dans Stripe et coller son cpmt_… ci-dessous.
+        "SAMSUNG_PAY_CPMT_ID": ""
       }
     }
   }

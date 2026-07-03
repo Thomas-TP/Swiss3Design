@@ -36,6 +36,9 @@ declare global {
     // (STAGE/PRODUCTION). Vides = bouton absent (prod tant que non approuvé).
     SAMSUNG_PAY_SERVICE_ID?: string;
     SAMSUNG_PAY_ENV?: string;
+    // Custom payment method Stripe (cpmt_…) : tuile SAMSUNG Pay intégrée au
+    // Payment Element ; vide → bouton autonome en repli.
+    SAMSUNG_PAY_CPMT_ID?: string;
     // Anti-bot (login/register/forgot-password) ; captcha désactivé si absente.
     TURNSTILE_SECRET_KEY?: string;
     // Clé publique du widget — lue côté client (NEXT_PUBLIC_, voir .env.production).
