@@ -65,7 +65,12 @@
     "SAMSUNG_PAY_ENV": "",
     // Tuile « SAMSUNG Pay » dans le Payment Element (custom payment method
     // du dashboard Stripe, mode LIVE). Inerte tant que SERVICE_ID est vide.
-    "SAMSUNG_PAY_CPMT_ID": "cpmt_1TiWhCK4o7ey3lG5zScp9iou"
+    "SAMSUNG_PAY_CPMT_ID": "cpmt_1TiWhCK4o7ey3lG5zScp9iou",
+    // Clé publiable Stripe (publique par design) lue à l'exécution : permet
+    // à la preview d'utiliser la clé TEST alors que le build embarque la
+    // clé de .env.production. Doit correspondre au STRIPE_SECRET_KEY du
+    // même environnement (même compte, même mode live/test).
+    "STRIPE_PUBLISHABLE_KEY": "pk_live_51TgkbnK4o7ey3lG5X2NE0ujxVeMTP1YdHK6gxgefCazQEeX6m5MMDAWPJKWMndMXrcS6tvxR8oXMJ00AxPqnJARb00q2dn8APu"
   },
   // Environnement de preview : Worker séparé (swiss3design-preview), bindings
   // isolés (D1/R2/KV propres, vides — aucune donnée client), sans route sur le
@@ -125,7 +130,10 @@
         // mode LIVE, invalide avec les clés TEST de la preview. Pour tester
         // la tuile unifiée ici : créer le même custom payment method en mode
         // test dans Stripe et coller son cpmt_… ci-dessous.
-        "SAMSUNG_PAY_CPMT_ID": ""
+        "SAMSUNG_PAY_CPMT_ID": "",
+        // Clé publiable TEST (même compte que la prod) — appairée avec le
+        // secret STRIPE_SECRET_KEY (sk_test) posé via wrangler secret put.
+        "STRIPE_PUBLISHABLE_KEY": "pk_test_51TgkbnK4o7ey3lG5CAqK0NBqFazy43LthNOQ0IKgmiTwv6ni7Cd4yiuaM6M0gb5XHF3HI4PAlYCFlqFr9BNIMND000iDY9eEiF"
       }
     }
   }

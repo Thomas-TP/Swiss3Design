@@ -16,8 +16,12 @@ import { stripeAppearance } from "@/lib/stripe-appearance";
 import { formatChf } from "@/lib/format";
 
 let stripePromise: ReturnType<typeof loadStripe> | null = null;
-function getStripePromise() {
-  stripePromise ??= loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
+// Clé publiable à l'exécution (vars Worker) avec repli sur la valeur inlinée
+// au build — même logique que le checkout (la preview utilise la clé TEST).
+function getStripePromise(publishableKey?: string) {
+  stripePromise ??= loadStripe(
+    publishableKey || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+  );
   return stripePromise;
 }
 
@@ -25,10 +29,12 @@ export function QuotePayFlow({
   quoteId,
   totalCents,
   locale,
+  stripePublishableKey,
 }: {
   quoteId: string;
   totalCents: number;
   locale: string;
+  stripePublishableKey?: string;
 }) {
   const t = useTranslations("account");
   const isDark = useIsDark();
@@ -69,7 +75,7 @@ export function QuotePayFlow({
 
   return (
     <Elements
-      stripe={getStripePromise()}
+      stripe={getStripePromise(stripePublishableKey)}
       options={{
         clientSecret,
         locale: locale as StripeElementLocale,

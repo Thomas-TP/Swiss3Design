@@ -48,10 +48,11 @@ export default async function QuotePayPage({
 
   const t = await getTranslations("account");
 
+  const { env } = await getCloudflareContext({ async: true });
+
   let paid = ["paid", "in_production", "done"].includes(quote.status);
   // Filet : si Stripe nous renvoie ici après paiement, on confirme (idempotent)
   if (paymentIntentId && !paid) {
-    const { env } = await getCloudflareContext({ async: true });
     const stripe = getStripe(env.STRIPE_SECRET_KEY);
     try {
       const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
@@ -115,6 +116,7 @@ export default async function QuotePayPage({
             quoteId={quote.id}
             totalCents={quote.quotedPriceCents!}
             locale={locale}
+            stripePublishableKey={env.STRIPE_PUBLISHABLE_KEY ?? ""}
           />
         </div>
       ) : (

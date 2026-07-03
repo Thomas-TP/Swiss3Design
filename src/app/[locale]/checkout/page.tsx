@@ -62,6 +62,7 @@ export default async function CheckoutPage() {
           initialAddress={initialAddress}
           sessionEmail={session?.user.email ?? null}
           samsungPay={samsungPay}
+          stripePublishableKey={env.STRIPE_PUBLISHABLE_KEY ?? ""}
         />
       </div>
     </div>

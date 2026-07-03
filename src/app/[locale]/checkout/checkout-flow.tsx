@@ -43,9 +43,12 @@ import { CANTONS, CANTON_CODES } from "@/lib/cantons";
 // soit immédiat — plus d'attente du téléchargement après la création du
 // PaymentIntent. La variante « /pure » nous laisse choisir ce moment.
 let stripePromise: ReturnType<typeof loadStripe> | null = null;
-function getStripePromise() {
+// La clé publiable vient d'abord des vars du Worker (runtime : permet à la
+// preview d'utiliser la clé TEST alors que le build embarque la clé live),
+// avec repli sur la valeur inlinée au build (dev local).
+function getStripePromise(publishableKey?: string) {
   stripePromise ??= loadStripe(
-    process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
+    publishableKey || process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!,
   );
   return stripePromise;
 }
@@ -575,10 +578,12 @@ export function CheckoutFlow({
   initialAddress,
   sessionEmail,
   samsungPay,
+  stripePublishableKey,
 }: {
   initialAddress: CheckoutAddress | null;
   sessionEmail: string | null;
   samsungPay: SamsungPayConfig;
+  stripePublishableKey?: string;
 }) {
   const t = useTranslations("checkout");
   const locale = useLocale();
@@ -611,13 +616,14 @@ export function CheckoutFlow({
   // l'étape paiement n'attend plus que le PaymentIntent. Différé en idle pour
   // ne pas concurrencer le premier rendu de la page.
   useEffect(() => {
-    const warm = () => void getStripePromise();
+    const warm = () => void getStripePromise(stripePublishableKey);
     if ("requestIdleCallback" in window) {
       const id = window.requestIdleCallback(warm);
       return () => window.cancelIdleCallback(id);
     }
     const timer = setTimeout(warm, 1200);
     return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const shippingCents = clientSecret
@@ -701,7 +707,7 @@ export function CheckoutFlow({
         <div className="order-2 min-w-0 lg:order-1">
           {clientSecret ? (
             <Elements
-              stripe={getStripePromise()}
+              stripe={getStripePromise(stripePublishableKey)}
               options={{
                 clientSecret,
                 locale: locale as StripeElementLocale,
