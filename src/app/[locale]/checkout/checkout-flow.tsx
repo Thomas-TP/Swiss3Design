@@ -4,13 +4,11 @@ import { useEffect, useRef, useState } from "react";
 // Import « /pure » : la variante par défaut injecte le script Stripe (et ses
 // iframes antifraude) dès l'import du module, même sans appeler loadStripe.
 import { loadStripe } from "@stripe/stripe-js/pure";
-import type { StripeElementLocale } from "@stripe/stripe-js";
 import {
-  Elements,
+  CheckoutElementsProvider,
   PaymentElement,
-  useElements,
-  useStripe,
-} from "@stripe/react-stripe-js";
+  useCheckoutElements,
+} from "@stripe/react-stripe-js/checkout";
 import {
   ArrowLeft,
   ArrowRight,
@@ -23,7 +21,7 @@ import {
   ShoppingBag,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { Link } from "@/i18n/navigation";
+import { Link, useRouter } from "@/i18n/navigation";
 import { Select } from "@/components/select";
 import { useCart } from "@/lib/cart";
 import { useSession } from "@/lib/auth-client";
@@ -689,26 +687,27 @@ export function CheckoutFlow({
       <div className="mt-7 grid gap-6 lg:grid-cols-[1fr_340px] lg:items-start lg:gap-8">
         <div className="order-2 min-w-0 lg:order-1">
           {clientSecret ? (
-            <Elements
+            <CheckoutElementsProvider
               stripe={getStripePromise(stripePublishableKey)}
               options={{
                 clientSecret,
-                locale: locale as StripeElementLocale,
-                // La police du site doit aussi vivre dans les iframes Stripe
-                fonts: [
-                  {
-                    cssSrc:
-                      "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap",
-                  },
-                ],
-                appearance: stripeAppearance(isDark),
+                elementsOptions: {
+                  // La police du site doit aussi vivre dans les iframes Stripe
+                  fonts: [
+                    {
+                      cssSrc:
+                        "https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&display=swap",
+                    },
+                  ],
+                  appearance: stripeAppearance(isDark),
+                },
               }}
             >
               <PaymentStep
                 totalCents={totalCents}
                 onBack={() => setClientSecret(null)}
               />
-            </Elements>
+            </CheckoutElementsProvider>
           ) : (
             <form action={startPayment} className="space-y-6">
               {/* Contact — compte connecté ou e-mail vérifié par code */}
@@ -875,26 +874,29 @@ function PaymentStep({
   const t = useTranslations("checkout");
   const tFooter = useTranslations("footer");
   const locale = useLocale();
-  const stripe = useStripe();
-  const elements = useElements();
+  const router = useRouter();
+  const checkoutState = useCheckoutElements();
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function pay() {
-    if (!stripe || !elements) return;
+    if (checkoutState.type !== "success") return;
     setPaying(true);
     setError(null);
-    const { error: stripeError } = await stripe.confirmPayment({
-      elements,
-      confirmParams: {
-        return_url: `${window.location.origin}/${locale}/checkout/success`,
-      },
-    });
-    // En cas de succès, Stripe redirige : on n'arrive ici qu'en cas d'erreur
-    if (stripeError) {
-      setError(stripeError.message ?? t("errorGeneric"));
+    const result = await checkoutState.checkout.confirm();
+    if (result.type === "error") {
+      setError(result.error.message ?? t("errorGeneric"));
       setPaying(false);
+      return;
     }
+    // Certains moyens de paiement (TWINT, virements…) font déjà naviguer le
+    // navigateur vers return_url ; pour les autres (carte sans 3DS…), Stripe
+    // ne redirige pas toujours de lui-même — on le fait nous-mêmes avec le
+    // même identifiant de session que porte return_url, pour un comportement
+    // garanti quel que soit le moyen choisi.
+    router.push(
+      `/checkout/success?session_id=${encodeURIComponent(result.session.id)}`,
+    );
   }
 
   return (
@@ -938,7 +940,7 @@ function PaymentStep({
 
       <button
         onClick={pay}
-        disabled={!stripe || paying}
+        disabled={checkoutState.type !== "success" || paying}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
       >
         {paying ? (

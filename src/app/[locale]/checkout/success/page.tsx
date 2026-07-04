@@ -20,9 +20,9 @@ export const dynamic = "force-dynamic";
 export default async function CheckoutSuccessPage({
   searchParams,
 }: {
-  searchParams: Promise<{ payment_intent?: string }>;
+  searchParams: Promise<{ session_id?: string }>;
 }) {
-  const { payment_intent: paymentIntentId } = await searchParams;
+  const { session_id: sessionId } = await searchParams;
   const [t, session] = await Promise.all([
     getTranslations("orderSuccess"),
     getServerSession(),
@@ -32,23 +32,29 @@ export default async function CheckoutSuccessPage({
   let orderNumber: string | null = null;
   let receiptEmail: string | null = null;
 
-  if (paymentIntentId) {
+  if (sessionId) {
     const { env } = await getCloudflareContext({ async: true });
     const stripe = getStripe(env.STRIPE_SECRET_KEY);
     try {
-      const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
-      orderNumber = pi.metadata?.orderNumber ?? null;
-      receiptEmail = pi.receipt_email ?? null;
-      if (pi.status === "succeeded") {
-        status = "succeeded";
-        // Filet de sécurité si le webhook n'est pas encore passé (idempotent)
-        const orderId = pi.metadata?.orderId;
-        if (orderId) {
-          const db = await getDb();
-          await markOrderPaid(db, orderId);
+      const checkoutSession = await stripe.checkout.sessions.retrieve(
+        sessionId,
+        { expand: ["payment_intent"] },
+      );
+      const pi = checkoutSession.payment_intent;
+      if (pi && typeof pi !== "string") {
+        orderNumber = pi.metadata?.orderNumber ?? null;
+        receiptEmail = pi.receipt_email ?? null;
+        if (pi.status === "succeeded") {
+          status = "succeeded";
+          // Filet de sécurité si le webhook n'est pas encore passé (idempotent)
+          const orderId = pi.metadata?.orderId;
+          if (orderId) {
+            const db = await getDb();
+            await markOrderPaid(db, orderId);
+          }
+        } else if (pi.status === "processing") {
+          status = "processing";
         }
-      } else if (pi.status === "processing") {
-        status = "processing";
       }
     } catch {
       status = "failed";

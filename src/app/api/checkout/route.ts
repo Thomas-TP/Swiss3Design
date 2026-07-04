@@ -13,7 +13,7 @@ import {
   customerAddresses,
 } from "@/db/schema";
 import { getSetting } from "@/db/queries";
-import { getStripe, createPaymentIntent } from "@/lib/stripe";
+import { getStripe, createCheckoutSession } from "@/lib/stripe";
 import { getOrCreateStripeCustomer } from "@/lib/stripe-customer";
 import { getAuth } from "@/lib/auth";
 import { verifyEmailProof } from "@/lib/email-proof";
@@ -309,35 +309,62 @@ export async function POST(request: Request) {
       })
     : undefined;
 
-  const paymentIntent = await createPaymentIntent(
+  // Checkout Session (ui_mode "elements") : un seul article couvrant le total
+  // déjà calculé et validé côté serveur (sous-total − remise + livraison).
+  // Stripe crée toujours un PaymentIntent réel dessous en mode "payment" — le
+  // webhook (payment_intent.succeeded, cf. api/stripe/webhook) continue de le
+  // recevoir tel quel, metadata comprise, sans aucun changement de sa part.
+  const session = await createCheckoutSession(
     stripe,
     {
-      amount: totalCents,
-      currency: "chf",
-      automatic_payment_methods: { enabled: true },
-      receipt_email: email,
-      ...(stripeCustomerId ? { customer: stripeCustomerId } : {}),
-      shipping: {
-        name: address.name,
-        address: {
-          line1: address.street,
-          postal_code: address.npa,
-          city: address.city,
-          country: "CH",
+      ui_mode: "elements",
+      mode: "payment",
+      locale,
+      line_items: [
+        {
+          price_data: {
+            currency: "chf",
+            product_data: { name: `Commande ${orderNumber}` },
+            unit_amount: totalCents,
+          },
+          quantity: 1,
         },
+      ],
+      return_url: `${env.BETTER_AUTH_URL}/${locale}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      ...(stripeCustomerId
+        ? { customer: stripeCustomerId }
+        : { customer_email: email }),
+      payment_intent_data: {
+        receipt_email: email,
+        shipping: {
+          name: address.name,
+          address: {
+            line1: address.street,
+            postal_code: address.npa,
+            city: address.city,
+            country: "CH",
+          },
+        },
+        metadata: { orderId: order.id, orderNumber },
       },
       metadata: { orderId: order.id, orderNumber },
     },
     env.STRIPE_PAYMENT_METHOD_CONFIGURATION,
   );
 
-  await db
-    .update(orders)
-    .set({ stripePaymentIntentId: paymentIntent.id })
-    .where(eq(orders.id, order.id));
+  // Le PaymentIntent est créé de façon synchrone en mode "payment" : on le
+  // rattache tout de suite à la commande (lien de remboursement admin). Si ce
+  // n'était pas le cas, la commande reste malgré tout finalisable normalement
+  // (webhook + page de succès ne dépendent pas de cette colonne).
+  if (session.payment_intent) {
+    await db
+      .update(orders)
+      .set({ stripePaymentIntentId: String(session.payment_intent) })
+      .where(eq(orders.id, order.id));
+  }
 
   return Response.json({
-    clientSecret: paymentIntent.client_secret,
+    clientSecret: session.client_secret,
     totalCents,
     shippingCents,
     discountCents,

@@ -3,22 +3,25 @@ import { eq } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { quoteRequests } from "@/db/schema";
-import { getStripe, createPaymentIntent } from "@/lib/stripe";
+import { getStripe, createCheckoutSession } from "@/lib/stripe";
 import { getOrCreateStripeCustomer } from "@/lib/stripe-customer";
 import { getServerSession } from "@/lib/session";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
-// Crée un PaymentIntent pour payer un devis chiffré. Réservé au client
+// Crée une Checkout Session pour payer un devis chiffré. Réservé au client
 // propriétaire du devis (compte connecté).
-const bodySchema = z.object({ quoteId: z.string().min(1) });
+const bodySchema = z.object({
+  quoteId: z.string().min(1),
+  locale: z.enum(["fr", "de", "it", "en"]).catch("fr"),
+});
 
 export async function POST(request: Request) {
   if (!(await rateLimit(request, "quote-checkout", { limit: 20, windowS: 600 }))) {
     return tooManyRequests();
   }
 
-  const session = await getServerSession();
-  if (!session) {
+  const authSession = await getServerSession();
+  if (!authSession) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
@@ -39,8 +42,8 @@ export async function POST(request: Request) {
 
   // Le devis doit appartenir au client connecté
   const owns =
-    quote.customerId === session.user.id ||
-    quote.email.toLowerCase() === session.user.email.toLowerCase();
+    quote.customerId === authSession.user.id ||
+    quote.email.toLowerCase() === authSession.user.email.toLowerCase();
   if (!owns) {
     return Response.json({ error: "forbidden" }, { status: 403 });
   }
@@ -63,27 +66,41 @@ export async function POST(request: Request) {
   // Toujours un client connecté ici (garde plus haut) : rattache le paiement
   // à son identité Stripe, comme le checkout panier (Link 1-clic).
   const stripeCustomerId = await getOrCreateStripeCustomer(stripe, db, {
-    id: session.user.id,
-    email: session.user.email,
-    name: session.user.name,
-    stripeCustomerId: session.user.stripeCustomerId ?? null,
+    id: authSession.user.id,
+    email: authSession.user.email,
+    name: authSession.user.name,
+    stripeCustomerId: authSession.user.stripeCustomerId ?? null,
   });
 
-  const paymentIntent = await createPaymentIntent(
+  const session = await createCheckoutSession(
     stripe,
     {
-      amount: quote.quotedPriceCents,
-      currency: "chf",
-      automatic_payment_methods: { enabled: true },
-      receipt_email: quote.email,
+      ui_mode: "elements",
+      mode: "payment",
+      locale: parsed.data.locale,
+      line_items: [
+        {
+          price_data: {
+            currency: "chf",
+            product_data: { name: `Devis ${quote.id.slice(0, 8)}` },
+            unit_amount: quote.quotedPriceCents,
+          },
+          quantity: 1,
+        },
+      ],
+      return_url: `${env.BETTER_AUTH_URL}/${parsed.data.locale}/account/quotes/${quote.id}/pay?session_id={CHECKOUT_SESSION_ID}`,
       customer: stripeCustomerId,
+      payment_intent_data: {
+        receipt_email: quote.email,
+        metadata: { quoteId: quote.id },
+      },
       metadata: { quoteId: quote.id },
     },
     env.STRIPE_PAYMENT_METHOD_CONFIGURATION,
   );
 
   return Response.json({
-    clientSecret: paymentIntent.client_secret,
+    clientSecret: session.client_secret,
     totalCents: quote.quotedPriceCents,
   });
 }

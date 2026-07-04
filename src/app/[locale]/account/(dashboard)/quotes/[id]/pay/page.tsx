@@ -20,10 +20,10 @@ export default async function QuotePayPage({
   searchParams,
 }: {
   params: Promise<{ locale: Locale; id: string }>;
-  searchParams: Promise<{ payment_intent?: string }>;
+  searchParams: Promise<{ session_id?: string }>;
 }) {
   const { locale, id } = await params;
-  const { payment_intent: paymentIntentId } = await searchParams;
+  const { session_id: sessionId } = await searchParams;
   const session = await getServerSession();
   if (!session) {
     redirect({ href: "/account/login", locale });
@@ -52,11 +52,20 @@ export default async function QuotePayPage({
 
   let paid = ["paid", "in_production", "done"].includes(quote.status);
   // Filet : si Stripe nous renvoie ici après paiement, on confirme (idempotent)
-  if (paymentIntentId && !paid) {
+  if (sessionId && !paid) {
     const stripe = getStripe(env.STRIPE_SECRET_KEY);
     try {
-      const pi = await stripe.paymentIntents.retrieve(paymentIntentId);
-      if (pi.status === "succeeded" && pi.metadata?.quoteId === quote.id) {
+      const checkoutSession = await stripe.checkout.sessions.retrieve(
+        sessionId,
+        { expand: ["payment_intent"] },
+      );
+      const pi = checkoutSession.payment_intent;
+      if (
+        pi &&
+        typeof pi !== "string" &&
+        pi.status === "succeeded" &&
+        pi.metadata?.quoteId === quote.id
+      ) {
         await markQuotePaid(db, quote.id);
         paid = true;
       }

@@ -9,20 +9,21 @@ export function getStripe(secretKey: string): Stripe {
 
 export const stripeCryptoProvider = Stripe.createSubtleCryptoProvider();
 
-// Crée un PaymentIntent en appliquant, si fournie, une « payment method
-// configuration » du dashboard (pmc_…) qui pilote les moyens de paiement
-// proposés par le Payment Element. Si Stripe refuse cette configuration
-// (id invalide, config d'un autre mode live/test, config gérée par un
-// tiers…), on retombe silencieusement sur la configuration par défaut du
-// compte : un mauvais réglage ne doit JAMAIS casser le checkout.
-export async function createPaymentIntent(
+// Crée une Checkout Session (ui_mode "elements" — Payment Element monté dans
+// notre propre UI, pas la page hébergée par Stripe) en appliquant, si fournie,
+// une « payment method configuration » du dashboard (pmc_…) qui pilote les
+// moyens de paiement proposés. Si Stripe refuse cette configuration (id
+// invalide, config d'un autre mode live/test, config gérée par un tiers…),
+// on retombe silencieusement sur la configuration par défaut du compte : un
+// mauvais réglage ne doit JAMAIS casser le checkout.
+export async function createCheckoutSession(
   stripe: Stripe,
-  params: Stripe.PaymentIntentCreateParams,
+  params: Stripe.Checkout.SessionCreateParams,
   paymentMethodConfiguration?: string,
-): Promise<Stripe.PaymentIntent> {
+): Promise<Stripe.Checkout.Session> {
   if (paymentMethodConfiguration) {
     try {
-      return await stripe.paymentIntents.create({
+      return await stripe.checkout.sessions.create({
         ...params,
         payment_method_configuration: paymentMethodConfiguration,
       });
@@ -30,5 +31,5 @@ export async function createPaymentIntent(
       console.error("payment_method_configuration rejetée, repli défaut", err);
     }
   }
-  return stripe.paymentIntents.create(params);
+  return stripe.checkout.sessions.create(params);
 }
