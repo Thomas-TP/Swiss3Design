@@ -40,10 +40,9 @@ function buildCsp({
   isProd: boolean;
   origin: string;
 }): string {
-  // img.mpay.samsung.com : SDK Samsung Pay Web Checkout (bouton au paiement)
   const scriptSrc = nonce
-    ? `script-src 'self' 'nonce-${nonce}' https://js.stripe.com https://static.cloudflareinsights.com https://img.mpay.samsung.com`
-    : `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://static.cloudflareinsights.com https://img.mpay.samsung.com`;
+    ? `script-src 'self' 'nonce-${nonce}' https://js.stripe.com https://static.cloudflareinsights.com`
+    : `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://static.cloudflareinsights.com`;
   return [
     "default-src 'self'",
     "base-uri 'self'",
@@ -54,7 +53,7 @@ function buildCsp({
     "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
     "font-src 'self' https://fonts.gstatic.com data:",
     "img-src 'self' data: blob: https:",
-    `connect-src 'self' https://*.stripe.com https://m.stripe.network https://fonts.googleapis.com https://api3.geo.admin.ch https://cloudflareinsights.com https://*.mpay.samsung.com${isProd ? "" : " ws: wss:"}`,
+    `connect-src 'self' https://*.stripe.com https://m.stripe.network https://fonts.googleapis.com https://api3.geo.admin.ch https://cloudflareinsights.com${isProd ? "" : " ws: wss:"}`,
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://m.stripe.network",
     "worker-src 'self' blob:",
     "manifest-src 'self'",

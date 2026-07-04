@@ -9,7 +9,7 @@ import { BrandMark } from "./brand-mark";
  * Composant serveur — aucune interactivité, que de la navigation.
  */
 
-const PAYMENT_METHODS = ["TWINT", "Visa", "Mastercard", "Samsung Pay", "Google Pay"];
+const PAYMENT_METHODS = ["TWINT", "Visa", "Mastercard", "Google Pay"];
 
 function FooterColumn({
   title,

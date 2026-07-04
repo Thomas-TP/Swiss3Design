@@ -58,14 +58,6 @@
     // America, pmc_1TopVd…) : ses moyens de paiement ne sont pas contrôlables
     // depuis le dashboard et ne correspondent pas à la boutique.
     "STRIPE_PAYMENT_METHOD_CONFIGURATION": "pmc_1TgkcKK4o7ey3lG5alpRZU3l",
-    // Samsung Pay Web Checkout : DORMANT en prod tant que le service
-    // partenaire (pay.samsung.com/developer) n'est pas approuvé. Le banc
-    // d'essai est l'environnement preview ci-dessous (STAGE).
-    "SAMSUNG_PAY_SERVICE_ID": "",
-    "SAMSUNG_PAY_ENV": "",
-    // Tuile « SAMSUNG Pay » dans le Payment Element (custom payment method
-    // du dashboard Stripe, mode LIVE). Inerte tant que SERVICE_ID est vide.
-    "SAMSUNG_PAY_CPMT_ID": "cpmt_1TiWhCK4o7ey3lG5zScp9iou",
     // Clé publiable Stripe (publique par design) lue à l'exécution : permet
     // à la preview d'utiliser la clé TEST alors que le build embarque la
     // clé de .env.production. Doit correspondre au STRIPE_SECRET_KEY du
@@ -122,15 +114,6 @@
         "EMAIL_FROM": "Swiss3Design Preview <commandes@swiss3design.ch>",
         // Vide : la preview (clés Stripe test) garde la config par défaut
         "STRIPE_PAYMENT_METHOD_CONFIGURATION": "",
-        // Banc d'essai Samsung Pay : mode STAGE (appareil Samsung connecté à
-        // un compte de test du portail + debug date active requis)
-        "SAMSUNG_PAY_SERVICE_ID": "798f1369c01a48659e89bf",
-        "SAMSUNG_PAY_ENV": "STAGE",
-        // Vide = bouton autonome en preview : le cpmt du dashboard est en
-        // mode LIVE, invalide avec les clés TEST de la preview. Pour tester
-        // la tuile unifiée ici : créer le même custom payment method en mode
-        // test dans Stripe et coller son cpmt_… ci-dessous.
-        "SAMSUNG_PAY_CPMT_ID": "",
         // Clé publiable TEST (même compte que la prod) — appairée avec le
         // secret STRIPE_SECRET_KEY (sk_test) posé via wrangler secret put.
         "STRIPE_PUBLISHABLE_KEY": "pk_test_51TgkbnK4o7ey3lG5CAqK0NBqFazy43LthNOQ0IKgmiTwv6ni7Cd4yiuaM6M0gb5XHF3HI4PAlYCFlqFr9BNIMND000iDY9eEiF"

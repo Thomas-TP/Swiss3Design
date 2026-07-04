@@ -32,13 +32,6 @@ declare global {
     // « Payment method configuration » Stripe (pmc_…) appliquée aux
     // PaymentIntents ; vide/absente → config par défaut du compte.
     STRIPE_PAYMENT_METHOD_CONFIGURATION?: string;
-    // Samsung Pay Web Checkout : service partenaire + environnement
-    // (STAGE/PRODUCTION). Vides = bouton absent (prod tant que non approuvé).
-    SAMSUNG_PAY_SERVICE_ID?: string;
-    SAMSUNG_PAY_ENV?: string;
-    // Custom payment method Stripe (cpmt_…) : tuile SAMSUNG Pay intégrée au
-    // Payment Element ; vide → bouton autonome en repli.
-    SAMSUNG_PAY_CPMT_ID?: string;
     // Clé publiable Stripe lue à l'exécution (test en preview, live en prod)
     STRIPE_PUBLISHABLE_KEY?: string;
     // Anti-bot (login/register/forgot-password) ; captcha désactivé si absente.

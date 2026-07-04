@@ -338,7 +338,6 @@ export async function POST(request: Request) {
 
   return Response.json({
     clientSecret: paymentIntent.client_secret,
-    orderNumber,
     totalCents,
     shippingCents,
     discountCents,

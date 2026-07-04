@@ -63,7 +63,7 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Le paiement s’effectue en ligne via le prestataire Stripe (carte de
-          crédit/débit, TWINT, Samsung Pay, Google Pay), y compris via Stripe
+          crédit/débit, TWINT, Google Pay), y compris via Stripe
           Link pour réutiliser une carte déjà enregistrée. L’exploitant n’a
           jamais accès aux données de carte et ne les stocke pas.
         </p>
@@ -253,7 +253,7 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Die Zahlung erfolgt online über den Zahlungsdienstleister Stripe
-          (Kredit-/Debitkarte, TWINT, Samsung Pay, Google Pay), einschliesslich
+          (Kredit-/Debitkarte, TWINT, Google Pay), einschliesslich
           Stripe Link zur Wiederverwendung einer bereits gespeicherten Karte.
           Der Betreiber hat zu keinem Zeitpunkt Zugriff auf Kartendaten und
           speichert diese nicht.
@@ -449,7 +449,7 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Il pagamento avviene online tramite il prestatore Stripe (carta di
-          credito/debito, TWINT, Samsung Pay, Google Pay), inclusa Stripe Link
+          credito/debito, TWINT, Google Pay), inclusa Stripe Link
           per riutilizzare una carta già registrata. Il gestore non ha mai
           accesso ai dati della carta e non li memorizza.
         </p>
@@ -638,7 +638,7 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Payment is made online via the payment provider Stripe
-          (credit/debit card, TWINT, Samsung Pay, Google Pay), including Stripe
+          (credit/debit card, TWINT, Google Pay), including Stripe
           Link to reuse a card already saved. The Operator never has access
           to card data and does not store it.
         </p>

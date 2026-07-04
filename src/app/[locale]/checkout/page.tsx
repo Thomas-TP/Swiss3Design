@@ -10,19 +10,7 @@ export const dynamic = "force-dynamic";
 
 export default async function CheckoutPage() {
   const t = await getTranslations("checkout");
-
-  // Interrupteur Samsung Pay côté serveur (wrangler.jsonc) : vide en prod
-  // (service partenaire pas encore approuvé), STAGE sur le Worker preview —
-  // le banc d'essai suit ainsi le workflow branche → preview sans toucher
-  // au checkout LIVE.
   const { env } = await getCloudflareContext({ async: true });
-  const samsungPay = {
-    serviceId: env.SAMSUNG_PAY_SERVICE_ID ?? "",
-    environment: env.SAMSUNG_PAY_ENV ?? "",
-    // « Custom payment method » Stripe (cpmt_…) : tuile SAMSUNG Pay affichée
-    // DANS le Payment Element. Vide → repli sur le bouton autonome.
-    cpmtId: env.SAMSUNG_PAY_CPMT_ID ?? "",
-  };
 
   // Adresse par défaut du client connecté, proposée en préremplissage
   // (carnet d'adresses complet géré depuis /account/addresses).
@@ -61,7 +49,6 @@ export default async function CheckoutPage() {
         <CheckoutFlow
           initialAddress={initialAddress}
           sessionEmail={session?.user.email ?? null}
-          samsungPay={samsungPay}
           stripePublishableKey={env.STRIPE_PUBLISHABLE_KEY ?? ""}
         />
       </div>

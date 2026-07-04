@@ -25,10 +25,6 @@ import {
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { Select } from "@/components/select";
-import {
-  SamsungPayButton,
-  useSamsungPay,
-} from "@/components/samsung-pay-button";
 import { useCart } from "@/lib/cart";
 import { useSession } from "@/lib/auth-client";
 import { useIsDark } from "@/lib/theme";
@@ -567,22 +563,13 @@ function GuestEmailVerification({
 
 // ── Flux de commande ─────────────────────────────────────────────────────────
 
-export interface SamsungPayConfig {
-  serviceId: string;
-  environment: string;
-  // cpmt_… (custom payment method Stripe) : tuile dans le Payment Element
-  cpmtId: string;
-}
-
 export function CheckoutFlow({
   initialAddress,
   sessionEmail,
-  samsungPay,
   stripePublishableKey,
 }: {
   initialAddress: CheckoutAddress | null;
   sessionEmail: string | null;
-  samsungPay: SamsungPayConfig;
   stripePublishableKey?: string;
 }) {
   const t = useTranslations("checkout");
@@ -597,8 +584,6 @@ export function CheckoutFlow({
   );
   const [proof, setProof] = useState<EmailProof | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
-  // Numéro de commande créé avec le PaymentIntent — requis par Samsung Pay
-  const [orderNumber, setOrderNumber] = useState<string | null>(null);
   const [totalCents, setTotalCents] = useState(0);
   const [discount, setDiscount] = useState<{
     code: string;
@@ -682,7 +667,6 @@ export function CheckoutFlow({
       if (!res.ok) throw new Error("checkout_failed");
       const data = (await res.json()) as {
         clientSecret: string;
-        orderNumber: string;
         totalCents: number;
         shippingCents: number;
         discountCents: number;
@@ -690,7 +674,6 @@ export function CheckoutFlow({
       setTotalCents(data.totalCents);
       setServerShipping(data.shippingCents);
       setServerDiscount(data.discountCents);
-      setOrderNumber(data.orderNumber);
       setClientSecret(data.clientSecret);
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
@@ -719,23 +702,10 @@ export function CheckoutFlow({
                   },
                 ],
                 appearance: stripeAppearance(isDark),
-                // Tuile « SAMSUNG Pay » dans l'accordéon (custom payment
-                // method) — uniquement si le service Samsung ET le cpmt sont
-                // configurés ; le paiement lui-même passe par notre flux
-                // Web Checkout (cf. PaymentStep.pay), pas par confirmPayment.
-                ...(samsungPay.serviceId && samsungPay.cpmtId
-                  ? {
-                      customPaymentMethods: [
-                        { id: samsungPay.cpmtId, options: { type: "static" } },
-                      ],
-                    }
-                  : {}),
               }}
             >
               <PaymentStep
                 totalCents={totalCents}
-                orderNumber={orderNumber}
-                samsungPay={samsungPay}
                 onBack={() => setClientSecret(null)}
               />
             </Elements>
@@ -897,13 +867,9 @@ export function CheckoutFlow({
 
 function PaymentStep({
   totalCents,
-  orderNumber,
-  samsungPay,
   onBack,
 }: {
   totalCents: number;
-  orderNumber: string | null;
-  samsungPay: SamsungPayConfig;
   onBack: () => void;
 }) {
   const t = useTranslations("checkout");
@@ -913,40 +879,11 @@ function PaymentStep({
   const elements = useElements();
   const [paying, setPaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  // Flux Samsung Pay (Web Checkout) — inerte tant que serviceId est vide
-  const samsung = useSamsungPay({
-    orderNumber: orderNumber ?? "",
-    totalCents,
-    serviceId: samsungPay.serviceId,
-    environment: samsungPay.environment,
-  });
 
   async function pay() {
     if (!stripe || !elements) return;
     setPaying(true);
     setError(null);
-
-    // Tuile « SAMSUNG Pay » (custom payment method) sélectionnée dans le
-    // Payment Element ? elements.submit() valide la saisie et révèle la
-    // sélection ; ce moyen se règle via la feuille Samsung, pas confirmPayment.
-    if (samsungPay.cpmtId && samsung.available) {
-      const { error: submitError, selectedPaymentMethod } =
-        (await elements.submit()) as {
-          error?: { message?: string };
-          selectedPaymentMethod?: string;
-        };
-      if (submitError) {
-        setError(submitError.message ?? t("errorGeneric"));
-        setPaying(false);
-        return;
-      }
-      if (selectedPaymentMethod === samsungPay.cpmtId) {
-        await samsung.launch();
-        setPaying(false);
-        return;
-      }
-    }
-
     const { error: stripeError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
@@ -980,17 +917,6 @@ function PaymentStep({
       </div>
 
       <div className="mt-5">
-        {/* Bouton Samsung Pay autonome — repli quand la tuile intégrée
-            (cpmt) n'est pas configurée ; rendu seulement si le service est
-            activé ET que l'appareil y est éligible */}
-        {orderNumber && samsungPay.serviceId && !samsungPay.cpmtId && (
-          <SamsungPayButton
-            orderNumber={orderNumber}
-            totalCents={totalCents}
-            serviceId={samsungPay.serviceId}
-            environment={samsungPay.environment}
-          />
-        )}
         {/* Accordéon : tous les moyens de paiement listés proprement,
             sans le menu déroulant « plus de moyens » du mode tabs */}
         <PaymentElement
@@ -1004,9 +930,9 @@ function PaymentStep({
         />
       </div>
 
-      {(error || samsung.error) && (
+      {error && (
         <p className="mt-5 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
-          {error ?? samsung.error}
+          {error}
         </p>
       )}
 

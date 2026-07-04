@@ -166,7 +166,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       },
       {
         title: "Paiement sécurisé",
-        text: "TWINT, cartes, Samsung Pay et Google Pay via Stripe. Vos données bancaires ne transitent jamais par nos serveurs.",
+        text: "TWINT, cartes et Google Pay via Stripe. Vos données bancaires ne transitent jamais par nos serveurs.",
       },
       {
         title: "Livraison suivie",
@@ -262,7 +262,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Comment payer ? Est-ce sécurisé ?",
         a: (
           <>
-            Le paiement se fait via Stripe : TWINT, cartes, Samsung Pay et Google
+            Le paiement se fait via Stripe : TWINT, cartes et Google
             Pay. La transaction est chiffrée et vos données bancaires ne
             transitent jamais par nos serveurs.
           </>
@@ -413,7 +413,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       },
       {
         title: "Sichere Zahlung",
-        text: "TWINT, Karten, Samsung Pay und Google Pay über Stripe. Ihre Kartendaten laufen nie über unsere Server.",
+        text: "TWINT, Karten und Google Pay über Stripe. Ihre Kartendaten laufen nie über unsere Server.",
       },
       {
         title: "Verfolgbare Lieferung",
@@ -507,7 +507,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Wie bezahle ich? Ist das sicher?",
         a: (
           <>
-            Die Zahlung erfolgt über Stripe: TWINT, Karten, Samsung Pay und Google
+            Die Zahlung erfolgt über Stripe: TWINT, Karten und Google
             Pay. Die Transaktion ist verschlüsselt und Ihre Kartendaten laufen
             nie über unsere Server.
           </>
@@ -658,7 +658,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       },
       {
         title: "Pagamento sicuro",
-        text: "TWINT, carte, Samsung Pay e Google Pay tramite Stripe. I vostri dati bancari non passano mai dai nostri server.",
+        text: "TWINT, carte e Google Pay tramite Stripe. I vostri dati bancari non passano mai dai nostri server.",
       },
       {
         title: "Consegna tracciata",
@@ -754,8 +754,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Come si paga? È sicuro?",
         a: (
           <>
-            Il pagamento avviene tramite Stripe: TWINT, carte, Samsung Pay e
-            Google Pay. La transazione è cifrata e i vostri dati bancari non
+            Il pagamento avviene tramite Stripe: TWINT, carte e Google Pay. La
+            transazione è cifrata e i vostri dati bancari non
             passano mai dai nostri server.
           </>
         ),
@@ -902,7 +902,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       },
       {
         title: "Secure payment",
-        text: "TWINT, cards, Samsung Pay and Google Pay via Stripe. Your card details never pass through our servers.",
+        text: "TWINT, cards and Google Pay via Stripe. Your card details never pass through our servers.",
       },
       {
         title: "Tracked delivery",
@@ -995,7 +995,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "How do I pay? Is it secure?",
         a: (
           <>
-            Payment is made via Stripe: TWINT, cards, Samsung Pay and Google Pay.
+            Payment is made via Stripe: TWINT, cards and Google Pay.
             The transaction is encrypted and your card details never pass
             through our servers.
           </>
