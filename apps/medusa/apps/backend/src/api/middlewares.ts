@@ -43,5 +43,9 @@ export default defineMiddlewares({
       matcher: "/admin/quotes*",
       middlewares: [authenticate("user", ["session", "bearer"])],
     },
+    {
+      matcher: "/admin/materials*",
+      middlewares: [authenticate("user", ["session", "bearer"])],
+    },
   ],
 })

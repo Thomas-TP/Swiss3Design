@@ -16,6 +16,9 @@ const eslintConfig = defineConfig([
     ".open-next/**",
     // Worker Cron autonome (déployé séparément, types Workers propres)
     "workers/**",
+    // Sous-projets independants (Medusa/SolidStart, migration en cours) —
+    // chacun a son propre tooling (tsconfig/eslint), pas celui de l'app Next.
+    "apps/**",
   ]),
 ]);
 

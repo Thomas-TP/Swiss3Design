@@ -38,6 +38,9 @@ declare global {
     TURNSTILE_SECRET_KEY?: string;
     // Clé publique du widget — lue côté client (NEXT_PUBLIC_, voir .env.production).
     NEXT_PUBLIC_TURNSTILE_SITE_KEY?: string;
+    // Pont d'authentification vers Medusa (migration en cours, voir
+    // apps/medusa) — doit être identique au secret cote Medusa.
+    BETTER_AUTH_BRIDGE_SECRET?: string;
   }
 }
 

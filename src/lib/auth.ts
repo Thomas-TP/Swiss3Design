@@ -7,6 +7,7 @@ import {
   emailOTP,
   haveIBeenPwned,
   captcha,
+  bearer,
 } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
 import { drizzle } from "drizzle-orm/d1";
@@ -21,6 +22,7 @@ import {
   magicLinkEmail,
   otpEmail,
 } from "./email-templates";
+import { STOREFRONT_ORIGINS } from "./medusa-bridge";
 
 function adminEmails(env: CloudflareEnv): string[] {
   return (env.ADMIN_EMAILS ?? "")
@@ -72,8 +74,8 @@ export async function getAuth() {
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins:
       env.APP_ENV === "preview"
-        ? [env.BETTER_AUTH_URL]
-        : ["https://swiss3design.ch", "https://www.swiss3design.ch"],
+        ? [env.BETTER_AUTH_URL, ...STOREFRONT_ORIGINS]
+        : ["https://swiss3design.ch", "https://www.swiss3design.ch", ...STOREFRONT_ORIGINS],
     database: drizzleAdapter(db, { provider: "sqlite" }),
     emailAndPassword: {
       enabled: true,
@@ -227,6 +229,11 @@ export async function getAuth() {
       // rpID dérivé automatiquement de baseURL (env.BETTER_AUTH_URL) : pas de
       // configuration manuelle, fonctionne tel quel en prod comme en preview.
       passkey(),
+      // Expose le token de session en clair (header "set-auth-token") pour
+      // le storefront SolidStart, qui n'est pas sur la même origine et ne
+      // peut donc pas s'appuyer sur le cookie de session — voir
+      // src/lib/medusa-bridge.ts. N'affecte pas le flux cookie existant.
+      bearer(),
       // Anti-bot sur inscription/connexion/mot de passe oublié — actif
       // uniquement si un widget Turnstile est configuré (sinon désactivé,
       // pour ne pas casser le dev local sans clé).

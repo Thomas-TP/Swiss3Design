@@ -17,6 +17,11 @@ STRIPE_WEBHOOK_SECRET="whsec_..."
 BETTER_AUTH_SECRET="change-me"               # ex. openssl rand -base64 32
 BETTER_AUTH_URL="http://localhost:3000"      # override local (prod = wrangler.jsonc)
 
+# Pont Medusa (migration en cours, voir apps/medusa) — DOIT etre exactement
+# la meme valeur que BETTER_AUTH_BRIDGE_SECRET dans apps/medusa/apps/backend/.env,
+# sinon le storefront SolidStart ne peut pas s'authentifier contre Medusa.
+BETTER_AUTH_BRIDGE_SECRET="change-me"
+
 # Emails (Resend) — optionnel : sans clé, l'envoi est ignoré et la
 # vérification d'e-mail est désactivée automatiquement.
 RESEND_API_KEY="re_..."
