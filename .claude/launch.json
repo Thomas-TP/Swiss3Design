@@ -18,6 +18,12 @@
       "runtimeExecutable": "cmd",
       "runtimeArgs": ["/c", "cd /d C:\\Perso\\Swiss3Design\\apps\\storefront && bun run dev --port 4001"],
       "port": 4001
+    },
+    {
+      "name": "medusa-backend",
+      "runtimeExecutable": "cmd",
+      "runtimeArgs": ["/c", "cd /d C:\\Perso\\Swiss3Design\\apps\\medusa\\apps\\backend && npx medusa develop"],
+      "port": 9000
     }
   ]
 }

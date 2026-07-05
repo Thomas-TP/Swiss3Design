@@ -24,6 +24,10 @@ module.exports = defineConfig({
     // couleur ici est un choix cosmetique a l'achat, pas une option qui
     // multiplie les variantes/SKU comme le systeme Product Option de Medusa).
     { resolve: "./src/modules/materials" },
+    // Devis 3D sur mesure : bespoke, aucun equivalent Medusa (pas de notion
+    // de devis negocie par fil de discussion dans une plateforme e-commerce
+    // standard).
+    { resolve: "./src/modules/quotes" },
     {
       // R2 (S3-compatible) file storage. Points at swiss3design-preview-files
       // (non-prod bucket) while this stack is still under development —
