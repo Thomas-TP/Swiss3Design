@@ -177,6 +177,12 @@ export default async function importLegacyCatalog({
               weight: D1_PRODUCT.weightGrams,
               options: { Title: "Default variant" },
               prices: [{ amount: D1_PRODUCT.priceCents / 100, currency_code: "chf" }],
+              // stock: null in D1 means print-on-demand (unlimited) - don't
+              // make Medusa track/require inventory levels for it. Products
+              // with a real stock number should set manage_inventory: true
+              // and get an inventory level created at the CH stock location
+              // (src/scripts/setup-switzerland-checkout.ts) once it exists.
+              manage_inventory: D1_PRODUCT.saleType !== "on_demand",
             },
           ],
           sales_channels: salesChannels.map((sc) => ({ id: sc.id })),

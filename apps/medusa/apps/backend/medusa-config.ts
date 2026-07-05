@@ -55,6 +55,27 @@ module.exports = defineConfig({
       },
     },
     {
+      // Stripe (Payment Element, capture automatique, Stripe Link via
+      // automaticPaymentMethods) - reproduit le comportement actuel de
+      // src/lib/stripe.ts. Cle TEST en dev ; passage en LIVE = decision de
+      // bascule Phase 6, jamais melangee avec l'environnement de dev.
+      resolve: "@medusajs/medusa/payment",
+      options: {
+        providers: [
+          {
+            resolve: "@medusajs/payment-stripe",
+            id: "stripe",
+            options: {
+              apiKey: process.env.STRIPE_API_KEY,
+              webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+              capture: true,
+              automaticPaymentMethods: true,
+            },
+          },
+        ],
+      },
+    },
+    {
       resolve: "@medusajs/medusa/auth",
       options: {
         providers: [
