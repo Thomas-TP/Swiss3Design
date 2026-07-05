@@ -1,26 +1,48 @@
 import Medusa from "@medusajs/js-sdk";
-import { authClient } from "./auth-client";
+import { readToken } from "./auth-client";
 
 export const medusa = new Medusa({
   baseUrl: import.meta.env.VITE_MEDUSA_BACKEND_URL ?? "http://localhost:9000",
   publishableKey: import.meta.env.VITE_MEDUSA_PUBLISHABLE_KEY,
 });
 
+const BETTER_AUTH_URL = import.meta.env.VITE_BETTER_AUTH_URL ?? "http://localhost:3000";
+
 // Échange la session Better Auth active contre un jeton pont court-lived
 // (`/api/medusa-bridge-token`, app Next.js) puis l'échange à son tour contre
 // une session Medusa via l'Auth Module Provider custom `better-auth-bridge`
 // (apps/medusa/apps/backend/src/modules/better-auth-bridge). Le SDK Medusa
 // stocke ensuite lui-même le jeton client résultant.
-export async function loginToMedusa() {
-  const response = await authClient.$fetch("/api/medusa-bridge-token", {
-    method: "GET",
+// fetch() direct (pas authClient.$fetch) : ce dernier passe par le même proxy
+// de routes dynamiques que signIn.email/etc., qui interprète "$fetch" comme
+// un segment de route au lieu du passthrough attendu par le type SolidAuthClient.
+export async function loginToMedusa(email: string) {
+  const token = readToken();
+  if (!token) {
+    throw new Error("Aucune session Better Auth active");
+  }
+  const response = await fetch(`${BETTER_AUTH_URL}/api/medusa-bridge-token`, {
+    headers: { Authorization: `Bearer ${token}` },
   });
-  if (response.error || !response.data) {
+  if (!response.ok) {
     throw new Error("Impossible d'obtenir le jeton pont Medusa");
   }
-  const { token } = response.data as { token: string };
-  const result = await medusa.auth.login("customer", "better-auth-bridge", { token });
+  const { token: bridgeToken } = (await response.json()) as { token: string };
+  const result = await medusa.auth.login("customer", "better-auth-bridge", { token: bridgeToken });
   if (typeof result !== "string") {
     throw new Error("Réponse d'authentification Medusa inattendue (MFA/redirection non gérée ici)");
+  }
+
+  // Le provider better-auth-bridge (comme emailpass) ne fait que résoudre/créer
+  // l'AuthIdentity — la toute première authentification n'a pas encore de
+  // Customer Medusa lié (app_metadata.customer_id absent), d'où le 401. On
+  // crée le profil client à la volée, ce qui termine le lien ; le jeton initial
+  // ne reflète pas encore ce lien (actor_id figé à l'émission), d'où le refresh
+  // explicite avant de réessayer.
+  try {
+    await medusa.store.customer.retrieve();
+  } catch {
+    await medusa.store.customer.create({ email });
+    await medusa.auth.refresh();
   }
 }

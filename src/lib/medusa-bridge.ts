@@ -21,6 +21,13 @@ export function corsHeadersFor(origin: string | null): HeadersInit {
   const allowed = origin && STOREFRONT_ORIGINS.includes(origin) ? origin : STOREFRONT_ORIGINS[0];
   return {
     "Access-Control-Allow-Origin": allowed,
+    // Le client Better Auth force `credentials: "include"` dès que
+    // l'environnement le supporte (voir better-auth/dist/client/config.mjs) :
+    // sans cet en-tête, le navigateur rejette toute réponse cross-origine,
+    // même si le cookie de session (SameSite=Lax/Strict) n'est de toute façon
+    // jamais transmis cross-origine — seul le jeton porteur (Authorization)
+    // circule réellement.
+    "Access-Control-Allow-Credentials": "true",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Authorization, Content-Type",
     "Access-Control-Expose-Headers": "set-auth-token",

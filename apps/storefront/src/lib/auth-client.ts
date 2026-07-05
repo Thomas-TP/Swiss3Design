@@ -9,7 +9,11 @@ import type { SuccessContext } from "@better-fetch/fetch";
 
 const TOKEN_KEY = "s3d_auth_token";
 
-function readToken(): string | undefined {
+// Exporté (pas seulement usage interne) : le pont Medusa (src/lib/medusa.ts)
+// en a besoin pour un appel fetch() direct — authClient.$fetch passe par le
+// même proxy de routes dynamiques que signIn.email/etc., qui interprète
+// "$fetch" comme un segment de route au lieu du passthrough attendu.
+export function readToken(): string | undefined {
   if (typeof window === "undefined") return undefined;
   return window.localStorage.getItem(TOKEN_KEY) ?? undefined;
 }

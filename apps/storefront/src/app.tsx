@@ -35,10 +35,12 @@ export default function App() {
   }
 
   async function handleConnectMedusa() {
+    const userEmail = session().data?.user.email;
+    if (!userEmail) return;
     setMedusaLoading(true);
     setMedusaError(null);
     try {
-      await loginToMedusa();
+      await loginToMedusa(userEmail);
       const { customer } = await medusa.store.customer.retrieve();
       setMedusaCustomerEmail(customer.email);
     } catch (err) {
