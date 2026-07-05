@@ -28,6 +28,9 @@ module.exports = defineConfig({
     // de devis negocie par fil de discussion dans une plateforme e-commerce
     // standard).
     { resolve: "./src/modules/quotes" },
+    // Avis clients (note + commentaire, lies a une commande livree) : aucun
+    // equivalent Medusa natif.
+    { resolve: "./src/modules/reviews" },
     {
       // R2 (S3-compatible) file storage. Points at swiss3design-preview-files
       // (non-prod bucket) while this stack is still under development —
