@@ -55,5 +55,9 @@ export default defineMiddlewares({
       matcher: "/admin/reviews*",
       middlewares: [authenticate("user", ["session", "bearer"])],
     },
+    {
+      matcher: "/admin/newsletters*",
+      middlewares: [authenticate("user", ["session", "bearer"])],
+    },
   ],
 })

@@ -41,6 +41,9 @@ declare global {
     // Pont d'authentification vers Medusa (migration en cours, voir
     // apps/medusa) — doit être identique au secret cote Medusa.
     BETTER_AUTH_BRIDGE_SECRET?: string;
+    // Protège /api/internal/* (appelé par Medusa — migration en cours) : doit
+    // être identique à MEDUSA_INTERNAL_SECRET côté apps/medusa.
+    MEDUSA_INTERNAL_SECRET?: string;
   }
 }
 

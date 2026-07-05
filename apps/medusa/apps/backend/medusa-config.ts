@@ -31,6 +31,10 @@ module.exports = defineConfig({
     // Avis clients (note + commentaire, lies a une commande livree) : aucun
     // equivalent Medusa natif.
     { resolve: "./src/modules/reviews" },
+    // Historique des annonces newsletter (rendu HTML + envoi Resend restent
+    // sur l'app Next.js, cf. src/api/admin/newsletters) : aucun equivalent
+    // Medusa natif pour un envoi ponctuel compose par l'admin.
+    { resolve: "./src/modules/newsletters" },
     {
       // R2 (S3-compatible) file storage. Points at swiss3design-preview-files
       // (non-prod bucket) while this stack is still under development —

@@ -38,3 +38,10 @@ FACEBOOK_CLIENT_SECRET=""
 
 # Maintenance planifiée (purge des fichiers R2 orphelins via /api/cron/maintenance)
 CRON_SECRET="change-me"
+
+# API interne appelée par Medusa (migration en cours, voir apps/medusa) — DOIT
+# etre exactement la meme valeur que MEDUSA_INTERNAL_SECRET dans
+# apps/medusa/apps/backend/.env. Protege /api/internal/* (destinataires
+# newsletter, envoi d'annonces) : ces routes ne doivent jamais etre appelables
+# sans ce secret.
+MEDUSA_INTERNAL_SECRET="change-me"

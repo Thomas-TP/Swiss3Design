@@ -1,16 +1,16 @@
 "use server";
 
-import { eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
-import { newsletterSends, products, productTranslations, productImages } from "@/db/schema";
+import { newsletterSends } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
 import { sendBulkEmail, sendEmail } from "@/lib/email";
 import { newsletterAnnouncementEmail } from "@/lib/email-templates";
 import {
   getRecipients,
   createUnsubscribeToken,
+  loadAnnouncementProducts,
   type NewsletterAudience,
 } from "@/lib/newsletter";
 
@@ -65,48 +65,6 @@ function parseInput(formData: FormData): ComposeInput | { error: string } {
   };
 }
 
-async function loadProducts(productIds: string[]) {
-  if (productIds.length === 0) return [];
-  const db = await getDb();
-  const rows = await db
-    .select({
-      id: products.id,
-      name: productTranslations.name,
-      priceCents: products.priceCents,
-      slug: products.slug,
-    })
-    .from(products)
-    .innerJoin(
-      productTranslations,
-      eq(productTranslations.productId, products.id),
-    )
-    .where(inArray(products.id, productIds));
-
-  const images = rows.length
-    ? await db
-        .select({ productId: productImages.productId, url: productImages.url })
-        .from(productImages)
-        .where(inArray(productImages.productId, rows.map((r) => r.id)))
-        .orderBy(productImages.sortOrder)
-    : [];
-  const firstImage = new Map<string, string>();
-  for (const img of images) {
-    if (!firstImage.has(img.productId)) firstImage.set(img.productId, img.url);
-  }
-
-  // Conserve l'ordre choisi par l'admin, pas l'ordre de retour SQL.
-  const byId = new Map(rows.map((r) => [r.id, r]));
-  return productIds
-    .map((id) => byId.get(id))
-    .filter((r): r is NonNullable<typeof r> => Boolean(r))
-    .map((r) => ({
-      name: r.name,
-      priceCents: r.priceCents,
-      imageUrl: firstImage.get(r.id) ?? null,
-      url: `https://swiss3design.ch/fr/products/${r.slug}`,
-    }));
-}
-
 function buildCta(input: ComposeInput) {
   return input.ctaLabel && input.ctaUrl
     ? { label: input.ctaLabel, url: input.ctaUrl }
@@ -121,7 +79,7 @@ export async function previewAnnouncement(
   if ("error" in input) return input;
 
   const [selectedProducts, recipients] = await Promise.all([
-    loadProducts(input.productIds),
+    loadAnnouncementProducts(input.productIds),
     getRecipients(input.audience),
   ]);
 
@@ -147,7 +105,7 @@ export async function sendTestEmail(
   const input = parseInput(formData);
   if ("error" in input) return input;
 
-  const selectedProducts = await loadProducts(input.productIds);
+  const selectedProducts = await loadAnnouncementProducts(input.productIds);
   const email = newsletterAnnouncementEmail({
     to: session.user.email,
     subject: `[Test] ${input.subject}`,
@@ -173,7 +131,7 @@ export async function sendAnnouncement(
   if (!env.BETTER_AUTH_SECRET) return { error: "Configuration serveur incomplète." };
 
   const [selectedProducts, recipients] = await Promise.all([
-    loadProducts(input.productIds),
+    loadAnnouncementProducts(input.productIds),
     getRecipients(input.audience),
   ]);
   if (recipients.length === 0) return { error: "Aucun destinataire pour cette cible." };
