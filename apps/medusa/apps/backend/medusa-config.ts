@@ -14,6 +14,16 @@ module.exports = defineConfig({
     }
   },
   modules: [
+    // i18n natif Medusa (>=2.12.3, derriere le flag MEDUSA_FF_TRANSLATION) :
+    // Product.title/subtitle/description/material et ProductCategory.name/
+    // description sont deja marques .translatable() dans le core. Remplace le
+    // module custom "catalog-i18n" initialement prevu au plan - inutile de
+    // reecrire ce que Medusa fournit deja nativement.
+    { resolve: "@medusajs/translation" },
+    // Palette matieres/couleurs custom : aucun equivalent Medusa natif (une
+    // couleur ici est un choix cosmetique a l'achat, pas une option qui
+    // multiplie les variantes/SKU comme le systeme Product Option de Medusa).
+    { resolve: "./src/modules/materials" },
     {
       // R2 (S3-compatible) file storage. Points at swiss3design-preview-files
       // (non-prod bucket) while this stack is still under development —
