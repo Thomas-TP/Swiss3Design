@@ -11,6 +11,20 @@ import { medusa } from "./medusa";
 type StoreCart = Awaited<ReturnType<typeof medusa.store.cart.retrieve>>["cart"];
 const STORAGE_KEY = "s3d-cart-id";
 
+// Le SDK Medusa (client.js::normalizeResponse) traite tout statut >= 300
+// comme une erreur, y compris 304 Not Modified - or le navigateur répond
+// bien un 304 réel (revalidation HTTP transparente) sur des GET identiques
+// répétés (ex. rechargement de page). `store.cart.retrieve()` ne permet pas
+// de forcer `cache: "no-store"` (seul `headers` est exposé) : on repasse par
+// `client.fetch()` (l'échappatoire générique du SDK) pour ce seul appel afin
+// que le panier ne disparaisse jamais après un simple F5.
+async function retrieveCart(id: string): Promise<StoreCart> {
+  const { cart } = await medusa.client.fetch<{ cart: StoreCart }>(`/store/carts/${id}`, {
+    cache: "no-store",
+  });
+  return cart;
+}
+
 interface CartContextValue {
   cart: () => StoreCart | null;
   count: () => number;
@@ -32,16 +46,25 @@ async function findSwissRegionId(): Promise<string> {
 
 export function CartProvider(props: { children: JSX.Element }) {
   const [cart, setCart] = createSignal<StoreCart | null>(null);
-  const [loading, setLoading] = createSignal(false);
+  // true jusqu'à ce qu'onMount ait tranché (pas de localStorage côté SSR) -
+  // valeur initiale déterministe (jamais dépendante de `window`) pour ne pas
+  // désynchroniser le rendu serveur et l'hydratation client. Sans ça, la
+  // page panier affichait un flash "panier vide" avant que le vrai panier
+  // Medusa (fetch asynchrone) n'arrive.
+  const [loading, setLoading] = createSignal(true);
 
   onMount(async () => {
     const id = localStorage.getItem(STORAGE_KEY);
-    if (!id) return;
+    if (!id) {
+      setLoading(false);
+      return;
+    }
     try {
-      const { cart: existing } = await medusa.store.cart.retrieve(id);
-      setCart(existing);
+      setCart(await retrieveCart(id));
     } catch {
       localStorage.removeItem(STORAGE_KEY);
+    } finally {
+      setLoading(false);
     }
   });
 
@@ -58,8 +81,7 @@ export function CartProvider(props: { children: JSX.Element }) {
   async function refresh() {
     const current = cart();
     if (!current) return;
-    const { cart: fresh } = await medusa.store.cart.retrieve(current.id);
-    setCart(fresh);
+    setCart(await retrieveCart(current.id));
   }
 
   return (
