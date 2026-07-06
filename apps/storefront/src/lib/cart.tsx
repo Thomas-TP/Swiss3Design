@@ -33,6 +33,7 @@ interface CartContextValue {
   updateItem: (lineItemId: string, quantity: number) => Promise<void>;
   removeItem: (lineItemId: string) => Promise<void>;
   refresh: () => Promise<void>;
+  clear: () => void;
 }
 
 const CartContext = createContext<CartContextValue>();
@@ -130,6 +131,13 @@ export function CartProvider(props: { children: JSX.Element }) {
           }
         },
         refresh,
+        // Le panier Medusa est marqué complété côté serveur par cart.complete()
+        // (checkout/success) - on ne le réutilise jamais, un prochain ajout au
+        // panier en créera un nouveau (ensureCart).
+        clear: () => {
+          localStorage.removeItem(STORAGE_KEY);
+          setCart(null);
+        },
       }}
     >
       {props.children}
