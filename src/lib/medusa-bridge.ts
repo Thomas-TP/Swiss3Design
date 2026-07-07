@@ -7,13 +7,16 @@
 
 const encoder = new TextEncoder();
 
-// Origines autorisées à appeler ce pont en cross-origin : le storefront
-// SolidStart tourne sur un port/Worker distinct de swiss3design.ch pendant
-// toute la migration (et possiblement après, selon la décision de bascule
-// Phase 6). Étendre cette liste quand une nouvelle origine de storefront
-// apparaît (preview, domaine final).
+// Origines autorisées à appeler ce pont en cross-origin : le(s) storefront(s)
+// tournent sur un port/Worker distinct de swiss3design.ch pendant toute la
+// migration (et possiblement après, selon la décision de bascule Phase 6).
+// Étendre cette liste quand une nouvelle origine de storefront apparaît
+// (preview, domaine final). localhost:4001 = storefront SolidStart (Phase 5,
+// mis de côté au profit de storefront-next mais gardé fonctionnel) ;
+// localhost:4002 = storefront-next (Next.js/React, choix retenu).
 export const STOREFRONT_ORIGINS = [
   "http://localhost:4001",
+  "http://localhost:4002",
   "https://swiss3design-storefront.thomastp.workers.dev",
 ];
 

@@ -1,0 +1,96 @@
+@import "tailwindcss";
+
+/* Bascule du thème pilotée par la classe .dark sur <html> (toggle manuel,
+   repli sur prefers-color-scheme via le script anti-FOUC du layout). */
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  /* Couleurs de base — thème clair */
+  --paper: #fafaf9;
+  --surface: #ffffff;
+  /* Surface "élevée" : cartes posées sur une autre carte / fonds de scène */
+  --elevated: #ffffff;
+  --ink: #1a1614;
+  --soft: #6f6962;
+  --line: #e8e5e1;
+  color-scheme: light;
+}
+
+.dark {
+  /* Thème sombre — ink/paper restent opposés : les boutons inversés
+     (bg-ink text-paper) gardent leur contraste dans les deux thèmes. */
+  --paper: #0b0a09;
+  --surface: #1a1714;
+  --elevated: #221e1b;
+  --ink: #f4f1ed;
+  --soft: #a39c92;
+  --line: #2a2622;
+  color-scheme: dark;
+}
+
+@theme inline {
+  /* Palette sobre "Swiss business" : neutres chauds + rouge suisse en accent.
+     Les neutres pointent vers les variables thémables ci-dessus. */
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-ink: var(--ink);
+  --color-soft: var(--soft);
+  --color-line: var(--line);
+  /* L'accent rouge marque est constant dans les deux thèmes */
+  --color-accent: #e5231c;
+  --color-accent-dark: #c01d14;
+  /* Contour des pastilles de couleur : gris medium constant, ~4.4:1 aussi bien
+     sur fond clair (#fff) que sombre (#1a1714) → bordure toujours visible quel
+     que soit le remplissage (noir sur noir, blanc sur blanc). WCAG 1.4.11 (3:1).
+     Un gris plus clair échouerait sur fond clair, plus foncé sur fond sombre :
+     #767676 est le point d'équilibre qui passe AA des deux côtés. */
+  --color-swatch-ring: #767676;
+  /* Panneau « nuit » : fond sombre constant dans les deux thèmes, réservé
+     aux blocs de mise en avant. Évite le pavé blanc éblouissant en mode
+     sombre que produisait l'inversion bg-ink. */
+  --color-night: #121110;
+  --color-night-soft: #a8a29b;
+  --color-night-line: #2c2825;
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --radius-card: 1.25rem;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  /* Halo discret en haut de page : donne de la profondeur sans casser la
+     sobriété. Très faible teinte rouge marque, adaptée aux deux thèmes. */
+  background-color: var(--color-paper);
+  background-image: radial-gradient(
+    920px 460px at 50% -10%,
+    color-mix(in srgb, var(--color-accent) 5%, transparent),
+    transparent 70%
+  );
+  background-repeat: no-repeat;
+  color: var(--color-ink);
+  font-family: var(--font-sans);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* FAQ accordéon (page « À propos ») : flèche qui pivote à l'ouverture, sans JS
+   ni script inline (compatible CSP nonce en prod). */
+.faq-item > summary {
+  list-style: none;
+}
+.faq-item > summary::-webkit-details-marker {
+  display: none;
+}
+.faq-item[open] .faq-chevron {
+  transform: rotate(180deg);
+}
