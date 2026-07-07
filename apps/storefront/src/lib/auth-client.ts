@@ -5,6 +5,7 @@
 // activé côté serveur expose le token de session via l'en-tête
 // `set-auth-token`, qu'on capture ici et rejoue en `Authorization: Bearer`.
 import { createAuthClient } from "better-auth/solid";
+import { twoFactorClient } from "better-auth/client/plugins";
 import type { SuccessContext } from "@better-fetch/fetch";
 
 const TOKEN_KEY = "s3d_auth_token";
@@ -26,6 +27,7 @@ export function storeAuthToken(token: string | null) {
 
 export const authClient = createAuthClient({
   baseURL: import.meta.env.VITE_BETTER_AUTH_URL ?? "http://localhost:3000",
+  plugins: [twoFactorClient()],
   fetchOptions: {
     auth: {
       type: "Bearer",
@@ -34,21 +36,21 @@ export const authClient = createAuthClient({
   },
 });
 
-export const { useSession, signIn, signOut } = authClient;
+export const { useSession, signIn, signUp, signOut, twoFactor } = authClient;
 
 // Le plugin bearer() (côté serveur) expose le jeton de session via l'en-tête
-// `set-auth-token` sur les réponses de login — on le capture ici et le
-// persiste pour que `authClient` le rejoue ensuite en Authorization: Bearer.
+// `set-auth-token` sur toute réponse qui complète une connexion (signIn.email,
+// signUp.email si vérification désactivée, twoFactor.verifyTotp/BackupCode) -
+// on le capture ici et le persiste pour que `authClient` le rejoue ensuite en
+// Authorization: Bearer. À passer en `onSuccess` sur CHAQUE appel qui peut
+// terminer une connexion, pas seulement signIn.email.
+export function captureToken(ctx: SuccessContext) {
+  const token = ctx.response.headers.get("set-auth-token");
+  if (token) storeAuthToken(token);
+}
+
 export async function signInWithEmail(email: string, password: string) {
-  return authClient.signIn.email(
-    { email, password },
-    {
-      onSuccess: (ctx) => {
-        const token = ctx.response.headers.get("set-auth-token");
-        if (token) storeAuthToken(token);
-      },
-    },
-  );
+  return authClient.signIn.email({ email, password }, { onSuccess: captureToken });
 }
 
 export async function signOutAndClear() {

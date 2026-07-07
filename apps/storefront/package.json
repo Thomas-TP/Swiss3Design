@@ -8,6 +8,7 @@
     "preview": "vinxi preview"
   },
   "dependencies": {
+    "@better-auth/passkey": "^1.6.23",
     "@medusajs/js-sdk": "^2.17.2",
     "@solid-primitives/i18n": "^2.2.1",
     "@solidjs/router": "^0.16.1",
