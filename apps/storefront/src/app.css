@@ -2,6 +2,19 @@
    Palette "Swiss business" : neutres chauds + rouge suisse en accent, thème
    clair/sombre piloté par la classe .dark sur <html>. */
 
+/* Geist (variable, poids 100–900 en un seul fichier) — l'app Next.js l'obtient
+   via next/font/google (auto-hébergé) ; ici le même fichier woff2 (paquet npm
+   "geist" officiel, poids "Sans" uniquement) est servi tel quel depuis
+   /public/fonts pour un rendu typographique identique, sans dépendance à
+   Google Fonts au runtime. */
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --paper: #fafaf9;
   --surface: #ffffff;
@@ -104,8 +117,12 @@ body {
   );
   background-repeat: no-repeat;
   color: var(--ink);
-  font-family:
-    -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Geist", ui-sans-serif, system-ui, sans-serif;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: var(--accent);
+  color: #fff;
 }
