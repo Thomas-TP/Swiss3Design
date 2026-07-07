@@ -9,7 +9,8 @@
 // que apps/storefront/src/lib/auth-client.ts (storefront SolidStart), avec
 // le client React officiel au lieu du client Solid.
 import { createAuthClient } from "better-auth/react";
-import { twoFactorClient } from "better-auth/client/plugins";
+import { twoFactorClient, emailOTPClient } from "better-auth/client/plugins";
+import { passkeyClient } from "@better-auth/passkey/client";
 import type { SuccessContext } from "@better-fetch/fetch";
 
 const TOKEN_KEY = "s3d_auth_token";
@@ -27,7 +28,13 @@ export function storeAuthToken(token: string | null) {
 
 export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? "http://localhost:3000",
-  plugins: [twoFactorClient()],
+  // magicLinkClient volontairement absent : le lien magique est vérifié par
+  // une redirection GET sur le serveur d'auth (localhost:3000), qui pose un
+  // cookie de session SUR CETTE ORIGINE-LÀ puis redirige - ce storefront
+  // (autre origine) ne peut pas lire ce cookie ni récupérer de jeton porteur
+  // à l'issue du flux tel quel. passkey/emailOTP restent de simples appels
+  // API directs (comme signIn.email), donc compatibles avec le pont bearer.
+  plugins: [twoFactorClient(), emailOTPClient(), passkeyClient()],
   fetchOptions: {
     auth: {
       type: "Bearer",
@@ -36,7 +43,7 @@ export const authClient = createAuthClient({
   },
 });
 
-export const { useSession, signIn, signUp, signOut, twoFactor } = authClient;
+export const { useSession, signIn, signUp, signOut, twoFactor, emailOtp, passkey } = authClient;
 
 // Le plugin bearer() (côté serveur) expose le jeton de session via l'en-tête
 // `set-auth-token` sur toute réponse qui complète une connexion (signIn.email,
