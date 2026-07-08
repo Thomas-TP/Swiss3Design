@@ -8,6 +8,7 @@ import {
   haveIBeenPwned,
   captcha,
   bearer,
+  oauthPopup,
 } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
 import { drizzle } from "drizzle-orm/d1";
@@ -230,10 +231,19 @@ export async function getAuth() {
       // configuration manuelle, fonctionne tel quel en prod comme en preview.
       passkey(),
       // Expose le token de session en clair (header "set-auth-token") pour
-      // le storefront SolidStart, qui n'est pas sur la même origine et ne
-      // peut donc pas s'appuyer sur le cookie de session — voir
+      // les storefronts externes, qui ne sont pas sur la même origine et ne
+      // peuvent donc pas s'appuyer sur le cookie de session — voir
       // src/lib/medusa-bridge.ts. N'affecte pas le flux cookie existant.
       bearer(),
+      // Connexion Google en popup pour les storefronts externes (storefront-next) :
+      // le popup navigue en premier niveau vers CETTE origine (cookies OK),
+      // puis la page de complétion poste le jeton de session au parent via
+      // postMessage plutôt qu'une redirection classique — voir
+      // apps/storefront-next/src/lib/auth-client.ts::signInWithGooglePopup.
+      // popupOrigin est validé contre trustedOrigins (STOREFRONT_ORIGINS
+      // ci-dessus), aucune config supplémentaire nécessaire. Sans effet sur
+      // la connexion Google classique de ce site (même origine, inchangée).
+      oauthPopup(),
       // Anti-bot sur inscription/connexion/mot de passe oublié — actif
       // uniquement si un widget Turnstile est configuré (sinon désactivé,
       // pour ne pas casser le dev local sans clé).

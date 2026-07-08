@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { UserPlus, MailCheck, LoaderCircle } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
+import { GoogleButton } from "@/components/google-button";
 import { signUp, signIn, captureToken } from "@/lib/auth-client";
 
 const field =
@@ -102,36 +103,46 @@ export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
   }
 
   return (
-    // method="post" : repli natif sans JS qui n'expose pas le mot de passe en URL
-    <form method="post" onSubmit={onSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="name" className="mb-1.5 block text-sm font-semibold">
-          {t("name")}
-        </label>
-        <input id="name" name="name" required minLength={2} autoComplete="name" className={field} />
+    <>
+      {/* method="post" : repli natif sans JS qui n'expose pas le mot de passe en URL */}
+      <form method="post" onSubmit={onSubmit} className="space-y-4">
+        <div>
+          <label htmlFor="name" className="mb-1.5 block text-sm font-semibold">
+            {t("name")}
+          </label>
+          <input id="name" name="name" required minLength={2} autoComplete="name" className={field} />
+        </div>
+        <div>
+          <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
+            {t("email")}
+          </label>
+          <input id="email" name="email" type="email" required autoComplete="email" defaultValue={defaultEmail} className={field} />
+        </div>
+        <div>
+          <label htmlFor="password" className="mb-1.5 block text-sm font-semibold">
+            {t("password")}
+          </label>
+          <input id="password" name="password" type="password" required minLength={8} autoComplete="new-password" className={field} />
+          <p className="mt-1 text-xs text-soft">{t("passwordHint")}</p>
+        </div>
+        {error && <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">{error}</p>}
+        <button
+          type="submit"
+          disabled={pending}
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+        >
+          <UserPlus size={16} />
+          {t("signUpCta")}
+        </button>
+      </form>
+      <div className="mt-4 flex items-center gap-3 text-xs text-soft">
+        <span className="h-px flex-1 bg-line" />
+        {t("orContinueWith")}
+        <span className="h-px flex-1 bg-line" />
       </div>
-      <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
-          {t("email")}
-        </label>
-        <input id="email" name="email" type="email" required autoComplete="email" defaultValue={defaultEmail} className={field} />
+      <div className="mt-4">
+        <GoogleButton onSuccess={() => router.push("/account")} />
       </div>
-      <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-semibold">
-          {t("password")}
-        </label>
-        <input id="password" name="password" type="password" required minLength={8} autoComplete="new-password" className={field} />
-        <p className="mt-1 text-xs text-soft">{t("passwordHint")}</p>
-      </div>
-      {error && <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">{error}</p>}
-      <button
-        type="submit"
-        disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
-      >
-        <UserPlus size={16} />
-        {t("signUpCta")}
-      </button>
-    </form>
+    </>
   );
 }

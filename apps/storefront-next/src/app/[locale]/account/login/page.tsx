@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { Link, useRouter } from "@/i18n/navigation";
 import { BrandMark } from "@/components/brand-mark";
+import { GoogleButton } from "@/components/google-button";
 import { signIn, twoFactor, emailOtp, captureToken } from "@/lib/auth-client";
 
 const field =
@@ -15,12 +16,16 @@ const btnGhost =
 
 // Miroir de login-form.tsx côté app Next.js racine, adapté à l'architecture
 // bearer cross-origine (chaque appel qui peut terminer une connexion passe
-// par `captureToken`). **Lien magique et connexion sociale volontairement
-// absents** : tous deux redirigent via le serveur d'auth (localhost:3000),
-// qui pose un cookie SUR CETTE origine avant de rediriger - ce storefront
-// (autre origine) n'a alors aucun jeton porteur à récupérer. Mot de passe,
-// 2FA, clé d'accès et code par e-mail restent de simples appels API directs,
-// donc pleinement compatibles.
+// par `captureToken`). **Lien magique volontairement absent** : redirige via
+// une navigation GET classique sur le serveur d'auth (localhost:3000), qui
+// pose un cookie SUR CETTE origine avant de rediriger - ce storefront (autre
+// origine) n'a alors aucun jeton porteur à récupérer. **Connexion Google en
+// popup** (`GoogleButton`/`signInWithGooglePopup`) : contourne ce problème en
+// gardant tout le dialogue OAuth sur l'origine du serveur d'auth (le popup y
+// navigue en premier niveau, cookies OK) et en récupérant le jeton via
+// postMessage plutôt que par redirection — voir auth-client.ts. Mot de
+// passe, 2FA, clé d'accès et code par e-mail restent de simples appels API
+// directs, donc pleinement compatibles nativement.
 function LoginForm({ next }: { next: string }) {
   const t = useTranslations("auth");
   const router = useRouter();
@@ -293,6 +298,12 @@ function LoginForm({ next }: { next: string }) {
           {t("passwordless.usePasskey")}
         </button>
       )}
+      <div className="flex items-center gap-3 text-xs text-soft">
+        <span className="h-px flex-1 bg-line" />
+        {t("orContinueWith")}
+        <span className="h-px flex-1 bg-line" />
+      </div>
+      <GoogleButton onSuccess={() => router.push(next)} />
       <button
         type="button"
         onClick={() => {
