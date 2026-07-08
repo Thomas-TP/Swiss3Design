@@ -43,7 +43,24 @@ export const authClient = createAuthClient({
   },
 });
 
-export const { useSession, signIn, signUp, signOut, twoFactor, emailOtp, passkey } = authClient;
+export const {
+  useSession,
+  signIn,
+  signUp,
+  signOut,
+  twoFactor,
+  emailOtp,
+  passkey,
+  updateUser,
+  changeEmail,
+  changePassword,
+  sendVerificationEmail,
+  listAccounts,
+  listSessions,
+  revokeSession,
+  revokeOtherSessions,
+  deleteUser,
+} = authClient;
 
 // Le plugin bearer() (côté serveur) expose le jeton de session via l'en-tête
 // `set-auth-token` sur toute réponse qui complète une connexion (signIn.email,

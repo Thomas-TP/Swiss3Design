@@ -345,6 +345,16 @@
       "delivered": "Geliefert",
       "cancelled": "Storniert"
     },
+    "orderStatus": {
+      "not_fulfilled": "In Vorbereitung",
+      "partially_fulfilled": "Teilweise vorbereitet",
+      "fulfilled": "Vorbereitet",
+      "partially_shipped": "Teilweise versendet",
+      "shipped": "Versendet",
+      "partially_delivered": "Teilweise geliefert",
+      "delivered": "Geliefert",
+      "canceled": "Storniert"
+    },
     "quoteStatus": {
       "received": "Erhalten",
       "quoted": "Offerte gesendet",
