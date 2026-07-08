@@ -9,6 +9,7 @@ import { medusa } from "@/lib/medusa";
 import { formatChfAmount } from "@/lib/format";
 import { orderStatusStyle } from "../../_ui";
 import { ReorderButton } from "./reorder-button";
+import { ReviewForm } from "./review-form";
 
 interface OrderItem {
   id: string;
@@ -49,6 +50,7 @@ function trackingUrl(n: string): string {
 
 export default function OrderDetailPage() {
   const t = useTranslations("account");
+  const tReviews = useTranslations("reviews");
   const locale = useLocale();
   const params = useParams<{ id: string }>();
   const [order, setOrder] = useState<OrderDetail | null | undefined>(undefined);
@@ -86,6 +88,8 @@ export default function OrderDetailPage() {
   const trackingNumber = order.fulfillments?.[0]?.labels?.[0]?.tracking_number;
   const addr = order.shipping_address;
   const promoCode = order.promotions?.[0]?.code;
+  // Les avis ne s'ouvrent que pour une commande LIVRÉE, et par article.
+  const canReview = order.fulfillment_status === "delivered";
 
   return (
     <div className="max-w-2xl">
@@ -160,6 +164,12 @@ export default function OrderDetailPage() {
                     {formatChfAmount(i.unit_price * i.quantity, locale)}
                   </span>
                 </div>
+                {canReview && i.product_id && (
+                  <div className="mt-3 border-t border-line pt-3">
+                    <p className="mb-2 text-xs font-medium text-soft">{tReviews("rateThis")}</p>
+                    <ReviewForm orderId={order.id} productId={i.product_id} />
+                  </div>
+                )}
               </li>
             );
           })}

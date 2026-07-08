@@ -39,6 +39,13 @@ export default defineMiddlewares({
       matcher: "/store/quotes/:id*",
       middlewares: [authenticate("customer", ["session", "bearer"])],
     },
+    // Dépôt d'un avis (après livraison) requiert un client connecté ; la
+    // lecture publique (GET /store/reviews) reste sans middleware.
+    {
+      matcher: "/store/reviews",
+      method: "POST",
+      middlewares: [authenticate("customer", ["session", "bearer"])],
+    },
     {
       matcher: "/admin/quotes*",
       middlewares: [authenticate("user", ["session", "bearer"])],
