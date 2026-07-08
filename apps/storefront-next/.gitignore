@@ -12,5 +12,14 @@ next-env.d.ts
 # Dependencies
 node_modules/
 
+# Cloudflare
+/.open-next/
+/.wrangler/
+.dev.vars
+
+# Copie générée par scripts/sync-messages.mjs — la source de vérité est
+# messages/ à la racine du monorepo.
+/messages/
+
 # Misc
 *.log

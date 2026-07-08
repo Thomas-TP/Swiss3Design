@@ -1,27 +1,32 @@
-import { readFile } from "node:fs/promises";
-import path from "node:path";
 import { getRequestConfig } from "next-intl/server";
 import { hasLocale } from "next-intl";
-import { routing } from "./routing";
+import { routing, type Locale } from "./routing";
 
-// Lecture fs directe (pas un import() dynamique) : messages/*.json vit hors
-// de la racine Turbopack de cette app (turbopack.root la scope à
-// apps/storefront-next pour la vitesse de dev, cf. next.config.ts) - un
-// import() relatif vers l'extérieur de cette racine échoue silencieusement
-// sous Turbopack (404 générique, aucune erreur serveur visible). fs échappe
-// entièrement à la résolution de modules.
-const MESSAGES_DIR = path.resolve(process.cwd(), "../../messages");
+// import() statique de apps/storefront-next/messages/*.json — une COPIE
+// générée par scripts/sync-messages.mjs (avant chaque dev/build/preview/
+// deploy) à partir de messages/*.json à la racine du monorepo, seule
+// source de vérité éditée à la main (partagée avec l'app Next.js racine).
+// Deux contraintes empêchent un import direct vers la racine du monorepo :
+// Turbopack refuse de résoudre tout fichier hors de turbopack.root (scopé à
+// cette app pour la vitesse de dev, cf. next.config.ts — "Module not
+// found" silencieux) et, une fois déployé, Cloudflare Workers n'a pas de
+// filesystem réel à l'exécution (un fs.readFile marchait en dev/`next
+// start` mais y échouerait). Un import() statique est résolu au build par
+// le bundler (Turbopack en dev, webpack pour le build OpenNext, cf.
+// AGENTS.md règle d'or 3) et le JSON est embarqué dans le bundle — aucun
+// accès disque requis à l'exécution, donc compatible Workers.
+const MESSAGE_LOADERS: Record<Locale, () => Promise<{ default: Record<string, unknown> }>> = {
+  fr: () => import("../../messages/fr.json"),
+  de: () => import("../../messages/de.json"),
+  it: () => import("../../messages/it.json"),
+  en: () => import("../../messages/en.json"),
+};
 
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
   const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
 
-  const raw = await readFile(path.join(MESSAGES_DIR, `${locale}.json`), "utf-8");
+  const { default: messages } = await MESSAGE_LOADERS[locale]();
 
-  return {
-    locale,
-    // Source de vérité unique avec l'app Next.js racine : réutilisé tel
-    // quel, aucune duplication de traduction.
-    messages: JSON.parse(raw),
-  };
+  return { locale, messages };
 });

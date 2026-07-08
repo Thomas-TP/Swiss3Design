@@ -1,0 +1,29 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "swiss3design-storefront-next",
+  "account_id": "b88f99010692662e118a9869f47767e4",
+  "main": ".open-next/worker.js",
+  "compatibility_date": "2026-05-01",
+  "compatibility_flags": ["nodejs_compat"],
+  "assets": {
+    "directory": ".open-next/assets",
+    "binding": "ASSETS"
+  },
+  // Pas encore de domaine de production décidé pour ce storefront (le
+  // basculement DNS fait partie de la Phase 6, non commencée) : on déploie
+  // sur une URL workers.dev uniquement, sans route sur un domaine custom, le
+  // temps que Medusa soit lui-même déployé (Railway) et qu'une URL/domaine
+  // finale soit choisie. Pas de bindings D1/R2/KV : ce storefront ne parle
+  // qu'à des backends externes (Medusa Store API, serveur better-auth de
+  // l'app racine), toutes ses variables sont NEXT_PUBLIC_* inlinées au build.
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": {
+    "enabled": true
+  },
+  "vars": {
+    // Lu par middleware.ts pour désindexer (X-Robots-Tag) tant qu'il n'y a
+    // pas de domaine de production choisi.
+    "APP_ENV": "preview"
+  }
+}

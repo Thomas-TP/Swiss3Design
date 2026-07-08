@@ -3,11 +3,15 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "predev": "node scripts/sync-messages.mjs",
     "dev": "next dev --port 4002",
+    "prebuild": "node scripts/sync-messages.mjs",
     "build": "next build",
     "start": "next start --port 4002",
     "lint": "eslint",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "preview": "node scripts/sync-messages.mjs && opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "deploy": "node scripts/sync-messages.mjs && opennextjs-cloudflare build && opennextjs-cloudflare deploy"
   },
   "dependencies": {
     "@better-auth/passkey": "^1.6.23",
@@ -26,6 +30,7 @@
     "three": "^0.185.0"
   },
   "devDependencies": {
+    "@opennextjs/cloudflare": "^1.20.1",
     "@tailwindcss/postcss": "^4.3.2",
     "@types/node": "^26",
     "@types/react": "^19",
@@ -33,6 +38,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
     "tailwindcss": "^4.3.2",
-    "typescript": "^6"
+    "typescript": "^6",
+    "wrangler": "^4.105.0"
   }
 }
