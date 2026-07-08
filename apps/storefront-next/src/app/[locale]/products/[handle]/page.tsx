@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { ArrowLeft, Truck, Factory, ShieldCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
@@ -120,11 +121,12 @@ export default async function ProductPage({
   params: Promise<{ locale: Locale; handle: string }>;
 }) {
   const { locale, handle } = await params;
-  const [t, tReviews, tHome, data] = await Promise.all([
+  const [t, tReviews, tHome, data, nonce] = await Promise.all([
     getTranslations("product"),
     getTranslations("reviews"),
     getTranslations("home"),
     getProduct(handle),
+    headers().then((h) => h.get("x-nonce") ?? undefined),
   ]);
   if (!data) notFound();
 
@@ -175,7 +177,7 @@ export default async function ProductPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-16">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <script type="application/ld+json" nonce={nonce} dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <Link href="/shop" className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink">
         <ArrowLeft size={15} />
         {t("backToShop")}
