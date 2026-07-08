@@ -1,16 +1,16 @@
 "use client";
 
-import { LayoutDashboard, Package, User, MapPin, ShieldCheck, Lock, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Package, FileText, User, MapPin, ShieldCheck, Lock, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 
-// Devis/Paiement/Notifications sont volontairement absents pour l'instant :
-// ces onglets dépendent de concepts D1 custom (pas Medusa, pas better-auth)
-// qui nécessitent de nouvelles routes API cross-origine côté app racine
-// (Phase 2, pas encore construites).
+// Paiement/Notifications restent absents pour l'instant : concepts D1
+// custom (pas Medusa, pas better-auth) qui nécessitent de nouvelles routes
+// API cross-origine côté app racine, pas encore construites.
 const tabs: { href: string; key: string; icon: LucideIcon; exact?: boolean }[] = [
   { href: "/account", key: "overview", icon: LayoutDashboard, exact: true },
   { href: "/account/orders", key: "orders", icon: Package },
+  { href: "/account/quotes", key: "quotes", icon: FileText },
   { href: "/account/profile", key: "profile", icon: User },
   { href: "/account/addresses", key: "addresses", icon: MapPin },
   { href: "/account/security", key: "security", icon: ShieldCheck },

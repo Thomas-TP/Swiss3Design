@@ -26,3 +26,17 @@ export const orderStatusStyle: Record<string, string> = {
   delivered: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
   canceled: "bg-red-500/15 text-red-600 dark:text-red-300",
 };
+
+// Badge de statut de devis (module Medusa "quotes") — mêmes teintes que
+// l'app racine.
+export const quoteStatusStyle: Record<string, string> = {
+  received: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
+  quoted: "bg-blue-500/15 text-blue-700 dark:text-blue-300",
+  revision_requested: "bg-orange-500/15 text-orange-700 dark:text-orange-300",
+  accepted: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  declined: "bg-red-500/15 text-red-600 dark:text-red-300",
+  paid: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  in_production: "bg-blue-500/15 text-blue-700 dark:text-blue-300",
+  done: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
+  rejected: "bg-stone-500/15 text-stone-600 dark:text-stone-300",
+};
