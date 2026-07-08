@@ -4,28 +4,33 @@ import { useEffect, useState } from "react";
 import { CheckCircle2, Send, Paperclip, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Select } from "@/components/select";
-import { useSession, readToken } from "@/lib/auth-client";
-import { medusa } from "@/lib/medusa";
+import { useSession } from "@/lib/auth-client";
+import { medusa, loginToMedusa } from "@/lib/medusa";
 
 const field =
   "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
 
-const BETTER_AUTH_URL = process.env.NEXT_PUBLIC_BETTER_AUTH_URL ?? "http://localhost:3000";
+const MEDUSA_URL = process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL ?? "http://localhost:9000";
+const PUBLISHABLE_KEY = process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ?? "";
 
-// Envoi via des routes cross-origine sur l'app racine (submit + upload sont
-// de simples miroirs HTTP des Server Actions/route originales, voir
-// src/app/api/{quote-request,quote-upload}) : storefront-next n'a pas
-// d'accès direct à D1/R2. Liste de matières : réutilise /store/filters
-// (Medusa, déjà construit pour le catalogue) plutôt qu'une nouvelle route -
-// simplification assumée (matières du catalogue publié, pas la liste
-// complète que l'atelier pourrait théoriquement proposer).
+interface QuoteFile {
+  url: string;
+  name: string;
+}
+
+// Envoie directement au module Medusa "quotes" (Phase 3 : /store/quotes,
+// /store/quotes/upload) — pas une route custom sur l'app racine. Ce module
+// existe déjà côté Medusa (Postgres) avec son propre panel admin, aucune
+// raison de faire transiter les devis par D1. Liste de matières :
+// réutilise /store/filters (déjà construit pour le catalogue) plutôt qu'une
+// nouvelle route - simplification assumée (matières du catalogue publié).
 export function QuoteForm() {
   const t = useTranslations("custom");
   const locale = useLocale();
   const { data: authSession } = useSession();
   const [materials, setMaterials] = useState<string[]>([]);
   const [material, setMaterial] = useState("");
-  const [file, setFile] = useState<{ key: string; name: string } | null>(null);
+  const [file, setFile] = useState<QuoteFile | null>(null);
   const [uploading, setUploading] = useState(false);
   const [fileError, setFileError] = useState(false);
   const [pending, setPending] = useState(false);
@@ -38,6 +43,17 @@ export function QuoteForm() {
       .catch(() => {});
   }, []);
 
+  // /custom est une page publique (pas sous le layout du tableau de bord qui
+  // établit le pont Medusa) : sans ceci, un client connecté via better-auth
+  // mais n'ayant jamais visité /account soumettrait un devis "invité" côté
+  // Medusa (customer_id jamais rattaché, req.auth_context.actor_id absent).
+  useEffect(() => {
+    if (!authSession) return;
+    medusa.store.customer.retrieve().catch(() => {
+      loginToMedusa(authSession.user.email).catch(() => {});
+    });
+  }, [authSession]);
+
   async function onFile(input: HTMLInputElement) {
     const selected = input.files?.[0];
     if (!selected) return;
@@ -46,10 +62,18 @@ export function QuoteForm() {
     try {
       const body = new FormData();
       body.append("file", selected);
-      const res = await fetch(`${BETTER_AUTH_URL}/api/quote-upload`, { method: "POST", body });
+      const token = await medusa.client.getToken();
+      const res = await fetch(`${MEDUSA_URL}/store/quotes/upload`, {
+        method: "POST",
+        headers: {
+          "x-publishable-api-key": PUBLISHABLE_KEY,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+        body,
+      });
       if (!res.ok) throw new Error();
-      const data = (await res.json()) as { key: string; fileName: string };
-      setFile({ key: data.key, name: data.fileName });
+      const data = (await res.json()) as { file_url: string; file_name: string };
+      setFile({ url: data.file_url, name: data.file_name });
     } catch {
       setFileError(true);
     } finally {
@@ -64,26 +88,20 @@ export function QuoteForm() {
     setStatus("idle");
     const data = new FormData(e.currentTarget);
     try {
-      const token = readToken();
-      const res = await fetch(`${BETTER_AUTH_URL}/api/quote-request`, {
+      await medusa.client.fetch("/store/quotes", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-        },
-        body: JSON.stringify({
+        body: {
           email: data.get("email"),
           description: data.get("description"),
           material: material || undefined,
           colors: (data.get("colors") as string) || undefined,
           dimensions: (data.get("dimensions") as string) || undefined,
-          fileKey: file?.key,
-          fileName: file?.name,
+          file_url: file?.url,
+          file_name: file?.name,
           locale,
-        }),
+        },
       });
-      const body = (await res.json()) as { status: "success" | "error" };
-      setStatus(res.ok ? body.status : "error");
+      setStatus("success");
     } catch {
       setStatus("error");
     } finally {
@@ -186,7 +204,7 @@ export function QuoteForm() {
             {uploading ? t("fileUploading") : t("fileHint")}
             <input
               type="file"
-              accept=".stl,.3mf,.obj,.step,.stp"
+              accept=".stl,.3mf,.obj"
               disabled={uploading}
               onChange={(e) => onFile(e.currentTarget)}
               className="hidden"
