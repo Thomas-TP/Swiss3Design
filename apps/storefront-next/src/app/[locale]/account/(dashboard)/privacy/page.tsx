@@ -2,11 +2,10 @@
 
 import { Lock } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { card } from "../_ui";
+import { ExportButton } from "./export-button";
 import { DeleteAccount } from "./delete-account";
 
-// L'export de données (nLPD/RGPD) est reporté : il agrège commandes/devis/
-// adresses depuis D1 côté app racine (voir requête interne), en attente
-// d'une route API cross-origine dédiée (Phase 2, cf. décision utilisateur).
 export default function PrivacyTab() {
   const t = useTranslations("account");
 
@@ -19,6 +18,14 @@ export default function PrivacyTab() {
       <p className="mt-1 mb-6 text-sm text-soft">{t("privacy.subtitle")}</p>
 
       <div className="space-y-4">
+        <div className={card}>
+          <p className="text-sm font-semibold">{t("privacy.exportTitle")}</p>
+          <p className="mt-1 text-sm text-soft">{t("privacy.exportDesc")}</p>
+          <div className="mt-4">
+            <ExportButton />
+          </div>
+        </div>
+
         <DeleteAccount />
       </div>
     </div>

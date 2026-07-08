@@ -1,12 +1,12 @@
 "use client";
 
-import { LayoutDashboard, Package, FileText, User, MapPin, ShieldCheck, Lock, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Package, FileText, User, MapPin, ShieldCheck, Bell, Lock, type LucideIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 
-// Paiement/Notifications restent absents pour l'instant : concepts D1
-// custom (pas Medusa, pas better-auth) qui nécessitent de nouvelles routes
-// API cross-origine côté app racine, pas encore construites.
+// Paiement reste absent pour l'instant : lecture seule côté Stripe direct
+// sur l'app racine (pas de gestion, juste un lien vers Stripe Link), pas
+// encore porté.
 const tabs: { href: string; key: string; icon: LucideIcon; exact?: boolean }[] = [
   { href: "/account", key: "overview", icon: LayoutDashboard, exact: true },
   { href: "/account/orders", key: "orders", icon: Package },
@@ -14,6 +14,7 @@ const tabs: { href: string; key: string; icon: LucideIcon; exact?: boolean }[] =
   { href: "/account/profile", key: "profile", icon: User },
   { href: "/account/addresses", key: "addresses", icon: MapPin },
   { href: "/account/security", key: "security", icon: ShieldCheck },
+  { href: "/account/notifications", key: "notifications", icon: Bell },
   { href: "/account/privacy", key: "privacy", icon: Lock },
 ];
 
