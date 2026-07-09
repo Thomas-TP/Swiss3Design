@@ -13,9 +13,9 @@ static assets. There is **no Node.js server** — code runs on the Workers
 
 Consequences that shape the whole codebase:
 
-- **Bindings are per-request.** `env.DB` / `env.R2` / `env.KV` only exist while
-  handling a request. Get them through `getCloudflareContext()` *inside* the
-  handler (wrapped by `getDb()` / `getAuth()`), never at import time.
+- **Bindings are per-request.** `env.HYPERDRIVE` / `env.R2` / `env.KV` only exist
+  while handling a request. Get them through `getCloudflareContext()` *inside*
+  the handler (wrapped by `getDb()` / `getAuth()`), never at import time.
 - **Middleware must be Edge.** `src/middleware.ts` stays on the Edge runtime;
   Next 16's `proxy.ts` (Node) is not deployable here.
 - **Server Actions can't `redirect()`.** It hangs the response on Workers — return
@@ -26,16 +26,23 @@ Browser ──▶ Cloudflare Worker
               ├─ middleware.ts  (i18n routing, security headers, CSP nonce, www→apex)
               ├─ RSC / pages    src/app/[locale]/**
               ├─ route handlers src/app/api/**
-              └─ bindings: DB (D1) · R2 (files) · KV (cache/rate-limit) · ASSETS
+              └─ bindings: HYPERDRIVE (Postgres) · R2 (files) · KV (cache/rate-limit) · ASSETS
 ```
 
-## Data model (D1 / Drizzle)
+## Data model (Postgres / Hyperdrive / Drizzle)
 
-Source of truth: [`src/db/schema.ts`](../src/db/schema.ts). SQLite dialect.
-Conventions: `id` = UUID (`crypto.randomUUID()`), timestamps stored as integer
-epoch, **all money as integer `*_cents` (CHF)**, translatable text split into
-`*_translations` tables keyed by `(parentId, locale)` with `LOCALES =
-["fr","de","it","en"]`.
+Source of truth: [`src/db/schema.pg.ts`](../src/db/schema.pg.ts) (`schema.ts`
+re-exports it — every call site still imports `@/db/schema`). Postgres (pg-core)
+dialect via Neon + Cloudflare Hyperdrive. Conventions: `id` = text UUID
+(`crypto.randomUUID()`, **not** the native `uuid` column type — real ids
+include non-UUID values like hand-picked category slugs and Better Auth's own
+ID format), timestamps stored as `timestamptz`, **all money as integer
+`*_cents` (CHF)**, translatable text split into `*_translations` tables keyed
+by `(parentId, locale)` with `LOCALES = ["fr","de","it","en"]`.
+
+D1/SQLite is kept wired (`schema.d1.ts`, `wrangler.jsonc`'s `DB` binding) as an
+inactive rollback safety net from the 2026-07-09 stack pivot — not the source
+of truth.
 
 ### Catalogue
 - **products** — `slug`, `priceCents`, `saleType` (`stock` | `on_demand`),
@@ -109,7 +116,7 @@ dedicated PaymentIntent (`/api/quote-checkout`); `markQuotePaid()` is idempotent
 
 ### Auth & accounts
 - `getAuth()` ([`src/lib/auth.ts`](../src/lib/auth.ts)) builds a per-request
-  Better Auth instance (Drizzle adapter on D1).
+  Better Auth instance (`better-auth-cloudflare`, Drizzle adapter on Postgres/Hyperdrive).
 - **Admin role** is assigned by a `databaseHooks.user.create.before` hook: emails
   in `ADMIN_EMAILS` get `role: "admin"`. `role` has `input: false` — **never**
   client-settable. Server code gates on `requireAdmin()`.
@@ -144,6 +151,7 @@ contract.
 
 ## Deployment
 
-Git-native **Cloudflare Workers Builds**: push `main` → build + D1 migrate +
-deploy. No GitHub Actions. See
-[`deploiement-cloudflare.md`](deploiement-cloudflare.md).
+Git-native **Cloudflare Workers Builds**: push `main` → build + deploy. No
+GitHub Actions. **Postgres schema migrations are a separate manual step**
+(`bun run db:generate:pg` + `db:push:pg`) — not part of this pipeline, unlike
+the old D1 setup. See [`deploiement-cloudflare.md`](deploiement-cloudflare.md).

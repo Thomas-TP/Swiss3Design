@@ -38,13 +38,19 @@ Always per-request, inside the handler:
 
 ```ts
 import { getDb } from "@/db";
-const db = await getDb();                 // Drizzle on env.DB (D1)
+const db = await getDb();                 // Drizzle on env.HYPERDRIVE (Postgres/Neon)
 ```
 
-- Schema is the single source of truth: [`src/db/schema.ts`](../src/db/schema.ts).
-  After editing it, run `npm run db:generate`, then `npm run db:migrate:local`.
-- **Never hand-edit a file in `drizzle/`** and never edit an already-applied
-  migration. Prod migrations apply automatically on deploy.
+- Schema source of truth: [`src/db/schema.pg.ts`](../src/db/schema.pg.ts)
+  (`schema.ts` re-exports it — call sites keep importing `@/db/schema`). After
+  editing it, run `bun run db:generate:pg`, then apply it to the real Neon
+  database with `bun run db:push:pg` **before** deploying code that depends on
+  the change — unlike the old D1 setup, **Postgres migrations are not applied
+  automatically on deploy.**
+- **Never hand-edit a file in `drizzle-pg/`** and never edit an already-applied
+  migration.
+- D1/SQLite (`schema.d1.ts`, `drizzle/`) is kept as an inactive rollback safety
+  net from the 2026-07-09 stack pivot — don't add new work there.
 - Drizzle query helpers (`and`, `eq`, `sql`, `inArray`, …) come from `drizzle-orm`.
 - Upserts use `.onConflictDoUpdate({ target, set })`.
 

@@ -29,7 +29,7 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 
 | Fichier | Rôle | Exports clés |
 | --- | --- | --- |
-| `auth.ts` | Instance Better Auth par requête (adapter Drizzle/D1) | `getAuth()` |
+| `auth.ts` | Instance Better Auth par requête (adapter Drizzle/Postgres via `better-auth-cloudflare`) | `getAuth()` |
 | `auth-client.ts` | Client Better Auth (côté navigateur) | `authClient` |
 | `session.ts` | Garde d'autorisation | `requireAdmin()`, `getServerSession()` |
 | `cart.tsx` | Panier client (localStorage `s3d-cart-v1`) | `CartProvider`, `useCart()` |
