@@ -23,9 +23,18 @@ This version has breaking changes — APIs, conventions, and file structure may 
 Swiss e-commerce store for **multicolour 3D prints**, **LIVE in production** at
 **swiss3design.ch**. Solo project; the AI writes essentially all the code.
 B2C, **shipping to Switzerland only**, prices in **CHF**, UI in **fr/de/it/en**.
-Runs entirely on **Cloudflare Workers** (Next.js 16 via OpenNext) with **D1**
-(SQLite), **R2** (files), **KV** (cache/rate-limit). Payments via **Stripe in
-LIVE mode** — treat checkout/webhook code as production-critical.
+Runs entirely on **Cloudflare Workers** (Next.js 16 via OpenNext) with
+**Postgres (Neon) via Cloudflare Hyperdrive**, **R2** (files), **KV**
+(cache/rate-limit). Payments via **Stripe in LIVE mode** — treat
+checkout/webhook code as production-critical.
+
+**Stack pivot (2026-07-09):** the project moved off Medusa/Railway (never
+viable on Cloudflare Workers — no persistent Node process — and Railway isn't
+free) and off D1/SQLite onto Postgres/Hyperdrive, with **Bun** as the
+package manager/dev runtime (deploy target is still `workerd`, unchanged) and
+**Biome** for formatting (ESLint stays the linter — `eslint-plugin-react-hooks`
+has no Biome equivalent). D1 stays wired in `wrangler.jsonc` for now as a
+rollback safety net, not the active database.
 
 ## Golden rules (these break production — read first)
 
@@ -41,12 +50,19 @@ LIVE mode** — treat checkout/webhook code as production-critical.
 4. **CSP nonce is production-only.** Every inline `<script>` must get the
    per-request nonce via the `x-nonce` request header
    (`(await headers()).get("x-nonce")`), or it's blocked **in prod only**.
-   `npm run dev` will NOT reveal this — verify with `npm run preview`.
+   `bun run dev` will NOT reveal this — verify with `bun run preview`.
 5. **Money is always integer centimes CHF** (`*_cents`). Never floats, never a
    plain `price`. Format for display via [`src/lib/format.ts`](src/lib/format.ts).
 6. **Cloudflare bindings only exist inside a request.** Always obtain DB/auth via
    `await getDb()` / `await getAuth()` *inside* the handler — never at module top
    level.
+6b. **Postgres is stricter than SQLite — don't assume a query that worked on D1
+   still works.** Concretely: `SELECT DISTINCT` + `ORDER BY` on a column absent
+   from the SELECT list is *tolerated* by SQLite but a hard Postgres error
+   (`42P10`), and TypeScript/Drizzle's types don't catch it — this broke
+   `/products/[slug]` in production right after the Hyperdrive cutover. When
+   `DISTINCT` exists only to dedupe rows from a join, prefer a correlated
+   `exists(...)` subquery over the join instead of reaching for `DISTINCT`.
 7. **Never commit secrets.** Local secrets live in `.dev.vars`; prod secrets in
    Cloudflare (`wrangler secret put` / dashboard). The committed `.env.*` files
    hold only the **public** Stripe publishable key. **Never run `wrangler secret
@@ -71,11 +87,13 @@ LIVE mode** — treat checkout/webhook code as production-critical.
 
 | Area | Choice |
 | --- | --- |
+| Runtime & package manager | Bun (install/scripts/dev) — deploy target is still `workerd` (Cloudflare Workers) |
 | Framework | Next.js 16 (App Router, RSC) + React 19 |
 | Language | TypeScript 6 (strict). Import alias `@/* → src/*` |
 | Styling | Tailwind CSS 4 (`src/app/globals.css`), `motion`, `lucide-react` |
-| DB | Cloudflare D1 (SQLite) via Drizzle ORM |
-| Auth | `better-auth` (email + Google OAuth, TOTP 2FA) |
+| DB | Postgres (Neon) via Cloudflare Hyperdrive + Drizzle ORM (pg dialect, `postgres.js` driver) |
+| Auth | `better-auth` via `better-auth-cloudflare` (email + Google OAuth, TOTP 2FA, passkeys) — Postgres-backed |
+| Lint/format | Biome (formatting only) + ESLint (`eslint-config-next`, `eslint-plugin-react-hooks` — Biome has no equivalent) |
 | Payments | Stripe Payment Element + webhooks (LIVE in prod) |
 | Email | Resend (REST) — no-op if `RESEND_API_KEY` unset |
 | i18n | `next-intl` (fr/de/it/en, auto-detect, fr fallback) |
@@ -85,32 +103,47 @@ LIVE mode** — treat checkout/webhook code as production-critical.
 ## Commands
 
 ```bash
-npm run dev               # dev server :3000 (loads D1/R2/KV bindings via OpenNext)
-npm run lint              # ESLint (run before declaring a change done)
-npm run typecheck         # tsc --noEmit — fast type check (no heavy OpenNext build)
-npm run test              # Vitest (unit tests for pure domain logic in src/lib)
-npm run format            # Prettier --write (format:check to verify only)
-npm run preview           # OpenNext build + local Workers preview — tests prod CSP/nonce
-npm run deploy            # OpenNext build + deploy from local machine (manual)
-npm run cf-typegen        # regenerate cloudflare-env.d.ts after editing wrangler.jsonc
-npm run db:generate       # generate a Drizzle migration after editing src/db/schema.ts
-npm run db:migrate:local  # apply migrations to the LOCAL D1
-npm run db:migrate:remote # apply migrations to the PROD D1 (normally automatic on deploy)
-npm run db:seed:local     # seed local D1 from scripts/seed.sql
+bun run dev               # dev server :3000 (loads Hyperdrive/R2/KV bindings via OpenNext)
+bun run lint              # ESLint (run before declaring a change done)
+bun run typecheck         # tsc --noEmit — fast type check (no heavy OpenNext build)
+bun run test              # Vitest (unit tests for pure domain logic in src/lib)
+bun run format             # Biome --write (format:check to verify only)
+bun run preview           # OpenNext build + local Workers preview — tests prod CSP/nonce
+bun run deploy            # OpenNext build + deploy from local machine (manual)
+bun run cf-typegen        # regenerate cloudflare-env.d.ts after editing wrangler.jsonc
+bun run db:generate:pg    # generate a Drizzle migration after editing src/db/schema.pg.ts
+bun run db:push:pg        # push schema changes to Postgres directly (drizzle-kit push)
 ```
 
-> **Lockfile / npm:** the project is on **npm 11**. The Cloudflare build image is
-> pinned to **Node 26** via the repo's `.node-version` file (Node 26 ships npm 11;
-> the image default is Node 22 / npm 10). That makes the CI `npm ci` match the
-> npm 11 `package-lock.json` written locally and by Dependabot — no more
-> `Missing: @esbuild/*… from lock file`. **Don't downgrade to npm 10 or delete
-> `.node-version`**: npm 10's `npm ci` is strict about the per-platform optional
-> packages (`@esbuild/*`) that npm 11 prunes from the lock, so the mismatch comes
-> straight back. Regenerate the lock with the repo's npm (`npm install`) and
-> validate with `npm ci` before pushing.
+> **Legacy D1 scripts** (`db:generate`, `db:migrate:local`, `db:migrate:remote`,
+> `db:seed:local`) still exist in `package.json` and still work — the `DB`
+> binding is kept wired as a rollback safety net (see Phase 6 of the stack
+> pivot) — but they operate on the **inactive** database. Don't reach for them
+> for day-to-day schema work; use the `:pg` commands above.
 
-Cloudflare bindings (`wrangler.jsonc`): `DB` (D1 `swiss3design-db`),
-`R2` (`swiss3design-files`), `KV`, `ASSETS`, `WORKER_SELF_REFERENCE`.
+> **Local Hyperdrive emulation** needs a real Postgres connection string in
+> `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`, and where it must
+> live depends on which process reads it: `next dev` reads
+> `.env.development.local`; `next build` (used by `preview`/`deploy`, which run
+> in production mode) reads `.env.local` instead — `.env.development.local` is
+> NOT loaded outside dev mode. The separate `wrangler preview`/`deploy`
+> subprocess spawned by `opennextjs-cloudflare` does **not** inherit Next's
+> dotenv-loaded values at all — on Windows/PowerShell, set it as a real
+> `$env:` variable in the *same* command as `bun run preview`/`deploy`
+> (PowerShell doesn't persist shell state between separate tool calls).
+
+> **Lockfile:** the project is on **Bun** (`packageManager` in `package.json`,
+> lockfile `bun.lock`) — `package-lock.json` is gone. Use `bun install`, not
+> `npm install`, or the lockfile drifts.
+
+Cloudflare bindings (`wrangler.jsonc`): `HYPERDRIVE` (Postgres/Neon, active DB),
+`R2` (`swiss3design-files`), `KV`, `ASSETS`, `WORKER_SELF_REFERENCE`, plus a
+still-wired but **inactive** `DB` (D1 `swiss3design-db`, rollback safety net —
+see the stack-pivot note above). **`env.preview` does not yet have a
+`HYPERDRIVE` binding** — the preview Worker's DB layer (`getDb()` throws if
+`env.HYPERDRIVE` is missing) is broken until this is wired up with a decision
+on preview DB topology (shared `swiss3design` Neon DB vs. an isolated Neon
+branch) — not yet made, ask before assuming either way.
 
 ## Layout
 
@@ -122,14 +155,21 @@ src/
                   files & admin/files (R2), cron/maintenance, auth/[...all],
                   csp-report, track-order
   components/     shared UI (product-card, add-to-cart, theme-toggle, …)
-  db/             Drizzle: schema.ts (source of truth), index.ts (getDb)
+  db/             Drizzle (Postgres/pg-core): schema.pg.ts + index.pg.ts are the
+                  real source; schema.ts/index.ts are thin re-export shims
+                  (so every call site still says `getDb()`/`@/db/schema`).
+                  schema.d1.ts/index.d1.ts = old D1/SQLite versions, kept only
+                  for the D1 rollback path and scripts/migrate-d1-to-pg.ts.
   i18n/           next-intl routing / request / navigation
   lib/            domain logic: auth, session, orders, cart, stripe, discounts,
                   shipping, email(+templates), rate-limit, maintenance, format, theme
   middleware.ts   Edge middleware: i18n + security headers + CSP nonce + www→apex
-drizzle/          generated SQL migrations + snapshots — NEVER hand-edit
+drizzle/          D1/SQLite migrations + snapshots (legacy, inactive DB) — NEVER hand-edit
+drizzle-pg/       Postgres migrations + snapshots (active DB, drizzle.config.pg.ts) — NEVER hand-edit
 messages/         next-intl translations (fr/de/it/en)
-scripts/          push.bat (one-click publish), seed*.sql
+scripts/          push.bat (one-click publish), seed*.sql, migrate-d1-to-pg.ts (Bun,
+                  one-off D1→Postgres data migration tool, reusable if D1 ever
+                  needs resyncing before the rollback safety net is retired)
 workers/cron/     standalone Cloudflare Cron Worker → POST /api/cron/maintenance
                   (purge R2 + cart reminders); deployed separately, excluded from
                   the app's tsconfig/eslint/OpenNext build
@@ -142,19 +182,28 @@ Server-side data access patterns to reuse: `getDb()` ([src/db/index.ts](src/db/i
 ## Deployment
 
 `git push` to `main` is *supposed* to trigger **Cloudflare Workers Builds**
-(Git-native): build + **D1 migrations** + deploy, with Cloudflare's own
-credentials — but this has proven unreliable in practice (see golden rule 9).
-**Always verify the push actually deployed**; fall back to a manual deploy
-(`npx opennextjs-cloudflare build && npx wrangler d1 migrations apply
-swiss3design-db --remote && npx wrangler deploy`) if it didn't. **There is no
-GitHub Actions workflow** — the green commit check, when it appears, comes from
-Cloudflare. One-click publish: run [`scripts/push.bat`](scripts/push.bat). Full
-details, the two-separate-Worker preview setup, the stacked-PR merge pitfall,
-and the secrets-rotation incident: [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
+(Git-native): build + deploy, with Cloudflare's own credentials — but this has
+proven unreliable in practice (see golden rule 9). **Always verify the push
+actually deployed**; fall back to a manual deploy (`bunx opennextjs-cloudflare
+build && bunx opennextjs-cloudflare deploy`, i.e. `bun run deploy`) if it
+didn't. **There is no GitHub Actions workflow** — the green commit check, when
+it appears, comes from Cloudflare. One-click publish: run
+[`scripts/push.bat`](scripts/push.bat). Full details, the two-separate-Worker
+preview setup, the stacked-PR merge pitfall, and the secrets-rotation
+incident: [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
+
+**Postgres schema changes are NOT part of this pipeline.** Unlike the old D1
+setup (migrations auto-applied by Cloudflare Workers Builds on every deploy),
+a `bun run deploy`/git-push deploy does **not** touch the Postgres schema at
+all. After editing `src/db/schema.pg.ts`, run `bun run db:generate:pg` then
+apply it against the real Neon database (`bun run db:push:pg`, or run the
+generated SQL in `drizzle-pg/` by hand) **before** deploying code that depends
+on the new columns/tables — deploy order matters here in a way it didn't
+under D1.
 
 ## Workflow & etiquette
 
-- **End of task:** auto-push to `main` and start the dev server (`npm run dev`).
+- **End of task:** auto-push to `main` and start the dev server (`bun run dev`).
   Verify in a browser preview whenever it helps confirm the change — you're free
   to use the preview/verification tools as you see fit. **Then confirm it's
   actually live** (golden rule 9) — don't report done on faith that the push
@@ -168,8 +217,8 @@ and the secrets-rotation incident: [`docs/deploiement-cloudflare.md`](docs/deplo
 - Match the surrounding style: **comments and user-facing copy are in French**;
   code identifiers in English. Keep the dense, explanatory comment style already
   in the codebase (the *why*, not the *what*).
-- Run `npm run lint` before declaring work done. When a change touches CSP, inline
-  scripts, or anything runtime-specific, also run `npm run preview`.
+- Run `bun run lint` before declaring work done. When a change touches CSP, inline
+  scripts, or anything runtime-specific, also run `bun run preview`.
 
 ## Brand constraints
 
