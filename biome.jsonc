@@ -15,6 +15,7 @@
       "!!**/apps",
       "!!**/.claude",
       "!!**/drizzle",
+      "!!**/drizzle-pg",
       "!!**/node_modules",
       "!!**/.next",
       "!!**/.open-next",

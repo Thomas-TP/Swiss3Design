@@ -35,6 +35,16 @@
       "id": "4d8b410c8ea743d281c530570668e837"
     }
   ],
+  // Postgres (Neon) via Hyperdrive — remplace progressivement D1 (voir
+  // C:\Users\leole\.claude\plans\foamy-swimming-cook.md). D1 reste branché
+  // tant que les données réelles n'ont pas été migrées (Phase 5) : les deux
+  // bindings coexistent pendant la transition.
+  "hyperdrive": [
+    {
+      "binding": "HYPERDRIVE",
+      "id": "ea1ca31861f64d3e9e1f082ee0e10033"
+    }
+  ],
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",

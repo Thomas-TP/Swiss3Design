@@ -6,7 +6,6 @@ import {
   magicLink,
   emailOTP,
   haveIBeenPwned,
-  captcha,
   bearer,
   oauthPopup,
 } from "better-auth/plugins";
@@ -249,17 +248,6 @@ export async function getAuth() {
       // ci-dessus), aucune config supplémentaire nécessaire. Sans effet sur
       // la connexion Google classique de ce site (même origine, inchangée).
       oauthPopup(),
-      // Anti-bot sur inscription/connexion/mot de passe oublié — actif
-      // uniquement si un widget Turnstile est configuré (sinon désactivé,
-      // pour ne pas casser le dev local sans clé).
-      ...(env.TURNSTILE_SECRET_KEY
-        ? [
-            captcha({
-              provider: "cloudflare-turnstile",
-              secretKey: env.TURNSTILE_SECRET_KEY,
-            }),
-          ]
-        : []),
       nextCookies(),
     ],
   });

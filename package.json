@@ -19,7 +19,9 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate:local": "wrangler d1 migrations apply swiss3design-db --local",
     "db:migrate:remote": "wrangler d1 migrations apply swiss3design-db --remote",
-    "db:seed:local": "wrangler d1 execute swiss3design-db --local --file=./scripts/seed.sql"
+    "db:seed:local": "wrangler d1 execute swiss3design-db --local --file=./scripts/seed.sql",
+    "db:generate:pg": "drizzle-kit generate --config=drizzle.config.pg.ts",
+    "db:push:pg": "drizzle-kit push --config=drizzle.config.pg.ts"
   },
   "dependencies": {
     "@better-auth/passkey": "^1.6.23",
@@ -28,11 +30,13 @@
     "@stripe/stripe-js": "^9.8.0",
     "@types/three": "^0.185.0",
     "better-auth": "^1.6.23",
+    "better-auth-cloudflare": "^0.3.0",
     "drizzle-orm": "^0.45.2",
     "lucide-react": "^1.22.0",
     "motion": "^12.42.1",
     "next": "16.2.9",
     "next-intl": "^4.13.1",
+    "postgres": "^3.4.9",
     "qrcode.react": "^4.2.0",
     "react": "19.2.7",
     "react-dom": "19.2.7",
