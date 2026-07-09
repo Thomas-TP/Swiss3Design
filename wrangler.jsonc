@@ -3,7 +3,7 @@
   "name": "swiss3design",
   "account_id": "b88f99010692662e118a9869f47767e4",
   "main": ".open-next/worker.js",
-  "compatibility_date": "2026-05-01",
+  "compatibility_date": "2026-07-09",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": ".open-next/assets",

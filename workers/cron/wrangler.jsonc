@@ -3,7 +3,7 @@
   "name": "swiss3design-cron",
   "account_id": "b88f99010692662e118a9869f47767e4",
   "main": "index.ts",
-  "compatibility_date": "2026-05-01",
+  "compatibility_date": "2026-07-09",
   // Toutes les heures (UTC) : purge R2 + relances de panier abandonné.
   "triggers": { "crons": ["0 * * * *"] },
   "observability": { "enabled": true }
