@@ -17,10 +17,13 @@ STRIPE_WEBHOOK_SECRET="whsec_..."
 BETTER_AUTH_SECRET="change-me"               # ex. openssl rand -base64 32
 BETTER_AUTH_URL="http://localhost:3000"      # override local (prod = wrangler.jsonc)
 
-# Pont Medusa (migration en cours, voir apps/medusa) — DOIT etre exactement
-# la meme valeur que BETTER_AUTH_BRIDGE_SECRET dans apps/medusa/apps/backend/.env,
-# sinon le storefront SolidStart ne peut pas s'authentifier contre Medusa.
-BETTER_AUTH_BRIDGE_SECRET="change-me"
+# Postgres (Neon, direct — pas l'endpoint -pooler, Hyperdrive fait déjà son
+# propre pooling). Utilisé par drizzle-kit (db:generate:pg) en local
+# uniquement — le Worker déployé passe par le binding HYPERDRIVE (wrangler.jsonc).
+DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
+# NB : l'émulation locale du binding Hyperdrive (initOpenNextCloudflareForDev)
+# ne se configure PAS ici mais dans .env.development.local — lue via
+# process.env directement, avant que env.HYPERDRIVE ne soit construit.
 
 # Emails (Resend) — optionnel : sans clé, l'envoi est ignoré et la
 # vérification d'e-mail est désactivée automatiquement.
@@ -38,10 +41,3 @@ FACEBOOK_CLIENT_SECRET=""
 
 # Maintenance planifiée (purge des fichiers R2 orphelins via /api/cron/maintenance)
 CRON_SECRET="change-me"
-
-# API interne appelée par Medusa (migration en cours, voir apps/medusa) — DOIT
-# etre exactement la meme valeur que MEDUSA_INTERNAL_SECRET dans
-# apps/medusa/apps/backend/.env. Protege /api/internal/* (destinataires
-# newsletter, envoi d'annonces) : ces routes ne doivent jamais etre appelables
-# sans ce secret.
-MEDUSA_INTERNAL_SECRET="change-me"

@@ -119,7 +119,7 @@ branche déployée. Totalement isolé de la prod :
 
 | | Production (`swiss3design`) | Preview (`swiss3design-preview`) |
 | --- | --- | --- |
-| Hyperdrive/Postgres | `swiss3design` (Neon, données clients réelles) | ⚠️ **pas encore configuré** — `env.preview` n'a aucun binding `HYPERDRIVE` dans `wrangler.jsonc` ; la preview est cassée tant que ce n'est pas câblé (choix de topologie à trancher : même base Neon que la prod, ou branche Neon isolée) |
+| Hyperdrive/Postgres | `swiss3design` (Neon, données clients réelles) | **branche Neon isolée `preview`** (child de `production`, Hyperdrive config `swiss3design-preview-db`/`4262c933ec8f45259643b190d701e8cd`) — catalogue produits de démo (6 articles, `scripts/seed.sql`), toutes les tables PII/secrets (orders, user, session, two_factor, passkey, account, customer_addresses, quote_requests, quote_messages, reviews, abandoned_carts, notification_preferences, newsletter_sends, verification) tronquées après clonage |
 | D1 (inactif, filet de secours) | `swiss3design-db` (données clients réelles) | `swiss3design-preview-db` (vide, migrée) |
 | R2 | `swiss3design-files` | `swiss3design-preview-files` (vide) |
 | KV | namespace prod | namespace preview dédié |

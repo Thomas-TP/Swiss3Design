@@ -139,11 +139,13 @@ bun run db:push:pg        # push schema changes to Postgres directly (drizzle-ki
 Cloudflare bindings (`wrangler.jsonc`): `HYPERDRIVE` (Postgres/Neon, active DB),
 `R2` (`swiss3design-files`), `KV`, `ASSETS`, `WORKER_SELF_REFERENCE`, plus a
 still-wired but **inactive** `DB` (D1 `swiss3design-db`, rollback safety net —
-see the stack-pivot note above). **`env.preview` does not yet have a
-`HYPERDRIVE` binding** — the preview Worker's DB layer (`getDb()` throws if
-`env.HYPERDRIVE` is missing) is broken until this is wired up with a decision
-on preview DB topology (shared `swiss3design` Neon DB vs. an isolated Neon
-branch) — not yet made, ask before assuming either way.
+see the stack-pivot note above). `env.preview` has its own separate
+`HYPERDRIVE` binding pointing at an **isolated Neon branch** (`preview`, a
+child of the `production` branch) — never the same database as prod. That
+branch's PII-bearing tables (orders, customers, sessions, 2FA, passkeys,
+quotes, reviews, …) are truncated after cloning; only a 6-product demo
+catalog (`scripts/seed.sql`, reseeded onto that branch) is kept, so preview
+has a populated shop without ever holding real customer data.
 
 ## Layout
 

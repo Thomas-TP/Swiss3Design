@@ -95,6 +95,18 @@
           "migrations_dir": "drizzle"
         }
       ],
+      // Branche Neon isolée "preview" (child de "production", jamais les
+      // vraies données clients — voir stack-pivot-medusa-to-hyperdrive.md) :
+      // catalogue produits de démo (6 articles, scripts/seed.sql) réinjecté,
+      // toutes les tables PII/secrets (orders, user, session, two_factor,
+      // passkey, account, customer_addresses, quotes, reviews, newsletters,
+      // notifications, verification) tronquées après clonage.
+      "hyperdrive": [
+        {
+          "binding": "HYPERDRIVE",
+          "id": "4262c933ec8f45259643b190d701e8cd"
+        }
+      ],
       "r2_buckets": [
         {
           "binding": "R2",
