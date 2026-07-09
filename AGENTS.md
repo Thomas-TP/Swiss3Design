@@ -32,8 +32,10 @@ checkout/webhook code as production-critical.
 viable on Cloudflare Workers — no persistent Node process — and Railway isn't
 free) and off D1/SQLite onto Postgres/Hyperdrive, with **Bun** as the
 package manager/dev runtime (deploy target is still `workerd`, unchanged) and
-**Biome** for formatting (ESLint stays the linter — `eslint-plugin-react-hooks`
-has no Biome equivalent). D1 stays wired in `wrangler.jsonc` for now as a
+**Biome** for formatting (ESLint stays the linter — Biome does cover
+react-hooks rules since v1.0.0, but `eslint-config-next` also brings
+Next.js-specific and `jsx-a11y` rules Biome doesn't replicate). D1 stays
+wired in `wrangler.jsonc` for now as a
 rollback safety net, not the active database.
 
 ## Golden rules (these break production — read first)
@@ -93,7 +95,7 @@ rollback safety net, not the active database.
 | Styling | Tailwind CSS 4 (`src/app/globals.css`), `motion`, `lucide-react` |
 | DB | Postgres (Neon) via Cloudflare Hyperdrive + Drizzle ORM (pg dialect, `postgres.js` driver) |
 | Auth | `better-auth` via `better-auth-cloudflare` (email + Google OAuth, TOTP 2FA, passkeys) — Postgres-backed |
-| Lint/format | Biome (formatting only) + ESLint (`eslint-config-next`, `eslint-plugin-react-hooks` — Biome has no equivalent) |
+| Lint/format | Biome (formatting only) + ESLint (`eslint-config-next` for Next.js-specific + `jsx-a11y` rules — not for react-hooks, Biome's `useHookAtTopLevel`/`useExhaustiveDependencies` already cover that since v1.0.0) |
 | Payments | Stripe Payment Element + webhooks (LIVE in prod) |
 | Email | Resend (REST) — no-op if `RESEND_API_KEY` unset |
 | i18n | `next-intl` (fr/de/it/en, auto-detect, fr fallback) |
