@@ -46,7 +46,10 @@ export async function POST(request: Request) {
 
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
-    return Response.json({ error: "invalid_request" }, { status: 400, headers });
+    return Response.json(
+      { error: "invalid_request" },
+      { status: 400, headers },
+    );
   }
 
   // Le cooldown par e-mail ne protège pas contre l'envoi massif vers des
@@ -70,24 +73,34 @@ export async function POST(request: Request) {
   if (parsed.data.action === "send") {
     const sentAt = existing?.createdAt?.getTime() ?? 0;
     if (Date.now() - sentAt < RESEND_COOLDOWN_MS) {
-      return Response.json({ error: "too_many_requests" }, { status: 429, headers });
+      return Response.json(
+        { error: "too_many_requests" },
+        { status: 429, headers },
+      );
     }
 
     const code = String(
       (crypto.getRandomValues(new Uint32Array(1))[0] % 900000) + 100000,
     );
 
-    await db.delete(verification).where(eq(verification.identifier, identifier));
+    await db
+      .delete(verification)
+      .where(eq(verification.identifier, identifier));
     await db.insert(verification).values({
       id: crypto.randomUUID(),
       identifier,
-      value: JSON.stringify({ hash: await sha256Hex(`${email}:${code}`), attempts: 0 }),
+      value: JSON.stringify({
+        hash: await sha256Hex(`${email}:${code}`),
+        attempts: 0,
+      }),
       expiresAt: new Date(Date.now() + CODE_TTL_MS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
-    const sent = await sendEmail(checkoutCodeEmail(email, code, parsed.data.locale));
+    const sent = await sendEmail(
+      checkoutCodeEmail(email, code, parsed.data.locale),
+    );
     // Sans RESEND_API_KEY (dev local), l'envoi est loggé au lieu d'être
     // expédié : on ne traite l'échec comme une erreur qu'en configuration réelle.
     const { env } = await getCloudflareContext({ async: true });
@@ -114,7 +127,9 @@ export async function POST(request: Request) {
     stored.hash !== (await sha256Hex(`${email}:${parsed.data.code}`))
   ) {
     if (stored.attempts + 1 >= MAX_ATTEMPTS) {
-      await db.delete(verification).where(eq(verification.identifier, identifier));
+      await db
+        .delete(verification)
+        .where(eq(verification.identifier, identifier));
     } else {
       await db
         .update(verification)

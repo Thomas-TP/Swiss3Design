@@ -46,10 +46,14 @@ function validate(body: RequestBody) {
     return { error: "Cible invalide." } as const;
   }
   if ((ctaLabel && !ctaUrl) || (!ctaLabel && ctaUrl)) {
-    return { error: "Le bouton personnalisé nécessite un libellé ET un lien." } as const;
+    return {
+      error: "Le bouton personnalisé nécessite un libellé ET un lien.",
+    } as const;
   }
   if (ctaUrl && !/^https?:\/\//.test(ctaUrl)) {
-    return { error: "Le lien du bouton doit commencer par http(s)://." } as const;
+    return {
+      error: "Le lien du bouton doit commencer par http(s)://.",
+    } as const;
   }
   if (bannerImageUrl && !/^https?:\/\//.test(bannerImageUrl)) {
     return { error: "Image de bannière invalide." } as const;
@@ -68,7 +72,10 @@ function validate(body: RequestBody) {
 export async function POST(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
   const auth = request.headers.get("authorization") ?? "";
-  if (!env.MEDUSA_INTERNAL_SECRET || auth !== `Bearer ${env.MEDUSA_INTERNAL_SECRET}`) {
+  if (
+    !env.MEDUSA_INTERNAL_SECRET ||
+    auth !== `Bearer ${env.MEDUSA_INTERNAL_SECRET}`
+  ) {
     return new Response("Forbidden", { status: 403 });
   }
 
@@ -79,7 +86,9 @@ export async function POST(request: Request) {
   }
 
   const cta =
-    input.ctaLabel && input.ctaUrl ? { label: input.ctaLabel, url: input.ctaUrl } : null;
+    input.ctaLabel && input.ctaUrl
+      ? { label: input.ctaLabel, url: input.ctaUrl }
+      : null;
 
   if (body.mode === "preview") {
     const [selectedProducts, recipients] = await Promise.all([
@@ -93,7 +102,8 @@ export async function POST(request: Request) {
       bannerImageUrl: input.bannerImageUrl,
       products: selectedProducts,
       cta,
-      unsubscribeUrl: "https://swiss3design.ch/api/newsletter/unsubscribe?u=apercu&t=apercu",
+      unsubscribeUrl:
+        "https://swiss3design.ch/api/newsletter/unsubscribe?u=apercu&t=apercu",
     });
     return Response.json({
       subject: email.subject,
@@ -105,7 +115,10 @@ export async function POST(request: Request) {
   if (body.mode === "test") {
     const testEmail = (body.testEmail ?? "").trim();
     if (!testEmail) {
-      return Response.json({ error: "testEmail requis pour le mode test." }, { status: 400 });
+      return Response.json(
+        { error: "testEmail requis pour le mode test." },
+        { status: 400 },
+      );
     }
     const selectedProducts = await loadAnnouncementProducts(input.productIds);
     const email = newsletterAnnouncementEmail({
@@ -115,24 +128,34 @@ export async function POST(request: Request) {
       bannerImageUrl: input.bannerImageUrl,
       products: selectedProducts,
       cta,
-      unsubscribeUrl: "https://swiss3design.ch/api/newsletter/unsubscribe?u=apercu&t=apercu",
+      unsubscribeUrl:
+        "https://swiss3design.ch/api/newsletter/unsubscribe?u=apercu&t=apercu",
     });
     const ok = await sendEmail(email);
     return ok
       ? Response.json({ success: true })
-      : Response.json({ error: "Envoi impossible (RESEND_API_KEY absente ?)." }, { status: 500 });
+      : Response.json(
+          { error: "Envoi impossible (RESEND_API_KEY absente ?)." },
+          { status: 500 },
+        );
   }
 
   // mode "send"
   if (!env.BETTER_AUTH_SECRET) {
-    return Response.json({ error: "Configuration serveur incomplète." }, { status: 500 });
+    return Response.json(
+      { error: "Configuration serveur incomplète." },
+      { status: 500 },
+    );
   }
   const [selectedProducts, recipients] = await Promise.all([
     loadAnnouncementProducts(input.productIds),
     getRecipients(input.audience),
   ]);
   if (recipients.length === 0) {
-    return Response.json({ error: "Aucun destinataire pour cette cible." }, { status: 400 });
+    return Response.json(
+      { error: "Aucun destinataire pour cette cible." },
+      { status: 400 },
+    );
   }
 
   const messages = await Promise.all(

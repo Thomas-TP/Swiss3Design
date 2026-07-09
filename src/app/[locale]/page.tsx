@@ -149,7 +149,10 @@ export default async function HomePage({
               {t("multicolorText")}
             </p>
           </div>
-          <div aria-hidden className="relative hidden h-44 items-end gap-3 md:flex">
+          <div
+            aria-hidden
+            className="relative hidden h-44 items-end gap-3 md:flex"
+          >
             {["#e5231c", "#1d4ed8", "#f59e0b", "#fafaf9"].map((c, i) => (
               <span
                 key={c}
@@ -177,7 +180,9 @@ export default async function HomePage({
                 <span className="grid h-9 w-9 place-items-center rounded-xl bg-accent/10 text-base font-bold tabular-nums text-accent">
                   {n}
                 </span>
-                <p className="mt-4 font-semibold">{t(`processStep${n}Title`)}</p>
+                <p className="mt-4 font-semibold">
+                  {t(`processStep${n}Title`)}
+                </p>
                 <p className="mt-1.5 text-sm leading-relaxed text-soft">
                   {t(`processStep${n}Text`, {
                     amount: formatChf(FREE_SHIPPING_OVER_CENTS, locale),

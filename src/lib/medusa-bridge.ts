@@ -21,7 +21,10 @@ export const STOREFRONT_ORIGINS = [
 ];
 
 export function corsHeadersFor(origin: string | null): HeadersInit {
-  const allowed = origin && STOREFRONT_ORIGINS.includes(origin) ? origin : STOREFRONT_ORIGINS[0];
+  const allowed =
+    origin && STOREFRONT_ORIGINS.includes(origin)
+      ? origin
+      : STOREFRONT_ORIGINS[0];
   return {
     "Access-Control-Allow-Origin": allowed,
     // Le client Better Auth force `credentials: "include"` dès que
@@ -41,7 +44,10 @@ export function corsHeadersFor(origin: string | null): HeadersInit {
 function base64url(bytes: Uint8Array): string {
   let binary = "";
   for (const b of bytes) binary += String.fromCharCode(b);
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
 
 async function hmacKey(secret: string): Promise<CryptoKey> {

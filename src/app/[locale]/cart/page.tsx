@@ -77,7 +77,9 @@ export default function CartPage() {
                       <p className="mt-0.5 flex items-center gap-1.5 text-xs text-soft">
                         <span
                           className="h-3 w-3 shrink-0 rounded-full border border-swatch-ring"
-                          style={{ backgroundColor: item.colorHex ?? undefined }}
+                          style={{
+                            backgroundColor: item.colorHex ?? undefined,
+                          }}
                         />
                         {item.colorName}
                       </p>

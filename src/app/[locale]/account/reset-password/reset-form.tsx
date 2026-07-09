@@ -53,7 +53,10 @@ export function ResetForm({ token }: { token: string }) {
     // method="post" : repli natif sans JS qui n'expose pas le mot de passe en URL
     <form method="post" onSubmit={onSubmit} className="space-y-4">
       <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-semibold">
+        <label
+          htmlFor="password"
+          className="mb-1.5 block text-sm font-semibold"
+        >
           {t("resetTitle")}
         </label>
         <input

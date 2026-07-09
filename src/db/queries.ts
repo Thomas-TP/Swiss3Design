@@ -226,7 +226,10 @@ export async function getMaterialsWithColors(): Promise<MaterialWithColors[]> {
       .from(filamentColors)
       .orderBy(asc(filamentColors.sortOrder), asc(filamentColors.name)),
   ]);
-  const byMaterial = new Map<string, { id: string; name: string; hex: string }[]>();
+  const byMaterial = new Map<
+    string,
+    { id: string; name: string; hex: string }[]
+  >();
   for (const c of colors) {
     const list = byMaterial.get(c.materialId) ?? [];
     list.push({ id: c.id, name: c.name, hex: c.hex });
@@ -265,7 +268,10 @@ export async function getUsedFilters(locale: Locale): Promise<{
         eq(categoryTranslations.locale, locale),
       ),
     )
-    .innerJoin(productCategories, eq(productCategories.categoryId, categories.id))
+    .innerJoin(
+      productCategories,
+      eq(productCategories.categoryId, categories.id),
+    )
     .innerJoin(
       products,
       and(
@@ -411,7 +417,10 @@ export async function getRelatedProducts(
       .selectDistinct(cols)
       .from(products)
       .innerJoin(productTranslations, withTranslation)
-      .innerJoin(productCategories, eq(productCategories.productId, products.id))
+      .innerJoin(
+        productCategories,
+        eq(productCategories.productId, products.id),
+      )
       .where(
         and(
           eq(products.active, true),
@@ -484,7 +493,11 @@ export async function getSitemapProducts(): Promise<
 
 export async function getSetting(key: string): Promise<string | null> {
   const db = await getDb();
-  const rows = await db.select().from(settings).where(eq(settings.key, key)).limit(1);
+  const rows = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, key))
+    .limit(1);
   return rows[0]?.value ?? null;
 }
 

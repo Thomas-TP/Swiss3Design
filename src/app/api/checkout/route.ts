@@ -81,7 +81,11 @@ export async function POST(request: Request) {
     const { env } = await getCloudflareContext({ async: true });
     const proofValid =
       parsed.data.emailProof &&
-      (await verifyEmailProof(claimed, parsed.data.emailProof, env.BETTER_AUTH_SECRET));
+      (await verifyEmailProof(
+        claimed,
+        parsed.data.emailProof,
+        env.BETTER_AUTH_SECRET,
+      ));
     if (!proofValid) {
       return Response.json({ error: "email_not_verified" }, { status: 403 });
     }
@@ -226,7 +230,11 @@ export async function POST(request: Request) {
   let discountCents = 0;
   let appliedCode: string | null = null;
   if (parsed.data.discountCode) {
-    const d = await validateDiscount(db, parsed.data.discountCode, subtotalCents);
+    const d = await validateDiscount(
+      db,
+      parsed.data.discountCode,
+      subtotalCents,
+    );
     if (d) {
       discountCents = d.discountCents;
       appliedCode = d.code;

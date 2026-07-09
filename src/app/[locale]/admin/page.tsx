@@ -12,7 +12,13 @@ import {
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
-import { orders, quoteRequests, products, productTranslations, user } from "@/db/schema";
+import {
+  orders,
+  quoteRequests,
+  products,
+  productTranslations,
+  user,
+} from "@/db/schema";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { ORDER_STATUS_FR, QUOTE_STATUS_FR, STATUS_STYLE } from "./ui";
@@ -70,7 +76,12 @@ export default async function AdminDashboard({
       db.select({ value: count() }).from(user),
     ]);
 
-  const paidStatuses = new Set(["paid", "in_production", "shipped", "delivered"]);
+  const paidStatuses = new Set([
+    "paid",
+    "in_production",
+    "shipped",
+    "delivered",
+  ]);
   const paidOrders = allOrders.filter((o) => paidStatuses.has(o.status));
   const revenueCents = paidOrders.reduce((sum, o) => sum + o.totalCents, 0);
 
@@ -174,7 +185,9 @@ export default async function AdminDashboard({
 
       {lowStock.length > 0 && (
         <div className="rounded-card border border-amber-500/30 bg-amber-500/10 p-4 text-sm">
-          <p className="font-semibold text-amber-800 dark:text-amber-200">⚠ Stock bas</p>
+          <p className="font-semibold text-amber-800 dark:text-amber-200">
+            ⚠ Stock bas
+          </p>
           <ul className="mt-1 text-amber-700 dark:text-amber-300">
             {lowStock.map((p) => (
               <li key={p.id}>
@@ -243,13 +256,18 @@ export default async function AdminDashboard({
         ) : (
           <ul className="divide-y divide-line rounded-card border border-line bg-surface px-5">
             {recent.map((o) => (
-              <li key={o.id} className="flex items-center justify-between gap-3 py-3.5">
+              <li
+                key={o.id}
+                className="flex items-center justify-between gap-3 py-3.5"
+              >
                 <Link
                   href={`/admin/orders/${o.id}`}
                   className="min-w-0 flex-1 hover:underline"
                 >
                   <span className="text-sm font-semibold">{o.orderNumber}</span>
-                  <span className="ml-2 truncate text-xs text-soft">{o.email}</span>
+                  <span className="ml-2 truncate text-xs text-soft">
+                    {o.email}
+                  </span>
                 </Link>
                 <span
                   className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${STATUS_STYLE[o.status]}`}

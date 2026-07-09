@@ -125,7 +125,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
     subtotalCents: items.reduce((sum, i) => sum + i.priceCents * i.quantity, 0),
     add: (item) => dispatch({ type: "add", item }),
     setQuantity: (productId, variantId, colorName, quantity) =>
-      dispatch({ type: "setQuantity", productId, variantId, colorName, quantity }),
+      dispatch({
+        type: "setQuantity",
+        productId,
+        variantId,
+        colorName,
+        quantity,
+      }),
     remove: (productId, variantId, colorName) =>
       dispatch({ type: "remove", productId, variantId, colorName }),
     clear: () => {

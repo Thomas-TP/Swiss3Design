@@ -12,13 +12,16 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Les présentes conditions générales de vente (« CGV ») régissent les
-          commandes passées sur la boutique en ligne <strong>swiss3design.ch</strong>,
-          exploitée par <strong>Swiss3Design, Thomas Prud’homme, Chemin de
-          l’Aubépine 9B, 1196 Gland (Vaud), Suisse</strong> (« l’exploitant »),
-          joignable à l’adresse contact@swiss3design.ch. En passant commande,
-          le client accepte les présentes CGV dans leur version en vigueur au
-          moment de la commande. Le client confirme être majeur ou agir avec
-          l’accord de son représentant légal.
+          commandes passées sur la boutique en ligne{" "}
+          <strong>swiss3design.ch</strong>, exploitée par{" "}
+          <strong>
+            Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
+            (Vaud), Suisse
+          </strong>{" "}
+          (« l’exploitant »), joignable à l’adresse contact@swiss3design.ch. En
+          passant commande, le client accepte les présentes CGV dans leur
+          version en vigueur au moment de la commande. Le client confirme être
+          majeur ou agir avec l’accord de son représentant légal.
         </p>
       ),
     },
@@ -53,8 +56,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           commande du client vaut offre d’achat ; le contrat est conclu au
           moment de la confirmation du paiement, attestée par l’e-mail de
           confirmation de commande. L’exploitant se réserve le droit de refuser
-          une commande, notamment en cas d’indisponibilité ou d’erreur
-          manifeste de prix ; les montants déjà perçus sont alors remboursés.
+          une commande, notamment en cas d’indisponibilité ou d’erreur manifeste
+          de prix ; les montants déjà perçus sont alors remboursés.
         </p>
       ),
     },
@@ -63,9 +66,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Le paiement s’effectue en ligne via le prestataire Stripe (carte de
-          crédit/débit, TWINT, Google Pay), y compris via Stripe
-          Link pour réutiliser une carte déjà enregistrée. L’exploitant n’a
-          jamais accès aux données de carte et ne les stocke pas.
+          crédit/débit, TWINT, Google Pay), y compris via Stripe Link pour
+          réutiliser une carte déjà enregistrée. L’exploitant n’a jamais accès
+          aux données de carte et ne les stocke pas.
         </p>
       ),
     },
@@ -76,8 +79,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           La livraison est effectuée <strong>en Suisse uniquement</strong>, par
           la Poste suisse. Les produits en stock sont remis à la Poste sous 1 à
           3 jours ouvrés ; les produits imprimés à la demande le sont après le
-          délai de production indiqué sur la fiche produit. Les frais de port
-          et le seuil de livraison offerte applicables sont affichés dans le
+          délai de production indiqué sur la fiche produit. Les frais de port et
+          le seuil de livraison offerte applicables sont affichés dans le
           panier. Les délais de livraison sont indicatifs ; un retard ne donne
           pas droit à des dommages-intérêts. Le risque de perte ou de dommage
           pendant le transport est supporté par l’exploitant jusqu’à la remise
@@ -93,11 +96,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           projets spécifiques) font l’objet d’un devis. Le contrat est conclu à
           l’acceptation du devis et au paiement. Les articles personnalisés ne
           sont ni repris ni échangés (voir « Retours »). Le client garantit
-          détenir les droits sur les fichiers transmis et que leur impression
-          ne viole aucun droit de tiers ni aucune disposition légale ;
-          l’exploitant peut refuser tout fichier sans justification. Le client
-          indemnise l’exploitant contre toute prétention de tiers découlant de
-          ses fichiers. Sont notamment exclus les fichiers d’armes ou de pièces
+          détenir les droits sur les fichiers transmis et que leur impression ne
+          viole aucun droit de tiers ni aucune disposition légale ; l’exploitant
+          peut refuser tout fichier sans justification. Le client indemnise
+          l’exploitant contre toute prétention de tiers découlant de ses
+          fichiers. Sont notamment exclus les fichiers d’armes ou de pièces
           d’armes, de contrefaçons et de tout objet illicite.
         </p>
       ),
@@ -106,13 +109,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Retours",
       body: (
         <p>
-          Le droit suisse ne prévoit pas de droit de rétractation légal pour
-          les achats en ligne. À titre commercial, l’exploitant accepte le
-          retour des articles de catalogue (non personnalisés) dans les
-          14 jours suivant la réception, à condition qu’ils soient non
-          utilisés et dans leur état d’origine. Les frais de retour sont à la
-          charge du client ; le prix des articles est remboursé, hors frais
-          d’envoi initiaux. Les articles sur mesure sont exclus du retour.
+          Le droit suisse ne prévoit pas de droit de rétractation légal pour les
+          achats en ligne. À titre commercial, l’exploitant accepte le retour
+          des articles de catalogue (non personnalisés) dans les 14 jours
+          suivant la réception, à condition qu’ils soient non utilisés et dans
+          leur état d’origine. Les frais de retour sont à la charge du client ;
+          le prix des articles est remboursé, hors frais d’envoi initiaux. Les
+          articles sur mesure sont exclus du retour.
         </p>
       ),
     },
@@ -120,13 +123,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Garantie",
       body: (
         <p>
-          La garantie légale pour les défauts de la chose vendue
-          (art. 197 ss CO) s’applique pendant deux ans dès la livraison. Le
-          client signale tout défaut dans les meilleurs délais à
-          contact@swiss3design.ch, photos à l’appui. L’exploitant propose en
-          priorité la réparation ou le remplacement ; si cela s’avère
-          impossible ou disproportionné, le client conserve ses droits légaux
-          (réduction du prix ou remboursement).
+          La garantie légale pour les défauts de la chose vendue (art. 197 ss
+          CO) s’applique pendant deux ans dès la livraison. Le client signale
+          tout défaut dans les meilleurs délais à contact@swiss3design.ch,
+          photos à l’appui. L’exploitant propose en priorité la réparation ou le
+          remplacement ; si cela s’avère impossible ou disproportionné, le
+          client conserve ses droits légaux (réduction du prix ou
+          remboursement).
         </p>
       ),
     },
@@ -136,13 +139,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Sauf faute grave ou intentionnelle, la responsabilité de l’exploitant
           est limitée au dommage direct et prouvé, à concurrence du montant de
-          la commande concernée. Sauf indication contraire expresse, les
-          objets imprimés en 3D ne sont pas destinés à un usage de sécurité,
-          au contact alimentaire prolongé, ni à un usage médical, et ne sont
-          pas des jouets pour enfants de moins de 3 ans. Les limitations qui
-          précèdent ne s’appliquent pas dans les cas où la loi exclut toute
-          limitation, notamment en cas de dommages corporels ou au titre de la
-          loi fédérale sur la responsabilité du fait des produits (LRFP).
+          la commande concernée. Sauf indication contraire expresse, les objets
+          imprimés en 3D ne sont pas destinés à un usage de sécurité, au contact
+          alimentaire prolongé, ni à un usage médical, et ne sont pas des jouets
+          pour enfants de moins de 3 ans. Les limitations qui précèdent ne
+          s’appliquent pas dans les cas où la loi exclut toute limitation,
+          notamment en cas de dommages corporels ou au titre de la loi fédérale
+          sur la responsabilité du fait des produits (LRFP).
         </p>
       ),
     },
@@ -165,10 +168,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           L’exploitant n’est pas responsable des retards ou empêchements
-          résultant de circonstances échappant à son contrôle raisonnable
-          (force majeure, défaillance d’un fournisseur ou du transporteur,
-          interruption technique, etc.). Les délais concernés sont suspendus
-          pour la durée de l’événement.
+          résultant de circonstances échappant à son contrôle raisonnable (force
+          majeure, défaillance d’un fournisseur ou du transporteur, interruption
+          technique, etc.). Les délais concernés sont suspendus pour la durée de
+          l’événement.
         </p>
       ),
     },
@@ -187,8 +190,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Droit applicable et for",
       body: (
         <p>
-          Les présentes CGV sont soumises au droit suisse. Le for est à
-          Nyon (VD), sous réserve des fors impératifs prévus par la loi.
+          Les présentes CGV sont soumises au droit suisse. Le for est à Nyon
+          (VD), sous réserve des fors impératifs prévus par la loi.
         </p>
       ),
     },
@@ -201,9 +204,12 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Die vorliegenden Allgemeinen Geschäftsbedingungen («AGB») gelten für
           Bestellungen im Online-Shop <strong>swiss3design.ch</strong>,
-          betrieben von <strong>Swiss3Design, Thomas Prud’homme, Chemin de
-          l’Aubépine 9B, 1196 Gland (Waadt), Schweiz</strong> («der
-          Betreiber»), erreichbar unter contact@swiss3design.ch. Mit der
+          betrieben von{" "}
+          <strong>
+            Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
+            (Waadt), Schweiz
+          </strong>{" "}
+          («der Betreiber»), erreichbar unter contact@swiss3design.ch. Mit der
           Bestellung akzeptiert der Kunde diese AGB in der zum Zeitpunkt der
           Bestellung gültigen Fassung. Der Kunde bestätigt, volljährig zu sein
           oder mit Zustimmung seiner gesetzlichen Vertretung zu handeln.
@@ -239,12 +245,12 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Die Präsentation der Produkte stellt kein verbindliches Angebot dar.
-          Die Bestellung des Kunden gilt als Kaufangebot; der Vertrag kommt
-          mit der Zahlungsbestätigung zustande, die durch die
-          Bestellbestätigung per E-Mail belegt wird. Der Betreiber behält sich
-          vor, eine Bestellung abzulehnen, insbesondere bei Nichtverfügbarkeit
-          oder offensichtlichem Preisfehler; bereits bezahlte Beträge werden
-          in diesem Fall zurückerstattet.
+          Die Bestellung des Kunden gilt als Kaufangebot; der Vertrag kommt mit
+          der Zahlungsbestätigung zustande, die durch die Bestellbestätigung per
+          E-Mail belegt wird. Der Betreiber behält sich vor, eine Bestellung
+          abzulehnen, insbesondere bei Nichtverfügbarkeit oder offensichtlichem
+          Preisfehler; bereits bezahlte Beträge werden in diesem Fall
+          zurückerstattet.
         </p>
       ),
     },
@@ -253,10 +259,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Die Zahlung erfolgt online über den Zahlungsdienstleister Stripe
-          (Kredit-/Debitkarte, TWINT, Google Pay), einschliesslich
-          Stripe Link zur Wiederverwendung einer bereits gespeicherten Karte.
-          Der Betreiber hat zu keinem Zeitpunkt Zugriff auf Kartendaten und
-          speichert diese nicht.
+          (Kredit-/Debitkarte, TWINT, Google Pay), einschliesslich Stripe Link
+          zur Wiederverwendung einer bereits gespeicherten Karte. Der Betreiber
+          hat zu keinem Zeitpunkt Zugriff auf Kartendaten und speichert diese
+          nicht.
         </p>
       ),
     },
@@ -264,16 +270,16 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Lieferung",
       body: (
         <p>
-          Die Lieferung erfolgt <strong>ausschliesslich innerhalb der
-          Schweiz</strong> durch die Schweizerische Post. Lagerartikel werden
-          innert 1 bis 3 Werktagen der Post übergeben; auf Bestellung
-          gedruckte Artikel nach Ablauf der auf der Produktseite angegebenen
-          Produktionszeit. Die anwendbaren Versandkosten und die Schwelle für
-          den Gratisversand werden im Warenkorb angezeigt. Lieferfristen sind
-          unverbindlich; eine Verzögerung begründet keinen Anspruch auf
-          Schadenersatz. Das Risiko von Verlust oder Beschädigung während des
-          Transports trägt der Betreiber bis zur Übergabe des Produkts an den
-          Kunden.
+          Die Lieferung erfolgt{" "}
+          <strong>ausschliesslich innerhalb der Schweiz</strong> durch die
+          Schweizerische Post. Lagerartikel werden innert 1 bis 3 Werktagen der
+          Post übergeben; auf Bestellung gedruckte Artikel nach Ablauf der auf
+          der Produktseite angegebenen Produktionszeit. Die anwendbaren
+          Versandkosten und die Schwelle für den Gratisversand werden im
+          Warenkorb angezeigt. Lieferfristen sind unverbindlich; eine
+          Verzögerung begründet keinen Anspruch auf Schadenersatz. Das Risiko
+          von Verlust oder Beschädigung während des Transports trägt der
+          Betreiber bis zur Übergabe des Produkts an den Kunden.
         </p>
       ),
     },
@@ -302,10 +308,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Das schweizerische Recht sieht für Online-Käufe kein gesetzliches
           Widerrufsrecht vor. Aus Kulanz akzeptiert der Betreiber die
-          Rücksendung von Katalogartikeln (nicht personalisiert) innert
-          14 Tagen nach Erhalt, sofern diese unbenutzt und im Originalzustand
-          sind. Die Rücksendekosten trägt der Kunde; der Preis der Artikel
-          wird zurückerstattet, ohne die ursprünglichen Versandkosten.
+          Rücksendung von Katalogartikeln (nicht personalisiert) innert 14 Tagen
+          nach Erhalt, sofern diese unbenutzt und im Originalzustand sind. Die
+          Rücksendekosten trägt der Kunde; der Preis der Artikel wird
+          zurückerstattet, ohne die ursprünglichen Versandkosten.
           Massanfertigungen sind von der Rückgabe ausgeschlossen.
         </p>
       ),
@@ -314,13 +320,12 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Gewährleistung",
       body: (
         <p>
-          Es gilt die gesetzliche Gewährleistung für Mängel der Kaufsache
-          (Art. 197 ff. OR) während zwei Jahren ab Lieferung. Der Kunde meldet
-          jeden Mangel so rasch wie möglich an contact@swiss3design.ch, mit
-          Fotos als Beleg. Der Betreiber bietet vorrangig Nachbesserung oder
-          Ersatz an; erweist sich dies als unmöglich oder unverhältnismässig,
-          behält der Kunde seine gesetzlichen Rechte (Minderung oder
-          Rückerstattung).
+          Es gilt die gesetzliche Gewährleistung für Mängel der Kaufsache (Art.
+          197 ff. OR) während zwei Jahren ab Lieferung. Der Kunde meldet jeden
+          Mangel so rasch wie möglich an contact@swiss3design.ch, mit Fotos als
+          Beleg. Der Betreiber bietet vorrangig Nachbesserung oder Ersatz an;
+          erweist sich dies als unmöglich oder unverhältnismässig, behält der
+          Kunde seine gesetzlichen Rechte (Minderung oder Rückerstattung).
         </p>
       ),
     },
@@ -328,15 +333,15 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Haftung",
       body: (
         <p>
-          Vorbehältlich grober Fahrlässigkeit oder Vorsatzes ist die Haftung
-          des Betreibers auf den direkten und nachgewiesenen Schaden
-          beschränkt, höchstens jedoch auf den Betrag der betreffenden
-          Bestellung. Sofern nicht ausdrücklich anders angegeben, sind
-          3D-gedruckte Objekte weder für sicherheitsrelevante Anwendungen noch
-          für längeren Lebensmittelkontakt oder medizinische Zwecke bestimmt
-          und sind kein Spielzeug für Kinder unter 3 Jahren. Die vorstehenden
-          Beschränkungen gelten nicht, soweit das Gesetz jegliche Beschränkung
-          ausschliesst, insbesondere bei Personenschäden oder nach dem
+          Vorbehältlich grober Fahrlässigkeit oder Vorsatzes ist die Haftung des
+          Betreibers auf den direkten und nachgewiesenen Schaden beschränkt,
+          höchstens jedoch auf den Betrag der betreffenden Bestellung. Sofern
+          nicht ausdrücklich anders angegeben, sind 3D-gedruckte Objekte weder
+          für sicherheitsrelevante Anwendungen noch für längeren
+          Lebensmittelkontakt oder medizinische Zwecke bestimmt und sind kein
+          Spielzeug für Kinder unter 3 Jahren. Die vorstehenden Beschränkungen
+          gelten nicht, soweit das Gesetz jegliche Beschränkung ausschliesst,
+          insbesondere bei Personenschäden oder nach dem
           Produktehaftpflichtgesetz (PrHG).
         </p>
       ),
@@ -373,8 +378,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Ist eine Bestimmung dieser AGB nichtig oder undurchführbar, bleiben
-          die übrigen Bestimmungen gültig; die betreffende Bestimmung wird
-          durch eine gültige Regelung ersetzt, die der ursprünglichen Absicht
+          die übrigen Bestimmungen gültig; die betreffende Bestimmung wird durch
+          eine gültige Regelung ersetzt, die der ursprünglichen Absicht
           möglichst nahekommt.
         </p>
       ),
@@ -383,8 +388,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Anwendbares Recht und Gerichtsstand",
       body: (
         <p>
-          Diese AGB unterstehen schweizerischem Recht. Gerichtsstand ist
-          Nyon (VD), unter Vorbehalt zwingender gesetzlicher Gerichtsstände.
+          Diese AGB unterstehen schweizerischem Recht. Gerichtsstand ist Nyon
+          (VD), unter Vorbehalt zwingender gesetzlicher Gerichtsstände.
         </p>
       ),
     },
@@ -397,12 +402,16 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Le presenti condizioni generali di vendita («CGV») disciplinano gli
           ordini effettuati sul negozio online <strong>swiss3design.ch</strong>,
-          gestito da <strong>Swiss3Design, Thomas Prud’homme, Chemin de
-          l’Aubépine 9B, 1196 Gland (Vaud), Svizzera</strong> («il gestore»),
-          raggiungibile all’indirizzo contact@swiss3design.ch. Effettuando un
-          ordine, il cliente accetta le presenti CGV nella versione in vigore
-          al momento dell’ordine. Il cliente conferma di essere maggiorenne o
-          di agire con il consenso del proprio rappresentante legale.
+          gestito da{" "}
+          <strong>
+            Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
+            (Vaud), Svizzera
+          </strong>{" "}
+          («il gestore»), raggiungibile all’indirizzo contact@swiss3design.ch.
+          Effettuando un ordine, il cliente accetta le presenti CGV nella
+          versione in vigore al momento dell’ordine. Il cliente conferma di
+          essere maggiorenne o di agire con il consenso del proprio
+          rappresentante legale.
         </p>
       ),
     },
@@ -410,12 +419,12 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Prodotti",
       body: (
         <p>
-          Gli articoli proposti sono oggetti realizzati artigianalmente
-          mediante stampa 3D, in pezzi unici o in piccola serie. Da un
-          esemplare all’altro possono esistere lievi variazioni di tonalità,
-          texture o aspetto (in particolare le linee degli strati proprie del
-          procedimento), che non costituiscono un difetto. Le fotografie sono
-          il più fedeli possibile ma non contrattuali.
+          Gli articoli proposti sono oggetti realizzati artigianalmente mediante
+          stampa 3D, in pezzi unici o in piccola serie. Da un esemplare
+          all’altro possono esistere lievi variazioni di tonalità, texture o
+          aspetto (in particolare le linee degli strati proprie del
+          procedimento), che non costituiscono un difetto. Le fotografie sono il
+          più fedeli possibile ma non contrattuali.
         </p>
       ),
     },
@@ -425,8 +434,7 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           I prezzi si intendono in franchi svizzeri (CHF). Il gestore non è
           assoggettato all’IVA (art. 10 LIVA); non viene fatturata alcuna IVA.
-          Le spese di consegna sono indicate prima della conferma del
-          pagamento.
+          Le spese di consegna sono indicate prima della conferma del pagamento.
         </p>
       ),
     },
@@ -437,10 +445,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           La presentazione dei prodotti non costituisce un’offerta vincolante.
           L’ordine del cliente vale come offerta d’acquisto; il contratto è
           concluso al momento della conferma del pagamento, attestata
-          dall’e-mail di conferma dell’ordine. Il gestore si riserva il
-          diritto di rifiutare un ordine, in particolare in caso di
-          indisponibilità o di errore manifesto di prezzo; gli importi già
-          percepiti vengono in tal caso rimborsati.
+          dall’e-mail di conferma dell’ordine. Il gestore si riserva il diritto
+          di rifiutare un ordine, in particolare in caso di indisponibilità o di
+          errore manifesto di prezzo; gli importi già percepiti vengono in tal
+          caso rimborsati.
         </p>
       ),
     },
@@ -449,9 +457,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Il pagamento avviene online tramite il prestatore Stripe (carta di
-          credito/debito, TWINT, Google Pay), inclusa Stripe Link
-          per riutilizzare una carta già registrata. Il gestore non ha mai
-          accesso ai dati della carta e non li memorizza.
+          credito/debito, TWINT, Google Pay), inclusa Stripe Link per
+          riutilizzare una carta già registrata. Il gestore non ha mai accesso
+          ai dati della carta e non li memorizza.
         </p>
       ),
     },
@@ -462,12 +470,12 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           La consegna avviene <strong>esclusivamente in Svizzera</strong>,
           tramite la Posta svizzera. I prodotti a magazzino vengono affidati
           alla Posta entro 1–3 giorni lavorativi; i prodotti stampati su
-          richiesta dopo il tempo di produzione indicato nella scheda
-          prodotto. Le spese di spedizione e la soglia per la consegna
-          gratuita applicabili sono visualizzate nel carrello. I termini di
-          consegna sono indicativi; un ritardo non dà diritto a risarcimento
-          danni. Il rischio di perdita o danneggiamento durante il trasporto è
-          a carico del gestore fino alla consegna del prodotto al cliente.
+          richiesta dopo il tempo di produzione indicato nella scheda prodotto.
+          Le spese di spedizione e la soglia per la consegna gratuita
+          applicabili sono visualizzate nel carrello. I termini di consegna sono
+          indicativi; un ritardo non dà diritto a risarcimento danni. Il rischio
+          di perdita o danneggiamento durante il trasporto è a carico del
+          gestore fino alla consegna del prodotto al cliente.
         </p>
       ),
     },
@@ -481,11 +489,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           personalizzati non vengono né ripresi né cambiati (vedere «Resi»). Il
           cliente garantisce di detenere i diritti sui file trasmessi e che la
           loro stampa non viola alcun diritto di terzi né alcuna disposizione
-          legale; il gestore può rifiutare qualsiasi file senza
-          giustificazione. Il cliente tiene indenne il gestore da qualsiasi
-          pretesa di terzi derivante dai suoi file. Sono in particolare esclusi
-          i file di armi o di parti di armi, di contraffazioni e di qualsiasi
-          oggetto illecito.
+          legale; il gestore può rifiutare qualsiasi file senza giustificazione.
+          Il cliente tiene indenne il gestore da qualsiasi pretesa di terzi
+          derivante dai suoi file. Sono in particolare esclusi i file di armi o
+          di parti di armi, di contraffazioni e di qualsiasi oggetto illecito.
         </p>
       ),
     },
@@ -497,9 +504,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           acquisti online. A titolo commerciale, il gestore accetta il reso
           degli articoli di catalogo (non personalizzati) entro 14 giorni dal
           ricevimento, a condizione che siano inutilizzati e nel loro stato
-          originale. Le spese di reso sono a carico del cliente; il prezzo
-          degli articoli viene rimborsato, escluse le spese di spedizione
-          iniziali. Gli articoli su misura sono esclusi dal reso.
+          originale. Le spese di reso sono a carico del cliente; il prezzo degli
+          articoli viene rimborsato, escluse le spese di spedizione iniziali.
+          Gli articoli su misura sono esclusi dal reso.
         </p>
       ),
     },
@@ -507,13 +514,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Garanzia",
       body: (
         <p>
-          La garanzia legale per i difetti della cosa venduta
-          (art. 197 segg. CO) si applica per due anni dalla consegna. Il
-          cliente segnala qualsiasi difetto il prima possibile a
-          contact@swiss3design.ch, allegando fotografie. Il gestore propone in
-          via prioritaria la riparazione o la sostituzione; qualora ciò risulti
-          impossibile o sproporzionato, il cliente conserva i propri diritti
-          legali (riduzione del prezzo o rimborso).
+          La garanzia legale per i difetti della cosa venduta (art. 197 segg.
+          CO) si applica per due anni dalla consegna. Il cliente segnala
+          qualsiasi difetto il prima possibile a contact@swiss3design.ch,
+          allegando fotografie. Il gestore propone in via prioritaria la
+          riparazione o la sostituzione; qualora ciò risulti impossibile o
+          sproporzionato, il cliente conserva i propri diritti legali (riduzione
+          del prezzo o rimborso).
         </p>
       ),
     },
@@ -521,15 +528,15 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Responsabilità",
       body: (
         <p>
-          Salvo colpa grave o dolo, la responsabilità del gestore è limitata
-          al danno diretto e provato, fino a concorrenza dell’importo
-          dell’ordine interessato. Salvo indicazione contraria espressa, gli
-          oggetti stampati in 3D non sono destinati a un uso di sicurezza, al
-          contatto alimentare prolungato né a un uso medico, e non sono
-          giocattoli per bambini di età inferiore a 3 anni. Le limitazioni che
-          precedono non si applicano nei casi in cui la legge esclude qualsiasi
-          limitazione, in particolare in caso di danni alle persone o ai sensi
-          della legge sulla responsabilità per danno da prodotti (LRDP).
+          Salvo colpa grave o dolo, la responsabilità del gestore è limitata al
+          danno diretto e provato, fino a concorrenza dell’importo dell’ordine
+          interessato. Salvo indicazione contraria espressa, gli oggetti
+          stampati in 3D non sono destinati a un uso di sicurezza, al contatto
+          alimentare prolungato né a un uso medico, e non sono giocattoli per
+          bambini di età inferiore a 3 anni. Le limitazioni che precedono non si
+          applicano nei casi in cui la legge esclude qualsiasi limitazione, in
+          particolare in caso di danni alle persone o ai sensi della legge sulla
+          responsabilità per danno da prodotti (LRDP).
         </p>
       ),
     },
@@ -551,11 +558,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Forza maggiore",
       body: (
         <p>
-          Il gestore non è responsabile dei ritardi o degli impedimenti dovuti
-          a circostanze che sfuggono al suo ragionevole controllo (forza
-          maggiore, inadempienza di un fornitore o del trasportatore,
-          interruzione tecnica, ecc.). I termini interessati sono sospesi per
-          la durata dell’evento.
+          Il gestore non è responsabile dei ritardi o degli impedimenti dovuti a
+          circostanze che sfuggono al suo ragionevole controllo (forza maggiore,
+          inadempienza di un fornitore o del trasportatore, interruzione
+          tecnica, ecc.). I termini interessati sono sospesi per la durata
+          dell’evento.
         </p>
       ),
     },
@@ -563,10 +570,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Clausola di salvaguardia",
       body: (
         <p>
-          Qualora una disposizione delle presenti CGV sia nulla o
-          inapplicabile, le altre disposizioni restano valide; la disposizione
-          interessata è sostituita da una regola valida il cui effetto si
-          avvicina il più possibile all’intenzione iniziale.
+          Qualora una disposizione delle presenti CGV sia nulla o inapplicabile,
+          le altre disposizioni restano valide; la disposizione interessata è
+          sostituita da una regola valida il cui effetto si avvicina il più
+          possibile all’intenzione iniziale.
         </p>
       ),
     },
@@ -574,8 +581,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Diritto applicabile e foro",
       body: (
         <p>
-          Le presenti CGV sono soggette al diritto svizzero. Il foro è
-          Nyon (VD), fatti salvi i fori imperativi previsti dalla legge.
+          Le presenti CGV sono soggette al diritto svizzero. Il foro è Nyon
+          (VD), fatti salvi i fori imperativi previsti dalla legge.
         </p>
       ),
     },
@@ -588,12 +595,15 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           These general terms and conditions of sale (“GTC”) govern orders
           placed on the online shop <strong>swiss3design.ch</strong>, operated
-          by <strong>Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B,
-          1196 Gland (Vaud), Switzerland</strong> (the “Operator”), reachable
-          at contact@swiss3design.ch. By placing an order, the customer
-          accepts these GTC in the version in force at the time of the order.
-          The customer confirms that they are of legal age or are acting with
-          the consent of their legal representative.
+          by{" "}
+          <strong>
+            Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
+            (Vaud), Switzerland
+          </strong>{" "}
+          (the “Operator”), reachable at contact@swiss3design.ch. By placing an
+          order, the customer accepts these GTC in the version in force at the
+          time of the order. The customer confirms that they are of legal age or
+          are acting with the consent of their legal representative.
         </p>
       ),
     },
@@ -601,12 +611,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Products",
       body: (
         <p>
-          The items offered are objects crafted by 3D printing, individually
-          or in small series. Slight variations in colour, texture or
-          appearance (in particular the layer lines inherent to the process)
-          may exist from one piece to another and do not constitute a defect.
-          Photographs are as faithful as possible but not contractually
-          binding.
+          The items offered are objects crafted by 3D printing, individually or
+          in small series. Slight variations in colour, texture or appearance
+          (in particular the layer lines inherent to the process) may exist from
+          one piece to another and do not constitute a defect. Photographs are
+          as faithful as possible but not contractually binding.
         </p>
       ),
     },
@@ -615,8 +624,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           All prices are in Swiss francs (CHF). The Operator is not subject to
-          VAT (Art. 10 of the Swiss VAT Act); no VAT is charged. Shipping
-          costs are shown before payment confirmation.
+          VAT (Art. 10 of the Swiss VAT Act); no VAT is charged. Shipping costs
+          are shown before payment confirmation.
         </p>
       ),
     },
@@ -624,9 +633,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Ordering and conclusion of the contract",
       body: (
         <p>
-          The presentation of products does not constitute a binding offer.
-          The customer’s order constitutes an offer to purchase; the contract
-          is concluded upon confirmation of payment, evidenced by the order
+          The presentation of products does not constitute a binding offer. The
+          customer’s order constitutes an offer to purchase; the contract is
+          concluded upon confirmation of payment, evidenced by the order
           confirmation e-mail. The Operator reserves the right to refuse an
           order, in particular in the event of unavailability or an obvious
           pricing error; any amounts already received will then be refunded.
@@ -637,10 +646,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Payment",
       body: (
         <p>
-          Payment is made online via the payment provider Stripe
-          (credit/debit card, TWINT, Google Pay), including Stripe
-          Link to reuse a card already saved. The Operator never has access
-          to card data and does not store it.
+          Payment is made online via the payment provider Stripe (credit/debit
+          card, TWINT, Google Pay), including Stripe Link to reuse a card
+          already saved. The Operator never has access to card data and does not
+          store it.
         </p>
       ),
     },
@@ -654,8 +663,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           indicated on the product page. The applicable shipping costs and
           free-shipping threshold are shown in the cart. Delivery times are
           indicative; a delay does not give rise to any claim for damages. The
-          risk of loss or damage during transport is borne by the Operator
-          until the product is handed over to the customer.
+          risk of loss or damage during transport is borne by the Operator until
+          the product is handed over to the customer.
         </p>
       ),
     },
@@ -669,10 +678,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           returned nor exchanged (see “Returns”). The customer warrants that
           they hold the rights to the files submitted and that printing them
           does not infringe any third-party rights or legal provisions; the
-          Operator may refuse any file without justification. The customer
-          shall indemnify the Operator against any third-party claim arising
-          from their files. Files of weapons or weapon parts, counterfeits and
-          any unlawful object are in particular excluded.
+          Operator may refuse any file without justification. The customer shall
+          indemnify the Operator against any third-party claim arising from
+          their files. Files of weapons or weapon parts, counterfeits and any
+          unlawful object are in particular excluded.
         </p>
       ),
     },
@@ -682,11 +691,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Swiss law does not provide for a statutory right of withdrawal for
           online purchases. As a commercial gesture, the Operator accepts
-          returns of catalogue items (non-customised) within 14 days of
-          receipt, provided they are unused and in their original condition.
-          Return costs are borne by the customer; the price of the items is
-          refunded, excluding the initial shipping costs. Custom-made items
-          are excluded from returns.
+          returns of catalogue items (non-customised) within 14 days of receipt,
+          provided they are unused and in their original condition. Return costs
+          are borne by the customer; the price of the items is refunded,
+          excluding the initial shipping costs. Custom-made items are excluded
+          from returns.
         </p>
       ),
     },
@@ -694,10 +703,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Warranty",
       body: (
         <p>
-          The statutory warranty for defects in the goods sold (Art. 197 et
-          seq. of the Swiss Code of Obligations) applies for two years from
-          delivery. The customer shall report any defect as soon as possible
-          to contact@swiss3design.ch, with supporting photos. The Operator will
+          The statutory warranty for defects in the goods sold (Art. 197 et seq.
+          of the Swiss Code of Obligations) applies for two years from delivery.
+          The customer shall report any defect as soon as possible to
+          contact@swiss3design.ch, with supporting photos. The Operator will
           primarily offer repair or replacement; if this proves impossible or
           disproportionate, the customer retains their statutory rights (price
           reduction or refund).
@@ -709,13 +718,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Except in cases of gross negligence or wilful misconduct, the
-          Operator’s liability is limited to direct and proven damage, up to
-          the amount of the order concerned. Unless expressly stated
-          otherwise, 3D-printed objects are not intended for safety-related
-          use, prolonged food contact or medical use, and are not toys for
-          children under 3 years of age. The foregoing limitations do not apply
-          where the law excludes any limitation, in particular in the event of
-          personal injury or under the Swiss Product Liability Act.
+          Operator’s liability is limited to direct and proven damage, up to the
+          amount of the order concerned. Unless expressly stated otherwise,
+          3D-printed objects are not intended for safety-related use, prolonged
+          food contact or medical use, and are not toys for children under 3
+          years of age. The foregoing limitations do not apply where the law
+          excludes any limitation, in particular in the event of personal injury
+          or under the Swiss Product Liability Act.
         </p>
       ),
     },
@@ -723,13 +732,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Intellectual property",
       body: (
         <p>
-          The contents of the site (texts, photographs, layout, visual
-          identity and the Swiss3Design logo) are protected and may not be
-          reproduced without authorisation. The sale concerns a physical
-          object: it grants the customer no rights in the underlying digital
-          3D models, nor any licence to reproduce, re-edit or resell in series.
-          The intellectual-property rights in the printed models remain
-          reserved to their respective holders.
+          The contents of the site (texts, photographs, layout, visual identity
+          and the Swiss3Design logo) are protected and may not be reproduced
+          without authorisation. The sale concerns a physical object: it grants
+          the customer no rights in the underlying digital 3D models, nor any
+          licence to reproduce, re-edit or resell in series. The
+          intellectual-property rights in the printed models remain reserved to
+          their respective holders.
         </p>
       ),
     },
@@ -738,8 +747,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           The Operator is not liable for delays or impediments resulting from
-          circumstances beyond its reasonable control (force majeure, failure
-          of a supplier or carrier, technical interruption, etc.). The affected
+          circumstances beyond its reasonable control (force majeure, failure of
+          a supplier or carrier, technical interruption, etc.). The affected
           time limits are suspended for the duration of the event.
         </p>
       ),
@@ -759,8 +768,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Governing law and jurisdiction",
       body: (
         <p>
-          These GTC are governed by Swiss law. The place of jurisdiction is
-          Nyon (VD), subject to mandatory statutory jurisdictions.
+          These GTC are governed by Swiss law. The place of jurisdiction is Nyon
+          (VD), subject to mandatory statutory jurisdictions.
         </p>
       ),
     },

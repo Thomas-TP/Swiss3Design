@@ -34,7 +34,10 @@ export async function GET(request: Request) {
     .limit(1);
 
   return Response.json(
-    { newsletter: prefs?.newsletter ?? false, productNews: prefs?.productNews ?? false },
+    {
+      newsletter: prefs?.newsletter ?? false,
+      productNews: prefs?.productNews ?? false,
+    },
     { headers },
   );
 }

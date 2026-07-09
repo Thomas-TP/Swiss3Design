@@ -10,7 +10,9 @@ const MAX_BYTES = 30 * 1024 * 1024; // 30 Mo
 
 export async function POST(request: Request) {
   // Upload anonyme : sans limite, n'importe qui peut remplir le bucket R2
-  if (!(await rateLimit(request, "quote-upload", { limit: 10, windowS: 3600 }))) {
+  if (
+    !(await rateLimit(request, "quote-upload", { limit: 10, windowS: 3600 }))
+  ) {
     return tooManyRequests();
   }
 

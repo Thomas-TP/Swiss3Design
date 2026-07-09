@@ -12,11 +12,7 @@ import {
   X,
 } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
-import {
-  saveProduct,
-  deleteProduct,
-  type ProductFormState,
-} from "./actions";
+import { saveProduct, deleteProduct, type ProductFormState } from "./actions";
 import { FIELD, BTN_PRIMARY, BTN_GHOST } from "../ui";
 
 interface Img {
@@ -110,10 +106,10 @@ export function ProductForm({
     );
 
   const router = useRouter();
-  const [state, formAction, pending] = useActionState<ProductFormState, FormData>(
-    saveProduct,
-    {},
-  );
+  const [state, formAction, pending] = useActionState<
+    ProductFormState,
+    FormData
+  >(saveProduct, {});
 
   // Navigation côté client après succès : redirect() dans l'action
   // laissait l'interface figée sur Cloudflare Workers.
@@ -297,7 +293,11 @@ export function ProductForm({
             [
               ["multicolor", "Multicolore (AMS)", initial?.multicolor ?? false],
               ["featured", "Mettre en vedette", initial?.featured ?? false],
-              ["active", "Publié (visible en boutique)", initial?.active ?? true],
+              [
+                "active",
+                "Publié (visible en boutique)",
+                initial?.active ?? true,
+              ],
             ] as const
           ).map(([name, label, checked]) => (
             <label key={name} className="flex items-center gap-2 font-medium">
@@ -485,7 +485,9 @@ function ModelManager({ initial }: { initial: string | null }) {
           />
         </label>
       )}
-      {error && <p className="mt-2 text-xs text-accent">{`Échec : ${error}`}</p>}
+      {error && (
+        <p className="mt-2 text-xs text-accent">{`Échec : ${error}`}</p>
+      )}
       <p className="mt-2 text-xs text-soft">STL ou GLB, 25 Mo max.</p>
     </div>
   );
@@ -588,7 +590,9 @@ function VariantManager({ initial }: { initial: VariantInitial[] }) {
               />
               <button
                 type="button"
-                onClick={() => setRows((prev) => prev.filter((_, j) => j !== i))}
+                onClick={() =>
+                  setRows((prev) => prev.filter((_, j) => j !== i))
+                }
                 aria-label="Retirer la variante"
                 className="grid place-items-center rounded-xl border border-line text-soft transition-colors hover:border-accent hover:text-accent"
               >
@@ -601,7 +605,10 @@ function VariantManager({ initial }: { initial: VariantInitial[] }) {
       <button
         type="button"
         onClick={() =>
-          setRows((prev) => [...prev, { name: "", sku: "", price: "", stock: "" }])
+          setRows((prev) => [
+            ...prev,
+            { name: "", sku: "", price: "", stock: "" },
+          ])
         }
         className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold text-soft transition-colors hover:border-ink hover:text-ink"
       >
@@ -642,9 +649,7 @@ function ImageManager({ initial }: { initial: Img[] }) {
         setImages((prev) => [...prev, { url }]);
       } catch (e) {
         const reason =
-          e instanceof Error && e.message
-            ? e.message
-            : "connexion interrompue";
+          e instanceof Error && e.message ? e.message : "connexion interrompue";
         setError(`Échec de l'envoi de ${file.name} : ${reason}`);
       }
     }
@@ -724,9 +729,7 @@ function ImageManager({ initial }: { initial: Img[] }) {
           />
         </label>
       </div>
-      {error && (
-        <p className="mt-2 text-xs font-medium text-accent">{error}</p>
-      )}
+      {error && <p className="mt-2 text-xs font-medium text-accent">{error}</p>}
       <p className="mt-2 text-xs text-soft">
         JPG, PNG ou WebP, 8 Mo max. La première photo est l&apos;image
         principale.

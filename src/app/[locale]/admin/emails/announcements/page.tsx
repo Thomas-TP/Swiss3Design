@@ -1,7 +1,12 @@
 import { desc, eq, inArray, asc } from "drizzle-orm";
 import { Link } from "@/i18n/navigation";
 import { getDb } from "@/db";
-import { products, productTranslations, productImages, newsletterSends } from "@/db/schema";
+import {
+  products,
+  productTranslations,
+  productImages,
+  newsletterSends,
+} from "@/db/schema";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { ComposeForm } from "./compose-form";
@@ -34,7 +39,12 @@ export default async function AnnouncementsPage() {
     ? await db
         .select({ productId: productImages.productId, url: productImages.url })
         .from(productImages)
-        .where(inArray(productImages.productId, productRows.map((p) => p.id)))
+        .where(
+          inArray(
+            productImages.productId,
+            productRows.map((p) => p.id),
+          ),
+        )
         .orderBy(asc(productImages.sortOrder))
     : [];
   const firstImage = new Map<string, string>();
@@ -91,8 +101,9 @@ export default async function AnnouncementsPage() {
                 <div>
                   <p className="font-medium">{h.subject}</p>
                   <p className="text-xs text-soft">
-                    {AUDIENCE_LABELS[h.audience] ?? h.audience} · {h.recipientCount}{" "}
-                    destinataires · {new Date(h.createdAt).toLocaleDateString("fr-CH")}
+                    {AUDIENCE_LABELS[h.audience] ?? h.audience} ·{" "}
+                    {h.recipientCount} destinataires ·{" "}
+                    {new Date(h.createdAt).toLocaleDateString("fr-CH")}
                   </p>
                 </div>
               </li>

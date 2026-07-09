@@ -78,7 +78,12 @@ export async function loadAnnouncementProducts(
     ? await db
         .select({ productId: productImages.productId, url: productImages.url })
         .from(productImages)
-        .where(inArray(productImages.productId, rows.map((r) => r.id)))
+        .where(
+          inArray(
+            productImages.productId,
+            rows.map((r) => r.id),
+          ),
+        )
         .orderBy(productImages.sortOrder)
     : [];
   const firstImage = new Map<string, string>();

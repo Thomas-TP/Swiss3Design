@@ -111,20 +111,24 @@ const CART_REMINDER_TEXTS: Record<
   fr: {
     subject: "Votre panier vous attend",
     title: "Vous avez oublié quelque chose ?",
-    intro: "Votre sélection est toujours là — reprenez votre commande quand vous voulez :",
+    intro:
+      "Votre sélection est toujours là — reprenez votre commande quand vous voulez :",
     cta: "Reprendre mon panier",
     outro: "Les articles restent disponibles dans la limite des stocks.",
     unsubscribe: "Ne plus recevoir de rappel",
-    consentNote: "Vous recevez cet e-mail car vous avez demandé un rappel de votre panier.",
+    consentNote:
+      "Vous recevez cet e-mail car vous avez demandé un rappel de votre panier.",
   },
   de: {
     subject: "Ihr Warenkorb wartet auf Sie",
     title: "Haben Sie etwas vergessen?",
-    intro: "Ihre Auswahl ist noch da — setzen Sie Ihre Bestellung fort, wann Sie möchten:",
+    intro:
+      "Ihre Auswahl ist noch da — setzen Sie Ihre Bestellung fort, wann Sie möchten:",
     cta: "Zum Warenkorb",
     outro: "Die Artikel bleiben verfügbar, solange der Vorrat reicht.",
     unsubscribe: "Keine Erinnerungen mehr erhalten",
-    consentNote: "Sie erhalten diese E-Mail, weil Sie eine Erinnerung an Ihren Warenkorb angefordert haben.",
+    consentNote:
+      "Sie erhalten diese E-Mail, weil Sie eine Erinnerung an Ihren Warenkorb angefordert haben.",
   },
   it: {
     subject: "Il tuo carrello ti aspetta",
@@ -133,12 +137,14 @@ const CART_REMINDER_TEXTS: Record<
     cta: "Riprendi il carrello",
     outro: "Gli articoli restano disponibili fino a esaurimento scorte.",
     unsubscribe: "Non ricevere più promemoria",
-    consentNote: "Ricevi questa e-mail perché hai richiesto un promemoria del carrello.",
+    consentNote:
+      "Ricevi questa e-mail perché hai richiesto un promemoria del carrello.",
   },
   en: {
     subject: "Your cart is waiting",
     title: "Did you forget something?",
-    intro: "Your selection is still here — pick up where you left off whenever you like:",
+    intro:
+      "Your selection is still here — pick up where you left off whenever you like:",
     cta: "Back to my cart",
     outro: "Items remain available while stocks last.",
     unsubscribe: "Stop receiving reminders",
@@ -153,9 +159,9 @@ export function abandonedCartEmail(params: {
   cartUrl: string;
   unsubscribeUrl: string;
 }): EmailMessage {
-  const loc = (["fr", "de", "it", "en"].includes(params.locale)
-    ? params.locale
-    : "fr") as Locale;
+  const loc = (
+    ["fr", "de", "it", "en"].includes(params.locale) ? params.locale : "fr"
+  ) as Locale;
   const t = CART_REMINDER_TEXTS[loc];
   const rows = params.items
     .map(
@@ -205,12 +211,22 @@ interface ItemForEmail {
 
 const ORDER_TEXTS: Record<
   Locale,
-  { subject: string; title: string; intro: string; shipping: string; free: string; discount: string; total: string; address: string }
+  {
+    subject: string;
+    title: string;
+    intro: string;
+    shipping: string;
+    free: string;
+    discount: string;
+    total: string;
+    address: string;
+  }
 > = {
   fr: {
     subject: "Commande {n} confirmée — Swiss3Design",
     title: "Merci pour votre commande ! 🎉",
-    intro: "Nous avons bien reçu votre paiement. Votre commande <strong>{n}</strong> part en préparation dans notre atelier de Gland.",
+    intro:
+      "Nous avons bien reçu votre paiement. Votre commande <strong>{n}</strong> part en préparation dans notre atelier de Gland.",
     shipping: "Livraison",
     free: "Offerte",
     total: "Total",
@@ -220,7 +236,8 @@ const ORDER_TEXTS: Record<
   de: {
     subject: "Bestellung {n} bestätigt — Swiss3Design",
     title: "Vielen Dank für Ihre Bestellung! 🎉",
-    intro: "Wir haben Ihre Zahlung erhalten. Ihre Bestellung <strong>{n}</strong> wird in unserem Atelier in Gland vorbereitet.",
+    intro:
+      "Wir haben Ihre Zahlung erhalten. Ihre Bestellung <strong>{n}</strong> wird in unserem Atelier in Gland vorbereitet.",
     shipping: "Versand",
     free: "Gratis",
     total: "Total",
@@ -230,7 +247,8 @@ const ORDER_TEXTS: Record<
   it: {
     subject: "Ordine {n} confermato — Swiss3Design",
     title: "Grazie per il vostro ordine! 🎉",
-    intro: "Abbiamo ricevuto il pagamento. Il vostro ordine <strong>{n}</strong> è in preparazione nel nostro atelier di Gland.",
+    intro:
+      "Abbiamo ricevuto il pagamento. Il vostro ordine <strong>{n}</strong> è in preparazione nel nostro atelier di Gland.",
     shipping: "Spedizione",
     free: "Gratuita",
     total: "Totale",
@@ -240,7 +258,8 @@ const ORDER_TEXTS: Record<
   en: {
     subject: "Order {n} confirmed — Swiss3Design",
     title: "Thank you for your order! 🎉",
-    intro: "We've received your payment. Your order <strong>{n}</strong> is now being prepared in our Gland workshop.",
+    intro:
+      "We've received your payment. Your order <strong>{n}</strong> is now being prepared in our Gland workshop.",
     shipping: "Shipping",
     free: "Free",
     total: "Total",
@@ -253,9 +272,9 @@ export function orderConfirmationEmail(
   order: OrderForEmail,
   items: ItemForEmail[],
 ): EmailMessage {
-  const locale = (["fr", "de", "it", "en"].includes(order.locale)
-    ? order.locale
-    : "fr") as Locale;
+  const locale = (
+    ["fr", "de", "it", "en"].includes(order.locale) ? order.locale : "fr"
+  ) as Locale;
   const t = ORDER_TEXTS[locale];
 
   let address = { name: "", street: "", npa: "", city: "" };
@@ -314,7 +333,13 @@ export function orderConfirmationEmail(
 
 const SHIPPED_TEXTS: Record<
   Locale,
-  { subject: string; title: string; body: string; tracking: string; track: string }
+  {
+    subject: string;
+    title: string;
+    body: string;
+    tracking: string;
+    track: string;
+  }
 > = {
   fr: {
     subject: "Votre commande {n} est en route 📦",
@@ -350,9 +375,9 @@ export function orderShippedEmail(
   order: OrderForEmail,
   trackingNumber?: string | null,
 ): EmailMessage {
-  const locale = (["fr", "de", "it", "en"].includes(order.locale)
-    ? order.locale
-    : "fr") as Locale;
+  const locale = (
+    ["fr", "de", "it", "en"].includes(order.locale) ? order.locale : "fr"
+  ) as Locale;
   const t = SHIPPED_TEXTS[locale];
   const tracking = trackingNumber
     ? `<p style="margin:18px 0 6px;text-align:center;font-size:13px;color:#78716c;">${t.tracking}</p>
@@ -380,32 +405,36 @@ const DELIVERED_TEXTS: Record<
     subject: "Votre commande {n} a été livrée ✅",
     title: "Bien arrivée !",
     body: "Votre commande <strong>{n}</strong> a été livrée. Nous espérons que vos impressions vous plaisent !",
-    feedback: "Un souci avec un article ? Une remarque ? Répondez simplement à cet e-mail, nous trouvons toujours une solution.",
+    feedback:
+      "Un souci avec un article ? Une remarque ? Répondez simplement à cet e-mail, nous trouvons toujours une solution.",
   },
   de: {
     subject: "Ihre Bestellung {n} wurde zugestellt ✅",
     title: "Gut angekommen!",
     body: "Ihre Bestellung <strong>{n}</strong> wurde zugestellt. Wir hoffen, Ihre Drucke gefallen Ihnen!",
-    feedback: "Ein Problem mit einem Artikel? Eine Anmerkung? Antworten Sie einfach auf diese E-Mail — wir finden immer eine Lösung.",
+    feedback:
+      "Ein Problem mit einem Artikel? Eine Anmerkung? Antworten Sie einfach auf diese E-Mail — wir finden immer eine Lösung.",
   },
   it: {
     subject: "Il vostro ordine {n} è stato consegnato ✅",
     title: "Arrivato a destinazione!",
     body: "Il vostro ordine <strong>{n}</strong> è stato consegnato. Speriamo che le vostre stampe vi piacciano!",
-    feedback: "Un problema con un articolo? Un'osservazione? Rispondete a questa e-mail — troviamo sempre una soluzione.",
+    feedback:
+      "Un problema con un articolo? Un'osservazione? Rispondete a questa e-mail — troviamo sempre una soluzione.",
   },
   en: {
     subject: "Your order {n} has been delivered ✅",
     title: "Safely delivered!",
     body: "Your order <strong>{n}</strong> has been delivered. We hope you love your prints!",
-    feedback: "An issue with an item? Any feedback? Just reply to this email — we always find a solution.",
+    feedback:
+      "An issue with an item? Any feedback? Just reply to this email — we always find a solution.",
   },
 };
 
 export function orderDeliveredEmail(order: OrderForEmail): EmailMessage {
-  const locale = (["fr", "de", "it", "en"].includes(order.locale)
-    ? order.locale
-    : "fr") as Locale;
+  const locale = (
+    ["fr", "de", "it", "en"].includes(order.locale) ? order.locale : "fr"
+  ) as Locale;
   const t = DELIVERED_TEXTS[locale];
   const body = `
     <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">${t.body.replace("{n}", order.orderNumber)}</p>
@@ -428,32 +457,36 @@ const CANCELLED_TEXTS: Record<
     subject: "Votre commande {n} a été annulée",
     title: "Commande annulée",
     body: "Votre commande <strong>{n}</strong> a été annulée.",
-    refund: "Si vous aviez déjà payé, le montant est remboursé sur votre moyen de paiement d'origine — il apparaît généralement sous 5 à 10 jours ouvrés.",
+    refund:
+      "Si vous aviez déjà payé, le montant est remboursé sur votre moyen de paiement d'origine — il apparaît généralement sous 5 à 10 jours ouvrés.",
   },
   de: {
     subject: "Ihre Bestellung {n} wurde storniert",
     title: "Bestellung storniert",
     body: "Ihre Bestellung <strong>{n}</strong> wurde storniert.",
-    refund: "Falls Sie bereits bezahlt haben, wird der Betrag auf Ihr ursprüngliches Zahlungsmittel zurückerstattet — in der Regel innerhalb von 5–10 Werktagen sichtbar.",
+    refund:
+      "Falls Sie bereits bezahlt haben, wird der Betrag auf Ihr ursprüngliches Zahlungsmittel zurückerstattet — in der Regel innerhalb von 5–10 Werktagen sichtbar.",
   },
   it: {
     subject: "Il vostro ordine {n} è stato annullato",
     title: "Ordine annullato",
     body: "Il vostro ordine <strong>{n}</strong> è stato annullato.",
-    refund: "Se avevate già pagato, l'importo viene rimborsato sul vostro metodo di pagamento originale — di solito appare entro 5–10 giorni lavorativi.",
+    refund:
+      "Se avevate già pagato, l'importo viene rimborsato sul vostro metodo di pagamento originale — di solito appare entro 5–10 giorni lavorativi.",
   },
   en: {
     subject: "Your order {n} has been cancelled",
     title: "Order cancelled",
     body: "Your order <strong>{n}</strong> has been cancelled.",
-    refund: "If you had already paid, the amount is refunded to your original payment method — it usually shows up within 5–10 business days.",
+    refund:
+      "If you had already paid, the amount is refunded to your original payment method — it usually shows up within 5–10 business days.",
   },
 };
 
 export function orderCancelledEmail(order: OrderForEmail): EmailMessage {
-  const locale = (["fr", "de", "it", "en"].includes(order.locale)
-    ? order.locale
-    : "fr") as Locale;
+  const locale = (
+    ["fr", "de", "it", "en"].includes(order.locale) ? order.locale : "fr"
+  ) as Locale;
   const t = CANCELLED_TEXTS[locale];
   const body = `
     <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">${t.body.replace("{n}", order.orderNumber)}</p>
@@ -470,12 +503,22 @@ export function orderCancelledEmail(order: OrderForEmail): EmailMessage {
 
 const QUOTE_TEXTS: Record<
   Locale,
-  { subject: string; title: string; intro: string; price: string; note: string; valid: string; cta: string; review: string }
+  {
+    subject: string;
+    title: string;
+    intro: string;
+    price: string;
+    note: string;
+    valid: string;
+    cta: string;
+    review: string;
+  }
 > = {
   fr: {
     subject: "Votre devis Swiss3Design est prêt",
     title: "Votre devis est prêt ✨",
-    intro: "Nous avons étudié votre projet d'impression sur mesure. Voici notre proposition :",
+    intro:
+      "Nous avons étudié votre projet d'impression sur mesure. Voici notre proposition :",
     price: "Prix proposé",
     note: "Notre message",
     valid: "Valable jusqu'au {date}",
@@ -530,9 +573,9 @@ export function quoteReplyEmail(quote: {
   adminMessage: string | null;
   validUntil?: Date | null;
 }): EmailMessage {
-  const locale = (["fr", "de", "it", "en"].includes(quote.locale)
-    ? quote.locale
-    : "fr") as Locale;
+  const locale = (
+    ["fr", "de", "it", "en"].includes(quote.locale) ? quote.locale : "fr"
+  ) as Locale;
   const t = QUOTE_TEXTS[locale];
   const body = `
     <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">${t.intro}</p>
@@ -567,35 +610,49 @@ export function quoteReplyEmail(quote: {
 
 const QUOTE_REJECTED_TEXTS: Record<
   Locale,
-  { subject: string; title: string; intro: string; reason: string; outro: string }
+  {
+    subject: string;
+    title: string;
+    intro: string;
+    reason: string;
+    outro: string;
+  }
 > = {
   fr: {
     subject: "Votre demande de devis — Swiss3Design",
     title: "Concernant votre demande de devis",
-    intro: "Merci pour l'intérêt que vous portez à Swiss3Design. Après étude attentive de votre projet, nous ne sommes malheureusement pas en mesure d'y donner suite.",
+    intro:
+      "Merci pour l'intérêt que vous portez à Swiss3Design. Après étude attentive de votre projet, nous ne sommes malheureusement pas en mesure d'y donner suite.",
     reason: "Notre message",
-    outro: "Cela ne remet pas en cause vos futurs projets : n'hésitez pas à nous soumettre une nouvelle demande, nous l'étudierons avec plaisir. Pour toute question, répondez simplement à cet e-mail.",
+    outro:
+      "Cela ne remet pas en cause vos futurs projets : n'hésitez pas à nous soumettre une nouvelle demande, nous l'étudierons avec plaisir. Pour toute question, répondez simplement à cet e-mail.",
   },
   de: {
     subject: "Ihre Offerten-Anfrage — Swiss3Design",
     title: "Zu Ihrer Offerten-Anfrage",
-    intro: "Vielen Dank für Ihr Interesse an Swiss3Design. Nach sorgfältiger Prüfung Ihres Projekts können wir Ihre Anfrage leider nicht umsetzen.",
+    intro:
+      "Vielen Dank für Ihr Interesse an Swiss3Design. Nach sorgfältiger Prüfung Ihres Projekts können wir Ihre Anfrage leider nicht umsetzen.",
     reason: "Unsere Nachricht",
-    outro: "Das gilt nicht für künftige Projekte: Reichen Sie gerne eine neue Anfrage ein — wir prüfen sie mit Freude. Bei Fragen antworten Sie einfach auf diese E-Mail.",
+    outro:
+      "Das gilt nicht für künftige Projekte: Reichen Sie gerne eine neue Anfrage ein — wir prüfen sie mit Freude. Bei Fragen antworten Sie einfach auf diese E-Mail.",
   },
   it: {
     subject: "La vostra richiesta di preventivo — Swiss3Design",
     title: "Riguardo alla vostra richiesta",
-    intro: "Grazie per l'interesse verso Swiss3Design. Dopo un attento esame del vostro progetto, purtroppo non siamo in grado di realizzarlo.",
+    intro:
+      "Grazie per l'interesse verso Swiss3Design. Dopo un attento esame del vostro progetto, purtroppo non siamo in grado di realizzarlo.",
     reason: "Il nostro messaggio",
-    outro: "Questo non vale per i progetti futuri: non esitate a inviarci una nuova richiesta, la esamineremo con piacere. Per qualsiasi domanda, rispondete a questa e-mail.",
+    outro:
+      "Questo non vale per i progetti futuri: non esitate a inviarci una nuova richiesta, la esamineremo con piacere. Per qualsiasi domanda, rispondete a questa e-mail.",
   },
   en: {
     subject: "Your quote request — Swiss3Design",
     title: "About your quote request",
-    intro: "Thank you for your interest in Swiss3Design. After carefully reviewing your project, we are unfortunately unable to take it on.",
+    intro:
+      "Thank you for your interest in Swiss3Design. After carefully reviewing your project, we are unfortunately unable to take it on.",
     reason: "Our message",
-    outro: "This doesn't apply to future projects: feel free to submit a new request and we'll gladly review it. For any question, just reply to this email.",
+    outro:
+      "This doesn't apply to future projects: feel free to submit a new request and we'll gladly review it. For any question, just reply to this email.",
   },
 };
 
@@ -604,9 +661,9 @@ export function quoteRejectedEmail(quote: {
   locale: string;
   adminMessage: string | null;
 }): EmailMessage {
-  const locale = (["fr", "de", "it", "en"].includes(quote.locale)
-    ? quote.locale
-    : "fr") as Locale;
+  const locale = (
+    ["fr", "de", "it", "en"].includes(quote.locale) ? quote.locale : "fr"
+  ) as Locale;
   const t = QUOTE_REJECTED_TEXTS[locale];
   const body = `
     <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">${t.intro}</p>
@@ -684,7 +741,11 @@ export function adminNewOrderEmail(
     from: FROM_ORDERS,
     replyTo: order.email,
     subject: `🛒 Nouvelle commande ${order.orderNumber} — ${chf(order.totalCents)}`,
-    html: layout(`Nouvelle commande ${order.orderNumber}`, body, "Notification interne Swiss3Design — répondre écrit directement au client."),
+    html: layout(
+      `Nouvelle commande ${order.orderNumber}`,
+      body,
+      "Notification interne Swiss3Design — répondre écrit directement au client.",
+    ),
   };
 }
 
@@ -727,7 +788,11 @@ export function adminNewQuoteEmail(
     from: FROM_CONTACT,
     replyTo: quote.email,
     subject: `📐 Nouvelle demande de devis — ${quote.email}`,
-    html: layout("Nouvelle demande de devis", body, "Notification interne Swiss3Design — répondre écrit directement au client."),
+    html: layout(
+      "Nouvelle demande de devis",
+      body,
+      "Notification interne Swiss3Design — répondre écrit directement au client.",
+    ),
   };
 }
 
@@ -742,7 +807,8 @@ export function adminQuotePaidEmail(
   },
   adminEmails: string[],
 ): EmailMessage {
-  const amount = quote.quotedPriceCents != null ? chf(quote.quotedPriceCents) : "—";
+  const amount =
+    quote.quotedPriceCents != null ? chf(quote.quotedPriceCents) : "—";
   const body = `
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
       Le devis de <strong>${esc(quote.email)}</strong> vient d'être
@@ -754,7 +820,11 @@ export function adminQuotePaidEmail(
     from: FROM_CONTACT,
     replyTo: quote.email,
     subject: `💳 Devis payé — ${quote.email} (${amount})`,
-    html: layout("Devis payé", body, "Notification interne Swiss3Design — répondre écrit directement au client."),
+    html: layout(
+      "Devis payé",
+      body,
+      "Notification interne Swiss3Design — répondre écrit directement au client.",
+    ),
   };
 }
 
@@ -783,18 +853,28 @@ export function adminQuoteRevisionEmail(
     from: FROM_CONTACT,
     replyTo: quote.email,
     subject: `✏️ Modification demandée — ${quote.email}`,
-    html: layout("Demande de modification", body, "Notification interne Swiss3Design — répondre écrit directement au client."),
+    html: layout(
+      "Demande de modification",
+      body,
+      "Notification interne Swiss3Design — répondre écrit directement au client.",
+    ),
   };
 }
 
 // ── Devis : le client refuse le devis (notification interne) ─────────────────
 
 export function adminQuoteDeclinedEmail(
-  quote: { id: string; email: string; locale: string; quotedPriceCents: number | null },
+  quote: {
+    id: string;
+    email: string;
+    locale: string;
+    quotedPriceCents: number | null;
+  },
   reason: string | null,
   adminEmails: string[],
 ): EmailMessage {
-  const amount = quote.quotedPriceCents != null ? chf(quote.quotedPriceCents) : "—";
+  const amount =
+    quote.quotedPriceCents != null ? chf(quote.quotedPriceCents) : "—";
   const body = `
     <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">
       <strong>${esc(quote.email)}</strong> (langue : ${quote.locale.toUpperCase()})
@@ -811,7 +891,11 @@ export function adminQuoteDeclinedEmail(
     from: FROM_CONTACT,
     replyTo: quote.email,
     subject: `🚫 Devis refusé — ${quote.email}`,
-    html: layout("Devis refusé par le client", body, "Notification interne Swiss3Design — répondre écrit directement au client."),
+    html: layout(
+      "Devis refusé par le client",
+      body,
+      "Notification interne Swiss3Design — répondre écrit directement au client.",
+    ),
   };
 }
 
@@ -824,26 +908,34 @@ const CHECKOUT_CODE_TEXTS: Record<
   fr: {
     subject: "{code} — votre code de vérification Swiss3Design",
     title: "Votre code de vérification",
-    intro: "Saisissez ce code sur la page de commande pour confirmer votre adresse e-mail :",
-    expiry: "Ce code expire dans 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.",
+    intro:
+      "Saisissez ce code sur la page de commande pour confirmer votre adresse e-mail :",
+    expiry:
+      "Ce code expire dans 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.",
   },
   de: {
     subject: "{code} — Ihr Swiss3Design-Bestätigungscode",
     title: "Ihr Bestätigungscode",
-    intro: "Geben Sie diesen Code auf der Bestellseite ein, um Ihre E-Mail-Adresse zu bestätigen:",
-    expiry: "Dieser Code läuft in 10 Minuten ab. Falls Sie das nicht angefordert haben, ignorieren Sie diese E-Mail.",
+    intro:
+      "Geben Sie diesen Code auf der Bestellseite ein, um Ihre E-Mail-Adresse zu bestätigen:",
+    expiry:
+      "Dieser Code läuft in 10 Minuten ab. Falls Sie das nicht angefordert haben, ignorieren Sie diese E-Mail.",
   },
   it: {
     subject: "{code} — il vostro codice di verifica Swiss3Design",
     title: "Il vostro codice di verifica",
-    intro: "Inserite questo codice nella pagina dell'ordine per confermare il vostro indirizzo e-mail:",
-    expiry: "Questo codice scade tra 10 minuti. Se non avete richiesto nulla, ignorate questa e-mail.",
+    intro:
+      "Inserite questo codice nella pagina dell'ordine per confermare il vostro indirizzo e-mail:",
+    expiry:
+      "Questo codice scade tra 10 minuti. Se non avete richiesto nulla, ignorate questa e-mail.",
   },
   en: {
     subject: "{code} — your Swiss3Design verification code",
     title: "Your verification code",
-    intro: "Enter this code on the checkout page to confirm your email address:",
-    expiry: "This code expires in 10 minutes. If you didn't request it, you can ignore this email.",
+    intro:
+      "Enter this code on the checkout page to confirm your email address:",
+    expiry:
+      "This code expires in 10 minutes. If you didn't request it, you can ignore this email.",
   },
 };
 
@@ -852,7 +944,9 @@ export function checkoutCodeEmail(
   code: string,
   locale: string,
 ): EmailMessage {
-  const l = (["fr", "de", "it", "en"].includes(locale) ? locale : "fr") as Locale;
+  const l = (
+    ["fr", "de", "it", "en"].includes(locale) ? locale : "fr"
+  ) as Locale;
   const t = CHECKOUT_CODE_TEXTS[l];
   const body = `
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">${t.intro}</p>
@@ -1035,7 +1129,11 @@ export function adminContactEmail(
     from: FROM_CONTACT,
     replyTo: message.email,
     subject: `✉️ Nouveau message — ${message.name}`,
-    html: layout("Nouveau message de contact", body, "Notification interne Swiss3Design — répondre écrit directement au client."),
+    html: layout(
+      "Nouveau message de contact",
+      body,
+      "Notification interne Swiss3Design — répondre écrit directement au client.",
+    ),
   };
 }
 
@@ -1080,7 +1178,9 @@ export function contactConfirmationEmail(
   body: string,
   locale: string,
 ): EmailMessage {
-  const l = (["fr", "de", "it", "en"].includes(locale) ? locale : "fr") as Locale;
+  const l = (
+    ["fr", "de", "it", "en"].includes(locale) ? locale : "fr"
+  ) as Locale;
   const t = CONTACT_CONFIRM_TEXTS[l];
   const html = `
     <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">${t.intro}</p>
@@ -1131,7 +1231,9 @@ export function newsletterAnnouncementEmail(params: {
 
   const productCards = (params.products ?? [])
     .map(
-      (product) => `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 12px;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;">
+      (
+        product,
+      ) => `<table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 12px;border:1px solid #e7e5e4;border-radius:12px;overflow:hidden;">
         <tr>
           ${
             product.imageUrl
@@ -1148,9 +1250,7 @@ export function newsletterAnnouncementEmail(params: {
     )
     .join("");
 
-  const cta = params.cta
-    ? button(params.cta.url, params.cta.label)
-    : "";
+  const cta = params.cta ? button(params.cta.url, params.cta.label) : "";
 
   const body = `${banner}${paragraphs}${productCards}${cta}`;
   const footer = `Vous recevez cet e-mail car vous êtes inscrit·e aux communications Swiss3Design.<br/><a href="${params.unsubscribeUrl}" style="color:#78716c;text-decoration:underline;">Se désabonner en un clic</a>`;

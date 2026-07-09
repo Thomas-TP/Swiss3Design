@@ -97,7 +97,10 @@ export function EmailForm({
       )}
 
       {editing && (
-        <form onSubmit={onSubmit} className="mt-3 flex flex-col gap-2.5 sm:flex-row">
+        <form
+          onSubmit={onSubmit}
+          className="mt-3 flex flex-col gap-2.5 sm:flex-row"
+        >
           <input
             type="email"
             value={value}

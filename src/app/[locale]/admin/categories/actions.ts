@@ -33,8 +33,7 @@ export async function saveCategory(
   if (nameFr.length < 2) {
     return { error: "Le nom en français est obligatoire." };
   }
-  const slug =
-    slugify(String(formData.get("slug") || "")) || slugify(nameFr);
+  const slug = slugify(String(formData.get("slug") || "")) || slugify(nameFr);
   if (!slug) return { error: "Slug invalide." };
 
   const sortOrderRaw = Number.parseInt(

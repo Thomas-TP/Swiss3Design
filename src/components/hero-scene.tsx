@@ -19,8 +19,8 @@ import {
 
 // Profil du vase : largeur relative (0–1) de chaque couche, base → col → lèvre.
 const PROFILE = [
-  0.46, 0.55, 0.64, 0.73, 0.81, 0.87, 0.91, 0.93, 0.92, 0.88, 0.81, 0.72,
-  0.63, 0.56, 0.53, 0.57, 0.65, 0.72,
+  0.46, 0.55, 0.64, 0.73, 0.81, 0.87, 0.91, 0.93, 0.92, 0.88, 0.81, 0.72, 0.63,
+  0.56, 0.53, 0.57, 0.65, 0.72,
 ];
 
 const SCENE_W = 280;
@@ -108,7 +108,9 @@ export function HeroScene({ className }: { className?: string }) {
           className="absolute inset-0 text-ink"
           animate={reduce ? undefined : { y: [0, -6, 0] }}
           transition={
-            reduce ? undefined : { duration: 6, repeat: Infinity, ease: "easeInOut" }
+            reduce
+              ? undefined
+              : { duration: 6, repeat: Infinity, ease: "easeInOut" }
           }
         >
           {/* Cadre de l'imprimante : montants latéraux */}
@@ -116,7 +118,12 @@ export function HeroScene({ className }: { className?: string }) {
             <div
               key={x}
               className="absolute rounded-full bg-ink/10"
-              style={{ left: x, top: TOP_Y - 26, width: 6, height: BASE_Y - TOP_Y + 34 }}
+              style={{
+                left: x,
+                top: TOP_Y - 26,
+                width: 6,
+                height: BASE_Y - TOP_Y + 34,
+              }}
             />
           ))}
 
@@ -140,7 +147,12 @@ export function HeroScene({ className }: { className?: string }) {
           {/* La pièce, révélée couche par couche (masque dérivé de reveal) */}
           <motion.div
             className="absolute left-1/2 flex -translate-x-1/2 flex-col items-center"
-            style={{ top: TOP_Y, willChange: "clip-path", clipPath: clip, opacity: objOpacity }}
+            style={{
+              top: TOP_Y,
+              willChange: "clip-path",
+              clipPath: clip,
+              opacity: objOpacity,
+            }}
           >
             {PROFILE.map((_, idx) => {
               // idx 0 = sommet (lèvre), dernier = base : dessin du haut vers le
@@ -181,7 +193,12 @@ export function HeroScene({ className }: { className?: string }) {
           {/* Portique : translateY dérivé de reveal → pointe pile au sommet imprimé */}
           <motion.div
             className="absolute left-0"
-            style={{ top: TOP_Y - NOZZLE_TIP, width: SCENE_W, height: NOZZLE_TIP + 14, y: gantryY }}
+            style={{
+              top: TOP_Y - NOZZLE_TIP,
+              width: SCENE_W,
+              height: NOZZLE_TIP + 14,
+              y: gantryY,
+            }}
           >
             {/* Rail horizontal (le long duquel la tête balaie) */}
             <div
@@ -189,9 +206,15 @@ export function HeroScene({ className }: { className?: string }) {
               style={{ left: 36, right: 42, top: 6, height: 5 }}
             />
             {/* Conteneur centré (statique) ; la tête balaie en X à l'intérieur */}
-            <div className="absolute left-1/2 -translate-x-1/2" style={{ top: 0 }}>
+            <div
+              className="absolute left-1/2 -translate-x-1/2"
+              style={{ top: 0 }}
+            >
               <motion.div style={{ x: headX }}>
-                <div className="w-11 rounded-md bg-ink shadow-md" style={{ height: CARRIAGE_H }} />
+                <div
+                  className="w-11 rounded-md bg-ink shadow-md"
+                  style={{ height: CARRIAGE_H }}
+                />
                 <div
                   className="mx-auto h-0 w-0"
                   style={{
@@ -206,7 +229,11 @@ export function HeroScene({ className }: { className?: string }) {
                     className="mx-auto w-0.5 rounded-full bg-accent"
                     style={{ height: 7 }}
                     animate={{ opacity: [0.25, 1, 0.25] }}
-                    transition={{ duration: 0.45, repeat: Infinity, ease: "easeInOut" }}
+                    transition={{
+                      duration: 0.45,
+                      repeat: Infinity,
+                      ease: "easeInOut",
+                    }}
                   />
                 )}
               </motion.div>

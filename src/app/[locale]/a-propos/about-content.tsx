@@ -262,9 +262,9 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Comment payer ? Est-ce sécurisé ?",
         a: (
           <>
-            Le paiement se fait via Stripe : TWINT, cartes et Google
-            Pay. La transaction est chiffrée et vos données bancaires ne
-            transitent jamais par nos serveurs.
+            Le paiement se fait via Stripe : TWINT, cartes et Google Pay. La
+            transaction est chiffrée et vos données bancaires ne transitent
+            jamais par nos serveurs.
           </>
         ),
       },
@@ -507,9 +507,9 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Wie bezahle ich? Ist das sicher?",
         a: (
           <>
-            Die Zahlung erfolgt über Stripe: TWINT, Karten und Google
-            Pay. Die Transaktion ist verschlüsselt und Ihre Kartendaten laufen
-            nie über unsere Server.
+            Die Zahlung erfolgt über Stripe: TWINT, Karten und Google Pay. Die
+            Transaktion ist verschlüsselt und Ihre Kartendaten laufen nie über
+            unsere Server.
           </>
         ),
       },
@@ -589,7 +589,10 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       { label: "Altezza dello strato", value: "0,08 – 0,28 mm" },
       { label: "Ugello", value: "0,4 mm" },
       { label: "Camera chiusa", value: "Sì — telaio CoreXY rigido" },
-      { label: "Essiccazione del filamento", value: "Integrata nell’AMS 2 Pro" },
+      {
+        label: "Essiccazione del filamento",
+        value: "Integrata nell’AMS 2 Pro",
+      },
     ],
 
     processKicker: "Il procedimento",
@@ -755,8 +758,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         a: (
           <>
             Il pagamento avviene tramite Stripe: TWINT, carte e Google Pay. La
-            transazione è cifrata e i vostri dati bancari non
-            passano mai dai nostri server.
+            transazione è cifrata e i vostri dati bancari non passano mai dai
+            nostri server.
           </>
         ),
       },
@@ -995,9 +998,9 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "How do I pay? Is it secure?",
         a: (
           <>
-            Payment is made via Stripe: TWINT, cards and Google Pay.
-            The transaction is encrypted and your card details never pass
-            through our servers.
+            Payment is made via Stripe: TWINT, cards and Google Pay. The
+            transaction is encrypted and your card details never pass through
+            our servers.
           </>
         ),
       },

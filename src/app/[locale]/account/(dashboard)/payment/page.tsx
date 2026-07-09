@@ -22,7 +22,12 @@ export default async function PaymentTab() {
   // moyens de paiement sont gérés par le client lui-même via son compte
   // Stripe Link — Swiss3Design ne stocke jamais de numéro de carte (PCI =
   // Stripe). Voir la décision de scope dans le plan Phase 4.
-  let cards: { brand: string; last4: string; expMonth: number; expYear: number }[] = [];
+  let cards: {
+    brand: string;
+    last4: string;
+    expMonth: number;
+    expYear: number;
+  }[] = [];
   if (user.stripeCustomerId) {
     const { env } = await getCloudflareContext({ async: true });
     const stripe = getStripe(env.STRIPE_SECRET_KEY);
@@ -51,7 +56,10 @@ export default async function PaymentTab() {
       <div className="space-y-4">
         <div className={card}>
           <div className="flex items-start gap-2.5">
-            <ShieldCheck size={18} className="mt-0.5 shrink-0 text-emerald-600" />
+            <ShieldCheck
+              size={18}
+              className="mt-0.5 shrink-0 text-emerald-600"
+            />
             <div>
               <p className="text-sm font-semibold">{t("payment.linkTitle")}</p>
               <p className="mt-1 text-sm text-soft">{t("payment.linkDesc")}</p>

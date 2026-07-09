@@ -13,7 +13,9 @@ const selectionSchema = z.array(z.string().min(1).max(64)).max(48);
 // la liste complète et ordonnée des produits retenus : on remet tout le
 // catalogue à plat (featured = false), puis on (re)marque les sélectionnés
 // dans l'ordre reçu. Source de vérité unique, pas de désynchronisation.
-export async function saveFeaturedSelection(orderedIds: string[]): Promise<void> {
+export async function saveFeaturedSelection(
+  orderedIds: string[],
+): Promise<void> {
   await requireAdmin();
 
   const parsed = selectionSchema.safeParse(orderedIds);

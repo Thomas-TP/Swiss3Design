@@ -16,17 +16,18 @@ import {
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 
-const tabs: { href: string; key: string; icon: LucideIcon; exact?: boolean }[] = [
-  { href: "/account", key: "overview", icon: LayoutDashboard, exact: true },
-  { href: "/account/orders", key: "orders", icon: Package },
-  { href: "/account/quotes", key: "quotes", icon: FileText },
-  { href: "/account/profile", key: "profile", icon: User },
-  { href: "/account/addresses", key: "addresses", icon: MapPin },
-  { href: "/account/payment", key: "payment", icon: CreditCard },
-  { href: "/account/security", key: "security", icon: ShieldCheck },
-  { href: "/account/notifications", key: "notifications", icon: Bell },
-  { href: "/account/privacy", key: "privacy", icon: Lock },
-];
+const tabs: { href: string; key: string; icon: LucideIcon; exact?: boolean }[] =
+  [
+    { href: "/account", key: "overview", icon: LayoutDashboard, exact: true },
+    { href: "/account/orders", key: "orders", icon: Package },
+    { href: "/account/quotes", key: "quotes", icon: FileText },
+    { href: "/account/profile", key: "profile", icon: User },
+    { href: "/account/addresses", key: "addresses", icon: MapPin },
+    { href: "/account/payment", key: "payment", icon: CreditCard },
+    { href: "/account/security", key: "security", icon: ShieldCheck },
+    { href: "/account/notifications", key: "notifications", icon: Bell },
+    { href: "/account/privacy", key: "privacy", icon: Lock },
+  ];
 
 export function AccountNav({ isAdmin }: { isAdmin: boolean }) {
   const t = useTranslations("account.nav");
@@ -35,7 +36,9 @@ export function AccountNav({ isAdmin }: { isAdmin: boolean }) {
   // L'onglet « Vue d'ensemble » (/account) ne s'allume qu'en correspondance
   // exacte, sinon il resterait actif sur tous les sous-onglets.
   const isActive = (href: string, exact?: boolean) =>
-    exact ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
+    exact
+      ? pathname === href
+      : pathname === href || pathname.startsWith(`${href}/`);
 
   const itemClass = (active: boolean) =>
     `flex shrink-0 items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${

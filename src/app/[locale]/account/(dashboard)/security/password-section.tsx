@@ -22,9 +22,7 @@ export function PasswordSection() {
     let cancelled = false;
     listAccounts().then(({ data }) => {
       if (cancelled) return;
-      setHasPassword(
-        (data ?? []).some((a) => a.providerId === "credential"),
-      );
+      setHasPassword((data ?? []).some((a) => a.providerId === "credential"));
     });
     return () => {
       cancelled = true;
@@ -68,7 +66,9 @@ export function PasswordSection() {
       <div className="flex items-center gap-2.5">
         <KeyRound size={18} className="shrink-0 text-soft" />
         <div>
-          <p className="text-sm font-semibold">{t("security.passwordSection.title")}</p>
+          <p className="text-sm font-semibold">
+            {t("security.passwordSection.title")}
+          </p>
           <p className="mt-0.5 text-xs text-soft">
             {hasPassword
               ? t("security.passwordSection.descChange")
@@ -110,7 +110,9 @@ export function PasswordSection() {
           disabled={pending || next.length < 8 || (hasPassword && !current)}
           className={btnPrimary}
         >
-          {pending ? t("security.processing") : t("security.passwordSection.submit")}
+          {pending
+            ? t("security.processing")
+            : t("security.passwordSection.submit")}
         </button>
       </form>
     </div>

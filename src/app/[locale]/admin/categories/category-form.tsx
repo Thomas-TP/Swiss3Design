@@ -57,7 +57,9 @@ export function CategoryForm({ initial }: { initial?: CategoryFormInitial }) {
             />
           </label>
           <label className="block text-sm">
-            <span className="mb-1.5 block font-semibold">Ordre d&apos;affichage</span>
+            <span className="mb-1.5 block font-semibold">
+              Ordre d&apos;affichage
+            </span>
             <input
               name="sortOrder"
               type="number"

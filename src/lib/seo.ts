@@ -76,7 +76,9 @@ export function productJsonLd(
     "@type": "Product",
     name: p.name,
     description: p.description,
-    image: p.imageUrls.map((u) => (u.startsWith("http") ? u : `${SITE_URL}${u}`)),
+    image: p.imageUrls.map((u) =>
+      u.startsWith("http") ? u : `${SITE_URL}${u}`,
+    ),
     material: p.material,
     brand: { "@type": "Brand", name: "Swiss3Design" },
     // Note agrégée (avis publiés) → étoiles dans les résultats Google.

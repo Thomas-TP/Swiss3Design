@@ -28,13 +28,17 @@ export default async function AdminSettingsPage() {
         <h3 className="font-semibold">Maintenance des données</h3>
         <p className="mb-4 mt-1 text-sm leading-relaxed text-soft">
           Supprime les fichiers 3D orphelins (uploads jamais transformés en
-          demande) et applique la rétention : les fichiers et devis de plus de
-          2 ans sont effacés (les devis payés sont conservés sans leur fichier).
+          demande) et applique la rétention : les fichiers et devis de plus de 2
+          ans sont effacés (les devis payés sont conservés sans leur fichier).
           Peut aussi être planifié quotidiennement via un cron appelant{" "}
           <code className="rounded bg-paper px-1 py-0.5 text-xs">
             POST /api/cron/maintenance
           </code>{" "}
-          avec l&apos;en-tête <code className="rounded bg-paper px-1 py-0.5 text-xs">Authorization: Bearer CRON_SECRET</code>.
+          avec l&apos;en-tête{" "}
+          <code className="rounded bg-paper px-1 py-0.5 text-xs">
+            Authorization: Bearer CRON_SECRET
+          </code>
+          .
         </p>
         <MaintenanceButton />
       </section>

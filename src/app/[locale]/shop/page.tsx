@@ -43,8 +43,7 @@ export default async function ShopPage({
   }>;
 }) {
   const { locale } = await params;
-  const { category, material, color, multicolor, sort, q } =
-    await searchParams;
+  const { category, material, color, multicolor, sort, q } = await searchParams;
   const searchParam = q?.trim() || undefined;
   const multicolorOn = multicolor === "1";
   // Le filtre multicolore n'apparaît que si un produit l'utilise — ou s'il est
@@ -114,7 +113,12 @@ export default async function ShopPage({
         </form>
         <div className="flex flex-wrap gap-2">
           <Link
-            href={linkFor({ material, color, multicolor: multicolorParam, sort: sortParam })}
+            href={linkFor({
+              material,
+              color,
+              multicolor: multicolorParam,
+              sort: sortParam,
+            })}
             className={chip(!category)}
           >
             {t("all")}
@@ -206,7 +210,9 @@ export default async function ShopPage({
             {t("results", { count: products.length })}
           </p>
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-soft">{t("sortLabel")}</span>
+            <span className="text-xs font-medium text-soft">
+              {t("sortLabel")}
+            </span>
             <div className="inline-flex items-center rounded-full border border-line bg-paper p-1">
               {SORTS.map((s) => (
                 <Link

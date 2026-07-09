@@ -62,7 +62,11 @@ export default async function CheckoutSuccessPage({
   }
 
   const Icon =
-    status === "succeeded" ? CheckCircle2 : status === "processing" ? Clock : XCircle;
+    status === "succeeded"
+      ? CheckCircle2
+      : status === "processing"
+        ? Clock
+        : XCircle;
 
   return (
     <div className="mx-auto max-w-xl px-4 py-20 sm:px-6">
@@ -80,7 +84,11 @@ export default async function CheckoutSuccessPage({
           <Icon size={30} strokeWidth={1.8} />
         </span>
         <h1 className="mt-6 text-2xl font-bold">
-          {status === "succeeded" ? t("title") : status === "processing" ? t("processingTitle") : t("failedTitle")}
+          {status === "succeeded"
+            ? t("title")
+            : status === "processing"
+              ? t("processingTitle")
+              : t("failedTitle")}
         </h1>
         <p className="mt-3 leading-relaxed text-soft">
           {status === "succeeded"
@@ -114,7 +122,10 @@ export default async function CheckoutSuccessPage({
             <Link
               href={
                 receiptEmail
-                  ? { pathname: "/account/register", query: { email: receiptEmail } }
+                  ? {
+                      pathname: "/account/register",
+                      query: { email: receiptEmail },
+                    }
                   : "/account/register"
               }
               className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] sm:w-auto"

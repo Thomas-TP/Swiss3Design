@@ -13,10 +13,10 @@ export function ContactForm() {
   const t = useTranslations("contact");
   const locale = useLocale();
   const { data: authSession } = useSession();
-  const [state, formAction, pending] = useActionState<ContactFormState, FormData>(
-    submitContactMessage,
-    { status: "idle" },
-  );
+  const [state, formAction, pending] = useActionState<
+    ContactFormState,
+    FormData
+  >(submitContactMessage, { status: "idle" });
 
   if (state.status === "success") {
     return (
@@ -36,12 +36,7 @@ export function ContactForm() {
       <div aria-hidden className="hidden">
         <label>
           Société
-          <input
-            type="text"
-            name="company"
-            tabIndex={-1}
-            autoComplete="off"
-          />
+          <input type="text" name="company" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
 

@@ -65,15 +65,22 @@ export function PasskeysSection({
       <div className="flex items-center gap-2.5">
         <Fingerprint size={18} className="shrink-0 text-soft" />
         <div>
-          <p className="text-sm font-semibold">{t("security.passkeys.title")}</p>
-          <p className="mt-0.5 text-xs text-soft">{t("security.passkeys.desc")}</p>
+          <p className="text-sm font-semibold">
+            {t("security.passkeys.title")}
+          </p>
+          <p className="mt-0.5 text-xs text-soft">
+            {t("security.passkeys.desc")}
+          </p>
         </div>
       </div>
 
       {initialPasskeys.length > 0 && (
         <ul className="mt-4 divide-y divide-line">
           {initialPasskeys.map((p) => (
-            <li key={p.id} className="flex items-center justify-between gap-3 py-3">
+            <li
+              key={p.id}
+              className="flex items-center justify-between gap-3 py-3"
+            >
               <div className="min-w-0">
                 <p className="truncate text-sm font-medium">
                   {p.name || p.providerLabel || t("security.passkeys.unnamed")}
@@ -107,7 +114,9 @@ export function PasskeysSection({
         className={`${btnPrimary} mt-4`}
       >
         <Plus size={15} />
-        {pending === "add" ? t("security.processing") : t("security.passkeys.add")}
+        {pending === "add"
+          ? t("security.processing")
+          : t("security.passkeys.add")}
       </button>
     </div>
   );

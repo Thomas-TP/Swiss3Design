@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { sendEmail, getAdminEmails } from "@/lib/email";
-import { adminContactEmail, contactConfirmationEmail } from "@/lib/email-templates";
+import {
+  adminContactEmail,
+  contactConfirmationEmail,
+} from "@/lib/email-templates";
 import { corsHeadersFor } from "@/lib/medusa-bridge";
 
 // Route cross-origine pour le formulaire de contact (page « À propos ») des
@@ -35,9 +38,15 @@ export async function POST(request: Request) {
 
   try {
     const adminEmails = await getAdminEmails();
-    const recipients = adminEmails.length > 0 ? adminEmails : ["contact@swiss3design.ch"];
+    const recipients =
+      adminEmails.length > 0 ? adminEmails : ["contact@swiss3design.ch"];
 
-    const sent = await sendEmail(adminContactEmail({ name, email, subject: subject ?? null, body: message, locale }, recipients));
+    const sent = await sendEmail(
+      adminContactEmail(
+        { name, email, subject: subject ?? null, body: message, locale },
+        recipients,
+      ),
+    );
 
     if (!sent && process.env.NODE_ENV === "production") {
       return Response.json({ status: "error" }, { status: 502, headers });

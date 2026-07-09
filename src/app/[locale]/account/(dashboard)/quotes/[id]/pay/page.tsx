@@ -77,8 +77,7 @@ export default async function QuotePayPage({
   // Server component dynamique : l'horloge est stable sur la durée du rendu
   // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
-  const expired =
-    !!quote.validUntil && quote.validUntil.getTime() < now;
+  const expired = !!quote.validUntil && quote.validUntil.getTime() < now;
   const payable =
     !paid &&
     !expired &&

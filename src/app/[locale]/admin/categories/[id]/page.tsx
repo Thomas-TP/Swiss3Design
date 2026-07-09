@@ -30,7 +30,9 @@ export default async function EditCategoryPage({
     id: cat.id,
     slug: cat.slug,
     sortOrder: cat.sortOrder,
-    translations: Object.fromEntries(translations.map((t) => [t.locale, t.name])),
+    translations: Object.fromEntries(
+      translations.map((t) => [t.locale, t.name]),
+    ),
   };
 
   return (

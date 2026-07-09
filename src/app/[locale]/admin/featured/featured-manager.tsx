@@ -76,7 +76,8 @@ export function FeaturedManager({
 
   const q = query.trim().toLowerCase();
   const available = all.filter(
-    (p) => !selectedIds.includes(p.id) && (!q || p.name.toLowerCase().includes(q)),
+    (p) =>
+      !selectedIds.includes(p.id) && (!q || p.name.toLowerCase().includes(q)),
   );
 
   return (

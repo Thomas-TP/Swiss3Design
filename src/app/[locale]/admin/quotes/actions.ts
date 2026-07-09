@@ -33,7 +33,9 @@ export async function updateQuote(formData: FormData) {
   const adminMessage =
     String(formData.get("adminMessage") || "").trim() || null;
   const adminNote =
-    String(formData.get("adminNote") || "").trim().slice(0, 2000) || null;
+    String(formData.get("adminNote") || "")
+      .trim()
+      .slice(0, 2000) || null;
   const db = await getDb();
   const [previous] = await db
     .select()
@@ -88,7 +90,11 @@ export async function updateQuote(formData: FormData) {
           validUntil,
         }),
       );
-    } else if (previous && status === "rejected" && previous.status !== "rejected") {
+    } else if (
+      previous &&
+      status === "rejected" &&
+      previous.status !== "rejected"
+    ) {
       // Demande non retenue : le client est prévenu, avec le message en motif
       await sendEmail(
         quoteRejectedEmail({

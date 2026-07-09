@@ -27,7 +27,9 @@ export async function POST(request: Request) {
   } | null;
   if (!data) return Response.json({ error: "invalid" }, { status: 400 });
 
-  const email = String(data.email ?? "").trim().toLowerCase();
+  const email = String(data.email ?? "")
+    .trim()
+    .toLowerCase();
   if (!EMAIL_RE.test(email) || email.length > 200) {
     return Response.json({ error: "invalid_email" }, { status: 400 });
   }
@@ -50,7 +52,10 @@ export async function POST(request: Request) {
     return Response.json({ error: "empty" }, { status: 400 });
   }
 
-  const subtotalCents = items.reduce((s, i) => s + i.priceCents * i.quantity, 0);
+  const subtotalCents = items.reduce(
+    (s, i) => s + i.priceCents * i.quantity,
+    0,
+  );
   const locale = LOCALES.includes(String(data.locale))
     ? (String(data.locale) as "fr" | "de" | "it" | "en")
     : "fr";
@@ -61,7 +66,10 @@ export async function POST(request: Request) {
   await db
     .delete(abandonedCarts)
     .where(
-      and(eq(abandonedCarts.email, email), isNull(abandonedCarts.reminderSentAt)),
+      and(
+        eq(abandonedCarts.email, email),
+        isNull(abandonedCarts.reminderSentAt),
+      ),
     );
   await db.insert(abandonedCarts).values({
     email,

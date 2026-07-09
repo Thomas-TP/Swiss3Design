@@ -254,7 +254,12 @@ export async function buildShowroomScene(
 
   // ---- Tapis rouge marque, épais. Posé sur le sol, sous le socle.
   const rug = new THREE.Mesh(
-    new THREE.CylinderGeometry(podiumRadius * 2.3, podiumRadius * 2.3, rugThickness, 80),
+    new THREE.CylinderGeometry(
+      podiumRadius * 2.3,
+      podiumRadius * 2.3,
+      rugThickness,
+      80,
+    ),
     new THREE.MeshStandardMaterial({
       color: new THREE.Color(BRAND_RED),
       roughness: 0.92,
@@ -267,7 +272,12 @@ export async function buildShowroomScene(
 
   // ---- Grand socle clair sur plinthe sombre, posé sur le tapis.
   const podium = new THREE.Mesh(
-    new THREE.CylinderGeometry(podiumRadius, podiumRadius * 1.03, podiumHeight, 96),
+    new THREE.CylinderGeometry(
+      podiumRadius,
+      podiumRadius * 1.03,
+      podiumHeight,
+      96,
+    ),
     new THREE.MeshStandardMaterial({
       color: new THREE.Color("#cbc7c0"),
       roughness: 0.5,
@@ -280,7 +290,12 @@ export async function buildShowroomScene(
   scene.add(podium);
   const plinthHeight = podiumHeight * 0.18;
   const plinth = new THREE.Mesh(
-    new THREE.CylinderGeometry(podiumRadius * 1.12, podiumRadius * 1.16, plinthHeight, 96),
+    new THREE.CylinderGeometry(
+      podiumRadius * 1.12,
+      podiumRadius * 1.16,
+      plinthHeight,
+      96,
+    ),
     new THREE.MeshStandardMaterial({
       color: new THREE.Color("#23201b"),
       roughness: 0.6,

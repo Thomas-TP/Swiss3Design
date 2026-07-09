@@ -65,8 +65,12 @@ export function SessionsSection() {
         <div className="flex items-center gap-2.5">
           <Laptop size={18} className="shrink-0 text-soft" />
           <div>
-            <p className="text-sm font-semibold">{t("security.sessions.title")}</p>
-            <p className="mt-0.5 text-xs text-soft">{t("security.sessions.desc")}</p>
+            <p className="text-sm font-semibold">
+              {t("security.sessions.title")}
+            </p>
+            <p className="mt-0.5 text-xs text-soft">
+              {t("security.sessions.desc")}
+            </p>
           </div>
         </div>
         {hasOtherSessions && (
@@ -86,7 +90,10 @@ export function SessionsSection() {
         {groups.map((g) => {
           const label =
             g.browser && g.os
-              ? t("security.sessions.browserOn", { browser: g.browser, os: g.os })
+              ? t("security.sessions.browserOn", {
+                  browser: g.browser,
+                  os: g.os,
+                })
               : t("security.sessions.unknownDevice");
           // Sur le groupe de l'appareil courant, seules les AUTRES sessions du
           // même appareil sont révocables (jamais la session en cours).
@@ -96,7 +103,10 @@ export function SessionsSection() {
           const otherCount = g.sessions.length - (g.isCurrent ? 1 : 0);
 
           return (
-            <li key={g.key} className="flex items-center justify-between gap-3 py-3">
+            <li
+              key={g.key}
+              className="flex items-center justify-between gap-3 py-3"
+            >
               <div className="min-w-0">
                 <p className="flex items-center gap-2 text-sm font-medium">
                   {label}
@@ -115,7 +125,11 @@ export function SessionsSection() {
                   )}
                   <span>{g.lastActive.toLocaleDateString(`${locale}-CH`)}</span>
                   {otherCount > 0 && (
-                    <span>{t("security.sessions.otherSessions", { count: otherCount })}</span>
+                    <span>
+                      {t("security.sessions.otherSessions", {
+                        count: otherCount,
+                      })}
+                    </span>
                   )}
                 </p>
               </div>

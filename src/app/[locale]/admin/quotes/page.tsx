@@ -81,7 +81,9 @@ export default async function AdminQuotesPage({
           ))}
         </div>
         <form className="relative" action="">
-          {statusFilter && <input type="hidden" name="s" value={statusFilter} />}
+          {statusFilter && (
+            <input type="hidden" name="s" value={statusFilter} />
+          )}
           <Search
             size={15}
             className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-soft"

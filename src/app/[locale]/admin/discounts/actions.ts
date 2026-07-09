@@ -52,7 +52,9 @@ export async function saveDiscount(
   const minRaw = String(formData.get("minSubtotal") || "").trim();
   const minSubtotalCents = minRaw ? chfToCents(minRaw) : null;
   const maxRaw = String(formData.get("maxUses") || "").trim();
-  const maxUses = maxRaw ? Math.max(1, Number.parseInt(maxRaw, 10) || 0) || null : null;
+  const maxUses = maxRaw
+    ? Math.max(1, Number.parseInt(maxRaw, 10) || 0) || null
+    : null;
   const expiresRaw = String(formData.get("expiresAt") || "").trim();
   const expiresAt = expiresRaw ? new Date(expiresRaw) : null;
   if (expiresAt && Number.isNaN(expiresAt.getTime())) {

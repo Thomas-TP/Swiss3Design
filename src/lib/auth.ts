@@ -34,7 +34,8 @@ function adminEmails(env: CloudflareEnv): string[] {
 
 // N'active un provider social que si ses identifiants sont configurés
 function socialProviders(env: CloudflareEnv) {
-  const providers: Record<string, { clientId: string; clientSecret: string }> = {};
+  const providers: Record<string, { clientId: string; clientSecret: string }> =
+    {};
   if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
     providers.google = {
       clientId: env.GOOGLE_CLIENT_ID,
@@ -76,7 +77,11 @@ export async function getAuth() {
     trustedOrigins:
       env.APP_ENV === "preview"
         ? [env.BETTER_AUTH_URL, ...STOREFRONT_ORIGINS]
-        : ["https://swiss3design.ch", "https://www.swiss3design.ch", ...STOREFRONT_ORIGINS],
+        : [
+            "https://swiss3design.ch",
+            "https://www.swiss3design.ch",
+            ...STOREFRONT_ORIGINS,
+          ],
     database: drizzleAdapter(db, { provider: "sqlite" }),
     emailAndPassword: {
       enabled: true,

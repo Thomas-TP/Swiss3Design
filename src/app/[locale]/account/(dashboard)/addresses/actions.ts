@@ -62,7 +62,11 @@ export async function updateAddress(
   const db = await getDb();
   const result = await db
     .update(customerAddresses)
-    .set({ ...parsed.data, label: parsed.data.label || null, updatedAt: new Date() })
+    .set({
+      ...parsed.data,
+      label: parsed.data.label || null,
+      updatedAt: new Date(),
+    })
     .where(
       and(
         eq(customerAddresses.id, id),

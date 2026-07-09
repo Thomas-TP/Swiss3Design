@@ -105,7 +105,9 @@ export interface ReorderItem {
 // sont silencieusement écartées (unavailableCount les compte pour affichage).
 export async function getReorderItems(
   orderId: string,
-): Promise<{ items: ReorderItem[]; unavailableCount: number } | { error: string }> {
+): Promise<
+  { items: ReorderItem[]; unavailableCount: number } | { error: string }
+> {
   const session = await getServerSession();
   if (!session) return { error: "unauthorized" };
   const { user } = session;
@@ -129,10 +131,14 @@ export async function getReorderItems(
     .where(eq(orderItems.orderId, orderId));
 
   const productIds = [
-    ...new Set(lines.map((l) => l.productId).filter((id): id is string => !!id)),
+    ...new Set(
+      lines.map((l) => l.productId).filter((id): id is string => !!id),
+    ),
   ];
   const variantIds = [
-    ...new Set(lines.map((l) => l.variantId).filter((id): id is string => !!id)),
+    ...new Set(
+      lines.map((l) => l.variantId).filter((id): id is string => !!id),
+    ),
   ];
 
   const [dbProducts, dbVariants, dbImages] = await Promise.all([
@@ -166,7 +172,9 @@ export async function getReorderItems(
   let unavailableCount = 0;
 
   for (const line of lines) {
-    const product = line.productId ? productById.get(line.productId) : undefined;
+    const product = line.productId
+      ? productById.get(line.productId)
+      : undefined;
     if (!product || !product.active) {
       unavailableCount++;
       continue;

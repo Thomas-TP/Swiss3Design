@@ -19,7 +19,10 @@ export async function GET(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
   const secret = env.BETTER_AUTH_BRIDGE_SECRET;
   if (!secret) {
-    return Response.json({ error: "server_misconfigured" }, { status: 500, headers });
+    return Response.json(
+      { error: "server_misconfigured" },
+      { status: 500, headers },
+    );
   }
 
   const token = await createMedusaBridgeToken(

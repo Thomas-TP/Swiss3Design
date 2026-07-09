@@ -13,7 +13,8 @@ function TwoFactor() {
   const router = useRouter();
   const { data } = useSession();
   const enabled = Boolean(
-    (data?.user as { twoFactorEnabled?: boolean } | undefined)?.twoFactorEnabled,
+    (data?.user as { twoFactorEnabled?: boolean } | undefined)
+      ?.twoFactorEnabled,
   );
 
   const [password, setPassword] = useState("");
@@ -31,7 +32,10 @@ function TwoFactor() {
   // le reste (500, réseau, session expirée...) n'a rien à voir avec le mot de
   // passe et ne doit jamais afficher "mot de passe incorrect" — un 500 étiqueté
   // à tort a fait perdre du temps de debug pendant l'incident du 2026-07-02.
-  function errorMessage(err: { status?: number } | null, wrongFallback: string) {
+  function errorMessage(
+    err: { status?: number } | null,
+    wrongFallback: string,
+  ) {
     if (err?.status === 429) return t("security.errorRateLimit");
     if (err?.status === 400) return wrongFallback;
     return t("security.errorGeneric");
@@ -97,13 +101,20 @@ function TwoFactor() {
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-2.5">
           {enabled ? (
-            <ShieldCheck size={18} className="mt-0.5 shrink-0 text-emerald-600" />
+            <ShieldCheck
+              size={18}
+              className="mt-0.5 shrink-0 text-emerald-600"
+            />
           ) : (
             <ShieldOff size={18} className="mt-0.5 shrink-0 text-soft" />
           )}
           <div>
-            <p className="text-sm font-semibold">{t("security.twoFactorTitle")}</p>
-            <p className="mt-0.5 text-xs text-soft">{t("security.twoFactorDesc")}</p>
+            <p className="text-sm font-semibold">
+              {t("security.twoFactorTitle")}
+            </p>
+            <p className="mt-0.5 text-xs text-soft">
+              {t("security.twoFactorDesc")}
+            </p>
           </div>
         </div>
         <span
@@ -113,7 +124,9 @@ function TwoFactor() {
               : "bg-line text-soft"
           }`}
         >
-          {enabled ? t("security.twoFactorActive") : t("security.twoFactorInactive")}
+          {enabled
+            ? t("security.twoFactorActive")
+            : t("security.twoFactorInactive")}
         </span>
       </div>
 
@@ -129,7 +142,9 @@ function TwoFactor() {
               <p className="text-xs font-semibold text-soft">
                 {t("security.backupTitle")}
               </p>
-              <p className="mt-1 text-xs text-soft">{t("security.backupHint")}</p>
+              <p className="mt-1 text-xs text-soft">
+                {t("security.backupHint")}
+              </p>
               <ul className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-sm tabular-nums">
                 {setup.codes.map((c) => (
                   <li key={c}>{c}</li>
@@ -137,7 +152,9 @@ function TwoFactor() {
               </ul>
               <button
                 type="button"
-                onClick={() => navigator.clipboard?.writeText(setup.codes.join("\n"))}
+                onClick={() =>
+                  navigator.clipboard?.writeText(setup.codes.join("\n"))
+                }
                 className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-soft hover:text-ink"
               >
                 <Copy size={13} />
@@ -150,7 +167,9 @@ function TwoFactor() {
             <div className="flex gap-2">
               <input
                 value={code}
-                onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                onChange={(e) =>
+                  setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+                }
                 inputMode="numeric"
                 autoComplete="one-time-code"
                 placeholder={t("security.codePlaceholder")}
@@ -175,7 +194,9 @@ function TwoFactor() {
               <p className="text-xs font-semibold text-soft">
                 {t("security.backupTitle")}
               </p>
-              <p className="mt-1 text-xs text-soft">{t("security.backupHint")}</p>
+              <p className="mt-1 text-xs text-soft">
+                {t("security.backupHint")}
+              </p>
               <ul className="mt-2 grid grid-cols-2 gap-x-4 gap-y-1 font-mono text-sm tabular-nums">
                 {newBackupCodes.map((c) => (
                   <li key={c}>{c}</li>
@@ -209,7 +230,9 @@ function TwoFactor() {
                 placeholder={t("security.password")}
                 className={field}
               />
-              {error && <p className="text-sm font-medium text-accent">{error}</p>}
+              {error && (
+                <p className="text-sm font-medium text-accent">{error}</p>
+              )}
               <div className="flex flex-wrap gap-2.5">
                 <button
                   type="button"
@@ -227,7 +250,9 @@ function TwoFactor() {
                   className={btnGhost}
                 >
                   <KeyRound size={15} />
-                  {pending ? t("security.processing") : t("security.regenerateBackupCodes")}
+                  {pending
+                    ? t("security.processing")
+                    : t("security.regenerateBackupCodes")}
                 </button>
               </div>
             </>

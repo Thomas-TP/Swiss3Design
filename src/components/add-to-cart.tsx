@@ -80,7 +80,9 @@ export function AddToCartMini({
         setTimeout(() => setAdded(false), 1600);
       }}
       className={`flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-all active:scale-[0.98] ${
-        added ? "bg-ink text-paper" : "bg-accent text-white hover:bg-accent-dark"
+        added
+          ? "bg-ink text-paper"
+          : "bg-accent text-white hover:bg-accent-dark"
       }`}
     >
       {added ? <Check size={14} /> : <ShoppingBag size={14} />}

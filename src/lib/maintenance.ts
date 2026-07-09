@@ -66,7 +66,9 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
     }
   }
   if (rowsToDelete.length > 0) {
-    await db.delete(quoteRequests).where(inArray(quoteRequests.id, rowsToDelete));
+    await db
+      .delete(quoteRequests)
+      .where(inArray(quoteRequests.id, rowsToDelete));
   }
 
   // 2) Fichiers R2 orphelins : préfixe quotes/ non référencé et plus vieux que

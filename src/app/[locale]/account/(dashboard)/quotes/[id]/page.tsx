@@ -93,8 +93,7 @@ export default async function QuoteDetailPage({
   const decisionPending =
     quote.status === "quoted" || quote.status === "accepted";
   const canPay = hasQuote && decisionPending && !expired;
-  const showActions =
-    decisionPending || quote.status === "revision_requested";
+  const showActions = decisionPending || quote.status === "revision_requested";
 
   return (
     <div className="max-w-xl">

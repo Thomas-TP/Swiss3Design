@@ -35,7 +35,9 @@ export const products = sqliteTable("products", {
   // Clé R2 d'un modèle 3D (.stl ou .glb) affiché dans le viewer interactif de
   // la fiche produit (teinté dans chaque couleur proposée). null = pas de 3D.
   model3dUrl: text("model_3d_url"),
-  multicolor: integer("multicolor", { mode: "boolean" }).notNull().default(false),
+  multicolor: integer("multicolor", { mode: "boolean" })
+    .notNull()
+    .default(false),
   featured: integer("featured", { mode: "boolean" }).notNull().default(false),
   // Rang dans la « Sélection du moment » (page d'accueil) : plus petit = plus
   // tôt. Édité depuis l'admin /admin/featured ; ignoré si featured = false.
@@ -180,7 +182,14 @@ export const orders = sqliteTable(
     customerId: text("customer_id"), // lié à Better Auth (phase auth)
     email: text("email").notNull(),
     status: text("status", {
-      enum: ["pending", "paid", "in_production", "shipped", "delivered", "cancelled"],
+      enum: [
+        "pending",
+        "paid",
+        "in_production",
+        "shipped",
+        "delivered",
+        "cancelled",
+      ],
     })
       .notNull()
       .default("pending"),
@@ -518,7 +527,9 @@ export const notificationPreferences = sqliteTable("notification_preferences", {
   userId: text("user_id")
     .primaryKey()
     .references(() => user.id, { onDelete: "cascade" }),
-  newsletter: integer("newsletter", { mode: "boolean" }).notNull().default(false),
+  newsletter: integer("newsletter", { mode: "boolean" })
+    .notNull()
+    .default(false),
   productNews: integer("product_news", { mode: "boolean" })
     .notNull()
     .default(false),

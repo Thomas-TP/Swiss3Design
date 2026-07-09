@@ -24,9 +24,7 @@ export default async function AdminOrdersPage({
   const query = (q ?? "").trim().slice(0, 100);
 
   const db = await getDb();
-  const all = await db
-    .select({ status: orders.status })
-    .from(orders);
+  const all = await db.select({ status: orders.status }).from(orders);
   const countByStatus = new Map<string, number>();
   for (const row of all) {
     countByStatus.set(row.status, (countByStatus.get(row.status) ?? 0) + 1);
@@ -84,7 +82,9 @@ export default async function AdminOrdersPage({
           ))}
         </div>
         <form className="relative" action="">
-          {statusFilter && <input type="hidden" name="s" value={statusFilter} />}
+          {statusFilter && (
+            <input type="hidden" name="s" value={statusFilter} />
+          )}
           <Search
             size={15}
             className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-soft"

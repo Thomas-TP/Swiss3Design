@@ -61,7 +61,8 @@ export default async function AdminReviewsPage() {
         <div className="rounded-card border border-line bg-surface p-10 text-center text-soft">
           <p className="font-medium">Aucun avis pour l’instant.</p>
           <p className="mt-1 text-sm">
-            Les clients peuvent noter un produit après livraison de leur commande.
+            Les clients peuvent noter un produit après livraison de leur
+            commande.
           </p>
         </div>
       ) : (
@@ -88,7 +89,9 @@ export default async function AdminReviewsPage() {
                 </span>
               </div>
               {r.body && (
-                <p className="mt-2 text-sm leading-relaxed text-soft">{r.body}</p>
+                <p className="mt-2 text-sm leading-relaxed text-soft">
+                  {r.body}
+                </p>
               )}
               <div className="mt-3 flex gap-2">
                 {r.status !== "published" && (

@@ -17,7 +17,11 @@ export function ThemeToggle() {
       aria-label={t("theme")}
       className="rounded-full p-2 text-soft transition-colors hover:bg-line/60 hover:text-ink"
     >
-      {dark ? <Sun size={20} strokeWidth={1.8} /> : <Moon size={20} strokeWidth={1.8} />}
+      {dark ? (
+        <Sun size={20} strokeWidth={1.8} />
+      ) : (
+        <Moon size={20} strokeWidth={1.8} />
+      )}
     </button>
   );
 }

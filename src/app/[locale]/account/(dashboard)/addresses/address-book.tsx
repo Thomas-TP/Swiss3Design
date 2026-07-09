@@ -36,7 +36,9 @@ function AddressForm({
 }: {
   initial: AddressInput;
   onCancel: () => void;
-  onSaved: (input: AddressInput) => Promise<{ error?: string } | { success: true }>;
+  onSaved: (
+    input: AddressInput,
+  ) => Promise<{ error?: string } | { success: true }>;
 }) {
   const t = useTranslations("account");
   const tCheckout = useTranslations("checkout");
@@ -85,7 +87,10 @@ function AddressForm({
         <input
           value={value.npa}
           onChange={(e) =>
-            setValue({ ...value, npa: e.target.value.replace(/\D/g, "").slice(0, 4) })
+            setValue({
+              ...value,
+              npa: e.target.value.replace(/\D/g, "").slice(0, 4),
+            })
           }
           placeholder={tCheckout("npa")}
           inputMode="numeric"
@@ -172,7 +177,10 @@ export function AddressBook({ addresses }: { addresses: Address[] }) {
             />
           </div>
         ) : (
-          <div key={a.id} className={`${card} flex items-start justify-between gap-3`}>
+          <div
+            key={a.id}
+            className={`${card} flex items-start justify-between gap-3`}
+          >
             <div className="flex items-start gap-2.5">
               <MapPin size={17} className="mt-0.5 shrink-0 text-soft" />
               <div>
@@ -240,7 +248,11 @@ export function AddressBook({ addresses }: { addresses: Address[] }) {
           />
         </div>
       ) : (
-        <button type="button" onClick={() => setAdding(true)} className={btnPrimary}>
+        <button
+          type="button"
+          onClick={() => setAdding(true)}
+          className={btnPrimary}
+        >
           <Plus size={15} />
           {t("addresses.add")}
         </button>

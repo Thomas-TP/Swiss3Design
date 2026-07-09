@@ -35,7 +35,12 @@ export function ExportButton() {
 
   return (
     <div>
-      <button type="button" onClick={onExport} disabled={pending} className={btnPrimary}>
+      <button
+        type="button"
+        onClick={onExport}
+        disabled={pending}
+        className={btnPrimary}
+      >
         <Download size={15} />
         {pending ? t("security.processing") : t("privacy.exportButton")}
       </button>

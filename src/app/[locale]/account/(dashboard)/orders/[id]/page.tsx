@@ -202,7 +202,9 @@ export default async function OrderDetailPage({
           </div>
           <div className="flex justify-between border-t border-line pt-2 text-base font-bold">
             <dt>{t("orderDetail.total")}</dt>
-            <dd className="tabular-nums">{formatChf(order.totalCents, locale)}</dd>
+            <dd className="tabular-nums">
+              {formatChf(order.totalCents, locale)}
+            </dd>
           </div>
         </dl>
       </section>
