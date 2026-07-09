@@ -15,6 +15,30 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 > et si rien ne bouge après quelques minutes, **déployer manuellement** (section
 > [Déployer manuellement](#déployer-manuellement--filet-de-sécurité-fiable) plus
 > bas) plutôt que d'attendre indéfiniment.
+>
+> **🔴 Panne réelle identifiée (2026-07-09, post-pivot Hyperdrive)** : depuis
+> l'introduction du binding Hyperdrive (Phase 2 du pivot Postgres), le pipeline
+> Workers Builds échouait **systématiquement** dès `next build` — pas une
+> panne intermittente comme ci-dessus, un vrai bug de configuration. Cause :
+> `next build` exécute du code de page au moment du build (même les pages
+> `force-dynamic`), ce qui nécessite une connexion Postgres via
+> `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` — variable qui
+> n'existait QUE dans `.env.local`/`.env.development.local` sur la machine de
+> dev (gitignorés, jamais uploadés). Tous les déploiements qui ont fonctionné
+> pendant cette période sont passés par `bun run deploy` en manuel (qui hérite
+> de l'environnement shell local), jamais par le vrai pipeline CI. **Fix** :
+> ajouter `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` (la
+> connection string Postgres réelle) dans **Settings → Environment variables →
+> section "Build variables and secrets"** (pas la section runtime "Variables &
+> Secrets" — ce sont deux systèmes distincts, voir
+> [doc Cloudflare](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/#environment-variables))
+> de **chaque** Worker (`swiss3design` ET `swiss3design-preview`, valeurs
+> différentes — chacun sa propre base/branche Neon). Cette variable n'est
+> configurable que via le dashboard : ni `wrangler.jsonc` (les `vars` y sont
+> des variables **runtime**, jamais lues au moment du build — "Currently,
+> Workers Builds does not honor the configurations set in Custom Builds
+> within your Wrangler configuration file"), ni aucune commande `wrangler`,
+> ni l'API Cloudflare exposée aux outils de cet agent.
 
 ## Pourquoi ce mode de déploiement
 

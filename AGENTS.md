@@ -185,14 +185,21 @@ Server-side data access patterns to reuse: `getDb()` ([src/db/index.ts](src/db/i
 
 `git push` to `main` is *supposed* to trigger **Cloudflare Workers Builds**
 (Git-native): build + deploy, with Cloudflare's own credentials — but this has
-proven unreliable in practice (see golden rule 9). **Always verify the push
-actually deployed**; fall back to a manual deploy (`bunx opennextjs-cloudflare
-build && bunx opennextjs-cloudflare deploy`, i.e. `bun run deploy`) if it
-didn't. **There is no GitHub Actions workflow** — the green commit check, when
-it appears, comes from Cloudflare. One-click publish: run
-[`scripts/push.bat`](scripts/push.bat). Full details, the two-separate-Worker
-preview setup, the stacked-PR merge pitfall, and the secrets-rotation
-incident: [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
+proven unreliable in practice (see golden rule 9), and from Phase 2 of the
+stack pivot until 2026-07-09 it was **outright broken** for a real reason, not
+flakiness: `next build` needs `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
+at build time and that variable only existed in local `.env*` files, never
+uploaded to Cloudflare — fixed by adding it as a **Build variable** (Worker →
+Settings → Environment variables → "Build variables and secrets", dashboard-only,
+no `wrangler.jsonc`/CLI/API equivalent) on both `swiss3design` and
+`swiss3design-preview`. **Always verify the push actually deployed**; fall
+back to a manual deploy (`bunx opennextjs-cloudflare build && bunx
+opennextjs-cloudflare deploy`, i.e. `bun run deploy`) if it didn't. **There is
+no GitHub Actions workflow** — the green commit check, when it appears, comes
+from Cloudflare. One-click publish: run [`scripts/push.bat`](scripts/push.bat).
+Full details, the two-separate-Worker preview setup, the stacked-PR merge
+pitfall, and the secrets-rotation incident:
+[`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
 
 **Postgres schema changes are NOT part of this pipeline.** Unlike the old D1
 setup (migrations auto-applied by Cloudflare Workers Builds on every deploy),
