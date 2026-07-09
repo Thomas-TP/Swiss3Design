@@ -10,9 +10,9 @@ import {
   oauthPopup,
 } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
-import { drizzle } from "drizzle-orm/d1";
 import { and, eq, isNull } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { getDb } from "@/db";
 import * as schema from "@/db/schema";
 import { sendEmail } from "./email";
 import {
@@ -64,7 +64,7 @@ export function enabledSocialProviders(env: CloudflareEnv): string[] {
 // que dans le contexte d'une requête.
 export async function getAuth() {
   const { env } = await getCloudflareContext({ async: true });
-  const db = drizzle(env.DB, { schema });
+  const db = await getDb();
 
   // La vérification d'e-mail exige un envoyeur opérationnel : elle
   // s'active automatiquement dès que RESEND_API_KEY est configurée.
@@ -81,7 +81,7 @@ export async function getAuth() {
             "https://www.swiss3design.ch",
             ...STOREFRONT_ORIGINS,
           ],
-    database: drizzleAdapter(db, { provider: "sqlite" }),
+    database: drizzleAdapter(db, { provider: "pg" }),
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 8,

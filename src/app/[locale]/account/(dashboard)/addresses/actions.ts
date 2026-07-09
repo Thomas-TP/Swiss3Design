@@ -72,8 +72,9 @@ export async function updateAddress(
         eq(customerAddresses.id, id),
         eq(customerAddresses.userId, session.user.id),
       ),
-    );
-  if (result.meta.changes === 0) return { error: "not_found" };
+    )
+    .returning({ id: customerAddresses.id });
+  if (result.length === 0) return { error: "not_found" };
 
   revalidatePath("/account/addresses");
   return { success: true };
