@@ -6,13 +6,12 @@
     // "!!" = force-ignore (saute le parcours du dossier, pas juste un filtre
     // de motif après coup) — un simple "!dossier/**" ne suffit pas de façon
     // fiable ici (bug connu de Biome sur l'exclusion de répertoires,
-    // biomejs/biome#7998, #7372, #1280 : deux tentatives avec "!apps/**"
-    // dans formatter.includes puis un .biomeignore n'ont pas exclu apps/ ni
-    // drizzle/ comme attendu — cette syntaxe au niveau top-level files.includes
-    // est la solution documentée).
+    // biomejs/biome#7998, #7372, #1280 : deux tentatives avec un simple motif
+    // "!dossier/**" puis un .biomeignore n'ont pas exclu drizzle/ comme
+    // attendu — cette syntaxe au niveau top-level files.includes est la
+    // solution documentée).
     "includes": [
       "**",
-      "!!**/apps",
       "!!**/.claude",
       "!!**/drizzle",
       "!!**/drizzle-pg",
