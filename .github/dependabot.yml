@@ -2,7 +2,7 @@
 # Chaque PR Dependabot génère un build de preview Cloudflare Workers Builds.
 version: 2
 updates:
-  - package-ecosystem: "npm"
+  - package-ecosystem: "bun"
     directory: "/"
     schedule:
       interval: "weekly"
