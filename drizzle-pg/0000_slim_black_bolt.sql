@@ -1,5 +1,5 @@
 CREATE TABLE "abandoned_carts" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"email" text NOT NULL,
 	"token" text NOT NULL,
 	"items_json" text NOT NULL,
@@ -30,21 +30,21 @@ CREATE TABLE "account" (
 );
 --> statement-breakpoint
 CREATE TABLE "categories" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"slug" text NOT NULL,
 	"sort_order" integer DEFAULT 0 NOT NULL,
 	CONSTRAINT "categories_slug_unique" UNIQUE("slug")
 );
 --> statement-breakpoint
 CREATE TABLE "category_translations" (
-	"category_id" uuid NOT NULL,
+	"category_id" text NOT NULL,
 	"locale" text NOT NULL,
 	"name" text NOT NULL,
 	CONSTRAINT "category_translations_category_id_locale_pk" PRIMARY KEY("category_id","locale")
 );
 --> statement-breakpoint
 CREATE TABLE "customer_addresses" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"user_id" text NOT NULL,
 	"label" text,
 	"name" text NOT NULL,
@@ -57,7 +57,7 @@ CREATE TABLE "customer_addresses" (
 );
 --> statement-breakpoint
 CREATE TABLE "discount_codes" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"code" text NOT NULL,
 	"type" text NOT NULL,
 	"value" integer NOT NULL,
@@ -71,15 +71,15 @@ CREATE TABLE "discount_codes" (
 );
 --> statement-breakpoint
 CREATE TABLE "filament_colors" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"material_id" uuid NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"material_id" text NOT NULL,
 	"name" text NOT NULL,
 	"hex" text NOT NULL,
 	"sort_order" integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "inventory_log" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"variant_id" text NOT NULL,
 	"delta" integer NOT NULL,
 	"reason" text NOT NULL,
@@ -87,13 +87,13 @@ CREATE TABLE "inventory_log" (
 );
 --> statement-breakpoint
 CREATE TABLE "materials" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
 	CONSTRAINT "materials_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE "newsletter_sends" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"subject" text NOT NULL,
 	"body_html" text NOT NULL,
 	"audience" text NOT NULL,
@@ -114,10 +114,10 @@ CREATE TABLE "notification_preferences" (
 );
 --> statement-breakpoint
 CREATE TABLE "order_items" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"order_id" uuid NOT NULL,
-	"product_id" uuid,
-	"variant_id" uuid,
+	"id" text PRIMARY KEY NOT NULL,
+	"order_id" text NOT NULL,
+	"product_id" text,
+	"variant_id" text,
 	"name_snapshot" text NOT NULL,
 	"color_name" text,
 	"color_hex" text,
@@ -126,7 +126,7 @@ CREATE TABLE "order_items" (
 );
 --> statement-breakpoint
 CREATE TABLE "orders" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"order_number" text NOT NULL,
 	"customer_id" text,
 	"email" text NOT NULL,
@@ -161,28 +161,28 @@ CREATE TABLE "passkey" (
 );
 --> statement-breakpoint
 CREATE TABLE "product_categories" (
-	"product_id" uuid NOT NULL,
-	"category_id" uuid NOT NULL,
+	"product_id" text NOT NULL,
+	"category_id" text NOT NULL,
 	CONSTRAINT "product_categories_product_id_category_id_pk" PRIMARY KEY("product_id","category_id")
 );
 --> statement-breakpoint
 CREATE TABLE "product_colors" (
-	"product_id" uuid NOT NULL,
-	"color_id" uuid NOT NULL,
+	"product_id" text NOT NULL,
+	"color_id" text NOT NULL,
 	"sort_order" integer DEFAULT 0 NOT NULL,
 	CONSTRAINT "product_colors_product_id_color_id_pk" PRIMARY KEY("product_id","color_id")
 );
 --> statement-breakpoint
 CREATE TABLE "product_images" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"product_id" uuid NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"product_id" text NOT NULL,
 	"url" text NOT NULL,
 	"alt" text,
 	"sort_order" integer DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "product_translations" (
-	"product_id" uuid NOT NULL,
+	"product_id" text NOT NULL,
 	"locale" text NOT NULL,
 	"name" text NOT NULL,
 	"description" text NOT NULL,
@@ -190,8 +190,8 @@ CREATE TABLE "product_translations" (
 );
 --> statement-breakpoint
 CREATE TABLE "product_variants" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"product_id" uuid NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"product_id" text NOT NULL,
 	"sku" text NOT NULL,
 	"name" text NOT NULL,
 	"price_cents" integer,
@@ -200,7 +200,7 @@ CREATE TABLE "product_variants" (
 );
 --> statement-breakpoint
 CREATE TABLE "products" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"slug" text NOT NULL,
 	"price_cents" integer NOT NULL,
 	"sale_type" text DEFAULT 'stock' NOT NULL,
@@ -219,8 +219,8 @@ CREATE TABLE "products" (
 );
 --> statement-breakpoint
 CREATE TABLE "quote_messages" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"quote_id" uuid NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"quote_id" text NOT NULL,
 	"sender" text NOT NULL,
 	"body" text NOT NULL,
 	"price_cents" integer,
@@ -230,7 +230,7 @@ CREATE TABLE "quote_messages" (
 );
 --> statement-breakpoint
 CREATE TABLE "quote_requests" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
 	"customer_id" text,
 	"email" text NOT NULL,
 	"description" text NOT NULL,
@@ -249,9 +249,9 @@ CREATE TABLE "quote_requests" (
 );
 --> statement-breakpoint
 CREATE TABLE "reviews" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"product_id" uuid NOT NULL,
-	"order_id" uuid NOT NULL,
+	"id" text PRIMARY KEY NOT NULL,
+	"product_id" text NOT NULL,
+	"order_id" text NOT NULL,
 	"customer_id" text,
 	"author_name" text NOT NULL,
 	"rating" integer NOT NULL,

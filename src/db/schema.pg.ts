@@ -4,7 +4,6 @@ import {
   integer,
   boolean,
   timestamp,
-  uuid,
   primaryKey,
   index,
   uniqueIndex,
@@ -12,16 +11,22 @@ import {
 
 // Traduction mécanique de schema.ts (D1/SQLite) vers Postgres (Hyperdrive) —
 // mêmes tables/colonnes/contraintes, adaptées aux types natifs Postgres :
-// uuid natif (au lieu de text + crypto.randomUUID), timestamp with time zone
-// natif (au lieu de integer epoch), boolean natif (au lieu de integer 0/1).
+// timestamp with time zone natif (au lieu de integer epoch), boolean natif
+// (au lieu de integer 0/1). Colonnes id/FK en TEXT (pas uuid natif Postgres)
+// — correction post-Phase 2 : les données réelles de production contiennent
+// des ids non-UUID (slugs manuels "c_deco", ids générés par Better Auth type
+// "fN2YEje9RkL04LDLh0NyYkuHxp4qrrWy", etc.), un type uuid natif rejette ces
+// valeurs à l'insertion (Phase 5, migration réelle). D1/SQLite n'a jamais
+// imposé de format UUID (juste TEXT PRIMARY KEY) : text() est la traduction
+// réellement fidèle, pas uuid().
 // Les enums restent des colonnes text({enum:...}) — contrainte TypeScript
 // uniquement, pas de contrainte SQL — pour rester fidèle au comportement de
 // schema.ts (aucune contrainte CHECK n'existait côté SQLite non plus).
-// Voir C:\Users\leole\.claude\plans\foamy-swimming-cook.md (Phase 2) : ce
-// fichier existe en parallèle de schema.ts (D1) tant que les données réelles
-// n'ont pas été migrées (Phase 5) — rien ne l'utilise encore en Phase 2.
 
-const id = () => uuid("id").primaryKey().defaultRandom();
+const id = () =>
+  text("id")
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID());
 
 const createdAt = () =>
   timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
@@ -53,7 +58,7 @@ export const products = pgTable("products", {
 export const productTranslations = pgTable(
   "product_translations",
   {
-    productId: uuid("product_id")
+    productId: text("product_id")
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
     locale: text("locale", { enum: LOCALES }).notNull(),
@@ -67,7 +72,7 @@ export const productImages = pgTable(
   "product_images",
   {
     id: id(),
-    productId: uuid("product_id")
+    productId: text("product_id")
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
     url: text("url").notNull(),
@@ -81,7 +86,7 @@ export const productVariants = pgTable(
   "product_variants",
   {
     id: id(),
-    productId: uuid("product_id")
+    productId: text("product_id")
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
     sku: text("sku").notNull().unique(),
@@ -101,7 +106,7 @@ export const filamentColors = pgTable(
   "filament_colors",
   {
     id: id(),
-    materialId: uuid("material_id")
+    materialId: text("material_id")
       .notNull()
       .references(() => materials.id, { onDelete: "cascade" }),
     name: text("name").notNull(),
@@ -120,10 +125,10 @@ export const filamentColors = pgTable(
 export const productColors = pgTable(
   "product_colors",
   {
-    productId: uuid("product_id")
+    productId: text("product_id")
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
-    colorId: uuid("color_id")
+    colorId: text("color_id")
       .notNull()
       .references(() => filamentColors.id, { onDelete: "cascade" }),
     sortOrder: integer("sort_order").notNull().default(0),
@@ -143,7 +148,7 @@ export const categories = pgTable("categories", {
 export const categoryTranslations = pgTable(
   "category_translations",
   {
-    categoryId: uuid("category_id")
+    categoryId: text("category_id")
       .notNull()
       .references(() => categories.id, { onDelete: "cascade" }),
     locale: text("locale", { enum: LOCALES }).notNull(),
@@ -155,10 +160,10 @@ export const categoryTranslations = pgTable(
 export const productCategories = pgTable(
   "product_categories",
   {
-    productId: uuid("product_id")
+    productId: text("product_id")
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
-    categoryId: uuid("category_id")
+    categoryId: text("category_id")
       .notNull()
       .references(() => categories.id, { onDelete: "cascade" }),
   },
@@ -172,7 +177,7 @@ export const orders = pgTable(
   {
     id: id(),
     orderNumber: text("order_number").notNull().unique(),
-    customerId: text("customer_id"), // lié à Better Auth (D1) — pas de FK cross-DB
+    customerId: text("customer_id"), // lié à Better Auth — pas de FK cross-table stricte
     email: text("email").notNull(),
     status: text("status", {
       enum: [
@@ -205,11 +210,11 @@ export const orderItems = pgTable(
   "order_items",
   {
     id: id(),
-    orderId: uuid("order_id")
+    orderId: text("order_id")
       .notNull()
       .references(() => orders.id, { onDelete: "cascade" }),
-    productId: uuid("product_id"),
-    variantId: uuid("variant_id"),
+    productId: text("product_id"),
+    variantId: text("variant_id"),
     nameSnapshot: text("name_snapshot").notNull(),
     colorName: text("color_name"),
     colorHex: text("color_hex"),
@@ -225,13 +230,13 @@ export const reviews = pgTable(
   "reviews",
   {
     id: id(),
-    productId: uuid("product_id")
+    productId: text("product_id")
       .notNull()
       .references(() => products.id, { onDelete: "cascade" }),
-    orderId: uuid("order_id")
+    orderId: text("order_id")
       .notNull()
       .references(() => orders.id, { onDelete: "cascade" }),
-    customerId: text("customer_id"), // utilisateur Better Auth (D1)
+    customerId: text("customer_id"), // utilisateur Better Auth
     authorName: text("author_name").notNull(),
     rating: integer("rating").notNull(),
     body: text("body"),
@@ -285,7 +290,7 @@ export const quoteMessages = pgTable(
   "quote_messages",
   {
     id: id(),
-    quoteId: uuid("quote_id")
+    quoteId: text("quote_id")
       .notNull()
       .references(() => quoteRequests.id, { onDelete: "cascade" }),
     sender: text("sender", { enum: ["customer", "admin"] }).notNull(),
@@ -348,8 +353,7 @@ export const abandonedCarts = pgTable(
 
 // ── Auth (Better Auth) ───────────────────────────────────────────────────────
 // Migré depuis D1 vers Postgres (décision explicite : plus de split D1/
-// Postgres). Colonnes id en text (pas uuid natif) : Better Auth génère ses
-// propres ids applicatifs, ne pas leur imposer le format uuid Postgres.
+// Postgres).
 
 export const user = pgTable("user", {
   id: text("id").primaryKey(),
