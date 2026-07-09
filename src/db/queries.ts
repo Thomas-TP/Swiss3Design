@@ -3,6 +3,7 @@ import {
   asc,
   desc,
   eq,
+  exists,
   inArray,
   like,
   ne,
@@ -414,18 +415,24 @@ export async function getRelatedProducts(
 
   if (catIds.length > 0) {
     rows = await db
-      .selectDistinct(cols)
+      .select(cols)
       .from(products)
       .innerJoin(productTranslations, withTranslation)
-      .innerJoin(
-        productCategories,
-        eq(productCategories.productId, products.id),
-      )
       .where(
         and(
           eq(products.active, true),
           ne(products.id, productId),
-          inArray(productCategories.categoryId, catIds),
+          exists(
+            db
+              .select({ n: sql`1` })
+              .from(productCategories)
+              .where(
+                and(
+                  eq(productCategories.productId, products.id),
+                  inArray(productCategories.categoryId, catIds),
+                ),
+              ),
+          ),
         ),
       )
       .orderBy(desc(products.createdAt))
