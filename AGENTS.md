@@ -190,9 +190,11 @@ stack pivot until 2026-07-09 it was **outright broken** for a real reason, not
 flakiness: `next build` needs `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
 at build time and that variable only existed in local `.env*` files, never
 uploaded to Cloudflare — fixed by adding it as a **Build variable** (Worker →
-Settings → Environment variables → "Build variables and secrets", dashboard-only,
-no `wrangler.jsonc`/CLI/API equivalent) on both `swiss3design` and
-`swiss3design-preview`. **Always verify the push actually deployed**; fall
+Settings → **Build tab** → "Build variables and secrets" — **not** the
+"Variables & Secrets" tab, that's runtime-only and has zero effect on the
+build; dashboard-only, no `wrangler.jsonc`/CLI/API equivalent) on both
+`swiss3design` and `swiss3design-preview`. **Always verify the push actually
+deployed**; fall
 back to a manual deploy (`bunx opennextjs-cloudflare build && bunx
 opennextjs-cloudflare deploy`, i.e. `bun run deploy`) if it didn't. **There is
 no GitHub Actions workflow** — the green commit check, when it appears, comes

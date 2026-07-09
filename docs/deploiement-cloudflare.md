@@ -28,10 +28,12 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 > pendant cette période sont passés par `bun run deploy` en manuel (qui hérite
 > de l'environnement shell local), jamais par le vrai pipeline CI. **Fix** :
 > ajouter `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` (la
-> connection string Postgres réelle) dans **Settings → Environment variables →
-> section "Build variables and secrets"** (pas la section runtime "Variables &
-> Secrets" — ce sont deux systèmes distincts, voir
-> [doc Cloudflare](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/#environment-variables))
+> connection string Postgres réelle) dans **Settings → onglet "Build" →
+> champ "Build variables and secrets"** — **PAS** l'onglet "Variables &
+> Secrets" (celui-ci est pour le runtime, un système totalement séparé du
+> build ; piège rencontré en vrai le 2026-07-09 : la variable posée dans
+> "Variables & Secrets" au lieu de "Build" n'a eu aucun effet sur le build,
+> voir [doc Cloudflare](https://developers.cloudflare.com/workers/ci-cd/builds/configuration/#environment-variables))
 > de **chaque** Worker (`swiss3design` ET `swiss3design-preview`, valeurs
 > différentes — chacun sa propre base/branche Neon). Cette variable n'est
 > configurable que via le dashboard : ni `wrangler.jsonc` (les `vars` y sont
