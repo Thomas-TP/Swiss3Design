@@ -17,7 +17,9 @@ export interface EmailMessage {
 export async function sendEmail(message: EmailMessage): Promise<boolean> {
   const { env } = await getCloudflareContext({ async: true });
   if (!env.RESEND_API_KEY) {
-    console.log(`[email ignoré — pas de RESEND_API_KEY] ${message.subject} → ${message.to}`);
+    console.log(
+      `[email ignoré — pas de RESEND_API_KEY] ${message.subject} → ${message.to}`,
+    );
     return false;
   }
 
@@ -28,7 +30,10 @@ export async function sendEmail(message: EmailMessage): Promise<boolean> {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: message.from || env.EMAIL_FROM || "Swiss3Design <onboarding@resend.dev>",
+      from:
+        message.from ||
+        env.EMAIL_FROM ||
+        "Swiss3Design <onboarding@resend.dev>",
       to: message.to,
       subject: message.subject,
       html: message.html,
@@ -54,7 +59,9 @@ export async function sendBulkEmail(messages: EmailMessage[]): Promise<number> {
   if (messages.length === 0) return 0;
   const { env } = await getCloudflareContext({ async: true });
   if (!env.RESEND_API_KEY) {
-    console.log(`[email en masse ignoré — pas de RESEND_API_KEY] ${messages.length} destinataires`);
+    console.log(
+      `[email en masse ignoré — pas de RESEND_API_KEY] ${messages.length} destinataires`,
+    );
     return 0;
   }
 
@@ -69,7 +76,8 @@ export async function sendBulkEmail(messages: EmailMessage[]): Promise<number> {
       },
       body: JSON.stringify(
         chunk.map((m) => ({
-          from: m.from || env.EMAIL_FROM || "Swiss3Design <onboarding@resend.dev>",
+          from:
+            m.from || env.EMAIL_FROM || "Swiss3Design <onboarding@resend.dev>",
           to: m.to,
           subject: m.subject,
           html: m.html,
@@ -78,7 +86,9 @@ export async function sendBulkEmail(messages: EmailMessage[]): Promise<number> {
       ),
     });
     if (!res.ok) {
-      console.error(`[email en masse] échec ${res.status}: ${await res.text()}`);
+      console.error(
+        `[email en masse] échec ${res.status}: ${await res.text()}`,
+      );
       continue;
     }
     sent += chunk.length;

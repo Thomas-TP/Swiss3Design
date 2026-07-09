@@ -18,7 +18,10 @@ export default async function AddressesTab() {
     .select()
     .from(customerAddresses)
     .where(eq(customerAddresses.userId, user.id))
-    .orderBy(desc(customerAddresses.isDefault), desc(customerAddresses.updatedAt));
+    .orderBy(
+      desc(customerAddresses.isDefault),
+      desc(customerAddresses.updatedAt),
+    );
 
   return (
     <div>

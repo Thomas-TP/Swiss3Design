@@ -1,17 +1,23 @@
 {
-  "version": "0.0.1",
-  "configurations": [
-    {
-      "name": "swiss3design",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "dev"],
-      "port": 3000
-    },
-    {
-      "name": "preview-worker",
-      "runtimeExecutable": "npx",
-      "runtimeArgs": ["opennextjs-cloudflare", "preview", "--", "--port", "3000"],
-      "port": 3000
-    }
-  ]
+	"version": "0.0.1",
+	"configurations": [
+		{
+			"name": "swiss3design",
+			"runtimeExecutable": "bun",
+			"runtimeArgs": ["run", "dev"],
+			"port": 3000
+		},
+		{
+			"name": "preview-worker",
+			"runtimeExecutable": "npx",
+			"runtimeArgs": [
+				"opennextjs-cloudflare",
+				"preview",
+				"--",
+				"--port",
+				"3000"
+			],
+			"port": 3000
+		}
+	]
 }

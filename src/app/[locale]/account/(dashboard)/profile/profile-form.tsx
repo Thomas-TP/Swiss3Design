@@ -27,7 +27,10 @@ export function ProfileForm({ name }: { name: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="mt-3 flex flex-col gap-2.5 sm:flex-row">
+    <form
+      onSubmit={onSubmit}
+      className="mt-3 flex flex-col gap-2.5 sm:flex-row"
+    >
       <input
         value={value}
         onChange={(e) => {
@@ -44,7 +47,11 @@ export function ProfileForm({ name }: { name: string }) {
         className={btnPrimary}
       >
         {saved ? <Check size={15} /> : null}
-        {pending ? t("security.processing") : saved ? t("profile.saved") : t("profile.save")}
+        {pending
+          ? t("security.processing")
+          : saved
+            ? t("profile.saved")
+            : t("profile.save")}
       </button>
     </form>
   );

@@ -47,15 +47,15 @@
       "PowerShell(npm ci)",
       "PowerShell(npm install)",
       "PowerShell(npx drizzle-kit:*)",
-      "Bash(npm run deploy)"
+      "Bash(npm run deploy)",
+      "Read(./.dev.vars)"
     ],
     "deny": [
       "Bash(npm run db:migrate:remote)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
       "PowerShell(git push --force:*)",
-      "Bash(rm -rf:*)",
-      "Read(./.dev.vars)"
+      "Bash(rm -rf:*)"
     ]
   }
 }

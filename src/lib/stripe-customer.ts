@@ -11,7 +11,12 @@ import { user as userTable } from "@/db/schema";
 export async function getOrCreateStripeCustomer(
   stripe: Stripe,
   db: Awaited<ReturnType<typeof getDb>>,
-  user: { id: string; email: string; name: string; stripeCustomerId: string | null },
+  user: {
+    id: string;
+    email: string;
+    name: string;
+    stripeCustomerId: string | null;
+  },
 ): Promise<string> {
   if (user.stripeCustomerId) return user.stripeCustomerId;
 

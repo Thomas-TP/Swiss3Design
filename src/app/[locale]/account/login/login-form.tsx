@@ -1,13 +1,7 @@
 "use client";
 
 import { useEffect, useState, useSyncExternalStore } from "react";
-import {
-  LogIn,
-  ShieldCheck,
-  Mail,
-  MailCheck,
-  Fingerprint,
-} from "lucide-react";
+import { LogIn, ShieldCheck, Mail, MailCheck, Fingerprint } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { signIn, twoFactor, emailOtp } from "@/lib/auth-client";
@@ -206,7 +200,9 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
           }}
           inputMode={isBackup ? "text" : "numeric"}
           autoComplete="one-time-code"
-          placeholder={isBackup ? t("twoFactor.backupCode") : t("twoFactor.code")}
+          placeholder={
+            isBackup ? t("twoFactor.backupCode") : t("twoFactor.code")
+          }
           className={`${field} ${isBackup ? "" : "tracking-[0.3em]"}`}
         />
         {error && (
@@ -250,10 +246,14 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
   if (stage === "otpVerify") {
     return (
       <div className="space-y-4">
-        <p className="text-sm text-soft">{t("passwordless.otpSentTo", { email: plEmail })}</p>
+        <p className="text-sm text-soft">
+          {t("passwordless.otpSentTo", { email: plEmail })}
+        </p>
         <input
           value={code}
-          onChange={(e) => setCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+          onChange={(e) =>
+            setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+          }
           onKeyDown={(e) => {
             if (e.key === "Enter") {
               e.preventDefault();
@@ -332,7 +332,11 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
           type="button"
           onClick={sendMagicLink}
           disabled={pending || !plEmail.trim()}
-          className={passkeySupported ? btnGhost : "flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"}
+          className={
+            passkeySupported
+              ? btnGhost
+              : "flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+          }
         >
           <Mail size={16} />
           {pending ? t("processing") : t("passwordless.sendLink")}
@@ -377,7 +381,10 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
         />
       </div>
       <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-semibold">
+        <label
+          htmlFor="password"
+          className="mb-1.5 block text-sm font-semibold"
+        >
           {t("password")}
         </label>
         <input

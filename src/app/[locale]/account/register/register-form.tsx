@@ -142,7 +142,10 @@ export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
         />
       </div>
       <div>
-        <label htmlFor="password" className="mb-1.5 block text-sm font-semibold">
+        <label
+          htmlFor="password"
+          className="mb-1.5 block text-sm font-semibold"
+        >
           {t("password")}
         </label>
         <input

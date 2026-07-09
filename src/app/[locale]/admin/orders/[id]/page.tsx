@@ -141,9 +141,9 @@ export default async function AdminOrderDetailPage({
         )}
         <p className="mt-2.5 text-xs leading-relaxed text-soft">
           E-mails automatiques au client : <strong>Expédiée</strong> → e-mail
-          avec n° de suivi · <strong>Livrée</strong> → confirmation de
-          livraison · <strong>Annulée</strong> (si payée) → annulation. Le
-          remboursement éventuel se fait dans Stripe.
+          avec n° de suivi · <strong>Livrée</strong> → confirmation de livraison
+          · <strong>Annulée</strong> (si payée) → annulation. Le remboursement
+          éventuel se fait dans Stripe.
         </p>
       </section>
 
@@ -222,7 +222,9 @@ export default async function AdminOrderDetailPage({
               <p className="font-medium">{customer.name}</p>
               <p className="text-xs text-soft">
                 Compte créé le {customer.createdAt.toLocaleDateString("fr-CH")}
-                {customer.emailVerified ? " · e-mail vérifié ✓" : " · e-mail non vérifié"}
+                {customer.emailVerified
+                  ? " · e-mail vérifié ✓"
+                  : " · e-mail non vérifié"}
               </p>
               <Link
                 href={{

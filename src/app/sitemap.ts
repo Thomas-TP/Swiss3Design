@@ -20,7 +20,10 @@ const STATIC_PATHS = [
 
 // Une entrée par page, avec ses variantes hreflang (fr/de/it/en). L'URL
 // principale pointe le repli français ; `alternates.languages` liste les 4.
-function entry(path: string, lastModified?: Date): MetadataRoute.Sitemap[number] {
+function entry(
+  path: string,
+  lastModified?: Date,
+): MetadataRoute.Sitemap[number] {
   const languages: Record<string, string> = {};
   for (const l of routing.locales) languages[l] = `${SITE_URL}/${l}${path}`;
   return {

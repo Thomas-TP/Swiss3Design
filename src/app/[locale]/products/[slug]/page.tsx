@@ -114,90 +114,94 @@ export default async function ProductPage({
       </Link>
 
       <ProductColorProvider colors={product.colors}>
-       <div className="grid gap-8 md:grid-cols-2 md:gap-14">
-        <div>
-          <ProductGallery
-            images={product.images}
-            name={product.name}
-            model3dUrl={product.model3dUrl}
-          />
-        </div>
+        <div className="grid gap-8 md:grid-cols-2 md:gap-14">
+          <div>
+            <ProductGallery
+              images={product.images}
+              name={product.name}
+              model3dUrl={product.model3dUrl}
+            />
+          </div>
 
-        <div className="flex flex-col md:sticky md:top-24 md:self-start">
-          {product.multicolor && (
-            <span className="flex w-fit items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold">
-              <MulticolorDots size={6} />
-              {t("multicolorBadge")}
-            </span>
-          )}
-
-          <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
-            {product.name}
-          </h1>
-          <p className="mt-4 leading-relaxed text-soft">
-            {product.description}
-          </p>
-
-          {ratingSummary.count > 0 && (
-            <div className="mt-3 flex items-center gap-2">
-              <StarRating value={ratingSummary.average} size={15} />
-              <span className="text-sm text-soft">
-                {tReviews("count", { count: ratingSummary.count })}
+          <div className="flex flex-col md:sticky md:top-24 md:self-start">
+            {product.multicolor && (
+              <span className="flex w-fit items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold">
+                <MulticolorDots size={6} />
+                {t("multicolorBadge")}
               </span>
-            </div>
-          )}
+            )}
 
-          <ProductPurchase
-            productId={product.id}
-            slug={product.slug}
-            name={product.name}
-            basePriceCents={product.priceCents}
-            saleType={product.saleType}
-            productionDays={product.productionDays}
-            productStock={product.stock}
-            imageUrl={image?.url ?? null}
-            variants={product.variants.map((v) => ({
-              id: v.id,
-              name: v.name,
-              priceCents: v.priceCents,
-              stock: v.stock,
-            }))}
-          />
+            <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
+              {product.name}
+            </h1>
+            <p className="mt-4 leading-relaxed text-soft">
+              {product.description}
+            </p>
 
-          {/* Réassurance au plus près du bouton d'achat : lève les trois
+            {ratingSummary.count > 0 && (
+              <div className="mt-3 flex items-center gap-2">
+                <StarRating value={ratingSummary.average} size={15} />
+                <span className="text-sm text-soft">
+                  {tReviews("count", { count: ratingSummary.count })}
+                </span>
+              </div>
+            )}
+
+            <ProductPurchase
+              productId={product.id}
+              slug={product.slug}
+              name={product.name}
+              basePriceCents={product.priceCents}
+              saleType={product.saleType}
+              productionDays={product.productionDays}
+              productStock={product.stock}
+              imageUrl={image?.url ?? null}
+              variants={product.variants.map((v) => ({
+                id: v.id,
+                name: v.name,
+                priceCents: v.priceCents,
+                stock: v.stock,
+              }))}
+            />
+
+            {/* Réassurance au plus près du bouton d'achat : lève les trois
               objections classiques (délai, provenance, paiement) sans quitter
               la page. Libellés partagés avec la homepage. */}
-          <ul className="mt-6 grid gap-2 text-sm sm:grid-cols-3">
-            {[
-              { Icon: Truck, label: tHome("trustShippingTitle") },
-              { Icon: Factory, label: tHome("trustMadeTitle") },
-              { Icon: ShieldCheck, label: tHome("trustPaymentTitle") },
-            ].map(({ Icon, label }) => (
-              <li
-                key={label}
-                className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5"
-              >
-                <Icon size={16} strokeWidth={1.8} className="shrink-0 text-accent" />
-                <span className="text-xs font-semibold leading-tight">
-                  {label}
-                </span>
-              </li>
-            ))}
-          </ul>
-
-          {specs.length > 0 && (
-            <dl className="mt-8 divide-y divide-line border-t border-line text-sm">
-              <p className="pt-4 font-semibold">{t("details")}</p>
-              {specs.map((s) => (
-                <div key={s.label} className="flex justify-between py-3">
-                  <dt className="text-soft">{s.label}</dt>
-                  <dd className="font-medium">{s.value}</dd>
-                </div>
+            <ul className="mt-6 grid gap-2 text-sm sm:grid-cols-3">
+              {[
+                { Icon: Truck, label: tHome("trustShippingTitle") },
+                { Icon: Factory, label: tHome("trustMadeTitle") },
+                { Icon: ShieldCheck, label: tHome("trustPaymentTitle") },
+              ].map(({ Icon, label }) => (
+                <li
+                  key={label}
+                  className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5"
+                >
+                  <Icon
+                    size={16}
+                    strokeWidth={1.8}
+                    className="shrink-0 text-accent"
+                  />
+                  <span className="text-xs font-semibold leading-tight">
+                    {label}
+                  </span>
+                </li>
               ))}
-            </dl>
-          )}
+            </ul>
+
+            {specs.length > 0 && (
+              <dl className="mt-8 divide-y divide-line border-t border-line text-sm">
+                <p className="pt-4 font-semibold">{t("details")}</p>
+                {specs.map((s) => (
+                  <div key={s.label} className="flex justify-between py-3">
+                    <dt className="text-soft">{s.label}</dt>
+                    <dd className="font-medium">{s.value}</dd>
+                  </div>
+                ))}
+              </dl>
+            )}
+          </div>
         </div>
-       </div>
       </ProductColorProvider>
 
       {productReviews.length > 0 && (

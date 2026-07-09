@@ -17,6 +17,11 @@ STRIPE_WEBHOOK_SECRET="whsec_..."
 BETTER_AUTH_SECRET="change-me"               # ex. openssl rand -base64 32
 BETTER_AUTH_URL="http://localhost:3000"      # override local (prod = wrangler.jsonc)
 
+# Pont Medusa (migration en cours, voir apps/medusa) — DOIT etre exactement
+# la meme valeur que BETTER_AUTH_BRIDGE_SECRET dans apps/medusa/apps/backend/.env,
+# sinon le storefront SolidStart ne peut pas s'authentifier contre Medusa.
+BETTER_AUTH_BRIDGE_SECRET="change-me"
+
 # Emails (Resend) — optionnel : sans clé, l'envoi est ignoré et la
 # vérification d'e-mail est désactivée automatiquement.
 RESEND_API_KEY="re_..."
@@ -33,3 +38,10 @@ FACEBOOK_CLIENT_SECRET=""
 
 # Maintenance planifiée (purge des fichiers R2 orphelins via /api/cron/maintenance)
 CRON_SECRET="change-me"
+
+# API interne appelée par Medusa (migration en cours, voir apps/medusa) — DOIT
+# etre exactement la meme valeur que MEDUSA_INTERNAL_SECRET dans
+# apps/medusa/apps/backend/.env. Protege /api/internal/* (destinataires
+# newsletter, envoi d'annonces) : ces routes ne doivent jamais etre appelables
+# sans ce secret.
+MEDUSA_INTERNAL_SECRET="change-me"

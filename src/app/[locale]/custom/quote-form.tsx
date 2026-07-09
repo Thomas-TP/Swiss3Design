@@ -47,7 +47,9 @@ export function QuoteForm({ materials }: { materials: string[] }) {
     return (
       <div className="rounded-card border border-emerald-500/30 bg-emerald-500/10 p-8 text-center">
         <CheckCircle2 size={32} className="mx-auto text-emerald-600" />
-        <p className="mt-4 font-semibold text-emerald-800 dark:text-emerald-200">{t("success")}</p>
+        <p className="mt-4 font-semibold text-emerald-800 dark:text-emerald-200">
+          {t("success")}
+        </p>
       </div>
     );
   }
@@ -112,7 +114,10 @@ export function QuoteForm({ materials }: { materials: string[] }) {
           />
         </div>
         <div>
-          <label htmlFor="colors" className="mb-1.5 block text-sm font-semibold">
+          <label
+            htmlFor="colors"
+            className="mb-1.5 block text-sm font-semibold"
+          >
             {t("colors")}{" "}
             <span className="font-normal text-soft">({t("optional")})</span>
           </label>

@@ -52,14 +52,14 @@ export function FavoritesList() {
         title={t("title")}
         actions={
           <button
-          type="button"
-          onClick={addAllToCart}
-          className={`inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] ${
-            addedAll
-              ? "bg-ink text-paper"
-              : "bg-accent text-white shadow-lg shadow-accent/25 hover:bg-accent-dark"
-          }`}
-        >
+            type="button"
+            onClick={addAllToCart}
+            className={`inline-flex shrink-0 items-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold transition-all active:scale-[0.98] ${
+              addedAll
+                ? "bg-ink text-paper"
+                : "bg-accent text-white shadow-lg shadow-accent/25 hover:bg-accent-dark"
+            }`}
+          >
             {addedAll ? <Check size={16} /> : <ShoppingBag size={16} />}
             {addedAll ? t("addedAll") : t("addAll")}
           </button>

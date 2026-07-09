@@ -6,7 +6,9 @@ const CHROME_WINDOWS =
 const SAFARI_IOS =
   "Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) AppleWebKit/605.1.15 Safari/604.1";
 
-function session(overrides: Partial<SessionLike> & { token: string }): SessionLike {
+function session(
+  overrides: Partial<SessionLike> & { token: string },
+): SessionLike {
   return {
     userAgent: CHROME_WINDOWS,
     createdAt: "2026-01-01T00:00:00Z",
@@ -52,8 +54,16 @@ describe("groupByDevice", () => {
 
   it("trie les groupes par activité la plus récente", () => {
     const sessions = [
-      session({ token: "old", userAgent: CHROME_WINDOWS, createdAt: "2026-01-01T00:00:00Z" }),
-      session({ token: "new", userAgent: SAFARI_IOS, createdAt: "2026-01-05T00:00:00Z" }),
+      session({
+        token: "old",
+        userAgent: CHROME_WINDOWS,
+        createdAt: "2026-01-01T00:00:00Z",
+      }),
+      session({
+        token: "new",
+        userAgent: SAFARI_IOS,
+        createdAt: "2026-01-05T00:00:00Z",
+      }),
     ];
     const groups = groupByDevice(sessions);
     expect(groups[0].sessions[0].token).toBe("new");

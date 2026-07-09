@@ -54,7 +54,10 @@ export function stripeAppearance(dark: boolean): Appearance {
           boxShadow: "0 8px 24px rgba(0, 0, 0, 0.4)",
         },
         ".DropdownItem": { color: "#f4f1ed" },
-        ".DropdownItem--highlight": { backgroundColor: "#2a2622", color: "#f4f1ed" },
+        ".DropdownItem--highlight": {
+          backgroundColor: "#2a2622",
+          color: "#f4f1ed",
+        },
       },
     };
   }
@@ -102,7 +105,10 @@ export function stripeAppearance(dark: boolean): Appearance {
         boxShadow: "0 8px 24px rgba(28, 25, 23, 0.08)",
       },
       ".DropdownItem": { color: "#1a1614" },
-      ".DropdownItem--highlight": { backgroundColor: "#fafaf9", color: "#1a1614" },
+      ".DropdownItem--highlight": {
+        backgroundColor: "#fafaf9",
+        color: "#1a1614",
+      },
     },
   };
 }

@@ -23,9 +23,14 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 - **Problème** : ce token a expiré → le push du 16/06/2026 a échoué sur
   `Unable to authenticate request [code: 10001]` et le site n'a pas été redéployé.
 - **Maintenant** : Cloudflare est connecté directement au dépôt GitHub
-  (**Workers Builds**). À chaque push sur `main`, Cloudflare **build + applique
-  les migrations D1 + déploie**, avec ses propres identifiants — plus aucun token
-  à gérer ni à renouveler.
+  (**Workers Builds**). À chaque push sur `main`, Cloudflare **build + déploie**,
+  avec ses propres identifiants — plus aucun token à gérer ni à renouveler. Le
+  binding D1 (`DB`) reste dans `wrangler.jsonc` comme filet de secours inactif
+  depuis le pivot Postgres/Hyperdrive du 2026-07-09 — `wrangler deploy` continue
+  d'y appliquer d'éventuelles migrations D1 en attente, mais **la vraie base de
+  données (Postgres/Neon) n'a aucune étape de migration automatique** : c'est
+  `bun run db:generate:pg` + `db:push:pg`, à faire manuellement avant de déployer
+  un changement de schéma.
 - Le **statut de déploiement** est porté par Cloudflare : Workers Builds publie sur
   chaque commit un **check GitHub** qui n'est vert que si le build **et** le deploy
   ont réellement réussi. L'ancien workflow GitHub Actions a été **supprimé** pour ne
@@ -34,7 +39,8 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 ## Pré-requis (déjà en place)
 
 - Dépôt GitHub : `Thomas-TP/Swiss3Design`.
-- Worker existant : `swiss3design` (domaine `swiss3design.ch`, bindings D1/R2/KV).
+- Worker existant : `swiss3design` (domaine `swiss3design.ch`, bindings
+  Hyperdrive/R2/KV, plus D1 en filet de secours inactif).
 - **Secrets runtime déjà configurés sur le Worker** (Stripe secret, BETTER_AUTH_SECRET,
   OAuth Google, e-mail…). La connexion Git **ne les touche pas** : ils restent.
 - `.env.production` est **commité** (clés publiques seulement, dont
@@ -74,7 +80,14 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 >
 > **Filet de sécurité** : si un jour l'étape migrations échoue pour une raison
 > d'authentification, retire-la du deploy command et applique les migrations en
-> local avant le push : `npm run db:migrate:remote`.
+> local avant le push : `bun run db:migrate:remote`.
+>
+> **⚠️ Depuis le pivot Postgres/Hyperdrive (2026-07-09)** : cette étape
+> `d1 migrations apply` ne concerne QUE la base D1 (`swiss3design-db`), gardée
+> comme filet de secours inactif — ce n'est plus la base réelle du site. Un
+> échec ici n'affecte donc pas la prod ; la vraie base (Postgres/Neon, binding
+> `HYPERDRIVE`) n'a **aucune** étape de migration dans ce pipeline, voir
+> `AGENTS.md` § Deployment.
 
 ## Vérifier que ça marche
 
@@ -106,7 +119,8 @@ branche déployée. Totalement isolé de la prod :
 
 | | Production (`swiss3design`) | Preview (`swiss3design-preview`) |
 | --- | --- | --- |
-| D1 | `swiss3design-db` (données clients réelles) | `swiss3design-preview-db` (vide, migrée) |
+| Hyperdrive/Postgres | `swiss3design` (Neon, données clients réelles) | ⚠️ **pas encore configuré** — `env.preview` n'a aucun binding `HYPERDRIVE` dans `wrangler.jsonc` ; la preview est cassée tant que ce n'est pas câblé (choix de topologie à trancher : même base Neon que la prod, ou branche Neon isolée) |
+| D1 (inactif, filet de secours) | `swiss3design-db` (données clients réelles) | `swiss3design-preview-db` (vide, migrée) |
 | R2 | `swiss3design-files` | `swiss3design-preview-files` (vide) |
 | KV | namespace prod | namespace preview dédié |
 | Stripe | clé **LIVE** | aucune clé définie (checkout désactivé en preview) |
@@ -282,9 +296,9 @@ comparer les fichiers `schema.mjs` sous
 `node_modules/better-auth/dist/plugins/*/**/schema.mjs` (et
 `node_modules/@better-auth/*/dist/**/schema.mjs` pour les plugins hors
 paquet principal, ex. `passkey`) avec les tables correspondantes dans
-`src/db/schema.ts` — chaque champ déclaré côté plugin doit avoir une colonne
-en face. Un `npm run typecheck` ou `npm run build` **ne détecte pas** ce
-genre de dérive : la validation de schéma de Better Auth est faite au
+`src/db/schema.pg.ts` — chaque champ déclaré côté plugin doit avoir une
+colonne en face. Un `bun run typecheck` ou `bun run build` **ne détecte pas**
+ce genre de dérive : la validation de schéma de Better Auth est faite au
 runtime, pas à la compilation. (Le message d'erreur suggère aussi `npx
 auth@latest generate` — non testé par nous, à vérifier avant de s'y fier.)
 

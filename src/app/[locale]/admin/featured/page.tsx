@@ -43,7 +43,12 @@ export default async function AdminFeaturedPage({
       ? await db
           .select()
           .from(productImages)
-          .where(inArray(productImages.productId, rows.map((r) => r.id)))
+          .where(
+            inArray(
+              productImages.productId,
+              rows.map((r) => r.id),
+            ),
+          )
           .orderBy(asc(productImages.sortOrder))
       : [];
   const firstImage = new Map<string, string>();

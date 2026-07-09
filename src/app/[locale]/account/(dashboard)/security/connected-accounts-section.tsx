@@ -61,8 +61,12 @@ export function ConnectedAccountsSection({
       <div className="flex items-center gap-2.5">
         <Users size={18} className="shrink-0 text-soft" />
         <div>
-          <p className="text-sm font-semibold">{t("security.connected.title")}</p>
-          <p className="mt-0.5 text-xs text-soft">{t("security.connected.desc")}</p>
+          <p className="text-sm font-semibold">
+            {t("security.connected.title")}
+          </p>
+          <p className="mt-0.5 text-xs text-soft">
+            {t("security.connected.desc")}
+          </p>
         </div>
       </div>
 
@@ -70,7 +74,10 @@ export function ConnectedAccountsSection({
         {providers.map((p) => {
           const isLinked = linked.includes(p);
           return (
-            <li key={p} className="flex items-center justify-between gap-3 py-3">
+            <li
+              key={p}
+              className="flex items-center justify-between gap-3 py-3"
+            >
               <span className="flex items-center gap-2.5 text-sm font-medium">
                 {SOCIAL_ICONS[p]}
                 {SOCIAL_LABELS[p]}
@@ -83,7 +90,9 @@ export function ConnectedAccountsSection({
                   className={`${btnGhost} !py-2 text-xs`}
                 >
                   <Link2Off size={13} />
-                  {pending === p ? t("security.processing") : t("security.connected.unlink")}
+                  {pending === p
+                    ? t("security.processing")
+                    : t("security.connected.unlink")}
                 </button>
               ) : (
                 <button
@@ -93,7 +102,9 @@ export function ConnectedAccountsSection({
                   className={`${btnGhost} !py-2 text-xs`}
                 >
                   <Link2 size={13} />
-                  {pending === p ? t("security.processing") : t("security.connected.link")}
+                  {pending === p
+                    ? t("security.processing")
+                    : t("security.connected.link")}
                 </button>
               )}
             </li>

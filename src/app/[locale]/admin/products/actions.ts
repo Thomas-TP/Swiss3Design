@@ -134,7 +134,9 @@ export async function saveProduct(
         name: v.name.trim().slice(0, 80),
         // prix vide → hérite du produit ; stock vide → non suivi
         priceCents: priceStr ? parsePriceToCents(priceStr) : null,
-        stock: stockStr ? Math.max(0, Number.parseInt(stockStr, 10) || 0) : null,
+        stock: stockStr
+          ? Math.max(0, Number.parseInt(stockStr, 10) || 0)
+          : null,
       };
     });
 
@@ -210,9 +212,9 @@ export async function saveProduct(
       productId = row.id;
     }
 
-    await db.insert(productTranslations).values(
-      translations.map((tr) => ({ ...tr, productId })),
-    );
+    await db
+      .insert(productTranslations)
+      .values(translations.map((tr) => ({ ...tr, productId })));
     if (parsedImages.data.length > 0) {
       await db.insert(productImages).values(
         parsedImages.data.map((img, i) => ({
@@ -224,18 +226,22 @@ export async function saveProduct(
       );
     }
     if (categoryIds.length > 0) {
-      await db.insert(productCategories).values(
-        categoryIds.map((categoryId) => ({ productId, categoryId })),
-      );
+      await db
+        .insert(productCategories)
+        .values(categoryIds.map((categoryId) => ({ productId, categoryId })));
     }
     if (variantRows.length > 0) {
-      await db.insert(productVariants).values(
-        variantRows.map((v) => ({ ...v, productId })),
-      );
+      await db
+        .insert(productVariants)
+        .values(variantRows.map((v) => ({ ...v, productId })));
     }
     if (validColorIds.length > 0) {
       await db.insert(productColors).values(
-        validColorIds.map((colorId, i) => ({ productId, colorId, sortOrder: i })),
+        validColorIds.map((colorId, i) => ({
+          productId,
+          colorId,
+          sortOrder: i,
+        })),
       );
     }
   } catch (e) {

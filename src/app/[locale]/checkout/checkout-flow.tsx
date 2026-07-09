@@ -123,7 +123,9 @@ function StreetAutocomplete({
         );
         const data = (await res.json()) as { results?: unknown[] };
         const parsed = (data.results ?? [])
-          .map((r) => parseGeoAdminResult(r as Parameters<typeof parseGeoAdminResult>[0]))
+          .map((r) =>
+            parseGeoAdminResult(r as Parameters<typeof parseGeoAdminResult>[0]),
+          )
           .filter((s): s is Suggestion => s !== null);
         setItems(parsed);
         setOpen(parsed.length > 0);
@@ -619,7 +621,11 @@ export function CheckoutFlow({
   if (items.length === 0 && !clientSecret) {
     return (
       <div className="rounded-card border border-line bg-surface p-10 text-center">
-        <ShoppingBag size={26} strokeWidth={1.6} className="mx-auto text-soft" />
+        <ShoppingBag
+          size={26}
+          strokeWidth={1.6}
+          className="mx-auto text-soft"
+        />
         <p className="mt-4 text-soft">{t("emptyCart")}</p>
         <Link
           href="/shop"
@@ -767,7 +773,9 @@ export function CheckoutFlow({
                   <div className="grid grid-cols-[110px_1fr] gap-3">
                     <input
                       value={addr.npa}
-                      onChange={(e) => setAddr({ ...addr, npa: e.target.value })}
+                      onChange={(e) =>
+                        setAddr({ ...addr, npa: e.target.value })
+                      }
                       required
                       inputMode="numeric"
                       pattern="\d{4}"
@@ -778,7 +786,9 @@ export function CheckoutFlow({
                     />
                     <input
                       value={addr.city}
-                      onChange={(e) => setAddr({ ...addr, city: e.target.value })}
+                      onChange={(e) =>
+                        setAddr({ ...addr, city: e.target.value })
+                      }
                       required
                       autoComplete="address-level2"
                       placeholder={t("city")}

@@ -56,7 +56,9 @@ export default async function QuotesTab({
                 className="block py-4 transition-opacity hover:opacity-70"
               >
                 <div className="flex items-center justify-between gap-3">
-                  <p className="line-clamp-1 text-sm font-medium">{q.description}</p>
+                  <p className="line-clamp-1 text-sm font-medium">
+                    {q.description}
+                  </p>
                   <span
                     className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusStyle[q.status] ?? "bg-line text-soft"}`}
                   >

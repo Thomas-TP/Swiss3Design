@@ -68,11 +68,15 @@ export async function addColor(
   const name = String(formData.get("name") || "")
     .trim()
     .slice(0, 40);
-  const hex = String(formData.get("hex") || "").trim().toUpperCase();
+  const hex = String(formData.get("hex") || "")
+    .trim()
+    .toUpperCase();
 
   if (!materialId) return { error: "Filament introuvable." };
-  if (name.length < 1) return { error: "Le nom de la couleur est obligatoire." };
-  if (!HEX_RE.test(hex)) return { error: "Code couleur invalide (ex. #E5231C)." };
+  if (name.length < 1)
+    return { error: "Le nom de la couleur est obligatoire." };
+  if (!HEX_RE.test(hex))
+    return { error: "Code couleur invalide (ex. #E5231C)." };
 
   const db = await getDb();
   // Place la nouvelle couleur en fin de palette.
@@ -80,7 +84,10 @@ export async function addColor(
     .select({ sortOrder: filamentColors.sortOrder })
     .from(filamentColors)
     .where(eq(filamentColors.materialId, materialId));
-  const nextOrder = existing.reduce((max, r) => Math.max(max, r.sortOrder + 1), 0);
+  const nextOrder = existing.reduce(
+    (max, r) => Math.max(max, r.sortOrder + 1),
+    0,
+  );
 
   try {
     await db

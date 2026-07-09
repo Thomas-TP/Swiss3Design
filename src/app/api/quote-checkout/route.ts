@@ -16,7 +16,9 @@ const bodySchema = z.object({
 });
 
 export async function POST(request: Request) {
-  if (!(await rateLimit(request, "quote-checkout", { limit: 20, windowS: 600 }))) {
+  if (
+    !(await rateLimit(request, "quote-checkout", { limit: 20, windowS: 600 }))
+  ) {
     return tooManyRequests();
   }
 
@@ -49,8 +51,7 @@ export async function POST(request: Request) {
   }
 
   // Seuls les devis chiffrés, non expirés et non encore payés sont payables
-  const expired =
-    !!quote.validUntil && quote.validUntil.getTime() < Date.now();
+  const expired = !!quote.validUntil && quote.validUntil.getTime() < Date.now();
   if (
     expired ||
     (quote.status !== "quoted" && quote.status !== "accepted") ||

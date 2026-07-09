@@ -40,7 +40,13 @@ interface TrackResult {
   discountCode: string | null;
   totalCents: number;
   trackingNumber: string | null;
-  address: { name: string; street: string; npa: string; city: string; canton: string };
+  address: {
+    name: string;
+    street: string;
+    npa: string;
+    city: string;
+    canton: string;
+  };
   items: {
     id: string;
     nameSnapshot: string;
@@ -51,7 +57,11 @@ interface TrackResult {
   }[];
 }
 
-export function TrackFlow({ initialOrderNumber }: { initialOrderNumber: string }) {
+export function TrackFlow({
+  initialOrderNumber,
+}: {
+  initialOrderNumber: string;
+}) {
   const t = useTranslations("track");
   const tStatus = useTranslations("account.status");
   const locale = useLocale();
@@ -61,7 +71,8 @@ export function TrackFlow({ initialOrderNumber }: { initialOrderNumber: string }
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<TrackResult | null>(null);
 
-  const ready = orderNumber.trim().length >= 3 && /^\S+@\S+\.\S+$/.test(email.trim());
+  const ready =
+    orderNumber.trim().length >= 3 && /^\S+@\S+\.\S+$/.test(email.trim());
 
   async function search() {
     if (!ready || pending) return;
@@ -101,7 +112,9 @@ export function TrackFlow({ initialOrderNumber }: { initialOrderNumber: string }
             </h2>
             <p className="mt-1 text-sm text-soft">
               {t("placedOn", {
-                date: new Date(result.createdAt).toLocaleDateString(`${locale}-CH`),
+                date: new Date(result.createdAt).toLocaleDateString(
+                  `${locale}-CH`,
+                ),
               })}
             </p>
           </div>
@@ -146,7 +159,9 @@ export function TrackFlow({ initialOrderNumber }: { initialOrderNumber: string }
                 className="flex items-center justify-between gap-3 py-4"
               >
                 <span className="flex items-center gap-2 text-sm">
-                  <span className="font-medium tabular-nums">{i.quantity}×</span>{" "}
+                  <span className="font-medium tabular-nums">
+                    {i.quantity}×
+                  </span>{" "}
                   {i.nameSnapshot}
                   {i.colorName && (
                     <span className="inline-flex items-center gap-1.5 text-xs text-soft">

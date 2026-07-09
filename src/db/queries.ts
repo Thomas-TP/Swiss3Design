@@ -3,6 +3,7 @@ import {
   asc,
   desc,
   eq,
+  exists,
   inArray,
   like,
   ne,
@@ -226,7 +227,10 @@ export async function getMaterialsWithColors(): Promise<MaterialWithColors[]> {
       .from(filamentColors)
       .orderBy(asc(filamentColors.sortOrder), asc(filamentColors.name)),
   ]);
-  const byMaterial = new Map<string, { id: string; name: string; hex: string }[]>();
+  const byMaterial = new Map<
+    string,
+    { id: string; name: string; hex: string }[]
+  >();
   for (const c of colors) {
     const list = byMaterial.get(c.materialId) ?? [];
     list.push({ id: c.id, name: c.name, hex: c.hex });
@@ -265,7 +269,10 @@ export async function getUsedFilters(locale: Locale): Promise<{
         eq(categoryTranslations.locale, locale),
       ),
     )
-    .innerJoin(productCategories, eq(productCategories.categoryId, categories.id))
+    .innerJoin(
+      productCategories,
+      eq(productCategories.categoryId, categories.id),
+    )
     .innerJoin(
       products,
       and(
@@ -408,15 +415,24 @@ export async function getRelatedProducts(
 
   if (catIds.length > 0) {
     rows = await db
-      .selectDistinct(cols)
+      .select(cols)
       .from(products)
       .innerJoin(productTranslations, withTranslation)
-      .innerJoin(productCategories, eq(productCategories.productId, products.id))
       .where(
         and(
           eq(products.active, true),
           ne(products.id, productId),
-          inArray(productCategories.categoryId, catIds),
+          exists(
+            db
+              .select({ n: sql`1` })
+              .from(productCategories)
+              .where(
+                and(
+                  eq(productCategories.productId, products.id),
+                  inArray(productCategories.categoryId, catIds),
+                ),
+              ),
+          ),
         ),
       )
       .orderBy(desc(products.createdAt))
@@ -484,7 +500,11 @@ export async function getSitemapProducts(): Promise<
 
 export async function getSetting(key: string): Promise<string | null> {
   const db = await getDb();
-  const rows = await db.select().from(settings).where(eq(settings.key, key)).limit(1);
+  const rows = await db
+    .select()
+    .from(settings)
+    .where(eq(settings.key, key))
+    .limit(1);
   return rows[0]?.value ?? null;
 }
 

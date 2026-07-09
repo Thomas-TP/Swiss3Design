@@ -129,7 +129,11 @@ export default async function AboutPage({
             <div className="mt-6 rounded-card border border-line bg-elevated p-6 shadow-sm shadow-ink/[0.04]">
               <div className="mb-4 flex items-center gap-3">
                 <span className="grid h-10 w-10 place-items-center rounded-xl bg-paper ring-1 ring-line">
-                  <Printer size={19} strokeWidth={1.8} className="text-accent" />
+                  <Printer
+                    size={19}
+                    strokeWidth={1.8}
+                    className="text-accent"
+                  />
                 </span>
                 <div>
                   <p className="text-sm font-semibold">Bambu Lab P1S</p>
@@ -203,7 +207,11 @@ export default async function AboutPage({
               {c.plaPoints.map((point) => (
                 <li key={point} className="flex items-start gap-2.5">
                   <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent/10">
-                    <Check size={13} strokeWidth={2.5} className="text-accent" />
+                    <Check
+                      size={13}
+                      strokeWidth={2.5}
+                      className="text-accent"
+                    />
                   </span>
                   <span className="text-sm leading-snug text-ink">{point}</span>
                 </li>

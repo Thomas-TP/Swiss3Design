@@ -27,7 +27,9 @@ export default async function NotificationsTab() {
         <Bell size={19} className="text-soft" />
         {t("notifications.title")}
       </h1>
-      <p className="mt-1 mb-6 text-sm text-soft">{t("notifications.subtitle")}</p>
+      <p className="mt-1 mb-6 text-sm text-soft">
+        {t("notifications.subtitle")}
+      </p>
 
       <div className="space-y-4">
         <div className={card}>
@@ -38,7 +40,9 @@ export default async function NotificationsTab() {
             }}
           />
         </div>
-        <p className={`${card} text-xs text-soft`}>{t("notifications.transactionalNote")}</p>
+        <p className={`${card} text-xs text-soft`}>
+          {t("notifications.transactionalNote")}
+        </p>
       </div>
     </div>
   );

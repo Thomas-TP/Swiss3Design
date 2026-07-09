@@ -50,7 +50,9 @@ export function ProductColorProvider({
 export function useProductColor(): ProductColorValue {
   const ctx = useContext(ProductColorContext);
   if (!ctx) {
-    throw new Error("useProductColor doit être utilisé dans ProductColorProvider");
+    throw new Error(
+      "useProductColor doit être utilisé dans ProductColorProvider",
+    );
   }
   return ctx;
 }

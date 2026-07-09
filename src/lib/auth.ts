@@ -6,12 +6,11 @@ import {
   magicLink,
   emailOTP,
   haveIBeenPwned,
-  captcha,
 } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
-import { drizzle } from "drizzle-orm/d1";
 import { and, eq, isNull } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { getDb } from "@/db";
 import * as schema from "@/db/schema";
 import { sendEmail } from "./email";
 import {
@@ -31,7 +30,8 @@ function adminEmails(env: CloudflareEnv): string[] {
 
 // N'active un provider social que si ses identifiants sont configurés
 function socialProviders(env: CloudflareEnv) {
-  const providers: Record<string, { clientId: string; clientSecret: string }> = {};
+  const providers: Record<string, { clientId: string; clientSecret: string }> =
+    {};
   if (env.GOOGLE_CLIENT_ID && env.GOOGLE_CLIENT_SECRET) {
     providers.google = {
       clientId: env.GOOGLE_CLIENT_ID,
@@ -61,7 +61,7 @@ export function enabledSocialProviders(env: CloudflareEnv): string[] {
 // que dans le contexte d'une requête.
 export async function getAuth() {
   const { env } = await getCloudflareContext({ async: true });
-  const db = drizzle(env.DB, { schema });
+  const db = await getDb();
 
   // La vérification d'e-mail exige un envoyeur opérationnel : elle
   // s'active automatiquement dès que RESEND_API_KEY est configurée.
@@ -74,7 +74,7 @@ export async function getAuth() {
       env.APP_ENV === "preview"
         ? [env.BETTER_AUTH_URL]
         : ["https://swiss3design.ch", "https://www.swiss3design.ch"],
-    database: drizzleAdapter(db, { provider: "sqlite" }),
+    database: drizzleAdapter(db, { provider: "pg" }),
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 8,
@@ -227,17 +227,6 @@ export async function getAuth() {
       // rpID dérivé automatiquement de baseURL (env.BETTER_AUTH_URL) : pas de
       // configuration manuelle, fonctionne tel quel en prod comme en preview.
       passkey(),
-      // Anti-bot sur inscription/connexion/mot de passe oublié — actif
-      // uniquement si un widget Turnstile est configuré (sinon désactivé,
-      // pour ne pas casser le dev local sans clé).
-      ...(env.TURNSTILE_SECRET_KEY
-        ? [
-            captcha({
-              provider: "cloudflare-turnstile",
-              secretKey: env.TURNSTILE_SECRET_KEY,
-            }),
-          ]
-        : []),
       nextCookies(),
     ],
   });

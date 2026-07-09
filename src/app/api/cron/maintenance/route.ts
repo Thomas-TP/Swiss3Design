@@ -8,8 +8,7 @@ import { runMaintenance } from "@/lib/maintenance";
 export async function POST(request: Request) {
   const { env } = await getCloudflareContext({ async: true });
   const auth = request.headers.get("authorization") ?? "";
-  const secretOk =
-    !!env.CRON_SECRET && auth === `Bearer ${env.CRON_SECRET}`;
+  const secretOk = !!env.CRON_SECRET && auth === `Bearer ${env.CRON_SECRET}`;
 
   if (!secretOk) {
     const session = await getServerSession();

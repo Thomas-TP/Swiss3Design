@@ -8,7 +8,12 @@ import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { FIELD } from "../ui";
 
-const PAID_STATUSES = new Set(["paid", "in_production", "shipped", "delivered"]);
+const PAID_STATUSES = new Set([
+  "paid",
+  "in_production",
+  "shipped",
+  "delivered",
+]);
 
 export default async function AdminCustomersPage({
   params,
@@ -51,7 +56,10 @@ export default async function AdminCustomersPage({
   const stats = new Map<string, { count: number; totalCents: number }>();
   const add = (key: string, totalCents: number) => {
     const cur = stats.get(key) ?? { count: 0, totalCents: 0 };
-    stats.set(key, { count: cur.count + 1, totalCents: cur.totalCents + totalCents });
+    stats.set(key, {
+      count: cur.count + 1,
+      totalCents: cur.totalCents + totalCents,
+    });
   };
   const emailToUserId = new Map(
     allCustomers.map((c) => [c.email.toLowerCase(), c.id]),

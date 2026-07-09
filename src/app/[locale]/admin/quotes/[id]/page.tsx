@@ -227,9 +227,9 @@ export default async function AdminQuoteDetailPage({
         <p className="text-xs leading-relaxed text-soft">
           E-mails automatiques au client : passer en{" "}
           <strong>« Devis envoyé »</strong> avec un prix → e-mail avec la
-          proposition · passer en <strong>« Refusée »</strong> → e-mail de
-          refus poli (le message ci-dessus sert de motif). Chaque e-mail
-          n&apos;est envoyé qu&apos;une seule fois.
+          proposition · passer en <strong>« Refusée »</strong> → e-mail de refus
+          poli (le message ci-dessus sert de motif). Chaque e-mail n&apos;est
+          envoyé qu&apos;une seule fois.
         </p>
       </form>
     </div>

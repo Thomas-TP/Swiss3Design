@@ -1,9 +1,21 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { Eye, Send, Pencil, ImagePlus, X, FlaskConical, Check } from "lucide-react";
+import {
+  Eye,
+  Send,
+  Pencil,
+  ImagePlus,
+  X,
+  FlaskConical,
+  Check,
+} from "lucide-react";
 import { FIELD, BTN_PRIMARY, BTN_GHOST } from "../../ui";
-import { previewAnnouncement, sendAnnouncement, sendTestEmail } from "./actions";
+import {
+  previewAnnouncement,
+  sendAnnouncement,
+  sendTestEmail,
+} from "./actions";
 
 interface Product {
   id: string;
@@ -162,8 +174,8 @@ export function ComposeForm({ products }: { products: Product[] }) {
     return (
       <div className="space-y-4">
         <div className="rounded-xl border border-line bg-amber-500/10 px-4 py-3 text-sm font-medium text-amber-800 dark:text-amber-200">
-          {recipientCount} destinataire{recipientCount > 1 ? "s" : ""} recevront cet
-          e-mail.
+          {recipientCount} destinataire{recipientCount > 1 ? "s" : ""} recevront
+          cet e-mail.
         </div>
         <iframe
           srcDoc={previewHtml}
@@ -178,7 +190,11 @@ export function ComposeForm({ products }: { products: Product[] }) {
           </p>
         )}
         <div className="flex flex-wrap items-center gap-2.5">
-          <button type="button" onClick={() => setStep("compose")} className={BTN_GHOST}>
+          <button
+            type="button"
+            onClick={() => setStep("compose")}
+            className={BTN_GHOST}
+          >
             <Pencil size={14} />
             Modifier
           </button>
@@ -222,7 +238,11 @@ export function ComposeForm({ products }: { products: Product[] }) {
         {bannerImageUrl ? (
           <div className="relative overflow-hidden rounded-xl border border-line">
             {/* eslint-disable-next-line @next/next/no-img-element -- aperçu admin, pas de page publique */}
-            <img src={bannerImageUrl} alt="" className="h-32 w-full object-cover" />
+            <img
+              src={bannerImageUrl}
+              alt=""
+              className="h-32 w-full object-cover"
+            />
             <button
               type="button"
               onClick={() => setBannerImageUrl(null)}
@@ -240,7 +260,9 @@ export function ComposeForm({ products }: { products: Product[] }) {
             className={`${BTN_GHOST} w-full justify-center py-6`}
           >
             <ImagePlus size={16} />
-            {bannerUploading ? "Envoi…" : "Ajouter une bannière (JPG, PNG, WebP)"}
+            {bannerUploading
+              ? "Envoi…"
+              : "Ajouter une bannière (JPG, PNG, WebP)"}
           </button>
         )}
         <input
@@ -250,7 +272,9 @@ export function ComposeForm({ products }: { products: Product[] }) {
           onChange={onBannerChange}
           className="hidden"
         />
-        {bannerError && <p className="mt-1.5 text-xs text-accent">{bannerError}</p>}
+        {bannerError && (
+          <p className="mt-1.5 text-xs text-accent">{bannerError}</p>
+        )}
       </div>
 
       <div>
@@ -278,8 +302,8 @@ export function ComposeForm({ products }: { products: Product[] }) {
 
       <div>
         <label className="mb-1.5 block text-sm font-semibold">
-          Produits à mettre en avant (facultatif, {MAX_PRODUCTS} max — {productIds.length}{" "}
-          sélectionné{productIds.length > 1 ? "s" : ""})
+          Produits à mettre en avant (facultatif, {MAX_PRODUCTS} max —{" "}
+          {productIds.length} sélectionné{productIds.length > 1 ? "s" : ""})
         </label>
         <div className="max-h-64 space-y-1 overflow-y-auto rounded-xl border border-line p-1.5">
           {products.map((p) => {
@@ -301,12 +325,20 @@ export function ComposeForm({ products }: { products: Product[] }) {
                 />
                 {p.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element -- aperçu admin
-                  <img src={p.imageUrl} alt="" className="size-9 shrink-0 rounded-md object-cover" />
+                  <img
+                    src={p.imageUrl}
+                    alt=""
+                    className="size-9 shrink-0 rounded-md object-cover"
+                  />
                 ) : (
                   <span className="size-9 shrink-0 rounded-md bg-line" />
                 )}
-                <span className="min-w-0 flex-1 truncate text-sm">{p.name}</span>
-                <span className="shrink-0 text-xs text-soft">{p.priceLabel}</span>
+                <span className="min-w-0 flex-1 truncate text-sm">
+                  {p.name}
+                </span>
+                <span className="shrink-0 text-xs text-soft">
+                  {p.priceLabel}
+                </span>
               </label>
             );
           })}
@@ -315,7 +347,9 @@ export function ComposeForm({ products }: { products: Product[] }) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1.5 block text-sm font-semibold">Destinataires</label>
+          <label className="mb-1.5 block text-sm font-semibold">
+            Destinataires
+          </label>
           <select
             value={audience}
             onChange={(e) => setAudience(e.target.value)}

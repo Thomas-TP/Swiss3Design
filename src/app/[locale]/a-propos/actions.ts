@@ -2,7 +2,10 @@
 
 import { z } from "zod";
 import { sendEmail, getAdminEmails } from "@/lib/email";
-import { adminContactEmail, contactConfirmationEmail } from "@/lib/email-templates";
+import {
+  adminContactEmail,
+  contactConfirmationEmail,
+} from "@/lib/email-templates";
 
 const schema = z.object({
   name: z.string().trim().min(1).max(100),

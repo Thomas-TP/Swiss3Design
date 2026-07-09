@@ -1,0 +1,67 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.5.3/schema.json",
+  "vcs": { "enabled": true, "clientKind": "git", "useIgnoreFile": true },
+  "files": {
+    "ignoreUnknown": false,
+    // "!!" = force-ignore (saute le parcours du dossier, pas juste un filtre
+    // de motif après coup) — un simple "!dossier/**" ne suffit pas de façon
+    // fiable ici (bug connu de Biome sur l'exclusion de répertoires,
+    // biomejs/biome#7998, #7372, #1280 : deux tentatives avec un simple motif
+    // "!dossier/**" puis un .biomeignore n'ont pas exclu drizzle/ comme
+    // attendu — cette syntaxe au niveau top-level files.includes est la
+    // solution documentée).
+    "includes": [
+      "**",
+      "!!**/.claude",
+      "!!**/drizzle",
+      "!!**/drizzle-pg",
+      "!!**/node_modules",
+      "!!**/.next",
+      "!!**/.open-next",
+      "!!**/.wrangler",
+      "!!**/public",
+      "!!**/cloudflare-env.d.ts",
+      "!!**/next-env.d.ts"
+    ]
+  },
+  "formatter": {
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "crlf",
+    "lineWidth": 80,
+    "attributePosition": "auto",
+    "bracketSameLine": false,
+    "bracketSpacing": true,
+    "expand": "auto",
+    "useEditorconfig": true
+  },
+  "linter": { "enabled": false },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSameLine": false,
+      "quoteStyle": "double",
+      "attributePosition": "auto",
+      "bracketSpacing": true
+    }
+  },
+  "css": {
+    "parser": { "tailwindDirectives": true }
+  },
+  "html": {
+    "formatter": {
+      "indentScriptAndStyle": false,
+      "selfCloseVoidElements": "always"
+    }
+  },
+  "assist": {
+    "enabled": true,
+    "actions": { "source": { "organizeImports": "on" } }
+  }
+}

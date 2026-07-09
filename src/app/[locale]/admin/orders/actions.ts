@@ -23,7 +23,9 @@ export async function updateOrderStatus(formData: FormData) {
   }
 
   const trackingNumber =
-    String(formData.get("tracking") || "").trim().slice(0, 60) || null;
+    String(formData.get("tracking") || "")
+      .trim()
+      .slice(0, 60) || null;
 
   const db = await getDb();
   const [previous] = await db
@@ -73,7 +75,9 @@ export async function updateOrderNote(formData: FormData) {
   const id = String(formData.get("id") || "");
   if (!id) return;
   const adminNote =
-    String(formData.get("adminNote") || "").trim().slice(0, 2000) || null;
+    String(formData.get("adminNote") || "")
+      .trim()
+      .slice(0, 2000) || null;
   const db = await getDb();
   await db.update(orders).set({ adminNote }).where(eq(orders.id, id));
   revalidatePath("/", "layout");

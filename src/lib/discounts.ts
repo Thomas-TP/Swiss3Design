@@ -42,7 +42,10 @@ export async function validateDiscount(
 }
 
 // Incrémente le compteur d'utilisations à la vente (paiement confirmé)
-export async function incrementDiscountUse(db: Db, code: string): Promise<void> {
+export async function incrementDiscountUse(
+  db: Db,
+  code: string,
+): Promise<void> {
   await db
     .update(discountCodes)
     .set({ usedCount: sql`${discountCodes.usedCount} + 1` })

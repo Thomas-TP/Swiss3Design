@@ -119,9 +119,12 @@ export default async function AdminEmailsPage({
     {
       title: "Nouvelle commande (notification interne)",
       desc: "Envoyé à l'équipe (ADMIN_EMAILS) dès qu'une commande est payée — avec alerte stock bas le cas échéant. « Répondre » écrit directement au client.",
-      email: adminNewOrderEmail(sampleOrder, sampleItems, ["vous@example.ch"], [
-        { name: "Vase Spirale", stock: 1 },
-      ]),
+      email: adminNewOrderEmail(
+        sampleOrder,
+        sampleItems,
+        ["vous@example.ch"],
+        [{ name: "Vase Spirale", stock: 1 }],
+      ),
       height: 760,
     },
     {
@@ -239,8 +242,7 @@ export default async function AdminEmailsPage({
         <div className="mt-10 border-t border-line pt-6">
           <h2 className="text-lg font-bold">Notifications internes</h2>
           <p className="text-sm text-soft">
-            Envoyées à vous uniquement ({"ADMIN_EMAILS"}), toujours en
-            français.
+            Envoyées à vous uniquement ({"ADMIN_EMAILS"}), toujours en français.
           </p>
         </div>
         {adminPreviews.map(renderPreview)}

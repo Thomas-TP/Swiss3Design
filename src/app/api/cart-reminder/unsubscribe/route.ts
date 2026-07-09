@@ -42,7 +42,9 @@ export async function GET(request: Request) {
       .limit(1);
     if (row) {
       locale = row.locale;
-      await db.delete(abandonedCarts).where(eq(abandonedCarts.email, row.email));
+      await db
+        .delete(abandonedCarts)
+        .where(eq(abandonedCarts.email, row.email));
     }
   }
 

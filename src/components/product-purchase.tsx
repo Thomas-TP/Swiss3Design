@@ -71,7 +71,14 @@ export function ProductPurchase({
     colorHex: selectedColor?.hex ?? null,
   };
   // Le favori reste au niveau produit (prix de base, sans variante ni couleur)
-  const favoriteItem = { productId, slug, name, priceCents: basePriceCents, imageUrl, saleType };
+  const favoriteItem = {
+    productId,
+    slug,
+    name,
+    priceCents: basePriceCents,
+    imageUrl,
+    saleType,
+  };
 
   const badgeClass =
     saleType === "stock"

@@ -30,7 +30,9 @@ export default async function ProfileTab() {
 
         <div className={card}>
           <p className="text-sm font-semibold">{t("profile.languageTitle")}</p>
-          <p className="mt-0.5 text-xs text-soft">{t("profile.languageDesc")}</p>
+          <p className="mt-0.5 text-xs text-soft">
+            {t("profile.languageDesc")}
+          </p>
           <div className="mt-3">
             <LocaleSwitcher />
           </div>

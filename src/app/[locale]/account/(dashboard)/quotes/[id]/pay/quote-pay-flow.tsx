@@ -129,7 +129,9 @@ function PayStep({
       </div>
 
       <div className="mt-5 flex items-baseline justify-between rounded-2xl bg-paper px-4 py-3.5 ring-1 ring-line">
-        <span className="text-sm font-medium text-soft">{tc("totalToPay")}</span>
+        <span className="text-sm font-medium text-soft">
+          {tc("totalToPay")}
+        </span>
         <span className="text-xl font-bold tabular-nums tracking-tight">
           {formatChf(totalCents, locale)}
         </span>
@@ -138,7 +140,11 @@ function PayStep({
       <div className="mt-5">
         <PaymentElement
           options={{
-            layout: { type: "accordion", radios: "never", spacedAccordionItems: true },
+            layout: {
+              type: "accordion",
+              radios: "never",
+              spacedAccordionItems: true,
+            },
           }}
         />
       </div>

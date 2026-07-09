@@ -16,7 +16,10 @@ export async function GET(request: Request) {
   let ok = false;
   if (userId && token) {
     const { env } = await getCloudflareContext({ async: true });
-    if (env.BETTER_AUTH_SECRET && (await verifyUnsubscribeToken(userId, token, env.BETTER_AUTH_SECRET))) {
+    if (
+      env.BETTER_AUTH_SECRET &&
+      (await verifyUnsubscribeToken(userId, token, env.BETTER_AUTH_SECRET))
+    ) {
       const db = await getDb();
       await db
         .insert(notificationPreferences)

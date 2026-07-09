@@ -27,5 +27,5 @@ export async function rateLimit(
   return true;
 }
 
-export const tooManyRequests = () =>
-  Response.json({ error: "too_many_requests" }, { status: 429 });
+export const tooManyRequests = (headers?: HeadersInit) =>
+  Response.json({ error: "too_many_requests" }, { status: 429, headers });

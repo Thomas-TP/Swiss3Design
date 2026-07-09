@@ -74,17 +74,24 @@ export async function POST(request: Request) {
       (crypto.getRandomValues(new Uint32Array(1))[0] % 900000) + 100000,
     );
 
-    await db.delete(verification).where(eq(verification.identifier, identifier));
+    await db
+      .delete(verification)
+      .where(eq(verification.identifier, identifier));
     await db.insert(verification).values({
       id: crypto.randomUUID(),
       identifier,
-      value: JSON.stringify({ hash: await sha256Hex(`${email}:${code}`), attempts: 0 }),
+      value: JSON.stringify({
+        hash: await sha256Hex(`${email}:${code}`),
+        attempts: 0,
+      }),
       expiresAt: new Date(Date.now() + CODE_TTL_MS),
       createdAt: new Date(),
       updatedAt: new Date(),
     });
 
-    const sent = await sendEmail(checkoutCodeEmail(email, code, parsed.data.locale));
+    const sent = await sendEmail(
+      checkoutCodeEmail(email, code, parsed.data.locale),
+    );
     // Sans RESEND_API_KEY (dev local), l'envoi est loggé au lieu d'être
     // expédié : on ne traite l'échec comme une erreur qu'en configuration réelle.
     const { env } = await getCloudflareContext({ async: true });
@@ -111,7 +118,9 @@ export async function POST(request: Request) {
     stored.hash !== (await sha256Hex(`${email}:${parsed.data.code}`))
   ) {
     if (stored.attempts + 1 >= MAX_ATTEMPTS) {
-      await db.delete(verification).where(eq(verification.identifier, identifier));
+      await db
+        .delete(verification)
+        .where(eq(verification.identifier, identifier));
     } else {
       await db
         .update(verification)

@@ -25,7 +25,9 @@ interface NavItem {
 
 const groups: { title?: string; items: NavItem[] }[] = [
   {
-    items: [{ href: "/admin", label: "Tableau de bord", Icon: LayoutDashboard }],
+    items: [
+      { href: "/admin", label: "Tableau de bord", Icon: LayoutDashboard },
+    ],
   },
   {
     title: "Catalogue",
