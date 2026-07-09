@@ -16,7 +16,6 @@ export default async function AdminDiscountsPage() {
     .orderBy(desc(discountCodes.createdAt));
 
   // Server component dynamique : l'horloge est stable sur la durée du rendu
-  // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
 
   return (

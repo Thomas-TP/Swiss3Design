@@ -56,30 +56,31 @@ export function LocaleSwitcher() {
         />
       </button>
       {open && (
-        <ul
+        <div
           role="listbox"
           className="absolute right-0 z-50 mt-2 w-40 overflow-hidden rounded-xl border border-line bg-surface py-1.5 shadow-lg shadow-ink/5"
         >
           {routing.locales.map((l) => (
-            <li key={l} role="option" aria-selected={l === locale}>
-              <button
-                type="button"
-                onClick={() => {
-                  setOpen(false);
-                  router.replace(pathname, { locale: l });
-                }}
-                className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper ${
-                  l === locale ? "font-semibold" : ""
-                }`}
-              >
-                {NAMES[l]}
-                {l === locale && (
-                  <Check size={15} className="shrink-0 text-accent" />
-                )}
-              </button>
-            </li>
+            <button
+              key={l}
+              type="button"
+              role="option"
+              aria-selected={l === locale}
+              onClick={() => {
+                setOpen(false);
+                router.replace(pathname, { locale: l });
+              }}
+              className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper ${
+                l === locale ? "font-semibold" : ""
+              }`}
+            >
+              {NAMES[l]}
+              {l === locale && (
+                <Check size={15} className="shrink-0 text-accent" />
+              )}
+            </button>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

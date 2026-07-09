@@ -53,7 +53,6 @@ export default function CartPage() {
                 className="h-20 w-20 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br from-paper to-line/40"
               >
                 {item.imageUrl && (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={item.imageUrl}
                     alt={item.name}
@@ -86,6 +85,7 @@ export default function CartPage() {
                     )}
                   </div>
                   <button
+                    type="button"
                     onClick={() =>
                       remove(
                         item.productId,
@@ -102,6 +102,7 @@ export default function CartPage() {
                 <div className="mt-auto flex items-center justify-between pt-3">
                   <div className="flex items-center gap-1 rounded-full border border-line">
                     <button
+                      type="button"
                       onClick={() =>
                         setQuantity(
                           item.productId,
@@ -119,6 +120,7 @@ export default function CartPage() {
                       {item.quantity}
                     </span>
                     <button
+                      type="button"
                       onClick={() =>
                         setQuantity(
                           item.productId,

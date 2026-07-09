@@ -124,7 +124,7 @@ export default async function AdminOrderDetailPage({
             placeholder="N° de suivi Poste (optionnel)"
             className={`${FIELD} w-56`}
           />
-          <button className={BTN_PRIMARY}>Mettre à jour</button>
+          <button type="submit" className={BTN_PRIMARY}>Mettre à jour</button>
         </form>
         {order.trackingNumber && (
           <p className="mt-2.5 text-xs text-soft">
@@ -261,7 +261,7 @@ export default async function AdminOrderDetailPage({
             placeholder="Ex. : réimprimer le couvercle en 0.2 mm, client appelé le 12.06…"
             className={FIELD}
           />
-          <button className={BTN_GHOST}>Enregistrer la note</button>
+          <button type="submit" className={BTN_GHOST}>Enregistrer la note</button>
         </form>
       </section>
 

@@ -21,7 +21,10 @@
       "!!**/.wrangler",
       "!!**/public",
       "!!**/cloudflare-env.d.ts",
-      "!!**/next-env.d.ts"
+      "!!**/next-env.d.ts",
+      // Favicon Next.js (convention de fichier app/icon.svg) -- jamais rendu
+      // inline dans la page, un <title> d'accessibilite n'a pas de sens ici.
+      "!!src/app/icon.svg"
     ]
   },
   "formatter": {
@@ -37,7 +40,25 @@
     "expand": "auto",
     "useEditorconfig": true
   },
-  "linter": { "enabled": false },
+  "linter": {
+    "enabled": true,
+    "domains": { "react": "recommended" },
+    "rules": {
+      "style": {
+        // Motif tolere partout dans ce codebase, jamais signale par ESLint :
+        // "!" apres un garde qui redirige/leve sans que TS puisse le prouver
+        // statiquement (ex. `if (!session) redirect(...); session!`).
+        "noNonNullAssertion": "off"
+      },
+      "performance": {
+        // `next.config.ts` delegue deja l'optimisation d'image a Cloudflare
+        // Images (`images.unoptimized: true`) -- convertir les <img> en
+        // next/image est un vrai changement UI a part, pas un correctif de
+        // lint. A traiter en tache dediee, pas ici.
+        "noImgElement": "off"
+      }
+    }
+  },
   "javascript": {
     "formatter": {
       "jsxQuoteStyle": "double",

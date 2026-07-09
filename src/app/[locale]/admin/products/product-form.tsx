@@ -193,9 +193,9 @@ export function ProductForm({
               className={FIELD}
             />
           </label>
-          <label className="block text-sm">
-            <span className="mb-1.5 block font-semibold">Matière</span>
-            {materialNames.length > 0 ? (
+          {materialNames.length > 0 ? (
+            <label className="block text-sm">
+              <span className="mb-1.5 block font-semibold">Matière</span>
               <select
                 name="material"
                 value={material}
@@ -208,7 +208,10 @@ export function ProductForm({
                   </option>
                 ))}
               </select>
-            ) : (
+            </label>
+          ) : (
+            <div className="text-sm">
+              <span className="mb-1.5 block font-semibold">Matière</span>
               <p className="rounded-xl border border-line bg-line/20 px-3 py-2 text-xs text-soft">
                 Aucun filament.{" "}
                 <Link href="/admin/materials" className="underline">
@@ -216,8 +219,8 @@ export function ProductForm({
                 </Link>{" "}
                 pour pouvoir le choisir.
               </p>
-            )}
-          </label>
+            </div>
+          )}
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">Dimensions</span>
             <input
@@ -522,6 +525,7 @@ function DeleteButton({ id }: { id: string }) {
 }
 
 interface VariantRow {
+  id: string;
   name: string;
   sku: string;
   price: string;
@@ -531,6 +535,7 @@ interface VariantRow {
 function VariantManager({ initial }: { initial: VariantInitial[] }) {
   const [rows, setRows] = useState<VariantRow[]>(
     initial.map((v) => ({
+      id: crypto.randomUUID(),
       name: v.name,
       sku: v.sku,
       price: v.priceCents != null ? (v.priceCents / 100).toFixed(2) : "",
@@ -546,7 +551,16 @@ function VariantManager({ initial }: { initial: VariantInitial[] }) {
       <input
         type="hidden"
         name="variants"
-        value={JSON.stringify(rows.filter((r) => r.name.trim()))}
+        value={JSON.stringify(
+          rows
+            .filter((r) => r.name.trim())
+            .map(({ name, sku, price, stock }) => ({
+              name,
+              sku,
+              price,
+              stock,
+            })),
+        )}
       />
       {rows.length > 0 && (
         <div className="space-y-2">
@@ -559,7 +573,7 @@ function VariantManager({ initial }: { initial: VariantInitial[] }) {
           </div>
           {rows.map((r, i) => (
             <div
-              key={i}
+              key={r.id}
               className="grid grid-cols-2 gap-2 sm:grid-cols-[1fr_1fr_90px_80px_36px]"
             >
               <input
@@ -607,7 +621,7 @@ function VariantManager({ initial }: { initial: VariantInitial[] }) {
         onClick={() =>
           setRows((prev) => [
             ...prev,
-            { name: "", sku: "", price: "", stock: "" },
+            { id: crypto.randomUUID(), name: "", sku: "", price: "", stock: "" },
           ])
         }
         className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold text-soft transition-colors hover:border-ink hover:text-ink"
@@ -676,7 +690,6 @@ function ImageManager({ initial }: { initial: Img[] }) {
             key={img.url}
             className="group relative h-24 w-24 overflow-hidden rounded-xl border border-line bg-line/30"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={img.url} alt="" className="h-full w-full object-cover" />
             {i === 0 && (
               <span className="absolute left-1 top-1 rounded bg-black/80 px-1.5 py-0.5 text-[9px] font-bold uppercase text-white">

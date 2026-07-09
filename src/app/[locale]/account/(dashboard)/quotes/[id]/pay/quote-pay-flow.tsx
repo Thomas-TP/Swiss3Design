@@ -154,6 +154,7 @@ function PayStep({
         </p>
       )}
       <button
+        type="button"
         onClick={pay}
         disabled={checkoutState.type !== "success" || paying}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"

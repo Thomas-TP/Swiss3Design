@@ -111,7 +111,6 @@ export default async function AboutPage({
               {/* Photo produit officielle Bambu Lab, recadrée (badge promo retiré).
                   Remplaçable par une vraie photo de l'atelier : déposer le fichier
                   dans public/about/ et adapter le src. */}
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src="/about/p1s-ams2-pro.jpg"
                 alt={c.equipmentTitle}

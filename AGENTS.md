@@ -31,12 +31,23 @@ checkout/webhook code as production-critical.
 **Stack pivot (2026-07-09):** the project moved off Medusa/Railway (never
 viable on Cloudflare Workers — no persistent Node process — and Railway isn't
 free) and off D1/SQLite onto Postgres/Hyperdrive, with **Bun** as the
-package manager/dev runtime (deploy target is still `workerd`, unchanged) and
-**Biome** for formatting (ESLint stays the linter — Biome does cover
-react-hooks rules since v1.0.0, but `eslint-config-next` also brings
-Next.js-specific and `jsx-a11y` rules Biome doesn't replicate). D1 stays
-wired in `wrangler.jsonc` for now as a
-rollback safety net, not the active database.
+package manager/dev runtime (deploy target is still `workerd`, unchanged).
+**ESLint has been fully removed and replaced by Biome** as the sole
+linter+formatter (same date) — Biome's `react` domain already covers
+react-hooks (`useHookAtTopLevel`/`useExhaustiveDependencies`) and its `a11y`
+domain covers what `jsx-a11y` did; the one confirmed, accepted gap is
+`eslint-plugin-react-hooks`'s `react-hooks/purity` rule (flags non-deterministic
+calls like `Date.now()` during render) and `@next/next`'s rules (e.g.
+`no-img-element`), neither of which Biome replicates — low-severity, not
+worth keeping a second linter for. **TypeScript 7 was attempted the same day
+and reverted**: TS 7.0.2's `package.json` maps its root import to a
+version-only stub (`./lib/version.cjs`, no compiler API), which breaks not
+just `typescript-eslint` but `next build` itself (Next's internal
+dependency-verification step `require()`s `typescript` and expects the classic
+API) — confirmed by direct inspection of the installed package, not just
+upstream reports. No config flag bypasses it. Stays on **TypeScript 6**
+until TS 7.1 reintroduces a JS API. D1 stays wired in `wrangler.jsonc` for
+now as a rollback safety net, not the active database.
 
 ## Golden rules (these break production — read first)
 
@@ -95,7 +106,7 @@ rollback safety net, not the active database.
 | Styling | Tailwind CSS 4 (`src/app/globals.css`), `motion`, `lucide-react` |
 | DB | Postgres (Neon) via Cloudflare Hyperdrive + Drizzle ORM (pg dialect, `postgres.js` driver) |
 | Auth | `better-auth` via `better-auth-cloudflare` (email + Google OAuth, TOTP 2FA, passkeys) — Postgres-backed |
-| Lint/format | Biome (formatting only) + ESLint (`eslint-config-next` for Next.js-specific + `jsx-a11y` rules — not for react-hooks, Biome's `useHookAtTopLevel`/`useExhaustiveDependencies` already cover that since v1.0.0) |
+| Lint/format | Biome (sole linter + formatter — ESLint removed 2026-07-09, see stack-pivot note) |
 | Payments | Stripe Payment Element + webhooks (LIVE in prod) |
 | Email | Resend (REST) — no-op if `RESEND_API_KEY` unset |
 | i18n | `next-intl` (fr/de/it/en, auto-detect, fr fallback) |
@@ -106,7 +117,7 @@ rollback safety net, not the active database.
 
 ```bash
 bun run dev               # dev server :3000 (loads Hyperdrive/R2/KV bindings via OpenNext)
-bun run lint              # ESLint (run before declaring a change done)
+bun run lint              # biome lint (run before declaring a change done)
 bun run typecheck         # tsc --noEmit — fast type check (no heavy OpenNext build)
 bun run test              # Vitest (unit tests for pure domain logic in src/lib)
 bun run format             # Biome --write (format:check to verify only)
@@ -176,7 +187,7 @@ scripts/          push.bat (one-click publish), seed*.sql, migrate-d1-to-pg.ts (
                   needs resyncing before the rollback safety net is retired)
 workers/cron/     standalone Cloudflare Cron Worker → POST /api/cron/maintenance
                   (purge R2 + cart reminders); deployed separately, excluded from
-                  the app's tsconfig/eslint/OpenNext build
+                  the app's tsconfig/Biome/OpenNext build
 ```
 
 Server-side data access patterns to reuse: `getDb()` ([src/db/index.ts](src/db/index.ts)),

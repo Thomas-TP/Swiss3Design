@@ -86,7 +86,6 @@ export default async function AdminDashboard({
   const revenueCents = paidOrders.reduce((sum, o) => sum + o.totalCents, 0);
 
   // Server component dynamique : rendu à chaque requête, l'horloge est stable
-  // eslint-disable-next-line react-hooks/purity
   const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
   const paid30d = paidOrders.filter((o) => o.createdAt >= thirtyDaysAgo);
   const revenue30dCents = paid30d.reduce((sum, o) => sum + o.totalCents, 0);

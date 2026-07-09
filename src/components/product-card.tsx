@@ -32,7 +32,6 @@ export function ProductCard({ product }: { product: ProductListItem }) {
     >
       <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-paper to-line/40">
         {product.imageUrl && (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={cfImage(product.imageUrl, { width: 600 })}
             alt={product.imageAlt ?? product.name}

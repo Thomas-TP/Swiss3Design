@@ -22,7 +22,9 @@ export function FavoritesList() {
   // identiques, donc relancer ne crée pas de doublons (incrémente la quantité).
   // On conserve la liste des favoris : « ajouter » n'est pas « retirer ».
   function addAllToCart() {
-    items.forEach((item) => add(item));
+    items.forEach((item) => {
+      add(item);
+    });
     setAddedAll(true);
     setTimeout(() => setAddedAll(false), 1800);
   }
@@ -75,7 +77,6 @@ export function FavoritesList() {
           >
             <div className="relative aspect-square overflow-hidden bg-line/30">
               {item.imageUrl && (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={item.imageUrl}
                   alt={item.name}

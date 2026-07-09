@@ -59,7 +59,6 @@ export function AvatarPicker({ current }: { current: string | null }) {
         className="relative block transition-transform active:scale-95"
       >
         {current ? (
-          // eslint-disable-next-line @next/next/no-img-element
           <img
             src={current}
             alt=""
@@ -92,7 +91,6 @@ export function AvatarPicker({ current }: { current: string | null }) {
                     : "ring-transparent hover:ring-line"
                 } ${saving === a ? "animate-pulse" : ""}`}
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={a} alt="" className="h-9 w-9" />
               </button>
             ))}

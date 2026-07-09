@@ -12,6 +12,7 @@ export function StarRating({
   const rounded = Math.round(value);
   return (
     <span
+      role="img"
       className="inline-flex items-center"
       aria-label={`${value.toFixed(1)}/5`}
     >

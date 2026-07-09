@@ -232,12 +232,14 @@ export function ComposeForm({ products }: { products: Product[] }) {
   return (
     <form onSubmit={onPreview} className="space-y-5">
       <div>
-        <label className="mb-1.5 block text-sm font-semibold">
+        <label
+          htmlFor="compose-banner-input"
+          className="mb-1.5 block text-sm font-semibold"
+        >
           Image de bannière (facultatif)
         </label>
         {bannerImageUrl ? (
           <div className="relative overflow-hidden rounded-xl border border-line">
-            {/* eslint-disable-next-line @next/next/no-img-element -- aperçu admin, pas de page publique */}
             <img
               src={bannerImageUrl}
               alt=""
@@ -266,6 +268,7 @@ export function ComposeForm({ products }: { products: Product[] }) {
           </button>
         )}
         <input
+          id="compose-banner-input"
           ref={bannerInputRef}
           type="file"
           accept="image/jpeg,image/png,image/webp,image/avif"
@@ -278,8 +281,14 @@ export function ComposeForm({ products }: { products: Product[] }) {
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-semibold">Objet</label>
+        <label
+          htmlFor="compose-subject"
+          className="mb-1.5 block text-sm font-semibold"
+        >
+          Objet
+        </label>
         <input
+          id="compose-subject"
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           required
@@ -288,8 +297,14 @@ export function ComposeForm({ products }: { products: Product[] }) {
         />
       </div>
       <div>
-        <label className="mb-1.5 block text-sm font-semibold">Message</label>
+        <label
+          htmlFor="compose-body"
+          className="mb-1.5 block text-sm font-semibold"
+        >
+          Message
+        </label>
         <textarea
+          id="compose-body"
           value={bodyText}
           onChange={(e) => setBodyText(e.target.value)}
           required
@@ -301,10 +316,10 @@ export function ComposeForm({ products }: { products: Product[] }) {
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-semibold">
+        <p className="mb-1.5 block text-sm font-semibold">
           Produits à mettre en avant (facultatif, {MAX_PRODUCTS} max —{" "}
           {productIds.length} sélectionné{productIds.length > 1 ? "s" : ""})
-        </label>
+        </p>
         <div className="max-h-64 space-y-1 overflow-y-auto rounded-xl border border-line p-1.5">
           {products.map((p) => {
             const checked = productIds.includes(p.id);
@@ -324,7 +339,6 @@ export function ComposeForm({ products }: { products: Product[] }) {
                   className="size-4 shrink-0 accent-accent"
                 />
                 {p.imageUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- aperçu admin
                   <img
                     src={p.imageUrl}
                     alt=""
@@ -347,10 +361,14 @@ export function ComposeForm({ products }: { products: Product[] }) {
 
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
-          <label className="mb-1.5 block text-sm font-semibold">
+          <label
+            htmlFor="compose-audience"
+            className="mb-1.5 block text-sm font-semibold"
+          >
             Destinataires
           </label>
           <select
+            id="compose-audience"
             value={audience}
             onChange={(e) => setAudience(e.target.value)}
             className={FIELD}
@@ -365,9 +383,9 @@ export function ComposeForm({ products }: { products: Product[] }) {
       </div>
 
       <div>
-        <label className="mb-1.5 block text-sm font-semibold">
+        <p className="mb-1.5 block text-sm font-semibold">
           Bouton d’appel à l’action (facultatif)
-        </label>
+        </p>
         <div className="grid gap-2.5 sm:grid-cols-2">
           <input
             value={ctaLabel}

@@ -24,6 +24,9 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
 
+  // `color` n'initialise que le matériau ; le recoloriage vit dans l'effet
+  // suivant. On NE veut PAS reconstruire la scène à chaque changement de teinte.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: color n'initialise que le materiau, le recoloriage vit dans l'effet suivant
   useEffect(() => {
     const el = mountRef.current;
     if (!el) return;
@@ -105,9 +108,6 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
         renderer.domElement.remove();
       }
     };
-    // `color` n'initialise que le matériau ; le recoloriage vit dans l'effet
-    // suivant. On NE veut PAS reconstruire la scène à chaque changement de teinte.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [modelUrl]);
 
   // Recolore le(s) matériau(x) à la volée quand la couleur produit change.

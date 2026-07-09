@@ -68,30 +68,31 @@ export function Select({
         />
       </button>
       {open && (
-        <ul
+        <div
           role="listbox"
           className="absolute z-30 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border border-line bg-surface py-1.5 shadow-lg shadow-ink/5"
         >
           {options.map((o) => (
-            <li key={o.value} role="option" aria-selected={o.value === value}>
-              <button
-                type="button"
-                onClick={() => {
-                  onChange(o.value);
-                  setOpen(false);
-                }}
-                className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper ${
-                  o.value === value ? "font-semibold" : ""
-                }`}
-              >
-                <span className="truncate">{o.label}</span>
-                {o.value === value && (
-                  <Check size={15} className="shrink-0 text-accent" />
-                )}
-              </button>
-            </li>
+            <button
+              key={o.value}
+              type="button"
+              role="option"
+              aria-selected={o.value === value}
+              onClick={() => {
+                onChange(o.value);
+                setOpen(false);
+              }}
+              className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper ${
+                o.value === value ? "font-semibold" : ""
+              }`}
+            >
+              <span className="truncate">{o.label}</span>
+              {o.value === value && (
+                <Check size={15} className="shrink-0 text-accent" />
+              )}
+            </button>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   );

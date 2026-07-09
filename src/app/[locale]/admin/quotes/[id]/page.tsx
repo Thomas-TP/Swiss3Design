@@ -45,7 +45,6 @@ export default async function AdminQuoteDetailPage({
   ].filter(([, v]) => v);
 
   // Server component dynamique : l'horloge est stable sur la durée du rendu
-  // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
   const quoteExpired = !!quote.validUntil && quote.validUntil.getTime() < now;
 
@@ -223,7 +222,7 @@ export default async function AdminQuoteDetailPage({
             className={FIELD}
           />
         </label>
-        <button className={BTN_PRIMARY}>Enregistrer la réponse</button>
+        <button type="submit" className={BTN_PRIMARY}>Enregistrer la réponse</button>
         <p className="text-xs leading-relaxed text-soft">
           E-mails automatiques au client : passer en{" "}
           <strong>« Devis envoyé »</strong> avec un prix → e-mail avec la

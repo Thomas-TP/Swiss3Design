@@ -42,6 +42,8 @@ export function ProductGallery({
   // Vignette 3D : on rend une fois la scène showroom hors-écran et on capture
   // l'image (toDataURL). Donne un aperçu fidèle de la visualisation interactive.
   const [thumb3d, setThumb3d] = useState<string | null>(null);
+  // Snapshot unique : couleur par défaut, ne se régénère pas au changement de teinte.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: snapshot unique, ne doit pas se regenerer au changement de teinte
   useEffect(() => {
     if (!model3dUrl) return;
     let cancelled = false;
@@ -75,8 +77,6 @@ export function ProductGallery({
     return () => {
       cancelled = true;
     };
-    // Snapshot unique : couleur par défaut, ne se régénère pas au changement de teinte.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [model3dUrl]);
 
   return (
@@ -86,7 +86,6 @@ export function ProductGallery({
           <ModelViewer modelUrl={model3dUrl} />
         ) : (
           current && (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={cfImage(current.url, { width: 1200 })}
               alt={current.alt ?? name}
@@ -101,7 +100,7 @@ export function ProductGallery({
         <div className="mt-3 grid grid-cols-5 gap-3">
           {images.map((img, i) => (
             <button
-              key={`${img.url}-${i}`}
+              key={img.url}
               type="button"
               onClick={() => setIndex(i)}
               aria-label={`${name} ${i + 1}/${images.length}`}
@@ -110,7 +109,6 @@ export function ProductGallery({
                 i === index ? "border-ink" : "border-line hover:border-ink/40"
               }`}
             >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={cfImage(img.url, { width: 200 })}
                 alt=""
@@ -131,7 +129,6 @@ export function ProductGallery({
               }`}
             >
               {thumb3d ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={thumb3d}
                   alt=""

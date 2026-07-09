@@ -83,7 +83,6 @@ export default async function QuoteDetailPage({
   ].filter(([, v]) => v) as [string, string][];
 
   // Server component dynamique : l'horloge est stable sur la durée du rendu
-  // eslint-disable-next-line react-hooks/purity
   const now = Date.now();
   const hasQuote = quote.quotedPriceCents != null && quote.quotedPriceCents > 0;
   const expired =

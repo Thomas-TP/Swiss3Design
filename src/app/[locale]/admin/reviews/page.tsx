@@ -99,6 +99,7 @@ export default async function AdminReviewsPage() {
                     <input type="hidden" name="id" value={r.id} />
                     <input type="hidden" name="status" value="published" />
                     <button
+                      type="submit"
                       className={`${ACTION_BTN} bg-emerald-600 text-white hover:opacity-90`}
                     >
                       Publier
@@ -110,6 +111,7 @@ export default async function AdminReviewsPage() {
                     <input type="hidden" name="id" value={r.id} />
                     <input type="hidden" name="status" value="rejected" />
                     <button
+                      type="submit"
                       className={`${ACTION_BTN} border border-line text-soft hover:border-ink hover:text-ink`}
                     >
                       Rejeter

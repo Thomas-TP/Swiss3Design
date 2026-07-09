@@ -11,6 +11,7 @@ export function SignOutButton() {
 
   return (
     <button
+      type="button"
       onClick={async () => {
         await signOut();
         router.push("/");

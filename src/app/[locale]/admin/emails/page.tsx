@@ -48,7 +48,6 @@ export default async function AdminEmailsPage({
     { nameSnapshot: "Porte-clés relief", priceCentsSnapshot: 995, quantity: 2 },
   ];
   // Aperçu : validité fictive à +30 j (horloge stable sur la durée du rendu)
-  // eslint-disable-next-line react-hooks/purity
   const validUntilPreview = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
   const customerPreviews = [

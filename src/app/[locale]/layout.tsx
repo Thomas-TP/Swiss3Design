@@ -106,6 +106,7 @@ export default async function LocaleLayout({
             relais est pris par <ThemeManager>. */}
         <script
           nonce={nonce}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: script inline statique (aucune entree utilisateur), nonce CSP applique
           dangerouslySetInnerHTML={{
             __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;var r=document.documentElement;r.classList.toggle('dark',d);r.style.colorScheme=d?'dark':'light';}catch(e){}})();`,
           }}
@@ -114,6 +115,7 @@ export default async function LocaleLayout({
         <script
           type="application/ld+json"
           nonce={nonce}
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON.stringify d'un objet genere cote serveur, aucune entree utilisateur brute
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(organizationJsonLd()),
           }}

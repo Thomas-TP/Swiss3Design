@@ -44,7 +44,6 @@ export function BottomNav() {
               >
                 <span className="relative">
                   {key === "account" && avatar ? (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={avatar}
                       alt=""

@@ -41,6 +41,7 @@ export function ReviewForm({
         aria-label={t("ratingLabel")}
       >
         {[1, 2, 3, 4, 5].map((n) => (
+          // biome-ignore lint/a11y/useSemanticElements: pattern ARIA radiogroup/radio standard (WAI-ARIA APG), etoile custom stylee, pas un <input type="radio"> natif pour garder le survol/preview
           <button
             key={n}
             type="button"

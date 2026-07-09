@@ -115,7 +115,6 @@ export default async function AdminCustomersPage({
               <li key={c.id} className="flex items-center gap-3 py-3.5">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-line/40 text-sm font-bold text-soft">
                   {c.image ? (
-                    // eslint-disable-next-line @next/next/no-img-element
                     <img
                       src={c.image}
                       alt=""

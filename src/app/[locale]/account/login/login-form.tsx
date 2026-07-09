@@ -39,6 +39,8 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
   // enregistrée directement dans la liste d'autocomplétion du champ e-mail
   // (autoComplete="username webauthn") — sans ça, une clé créée dans le compte
   // n'est jamais proposée et reste lettre morte.
+  // router/next stables sur la durée de vie du formulaire
+  // biome-ignore lint/correctness/useExhaustiveDependencies: router/next stables sur la durée de vie du formulaire
   useEffect(() => {
     if (!passkeySupported) return;
     let cancelled = false;
@@ -56,8 +58,6 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
     return () => {
       cancelled = true;
     };
-    // router/next stables sur la durée de vie du formulaire
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [passkeySupported]);
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {

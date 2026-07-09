@@ -170,7 +170,6 @@ export default async function AdminProductsPage({
             <li key={p.id} className="flex items-center gap-4 py-3.5">
               <div className="h-14 w-14 shrink-0 overflow-hidden rounded-xl bg-line/30">
                 {firstImage.get(p.id) && (
-                  // eslint-disable-next-line @next/next/no-img-element
                   <img
                     src={firstImage.get(p.id)}
                     alt=""
@@ -223,6 +222,7 @@ export default async function AdminProductsPage({
                     }`}
                   />
                   <button
+                    type="submit"
                     title="Enregistrer le stock"
                     className="rounded-full p-1.5 text-soft transition-colors hover:bg-line/60 hover:text-ink"
                   >
@@ -233,6 +233,7 @@ export default async function AdminProductsPage({
               <form action={toggleProductActive}>
                 <input type="hidden" name="id" value={p.id} />
                 <button
+                  type="submit"
                   title={p.active ? "Masquer" : "Publier"}
                   className="rounded-full p-2 text-soft transition-colors hover:bg-line/60 hover:text-ink"
                 >

@@ -26,6 +26,7 @@ export default function ErrorPage({
       <h1 className="mt-6 text-2xl font-bold">{t("errorTitle")}</h1>
       <p className="mt-2 text-soft">{t("errorText")}</p>
       <button
+        type="button"
         onClick={reset}
         className="mt-7 inline-flex items-center gap-2 rounded-full bg-accent px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-accent-dark"
       >

@@ -25,7 +25,6 @@ function Thumb({ product }: { product: FeaturedProduct }) {
   return (
     <div className="grid h-12 w-12 shrink-0 place-items-center overflow-hidden rounded-lg bg-line/30 text-soft">
       {product.imageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
         <img
           src={product.imageUrl}
           alt=""

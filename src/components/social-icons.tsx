@@ -3,6 +3,7 @@
 
 export const SOCIAL_ICONS: Record<string, React.ReactNode> = {
   google: (
+    // biome-ignore lint/a11y/noSvgWithoutTitle: aria-hidden retire deja le svg de l'arbre d'accessibilite, un titre serait inatteignable ; le libelle vient de SOCIAL_LABELS
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
       <path
         fill="#4285F4"
@@ -23,6 +24,7 @@ export const SOCIAL_ICONS: Record<string, React.ReactNode> = {
     </svg>
   ),
   apple: (
+    // biome-ignore lint/a11y/noSvgWithoutTitle: aria-hidden retire deja le svg de l'arbre d'accessibilite, un titre serait inatteignable ; le libelle vient de SOCIAL_LABELS
     <svg
       width="18"
       height="18"
@@ -34,6 +36,7 @@ export const SOCIAL_ICONS: Record<string, React.ReactNode> = {
     </svg>
   ),
   facebook: (
+    // biome-ignore lint/a11y/noSvgWithoutTitle: aria-hidden retire deja le svg de l'arbre d'accessibilite, un titre serait inatteignable ; le libelle vient de SOCIAL_LABELS
     <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden>
       <path
         fill="#1877F2"

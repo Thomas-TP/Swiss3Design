@@ -103,6 +103,7 @@ export default async function ProductPage({
       <script
         type="application/ld+json"
         nonce={nonce}
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON.stringify d'un objet genere cote serveur, aucune entree utilisateur brute
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Link

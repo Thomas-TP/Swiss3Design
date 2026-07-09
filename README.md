@@ -256,7 +256,7 @@ bindings Cloudflare (D1, R2, KV) via OpenNext.
 | --- | --- |
 | `npm run dev` | Serveur de développement (bindings Cloudflare inclus) |
 | `npm run build` | Build Next.js |
-| `npm run lint` | ESLint |
+| `npm run lint` | Biome (lint) |
 | `npm run preview` | Build OpenNext + aperçu Workers en local (teste la CSP prod) |
 | `npm run deploy` | Build OpenNext + déploiement Cloudflare |
 | `npm run cf-typegen` | Régénère `cloudflare-env.d.ts` depuis `wrangler.jsonc` |

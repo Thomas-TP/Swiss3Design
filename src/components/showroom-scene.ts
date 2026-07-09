@@ -350,7 +350,10 @@ export async function buildShowroomScene(
         | THREE_NS.Material
         | THREE_NS.Material[]
         | undefined;
-      if (Array.isArray(mat)) mat.forEach((m) => m.dispose());
+      if (Array.isArray(mat))
+        mat.forEach((m) => {
+          m.dispose();
+        });
       else if (mat) mat.dispose();
     });
     envTexture.dispose();

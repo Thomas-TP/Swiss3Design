@@ -56,7 +56,7 @@ export function SettingsForm({
           Réglages enregistrés ✓
         </p>
       )}
-      <button disabled={pending} className={BTN_PRIMARY}>
+      <button type="submit" disabled={pending} className={BTN_PRIMARY}>
         <Save size={16} />
         {pending ? "Enregistrement…" : "Enregistrer"}
       </button>

@@ -600,6 +600,7 @@ export function CheckoutFlow({
   // télécharge en parallèle de la saisie de l'adresse, donc le passage à
   // l'étape paiement n'attend plus que le PaymentIntent. Différé en idle pour
   // ne pas concurrencer le premier rendu de la page.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: precharge une seule fois au montage, jamais a chaque changement de cle
   useEffect(() => {
     const warm = () => void getStripePromise(stripePublishableKey);
     if ("requestIdleCallback" in window) {
@@ -608,7 +609,6 @@ export function CheckoutFlow({
     }
     const timer = setTimeout(warm, 1200);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const shippingCents = clientSecret
@@ -949,6 +949,7 @@ function PaymentStep({
       )}
 
       <button
+        type="button"
         onClick={pay}
         disabled={checkoutState.type !== "success" || paying}
         className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"

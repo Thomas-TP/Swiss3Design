@@ -88,7 +88,6 @@ export function Header() {
             className="hidden rounded-full p-2 text-soft transition-colors hover:bg-line/60 hover:text-ink md:block"
           >
             {avatar ? (
-              // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={avatar}
                 alt=""
