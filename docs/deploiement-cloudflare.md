@@ -41,6 +41,23 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 > Workers Builds does not honor the configurations set in Custom Builds
 > within your Wrangler configuration file"), ni aucune commande `wrangler`,
 > ni l'API Cloudflare exposée aux outils de cet agent.
+>
+> **🔴 Deuxième panne, trouvée juste après la première (2026-07-09)** : une
+> fois la variable Hyperdrive posée au bon endroit, `next build` réussissait
+> enfin — mais le déploiement échouait ensuite avec `duplicate column name:
+> failed_verification_count: SQLITE_ERROR`. Cause : le **Deploy command** du
+> Worker `swiss3design` (Settings → Build → Build configuration), configuré
+> avant le pivot Postgres, contenait encore `npx wrangler d1 migrations apply
+> swiss3design-db --remote && npx wrangler deploy` — la partie migrations D1
+> tentait de réappliquer une migration déjà passée sur la base D1 (inactive)
+> et bloquait tout le reste. **Fix** : Deploy command simplifié en
+> `npx wrangler deploy` (retrait complet de l'étape migrations D1, qui n'a
+> plus lieu d'être). Le Deploy command de `swiss3design-preview`
+> (`npx wrangler deploy --env preview`) était déjà correct, rien à y changer.
+> **Il n'y a volontairement aucun équivalent auto-migration pour Postgres**
+> dans ce pipeline (décision explicite de Thomas le 2026-07-09) — voir
+> "Postgres schema changes" dans `AGENTS.md`/`runbook.md` pour la procédure
+> manuelle (`db:generate:pg` + `db:push:pg` avant de déployer).
 
 ## Pourquoi ce mode de déploiement
 
@@ -92,28 +109,26 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
      ```
    - **Deploy command** :
      ```
-     npx wrangler d1 migrations apply swiss3design-db --remote && npx wrangler deploy
+     npx wrangler deploy
      ```
    - **Root directory** : `/` (par défaut)
-   - **Build variables** : rien à ajouter (clés publiques déjà dans `.env.production`).
+   - **Build variables** : `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
+     (Settings → **Build** → "Build variables and secrets", **pas** l'onglet
+     runtime "Variables & Secrets") — obligatoire depuis le pivot Postgres,
+     `next build` exécute du code de page qui a besoin d'une connexion
+     Postgres même au build. Voir l'avertissement 🔴 plus haut.
 7. **Save and Deploy** → Cloudflare lance un premier build depuis `main`.
 
-> **Pourquoi les migrations sont dans le deploy command** : elles s'appliquent
-> (de façon idempotente) **avant** `wrangler deploy`. Si une migration échoue, le
-> `&&` bloque le déploiement → l'ancien code reste en ligne sur l'ancien schéma
-> (état cohérent, jamais de demi-déploiement). L'environnement Workers Builds
-> fournit l'authentification Cloudflare, donc **aucun token n'est requis**.
->
-> **Filet de sécurité** : si un jour l'étape migrations échoue pour une raison
-> d'authentification, retire-la du deploy command et applique les migrations en
-> local avant le push : `bun run db:migrate:remote`.
->
-> **⚠️ Depuis le pivot Postgres/Hyperdrive (2026-07-09)** : cette étape
-> `d1 migrations apply` ne concerne QUE la base D1 (`swiss3design-db`), gardée
-> comme filet de secours inactif — ce n'est plus la base réelle du site. Un
-> échec ici n'affecte donc pas la prod ; la vraie base (Postgres/Neon, binding
-> `HYPERDRIVE`) n'a **aucune** étape de migration dans ce pipeline, voir
-> `AGENTS.md` § Deployment.
+> **Historique — pourquoi il y avait des migrations D1 dans le deploy
+> command** : à l'époque D1 (avant le pivot Postgres du 2026-07-09), elles
+> s'appliquaient (de façon idempotente) **avant** `wrangler deploy`, pour
+> qu'un échec de migration bloque le déploiement plutôt que de tourner sur un
+> schéma incohérent. **Ce n'est plus le cas** : le Deploy command est
+> aujourd'hui un simple `npx wrangler deploy`, la ligne `d1 migrations apply`
+> a été retirée (elle causait un vrai échec de déploiement, `duplicate column
+> name`, voir l'avertissement 🔴 plus haut). Postgres/Hyperdrive n'a
+> **aucune** étape de migration dans ce pipeline — volontairement, voir
+> `AGENTS.md` § Deployment et « Postgres schema changes » dans `runbook.md`.
 
 ## Vérifier que ça marche
 
@@ -181,13 +196,18 @@ possible) :
 1. **Worker `swiss3design` (prod)** → Settings → Builds :
    - Production branch : `main`
    - Builds for non-production branches : **désactivé**
-   - Deploy command : `npx wrangler d1 migrations apply swiss3design-db --remote && npx wrangler deploy`
+   - Deploy command : `npx wrangler deploy`
+   - Build variable (onglet **Build**, pas "Variables & Secrets") :
+     `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
 2. **Worker `swiss3design-preview`** → Settings → Builds → **Connect** le
    *même* dépôt ici, séparément :
    - Production branch : `main` (garde preview synchro par défaut)
    - Builds for non-production branches : **activé**
    - Deploy command (déclenché sur push `main`) : `npx wrangler deploy --env preview`
    - Version command (déclenché sur push toute autre branche) : `npx wrangler deploy --env preview`
+   - Build variable (onglet **Build**) : `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
+     — valeur **différente** de celle du Worker prod (branche Neon `preview`
+     isolée, pas `production`).
    - **Les deux commandes doivent explicitement porter `--env preview`** — un
      `wrangler deploy` nu résout sur l'environnement top-level (= la prod) dès
      que `wrangler.jsonc` définit plusieurs environnements, quel que soit le
@@ -214,18 +234,29 @@ Vu le manque de fiabilité documenté de l'auto-build (voir avertissement en
 haut), c'est la méthode **utilisée en pratique** chaque fois qu'un doute existe
 sur l'état de la prod. Depuis une branche à jour avec `main` :
 
-```
+Depuis le pivot Postgres/Hyperdrive, `next build` a besoin d'une connexion
+Postgres même au build local — poser `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
+comme vraie variable `$env:` PowerShell dans la **même** commande (elle ne
+persiste pas entre deux appels séparés) :
+
+```powershell
 git checkout main && git pull
-npx opennextjs-cloudflare build
-npx wrangler d1 migrations apply swiss3design-db --remote   # jamais oublier avant deploy si le schema a changé
-npx wrangler deploy                                          # sans --env = top-level = prod
+$env:CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE = "<connection string swiss3design>"
+bun run deploy   # = opennextjs-cloudflare build && opennextjs-cloudflare deploy, sans --env = top-level = prod
 ```
 
-Pour la preview, remplacer les deux dernières lignes par :
-```
-npx wrangler d1 migrations apply swiss3design-preview-db --env preview --remote
+Pour la preview, même principe avec la connection string de la branche Neon
+`preview` (différente) et `--env preview` :
+```powershell
+$env:CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE = "<connection string preview>"
+npx opennextjs-cloudflare build
 npx wrangler deploy --env preview
 ```
+
+Aucune étape de migration D1 ou Postgres n'est nécessaire ici — D1 est
+inactif (filet de secours), et un changement de schéma Postgres se fait
+**avant** ce déploiement via `bun run db:generate:pg` + `db:push:pg` (voir
+`AGENTS.md` § Deployment), jamais dans cette commande.
 
 **Vérifier après coup** (obligatoire, ne pas supposer que « la commande a
 tourné sans erreur » = « c'est en ligne ») :
