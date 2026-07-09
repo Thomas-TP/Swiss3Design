@@ -1,6 +1,5 @@
 import { getAuth } from "@/lib/auth";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
-import { corsHeadersFor } from "@/lib/medusa-bridge";
 
 // Endpoints d'authentification sensibles (mot de passe, envoi d'e-mails),
 // limités par IP : le rate limiting intégré de better-auth compte en mémoire,
@@ -31,27 +30,7 @@ async function handler(request: Request) {
   }
 
   const auth = await getAuth();
-  const response = await auth.handler(request);
-
-  // Cross-origin uniquement pour le storefront SolidStart (voir
-  // src/lib/medusa-bridge.ts) — même origine (l'app actuelle) : ces en-têtes
-  // sont ignorés par le navigateur, aucun changement de comportement.
-  const origin = request.headers.get("origin");
-  if (origin) {
-    const headers = new Headers(response.headers);
-    for (const [key, value] of Object.entries(corsHeadersFor(origin))) {
-      headers.set(key, value as string);
-    }
-    return new Response(response.body, { status: response.status, headers });
-  }
-  return response;
+  return auth.handler(request);
 }
 
-function OPTIONS(request: Request) {
-  return new Response(null, {
-    status: 204,
-    headers: corsHeadersFor(request.headers.get("origin")),
-  });
-}
-
-export { handler as GET, handler as POST, OPTIONS };
+export { handler as GET, handler as POST };

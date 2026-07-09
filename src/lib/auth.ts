@@ -6,8 +6,6 @@ import {
   magicLink,
   emailOTP,
   haveIBeenPwned,
-  bearer,
-  oauthPopup,
 } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
 import { and, eq, isNull } from "drizzle-orm";
@@ -22,7 +20,6 @@ import {
   magicLinkEmail,
   otpEmail,
 } from "./email-templates";
-import { STOREFRONT_ORIGINS } from "./medusa-bridge";
 
 function adminEmails(env: CloudflareEnv): string[] {
   return (env.ADMIN_EMAILS ?? "")
@@ -75,12 +72,8 @@ export async function getAuth() {
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins:
       env.APP_ENV === "preview"
-        ? [env.BETTER_AUTH_URL, ...STOREFRONT_ORIGINS]
-        : [
-            "https://swiss3design.ch",
-            "https://www.swiss3design.ch",
-            ...STOREFRONT_ORIGINS,
-          ],
+        ? [env.BETTER_AUTH_URL]
+        : ["https://swiss3design.ch", "https://www.swiss3design.ch"],
     database: drizzleAdapter(db, { provider: "pg" }),
     emailAndPassword: {
       enabled: true,
@@ -234,20 +227,6 @@ export async function getAuth() {
       // rpID dérivé automatiquement de baseURL (env.BETTER_AUTH_URL) : pas de
       // configuration manuelle, fonctionne tel quel en prod comme en preview.
       passkey(),
-      // Expose le token de session en clair (header "set-auth-token") pour
-      // les storefronts externes, qui ne sont pas sur la même origine et ne
-      // peuvent donc pas s'appuyer sur le cookie de session — voir
-      // src/lib/medusa-bridge.ts. N'affecte pas le flux cookie existant.
-      bearer(),
-      // Connexion Google en popup pour les storefronts externes (storefront-next) :
-      // le popup navigue en premier niveau vers CETTE origine (cookies OK),
-      // puis la page de complétion poste le jeton de session au parent via
-      // postMessage plutôt qu'une redirection classique — voir
-      // apps/storefront-next/src/lib/auth-client.ts::signInWithGooglePopup.
-      // popupOrigin est validé contre trustedOrigins (STOREFRONT_ORIGINS
-      // ci-dessus), aucune config supplémentaire nécessaire. Sans effet sur
-      // la connexion Google classique de ce site (même origine, inchangée).
-      oauthPopup(),
       nextCookies(),
     ],
   });
