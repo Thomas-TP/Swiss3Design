@@ -449,7 +449,6 @@ reflétée dans l'URL (`/fr`, `/de`, `/it`, `/en`). Les traductions vivent dans
 | [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md) | Ops | Connexion Git ↔ Cloudflare Workers Builds |
 | [`docs/codemap.md`](docs/codemap.md) | Agents / dev | « Je dois faire X » → fichier(s) exact(s) |
 | [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md) | Produit | Proposition de refonte (pas encore implémentée) |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contributeurs | Mise en route & conventions |
 | [`SECURITY.md`](SECURITY.md) | Sécurité | Signalement de vulnérabilité |
 | [`ROADMAP.md`](ROADMAP.md) | Produit | État du projet & suite envisagée |
 | [`LICENSE.md`](LICENSE.md) | Légal | Propriété & interdictions (tous droits réservés) |

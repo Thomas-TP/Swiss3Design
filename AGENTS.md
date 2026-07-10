@@ -27,7 +27,6 @@ Every `.md` in this repo, what it's for, and who reads it:
 | [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md) | Product | Forward-looking redesign proposal — **not implemented**, don't treat as current state |
 | [`README.md`](README.md) | Human (public) | Project overview, stack, setup, for anyone landing on the repo |
 | [`ROADMAP.md`](ROADMAP.md) | Product | What's shipped vs. what's next, budget |
-| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Human contributors | Local setup, commit/PR conventions |
 | [`SECURITY.md`](SECURITY.md) | Security | Vulnerability disclosure process |
 | [`LICENSE.md`](LICENSE.md) | Legal | All-rights-reserved terms |
 
