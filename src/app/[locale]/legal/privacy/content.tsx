@@ -31,7 +31,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           livraison, articles, historique. <strong>Paiement</strong> : traité
           exclusivement par Stripe ; nous ne voyons ni ne stockons aucune donnée
           de carte. <strong>Devis sur mesure</strong> : description du projet et
-          fichiers 3D transmis. <strong>Échanges</strong> : e-mails et
+          fichiers 3D transmis. <strong>Avis</strong> : si vous laissez un
+          avis sur un produit acheté, votre nom d’affichage, la note et le
+          commentaire sont publiés sur la fiche produit après modération.{" "}
+          <strong>Échanges</strong> : e-mails et
           correspondance. <strong>Données techniques</strong> : lors de la
           consultation du site, votre adresse IP, le type de navigateur et des
           journaux de connexion sont traités automatiquement à des fins de
@@ -99,16 +102,20 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Sous-traitants et transferts",
       body: (
         <p>
-          Nous recourons à des prestataires techniques : Cloudflare (hébergement
-          et base de données), Stripe (paiement — y compris, le cas échéant, la
-          fonctionnalité <strong>Stripe Link</strong> qui permet de réutiliser
-          une carte déjà enregistrée auprès d’un autre marchand utilisant Stripe
-          ; nous ne conservons nous-mêmes aucune donnée de carte), Resend (envoi
+          Nous recourons à des prestataires techniques : Cloudflare
+          (hébergement, réseau de diffusion et stockage des fichiers), Neon
+          (base de données PostgreSQL, hébergée dans l’Union européenne),
+          Stripe (paiement — y compris, le cas échéant, la fonctionnalité{" "}
+          <strong>Stripe Link</strong> qui permet de réutiliser une carte déjà
+          enregistrée auprès d’un autre marchand utilisant Stripe ; nous ne
+          conservons nous-mêmes aucune donnée de carte), Resend (envoi
           d’e-mails), Google (connexion Google, si utilisée). Certains de ces
-          prestataires traitent des données à l’étranger, en particulier aux
-          États-Unis ; ces transferts reposent sur des garanties reconnues
-          (Swiss-U.S. Data Privacy Framework pour les prestataires certifiés, ou
-          clauses contractuelles types).
+          prestataires traitent des données à l’étranger, en particulier dans
+          l’Union européenne et aux États-Unis ; ces transferts reposent sur
+          des garanties reconnues (l’Union européenne assure un niveau de
+          protection adéquat reconnu par la Suisse ; Swiss-U.S. Data Privacy
+          Framework pour les prestataires américains certifiés, ou clauses
+          contractuelles types).
         </p>
       ),
     },
@@ -207,7 +214,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           <strong>Zahlung</strong>: wird ausschliesslich von Stripe verarbeitet;
           wir sehen und speichern keinerlei Kartendaten.{" "}
           <strong>Offerten für Massanfertigungen</strong>: Projektbeschreibung
-          und übermittelte 3D-Dateien. <strong>Korrespondenz</strong>: E-Mails
+          und übermittelte 3D-Dateien.{" "}
+          <strong>Bewertungen</strong>: Wenn Sie eine Bewertung zu einem
+          gekauften Produkt hinterlassen, werden Ihr Anzeigename, die Bewertung
+          und der Kommentar nach Prüfung auf der Produktseite veröffentlicht.{" "}
+          <strong>Korrespondenz</strong>: E-Mails
           und Schriftverkehr. <strong>Technische Daten</strong>: Beim Besuch der
           Website werden Ihre IP-Adresse, der Browsertyp und
           Verbindungsprotokolle automatisch zu Zwecken der Sicherheit, der
@@ -275,15 +286,19 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Auftragsbearbeiter und Datenübermittlungen",
       body: (
         <p>
-          Wir setzen technische Dienstleister ein: Cloudflare (Hosting und
-          Datenbank), Stripe (Zahlung — einschliesslich, falls zutreffend, der
-          Funktion <strong>Stripe Link</strong>, die es ermöglicht, eine bereits
-          bei einem anderen Stripe-Händler gespeicherte Karte wiederzuverwenden;
+          Wir setzen technische Dienstleister ein: Cloudflare (Hosting,
+          Content-Delivery-Netzwerk und Dateispeicherung), Neon
+          (PostgreSQL-Datenbank, gehostet in der Europäischen Union), Stripe
+          (Zahlung — einschliesslich, falls zutreffend, der Funktion{" "}
+          <strong>Stripe Link</strong>, die es ermöglicht, eine bereits bei
+          einem anderen Stripe-Händler gespeicherte Karte wiederzuverwenden;
           wir selbst speichern keinerlei Kartendaten), Resend (E-Mail-Versand),
           Google (Google-Anmeldung, falls genutzt). Einige dieser Anbieter
-          bearbeiten Daten im Ausland, insbesondere in den USA; diese
-          Übermittlungen stützen sich auf anerkannte Garantien (Swiss-U.S. Data
-          Privacy Framework für zertifizierte Anbieter oder
+          bearbeiten Daten im Ausland, insbesondere in der Europäischen Union
+          und in den USA; diese Übermittlungen stützen sich auf anerkannte
+          Garantien (die Europäische Union gewährleistet ein von der Schweiz
+          anerkanntes angemessenes Schutzniveau; Swiss-U.S. Data Privacy
+          Framework für zertifizierte US-Anbieter oder
           Standardvertragsklauseln).
         </p>
       ),
@@ -385,7 +400,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           <strong>Pagamento</strong>: trattato esclusivamente da Stripe; non
           vediamo né memorizziamo alcun dato della carta.{" "}
           <strong>Preventivi su misura</strong>: descrizione del progetto e file
-          3D trasmessi. <strong>Scambi</strong>: e-mail e corrispondenza.{" "}
+          3D trasmessi.{" "}
+          <strong>Recensioni</strong>: se lasciate una recensione su un
+          prodotto acquistato, il vostro nome visualizzato, il voto e il
+          commento vengono pubblicati sulla scheda prodotto dopo moderazione.{" "}
+          <strong>Scambi</strong>: e-mail e corrispondenza.{" "}
           <strong>Dati tecnici</strong>: durante la consultazione del sito, il
           vostro indirizzo IP, il tipo di browser e i registri di connessione
           sono trattati automaticamente a fini di sicurezza, prevenzione degli
@@ -452,16 +471,20 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Responsabili del trattamento e trasferimenti",
       body: (
         <p>
-          Ricorriamo a fornitori tecnici: Cloudflare (hosting e banca dati),
-          Stripe (pagamento — inclusa, se applicabile, la funzione{" "}
+          Ricorriamo a fornitori tecnici: Cloudflare (hosting, rete di
+          distribuzione dei contenuti e archiviazione dei file), Neon (banca
+          dati PostgreSQL, ospitata nell’Unione europea), Stripe (pagamento —
+          inclusa, se applicabile, la funzione{" "}
           <strong>Stripe Link</strong> che consente di riutilizzare una carta
           già registrata presso un altro esercente che utilizza Stripe; noi
           stessi non conserviamo alcun dato della carta), Resend (invio di
           e-mail), Google (accesso Google, se utilizzato). Alcuni di questi
-          fornitori trattano dati all’estero, in particolare negli Stati Uniti;
-          tali trasferimenti si basano su garanzie riconosciute (Swiss-U.S. Data
-          Privacy Framework per i fornitori certificati o clausole contrattuali
-          tipo).
+          fornitori trattano dati all’estero, in particolare nell’Unione
+          europea e negli Stati Uniti; tali trasferimenti si basano su
+          garanzie riconosciute (l’Unione europea garantisce un livello di
+          protezione adeguato riconosciuto dalla Svizzera; Swiss-U.S. Data
+          Privacy Framework per i fornitori statunitensi certificati o
+          clausole contrattuali tipo).
         </p>
       ),
     },
@@ -559,7 +582,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           items, history. <strong>Payment</strong>: processed exclusively by
           Stripe; we neither see nor store any card data.{" "}
           <strong>Custom quotes</strong>: project description and 3D files
-          submitted. <strong>Correspondence</strong>: e-mails and exchanges.{" "}
+          submitted.{" "}
+          <strong>Reviews</strong>: if you leave a review on a purchased
+          product, your display name, rating and comment are published on the
+          product page after moderation.{" "}
+          <strong>Correspondence</strong>: e-mails and exchanges.{" "}
           <strong>Technical data</strong>: when you browse the site, your IP
           address, browser type and connection logs are processed automatically
           for security, abuse-prevention and proper operation of the site.
@@ -622,14 +649,17 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Processors and transfers",
       body: (
         <p>
-          We use technical service providers: Cloudflare (hosting and database),
-          Stripe (payment — including, where applicable,{" "}
-          <strong>Stripe Link</strong>, which lets you reuse a card already
-          saved with another merchant using Stripe; we ourselves never store any
-          card data), Resend (e-mail delivery), Google (Google sign-in, if
-          used). Some of these providers process data abroad, in particular in
-          the United States; these transfers are based on recognised safeguards
-          (Swiss-U.S. Data Privacy Framework for certified providers, or
+          We use technical service providers: Cloudflare (hosting, content
+          delivery network and file storage), Neon (PostgreSQL database,
+          hosted in the European Union), Stripe (payment — including, where
+          applicable, <strong>Stripe Link</strong>, which lets you reuse a
+          card already saved with another merchant using Stripe; we ourselves
+          never store any card data), Resend (e-mail delivery), Google (Google
+          sign-in, if used). Some of these providers process data abroad, in
+          particular in the European Union and the United States; these
+          transfers are based on recognised safeguards (the European Union
+          provides an adequate level of protection recognised by Switzerland;
+          the Swiss-U.S. Data Privacy Framework for certified US providers, or
           standard contractual clauses).
         </p>
       ),
