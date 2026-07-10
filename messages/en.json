@@ -577,7 +577,9 @@
     "success": "Message sent! We’ll get back to you within 24 to 48 hours.",
     "error": "Something went wrong. Please try again or email us at contact@swiss3design.ch.",
     "directEmail": "By email:",
-    "quoteCta": "Custom project"
+    "quoteCta": "Custom project",
+    "pageTitle": "Contact us",
+    "pageIntro": "A question about an order, a quote, or our workshop? Write to us — we reply within 48 h."
   },
   "footer": {
     "tagline": "Multicolor 3D printing — Gland, Switzerland",

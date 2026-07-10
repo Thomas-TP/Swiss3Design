@@ -577,7 +577,9 @@
     "success": "Nachricht gesendet! Wir melden uns innert 24 bis 48 Std.",
     "error": "Ein Fehler ist aufgetreten. Versuchen Sie es erneut oder schreiben Sie an contact@swiss3design.ch.",
     "directEmail": "Per E-Mail:",
-    "quoteCta": "Massanfertigung"
+    "quoteCta": "Massanfertigung",
+    "pageTitle": "Kontaktieren Sie uns",
+    "pageIntro": "Eine Frage zu einer Bestellung, einer Offerte oder unserer Werkstatt? Schreiben Sie uns, wir antworten innerhalb von 48 Std."
   },
   "footer": {
     "tagline": "Mehrfarbiger 3D-Druck — Gland, Schweiz",

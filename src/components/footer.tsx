@@ -31,19 +31,13 @@ function FooterColumn({
 function FooterLink({
   href,
   children,
-  external,
 }: {
   href: string;
   children: React.ReactNode;
-  external?: boolean;
 }) {
   return (
     <li>
-      <Link
-        href={href}
-        {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-        className="text-soft transition-colors hover:text-ink"
-      >
+      <Link href={href} className="text-soft transition-colors hover:text-ink">
         {children}
       </Link>
     </li>
@@ -86,24 +80,15 @@ export function Footer() {
           <FooterColumn title={t("helpTitle")}>
             <FooterLink href="/account">{tNav("account")}</FooterLink>
             <FooterLink href="/a-propos">{t("about")}</FooterLink>
-            <li>
-              <a
-                href="mailto:contact@swiss3design.ch"
-                className="text-soft transition-colors hover:text-ink"
-              >
-                {t("contact")}
-              </a>
-            </li>
+            <FooterLink href="/contact">{t("contact")}</FooterLink>
           </FooterColumn>
 
           <FooterColumn title={t("legalTitle")}>
-            <FooterLink href="/legal/terms" external>
-              {t("terms")}
+            <FooterLink href="/legal/terms">{t("terms")}</FooterLink>
+            <FooterLink href="/legal/privacy">{t("privacy")}</FooterLink>
+            <FooterLink href="/legal/shipping">
+              {t("shippingReturns")}
             </FooterLink>
-            <FooterLink href="/legal/privacy" external>
-              {t("privacy")}
-            </FooterLink>
-            <FooterLink href="/a-propos">{t("shippingReturns")}</FooterLink>
           </FooterColumn>
         </div>
 

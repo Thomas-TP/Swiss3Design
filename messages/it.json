@@ -577,7 +577,9 @@
     "success": "Messaggio inviato! Vi rispondiamo entro 24–48 h.",
     "error": "Si è verificato un errore. Riprovate o scriveteci a contact@swiss3design.ch.",
     "directEmail": "Per e-mail:",
-    "quoteCta": "Su misura"
+    "quoteCta": "Su misura",
+    "pageTitle": "Contattaci",
+    "pageIntro": "Una domanda su un ordine, un preventivo o il nostro laboratorio? Scriveteci, rispondiamo entro 48 h."
   },
   "footer": {
     "tagline": "Stampa 3D multicolore — Gland, Svizzera",

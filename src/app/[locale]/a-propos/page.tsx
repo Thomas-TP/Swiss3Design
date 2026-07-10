@@ -16,6 +16,7 @@ import type { Locale } from "@/i18n/routing";
 import { Reveal } from "@/components/reveal";
 import { ContactForm } from "./contact-form";
 import { ABOUT_CONTENT } from "./about-content";
+import { AboutNav } from "./about-nav";
 
 const CONTACT_EMAIL = "contact@swiss3design.ch";
 const TRUST_ICONS = [MapPin, ShieldCheck, Lock, Truck] as const;
@@ -100,8 +101,25 @@ export default async function AboutPage({
         </section>
       </Reveal>
 
+      {/* Navigation rapide : reste visible au défilement, met en avant la
+          section lue (voir about-nav.tsx). Page volontairement longue et
+          complète — cette barre en est le sommaire, pas un raccourci qui
+          en retire le contenu. */}
+      <div className="mt-10">
+        <AboutNav
+          items={[
+            { id: "equipment", label: c.equipmentKicker },
+            { id: "process", label: c.processKicker },
+            { id: "materials", label: c.materialsKicker },
+            { id: "trust", label: c.trustKicker },
+            { id: "faq", label: c.faqKicker },
+            { id: "contact", label: c.contactKicker },
+          ]}
+        />
+      </div>
+
       {/* Notre matériel */}
-      <section className="py-16 md:py-20">
+      <section id="equipment" className="scroll-mt-32 py-16 md:py-20">
         <Reveal inView>
           <SectionHeading kicker={c.equipmentKicker} title={c.equipmentTitle} />
         </Reveal>
@@ -161,7 +179,10 @@ export default async function AboutPage({
       </section>
 
       {/* Le procédé */}
-      <section className="border-t border-line py-16 md:py-20">
+      <section
+        id="process"
+        className="scroll-mt-32 border-t border-line py-16 md:py-20"
+      >
         <Reveal inView>
           <SectionHeading kicker={c.processKicker} title={c.processTitle} />
         </Reveal>
@@ -183,7 +204,10 @@ export default async function AboutPage({
       </section>
 
       {/* Nos matières */}
-      <section className="border-t border-line py-16 md:py-20">
+      <section
+        id="materials"
+        className="scroll-mt-32 border-t border-line py-16 md:py-20"
+      >
         <Reveal inView>
           <SectionHeading kicker={c.materialsKicker} title={c.materialsTitle} />
         </Reveal>
@@ -226,7 +250,10 @@ export default async function AboutPage({
       </section>
 
       {/* Qualité & engagements */}
-      <section className="border-t border-line py-16 md:py-20">
+      <section
+        id="trust"
+        className="scroll-mt-32 border-t border-line py-16 md:py-20"
+      >
         <Reveal inView>
           <SectionHeading kicker={c.trustKicker} title={c.trustTitle} />
         </Reveal>
@@ -251,7 +278,10 @@ export default async function AboutPage({
       </section>
 
       {/* FAQ */}
-      <section className="border-t border-line py-16 md:py-20">
+      <section
+        id="faq"
+        className="scroll-mt-32 border-t border-line py-16 md:py-20"
+      >
         <div className="mx-auto max-w-3xl">
           <Reveal inView>
             <SectionHeading kicker={c.faqKicker} title={c.faqTitle} />
@@ -279,7 +309,10 @@ export default async function AboutPage({
       </section>
 
       {/* Contact */}
-      <section className="border-t border-line py-16 md:py-20">
+      <section
+        id="contact"
+        className="scroll-mt-32 border-t border-line py-16 md:py-20"
+      >
         <div className="mx-auto max-w-2xl">
           <Reveal inView>
             <div className="text-center">
