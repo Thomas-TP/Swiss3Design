@@ -7,11 +7,10 @@ brief opérationnel, règles d'or et liens vers la doc détaillée.
 ## Mise en route
 
 ```bash
-npm ci
-cp .dev.vars.example .dev.vars   # remplir avec des valeurs de TEST
-npm run db:migrate:local
-npm run db:seed:local
-npm run dev                      # http://localhost:3000
+bun install
+cp .dev.vars.example .dev.vars   # remplir avec des valeurs de TEST (+ DATABASE_URL Postgres)
+bun run db:push:pg               # applique schema.pg.ts à cette base Postgres
+bun run dev                      # http://localhost:3000
 ```
 
 Détails environnement & dépannage : [`docs/runbook.md`](docs/runbook.md).
@@ -24,18 +23,20 @@ Détails environnement & dépannage : [`docs/runbook.md`](docs/runbook.md).
   docs humaines (`README`, `ROADMAP`, ce fichier) en français.
 - **Argent** : toujours en centimes CHF (`*_cents`), jamais de flottants.
 - **i18n** : tout texte visible existe dans les **4 langues** (`messages/*.json`).
-- **Base de données** : modifier `src/db/schema.ts`, puis `npm run db:generate` ;
-  **ne jamais éditer** une migration déjà appliquée dans `drizzle/`.
+- **Base de données** : modifier `src/db/schema.pg.ts` (Postgres, source de
+  vérité — `schema.ts` n'est qu'un re-export), puis `bun run db:generate:pg` +
+  `bun run db:push:pg` ; **ne jamais éditer** une migration déjà appliquée
+  dans `drizzle-pg/`.
 - **Secrets** : jamais committés (voir [`SECURITY.md`](SECURITY.md)).
 - **Patterns** : pas de `redirect()` en Server Action ; `middleware.ts` reste
   Edge ; finalisation de paiement idempotente — cf. [`docs/conventions.md`](docs/conventions.md).
 
 ## Avant de pousser
 
-1. `npm run lint` (doit passer).
-2. Tester en local (`npm run dev`).
+1. `bun run lint` (Biome — doit passer).
+2. Tester en local (`bun run dev`).
 3. Si le changement touche la CSP / des scripts inline / le runtime :
-   `npm run preview` (reproduit la prod).
+   `bun run preview` (reproduit la prod).
 4. Messages de commit en français, à l'impératif (ex. « Ajoute le suivi invité »).
 
 ## Déploiement

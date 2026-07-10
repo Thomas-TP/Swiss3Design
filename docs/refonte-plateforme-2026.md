@@ -595,9 +595,9 @@ Chaque lot suit ce cycle, aligné sur l'outillage du dépôt :
    de pile dans `main`, cf. pièges dans `docs/deploiement-cloudflare.md`).
 2. **Tests** : Vitest sur la logique pure (le moteur de prix et le parseur
    STL sont des cibles idéales : entrées/sorties déterministes, fichiers de
-   fixture) + `npm run lint` + `npm run typecheck`.
-3. **Validation locale** : `npm run dev`, parcours complet au navigateur.
-4. **Préview production** : `npm run preview` — obligatoire ici : la Forge
+   fixture) + `bun run lint` + `bun run typecheck`.
+3. **Validation locale** : `bun run dev`, parcours complet au navigateur.
+4. **Préview production** : `bun run preview` — obligatoire ici : la Forge
    ajoute des Web Workers et du contenu inline → la **CSP à nonce**
    (prod uniquement) doit être vérifiée avant tout déploiement.
 5. **Tests complets** : responsive (barre basse mobile), 4 langues (toute

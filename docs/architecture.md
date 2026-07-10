@@ -88,8 +88,23 @@ of truth.
 
 ### Auth (Better Auth tables)
 `user` (with `role`, `twoFactorEnabled`), `session`, `account` (OAuth/password),
-`two_factor` (TOTP secret + backup codes), `verification`, and our own
-`customer_addresses` (one saved CH address per user). See [Auth](#auth--accounts).
+`two_factor` (TOTP secret + backup codes), `passkey` (WebAuthn credentials via
+`@better-auth/passkey`), `verification`, and our own `customer_addresses` (one
+saved CH address per user) and `notification_preferences` (`newsletter` /
+`productNews` opt-ins, one row per user). See [Auth](#auth--accounts).
+
+### Reviews & marketing
+- **reviews** — `(productId, orderId)`, `authorName`, `rating`, `body`,
+  `status` (`pending → published` | `rejected`). Only openable on delivered
+  order items (verified-buyer reviews), moderated in `/admin/reviews`.
+- **abandoned_carts** — `email`, `token` (unsubscribe link), `itemsJson`
+  snapshot, `subtotalCents`, nLPD `consentAt`, `reminderSentAt` /
+  `recoveredAt` / `unsubscribedAt`. Populated client-side on opt-in, reminder
+  e-mail triggered by the standalone `workers/cron` Worker.
+- **newsletter_sends** — one row per admin-composed announcement blast
+  (`/admin/emails/announcements`): `subject`/`bodyHtml`, `audience`
+  (`newsletter` | `product_news` | `both`), optional featured `productIds` +
+  banner/CTA, `recipientCount`, `sentBy`.
 
 ## Key flows
 

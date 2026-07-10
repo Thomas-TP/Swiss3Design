@@ -20,6 +20,9 @@
       "!!**/.open-next",
       "!!**/.wrangler",
       "!!**/public",
+      // Worker Cron autonome : projet TS separe (son propre tsconfig.json),
+      // deploye independamment, jamais construit avec l'app principale.
+      "!!workers",
       "!!**/cloudflare-env.d.ts",
       "!!**/next-env.d.ts",
       // Favicon Next.js (convention de fichier app/icon.svg) -- jamais rendu

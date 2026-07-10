@@ -13,9 +13,9 @@
 
 ## Checklist
 
-- [ ] `npm run lint` passe
-- [ ] Testé en local (`npm run dev`)
-- [ ] `npm run preview` si le changement touche la CSP / scripts inline / runtime
-- [ ] Migration générée (`npm run db:generate`) si `src/db/schema.ts` a changé
+- [ ] `bun run lint` passe (Biome)
+- [ ] Testé en local (`bun run dev`)
+- [ ] `bun run preview` si le changement touche la CSP / scripts inline / runtime
+- [ ] Migration générée (`bun run db:generate:pg` + `db:push:pg`) si `src/db/schema.pg.ts` a changé
 - [ ] Textes visibles traduits dans les 4 langues (`messages/*.json`)
 - [ ] Aucun secret committé

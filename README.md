@@ -12,36 +12,29 @@ fabriqués à **Gland (VD)** et livrés dans toute la Suisse.
 
 🌐 **[swiss3design.ch](https://swiss3design.ch)**
 
-[![Site en ligne](https://img.shields.io/website?url=https%3A%2F%2Fswiss3design.ch&label=swiss3design.ch&up_message=en%20ligne&down_message=hors%20ligne&color=E5231C)](https://swiss3design.ch)
-&nbsp;
-![Next.js](https://img.shields.io/badge/Next.js-16-000000?logo=next.js&logoColor=white)
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=000)
-![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript&logoColor=white)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38BDF8?logo=tailwindcss&logoColor=white)
-![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?logo=cloudflare&logoColor=white)
-![Stripe](https://img.shields.io/badge/Stripe-LIVE-635BFF?logo=stripe&logoColor=white)
+[![Site en ligne](https://img.shields.io/website?url=https%3A%2F%2Fswiss3design.ch&label=swiss3design.ch&up_message=en%20ligne&down_message=hors%20ligne&color=E5231C&style=flat-square)](https://swiss3design.ch)
+
+<br />
+
+![Next.js](https://img.shields.io/badge/Next.js-16-000000?style=flat-square&logo=next.js&logoColor=white)
+![React](https://img.shields.io/badge/React-19-61DAFB?style=flat-square&logo=react&logoColor=000)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)
+![Bun](https://img.shields.io/badge/Bun-1.3-000000?style=flat-square&logo=bun&logoColor=white)
+![Biome](https://img.shields.io/badge/Biome-lint%20%2B%20format-60A5FA?style=flat-square&logo=biome&logoColor=white)
+![Postgres](https://img.shields.io/badge/Postgres-Neon%20%2B%20Hyperdrive-4169E1?style=flat-square&logo=postgresql&logoColor=white)
+![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=flat-square&logo=cloudflare&logoColor=white)
+![Stripe](https://img.shields.io/badge/Stripe-LIVE-635BFF?style=flat-square&logo=stripe&logoColor=white)
 
 </div>
 
----
+<br />
 
-## Sommaire
+<div align="center">
 
-- [Aperçu](#aperçu)
-- [Fonctionnalités](#fonctionnalités)
-- [Identité visuelle](#identité-visuelle)
-- [Stack technique](#stack-technique)
-- [Intégrations](#intégrations)
-- [Structure du projet](#structure-du-projet)
-- [Démarrage rapide](#démarrage-rapide)
-- [Variables d'environnement](#variables-denvironnement)
-- [Scripts npm](#scripts-npm)
-- [Base de données](#base-de-données)
-- [Déploiement](#déploiement)
-- [Sécurité](#sécurité)
-- [Internationalisation](#internationalisation)
-- [Documentation](#documentation)
-- [Propriété & licences](#propriété--licences)
+**[Aperçu](#aperçu)** · **[Fonctionnalités](#fonctionnalités)** · **[Identité visuelle](#identité-visuelle)** · **[Stack technique](#stack-technique)** · **[Structure du projet](#structure-du-projet)** · **[Démarrage rapide](#démarrage-rapide)** · **[Base de données](#base-de-données)** · **[Déploiement](#déploiement)** · **[Sécurité](#sécurité)** · **[Documentation](#documentation)**
+
+</div>
 
 ---
 
@@ -50,8 +43,9 @@ fabriqués à **Gland (VD)** et livrés dans toute la Suisse.
 Swiss3Design est une boutique en ligne complète : catalogue, panier, paiement,
 devis sur mesure, comptes clients et back-office d'administration. Le site est
 **en production** sur [swiss3design.ch](https://swiss3design.ch), déployé sur
-**Cloudflare Workers** et alimenté par une base **D1**, un stockage de fichiers
-**R2** et un cache **KV**.
+**Cloudflare Workers** et alimenté par **Postgres (Neon)** via **Cloudflare
+Hyperdrive**, un stockage de fichiers **R2** et un cache **KV** — 100 %
+Cloudflare côté hébergement, sans process Node persistant.
 
 Le site est multilingue (🇫🇷 🇩🇪 🇮🇹 🇬🇧) avec détection automatique de la langue
 du navigateur, et propose un mode clair/sombre.
@@ -63,15 +57,17 @@ du navigateur, et propose un mode clair/sombre.
 ### Côté client
 
 - 🛍️ **Boutique** — catalogue par catégories, fiches produits, choix des couleurs
-  et matières, galerie d'images.
+  et matières, galerie d'images, **viewer 3D** interactif (Three.js).
 - 🎨 **Configurateur multicolore** — sélection jusqu'à 4 couleurs par objet.
 - 🧾 **Devis sur mesure** — envoi de fichiers 3D (upload R2), chiffrage, puis
   paiement du devis en ligne.
-- 🛒 **Panier & paiement** — tunnel de commande avec **Stripe Payment Element**,
-  codes promo, calcul des frais de port suisses.
+- 🛒 **Panier & paiement** — tunnel de commande avec **Stripe Payment Element**
+  (cartes, TWINT, Apple/Google Pay), codes promo, frais de port suisses.
 - ❤️ **Favoris** — produits mis de côté.
-- 👤 **Comptes clients** — inscription, connexion e-mail + **Google**, mot de
-  passe oublié/réinitialisé, historique des commandes et des devis.
+- ⭐ **Avis vérifiés** — ouverts après livraison sur les articles achetés,
+  modérés en admin.
+- 👤 **Comptes clients** — inscription, connexion e-mail + **Google**, 2FA
+  TOTP, passkeys, historique des commandes et des devis.
 - 📦 **Suivi invité** — page `/track` pour suivre une commande sans compte, avec
   conversion invité → compte et rattachement des commandes.
 - 🌍 **Multilingue & thème** — fr/de/it/en, bascule clair/sombre.
@@ -79,7 +75,8 @@ du navigateur, et propose un mode clair/sombre.
 ### Côté administration (`/admin`)
 
 Gestion complète : produits, catégories, matières, mises en avant, codes promo,
-commandes, devis, clients, e-mails transactionnels et réglages de la boutique.
+commandes, devis, avis, clients, e-mails transactionnels & annonces newsletter,
+réglages de la boutique.
 
 ---
 
@@ -88,9 +85,19 @@ commandes, devis, clients, e-mails transactionnels et réglages de la boutique.
 L'identité suit une ligne **« Swiss business »** : neutres chauds, **rouge suisse**
 en accent, typographie nette, et un logomark géométrique.
 
+<div align="center">
+
+![#E5231C](https://img.shields.io/badge/E5231C-E5231C?style=flat-square)
+![#1A1614](https://img.shields.io/badge/1A1614-1A1614?style=flat-square)
+![#FAFAF9](https://img.shields.io/badge/FAFAF9-FAFAF9?style=flat-square&labelColor=1A1614)
+![#0B0A09](https://img.shields.io/badge/0B0A09-0B0A09?style=flat-square)
+![#F4F1ED](https://img.shields.io/badge/F4F1ED-F4F1ED?style=flat-square&labelColor=1A1614)
+
+</div>
+
 | Élément | Valeur |
 | --- | --- |
-| 🔴 Rouge marque | `#E5231C` (foncé : `#C01D14`) |
+| 🔴 Rouge marque | `#E5231C` (accent foncé : `#C01D14`) |
 | ⚫ Encre (texte) | `#1A1614` clair · `#F4F1ED` sombre |
 | ⚪ Papier (fond) | `#FAFAF9` clair · `#0B0A09` sombre |
 | 🔤 Police | **Geist Sans** (`next/font`) |
@@ -119,14 +126,20 @@ Le **kit de marque** complet est versionné dans [`public/brand/`](public/brand)
 | Framework | **Next.js 16** (App Router, React Server Components) |
 | UI | **React 19**, **Tailwind CSS 4**, [`motion`](https://motion.dev), `lucide-react` |
 | Langage | **TypeScript 6** (strict) |
-| Base de données | **Cloudflare D1** (SQLite) via **Drizzle ORM** |
-| Authentification | **better-auth** (e-mail + Google OAuth) |
-| Paiement | **Stripe** (Payment Element + webhooks) |
+| Runtime & package manager | **Bun** (install / scripts / dev) — déploiement sur `workerd` (Cloudflare Workers) |
+| Lint / format | **Biome** (linter + formatter, remplace ESLint depuis 2026-07-09) |
+| Base de données | **Postgres (Neon)** via **Cloudflare Hyperdrive** + **Drizzle ORM** |
+| Authentification | **better-auth** (e-mail + Google OAuth, 2FA TOTP, passkeys) |
+| Paiement | **Stripe** (Payment Element + webhooks, **LIVE** en prod) |
 | E-mails | **Resend** (API REST) |
 | i18n | **next-intl** (fr/de/it/en) |
 | Stockage fichiers | **Cloudflare R2** |
 | Cache / rate-limit | **Cloudflare KV** |
 | Hébergement | **Cloudflare Workers** via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare) |
+
+> ℹ️ Le projet a migré de D1/SQLite vers Postgres/Hyperdrive le 2026-07-09
+> (voir [`AGENTS.md`](AGENTS.md#what-this-is)). D1 reste câblé dans
+> `wrangler.jsonc` comme filet de secours inactif, pas comme base active.
 
 ---
 
@@ -136,8 +149,10 @@ Le **kit de marque** complet est versionné dans [`public/brand/`](public/brand)
   paiement des devis, webhooks pour la confirmation des paiements.
 - **better-auth + Google OAuth** — sessions, comptes, rôle admin attribué
   automatiquement aux adresses de `ADMIN_EMAILS`.
-- **Cloudflare** — D1 (`swiss3design-db`), R2 (`swiss3design-files`), KV,
-  domaine personnalisé `swiss3design.ch`.
+- **Cloudflare** — Hyperdrive → Postgres/Neon, R2 (`swiss3design-files`), KV,
+  D1 (`swiss3design-db`, filet de secours), domaine personnalisé `swiss3design.ch`.
+- **Neon Postgres** — base active (`swiss3design`), branche `preview` isolée
+  pour l'environnement de test (jamais de données clients réelles).
 - **Resend** — e-mails transactionnels (confirmations, devis, comptes). Les
   réponses clients arrivent sur l'alias **Infomaniak** `contact@swiss3design.ch`.
 
@@ -148,7 +163,8 @@ Le **kit de marque** complet est versionné dans [`public/brand/`](public/brand)
 ```text
 Swiss3Design/
 ├─ docs/                          # Doc interne : architecture, conventions, playbook, runbook, déploiement
-├─ drizzle/                       # Migrations SQL (drizzle-kit) + snapshots — NE PAS éditer à la main
+├─ drizzle-pg/                    # Migrations Postgres (drizzle-kit, actif) — NE PAS éditer à la main
+├─ drizzle/                       # Migrations D1/SQLite legacy (filet de secours) — NE PAS éditer à la main
 ├─ messages/                      # Traductions next-intl (fr, de, it, en)
 ├─ public/
 │  ├─ brand/                      # Kit de marque (logos, icônes, og-image)
@@ -158,8 +174,8 @@ Swiss3Design/
 │  └─ .well-known/security.txt    # Contact sécurité
 ├─ scripts/                       # Outils hors-app
 │  ├─ push.bat                    # Publier : commit + push (= déploiement auto)
-│  ├─ seed.sql                    # Jeu de données de départ (boutique)
-│  └─ seed-categories.sql         # Jeu de données catégories
+│  ├─ seed.sql / seed-categories.sql  # Jeux de données D1 legacy (rollback)
+│  └─ migrate-d1-to-pg.ts         # Outil de migration D1 → Postgres (Bun)
 ├─ src/
 │  ├─ app/
 │  │  ├─ [locale]/                # Pages localisées (boutique, compte, admin, devis…)
@@ -168,14 +184,17 @@ Swiss3Design/
 │  │  ├─ manifest.ts              # Manifest PWA
 │  │  └─ favicon.ico · icon.svg · apple-icon.png
 │  ├─ components/                 # Composants UI (header, footer, product-card…)
-│  ├─ db/                         # Drizzle : schema, queries, client D1
+│  ├─ db/                         # Drizzle : schema.pg.ts (source de vérité), queries, client Hyperdrive
 │  ├─ i18n/                       # Config next-intl (routing, request, navigation)
 │  ├─ lib/                        # Logique métier (auth, panier, stripe, email…)
 │  └─ middleware.ts               # Middleware Edge (i18n + sécurité + CSP nonce)
+├─ workers/cron/                  # Worker Cron autonome (purge R2, relances panier)
 ├─ next.config.ts                 # Next.js + next-intl + OpenNext
 ├─ open-next.config.ts            # Adaptateur Cloudflare (build webpack)
-├─ wrangler.jsonc                 # Bindings Cloudflare (D1, R2, KV) + domaine
-├─ drizzle.config.ts              # Config drizzle-kit
+├─ wrangler.jsonc                 # Bindings Cloudflare (Hyperdrive, R2, KV, D1) + domaine
+├─ drizzle.config.pg.ts           # Config drizzle-kit — Postgres (actif)
+├─ drizzle.config.ts              # Config drizzle-kit — D1 (legacy)
+├─ biome.jsonc                    # Lint + format (Biome)
 ├─ AGENTS.md                      # Guide pour agents IA (CLAUDE.md l'importe)
 └─ ROADMAP.md                     # Feuille de route
 ```
@@ -184,35 +203,38 @@ Swiss3Design/
 
 ## Démarrage rapide
 
-**Prérequis** : [Node.js 22+](https://nodejs.org), un compte Cloudflare et un
-compte Stripe (mode test pour le développement).
+**Prérequis** : [Bun](https://bun.sh) 1.3+, un compte Cloudflare, une base
+Postgres (ex. [Neon](https://neon.tech), palier gratuit) et un compte Stripe
+(mode test pour le développement).
 
 ```bash
 # 1. Installer les dépendances
-npm install
+bun install
 
 # 2. Créer les secrets locaux (non versionnés) dans .dev.vars
-#    voir « Variables d'environnement » ci-dessous
+#    voir « Variables d'environnement » ci-dessous — inclut DATABASE_URL
 
-# 3. Préparer la base D1 locale
-npm run db:migrate:local
-npm run db:seed:local
+# 3. Appliquer le schéma sur la base Postgres locale/de dev
+bun run db:push:pg
 
 # 4. Lancer le serveur de développement
-npm run dev
+bun run dev
 ```
 
 Le site est servi sur **http://localhost:3000**. Le `next dev` charge les
-bindings Cloudflare (D1, R2, KV) via OpenNext.
+bindings Cloudflare (Hyperdrive, R2, KV) via OpenNext.
 
 > 💡 La **CSP avec nonce** n'est active qu'en production. Pour la tester avant
-> de déployer : `npm run preview` (build + aperçu Workers en local).
+> de déployer : `bun run preview` (build + aperçu Workers en local).
 
 ---
 
 ## Variables d'environnement
 
-### Clés publiques (versionnées)
+<details>
+<summary><strong>Clés publiques (versionnées)</strong></summary>
+
+<br />
 
 `.env.development` (Stripe **test**) et `.env.production` (Stripe **live**) :
 
@@ -220,22 +242,33 @@ bindings Cloudflare (D1, R2, KV) via OpenNext.
 | --- | --- |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Clé publiable Stripe (test en dev, live en prod) |
 
-### Secrets — local : `.dev.vars` · prod : secrets Cloudflare
+</details>
+
+<details>
+<summary><strong>Secrets — local : <code>.dev.vars</code> · prod : secrets Cloudflare</strong></summary>
+
+<br />
 
 > ⚠️ Jamais versionnés. En production, gérés via `wrangler secret put` ou le
 > dashboard Cloudflare.
 
 | Variable | Rôle |
 | --- | --- |
+| `DATABASE_URL` | Connexion Postgres (dev local / `drizzle-kit`) |
+| `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` | Émulation Hyperdrive locale (même Postgres) |
 | `STRIPE_SECRET_KEY` | Clé secrète Stripe |
 | `STRIPE_WEBHOOK_SECRET` | Signature des webhooks Stripe |
 | `BETTER_AUTH_SECRET` | Secret de signature des sessions |
 | `RESEND_API_KEY` | Envoi d'e-mails (optionnel — sans clé, l'envoi est ignoré) |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Connexion Google |
-| `APPLE_*` / `FACEBOOK_*` | Fournisseurs sociaux additionnels (optionnels) |
 | `CRON_SECRET` | Jeton de la maintenance planifiée (purge R2) |
 
-### Variables non-secrètes (dans `wrangler.jsonc`)
+</details>
+
+<details>
+<summary><strong>Variables non-secrètes & bindings (dans <code>wrangler.jsonc</code>)</strong></summary>
+
+<br />
 
 | Variable | Valeur |
 | --- | --- |
@@ -243,47 +276,61 @@ bindings Cloudflare (D1, R2, KV) via OpenNext.
 | `ADMIN_EMAILS` | Adresses recevant le rôle admin |
 | `EMAIL_FROM` | Expéditeur des e-mails |
 
-### Bindings Cloudflare
+Bindings : `HYPERDRIVE` (Postgres actif) · `DB` (D1, filet de secours) ·
+`R2` (fichiers) · `KV` (cache / rate-limit) · `ASSETS` ·
+`WORKER_SELF_REFERENCE`. Types régénérés avec `bun run cf-typegen`.
 
-`DB` (D1) · `R2` (fichiers) · `KV` (cache / rate-limit) · `ASSETS` ·
-`WORKER_SELF_REFERENCE`. Types régénérés avec `npm run cf-typegen`.
+</details>
 
 ---
 
-## Scripts npm
+## Scripts
+
+<details open>
+<summary><strong>Voir la liste complète</strong></summary>
+
+<br />
 
 | Script | Action |
 | --- | --- |
-| `npm run dev` | Serveur de développement (bindings Cloudflare inclus) |
-| `npm run build` | Build Next.js |
-| `npm run lint` | Biome (lint) |
-| `npm run preview` | Build OpenNext + aperçu Workers en local (teste la CSP prod) |
-| `npm run deploy` | Build OpenNext + déploiement Cloudflare |
-| `npm run cf-typegen` | Régénère `cloudflare-env.d.ts` depuis `wrangler.jsonc` |
-| `npm run db:generate` | Génère une migration Drizzle depuis `src/db/schema.ts` |
-| `npm run db:migrate:local` | Applique les migrations sur la D1 **locale** |
-| `npm run db:migrate:remote` | Applique les migrations sur la D1 **de production** |
-| `npm run db:seed:local` | Injecte `scripts/seed.sql` dans la D1 locale |
+| `bun run dev` | Serveur de développement (bindings Cloudflare inclus) |
+| `bun run build` | Build Next.js |
+| `bun run lint` | Biome (lint) |
+| `bun run format` | Biome (format --write) |
+| `bun run typecheck` | `tsc --noEmit` |
+| `bun run test` | Vitest |
+| `bun run preview` | Build OpenNext + aperçu Workers en local (teste la CSP prod) |
+| `bun run deploy` | Build OpenNext + déploiement Cloudflare |
+| `bun run cf-typegen` | Régénère `cloudflare-env.d.ts` depuis `wrangler.jsonc` |
+| `bun run db:generate:pg` | Génère une migration Drizzle depuis `src/db/schema.pg.ts` |
+| `bun run db:push:pg` | Applique le schéma directement sur Postgres |
+
+</details>
 
 ---
 
 ## Base de données
 
-Schéma défini dans [`src/db/schema.ts`](src/db/schema.ts) (Drizzle ORM, dialecte
-SQLite). Le workflow :
+Schéma défini dans [`src/db/schema.pg.ts`](src/db/schema.pg.ts) (Drizzle ORM,
+dialecte **Postgres** — `schema.ts` n'en est qu'un re-export, tous les appels
+utilisent toujours `@/db/schema`). Le workflow :
 
 ```bash
-# Après modification du schéma → générer la migration
-npm run db:generate
+# 1. Modifier le schéma
+#    éditer src/db/schema.pg.ts
 
-# Appliquer en local
-npm run db:migrate:local
+# 2. Générer + appliquer la migration
+bun run db:generate:pg   # écrit dans drizzle-pg/
+bun run db:push:pg       # applique sur la vraie base Neon
 ```
 
-Les migrations sont stockées dans [`drizzle/`](drizzle) et **appliquées
-automatiquement à la base de production** par Cloudflare Workers Builds à chaque
-push sur `main` (voir [Déploiement](#déploiement)). Ne jamais éditer un fichier de
-migration déjà appliqué.
+**Contrairement à l'ancien D1** (migrations auto-appliquées par Cloudflare
+Workers Builds à chaque déploiement), **un `git push`/`bun run deploy` ne
+touche jamais le schéma Postgres.** Toujours exécuter `db:push:pg` *avant* de
+déployer du code qui dépend de nouvelles colonnes/tables — l'ordre compte.
+
+Les migrations sont stockées dans [`drizzle-pg/`](drizzle-pg) — ne jamais
+éditer un fichier déjà appliqué.
 
 ---
 
@@ -299,14 +346,14 @@ Le dépôt est connecté à **Cloudflare Workers Builds** (intégration Git nati
 Tout push sur `main` déclenche, côté Cloudflare et avec ses propres identifiants :
 
 1. build OpenNext (`opennextjs-cloudflare build`) ;
-2. application des **migrations D1** manquantes sur la base de production ;
-3. **déploiement** sur Cloudflare Workers.
+2. **déploiement** sur Cloudflare Workers.
 
 > Il n'y a **plus de workflow GitHub Actions** : le statut de déploiement est porté
 > par le *check* « Cloudflare Workers Builds » sur le commit (vert = build **et**
 > deploy réussis ; rouge = l'ancienne version reste en ligne, rien n'est cassé).
-> Détails et procédure de (re)connexion Git :
-> [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
+> **Toujours vérifier qu'un push a réellement déployé** — l'auto-trigger
+> Cloudflare s'est déjà avéré peu fiable. Détails, filet de secours manuel et
+> configuration de preview : [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
 
 Pour publier en un clic : double-cliquer sur [`scripts/push.bat`](scripts/push.bat)
 (commit + push), et la mise en production démarre automatiquement.
@@ -314,7 +361,7 @@ Pour publier en un clic : double-cliquer sur [`scripts/push.bat`](scripts/push.b
 ### Manuel
 
 ```bash
-npm run deploy   # build + déploiement depuis la machine locale
+bun run deploy   # build + déploiement depuis la machine locale
 ```
 
 Le domaine `swiss3design.ch` (et `www`) est routé en *custom domain* dans
@@ -325,7 +372,7 @@ Le domaine `swiss3design.ch` (et `www`) est routé en *custom domain* dans
 ## Sécurité
 
 - **CSP avec nonce par requête** en production (plus d'`unsafe-inline`). Tout
-  `<script>` inline doit recevoir le `nonce` — à vérifier via `npm run preview`.
+  `<script>` inline doit recevoir le `nonce` — à vérifier via `bun run preview`.
 - **Middleware Edge** ([`src/middleware.ts`](src/middleware.ts)) : routage i18n
   et en-têtes de sécurité.
 - **Rate-limiting** via KV ([`src/lib/rate-limit.ts`](src/lib/rate-limit.ts)).
@@ -353,6 +400,8 @@ reflétée dans l'URL (`/fr`, `/de`, `/it`, `/en`). Les traductions vivent dans
 | [`docs/playbook.md`](docs/playbook.md) | Humain ↔ IA | Comment demander et réaliser une tâche efficacement |
 | [`docs/runbook.md`](docs/runbook.md) | Ops | Déploiement, rollback, incidents, secrets |
 | [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md) | Ops | Connexion Git ↔ Cloudflare Workers Builds |
+| [`docs/codemap.md`](docs/codemap.md) | Agents / dev | « Je dois faire X » → fichier(s) exact(s) |
+| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md) | Produit | Proposition de refonte (pas encore implémentée) |
 | [`CONTRIBUTING.md`](CONTRIBUTING.md) | Contributeurs | Mise en route & conventions |
 | [`SECURITY.md`](SECURITY.md) | Sécurité | Signalement de vulnérabilité |
 | [`ROADMAP.md`](ROADMAP.md) | Produit | État du projet & suite envisagée |

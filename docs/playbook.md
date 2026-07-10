@@ -19,11 +19,11 @@ works) and [`conventions.md`](conventions.md) (how to write code here).
 
 1. Reads `AGENTS.md` / relevant `docs/` + the touched source files.
 2. Implements, matching existing style (French comments, English identifiers).
-3. Runs `npm run lint`; runs `npm run preview` when the change touches CSP, inline
+3. Runs `bun run lint`; runs `bun run preview` when the change touches CSP, inline
    scripts, runtime, or anything prod-only.
 4. **Pushes to `main`** (this *should* trigger the Cloudflare deploy, but that
    auto-trigger has proven unreliable — see `AGENTS.md` golden rule 9) and
-   starts `npm run dev` so Thomas can test. **Verifies the deploy actually
+   starts `bun run dev` so Thomas can test. **Verifies the deploy actually
    happened** (Worker `modified_on` moved) and deploys manually if not. Browser
    verification with the preview tools is allowed whenever it helps confirm
    the change.
@@ -34,20 +34,25 @@ If you do **not** want an auto-push (e.g. risky change), say so up front.
 
 Never `redirect()` from a Server Action · keep `middleware.ts` (Edge), never
 `proxy.ts` · no Turbopack in the prod build · CSP nonce is prod-only (test with
-`npm run preview`) · money is integer centimes CHF · bindings only inside a
+`bun run preview`) · money is integer centimes CHF · bindings only inside a
 request · never commit secrets · translate every UI string (fr/de/it/en).
 
 ## Task recipes
 
 ### Add / change a product field
-1. Edit [`src/db/schema.ts`](../src/db/schema.ts) (`products` or a related table).
-2. `npm run db:generate` → review the new file in `drizzle/` (never hand-edit it).
-3. `npm run db:migrate:local`.
+1. Edit [`src/db/schema.pg.ts`](../src/db/schema.pg.ts) (`products` or a
+   related table) — **not** `schema.ts`, which is just a re-export shim.
+2. `bun run db:generate:pg` → review the new file in `drizzle-pg/` (never
+   hand-edit it).
+3. `bun run db:push:pg` to apply it to the real Neon database.
 4. Wire it through the admin form + action
    (`src/app/[locale]/admin/products/product-form.tsx` + `actions.ts`).
 5. Display it on the storefront (`product-card`, `products/[slug]`).
 6. If it's user-visible text, add keys to all four `messages/*.json`.
-7. Prod migration applies automatically on deploy.
+7. **Prod migration does NOT apply automatically on deploy** — step 3 must run
+   *before* pushing code that depends on the new column/table, or the deployed
+   code will query a column that doesn't exist yet. Unlike the old D1 setup,
+   `bun run deploy` / a `main` push never touches the Postgres schema.
 
 ### Add a UI string
 Add the key to **all four** `messages/{fr,de,it,en}.json`; read it with
@@ -70,20 +75,21 @@ pattern; never assume a single call. Stripe is **LIVE in prod**.
 
 ### "It works in dev but breaks in prod"
 Almost always the **CSP nonce** (inline script without `x-nonce`) — invisible in
-`npm run dev`. Reproduce with `npm run preview`, then pass `nonce={...}` from
+`bun run dev`. Reproduce with `bun run preview`, then pass `nonce={...}` from
 `(await headers()).get("x-nonce")`. See [conventions.md](conventions.md).
 
 ## Don't ask the agent to (without saying so explicitly)
 
 - Force-push, or push when you wanted to review first.
-- Edit an already-applied migration in `drizzle/`.
+- Edit an already-applied migration in `drizzle-pg/` (Postgres, active) or
+  `drizzle/` (D1, legacy rollback path).
 - Hardcode UI text, or commit a secret.
 - Run `wrangler secret put` on an env with real users without a very good
   reason and an explicit `--env` — a shared secret like `BETTER_AUTH_SECRET`
   encrypts existing 2FA data; getting the target wrong locks users out with no
   self-service recovery (real incident, see `deploiement-cloudflare.md`).
 
-Note: `npm run deploy` / `db:migrate:remote` by hand are no longer "don't ask
+Note: `bun run deploy` / `bun run db:push:pg` by hand are no longer "don't ask
 for" — the auto-deploy-on-push is unreliable enough that a manual deploy is
 often the right call; see `AGENTS.md` golden rule 9.
 
@@ -95,8 +101,8 @@ often the right call; see `AGENTS.md` golden rule 9.
 
 **Bug**
 > Symptom: <what happens> on <page/flow>, <dev or prod>. Expected: <…>.
-> Repro: <steps>. (If prod-only, suspect CSP/nonce — check `npm run preview`.)
+> Repro: <steps>. (If prod-only, suspect CSP/nonce — check `bun run preview`.)
 
 **Refactor**
 > Refactor <area> for <reason>. Keep behaviour identical. Don't touch <X>.
-> Verify with `npm run lint` (+ `npm run preview` if runtime-affecting).
+> Verify with `bun run lint` (+ `bun run preview` if runtime-affecting).

@@ -115,13 +115,13 @@ async function main() {
       : (typeof d1Schema)[typeof d1Key];
     const destTable = pgSchema[pgKey];
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // biome-ignore lint/suspicious/noExplicitAny: table dynamique (nom resolu a l'execution), aucun type Drizzle statique possible ici
     const rows = await (d1.select().from(sourceTable as any) as Promise<any[]>);
     let inserted = 0;
     for (let i = 0; i < rows.length; i += BATCH_SIZE) {
       const batch = rows.slice(i, i + BATCH_SIZE);
       if (batch.length === 0) continue;
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      // biome-ignore lint/suspicious/noExplicitAny: table dynamique (nom resolu a l'execution), aucun type Drizzle statique possible ici
       await (pg.insert(destTable as any).values(batch) as Promise<unknown>);
       inserted += batch.length;
     }

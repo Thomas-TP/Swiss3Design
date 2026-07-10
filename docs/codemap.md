@@ -18,7 +18,7 @@
 | Une route API | `src/app/api/<nom>/route.ts` |
 | Un composant partagé | `src/components/<kebab-case>.tsx` |
 | La logique métier | `src/lib/<domaine>.ts` |
-| Le schéma DB (source de vérité) | `src/db/schema.ts` |
+| Le schéma DB (source de vérité) | `src/db/schema.pg.ts` (`schema.ts` n'est qu'un re-export) |
 | Les requêtes de lecture | `src/db/queries.ts` |
 | Les textes UI | `messages/{fr,de,it,en}.json` (fr = fallback) |
 
@@ -48,14 +48,20 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | `theme.ts` | Constantes/aides de thème (clair/sombre) | — |
 | `seo.ts` | Helpers SEO : hreflang + JSON-LD produit/Organization | `alternatesFor()`, `productJsonLd()`, `organizationJsonLd()` |
 | `cf-image.ts` | URL image Cloudflare Transformations (`/cdn-cgi/image`, prod only) | `cfImage()` |
+| `cantons.ts` | Les 26 cantons suisses (code + nom), partagé checkout/carnet d'adresses | `CANTONS` |
+| `stripe-customer.ts` | Identité Stripe client, créée paresseusement au 1er checkout connecté | `getOrCreateStripeCustomer()` |
+| `newsletter.ts` | Destinataires + jeton HMAC de désabonnement pour les annonces | — |
+| `session-groups.ts` | Regroupe les sessions Better Auth par appareil (écran « Sessions ») | — |
+| `user-agent.ts` | Lecture indicative du user-agent (« Chrome sur Windows ») | `describeUserAgent()` |
 
 ## `src/db` & `src/i18n`
 
 | Fichier | Rôle |
 | --- | --- |
-| `db/index.ts` | `getDb()` — Drizzle sur `env.DB` (par requête) |
+| `db/index.ts` | `getDb()` — Drizzle sur `env.HYPERDRIVE` (Postgres, par requête) ; re-export de `index.pg.ts` |
 | `db/queries.ts` | Requêtes lecture : `getProducts()`, `getProductBySlug()`, … |
-| `db/schema.ts` | Schéma Drizzle = **source de vérité** (catalogue, commandes, devis, auth) |
+| `db/schema.pg.ts` | Schéma Drizzle = **source de vérité** (catalogue, commandes, devis, auth) — `schema.ts` n'en est qu'un re-export, tous les appelants importent `@/db/schema` |
+| `db/schema.d1.ts` / `db/index.d1.ts` | Filet de secours D1/SQLite (inactif) — ne pas modifier sans raison de rollback |
 | `i18n/routing.ts` | `locales`, locale par défaut, config routing |
 | `i18n/navigation.ts` | `Link`, `redirect`, `useRouter` **localisés** (à utiliser au lieu de `next/*`) |
 | `i18n/request.ts` | Config requête next-intl |
@@ -77,12 +83,14 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | `csp-report/route.ts` | Réception des violations CSP |
 | `cart-reminder/route.ts` · `cart-reminder/unsubscribe/route.ts` | Opt-in relance panier (nLPD) + désinscription par token |
 | `admin/model-upload/route.ts` | Upload d'un modèle 3D (.stl/.glb) → R2 |
+| `checkout/verify-email/route.ts` | Vérification e-mail pour un checkout invité |
+| `newsletter/unsubscribe/route.ts` | Désinscription 1 clic aux annonces newsletter (jeton HMAC) |
 
 ## « Je dois… » → où commencer
 
 | Tâche | Point d'entrée |
 | --- | --- |
-| Ajouter/modifier un champ produit | `db/schema.ts` → `db/generate` → admin `products/product-form.tsx` + `actions.ts` → affichage `products/[slug]/page.tsx` + `components/product-card.tsx` |
+| Ajouter/modifier un champ produit | `db/schema.pg.ts` → `bun run db:generate:pg` + `db:push:pg` → admin `products/product-form.tsx` + `actions.ts` → affichage `products/[slug]/page.tsx` + `components/product-card.tsx` |
 | Toucher au tunnel de paiement | `app/[locale]/checkout/checkout-flow.tsx` + `api/checkout/route.ts` + `lib/orders.ts` (idempotence) |
 | Toucher aux devis | `app/[locale]/custom/` + `api/quote-*` + admin `quotes/` + `lib/orders.ts` |
 | Modifier les frais de port | `lib/shipping.ts` + admin `settings/` |
@@ -91,7 +99,7 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | Ajouter une chaîne UI | les 4 `messages/*.json` (cherche la clé dans `fr.json`, recopie partout) |
 | Sécurité / en-têtes / CSP nonce | `src/middleware.ts` |
 | Auth / rôle admin | `lib/auth.ts` + `lib/session.ts` |
-| Toucher aux avis | `db/schema.ts` (`reviews`) + `account/orders/[id]/` (dépôt, livré) + `admin/reviews/` (modération) + `products/[slug]` (affichage) |
+| Toucher aux avis | `db/schema.pg.ts` (`reviews`) + `account/orders/[id]/` (dépôt, livré) + `admin/reviews/` (modération) + `products/[slug]` (affichage) |
 | Viewer 3D produit | `components/product-viewer-3d.tsx` + `api/admin/model-upload` + champ `products.model3dUrl` |
 | Recherche / produits liés | `db/queries.ts` (`getProducts` param `q`, `getRelatedProducts`) + `shop/page.tsx` |
 | SEO d'une page | `app/sitemap.ts` · `app/robots.ts` · `lib/seo.ts` + `generateMetadata` de la page |
@@ -111,5 +119,6 @@ Surtout du texte/markup statique : lis par plage ciblée plutôt qu'en entier.
 
 ## Ce qu'il ne faut pas ouvrir pour comprendre le projet
 
-- `package-lock.json` (~500 Ko), `drizzle/` (migrations générées), `cloudflare-env.d.ts`
-  (généré par `cf-typegen`), `public/brand/**` (binaires). Aucune logique à y lire.
+- `bun.lock`, `drizzle/` (migrations D1 legacy générées) et `drizzle-pg/`
+  (migrations Postgres générées), `cloudflare-env.d.ts` (généré par
+  `cf-typegen`), `public/brand/**` (binaires). Aucune logique à y lire.

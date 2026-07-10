@@ -15,7 +15,7 @@
 |---|---|
 | Framework | **Next.js 16 + React 19** via **OpenNext for Cloudflare** |
 | Animations / rendu | **Motion** (ex-Framer Motion) + View Transitions |
-| Comptes clients | **Better Auth** sur D1 (e-mail + **Google OAuth**, **2FA TOTP**) |
+| Comptes clients | **Better Auth** sur Postgres/Hyperdrive (e-mail + **Google OAuth**, **2FA TOTP**, passkeys) |
 | Auth admin | **Rôle `admin` Better Auth**, attribué automatiquement aux adresses de `ADMIN_EMAILS` (pas de Cloudflare Access) |
 | Paiement | **Stripe Payment Element** personnalisé (intégré) — cartes + Apple/Google Pay. **TWINT** disponible via Stripe (à activer au dashboard). PostFinance Pay : abandonné. |
 | Langues | **FR / DE / IT / EN** avec détection auto du navigateur (repli FR) via `next-intl` |
@@ -42,12 +42,13 @@
 |---|---|
 | Framework | Next.js 16 (App Router) + React 19, déployé via **OpenNext** sur **Cloudflare Workers** |
 | Animations | **Motion** + View Transitions API |
-| Base de données | **Cloudflare D1** (SQLite) + **Drizzle ORM** |
+| Base de données | **Postgres (Neon)** via **Cloudflare Hyperdrive** + **Drizzle ORM** — pivot 2026-07-09, D1/SQLite gardé en filet de secours inactif |
+| Outillage | **Bun** (install/scripts/dev) + **Biome** (lint + format, ESLint retiré 2026-07-09) |
 | Fichiers (images, STL/3MF) | **Cloudflare R2** (servis via route handlers, jamais publics) |
 | Optimisation images | **Cloudflare Images** (`images.unoptimized` côté Next, délégué au déploiement) |
 | Sessions / cache / rate-limit | **Workers KV** |
 | Tâches planifiées | **Route cron** `/api/cron/maintenance` (purge R2 + relances panier) protégée par `CRON_SECRET`, déclenchée par un **Worker Cron dédié** (`workers/cron`, horaire) — pas de Cloudflare Queues |
-| Auth clients & admin | **Better Auth** (D1/Drizzle) — rôle `admin` via `ADMIN_EMAILS` |
+| Auth clients & admin | **Better Auth** (Postgres/Drizzle via Hyperdrive) — rôle `admin` via `ADMIN_EMAILS` |
 | Paiement | **Stripe Payment Element** (PaymentIntents + webhook) en CHF |
 | i18n | **next-intl** (routing `/fr` `/de` `/it` `/en`, détection auto) |
 | Emails | **Resend** (réponses clients vers l'alias Infomaniak `contact@swiss3design.ch`) |
@@ -62,7 +63,7 @@
 
 ## 3. Modèle de données
 
-Le schéma fait foi : [`src/db/schema.ts`](src/db/schema.ts) (Drizzle, SQLite).
+Le schéma fait foi : [`src/db/schema.pg.ts`](src/db/schema.pg.ts) (Drizzle, Postgres — `schema.ts` n'en est qu'un re-export).
 Vue d'ensemble commentée : [`docs/architecture.md`](docs/architecture.md#data-model-d1--drizzle).
 
 Principes : `id` UUID, **argent en centimes CHF** (`*_cents`), textes traduits
@@ -180,7 +181,8 @@ Lot SEO / perf / conversion (livré) :
 
 | Poste | Coût |
 |---|---|
-| Cloudflare Workers Paid (D1 + R2 + KV inclus) | ~5 $/mois |
+| Cloudflare Workers Paid (Hyperdrive, R2, KV inclus ; D1 gardé en filet de secours, inclus) | ~5 $/mois |
+| Neon Postgres (base active, branche `preview` isolée incluse) | Gratuit (palier free) |
 | Domaine `.ch` | ~10–12 CHF/an |
 | Stripe | 0 fixe + ~2.9 % + 0.30 CHF/tx (TWINT ~1.3 %) |
 | Resend | Gratuit jusqu'à ~3 000 emails/mois |

@@ -145,8 +145,8 @@ const nonce = (await headers()).get("x-nonce") ?? undefined;
 // pass nonce={nonce} to NextIntlClientProvider / any inline <script>
 ```
 
-`npm run dev` relaxes CSP (HMR needs inline+eval), so a missing nonce is invisible
-in dev. **Always verify CSP-affecting changes with `npm run preview`** (real
+`bun run dev` relaxes CSP (HMR needs inline+eval), so a missing nonce is invisible
+in dev. **Always verify CSP-affecting changes with `bun run preview`** (real
 Workers runtime + prod CSP).
 
 ## Environment & secrets
@@ -158,7 +158,7 @@ Workers runtime + prod CSP).
   `.env.production` (Stripe **live**) — just `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`,
   inlined at build.
 - **Non-secret vars** (`BETTER_AUTH_URL`, `ADMIN_EMAILS`, `EMAIL_FROM`) live in
-  `wrangler.jsonc`. After editing bindings/vars there, run `npm run cf-typegen`.
+  `wrangler.jsonc`. After editing bindings/vars there, run `bun run cf-typegen`.
 
 ## Swiss specifics
 
@@ -172,5 +172,9 @@ Workers runtime + prod CSP).
 - **Comments and user-facing copy in French**; code identifiers in English.
 - Keep the existing dense, explanatory comment style: explain the *why* (the Workers
   constraint, the idempotency reason, the nLPD rule), not the obvious *what*.
-- TypeScript strict; prefer the `@/…` import alias over deep relative paths.
-- Run `npm run lint` before finishing.
+- TypeScript **6** strict (7 was attempted and reverted 2026-07-09 — its
+  package no longer exports the classic compiler API, which breaks `next
+  build` itself, not just tooling; revisit once 7.1 ships a JS API again).
+  Prefer the `@/…` import alias over deep relative paths.
+- Lint + format = **Biome** (`biome.jsonc`), ESLint fully removed 2026-07-09.
+  Run `bun run lint` before finishing; `bun run format` to auto-fix style.

@@ -117,7 +117,7 @@ bun run db:seed:local        # seed local D1 from scripts/seed.sql
   call, or — in prod — the **dedicated Worker Cron** (`workers/cron`, hourly).
   `CRON_SECRET` must be set on **both** workers (`swiss3design` and
   `swiss3design-cron`). Deploy the cron worker once:
-  `cd workers/cron && npx wrangler deploy && npx wrangler secret put CRON_SECRET`.
+  `cd workers/cron && bunx wrangler deploy && bunx wrangler secret put CRON_SECRET`.
 
 ## Local dev setup
 
