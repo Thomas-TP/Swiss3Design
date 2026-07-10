@@ -592,6 +592,7 @@
     "track": "Track your order",
     "madeIn": "Designed and printed in Gland (VD), delivered across Switzerland.",
     "securePayment": "Secure payment",
-    "copyright": "© {year} Swiss3Design — Gland, Switzerland"
+    "copyright": "© {year} Swiss3Design — Gland, Switzerland",
+    "createdBy": "Site built by"
   }
 }

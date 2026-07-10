@@ -107,9 +107,31 @@ export function Footer() {
           </FooterColumn>
         </div>
 
-        {/* Barre basse : copyright + paiement sécurisé */}
+        {/* Barre basse : copyright + crédit agence + paiement sécurisé */}
         <div className="mt-12 flex flex-col gap-4 border-t border-line py-6 text-xs text-soft sm:flex-row sm:items-center sm:justify-between">
-          <p>{t("copyright", { year: new Date().getFullYear() })}</p>
+          <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+            <p>{t("copyright", { year: new Date().getFullYear() })}</p>
+            <a
+              href="https://tom-web.ch/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 transition-colors hover:text-ink"
+            >
+              {t("createdBy")}
+              <img
+                src="/credits/tomweb-logo-light.png"
+                alt="TomWeb"
+                loading="lazy"
+                className="h-4 w-auto dark:hidden"
+              />
+              <img
+                src="/credits/tomweb-logo-dark.png"
+                alt="TomWeb"
+                loading="lazy"
+                className="hidden h-4 w-auto dark:block"
+              />
+            </a>
+          </div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="mr-1 flex items-center gap-1.5 font-medium">
               <ShieldCheck size={14} className="text-accent" />
