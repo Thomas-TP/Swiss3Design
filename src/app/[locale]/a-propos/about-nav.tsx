@@ -7,35 +7,49 @@ interface AboutNavItem {
   label: string;
 }
 
-// Barre de navigation rapide, collée sous le header (top-16 = hauteur du
-// header) : suit le défilement et met en avant la section actuellement
-// visible (IntersectionObserver), pour retrouver une info sans tout relire
-// sur une page volontairement longue et complète.
+// Ligne de détection : juste sous le header (64px) + cette barre sticky.
+const DETECTION_LINE = 150;
+
+// Barre de navigation rapide, collée sous le header : suit le défilement et
+// met en avant la section actuellement lue, pour retrouver une info sans
+// tout relire sur une page volontairement longue et complète.
+//
+// Écoute `scroll` (throttlée par requestAnimationFrame) plutôt qu'un
+// IntersectionObserver : son callback ne reçoit que les entrées dont l'état
+// vient de CHANGER, pas un instantané de toutes les sections observées — sur
+// une page à sections hautes, beaucoup de mouvements de défilement ne
+// produisent aucune entrée "actuellement visible" dans le batch reçu, et la
+// pastille active reste bloquée sur la première section. Constaté en usage
+// réel, pas juste en théorie. L'algorithme ici est déterministe : à chaque
+// scroll, on prend la dernière section (dans l'ordre du document) dont le
+// haut a déjà franchi la ligne de détection.
 export function AboutNav({ items }: { items: AboutNavItem[] }) {
   const [activeId, setActiveId] = useState(items[0]?.id);
   const listRef = useRef<HTMLDivElement>(null);
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
 
   useEffect(() => {
-    const sections = items
-      .map((item) => document.getElementById(item.id))
-      .filter((el): el is HTMLElement => el !== null);
+    function computeActive() {
+      let current = itemsRef.current[0]?.id;
+      for (const item of itemsRef.current) {
+        const el = document.getElementById(item.id);
+        if (el && el.getBoundingClientRect().top <= DETECTION_LINE) {
+          current = item.id;
+        }
+      }
+      setActiveId((prev) => (prev === current ? prev : current));
+    }
 
-    // Fenêtre de détection : juste sous les barres sticky (header + cette
-    // nav) jusqu'au tiers supérieur de l'écran — la section active est celle
-    // dont le titre vient de passer sous cette ligne.
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((e) => e.isIntersecting)
-          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
-        if (visible[0]) setActiveId(visible[0].target.id);
-      },
-      { rootMargin: "-150px 0px -70% 0px", threshold: 0 },
-    );
-
-    for (const section of sections) observer.observe(section);
-    return () => observer.disconnect();
-  }, [items]);
+    // Pas de throttle requestAnimationFrame : ne pas dépendre d'un rAF qui
+    // se déclenche de façon fiable (constaté peu fiable dans un contexte de
+    // test automatisé/headless — même famille de souci que le défilement
+    // fluide ou IntersectionObserver). Vérifier 6 éléments par événement
+    // scroll est de toute façon négligeable en coût.
+    computeActive();
+    window.addEventListener("scroll", computeActive, { passive: true });
+    return () => window.removeEventListener("scroll", computeActive);
+  }, []);
 
   // Garde la pastille active visible dans la barre horizontale scrollable.
   // Ajuste `scrollLeft` du conteneur directement plutôt que
