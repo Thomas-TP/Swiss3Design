@@ -1,7 +1,8 @@
 /// <reference types="bun" />
-// Migration des données réelles de production D1 -> Postgres (Phase 5, voir
-// C:\Users\leole\.claude\plans\foamy-swimming-cook.md). Lit un export SQL de
-// D1 (généré par `wrangler d1 export swiss3design-db --remote --output=...`)
+// Outil de migration des données réelles de production D1 -> Postgres, utilisé
+// lors du pivot de stack 2026-07-09 (voir AGENTS.md), gardé pour resynchroniser
+// si besoin. Lit un export SQL de D1 (généré par
+// `wrangler d1 export swiss3design-db --remote --output=...`)
 // dans une base SQLite Bun temporaire, puis recopie chaque table vers
 // Postgres via les deux schémas Drizzle déjà existants (schema.d1.ts /
 // schema.pg.ts) — aucune transformation manuelle de type nécessaire, Drizzle

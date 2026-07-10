@@ -1,8 +1,7 @@
 import { defineConfig } from "drizzle-kit";
 
-// Config drizzle-kit pour le schéma Postgres (Hyperdrive) — distincte de
-// drizzle.config.ts (D1/SQLite, toujours actif tant que les données réelles
-// n'ont pas été migrées, voir C:\Users\leole\.claude\plans\foamy-swimming-cook.md).
+// Config drizzle-kit pour le schéma Postgres (Hyperdrive, actif) — distincte
+// de drizzle.config.ts (D1/SQLite, filet de secours inactif, voir AGENTS.md).
 export default defineConfig({
   schema: "./src/db/schema.pg.ts",
   out: "./drizzle-pg",
