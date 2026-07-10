@@ -1,7 +1,10 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "swiss3design",
-  "account_id": "b88f99010692662e118a9869f47767e4",
+  // account_id volontairement omis (dépôt public) : un seul compte Cloudflare
+  // est accessible depuis la session `wrangler login`/le token de build, donc
+  // wrangler le résout tout seul (CLOUDFLARE_ACCOUNT_ID en variable
+  // d'environnement reste possible mais inutile ici).
   "main": ".open-next/worker.js",
   "compatibility_date": "2026-07-09",
   "compatibility_flags": ["nodejs_compat"],
@@ -53,10 +56,11 @@
   "observability": {
     "enabled": true
   },
+  // ADMIN_EMAILS n'est PAS ici : dépôt public, posé comme secret Cloudflare
+  // (`wrangler secret put ADMIN_EMAILS`) plutôt qu'en var en clair — même
+  // interface `env.ADMIN_EMAILS` côté code, voir AGENTS.md.
   "vars": {
     "BETTER_AUTH_URL": "https://swiss3design.ch",
-    // Les comptes créés avec ces e-mails reçoivent automatiquement le rôle admin
-    "ADMIN_EMAILS": "t@prudhomme.li",
     // Alias Infomaniak : les réponses des clients arrivent dans contact@swiss3design.ch
     "EMAIL_FROM": "Swiss3Design <commandes@swiss3design.ch>",
     // « Payment method configuration » Stripe (dashboard → Paramètres de
@@ -127,11 +131,12 @@
       "observability": {
         "enabled": true
       },
+      // ADMIN_EMAILS n'est pas ici non plus — même secret Cloudflare que la
+      // prod, posé via `wrangler secret put ADMIN_EMAILS --env preview`.
       "vars": {
         // Lu par middleware.ts pour désindexer (X-Robots-Tag) tout l'environnement.
         "APP_ENV": "preview",
         "BETTER_AUTH_URL": "https://swiss3design-preview.thomastp.workers.dev",
-        "ADMIN_EMAILS": "t@prudhomme.li",
         "EMAIL_FROM": "Swiss3Design Preview <commandes@swiss3design.ch>",
         // Vide : la preview (clés Stripe test) garde la config par défaut
         "STRIPE_PAYMENT_METHOD_CONFIGURATION": "",

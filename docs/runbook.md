@@ -88,8 +88,10 @@ bun run db:seed:local        # seed local D1 from scripts/seed.sql
   redeploy needed.
 - **Which secrets exist:** see [`.dev.vars.example`](../.dev.vars.example)
   (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BETTER_AUTH_SECRET`,
-  `RESEND_API_KEY`, `GOOGLE_*`, optional `APPLE_*`/`FACEBOOK_*`, `CRON_SECRET`).
-- **Non-secret vars** (`BETTER_AUTH_URL`, `ADMIN_EMAILS`, `EMAIL_FROM`) live in
+  `RESEND_API_KEY`, `GOOGLE_*`, optional `APPLE_*`/`FACEBOOK_*`, `CRON_SECRET`,
+  `ADMIN_EMAILS`). `ADMIN_EMAILS` is a secret rather than a `vars` entry
+  specifically because the repo is public (moved 2026-07-10).
+- **Non-secret vars** (`BETTER_AUTH_URL`, `EMAIL_FROM`) live in
   `wrangler.jsonc`; after editing run `bun run cf-typegen`.
 - **Local dev:** copy `.dev.vars.example` → `.dev.vars` (gitignored) and fill in
   **test** values.

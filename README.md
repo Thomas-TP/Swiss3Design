@@ -309,6 +309,7 @@ bindings Cloudflare (Hyperdrive, R2, KV) via OpenNext.
 | `RESEND_API_KEY` | Envoi d'e-mails (optionnel — sans clé, l'envoi est ignoré) |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Connexion Google |
 | `CRON_SECRET` | Jeton de la maintenance planifiée (purge R2) |
+| `ADMIN_EMAILS` | Adresses recevant le rôle admin (secret plutôt que var en clair — dépôt public) |
 
 </details>
 
@@ -320,7 +321,6 @@ bindings Cloudflare (Hyperdrive, R2, KV) via OpenNext.
 | Variable | Valeur |
 | --- | --- |
 | `BETTER_AUTH_URL` | `https://swiss3design.ch` |
-| `ADMIN_EMAILS` | Adresses recevant le rôle admin |
 | `EMAIL_FROM` | Expéditeur des e-mails |
 
 Bindings : `HYPERDRIVE` (Postgres actif) · `DB` (D1, filet de secours) ·

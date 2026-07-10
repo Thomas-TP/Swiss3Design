@@ -17,6 +17,10 @@ STRIPE_WEBHOOK_SECRET="whsec_..."
 BETTER_AUTH_SECRET="change-me"               # ex. openssl rand -base64 32
 BETTER_AUTH_URL="http://localhost:3000"      # override local (prod = wrangler.jsonc)
 
+# Rôle admin — posé comme secret Cloudflare en prod/preview (wrangler secret
+# put ADMIN_EMAILS), pas en var en clair dans wrangler.jsonc (dépôt public).
+ADMIN_EMAILS="admin@example.com"
+
 # Postgres (Neon, direct — pas l'endpoint -pooler, Hyperdrive fait déjà son
 # propre pooling). Utilisé par drizzle-kit (db:generate:pg) en local
 # uniquement — le Worker déployé passe par le binding HYPERDRIVE (wrangler.jsonc).

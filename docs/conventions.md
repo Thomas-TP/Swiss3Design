@@ -152,12 +152,14 @@ Workers runtime + prod CSP).
 ## Environment & secrets
 
 - **Secrets** (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BETTER_AUTH_SECRET`,
-  `RESEND_API_KEY`, `GOOGLE_*`, `CRON_SECRET`, …): local in `.dev.vars` (gitignored),
-  prod via `wrangler secret put` / dashboard. **Never commit them.**
+  `RESEND_API_KEY`, `GOOGLE_*`, `CRON_SECRET`, `ADMIN_EMAILS`, …): local in
+  `.dev.vars` (gitignored), prod via `wrangler secret put` / dashboard.
+  **Never commit them.** `ADMIN_EMAILS` in particular is a secret (not a
+  `vars` entry) specifically because the repo is public — moved 2026-07-10.
 - **Public** keys only in committed `.env.development` (Stripe **test**) and
   `.env.production` (Stripe **live**) — just `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`,
   inlined at build.
-- **Non-secret vars** (`BETTER_AUTH_URL`, `ADMIN_EMAILS`, `EMAIL_FROM`) live in
+- **Non-secret vars** (`BETTER_AUTH_URL`, `EMAIL_FROM`) live in
   `wrangler.jsonc`. After editing bindings/vars there, run `bun run cf-typegen`.
 
 ## Swiss specifics
