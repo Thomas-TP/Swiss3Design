@@ -104,19 +104,24 @@ export default async function AboutPage({
       {/* Navigation rapide : reste visible au défilement, met en avant la
           section lue (voir about-nav.tsx). Page volontairement longue et
           complète — cette barre en est le sommaire, pas un raccourci qui
-          en retire le contenu. */}
-      <div className="mt-10">
-        <AboutNav
-          items={[
-            { id: "equipment", label: c.equipmentKicker },
-            { id: "process", label: c.processKicker },
-            { id: "materials", label: c.materialsKicker },
-            { id: "trust", label: c.trustKicker },
-            { id: "faq", label: c.faqKicker },
-            { id: "contact", label: c.contactKicker },
-          ]}
-        />
-      </div>
+          en retire le contenu.
+          Placée en enfant DIRECT du conteneur racine (pas dans un div
+          dédié) : `position: sticky` ne "colle" que dans la hauteur de son
+          bloc englobant — un wrapper qui ne contient que la barre elle-même
+          n'a aucune marge de manœuvre pour rester à l'écran (elle se
+          décolle dès qu'on dépasse sa propre hauteur). Le conteneur racine,
+          lui, s'étend sur toute la page. Bug constaté en usage réel
+          (Thomas : "je dois revenir en haut pour l'utiliser"). */}
+      <AboutNav
+        items={[
+          { id: "equipment", label: c.equipmentKicker },
+          { id: "process", label: c.processKicker },
+          { id: "materials", label: c.materialsKicker },
+          { id: "trust", label: c.trustKicker },
+          { id: "faq", label: c.faqKicker },
+          { id: "contact", label: c.contactKicker },
+        ]}
+      />
 
       {/* Notre matériel */}
       <section id="equipment" className="scroll-mt-32 py-16 md:py-20">

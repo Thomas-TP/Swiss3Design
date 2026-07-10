@@ -87,7 +87,7 @@ export function AboutNav({ items }: { items: AboutNavItem[] }) {
   }
 
   return (
-    <div className="sticky top-16 z-30 -mx-4 border-b border-line bg-paper/90 backdrop-blur-lg sm:-mx-6">
+    <div className="sticky top-16 z-30 -mx-4 mt-10 border-b border-line bg-paper/90 backdrop-blur-lg sm:-mx-6">
       <div
         ref={listRef}
         className="flex gap-1.5 overflow-x-auto px-4 py-2.5 sm:px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"

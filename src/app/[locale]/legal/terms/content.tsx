@@ -128,10 +128,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Les prestations personnalisées (fichiers fournis par le client ou
           projets spécifiques) font l’objet d’un devis. Le contrat est conclu à
-          l’acceptation du devis et au paiement. La production démarre dès ce
-          paiement ; passé ce stade, la commande ne peut plus être annulée ni
-          modifiée. Les articles personnalisés ne sont ni repris ni échangés
-          (voir « Retours »). Le client garantit
+          l’acceptation du devis et au paiement. Le client peut annuler sa
+          commande ou en demander la modification tant que l’impression n’a
+          pas commencé ; une fois l’impression commencée, la commande ne peut
+          plus être annulée ni modifiée. Les articles personnalisés ne sont
+          ni repris ni échangés (voir « Retours »). Le client garantit
           détenir les droits sur les fichiers transmis et que leur impression ne
           viole aucun droit de tiers ni aucune disposition légale ; l’exploitant
           peut refuser tout fichier sans justification. Le client indemnise
@@ -377,10 +378,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Individuelle Leistungen (vom Kunden gelieferte Dateien oder
           spezifische Projekte) erfolgen auf der Grundlage einer Offerte. Der
           Vertrag kommt mit der Annahme der Offerte und der Zahlung zustande.
-          Die Produktion beginnt mit dieser Zahlung; danach kann die
-          Bestellung weder storniert noch geändert werden. Personalisierte
-          Artikel werden weder zurückgenommen noch umgetauscht (siehe
-          «Rücksendungen»). Der Kunde gewährleistet, dass er über die
+          Der Kunde kann seine Bestellung stornieren oder deren Änderung
+          verlangen, solange der Druckvorgang noch nicht begonnen hat; sobald
+          der Druck begonnen hat, kann die Bestellung weder storniert noch
+          geändert werden. Personalisierte Artikel werden weder
+          zurückgenommen noch umgetauscht (siehe «Rücksendungen»). Der Kunde gewährleistet, dass er über die
           Rechte an den übermittelten Dateien verfügt und deren Druck weder
           Rechte Dritter noch gesetzliche Bestimmungen verletzt; der Betreiber
           kann jede Datei ohne Begründung ablehnen. Der Kunde stellt den
@@ -624,10 +626,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Le prestazioni personalizzate (file forniti dal cliente o progetti
           specifici) sono oggetto di un preventivo. Il contratto è concluso
-          all’accettazione del preventivo e al pagamento. La produzione inizia
-          con tale pagamento; superata questa fase, l’ordine non può più
-          essere annullato né modificato. Gli articoli personalizzati non
-          vengono né ripresi né cambiati (vedere «Resi»). Il
+          all’accettazione del preventivo e al pagamento. Il cliente può
+          annullare l’ordine o richiederne la modifica finché la stampa non è
+          iniziata; una volta iniziata la stampa, l’ordine non può più essere
+          annullato né modificato. Gli articoli personalizzati non vengono né
+          ripresi né cambiati (vedere «Resi»). Il
           cliente garantisce di detenere i diritti sui file trasmessi e che la
           loro stampa non viola alcun diritto di terzi né alcuna disposizione
           legale; il gestore può rifiutare qualsiasi file senza giustificazione.
@@ -862,10 +865,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Customised services (files supplied by the customer or specific
           projects) are subject to a quote. The contract is concluded upon
-          acceptance of the quote and payment. Production begins upon that
-          payment; past that point, the order can no longer be cancelled or
-          changed. Customised items can be neither returned nor exchanged (see
-          “Returns”). The customer warrants that
+          acceptance of the quote and payment. The customer may cancel the
+          order or request changes as long as printing has not yet started;
+          once printing has started, the order can no longer be cancelled or
+          changed. Customised items can be neither returned nor exchanged
+          (see “Returns”). The customer warrants that
           they hold the rights to the files submitted and that printing them
           does not infringe any third-party rights or legal provisions; the
           Operator may refuse any file without justification. The customer shall
