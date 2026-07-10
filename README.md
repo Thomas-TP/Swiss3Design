@@ -32,7 +32,7 @@ fabriqués à **Gland (VD)** et livrés dans toute la Suisse.
 
 <div align="center">
 
-**[Aperçu](#aperçu)** · **[Fonctionnalités](#fonctionnalités)** · **[Identité visuelle](#identité-visuelle)** · **[Stack technique](#stack-technique)** · **[Structure du projet](#structure-du-projet)** · **[Démarrage rapide](#démarrage-rapide)** · **[Base de données](#base-de-données)** · **[Déploiement](#déploiement)** · **[Sécurité](#sécurité)** · **[Documentation](#documentation)**
+**[Aperçu](#aperçu)** · **[Architecture](#architecture)** · **[Fonctionnalités](#fonctionnalités)** · **[Identité visuelle](#identité-visuelle)** · **[Stack technique](#stack-technique)** · **[Structure du projet](#structure-du-projet)** · **[Démarrage rapide](#démarrage-rapide)** · **[Base de données](#base-de-données)** · **[Déploiement](#déploiement)** · **[Sécurité](#sécurité)** · **[Documentation](#documentation)**
 
 </div>
 
@@ -49,6 +49,53 @@ Cloudflare côté hébergement, sans process Node persistant.
 
 Le site est multilingue (🇫🇷 🇩🇪 🇮🇹 🇬🇧) avec détection automatique de la langue
 du navigateur, et propose un mode clair/sombre.
+
+---
+
+## Architecture
+
+Tout tourne dans **un seul Worker Cloudflare** — pas de process Node
+persistant, tout sur le runtime Edge (`nodejs_compat`).
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#E5231C','primaryTextColor':'#ffffff','primaryBorderColor':'#C01D14','lineColor':'#8a8378','secondaryColor':'#FAFAF9','secondaryTextColor':'#1A1614','tertiaryColor':'#FAFAF9','tertiaryTextColor':'#1A1614'}}}%%
+flowchart LR
+    Browser(["🌐 Navigateur"]) --> Worker["☁️ Cloudflare Worker"]
+    Worker --> MW["middleware.ts<br/>i18n · sécurité · CSP nonce"]
+    MW --> App["RSC / pages<br/>src/app/[locale]/**"]
+    MW --> API["Route handlers<br/>src/app/api/**"]
+    App --> PG[("Postgres<br/>via Hyperdrive")]
+    API --> PG
+    API --> R2[("R2<br/>fichiers")]
+    API --> KV[("KV<br/>cache · rate-limit")]
+```
+
+Le paiement (commande **et** devis) se finalise via une écriture **idempotente**
+— webhook Stripe et page de retour peuvent arriver dans n'importe quel ordre,
+un seul l'emporte :
+
+```mermaid
+%%{init: {'theme':'base', 'themeVariables': {'primaryColor':'#E5231C','primaryTextColor':'#ffffff','primaryBorderColor':'#C01D14','lineColor':'#8a8378','actorBkg':'#FAFAF9','actorTextColor':'#1A1614','actorBorder':'#8a8378','signalColor':'#1A1614','signalTextColor':'#1A1614'}}}%%
+sequenceDiagram
+    participant Stripe
+    participant Webhook as Webhook Stripe
+    participant Retour as Page de retour
+    participant DB as Postgres
+
+    Note over Webhook: source de vérité
+    Note over Retour: filet de sécurité
+    Stripe->>Webhook: payment_intent.succeeded
+    Stripe-->>Retour: redirection client
+    par
+        Webhook->>DB: UPDATE ... WHERE status != paid
+    and
+        Retour->>DB: UPDATE ... WHERE status != paid
+    end
+    Note over DB: un seul UPDATE réussit → stock décrémenté une seule fois
+```
+
+Détails complets (modèle de données, auth, R2, CSP) :
+[`docs/architecture.md`](docs/architecture.md).
 
 ---
 

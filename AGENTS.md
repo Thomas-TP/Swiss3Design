@@ -11,12 +11,28 @@ This version has breaking changes — APIs, conventions, and file structure may 
 > Operational brief for AI coding agents. Keep it short and high-signal.
 > **Need to locate code? Read [`docs/codemap.md`](docs/codemap.md) first** — it maps
 > "I need to do X" → exact file(s), so you find things in one read instead of grepping.
-> Deep references: [`docs/architecture.md`](docs/architecture.md) ·
-> [`docs/conventions.md`](docs/conventions.md) ·
-> [`docs/playbook.md`](docs/playbook.md) ·
-> [`docs/runbook.md`](docs/runbook.md) ·
-> [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
-> Human-facing overview lives in [`README.md`](README.md).
+
+## Documentation map
+
+Every `.md` in this repo, what it's for, and who reads it:
+
+| File | Audience | Read it for |
+| --- | --- | --- |
+| [`docs/codemap.md`](docs/codemap.md) | Agents | **Start here for any code task** — "I need to do X" → exact file(s) |
+| [`docs/architecture.md`](docs/architecture.md) | Agents / dev | Data model, request flows (checkout, quotes, auth), runtime model |
+| [`docs/conventions.md`](docs/conventions.md) | Agents / dev | Code patterns, CSP nonce contract, i18n, Swiss specifics, style |
+| [`docs/playbook.md`](docs/playbook.md) | Human ↔ agent | How to phrase a request well, task recipes, prompt templates |
+| [`docs/runbook.md`](docs/runbook.md) | Ops | Deploy/rollback steps, incident procedures, secrets rotation |
+| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md) | Ops | Git ↔ Cloudflare Workers Builds wiring, preview env, PR-stack pitfall |
+| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md) | Product | Forward-looking redesign proposal — **not implemented**, don't treat as current state |
+| [`README.md`](README.md) | Human (public) | Project overview, stack, setup, for anyone landing on the repo |
+| [`ROADMAP.md`](ROADMAP.md) | Product | What's shipped vs. what's next, budget |
+| [`CONTRIBUTING.md`](CONTRIBUTING.md) | Human contributors | Local setup, commit/PR conventions |
+| [`SECURITY.md`](SECURITY.md) | Security | Vulnerability disclosure process |
+| [`LICENSE.md`](LICENSE.md) | Legal | All-rights-reserved terms |
+
+`CLAUDE.md` at the repo root is a one-line `@AGENTS.md` import — this file
+*is* the actual source of truth Claude Code loads every session.
 
 ## What this is
 
