@@ -97,23 +97,17 @@ export function Footer() {
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
             <p>{t("copyright", { year: new Date().getFullYear() })}</p>
             <a
-              href="https://tom-web.ch/"
+              href="https://calyroc.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1.5 transition-colors hover:text-ink"
             >
               {t("createdBy")}
               <img
-                src="/credits/tomweb-logo-light.png"
-                alt="TomWeb"
+                src="/credits/calyroc-logo.png"
+                alt="Calyroc"
                 loading="lazy"
-                className="h-4 w-auto dark:hidden"
-              />
-              <img
-                src="/credits/tomweb-logo-dark.png"
-                alt="TomWeb"
-                loading="lazy"
-                className="hidden h-4 w-auto dark:block"
+                className="h-4 w-auto"
               />
             </a>
           </div>
