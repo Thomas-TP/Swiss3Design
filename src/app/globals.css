@@ -94,3 +94,44 @@ body {
 .faq-item[open] .faq-chevron {
   transform: rotate(180deg);
 }
+
+/* Schémas d'imprimantes (page « À propos ») : les traits de rappel et leurs
+   étiquettes n'ont pas la place de s'afficher sur un écran étroit. En dessous
+   de 768 px on ne garde que les pastilles numérotées sur la machine — la
+   légende numérotée sous le schéma prend le relais pour les libellés. */
+@media (max-width: 767px) {
+  .schematic-leaders {
+    display: none;
+  }
+}
+@media (min-width: 768px) {
+  .schematic-dots {
+    display: none;
+  }
+}
+/* Survol d'un renvoi : les autres s'estompent, le cadre de la pièce désignée
+   apparaît. Transitions coupées si l'utilisateur limite les animations. */
+.schematic-callout,
+.schematic-hi {
+  transition:
+    opacity 0.18s ease,
+    stroke-width 0.18s ease;
+}
+.schematic-hi {
+  animation: schematic-hi-in 0.22s ease-out;
+}
+@keyframes schematic-hi-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .schematic-callout,
+  .schematic-hi {
+    transition: none;
+    animation: none;
+  }
+}

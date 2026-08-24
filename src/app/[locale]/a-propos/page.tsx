@@ -6,7 +6,6 @@ import {
   Lock,
   Mail,
   MapPin,
-  Printer,
   ShieldCheck,
   Truck,
 } from "lucide-react";
@@ -17,6 +16,7 @@ import { Reveal } from "@/components/reveal";
 import { ContactForm } from "./contact-form";
 import { ABOUT_CONTENT } from "./about-content";
 import { AboutNav } from "./about-nav";
+import { PrinterShowcase } from "./printer-showcase";
 
 const CONTACT_EMAIL = "contact@swiss3design.ch";
 const TRUST_ICONS = [MapPin, ShieldCheck, Lock, Truck] as const;
@@ -128,59 +128,18 @@ export default async function AboutPage({
         <Reveal inView>
           <SectionHeading kicker={c.equipmentKicker} title={c.equipmentTitle} />
         </Reveal>
-        <div className="grid gap-8 md:grid-cols-2 md:gap-10 md:items-start">
-          <Reveal inView>
-            <figure className="overflow-hidden rounded-card border border-line bg-white shadow-sm shadow-ink/[0.06] dark:shadow-black/30">
-              {/* Photo produit officielle Bambu Lab, recadrée (badge promo retiré).
-                  Remplaçable par une vraie photo de l'atelier : déposer le fichier
-                  dans public/about/ et adapter le src. */}
-              <img
-                src="/about/p1s-ams2-pro.jpg"
-                alt={c.equipmentTitle}
-                width={1340}
-                height={1420}
-                loading="lazy"
-                className="block h-auto w-full"
-              />
-            </figure>
-          </Reveal>
-          <Reveal inView delay={0.1}>
-            <p className="text-[15px] leading-relaxed text-soft">
-              {c.equipmentText}
-            </p>
-            <div className="mt-6 rounded-card border border-line bg-elevated p-6 shadow-sm shadow-ink/[0.04]">
-              <div className="mb-4 flex items-center gap-3">
-                <span className="grid h-10 w-10 place-items-center rounded-xl bg-paper ring-1 ring-line">
-                  <Printer
-                    size={19}
-                    strokeWidth={1.8}
-                    className="text-accent"
-                  />
-                </span>
-                <div>
-                  <p className="text-sm font-semibold">Bambu Lab P1S</p>
-                  <p className="text-xs text-soft">+ AMS 2 Pro</p>
-                </div>
-              </div>
-              <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-soft">
-                {c.specsTitle}
-              </p>
-              <dl className="divide-y divide-line">
-                {c.specs.map((spec) => (
-                  <div
-                    key={spec.label}
-                    className="flex items-center justify-between gap-4 py-2.5"
-                  >
-                    <dt className="text-sm text-soft">{spec.label}</dt>
-                    <dd className="text-right text-sm font-medium">
-                      {spec.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-            </div>
-          </Reveal>
-        </div>
+        <Reveal inView>
+          <p className="mb-8 max-w-2xl text-[15px] leading-relaxed text-soft">
+            {c.equipmentText}
+          </p>
+        </Reveal>
+        <Reveal inView delay={0.08}>
+          <PrinterShowcase
+            printers={c.printers}
+            specsTitle={c.specsTitle}
+            legendHint={c.legendHint}
+          />
+        </Reveal>
       </section>
 
       {/* Le procédé */}

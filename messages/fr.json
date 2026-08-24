@@ -14,26 +14,26 @@
     "theme": "Changer de thème"
   },
   "home": {
-    "heroBadge": "Imprimé à Gland · Livré dans toute la Suisse",
+    "heroBadge": "Imprimé dans l'arc lémanique · Livré dans toute la Suisse",
     "heroTitle": "L'impression 3D multicolore, pensée en Suisse.",
-    "heroSubtitle": "Objets design imprimés en 3D jusqu'à 4 couleurs simultanées. Fabriqués à la pièce dans notre atelier de Gland, expédiés partout en Suisse.",
+    "heroSubtitle": "Objets design imprimés en 3D jusqu'à 4 couleurs simultanées. Fabriqués à la pièce dans nos ateliers de l'arc lémanique, expédiés partout en Suisse.",
     "ctaShop": "Découvrir le catalogue",
     "ctaCustom": "Projet sur mesure",
     "featuredTitle": "Sélection du moment",
     "featuredAll": "Tout le catalogue",
     "multicolorTitle": "4 couleurs. Une seule pièce.",
-    "multicolorText": "Notre système AMS permet d'imprimer jusqu'à quatre couleurs dans un même objet, sans assemblage ni peinture. Des dégradés nets, des détails précis, directement sortis de la machine.",
+    "multicolorText": "Nos systèmes multi-filament impriment jusqu'à quatre couleurs dans un même objet, sans assemblage ni peinture. Des dégradés nets, des détails précis, directement sortis de la machine.",
     "trustShippingTitle": "Livraison suisse",
     "trustShippingText": "Envoi par la Poste, tarif unique. Offert dès {amount}.",
-    "trustMadeTitle": "Fabriqué à Gland",
-    "trustMadeText": "Chaque pièce est imprimée et contrôlée dans notre atelier vaudois.",
+    "trustMadeTitle": "Fabriqué dans l'arc lémanique",
+    "trustMadeText": "Chaque pièce est imprimée et contrôlée dans nos ateliers vaudois.",
     "trustPaymentTitle": "Paiement sécurisé",
     "trustPaymentText": "TWINT, cartes et Google Pay.",
     "processTitle": "Comment ça marche",
     "processStep1Title": "Choisissez ou décrivez",
     "processStep1Text": "Un objet du catalogue, ou votre propre idée en sur mesure.",
-    "processStep2Title": "Imprimé à Gland",
-    "processStep2Text": "Chaque pièce est lancée, contrôlée et emballée à l'atelier.",
+    "processStep2Title": "Imprimé dans l'arc lémanique",
+    "processStep2Text": "Chaque pièce est lancée, contrôlée et emballée dans l'un de nos ateliers.",
     "processStep3Title": "Livré chez vous",
     "processStep3Text": "Expédition par la Poste Suisse, offerte dès {amount}.",
     "customBandTitle": "Une pièce sur mesure en tête ?",
@@ -318,7 +318,7 @@
       "title": "Notifications",
       "subtitle": "Choisissez les e-mails que vous souhaitez recevoir.",
       "newsletter": "Newsletter",
-      "newsletterDesc": "Actualités de l'atelier, offres et nouveautés Swiss3Design.",
+      "newsletterDesc": "Actualités de nos ateliers, offres et nouveautés Swiss3Design.",
       "productNews": "Nouveaux produits",
       "productNewsDesc": "Soyez averti·e à la sortie de nouvelles pièces du catalogue.",
       "transactionalNote": "Les e-mails liés à vos commandes, devis et à la sécurité de votre compte sont toujours envoyés, indépendamment de ces réglages."
@@ -582,7 +582,7 @@
     "pageIntro": "Une question sur une commande, un devis ou notre atelier ? Écrivez-nous, nous répondons sous 48 h."
   },
   "footer": {
-    "tagline": "Impression 3D multicolore — Gland, Suisse",
+    "tagline": "Impression 3D multicolore — arc lémanique, Suisse",
     "about": "À propos",
     "shop": "Boutique",
     "legalTitle": "Informations",
@@ -592,9 +592,9 @@
     "contact": "Contact",
     "helpTitle": "Compte & aide",
     "track": "Suivre une commande",
-    "madeIn": "Conçu et imprimé à Gland (VD), livré dans toute la Suisse.",
+    "madeIn": "Conçu et imprimé dans l'arc lémanique (VD), livré dans toute la Suisse.",
     "securePayment": "Paiement sécurisé",
-    "copyright": "© {year} Swiss3Design — Gland, Suisse",
+    "copyright": "© {year} Swiss3Design — arc lémanique, Suisse",
     "createdBy": "Site créé par"
   }
 }

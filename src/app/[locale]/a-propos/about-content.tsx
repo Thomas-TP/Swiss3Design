@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import type { ShowcasePrinter } from "./printer-showcase";
 
 // Contenu éditorial de la page « À propos » dans les 4 langues. Même logique
 // que les pages légales : le texte riche (JSX) vit ici, la page se contente de
@@ -22,7 +23,10 @@ export interface AboutContent {
   equipmentTitle: string;
   equipmentText: ReactNode;
   specsTitle: string;
-  specs: { label: string; value: string }[];
+  /** Invite affichée sous le schéma (« survolez un repère… »). */
+  legendHint: string;
+  /** Le parc machine : une entrée par imprimante, dans l'ordre d'affichage. */
+  printers: ShowcasePrinter[];
 
   processKicker: string;
   processTitle: string;
@@ -56,48 +60,122 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   fr: {
     metaTitle: "À propos — Swiss3Design",
     metaDescription:
-      "L'atelier d'impression 3D Swiss3Design à Gland (VD) : notre matériel Bambu Lab P1S + AMS 2 Pro, notre procédé, nos matières et les réponses à vos questions.",
+      "Les ateliers d'impression 3D Swiss3Design dans l'arc lémanique : nos deux machines multicolores, notre procédé, nos matières et les réponses à vos questions.",
 
-    badge: "Atelier à Gland (VD), Suisse",
-    title: "Derrière chaque pièce, un atelier suisse.",
+    badge: "Deux ateliers dans l’arc lémanique",
+    title: "Derrière chaque pièce, deux ateliers suisses.",
     intro: (
       <>
-        Swiss3Design, c’est un atelier d’impression 3D basé à{" "}
-        <strong>Gland</strong>, dans le canton de Vaud. Derrière chaque objet :
-        une imprimante de précision, des matières choisies avec soin, et une
-        personne qui contrôle chaque pièce à la main avant de vous l’envoyer.
-        Pas d’usine, pas d’intermédiaire — de l’impression à la demande, pensée
-        et fabriquée en Suisse.
+        Swiss3Design, ce sont deux ateliers d’impression 3D dans{" "}
+        <strong>l’arc lémanique</strong>, entre Gland et Pully. Deux machines
+        multicolores, des matières choisies avec soin, et à chaque fois
+        quelqu’un qui contrôle la pièce à la main avant de vous l’envoyer. Pas
+        d’usine, pas d’intermédiaire — de l’impression à la demande, pensée et
+        fabriquée en Suisse.
       </>
     ),
 
     stats: [
-      { value: "100 %", label: "fabriqué et contrôlé à Gland" },
+      { value: "2", label: "ateliers dans l’arc lémanique" },
       { value: "Jusqu’à 4", label: "couleurs dans une seule pièce" },
       { value: "2 ans", label: "de garantie légale" },
       { value: "48 h", label: "pour répondre à votre projet" },
     ],
 
     equipmentKicker: "Notre matériel",
-    equipmentTitle: "Une Bambu Lab P1S, équipée de l’AMS 2 Pro.",
+    equipmentTitle: "Deux machines multicolores, deux ateliers.",
     equipmentText: (
       <>
-        Toutes nos pièces sortent d’une <strong>Bambu Lab P1S</strong> équipée
-        du système multi-filament <strong>AMS 2 Pro</strong>. C’est une
-        imprimante CoreXY à enceinte fermée, rapide et précise, capable de
-        combiner jusqu’à quatre couleurs dans un même objet. L’AMS 2 Pro garde
-        aussi les filaments au sec, pour une qualité constante d’une impression
-        à l’autre.
+        Nos pièces sortent de deux imprimantes à enceinte fermée, chacune
+        équipée de son propre système multi-filament : une{" "}
+        <strong>Bambu Lab P1S</strong> à Gland et une{" "}
+        <strong>Creality K2</strong> à Pully. Toutes deux combinent jusqu’à
+        quatre couleurs dans un même objet et gardent les filaments à l’abri de
+        l’humidité — c’est ce qui donne une qualité constante d’une impression à
+        l’autre, quel que soit l’atelier qui la lance.
       </>
     ),
     specsTitle: "Fiche technique",
-    specs: [
-      { label: "Volume d’impression", value: "256 × 256 × 256 mm" },
-      { label: "Couleurs simultanées", value: "Jusqu’à 4 (AMS 2 Pro)" },
-      { label: "Hauteur de couche", value: "0,08 – 0,28 mm" },
-      { label: "Buse", value: "0,4 mm" },
-      { label: "Enceinte fermée", value: "Oui — châssis CoreXY rigide" },
-      { label: "Séchage du filament", value: "Intégré à l’AMS 2 Pro" },
+    legendHint: "Survolez un repère du schéma pour situer la pièce",
+    printers: [
+      {
+        variant: "p1s",
+        name: "Bambu Lab P1S",
+        sub: "+ AMS 2 Pro",
+        place: "Atelier de Gland (VD)",
+        blurb:
+          "Une CoreXY à enceinte fermée, rapide et régulière. C’est la machine historique de l’atelier : celle sur laquelle le catalogue a été mis au point.",
+        callouts: [
+          {
+            label: "AMS 2 Pro",
+            text: "Quatre bobines chargées en permanence. Le système change de filament seul en cours d’impression et les garde au sec.",
+          },
+          {
+            label: "Écran + molette",
+            text: "Le pilotage direct : lancer, mettre en pause, surveiller les températures sans passer par un ordinateur.",
+          },
+          {
+            label: "Tête d’impression",
+            text: "Buse 0,4 mm montée sur un portique CoreXY — précise même à vitesse élevée.",
+          },
+          {
+            label: "Enceinte fermée",
+            text: "Elle stabilise la température et coupe les courants d’air : c’est ce qui évite les décollements sur les grandes pièces.",
+          },
+          {
+            label: "Plateau chauffant",
+            text: "Il fait adhérer la première couche, puis libère la pièce en refroidissant. Surface texturée PEI.",
+          },
+        ],
+        specs: [
+          { label: "Volume d’impression", value: "256 × 256 × 256 mm" },
+          { label: "Couleurs simultanées", value: "Jusqu’à 4 (AMS 2 Pro)" },
+          { label: "Hauteur de couche", value: "0,08 – 0,28 mm" },
+          { label: "Buse", value: "0,4 mm" },
+          { label: "Enceinte fermée", value: "Oui — châssis CoreXY" },
+          { label: "Séchage du filament", value: "Intégré à l’AMS 2 Pro" },
+          { label: "Encombrement", value: "389 × 389 × 458 mm" },
+        ],
+      },
+      {
+        variant: "k2",
+        name: "Creality K2",
+        sub: "+ CFS",
+        place: "Atelier de Pully (VD)",
+        blurb:
+          "Plus haute, plus rapide, avec un caisson à filament étanche. Elle double la capacité de production et prend le relais sur les séries.",
+        callouts: [
+          {
+            label: "Creality CFS",
+            text: "Quatre bobines dans un caisson étanche, température et humidité affichées. La puce RFID annonce la matière et la couleur à la machine.",
+          },
+          {
+            label: "Écran tactile",
+            text: "Grand écran couleur en façade : file d’impression, réglages et caméra de chambre, directement sur la machine.",
+          },
+          {
+            label: "Tête d’impression",
+            text: "Extrudeur direct, buse 0,4 mm jusqu’à 300 °C, et des pointes à 600 mm/s.",
+          },
+          {
+            label: "Enceinte fermée",
+            text: "Chambre close et filtrée : elle garde la chaleur et retient les particules pendant l’impression.",
+          },
+          {
+            label: "Plateau chauffant",
+            text: "260 × 260 mm, avec mise à niveau automatique avant chaque impression.",
+          },
+        ],
+        specs: [
+          { label: "Volume d’impression", value: "260 × 260 × 260 mm" },
+          { label: "Couleurs simultanées", value: "Jusqu’à 4 (CFS)" },
+          { label: "Hauteur de couche", value: "0,05 – 0,3 mm" },
+          { label: "Buse", value: "0,4 mm — jusqu’à 300 °C" },
+          { label: "Vitesse maximale", value: "600 mm/s" },
+          { label: "Stockage filament", value: "CFS étanche, hygrométrie affichée" },
+          { label: "Encombrement", value: "404 × 436 × 545 mm" },
+        ],
+      },
     ],
 
     processKicker: "Le procédé",
@@ -113,7 +191,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       },
       {
         title: "Impression",
-        text: "La P1S imprime votre pièce couche après couche ; l’AMS 2 Pro gère automatiquement jusqu’à 4 couleurs.",
+        text: "L’un des deux ateliers imprime votre pièce couche après couche ; le système multi-filament gère seul jusqu’à 4 couleurs.",
       },
       {
         title: "Finition & contrôle",
@@ -157,8 +235,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     trustTitle: "Ce sur quoi vous pouvez compter.",
     trust: [
       {
-        title: "Fabriqué à Gland",
-        text: "Chaque pièce est imprimée et contrôlée à la main dans notre atelier vaudois.",
+        title: "Fabriqué dans l’arc lémanique",
+        text: "Chaque pièce est imprimée et contrôlée à la main dans l’un de nos deux ateliers vaudois.",
       },
       {
         title: "Garantie 2 ans",
@@ -192,10 +270,11 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "C’est quoi l’impression 3D multicolore ?",
         a: (
           <>
-            Grâce au système AMS 2 Pro, l’imprimante combine jusqu’à 4 filaments
-            dans une même pièce : les couleurs sont intégrées à l’impression,
-            sans peinture ni assemblage. Le résultat sort net, directement de la
-            machine.
+            Nos deux machines sont équipées d’un système multi-filament (AMS 2
+            Pro sur la Bambu Lab, CFS sur la Creality). L’imprimante combine
+            jusqu’à 4 filaments dans une même pièce : les couleurs sont
+            intégrées à l’impression, sans peinture ni assemblage. Le résultat
+            sort net, directement de la machine.
           </>
         ),
       },
@@ -304,47 +383,124 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   de: {
     metaTitle: "Über uns — Swiss3Design",
     metaDescription:
-      "Das 3D-Druck-Atelier Swiss3Design in Gland (VD): unsere Bambu Lab P1S + AMS 2 Pro, unser Verfahren, unsere Materialien und Antworten auf Ihre Fragen.",
+      "Die 3D-Druck-Ateliers von Swiss3Design in der Genferseeregion: unsere zwei Mehrfarbdrucker, unser Verfahren, unsere Materialien und Antworten auf Ihre Fragen.",
 
-    badge: "Atelier in Gland (VD), Schweiz",
-    title: "Hinter jedem Stück steht ein Schweizer Atelier.",
+    badge: "Zwei Ateliers in der Genferseeregion",
+    title: "Hinter jedem Stück stehen zwei Schweizer Ateliers.",
     intro: (
       <>
-        Swiss3Design ist ein 3D-Druck-Atelier in <strong>Gland</strong>, im
-        Kanton Waadt. Hinter jedem Objekt: ein Präzisionsdrucker, sorgfältig
-        ausgewählte Materialien und ein Mensch, der jedes Stück von Hand
-        kontrolliert, bevor es zu Ihnen kommt. Keine Fabrik, keine
-        Zwischenhändler — Druck auf Bestellung, in der Schweiz gedacht und
-        gefertigt.
+        Swiss3Design, das sind zwei 3D-Druck-Ateliers in der{" "}
+        <strong>Genferseeregion</strong>, zwischen Gland und Pully. Zwei
+        Mehrfarbdrucker, sorgfältig ausgewählte Materialien und jedes Mal ein
+        Mensch, der das Stück von Hand kontrolliert, bevor es zu Ihnen kommt.
+        Keine Fabrik, keine Zwischenhändler — Druck auf Bestellung, in der
+        Schweiz gedacht und gefertigt.
       </>
     ),
 
     stats: [
-      { value: "100 %", label: "in Gland gefertigt und kontrolliert" },
+      { value: "2", label: "Ateliers in der Genferseeregion" },
       { value: "Bis zu 4", label: "Farben in einem einzigen Stück" },
       { value: "2 Jahre", label: "gesetzliche Gewährleistung" },
       { value: "48 Std.", label: "für eine Antwort auf Ihr Projekt" },
     ],
 
     equipmentKicker: "Unser Material",
-    equipmentTitle: "Eine Bambu Lab P1S mit AMS 2 Pro.",
+    equipmentTitle: "Zwei Mehrfarbdrucker, zwei Ateliers.",
     equipmentText: (
       <>
-        Alle unsere Stücke entstehen auf einer <strong>Bambu Lab P1S</strong>{" "}
-        mit dem Mehrfilament-System <strong>AMS 2 Pro</strong>. Ein
-        geschlossener CoreXY-Drucker, schnell und präzise, der bis zu vier
-        Farben in einem Objekt vereinen kann. Die AMS 2 Pro hält die Filamente
-        ausserdem trocken — für gleichbleibende Qualität, Druck für Druck.
+        Unsere Stücke entstehen auf zwei geschlossenen Druckern, jeder mit
+        seinem eigenen Mehrfilament-System: einer <strong>Bambu Lab P1S</strong>{" "}
+        in Gland und einer <strong>Creality K2</strong> in Pully. Beide
+        vereinen bis zu vier Farben in einem Objekt und halten die Filamente vor
+        Feuchtigkeit geschützt — das sorgt für gleichbleibende Qualität, ganz
+        gleich, welches Atelier den Druck startet.
       </>
     ),
     specsTitle: "Technische Daten",
-    specs: [
-      { label: "Bauraum", value: "256 × 256 × 256 mm" },
-      { label: "Gleichzeitige Farben", value: "Bis zu 4 (AMS 2 Pro)" },
-      { label: "Schichthöhe", value: "0,08 – 0,28 mm" },
-      { label: "Düse", value: "0,4 mm" },
-      { label: "Geschlossenes Gehäuse", value: "Ja — steifes CoreXY-Chassis" },
-      { label: "Filamenttrocknung", value: "In der AMS 2 Pro integriert" },
+    legendHint: "Fahren Sie über einen Punkt, um das Bauteil zu finden",
+    printers: [
+      {
+        variant: "p1s",
+        name: "Bambu Lab P1S",
+        sub: "+ AMS 2 Pro",
+        place: "Atelier Gland (VD)",
+        blurb:
+          "Ein geschlossener CoreXY-Drucker, schnell und gleichmässig. Die Maschine der ersten Stunde — auf ihr entstand der gesamte Katalog.",
+        callouts: [
+          {
+            label: "AMS 2 Pro",
+            text: "Vier dauerhaft geladene Spulen. Das System wechselt das Filament während des Drucks selbstständig und hält es trocken.",
+          },
+          {
+            label: "Display + Drehregler",
+            text: "Direkte Steuerung: starten, pausieren, Temperaturen überwachen — ganz ohne Computer.",
+          },
+          {
+            label: "Druckkopf",
+            text: "0,4-mm-Düse auf einem CoreXY-Portal — präzise auch bei hohem Tempo.",
+          },
+          {
+            label: "Geschlossenes Gehäuse",
+            text: "Es hält die Temperatur stabil und schirmt Zugluft ab — so lösen sich grosse Teile nicht vom Druckbett.",
+          },
+          {
+            label: "Heizbett",
+            text: "Es lässt die erste Schicht haften und gibt das Stück beim Abkühlen wieder frei. Strukturierte PEI-Oberfläche.",
+          },
+        ],
+        specs: [
+          { label: "Bauraum", value: "256 × 256 × 256 mm" },
+          { label: "Gleichzeitige Farben", value: "Bis zu 4 (AMS 2 Pro)" },
+          { label: "Schichthöhe", value: "0,08 – 0,28 mm" },
+          { label: "Düse", value: "0,4 mm" },
+          { label: "Geschlossenes Gehäuse", value: "Ja — CoreXY-Chassis" },
+          { label: "Filamenttrocknung", value: "In der AMS 2 Pro integriert" },
+          { label: "Aussenmasse", value: "389 × 389 × 458 mm" },
+        ],
+      },
+      {
+        variant: "k2",
+        name: "Creality K2",
+        sub: "+ CFS",
+        place: "Atelier Pully (VD)",
+        blurb:
+          "Höher, schneller, mit luftdichtem Filamentfach. Sie verdoppelt die Kapazität und übernimmt die Serien.",
+        callouts: [
+          {
+            label: "Creality CFS",
+            text: "Vier Spulen in einem luftdichten Fach mit Temperatur- und Feuchtigkeitsanzeige. Der RFID-Chip meldet Material und Farbe an den Drucker.",
+          },
+          {
+            label: "Touchscreen",
+            text: "Grosses Farbdisplay an der Front: Druckwarteschlange, Einstellungen und Kamerabild direkt an der Maschine.",
+          },
+          {
+            label: "Druckkopf",
+            text: "Direktextruder, 0,4-mm-Düse bis 300 °C, Spitzen bis 600 mm/s.",
+          },
+          {
+            label: "Geschlossenes Gehäuse",
+            text: "Geschlossene, gefilterte Kammer: Sie hält die Wärme und bindet Partikel während des Drucks.",
+          },
+          {
+            label: "Heizbett",
+            text: "260 × 260 mm, mit automatischer Nivellierung vor jedem Druck.",
+          },
+        ],
+        specs: [
+          { label: "Bauraum", value: "260 × 260 × 260 mm" },
+          { label: "Gleichzeitige Farben", value: "Bis zu 4 (CFS)" },
+          { label: "Schichthöhe", value: "0,05 – 0,3 mm" },
+          { label: "Düse", value: "0,4 mm — bis 300 °C" },
+          { label: "Höchstgeschwindigkeit", value: "600 mm/s" },
+          {
+            label: "Filamentlagerung",
+            value: "Luftdichtes CFS mit Feuchteanzeige",
+          },
+          { label: "Aussenmasse", value: "404 × 436 × 545 mm" },
+        ],
+      },
     ],
 
     processKicker: "Das Verfahren",
@@ -360,7 +516,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       },
       {
         title: "Druck",
-        text: "Die P1S druckt Ihr Stück Schicht für Schicht; die AMS 2 Pro steuert automatisch bis zu 4 Farben.",
+        text: "Eines der beiden Ateliers druckt Ihr Stück Schicht für Schicht; das Mehrfilament-System steuert bis zu 4 Farben automatisch.",
       },
       {
         title: "Finish & Kontrolle",
@@ -404,8 +560,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     trustTitle: "Worauf Sie sich verlassen können.",
     trust: [
       {
-        title: "In Gland gefertigt",
-        text: "Jedes Stück wird in unserem Waadtländer Atelier von Hand gedruckt und kontrolliert.",
+        title: "In der Genferseeregion gefertigt",
+        text: "Jedes Stück wird in einem unserer beiden Waadtländer Ateliers von Hand gedruckt und kontrolliert.",
       },
       {
         title: "2 Jahre Gewährleistung",
@@ -439,7 +595,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Was ist mehrfarbiger 3D-Druck?",
         a: (
           <>
-            Dank des AMS-2-Pro-Systems vereint der Drucker bis zu 4 Filamente in
+            Beide Maschinen haben ein Mehrfilament-System (AMS 2 Pro bei Bambu
+            Lab, CFS bei Creality). Der Drucker vereint bis zu 4 Filamente in
             einem Stück: Die Farben sind Teil des Drucks, ohne Lackieren oder
             Zusammenbauen. Das Ergebnis kommt sauber direkt aus der Maschine.
           </>
@@ -550,48 +707,125 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   it: {
     metaTitle: "Chi siamo — Swiss3Design",
     metaDescription:
-      "L’atelier di stampa 3D Swiss3Design a Gland (VD): la nostra Bambu Lab P1S + AMS 2 Pro, il nostro procedimento, i materiali e le risposte alle vostre domande.",
+      "Gli atelier di stampa 3D Swiss3Design nell’arco lemanico: le nostre due stampanti multicolore, il procedimento, i materiali e le risposte alle vostre domande.",
 
-    badge: "Atelier a Gland (VD), Svizzera",
-    title: "Dietro ogni pezzo, un atelier svizzero.",
+    badge: "Due atelier nell’arco lemanico",
+    title: "Dietro ogni pezzo, due atelier svizzeri.",
     intro: (
       <>
-        Swiss3Design è un atelier di stampa 3D con sede a <strong>Gland</strong>
-        , nel Cantone di Vaud. Dietro ogni oggetto: una stampante di precisione,
-        materiali scelti con cura e una persona che controlla ogni pezzo a mano
-        prima di spedirvelo. Nessuna fabbrica, nessun intermediario — stampa su
-        richiesta, pensata e realizzata in Svizzera.
+        Swiss3Design sono due atelier di stampa 3D nell’
+        <strong>arco lemanico</strong>, tra Gland e Pully. Due stampanti
+        multicolore, materiali scelti con cura e ogni volta una persona che
+        controlla il pezzo a mano prima di spedirvelo. Nessuna fabbrica, nessun
+        intermediario — stampa su richiesta, pensata e realizzata in Svizzera.
       </>
     ),
 
     stats: [
-      { value: "100 %", label: "fabbricato e controllato a Gland" },
+      { value: "2", label: "atelier nell’arco lemanico" },
       { value: "Fino a 4", label: "colori in un solo pezzo" },
       { value: "2 anni", label: "di garanzia legale" },
       { value: "48 h", label: "per rispondere al vostro progetto" },
     ],
 
     equipmentKicker: "Il nostro materiale",
-    equipmentTitle: "Una Bambu Lab P1S, con AMS 2 Pro.",
+    equipmentTitle: "Due stampanti multicolore, due atelier.",
     equipmentText: (
       <>
-        Tutti i nostri pezzi escono da una <strong>Bambu Lab P1S</strong> dotata
-        del sistema multi-filamento <strong>AMS 2 Pro</strong>. È una stampante
-        CoreXY a camera chiusa, rapida e precisa, capace di combinare fino a
-        quattro colori in uno stesso oggetto. L’AMS 2 Pro mantiene inoltre i
-        filamenti asciutti, per una qualità costante a ogni stampa.
+        I nostri pezzi escono da due stampanti a camera chiusa, ciascuna con il
+        proprio sistema multi-filamento: una <strong>Bambu Lab P1S</strong> a
+        Gland e una <strong>Creality K2</strong> a Pully. Entrambe combinano
+        fino a quattro colori nello stesso oggetto e tengono i filamenti al
+        riparo dall’umidità — è così che la qualità resta costante, qualunque
+        sia l’atelier che avvia la stampa.
       </>
     ),
     specsTitle: "Scheda tecnica",
-    specs: [
-      { label: "Volume di stampa", value: "256 × 256 × 256 mm" },
-      { label: "Colori simultanei", value: "Fino a 4 (AMS 2 Pro)" },
-      { label: "Altezza dello strato", value: "0,08 – 0,28 mm" },
-      { label: "Ugello", value: "0,4 mm" },
-      { label: "Camera chiusa", value: "Sì — telaio CoreXY rigido" },
+    legendHint: "Passate su un punto dello schema per individuare il componente",
+    printers: [
       {
-        label: "Essiccazione del filamento",
-        value: "Integrata nell’AMS 2 Pro",
+        variant: "p1s",
+        name: "Bambu Lab P1S",
+        sub: "+ AMS 2 Pro",
+        place: "Atelier di Gland (VD)",
+        blurb:
+          "Una CoreXY a camera chiusa, rapida e regolare. È la macchina storica dell’atelier: quella su cui è nato il catalogo.",
+        callouts: [
+          {
+            label: "AMS 2 Pro",
+            text: "Quattro bobine sempre caricate. Il sistema cambia filamento da solo durante la stampa e li mantiene asciutti.",
+          },
+          {
+            label: "Display e manopola",
+            text: "Il comando diretto: avviare, mettere in pausa, sorvegliare le temperature senza passare da un computer.",
+          },
+          {
+            label: "Testa di stampa",
+            text: "Ugello da 0,4 mm su un portale CoreXY — preciso anche ad alta velocità.",
+          },
+          {
+            label: "Camera chiusa",
+            text: "Stabilizza la temperatura e blocca le correnti d’aria: è ciò che evita il distacco dei pezzi grandi.",
+          },
+          {
+            label: "Piano riscaldato",
+            text: "Fa aderire il primo strato, poi libera il pezzo raffreddandosi. Superficie PEI testurizzata.",
+          },
+        ],
+        specs: [
+          { label: "Volume di stampa", value: "256 × 256 × 256 mm" },
+          { label: "Colori simultanei", value: "Fino a 4 (AMS 2 Pro)" },
+          { label: "Altezza dello strato", value: "0,08 – 0,28 mm" },
+          { label: "Ugello", value: "0,4 mm" },
+          { label: "Camera chiusa", value: "Sì — telaio CoreXY" },
+          {
+            label: "Essiccazione del filamento",
+            value: "Integrata nell’AMS 2 Pro",
+          },
+          { label: "Ingombro", value: "389 × 389 × 458 mm" },
+        ],
+      },
+      {
+        variant: "k2",
+        name: "Creality K2",
+        sub: "+ CFS",
+        place: "Atelier di Pully (VD)",
+        blurb:
+          "Più alta, più rapida, con vano filamenti a tenuta stagna. Raddoppia la capacità produttiva e si occupa delle serie.",
+        callouts: [
+          {
+            label: "Creality CFS",
+            text: "Quattro bobine in un vano stagno, con temperatura e umidità visualizzate. Il chip RFID comunica materiale e colore alla macchina.",
+          },
+          {
+            label: "Schermo tattile",
+            text: "Ampio display a colori sul fronte: coda di stampa, impostazioni e telecamera della camera, direttamente sulla macchina.",
+          },
+          {
+            label: "Testa di stampa",
+            text: "Estrusore diretto, ugello da 0,4 mm fino a 300 °C, con punte a 600 mm/s.",
+          },
+          {
+            label: "Camera chiusa",
+            text: "Camera chiusa e filtrata: trattiene il calore e le particelle durante la stampa.",
+          },
+          {
+            label: "Piano riscaldato",
+            text: "260 × 260 mm, con livellamento automatico prima di ogni stampa.",
+          },
+        ],
+        specs: [
+          { label: "Volume di stampa", value: "260 × 260 × 260 mm" },
+          { label: "Colori simultanei", value: "Fino a 4 (CFS)" },
+          { label: "Altezza dello strato", value: "0,05 – 0,3 mm" },
+          { label: "Ugello", value: "0,4 mm — fino a 300 °C" },
+          { label: "Velocità massima", value: "600 mm/s" },
+          {
+            label: "Conservazione filamenti",
+            value: "CFS stagno, umidità visualizzata",
+          },
+          { label: "Ingombro", value: "404 × 436 × 545 mm" },
+        ],
       },
     ],
 
@@ -608,7 +842,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       },
       {
         title: "Stampa",
-        text: "La P1S stampa il vostro pezzo strato dopo strato; l’AMS 2 Pro gestisce automaticamente fino a 4 colori.",
+        text: "Uno dei due atelier stampa il vostro pezzo strato dopo strato; il sistema multi-filamento gestisce da solo fino a 4 colori.",
       },
       {
         title: "Finitura & controllo",
@@ -652,8 +886,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     trustTitle: "Su cosa potete contare.",
     trust: [
       {
-        title: "Fabbricato a Gland",
-        text: "Ogni pezzo è stampato e controllato a mano nel nostro atelier vodese.",
+        title: "Fabbricato nell’arco lemanico",
+        text: "Ogni pezzo è stampato e controllato a mano in uno dei nostri due atelier vodesi.",
       },
       {
         title: "Garanzia 2 anni",
@@ -687,10 +921,11 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Cos’è la stampa 3D multicolore?",
         a: (
           <>
-            Grazie al sistema AMS 2 Pro, la stampante combina fino a 4 filamenti
-            in uno stesso pezzo: i colori sono integrati nella stampa, senza
-            vernice né assemblaggio. Il risultato esce nitido, direttamente
-            dalla macchina.
+            Entrambe le macchine hanno un sistema multi-filamento (AMS 2 Pro
+            sulla Bambu Lab, CFS sulla Creality). La stampante combina fino a 4
+            filamenti in uno stesso pezzo: i colori sono integrati nella stampa,
+            senza vernice né assemblaggio. Il risultato esce nitido,
+            direttamente dalla macchina.
           </>
         ),
       },
@@ -798,46 +1033,123 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   en: {
     metaTitle: "About — Swiss3Design",
     metaDescription:
-      "The Swiss3Design 3D-printing workshop in Gland (VD): our Bambu Lab P1S + AMS 2 Pro, our process, our materials and answers to your questions.",
+      "The Swiss3Design 3D-printing workshops in the Lake Geneva region: our two multicolour printers, our process, our materials and answers to your questions.",
 
-    badge: "Workshop in Gland (VD), Switzerland",
-    title: "Behind every piece, a Swiss workshop.",
+    badge: "Two workshops in the Lake Geneva region",
+    title: "Behind every piece, two Swiss workshops.",
     intro: (
       <>
-        Swiss3Design is a 3D-printing workshop based in <strong>Gland</strong>,
-        in the canton of Vaud. Behind every object: a precision printer,
-        carefully chosen materials, and a person who checks every piece by hand
-        before sending it to you. No factory, no middleman — print on demand,
-        designed and made in Switzerland.
+        Swiss3Design is two 3D-printing workshops in the{" "}
+        <strong>Lake Geneva region</strong>, between Gland and Pully. Two
+        multicolour printers, carefully chosen materials, and every time a
+        person who checks the piece by hand before sending it to you. No
+        factory, no middleman — print on demand, designed and made in
+        Switzerland.
       </>
     ),
 
     stats: [
-      { value: "100%", label: "made and checked in Gland" },
+      { value: "2", label: "workshops in the Lake Geneva region" },
       { value: "Up to 4", label: "colours in a single piece" },
       { value: "2 years", label: "statutory warranty" },
       { value: "48 h", label: "to reply to your project" },
     ],
 
     equipmentKicker: "Our equipment",
-    equipmentTitle: "A Bambu Lab P1S, fitted with the AMS 2 Pro.",
+    equipmentTitle: "Two multicolour printers, two workshops.",
     equipmentText: (
       <>
-        All our pieces come off a <strong>Bambu Lab P1S</strong> fitted with the{" "}
-        <strong>AMS 2 Pro</strong> multi-filament system. It’s an enclosed
-        CoreXY printer, fast and precise, able to combine up to four colours in
-        a single object. The AMS 2 Pro also keeps the filaments dry, for
-        consistent quality from one print to the next.
+        Our pieces come off two enclosed printers, each with its own
+        multi-filament system: a <strong>Bambu Lab P1S</strong> in Gland and a{" "}
+        <strong>Creality K2</strong> in Pully. Both combine up to four colours
+        in a single object and keep the filaments away from moisture — that’s
+        what keeps quality consistent, whichever workshop starts the print.
       </>
     ),
     specsTitle: "Specifications",
-    specs: [
-      { label: "Build volume", value: "256 × 256 × 256 mm" },
-      { label: "Simultaneous colours", value: "Up to 4 (AMS 2 Pro)" },
-      { label: "Layer height", value: "0.08 – 0.28 mm" },
-      { label: "Nozzle", value: "0.4 mm" },
-      { label: "Enclosed chamber", value: "Yes — rigid CoreXY frame" },
-      { label: "Filament drying", value: "Built into the AMS 2 Pro" },
+    legendHint: "Hover a marker on the diagram to locate the part",
+    printers: [
+      {
+        variant: "p1s",
+        name: "Bambu Lab P1S",
+        sub: "+ AMS 2 Pro",
+        place: "Gland workshop (VD)",
+        blurb:
+          "An enclosed CoreXY printer, fast and consistent. The workshop’s original machine — the one the whole catalogue was developed on.",
+        callouts: [
+          {
+            label: "AMS 2 Pro",
+            text: "Four spools loaded at all times. The system swaps filament on its own mid-print and keeps them dry.",
+          },
+          {
+            label: "Screen + dial",
+            text: "Direct control: start, pause and watch temperatures without going through a computer.",
+          },
+          {
+            label: "Print head",
+            text: "A 0.4 mm nozzle on a CoreXY gantry — precise even at high speed.",
+          },
+          {
+            label: "Enclosed chamber",
+            text: "It steadies the temperature and blocks draughts — that’s what stops large pieces lifting off the bed.",
+          },
+          {
+            label: "Heated bed",
+            text: "It makes the first layer stick, then releases the piece as it cools. Textured PEI surface.",
+          },
+        ],
+        specs: [
+          { label: "Build volume", value: "256 × 256 × 256 mm" },
+          { label: "Simultaneous colours", value: "Up to 4 (AMS 2 Pro)" },
+          { label: "Layer height", value: "0.08 – 0.28 mm" },
+          { label: "Nozzle", value: "0.4 mm" },
+          { label: "Enclosed chamber", value: "Yes — CoreXY frame" },
+          { label: "Filament drying", value: "Built into the AMS 2 Pro" },
+          { label: "Footprint", value: "389 × 389 × 458 mm" },
+        ],
+      },
+      {
+        variant: "k2",
+        name: "Creality K2",
+        sub: "+ CFS",
+        place: "Pully workshop (VD)",
+        blurb:
+          "Taller, faster, with an airtight filament bay. It doubles production capacity and takes on the batch runs.",
+        callouts: [
+          {
+            label: "Creality CFS",
+            text: "Four spools in an airtight bay, with temperature and humidity on display. The RFID chip tells the printer the material and colour.",
+          },
+          {
+            label: "Touchscreen",
+            text: "Large colour display on the front: print queue, settings and chamber camera, right on the machine.",
+          },
+          {
+            label: "Print head",
+            text: "Direct-drive extruder, 0.4 mm nozzle up to 300 °C, peaking at 600 mm/s.",
+          },
+          {
+            label: "Enclosed chamber",
+            text: "A closed, filtered chamber: it holds the heat and traps particles while printing.",
+          },
+          {
+            label: "Heated bed",
+            text: "260 × 260 mm, with automatic levelling before every print.",
+          },
+        ],
+        specs: [
+          { label: "Build volume", value: "260 × 260 × 260 mm" },
+          { label: "Simultaneous colours", value: "Up to 4 (CFS)" },
+          { label: "Layer height", value: "0.05 – 0.3 mm" },
+          { label: "Nozzle", value: "0.4 mm — up to 300 °C" },
+          { label: "Top speed", value: "600 mm/s" },
+          {
+            label: "Filament storage",
+            value: "Airtight CFS, humidity on display",
+          },
+          { label: "Footprint", value: "404 × 436 × 545 mm" },
+        ],
+      },
     ],
 
     processKicker: "The process",
@@ -853,7 +1165,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       },
       {
         title: "Printing",
-        text: "The P1S prints your piece layer by layer; the AMS 2 Pro automatically handles up to 4 colours.",
+        text: "One of the two workshops prints your piece layer by layer; the multi-filament system handles up to 4 colours on its own.",
       },
       {
         title: "Finishing & checks",
@@ -896,8 +1208,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     trustTitle: "What you can rely on.",
     trust: [
       {
-        title: "Made in Gland",
-        text: "Every piece is printed and checked by hand in our Vaud workshop.",
+        title: "Made in the Lake Geneva region",
+        text: "Every piece is printed and checked by hand in one of our two Vaud workshops.",
       },
       {
         title: "2-year warranty",
@@ -930,10 +1242,10 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "What is multicolour 3D printing?",
         a: (
           <>
-            Thanks to the AMS 2 Pro system, the printer combines up to 4
-            filaments in a single piece: the colours are part of the print, with
-            no painting or assembly. The result comes out clean, straight from
-            the machine.
+            Both machines have a multi-filament system (AMS 2 Pro on the Bambu
+            Lab, CFS on the Creality). The printer combines up to 4 filaments in
+            a single piece: the colours are part of the print, with no painting
+            or assembly. The result comes out clean, straight from the machine.
           </>
         ),
       },
