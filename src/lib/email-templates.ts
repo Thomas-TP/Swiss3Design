@@ -38,7 +38,7 @@ function esc(input: string): string {
 function layout(title: string, body: string, footer: string): string {
   // Mode sombre e-mail : on assombrit le chrome de la page et on garde la
   // carte blanche (toujours lisible quel que soit le client mail). Le logo
-  // bascule sur sa variante blanche via prefers-color-scheme.
+  // (rouge de marque, sans blanc/noir) reste identique dans les deux modes.
   return `<!doctype html>
 <html>
 <head>
@@ -51,8 +51,6 @@ function layout(title: string, body: string, footer: string): string {
     .s3d-body { background:#0c0a09 !important; }
     .s3d-brand { color:#fafaf9 !important; }
     .s3d-footer { color:#a8a29e !important; }
-    .s3d-logo-light { display:none !important; }
-    .s3d-logo-dark { display:inline-block !important; }
   }
 </style>
 </head>
@@ -61,8 +59,7 @@ function layout(title: string, body: string, footer: string): string {
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
       <tr>
         <td style="padding-right:9px;line-height:0;vertical-align:middle;">
-          <img class="s3d-logo-light" src="${SITE_URL}/brand/png/icon-ink-64.png" alt="" width="30" height="30" style="display:block;border:0;outline:none;width:30px;height:30px;" />
-          <img class="s3d-logo-dark" src="${SITE_URL}/brand/png/icon-white-64.png" alt="" width="30" height="30" style="display:none;border:0;outline:none;width:30px;height:30px;" />
+          <img src="${SITE_URL}/brand/png/icon-64.png" alt="" width="30" height="30" style="display:block;border:0;outline:none;width:30px;height:30px;" />
         </td>
         <td class="s3d-brand" style="vertical-align:middle;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:17px;letter-spacing:-0.2px;color:#1c1917;">
           <span style="font-weight:500;">Swiss</span><span style="font-weight:700;">3Design</span>

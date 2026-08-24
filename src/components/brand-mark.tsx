@@ -1,8 +1,6 @@
-// Swiss3Design logomark — vectorised isometric cube with 180° rotational symmetry:
-// an ink/white "L" (bottom-left) and its mirrored red twin (top-right).
-// The neutral ribbon uses `currentColor` so it themes with the surrounding text.
-
-const RED = "#E5231C";
+// Swiss3Design logomark — pic géométrique en couches (impression 3D additive),
+// rouge de marque uniquement (pas de blanc/noir dans le mark) : un seul asset
+// fonctionne aussi bien en thème clair qu'en thème sombre.
 
 export function BrandMark({
   className,
@@ -12,23 +10,6 @@ export function BrandMark({
   title?: string;
 }) {
   return (
-    <svg
-      viewBox="0 0 300 300"
-      className={className}
-      fill="none"
-      role={title ? "img" : undefined}
-      aria-label={title}
-      aria-hidden={title ? undefined : true}
-    >
-      {title ? <title>{title}</title> : null}
-      <polygon
-        points="53,84 91,64 93,159 195,240 159,266 52,201"
-        fill="currentColor"
-      />
-      <polygon
-        points="251,220 213,240 211,145 109,64 145,38 252,103"
-        fill={RED}
-      />
-    </svg>
+    <img src="/brand/webp/mark.webp" alt={title ?? ""} className={className} />
   );
 }
