@@ -56,6 +56,20 @@ export async function generateMetadata({
       template: "%s · Swiss3Design",
     },
     description: meta.description,
+    // Icônes déclarées à la main (et non via les conventions app/icon.png &
+    // app/apple-icon.png) : Next inline les fichiers de ces conventions en
+    // base64 DANS le bundle du Worker, qui est plafonné à 3 Mio — un jeu
+    // d'icônes complet suffisait à faire échouer le deploy. Servies depuis
+    // public/, elles passent par les static assets Cloudflare : hors bundle,
+    // donc leur poids n'entre plus jamais dans ce plafond.
+    icons: {
+      icon: [
+        { url: "/brand/app/icon.webp", type: "image/webp" },
+        { url: "/brand/app/icon-192.png", type: "image/png" },
+      ],
+      shortcut: "/favicon.ico",
+      apple: "/brand/app/apple-icon.png",
+    },
     openGraph: {
       type: "website",
       siteName: "Swiss3Design",
