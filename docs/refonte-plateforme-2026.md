@@ -274,7 +274,8 @@ plus qu'à l'escalade humaine.
 
 ## 4. Système de design
 
-La charte (rouge `#E5231C` / encre / papier, Geist Sans, cube isométrique)
+La charte (rouge `#E5231C` / encre / papier, Geist Sans, pic géométrique en
+couches — le cube isométrique d'origine est archivé dans `public/brand/old-logo/`)
 est saine et déjà appliquée avec rigueur — **on la garde**. Toute nouvelle
 déclinaison visuelle reste soumise à validation avant usage (contrainte de
 marque). Le travail est de la *systématiser*, pas de la remplacer.

@@ -1,9 +1,6 @@
 <div align="center">
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="public/brand/png/logo-dark-960.png" />
-  <img alt="Swiss3Design" src="public/brand/png/logo-light-960.png" width="380" />
-</picture>
+<img alt="Swiss3Design" src="public/brand/app/icon-512.png" width="120" />
 
 ### Impression 3D multicolore en Suisse
 
@@ -148,21 +145,32 @@ en accent, typographie nette, et un logomark géométrique.
 | ⚫ Encre (texte) | `#1A1614` clair · `#F4F1ED` sombre |
 | ⚪ Papier (fond) | `#FAFAF9` clair · `#0B0A09` sombre |
 | 🔤 Police | **Geist Sans** (`next/font`) |
-| 🧊 Logo | Cube isométrique, symétrie 180° : un « L » encre + son miroir rouge |
+| ⛰️ Logo | Pic géométrique en couches — couches d'impression + clin d'œil alpin |
 
-Le **kit de marque** complet est versionné dans [`public/brand/`](public/brand) :
+Le logo est en **rouge de marque uniquement, sur fond transparent** : ni blanc
+ni noir dans le mark, donc **un seul fichier** suffit pour le thème clair et le
+thème sombre (plus de variantes `-light` / `-dark` à maintenir).
 
-- **Logos** — `svg/`, `png/`, `webp/`, `jpg/` en variantes claire/sombre et
-  plusieurs tailles (480 / 960 / 1896 px).
-- **Icônes / favicon** — `app/` (favicon.ico, icon.svg, apple-icon, icônes PWA
-  192/512) et déclinaisons mono encre/blanc de 16 à 512 px.
+Le **kit de marque** est versionné dans [`public/brand/`](public/brand) :
+
+- **Mark** — `webp/mark.webp` (transparent), rendu par
+  [`src/components/brand-mark.tsx`](src/components/brand-mark.tsx) dans le
+  header, le footer et les pages de compte.
+- **Icônes / favicon** — `../favicon.ico` (16/32/48, PNG embarqués avec alpha),
+  `app/icon.webp` (Chrome), `app/apple-icon.png` (iOS), `app/icon-192.png` &
+  `app/icon-512.png` (PWA). Déclarées via `metadata.icons` — **jamais** par les
+  conventions `app/icon.*` de Next, qui les feraient entrer dans le bundle du
+  Worker (voir règle d'or 10 dans [`AGENTS.md`](AGENTS.md)).
 - **Réseaux sociaux** — `social/og-image.png` (1200 × 630, balises Open Graph
   & Twitter Card).
+- **Ancien logo** — `old-logo/` : le cube isométrique et tout son kit, archivés
+  lors du changement de logo (août 2026). Conservés pour référence, jamais
+  référencés par l'app.
 - **Illustrations produits** — [`public/products/`](public/products) (SVG).
 
-> 🎨 **Contraintes de marque** : rouge / noir / blanc uniquement ; pas de « 3 »,
-> pas de « S », pas de cliché d'impression 3D. Toute nouvelle identité visuelle
-> doit être validée avant usage.
+> 🎨 **Contraintes de marque** : rouge de marque `#E5231C` sur neutres chauds ;
+> pas de blanc ni de noir *dans* le mark ; pas de « 3 », pas de « S ». Toute
+> nouvelle identité visuelle doit être validée avant usage.
 
 ---
 
@@ -214,7 +222,7 @@ Swiss3Design/
 ├─ drizzle/                       # Migrations D1/SQLite legacy (filet de secours) — NE PAS éditer à la main
 ├─ messages/                      # Traductions next-intl (fr, de, it, en)
 ├─ public/
-│  ├─ brand/                      # Kit de marque (logos, icônes, og-image)
+│  ├─ brand/                      # Kit de marque (mark, icônes, og-image) + old-logo/ archivé
 │  ├─ products/                   # Illustrations produits (SVG)
 │  ├─ avatars/                    # Avatars par défaut
 │  ├─ about/                      # Photos page « À propos »

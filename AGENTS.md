@@ -110,6 +110,22 @@ now as a rollback safety net, not the active database.
    **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
+10. **The Worker bundle has ~120 KiB of headroom under a hard 3 MiB cap. Never
+   add a binary asset through a Next file convention.** The Workers **Free**
+   plan caps a Worker at 3 MiB **gzipped** (`Total Upload: … / gzip:` in the
+   deploy log is the number that counts — the uncompressed figure is 5× larger
+   and irrelevant). The `app/icon.*` & `app/apple-icon.*` conventions inline
+   their file as base64 **into that bundle** — a full icon set cost ~135 KiB
+   and broke the deploy in August 2026 (`error 10027`). Icons therefore live in
+   `public/` and are declared via `metadata.icons` in
+   [`src/app/[locale]/layout.tsx`](src/app/[locale]/layout.tsx): `public/` ships
+   as Cloudflare **static assets**, outside the bundle and outside the cap. The
+   same trap applies to `opengraph-image.*`, `twitter-image.*` and any
+   `import`ed image. Measure before pushing — `bunx wrangler deploy --dry-run`
+   prints the gzip size in ~1 min without deploying. Known remaining fat:
+   `three.js` sits in the **server** bundle (~718 KiB raw) because the 3D
+   viewer's client component is server-rendered; moving it out is the next real
+   win if headroom runs short.
 
 ## Tech stack
 
@@ -261,6 +277,15 @@ under D1.
 
 ## Brand constraints
 
-Red / black / white only. Brand red `#E5231C`. No "3", no "S", no 3D-printing
-cliché. Logo = isometric cube, 180° symmetry. Brand kit in `public/brand/`.
-**Any new visual must be validated before use.**
+Brand red `#E5231C`, over warm neutral ink/paper. Logo = layered geometric peak
+(stacked print layers + alpine nod), **brand red only — no white or black inside
+the mark**, so a single asset works on both the light and the dark theme. No
+"3", no "S". Brand kit in `public/brand/`; the previous logo (isometric cube,
+180° symmetry, ink + red) is archived under `public/brand/old-logo/` — kept for
+reference, never referenced by the app.
+
+The mark is a **raster** image (`public/brand/webp/mark.webp`, rendered by
+[`src/components/brand-mark.tsx`](src/components/brand-mark.tsx)), unlike the
+old inline-SVG mark: it can't be recoloured with `currentColor`, and it does
+not scale to a legible 16 px favicon on its own — see golden rule 10 before
+regenerating the icon set. **Any new visual must be validated before use.**
