@@ -44,10 +44,17 @@ function TwoFactor() {
   async function onEnable() {
     setPending(true);
     setError(null);
-    const { data: res, error: err } = await twoFactor.enable({ password });
+    const { data: res, error: err } = await twoFactor.enable({
+      password,
+      method: "totp",
+    });
     setPending(false);
     if (err || !res) {
       setError(errorMessage(err, t("security.errorPassword")));
+      return;
+    }
+    if (res.method !== "totp") {
+      setError(t("security.errorGeneric"));
       return;
     }
     setSetup({ uri: res.totpURI, codes: res.backupCodes });

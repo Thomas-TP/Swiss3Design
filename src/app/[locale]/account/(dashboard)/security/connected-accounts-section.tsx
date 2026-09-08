@@ -14,26 +14,41 @@ export function ConnectedAccountsSection({
 }) {
   const t = useTranslations("account");
   const locale = useLocale();
-  const [linked, setLinked] = useState<string[] | null>(null);
+  const [accounts, setAccounts] = useState<
+    { providerId: string; accountId: string }[] | null
+  >(null);
   const [pending, setPending] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   async function load() {
     const { data } = await listAccounts();
-    setLinked((data ?? []).map((a) => a.providerId));
+    setAccounts(
+      (data ?? []).map((a) => ({
+        providerId: a.providerId,
+        accountId: a.accountId,
+      })),
+    );
   }
 
   useEffect(() => {
     let cancelled = false;
     listAccounts().then(({ data }) => {
-      if (!cancelled) setLinked((data ?? []).map((a) => a.providerId));
+      if (!cancelled)
+        setAccounts(
+          (data ?? []).map((a) => ({
+            providerId: a.providerId,
+            accountId: a.accountId,
+          })),
+        );
     });
     return () => {
       cancelled = true;
     };
   }, []);
 
-  if (providers.length === 0 || linked === null) return null;
+  if (providers.length === 0 || accounts === null) return null;
+
+  const linked = accounts.map((a) => a.providerId);
 
   async function onLink(provider: string) {
     setPending(provider);
@@ -45,9 +60,13 @@ export function ConnectedAccountsSection({
   }
 
   async function onUnlink(provider: string) {
+    const account = accounts?.find((a) => a.providerId === provider);
+    if (!account) return;
     setPending(provider);
     setError(null);
-    const { error: err } = await unlinkAccount({ providerId: provider });
+    const { error: err } = await unlinkAccount({
+      accountId: account.accountId,
+    });
     setPending(null);
     if (err) {
       setError(t("security.connected.errorUnlink"));
