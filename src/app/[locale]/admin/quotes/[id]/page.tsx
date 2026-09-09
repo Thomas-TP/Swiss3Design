@@ -6,7 +6,7 @@ import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { quoteRequests, quoteMessages } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
-import { formatChf } from "@/lib/format";
+import { formatChf, renderTime } from "@/lib/format";
 import { updateQuote } from "../actions";
 import {
   QUOTE_STATUSES,
@@ -44,8 +44,7 @@ export default async function AdminQuoteDetailPage({
     ["Dimensions", quote.dimensions],
   ].filter(([, v]) => v);
 
-  // Server component dynamique : l'horloge est stable sur la durée du rendu
-  const now = Date.now();
+  const now = renderTime();
   const quoteExpired = !!quote.validUntil && quote.validUntil.getTime() < now;
 
   return (

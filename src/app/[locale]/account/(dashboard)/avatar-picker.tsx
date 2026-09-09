@@ -79,12 +79,13 @@ export function AvatarPicker({ current }: { current: string | null }) {
         <div className="absolute left-0 top-full z-30 mt-2 w-60 rounded-xl border border-line bg-surface p-3.5 shadow-lg shadow-ink/5">
           <p className="text-xs font-semibold text-soft">{t("avatarTitle")}</p>
           <div className="mt-2.5 grid grid-cols-5 gap-2">
-            {AVATARS.map((a) => (
+            {AVATARS.map((a, i) => (
               <button
                 key={a}
                 type="button"
                 onClick={() => pick(a)}
                 disabled={saving !== null}
+                aria-label={t("avatarOption", { n: i + 1 })}
                 className={`overflow-hidden rounded-full ring-2 ring-offset-2 ring-offset-surface transition-all hover:scale-105 ${
                   current === a
                     ? "ring-accent"

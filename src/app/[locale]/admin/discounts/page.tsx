@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import { getDb } from "@/db";
 import { discountCodes } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
-import { formatChf } from "@/lib/format";
+import { formatChf, renderTime } from "@/lib/format";
 import { BTN_PRIMARY } from "../ui";
 
 export default async function AdminDiscountsPage() {
@@ -15,8 +15,7 @@ export default async function AdminDiscountsPage() {
     .from(discountCodes)
     .orderBy(desc(discountCodes.createdAt));
 
-  // Server component dynamique : l'horloge est stable sur la durée du rendu
-  const now = Date.now();
+  const now = renderTime();
 
   return (
     <div>

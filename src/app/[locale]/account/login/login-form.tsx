@@ -376,7 +376,8 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
           name="email"
           type="email"
           required
-          autoComplete="email webauthn"
+          // oxlint-disable-next-line autocomplete-valid -- "username webauthn" est la valeur standard pour l'autofill de cle d'acces (conditional UI WebAuthn) ; faux positif connu de la regle, portee de eslint-plugin-jsx-a11y (cf. sveltejs/svelte#8568), qui ne reconnait pas le token "webauthn" du spec
+          autoComplete="username webauthn"
           className={field}
         />
       </div>

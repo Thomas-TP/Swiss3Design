@@ -10,7 +10,7 @@ import { quoteRequests } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { getStripe } from "@/lib/stripe";
 import { markQuotePaid } from "@/lib/orders";
-import { formatChf } from "@/lib/format";
+import { formatChf, renderTime } from "@/lib/format";
 import { QuotePayFlow } from "./quote-pay-flow";
 
 export const dynamic = "force-dynamic";
@@ -74,8 +74,7 @@ export default async function QuotePayPage({
     }
   }
 
-  // Server component dynamique : l'horloge est stable sur la durée du rendu
-  const now = Date.now();
+  const now = renderTime();
   const expired = !!quote.validUntil && quote.validUntil.getTime() < now;
   const payable =
     !paid &&

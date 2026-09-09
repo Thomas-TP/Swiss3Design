@@ -27,7 +27,12 @@ export function AboutNav({ items }: { items: AboutNavItem[] }) {
   const [activeId, setActiveId] = useState(items[0]?.id);
   const listRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef(items);
-  itemsRef.current = items;
+  // Écrire dans un ref pendant le rendu n'est pas garanti par React (lecture
+  // seulement dans des callbacks hors rendu ici, mais on synchronise via un
+  // effet plutôt que dans le corps du composant pour rester dans le contrat).
+  useEffect(() => {
+    itemsRef.current = items;
+  }, [items]);
 
   useEffect(() => {
     function computeActive() {

@@ -152,8 +152,10 @@ put` on an environment with real users without `--env <name>` explicitly
    **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
-10. **The Worker bundle has ~120 KiB of headroom under a hard 3 MiB cap. Never
-    add a binary asset through a Next file convention.** The Workers **Free**
+10. **The Worker bundle has ~312 KiB of headroom under a hard 3 MiB cap (2026-09-09
+    measurement — grew from ~120 KiB after the pg/oxlint migration, re-measure
+    rather than trust this figure as it ages). Never add a binary asset through
+    a Next file convention.** The Workers **Free**
     plan caps a Worker at 3 MiB **gzipped** (`Total Upload: … / gzip:` in the
     deploy log is the number that counts — the uncompressed figure is 5× larger
     and irrelevant). The `app/icon.*` & `app/apple-icon.*` conventions inline

@@ -19,7 +19,7 @@ import {
   productTranslations,
   user,
 } from "@/db/schema";
-import { formatChf } from "@/lib/format";
+import { formatChf, renderTime } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { ORDER_STATUS_FR, QUOTE_STATUS_FR, STATUS_STYLE } from "./ui";
 
@@ -85,8 +85,7 @@ export default async function AdminDashboard({
   const paidOrders = allOrders.filter((o) => paidStatuses.has(o.status));
   const revenueCents = paidOrders.reduce((sum, o) => sum + o.totalCents, 0);
 
-  // Server component dynamique : rendu à chaque requête, l'horloge est stable
-  const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+  const thirtyDaysAgo = new Date(renderTime() - 30 * 24 * 60 * 60 * 1000);
   const paid30d = paidOrders.filter((o) => o.createdAt >= thirtyDaysAgo);
   const revenue30dCents = paid30d.reduce((sum, o) => sum + o.totalCents, 0);
   const avgBasketCents =

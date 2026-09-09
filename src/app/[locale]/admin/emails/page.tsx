@@ -14,6 +14,7 @@ import {
   resetPasswordEmail,
 } from "@/lib/email-templates";
 import { requireAdmin } from "@/lib/session";
+import { renderTime } from "@/lib/format";
 
 const PREVIEW_LOCALES = ["fr", "de", "it", "en"] as const;
 
@@ -47,8 +48,8 @@ export default async function AdminEmailsPage({
     { nameSnapshot: "Vase Spirale", priceCentsSnapshot: 2990, quantity: 1 },
     { nameSnapshot: "Porte-clés relief", priceCentsSnapshot: 995, quantity: 2 },
   ];
-  // Aperçu : validité fictive à +30 j (horloge stable sur la durée du rendu)
-  const validUntilPreview = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+  // Aperçu : validité fictive à +30 j
+  const validUntilPreview = new Date(renderTime() + 30 * 24 * 60 * 60 * 1000);
 
   const customerPreviews = [
     {

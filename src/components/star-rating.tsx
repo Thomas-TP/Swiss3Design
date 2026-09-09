@@ -11,6 +11,7 @@ export function StarRating({
 }) {
   const rounded = Math.round(value);
   return (
+    // oxlint-disable prefer-tag-over-role -- graphique composite (5 icones Star), aucune balise <img> n'existe pour ca ; role="img" + aria-label est le pattern WAI-ARIA standard pour l'annoncer comme une seule image
     <span
       role="img"
       className="inline-flex items-center"
@@ -24,5 +25,6 @@ export function StarRating({
         />
       ))}
     </span>
+    // oxlint-enable prefer-tag-over-role
   );
 }

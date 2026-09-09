@@ -15,7 +15,7 @@ import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
 import { quoteRequests, quoteMessages } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
-import { formatChf } from "@/lib/format";
+import { formatChf, renderTime } from "@/lib/format";
 import { QuoteActions } from "./quote-actions";
 
 export const dynamic = "force-dynamic";
@@ -82,8 +82,7 @@ export default async function QuoteDetailPage({
     [td("specDimensions"), quote.dimensions],
   ].filter(([, v]) => v) as [string, string][];
 
-  // Server component dynamique : l'horloge est stable sur la durée du rendu
-  const now = Date.now();
+  const now = renderTime();
   const hasQuote = quote.quotedPriceCents != null && quote.quotedPriceCents > 0;
   const expired =
     !!quote.validUntil &&

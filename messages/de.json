@@ -272,6 +272,7 @@
     },
     "avatarTitle": "Avatar wählen",
     "avatarChange": "Avatar ändern",
+    "avatarOption": "Avatar {n}",
     "profile": {
       "title": "Profil",
       "subtitle": "Ihr Name, Ihre E-Mail-Adresse und die Sprache der Oberfläche.",

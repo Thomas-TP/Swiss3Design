@@ -664,6 +664,7 @@ export function PrinterSchematic({
   const dimmed = active !== null;
 
   return (
+    // oxlint-disable prefer-tag-over-role -- SVG inline interactif (annotations survolables), role="img" + aria-label/<title> est le pattern WAI-ARIA standard pour un SVG accessible, pas de balise <img> possible ici
     <svg
       viewBox={`0 0 ${g.frameW} ${g.frameH}`}
       className="block h-auto w-full text-ink"
@@ -806,5 +807,6 @@ export function PrinterSchematic({
         })}
       </g>
     </svg>
+    // oxlint-enable prefer-tag-over-role
   );
 }

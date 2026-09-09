@@ -272,6 +272,7 @@
     },
     "avatarTitle": "Choose an avatar",
     "avatarChange": "Change avatar",
+    "avatarOption": "Avatar {n}",
     "profile": {
       "title": "Profile",
       "subtitle": "Your name, email and interface language.",

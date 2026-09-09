@@ -55,6 +55,7 @@ export function LocaleSwitcher() {
           className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
+      {/* oxlint-disable prefer-tag-over-role -- liste deroulante maison stylee (les <select>/<option> natifs ne se stylent pas), role="listbox"/"option" est le pattern WAI-ARIA standard pour ce cas */}
       {open && (
         <div
           role="listbox"
@@ -82,6 +83,7 @@ export function LocaleSwitcher() {
           ))}
         </div>
       )}
+      {/* oxlint-enable prefer-tag-over-role */}
     </div>
   );
 }
