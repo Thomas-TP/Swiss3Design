@@ -13,7 +13,7 @@
 
 ## Checklist
 
-- [ ] `bun run lint` passe (Biome)
+- [ ] `bun run lint` passe (Oxlint)
 - [ ] Testé en local (`bun run dev`)
 - [ ] `bun run preview` si le changement touche la CSP / scripts inline / runtime
 - [ ] Migration générée (`bun run db:generate:pg` + `db:push:pg`) si `src/db/schema.pg.ts` a changé

@@ -10,11 +10,11 @@
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": ".open-next/assets",
-    "binding": "ASSETS"
+    "binding": "ASSETS",
   },
   "routes": [
     { "pattern": "swiss3design.ch", "custom_domain": true },
-    { "pattern": "www.swiss3design.ch", "custom_domain": true }
+    { "pattern": "www.swiss3design.ch", "custom_domain": true },
   ],
   // Le domaine est en place : l'URL workers.dev est coupée (contenu dupliqué)
   "workers_dev": false,
@@ -23,20 +23,20 @@
       "binding": "DB",
       "database_name": "swiss3design-db",
       "database_id": "a87e4231-6f56-4c18-9ead-42bb9a47d5fe",
-      "migrations_dir": "drizzle"
-    }
+      "migrations_dir": "drizzle",
+    },
   ],
   "r2_buckets": [
     {
       "binding": "R2",
-      "bucket_name": "swiss3design-files"
-    }
+      "bucket_name": "swiss3design-files",
+    },
   ],
   "kv_namespaces": [
     {
       "binding": "KV",
-      "id": "4d8b410c8ea743d281c530570668e837"
-    }
+      "id": "4d8b410c8ea743d281c530570668e837",
+    },
   ],
   // Postgres (Neon) via Hyperdrive — base active (pivot 2026-07-09, voir
   // AGENTS.md). Le binding D1 ci-dessus reste câblé comme filet de secours
@@ -44,17 +44,17 @@
   "hyperdrive": [
     {
       "binding": "HYPERDRIVE",
-      "id": "ea1ca31861f64d3e9e1f082ee0e10033"
-    }
+      "id": "ea1ca31861f64d3e9e1f082ee0e10033",
+    },
   ],
   "services": [
     {
       "binding": "WORKER_SELF_REFERENCE",
-      "service": "swiss3design"
-    }
+      "service": "swiss3design",
+    },
   ],
   "observability": {
-    "enabled": true
+    "enabled": true,
   },
   // ADMIN_EMAILS n'est PAS ici : dépôt public, posé comme secret Cloudflare
   // (`wrangler secret put ADMIN_EMAILS`) plutôt qu'en var en clair — même
@@ -75,7 +75,7 @@
     // à la preview d'utiliser la clé TEST alors que le build embarque la
     // clé de .env.production. Doit correspondre au STRIPE_SECRET_KEY du
     // même environnement (même compte, même mode live/test).
-    "STRIPE_PUBLISHABLE_KEY": "pk_live_51TgkbnK4o7ey3lG5X2NE0ujxVeMTP1YdHK6gxgefCazQEeX6m5MMDAWPJKWMndMXrcS6tvxR8oXMJ00AxPqnJARb00q2dn8APu"
+    "STRIPE_PUBLISHABLE_KEY": "pk_live_51TgkbnK4o7ey3lG5X2NE0ujxVeMTP1YdHK6gxgefCazQEeX6m5MMDAWPJKWMndMXrcS6tvxR8oXMJ00AxPqnJARb00q2dn8APu",
   },
   // Environnement de preview : Worker séparé (swiss3design-preview), bindings
   // isolés (D1/R2/KV propres, vides — aucune donnée client), sans route sur le
@@ -95,8 +95,8 @@
           "binding": "DB",
           "database_name": "swiss3design-preview-db",
           "database_id": "f4b2c6c5-0fe8-42a3-9aad-5a7a22378d6d",
-          "migrations_dir": "drizzle"
-        }
+          "migrations_dir": "drizzle",
+        },
       ],
       // Branche Neon isolée "preview" (child de "production", jamais les
       // vraies données clients — voir stack-pivot-medusa-to-hyperdrive.md) :
@@ -107,29 +107,29 @@
       "hyperdrive": [
         {
           "binding": "HYPERDRIVE",
-          "id": "4262c933ec8f45259643b190d701e8cd"
-        }
+          "id": "4262c933ec8f45259643b190d701e8cd",
+        },
       ],
       "r2_buckets": [
         {
           "binding": "R2",
-          "bucket_name": "swiss3design-preview-files"
-        }
+          "bucket_name": "swiss3design-preview-files",
+        },
       ],
       "kv_namespaces": [
         {
           "binding": "KV",
-          "id": "8893ee22e6cf4ccca1b5c2a5dd23ef86"
-        }
+          "id": "8893ee22e6cf4ccca1b5c2a5dd23ef86",
+        },
       ],
       "services": [
         {
           "binding": "WORKER_SELF_REFERENCE",
-          "service": "swiss3design-preview"
-        }
+          "service": "swiss3design-preview",
+        },
       ],
       "observability": {
-        "enabled": true
+        "enabled": true,
       },
       // ADMIN_EMAILS n'est pas ici non plus — même secret Cloudflare que la
       // prod, posé via `wrangler secret put ADMIN_EMAILS --env preview`.
@@ -142,8 +142,8 @@
         "STRIPE_PAYMENT_METHOD_CONFIGURATION": "",
         // Clé publiable TEST (même compte que la prod) — appairée avec le
         // secret STRIPE_SECRET_KEY (sk_test) posé via wrangler secret put.
-        "STRIPE_PUBLISHABLE_KEY": "pk_test_51TgkbnK4o7ey3lG5CAqK0NBqFazy43LthNOQ0IKgmiTwv6ni7Cd4yiuaM6M0gb5XHF3HI4PAlYCFlqFr9BNIMND000iDY9eEiF"
-      }
-    }
-  }
+        "STRIPE_PUBLISHABLE_KEY": "pk_test_51TgkbnK4o7ey3lG5CAqK0NBqFazy43LthNOQ0IKgmiTwv6ni7Cd4yiuaM6M0gb5XHF3HI4PAlYCFlqFr9BNIMND000iDY9eEiF",
+      },
+    },
+  },
 }

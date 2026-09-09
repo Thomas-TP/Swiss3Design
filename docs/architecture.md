@@ -14,7 +14,7 @@ static assets. There is **no Node.js server** — code runs on the Workers
 Consequences that shape the whole codebase:
 
 - **Bindings are per-request.** `env.HYPERDRIVE` / `env.R2` / `env.KV` only exist
-  while handling a request. Get them through `getCloudflareContext()` *inside*
+  while handling a request. Get them through `getCloudflareContext()` _inside_
   the handler (wrapped by `getDb()` / `getAuth()`), never at import time.
 - **Middleware must be Edge.** `src/middleware.ts` stays on the Edge runtime;
   Next 16's `proxy.ts` (Node) is not deployable here.
@@ -45,6 +45,7 @@ inactive rollback safety net from the 2026-07-09 stack pivot — not the source
 of truth.
 
 ### Catalogue
+
 - **products** — `slug`, `priceCents`, `saleType` (`stock` | `on_demand`),
   `productionDays`, `material`, `dimensionsMm`, `weightGrams`, `multicolor`,
   `featured` + `featuredOrder` (homepage "Sélection du moment"), `active`,
@@ -60,6 +61,7 @@ of truth.
 - **categories** / **category_translations** / **product_categories** (M:N).
 
 ### Orders
+
 - **orders** — `orderNumber` (unique), `customerId` (nullable; links to Better
   Auth user, also set retroactively for guests), `email`, `status`
   (`pending → paid → in_production → shipped → delivered`, plus `cancelled`),
@@ -70,9 +72,10 @@ of truth.
   `priceCentsSnapshot`, `quantity`. History never changes when products change.
 
 ### Custom quotes
+
 - **quote_requests** — `email`, `description`, `material`/`colors`/`dimensions`,
   `fileUrl`/`fileName` (R2 STL/3MF), `status` (`received → quoted →
-  revision_requested → accepted/declined → paid → in_production → done`, plus
+revision_requested → accepted/declined → paid → in_production → done`, plus
   `rejected`), `quotedPriceCents`, `adminMessage`, `validUntil` (+30 days at
   quoting), `adminNote`, `locale`.
 - **quote_messages** — threaded customer ↔ workshop conversation; an admin message
@@ -80,6 +83,7 @@ of truth.
   R2 file.
 
 ### Stock & settings
+
 - **inventory_log** — stock movements (`delta`, `reason`: order/restock/adjustment).
 - **settings** — key/value store (e.g. `shipping_cents`,
   `free_shipping_over_cents`), edited in `/admin/settings`.
@@ -87,6 +91,7 @@ of truth.
   `maxUses` / `usedCount`, `active`, `expiresAt`. Codes stored UPPERCASE.
 
 ### Auth (Better Auth tables)
+
 `user` (with `role`, `twoFactorEnabled`), `session`, `account` (OAuth/password),
 `two_factor` (TOTP secret + backup codes), `passkey` (WebAuthn credentials via
 `@better-auth/passkey`), `verification`, and our own `customer_addresses` (one
@@ -94,6 +99,7 @@ saved CH address per user) and `notification_preferences` (`newsletter` /
 `productNews` opt-ins, one row per user). See [Auth](#auth--accounts).
 
 ### Reviews & marketing
+
 - **reviews** — `(productId, orderId)`, `authorName`, `rating`, `body`,
   `status` (`pending → published` | `rejected`). Only openable on delivered
   order items (verified-buyer reviews), moderated in `/admin/reviews`.
@@ -109,6 +115,7 @@ saved CH address per user) and `notification_preferences` (`newsletter` /
 ## Key flows
 
 ### Checkout & payment (idempotent)
+
 1. Cart lives client-side in `localStorage` (`src/lib/cart.tsx`, key `s3d-cart-v1`).
 2. `POST /api/checkout` validates the cart + CH address server-side, computes
    shipping ([`src/lib/shipping.ts`](../src/lib/shipping.ts)) and any discount
@@ -116,7 +123,7 @@ saved CH address per user) and `notification_preferences` (`newsletter` /
    (`pending`) and a Stripe **PaymentIntent** (CHF).
 3. The client confirms payment with the Stripe **Payment Element**.
 4. **Finalization is idempotent and runs twice on purpose** — from the Stripe
-   **webhook** (`src/app/api/stripe/webhook/route.ts`) *and* the success page as a
+   **webhook** (`src/app/api/stripe/webhook/route.ts`) _and_ the success page as a
    safety net. `markOrderPaid()` ([`src/lib/orders.ts`](../src/lib/orders.ts)) uses
    a conditional `UPDATE ... WHERE status != 'paid'` to claim the order once, then
    decrements stock atomically (`stock >= qty` guard prevents oversell), logs
@@ -124,14 +131,18 @@ saved CH address per user) and `notification_preferences` (`newsletter` /
    Email failures never fail the payment.
 
 ### Quote lifecycle
+
 Customer submits `/custom` (file → R2 via `/api/quote-upload`). Admin prices it in
 `/admin/quotes` (`status: quoted`, `validUntil` +30d). Customer pays via a
 dedicated PaymentIntent (`/api/quote-checkout`); `markQuotePaid()` is idempotent
 (webhook + return page), accepting only `quoted`/`accepted` quotes.
 
 ### Auth & accounts
+
 - `getAuth()` ([`src/lib/auth.ts`](../src/lib/auth.ts)) builds a per-request
-  Better Auth instance (`better-auth-cloudflare`, Drizzle adapter on Postgres/Hyperdrive).
+  Better Auth instance (plain `betterAuth()` + the driver-agnostic
+  `better-auth/adapters/drizzle` on Postgres/Hyperdrive — `better-auth-cloudflare`
+  is a declared but unused dependency, see AGENTS.md's 2026-09-09 note).
 - **Admin role** is assigned by a `databaseHooks.user.create.before` hook: emails
   in `ADMIN_EMAILS` get `role: "admin"`. `role` has `input: false` — **never**
   client-settable. Server code gates on `requireAdmin()`.
@@ -146,11 +157,13 @@ dedicated PaymentIntent (`/api/quote-checkout`); `markQuotePaid()` is idempotent
   nulling `customerId`.
 
 ### Files (R2)
+
 Uploads (`/api/quote-upload`, `/api/admin/upload`) and downloads
 (`/api/files/[...path]`, gated `/api/admin/files/[...path]`) go through route
 handlers — R2 is never public. `cron/maintenance` purges orphaned files.
 
 ### Security
+
 `src/middleware.ts` sets HSTS / X-Content-Type-Options / X-Frame-Options /
 Referrer-Policy / Permissions-Policy on every response, builds a strict CSP
 (**per-request nonce in prod**, relaxed in dev for HMR), redirects `www → apex`,
@@ -160,6 +173,7 @@ window on KV, per IP + route. See [conventions.md](conventions.md) for the nonce
 contract.
 
 ### i18n
+
 `next-intl` with locales `fr/de/it/en`, `fr` default/fallback, auto-detected from
 `Accept-Language`. Routing config in [`src/i18n/`](../src/i18n); messages in
 [`messages/`](../messages). Locale is the first path segment (`/fr`, `/de`, …).

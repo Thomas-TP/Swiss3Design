@@ -26,7 +26,7 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
 
   // `color` n'initialise que le matériau ; le recoloriage vit dans l'effet
   // suivant. On NE veut PAS reconstruire la scène à chaque changement de teinte.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: color n'initialise que le materiau, le recoloriage vit dans l'effet suivant
+  // oxlint-disable exhaustive-deps -- color n'initialise que le materiau, le recoloriage vit dans l'effet suivant
   useEffect(() => {
     const el = mountRef.current;
     if (!el) return;
@@ -40,9 +40,8 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
 
     (async () => {
       const THREE = await import("three");
-      const { OrbitControls } = await import(
-        "three/addons/controls/OrbitControls.js"
-      );
+      const { OrbitControls } =
+        await import("three/addons/controls/OrbitControls.js");
       if (disposed) return;
 
       renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -109,6 +108,7 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
       }
     };
   }, [modelUrl]);
+  // oxlint-enable exhaustive-deps
 
   // Recolore le(s) matériau(x) à la volée quand la couleur produit change.
   useEffect(() => {

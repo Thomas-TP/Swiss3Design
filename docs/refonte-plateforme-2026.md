@@ -1,8 +1,8 @@
 # Refonte 2026 — « La Forge » : plan produit complet
 
 > **Statut : proposition — aucune ligne de code n'est encore modifiée.**
-> Document de référence pour transformer Swiss3Design d'une *boutique* d'objets
-> imprimés en 3D en une *plateforme* d'impression 3D de référence : commande
+> Document de référence pour transformer Swiss3Design d'une _boutique_ d'objets
+> imprimés en 3D en une _plateforme_ d'impression 3D de référence : commande
 > d'une pièce sur mesure en moins de 60 secondes, prix instantané, suivi de
 > fabrication honnête. Rédigé à partir d'un audit du code réel (juillet 2026),
 > pas de suppositions.
@@ -17,7 +17,7 @@
 
 ## 0. Résumé exécutif
 
-**Le diagnostic en une phrase :** le site vend très bien des *objets finis*
+**Le diagnostic en une phrase :** le site vend très bien des _objets finis_
 (catalogue, panier, checkout : déjà au niveau), mais la moitié « impression
 3D sur mesure » — le vrai différenciateur — est un **formulaire de contact
 déguisé** : pas de prix, pas de délai, pas de retour visuel, dépendance totale
@@ -32,13 +32,13 @@ checkout existe déjà).
 
 **Les 5 chantiers, par ordre de retour sur effort :**
 
-| # | Chantier | Effet attendu |
-|---|---|---|
-| 1 | **La Forge** — devis instantané : upload → analyse → prix → paiement | Le formulaire de devis (conversion quasi nulle par nature) devient un tunnel d'achat |
-| 2 | **Homepage à double intention** — « Acheter un objet » / « Imprimer ma pièce » | Le visiteur comprend l'offre en < 5 s, chaque intention a son tunnel |
-| 3 | **Suivi de fabrication** — timeline honnête commande → impression → QC → expédition | Confiance, moins d'e-mails « où en est ma commande ? » |
-| 4 | **Transparence prix & matières** — page matières comparées, coûts expliqués | Lève l'objection n°1 du sur-mesure : « combien ça va coûter ? » |
-| 5 | **Bibliothèque & recommande** — fichiers analysés conservés, re-commande 1 clic | Récurrence (pièces techniques = besoin répétitif) et socle B2B |
+| #   | Chantier                                                                            | Effet attendu                                                                        |
+| --- | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------ |
+| 1   | **La Forge** — devis instantané : upload → analyse → prix → paiement                | Le formulaire de devis (conversion quasi nulle par nature) devient un tunnel d'achat |
+| 2   | **Homepage à double intention** — « Acheter un objet » / « Imprimer ma pièce »      | Le visiteur comprend l'offre en < 5 s, chaque intention a son tunnel                 |
+| 3   | **Suivi de fabrication** — timeline honnête commande → impression → QC → expédition | Confiance, moins d'e-mails « où en est ma commande ? »                               |
+| 4   | **Transparence prix & matières** — page matières comparées, coûts expliqués         | Lève l'objection n°1 du sur-mesure : « combien ça va coûter ? »                      |
+| 5   | **Bibliothèque & recommande** — fichiers analysés conservés, re-commande 1 clic     | Récurrence (pièces techniques = besoin répétitif) et socle B2B                       |
 
 ---
 
@@ -76,88 +76,88 @@ business → aujourd'hui vs idéal.**
 **P1 — Le devis sur mesure est une boîte noire** (`custom/quote-form.tsx`,
 `custom/actions.ts`, schéma `quote_requests`)
 
-- *Pourquoi.* Le client remplit e-mail + description (min. 10 caractères),
+- _Pourquoi._ Le client remplit e-mail + description (min. 10 caractères),
   le fichier 3D est **optionnel**, aucun prix ni délai n'est annoncé, l'écran
   de succès dit en substance « on vous répondra ». Toute la valeur dépend
   d'une réponse humaine asynchrone (`status: received → quoted → …`).
-- *Impact utilisateur.* Incertitude totale : « ça va coûter 15 ou 150 CHF ? »,
+- _Impact utilisateur._ Incertitude totale : « ça va coûter 15 ou 150 CHF ? »,
   « réponse dans 2 h ou 5 jours ? ». L'utilisateur pressé (cas majoritaire :
   pièce cassée à remplacer) part chez un concurrent ou sur un site étranger.
-- *Impact business.* Le canal au plus fort potentiel de marge a la friction
+- _Impact business._ Le canal au plus fort potentiel de marge a la friction
   d'un formulaire SAV. Chaque devis coûte du temps d'atelier (chiffrage
   manuel, allers-retours quand le fichier manque). Non scalable.
-- *Aujourd'hui :* formulaire → e-mail → chiffrage manuel → fil de discussion
-  → paiement. *Idéal :* upload → analyse automatique → **prix ferme
+- _Aujourd'hui :_ formulaire → e-mail → chiffrage manuel → fil de discussion
+  → paiement. _Idéal :_ upload → analyse automatique → **prix ferme
   instantané** pour les cas standards (STL sain, matière courante), le fil
   de discussion ne restant que pour les cas hors norme. Voir § 5.1.
 
 **P2 — La promesse de la plateforme est invisible sur la homepage**
 (`app/[locale]/page.tsx`)
 
-- *Pourquoi.* Hero générique e-commerce : badge, titre, deux CTA dont
-  « sur mesure » en bouton secondaire fantôme. Rien ne montre *ce qu'on peut
-  faire* (déposer un fichier, choisir 4 couleurs, recevoir en X jours).
-- *Impact utilisateur.* Le visiteur « j'ai un fichier STL » — l'intention la
+- _Pourquoi._ Hero générique e-commerce : badge, titre, deux CTA dont
+  « sur mesure » en bouton secondaire fantôme. Rien ne montre _ce qu'on peut
+  faire_ (déposer un fichier, choisir 4 couleurs, recevoir en X jours).
+- _Impact utilisateur._ Le visiteur « j'ai un fichier STL » — l'intention la
   plus qualifiée qui puisse arriver sur le site — ne voit pas en < 5 s que
   c'est possible, encore moins que c'est simple.
-- *Impact business.* Perte du trafic le plus monétisable ; le site se
+- _Impact business._ Perte du trafic le plus monétisable ; le site se
   positionne de fait comme une petite boutique déco, en concurrence frontale
   avec des marchands généralistes, au lieu d'occuper la niche « impression à
   la demande en Suisse » où la concurrence locale est faible.
-- *Aujourd'hui :* un seul hero, une seule hiérarchie. *Idéal :* homepage à
+- _Aujourd'hui :_ un seul hero, une seule hiérarchie. _Idéal :_ homepage à
   **double intention** avec zone de dépôt de fichier fonctionnelle dès le
   hero. Voir § 6.1.
 
 **P3 — Aucun prix de référence pour le sur-mesure, nulle part**
 
-- *Pourquoi.* Ni fourchette, ni exemples (« ce crochet : 12 CHF », « ce
+- _Pourquoi._ Ni fourchette, ni exemples (« ce crochet : 12 CHF », « ce
   boîtier : 38 CHF »), ni logique tarifaire expliquée.
-- *Impact utilisateur.* L'ancrage mental par défaut est « l'impression 3D
+- _Impact utilisateur._ L'ancrage mental par défaut est « l'impression 3D
   c'est cher » ou l'inverse — les deux tuent la conversion : le premier fait
   fuir, le second produit des devis refusés (déception).
-- *Impact business.* Devis chiffrés puis refusés = travail gratuit. Le taux
+- _Impact business._ Devis chiffrés puis refusés = travail gratuit. Le taux
   `quoted → paid` est mécaniquement bas quand le prix arrive après
   l'engagement émotionnel.
-- *Idéal :* grille publique (« dès 9 CHF, la plupart des pièces entre 15 et
+- _Idéal :_ grille publique (« dès 9 CHF, la plupart des pièces entre 15 et
   60 CHF »), exemples réels chiffrés, et à terme le prix vivant de la Forge.
 
 **P4 — Le client n'a aucun retour visuel ni technique sur son fichier**
 
-- *Pourquoi.* Le viewer 3D existe (`components/product-viewer-3d.tsx`) mais
+- _Pourquoi._ Le viewer 3D existe (`components/product-viewer-3d.tsx`) mais
   seulement pour les produits du catalogue. Un upload client part dans R2
   sans validation : fichier corrompu, non étanche, trop grand pour le
   plateau (256 mm), parois trop fines — tout est découvert par l'atelier,
   après coup.
-- *Impact utilisateur.* Aucun « votre fichier est bon » rassurant ; en cas de
+- _Impact utilisateur._ Aucun « votre fichier est bon » rassurant ; en cas de
   problème, un aller-retour e-mail de plus (des jours perdus).
-- *Impact business.* Temps d'atelier consommé par du contrôle qualité
+- _Impact business._ Temps d'atelier consommé par du contrôle qualité
   amont qui devrait être automatique ; devis retardés = devis perdus.
-- *Idéal :* analyse à l'upload (étanchéité, dimensions vs plateau, épaisseurs)
+- _Idéal :_ analyse à l'upload (étanchéité, dimensions vs plateau, épaisseurs)
   avec verdict clair et suggestions. Voir § 5.2.
 
 **P5 — Après paiement, silence radio jusqu'à l'expédition**
 
-- *Pourquoi.* Les statuts existent en base (`in_production`, `done`,
+- _Pourquoi._ Les statuts existent en base (`in_production`, `done`,
   `trackingNumber`) mais le client ne voit qu'un état sec dans son compte.
   Pas de timeline, pas d'estimation, pas de notification intermédiaire.
-- *Impact utilisateur.* Anxiété post-achat, surtout pour du sur-mesure
+- _Impact utilisateur._ Anxiété post-achat, surtout pour du sur-mesure
   (« ont-ils vu ma commande ? »).
-- *Impact business.* E-mails de relance clients à traiter à la main ;
+- _Impact business._ E-mails de relance clients à traiter à la main ;
   occasion manquée de créer le moment « waouh » (voir sa pièce passer en
   fabrication) qui génère bouche-à-oreille et réachat.
-- *Idéal :* timeline de fabrication avec ETA calculée (le moteur de prix
+- _Idéal :_ timeline de fabrication avec ETA calculée (le moteur de prix
   connaît le temps d'impression estimé — autant le réutiliser). Voir § 5.3.
 
 ### 1.4 Problèmes secondaires
 
-| Constat | Fichier | Correctif proposé |
-|---|---|---|
-| Panier 100 % localStorage : pas de synchro multi-appareils pour les connectés | `lib/cart.tsx` | Synchro D1 pour utilisateurs connectés (fusion à la connexion), localStorage reste la source invité |
-| Vérification e-mail invité au checkout = étape de friction | `checkout-flow.tsx` (`GuestEmailVerification`) | À conserver (anti-fraude, qualité des e-mails transactionnels) mais mesurer son taux d'abandon ; si > 5 %, passer en vérification différée post-commande |
-| Pas de page « comment ça marche » ni FAQ structurée | — | Page `/aide` + bloc processus sur la homepage (voir § 3) |
-| Pas de comparaison des matières côté client (PLA vs PETG…) | admin `materials/` seulement | Page `/matieres` avec tableau comparatif + assistant de choix (voir § 5.4) |
-| `custom` demande l'e-mail même connecté (prérempli mais affiché) | `quote-form.tsx` | Dans la Forge : champ masqué si session active |
-| Le multicolore — LE différenciateur — n'est montré qu'en panneau statique | `page.tsx` § multicolore | Démo interactive : recolorer un modèle 3D en direct dans le hero (le viewer teinté existe déjà) |
+| Constat                                                                       | Fichier                                        | Correctif proposé                                                                                                                                        |
+| ----------------------------------------------------------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Panier 100 % localStorage : pas de synchro multi-appareils pour les connectés | `lib/cart.tsx`                                 | Synchro D1 pour utilisateurs connectés (fusion à la connexion), localStorage reste la source invité                                                      |
+| Vérification e-mail invité au checkout = étape de friction                    | `checkout-flow.tsx` (`GuestEmailVerification`) | À conserver (anti-fraude, qualité des e-mails transactionnels) mais mesurer son taux d'abandon ; si > 5 %, passer en vérification différée post-commande |
+| Pas de page « comment ça marche » ni FAQ structurée                           | —                                              | Page `/aide` + bloc processus sur la homepage (voir § 3)                                                                                                 |
+| Pas de comparaison des matières côté client (PLA vs PETG…)                    | admin `materials/` seulement                   | Page `/matieres` avec tableau comparatif + assistant de choix (voir § 5.4)                                                                               |
+| `custom` demande l'e-mail même connecté (prérempli mais affiché)              | `quote-form.tsx`                               | Dans la Forge : champ masqué si session active                                                                                                           |
+| Le multicolore — LE différenciateur — n'est montré qu'en panneau statique     | `page.tsx` § multicolore                       | Démo interactive : recolorer un modèle 3D en direct dans le hero (le viewer teinté existe déjà)                                                          |
 
 ---
 
@@ -174,14 +174,14 @@ pour rendre ça **immédiat, transparent et local**.
 > **« Votre pièce, imprimée en Suisse : prix en 10 secondes, chez vous en
 > quelques jours. »**
 
-Chaque mot est un engagement mesurable : *prix en 10 secondes* (la Forge),
-*imprimée en Suisse* (confiance, nLPD, pas de douane), *quelques jours*
+Chaque mot est un engagement mesurable : _prix en 10 secondes_ (la Forge),
+_imprimée en Suisse_ (confiance, nLPD, pas de douane), _quelques jours_
 (délai affiché et tenu, pas de promesse J+1 intenable avec une imprimante).
 
 **Les trois publics, par ordre de priorité :**
 
 1. **Le réparateur** — une pièce cassée, un fichier trouvé ou modélisé, veut
-   un prix et une date *maintenant*. C'est lui que la Forge sert d'abord.
+   un prix et une date _maintenant_. C'est lui que la Forge sert d'abord.
 2. **L'acheteur déco/cadeau** — veut un bel objet fini, multicolore. Le
    catalogue actuel le sert déjà bien ; on ne touche presque rien.
 3. **Le pro / l'artisan** (B2B léger) — petites séries, prototypes,
@@ -191,13 +191,13 @@ Chaque mot est un engagement mesurable : *prix en 10 secondes* (la Forge),
 résolu trois choses : prix visible avant tout engagement, confiance par
 défaut, zéro re-saisie. Transposé ici :
 
-- *Prix avant engagement* → le prix apparaît **pendant** la configuration,
+- _Prix avant engagement_ → le prix apparaît **pendant** la configuration,
   recalculé en direct à chaque choix (matière, couleurs, remplissage,
   quantité), jamais « à la fin ».
-- *Confiance par défaut* → verdict technique automatique sur le fichier
+- _Confiance par défaut_ → verdict technique automatique sur le fichier
   (« imprimable ✓ »), délai daté (« expédiée le mardi 14 »), fabrication
   locale visible.
-- *Zéro re-saisie* → la Forge débouche dans le **même panier et le même
+- _Zéro re-saisie_ → la Forge débouche dans le **même panier et le même
   checkout** que le catalogue. Pas de tunnel parallèle. Adresses mémorisées,
   re-commande en un clic depuis la bibliothèque.
 
@@ -278,7 +278,7 @@ La charte (rouge `#E5231C` / encre / papier, Geist Sans, pic géométrique en
 couches — le cube isométrique d'origine est archivé dans `public/brand/old-logo/`)
 est saine et déjà appliquée avec rigueur — **on la garde**. Toute nouvelle
 déclinaison visuelle reste soumise à validation avant usage (contrainte de
-marque). Le travail est de la *systématiser*, pas de la remplacer.
+marque). Le travail est de la _systématiser_, pas de la remplacer.
 
 **Tokens (déjà largement en place dans `globals.css`, à figer comme
 contrat) :** `paper / surface / line / ink / soft / accent / accent-dark /
@@ -292,7 +292,7 @@ actions. Espacement : échelle 4-8-12-16-24-32-48-64, sections en `py-14/16`.
 2. Un seul CTA accent par écran ; le reste en bordure/fantôme.
 3. Toute attente > 1 s est **narrée** (« Analyse du maillage… 214 000
    triangles ») — une attente expliquée est perçue moitié moins longue,
-   et dans la Forge elle *démontre la compétence technique* de l'atelier.
+   et dans la Forge elle _démontre la compétence technique_ de l'atelier.
 4. Les animations (`motion`, `Reveal`) signifient quelque chose (hiérarchie,
    causalité) ou n'existent pas. Pas de décoration mouvante.
 5. Chaque état vide dit quoi faire ensuite (panier vide → « Déposer un
@@ -319,18 +319,18 @@ se recalcule à chaque réglage. Il ajoute au panier. C'est tout.
 **Pipeline technique (aucune dépendance externe, tient sur la stack
 actuelle) :**
 
-1. *Client (instantané, gratuit en CPU serveur)* — parsing STL
+1. _Client (instantané, gratuit en CPU serveur)_ — parsing STL
    binaire/ASCII en TypeScript dans un Web Worker : volume du maillage
    (somme des tétraèdres signés), boîte englobante, nombre de triangles,
    étanchéité (chaque arête partagée par exactement 2 triangles), aires par
    tranche de hauteur. Affichage immédiat du modèle + métriques.
-2. *Serveur (source de vérité du prix)* — à l'ajout au panier, le Worker
+2. _Serveur (source de vérité du prix)_ — à l'ajout au panier, le Worker
    re-parse le fichier depuis R2 (STL binaire = lecture séquentielle
    triviale, 50 octets/triangle ; plafond 64 Mo ≈ 1,3 M triangles, largement
    dans le budget CPU Workers) et recalcule le prix. Le prix client n'est
    qu'un aperçu ; **le serveur ne fait jamais confiance aux chiffres du
    navigateur.** Tolérance de réconciliation 1 % ; au-delà → prix serveur.
-3. *Snapshot* — l'article de panier fige : clé R2, hash du fichier, matière,
+3. _Snapshot_ — l'article de panier fige : clé R2, hash du fichier, matière,
    couleurs, remplissage, quantité, prix, temps d'impression estimé. Même
    principe de snapshot que `order_items` aujourd'hui.
 
@@ -425,7 +425,7 @@ client récurrent, et le socle de l'offre pro.
 Le prix vivant rend chaque levier **manipulable** : curseurs remplissage /
 quantité / couleurs avec impact CHF immédiat, et suggestions calculées
 (« −20 % de hauteur = −15 % ») puisque la formule est locale et
-instantanée. Aucun concurrent grand public ne montre *pourquoi* un prix
+instantanée. Aucun concurrent grand public ne montre _pourquoi_ un prix
 bouge ; ici la transparence devient l'argument de vente.
 
 ### 5.7 Offre pro légère (`/pro`, phase 3)
@@ -465,7 +465,7 @@ PROCESSUS — 3 étapes illustrées : Déposez / Validez le prix / Recevez
 SÉLECTION — grille produits phares (existant, conservé)
 ```
 
-- **Interactions :** le drop de fichier fonctionne sur *toute* la page
+- **Interactions :** le drop de fichier fonctionne sur _toute_ la page
   (overlay « Déposez pour lancer la Forge » au dragover) — le geste le plus
   qualifié ne doit jamais tomber à côté.
 - **Responsive :** mobile = cartes A/B empilées, zone de dépôt devient
@@ -570,18 +570,18 @@ Récurrence: % clients avec 2e commande < 90 j
 
 **Leviers classés par impact estimé :**
 
-| Levier | Mécanisme | Attente |
-|---|---|---|
-| Prix instantané (Forge) | Supprime l'incertitude n°1 du sur-mesure | Conversion sur-mesure ×3 à ×5 (base actuelle quasi nulle) |
-| Date d'expédition datée partout | « Mardi 14 » bat « 3–5 jours » (concret > abstrait) | +abandon panier ↓ |
-| Hero double intention + drop global | Route l'intention la plus chaude sans clic | Sessions → /forge ↑↑ |
-| Détail du prix dépliable | La transparence désamorce la comparaison prix | Taux config → panier ↑ |
-| Timeline fabrication + 2 e-mails | Confiance post-achat, partage | Réachat ↑, SAV ↓ |
-| Curseurs à impact CHF direct | L'utilisateur s'auto-convainc en manipulant | Panier moyen ↑ (remplissage/quantité) |
-| Badge stock vs à-la-demande sur cartes | Attentes justes = moins de déceptions | SAV ↓ |
+| Levier                                 | Mécanisme                                           | Attente                                                   |
+| -------------------------------------- | --------------------------------------------------- | --------------------------------------------------------- |
+| Prix instantané (Forge)                | Supprime l'incertitude n°1 du sur-mesure            | Conversion sur-mesure ×3 à ×5 (base actuelle quasi nulle) |
+| Date d'expédition datée partout        | « Mardi 14 » bat « 3–5 jours » (concret > abstrait) | +abandon panier ↓                                         |
+| Hero double intention + drop global    | Route l'intention la plus chaude sans clic          | Sessions → /forge ↑↑                                      |
+| Détail du prix dépliable               | La transparence désamorce la comparaison prix       | Taux config → panier ↑                                    |
+| Timeline fabrication + 2 e-mails       | Confiance post-achat, partage                       | Réachat ↑, SAV ↓                                          |
+| Curseurs à impact CHF direct           | L'utilisateur s'auto-convainc en manipulant         | Panier moyen ↑ (remplissage/quantité)                     |
+| Badge stock vs à-la-demande sur cartes | Attentes justes = moins de déceptions               | SAV ↓                                                     |
 
 **Frictions supprimées :** devis asynchrone pour cas standards (l'attente
-*est* la friction), re-saisie e-mail connecté, silence post-achat, absence
+_est_ la friction), re-saisie e-mail connecté, silence post-achat, absence
 de fourchettes de prix. **Frictions conservées sciemment :** vérification
 e-mail invité (qualité > vitesse ici — sous surveillance), validation
 serveur du prix (sécurité non négociable).
@@ -619,15 +619,15 @@ prix toujours recalculé serveur.
 Phases indépendamment livrables, chacune utile seule. Efforts en sessions
 de travail IA (~une demi-journée équivalent).
 
-| Phase | Contenu | Effort | Dépend de |
-|---|---|---|---|
-| **0 — Quick wins** | Badges stock/délai sur cartes produit · SLA + fourchette de prix affichés sur `/custom` · exemples de prix réels sur la homepage · e-mail masqué si connecté | 1–2 | — |
-| **1 — Moteur de prix** | Parseur STL (lib pure + tests fixtures) · formule + table `pricing_params` + admin · calibration sur historique Bambu Studio | 3–4 | — |
-| **2 — La Forge v1** | Page `/forge` : upload → analyse Web Worker → viewer → config → prix vivant → article de panier snapshot · re-parse serveur · passerelles Forge ↔ `/custom` (conservé) | 5–7 | 1 |
-| **3 — Homepage & nav** | Hero double intention · drop global · démo multicolore interactive · nav (Forge au centre mobile) · pages `/matieres` + `/aide` | 3–4 | 2 |
-| **4 — Fabrication visible** | Statuts + horodatages sur `orders` · timeline compte + `/track` · 2 e-mails · admin 2-taps | 2–3 | — |
-| **5 — Bibliothèque & récurrence** | `/account/library` · re-commande 1 clic · rattachement fichier à l'inscription · synchro panier D1 | 2–3 | 2 |
-| **6 — Pro & extensions** | `/pro` : profil entreprise, factures PDF, dégressif quantité · `.3mf` · assistant matières | 3–4 | 2, 5 |
+| Phase                             | Contenu                                                                                                                                                                | Effort | Dépend de |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ | --------- |
+| **0 — Quick wins**                | Badges stock/délai sur cartes produit · SLA + fourchette de prix affichés sur `/custom` · exemples de prix réels sur la homepage · e-mail masqué si connecté           | 1–2    | —         |
+| **1 — Moteur de prix**            | Parseur STL (lib pure + tests fixtures) · formule + table `pricing_params` + admin · calibration sur historique Bambu Studio                                           | 3–4    | —         |
+| **2 — La Forge v1**               | Page `/forge` : upload → analyse Web Worker → viewer → config → prix vivant → article de panier snapshot · re-parse serveur · passerelles Forge ↔ `/custom` (conservé) | 5–7    | 1         |
+| **3 — Homepage & nav**            | Hero double intention · drop global · démo multicolore interactive · nav (Forge au centre mobile) · pages `/matieres` + `/aide`                                        | 3–4    | 2         |
+| **4 — Fabrication visible**       | Statuts + horodatages sur `orders` · timeline compte + `/track` · 2 e-mails · admin 2-taps                                                                             | 2–3    | —         |
+| **5 — Bibliothèque & récurrence** | `/account/library` · re-commande 1 clic · rattachement fichier à l'inscription · synchro panier D1                                                                     | 2–3    | 2         |
+| **6 — Pro & extensions**          | `/pro` : profil entreprise, factures PDF, dégressif quantité · `.3mf` · assistant matières                                                                             | 3–4    | 2, 5      |
 
 **Ordre recommandé : 0 → 1 → 2 → 3 → 4 → 5 → 6.** La phase 1 est du calcul
 pur testable sans UI (risque technique purgé en premier) ; la phase 2 est le
@@ -638,18 +638,18 @@ comprise avant `main`.
 **Décisions prises par défaut (à invalider si désaccord) :**
 
 1. STL seul en v1 (binaire + ASCII) — 3MF/STEP escaladent vers l'atelier.
-   *Justification :* STL = 90 % des fichiers amateurs, parsing trivial et
+   _Justification :_ STL = 90 % des fichiers amateurs, parsing trivial et
    fiable ; STEP exigerait un noyau CAO, hors de portée raisonnable sur
    Workers.
 2. Le prix serveur fait foi, tolérance 1 % avec le calcul client.
-   *Justification :* sécurité (manipulation triviale sinon) sans sacrifier
+   _Justification :_ sécurité (manipulation triviale sinon) sans sacrifier
    l'instantanéité perçue.
 3. La Forge alimente le panier standard, pas la table `quote_requests`.
-   *Justification :* un seul tunnel de paiement éprouvé et idempotent à
+   _Justification :_ un seul tunnel de paiement éprouvé et idempotent à
    maintenir ; les devis restent le chemin d'exception.
 4. Pas de rendu serveur des vignettes 3D en v1 (capture canvas côté client
-   à l'analyse). *Justification :* le rendu 3D serveur sur Workers est
+   à l'analyse). _Justification :_ le rendu 3D serveur sur Workers est
    coûteux/fragile ; la capture client est gratuite et suffisante.
 5. Délais exprimés en date d'expédition, jamais en date de livraison.
-   *Justification :* la Poste n'est pas sous notre contrôle ; on ne promet
+   _Justification :_ la Poste n'est pas sous notre contrôle ; on ne promet
    que ce qu'on tient.

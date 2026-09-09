@@ -22,7 +22,11 @@ export async function generateMetadata({
   return {
     title,
     description: META_DESCRIPTION[locale] ?? META_DESCRIPTION.fr,
-    openGraph: { title, description: META_DESCRIPTION[locale], type: "website" },
+    openGraph: {
+      title,
+      description: META_DESCRIPTION[locale],
+      type: "website",
+    },
   };
 }
 
@@ -36,7 +40,11 @@ export default async function ShippingPage({
   const sections = SHIPPING_CONTENT[locale] ?? SHIPPING_CONTENT.fr;
 
   return (
-    <LegalPage locale={locale} title={t("shippingReturns")} updated="2026-07-10">
+    <LegalPage
+      locale={locale}
+      title={t("shippingReturns")}
+      updated="2026-07-10"
+    >
       {sections.map((section, i) => (
         <Section key={section.title} n={i + 1} title={section.title}>
           {section.body}

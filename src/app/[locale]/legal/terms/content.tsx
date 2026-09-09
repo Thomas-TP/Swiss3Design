@@ -34,11 +34,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           teinte, de texture ou d’aspect (notamment les lignes de couches
           propres au procédé) peuvent exister d’un exemplaire à l’autre et ne
           constituent pas un défaut. Les photographies sont aussi fidèles que
-          possible mais non contractuelles. En cas d’indisponibilité
-          temporaire d’une couleur ou d’une matière indiquée sur la fiche
-          produit, l’exploitant peut proposer une alternative équivalente ; à
-          défaut d’accord du client, la commande concernée est annulée et
-          intégralement remboursée.
+          possible mais non contractuelles. En cas d’indisponibilité temporaire
+          d’une couleur ou d’une matière indiquée sur la fiche produit,
+          l’exploitant peut proposer une alternative équivalente ; à défaut
+          d’accord du client, la commande concernée est annulée et intégralement
+          remboursée.
         </p>
       ),
     },
@@ -80,15 +80,14 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Litiges de paiement",
       body: (
         <p>
-          En cas de désaccord sur une commande, le client est invité à
-          contacter l’exploitant à contact@swiss3design.ch avant toute
-          contestation directe auprès de sa banque ou de Stripe. Une
-          contestation de paiement (« chargeback ») manifestement infondée —
-          notamment pour une commande livrée et conforme, preuve de suivi à
-          l’appui — peut entraîner la suspension du compte concerné et la
-          facturation des frais qu’elle engendre (frais de contestation du
-          prestataire de paiement, frais de recouvrement), sans préjudice
-          d’une action en justice.
+          En cas de désaccord sur une commande, le client est invité à contacter
+          l’exploitant à contact@swiss3design.ch avant toute contestation
+          directe auprès de sa banque ou de Stripe. Une contestation de paiement
+          (« chargeback ») manifestement infondée — notamment pour une commande
+          livrée et conforme, preuve de suivi à l’appui — peut entraîner la
+          suspension du compte concerné et la facturation des frais qu’elle
+          engendre (frais de contestation du prestataire de paiement, frais de
+          recouvrement), sans préjudice d’une action en justice.
         </p>
       ),
     },
@@ -99,10 +98,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           L’exploitant peut suspendre ou clôturer un compte client en cas de
           fraude avérée ou suspectée, de non-respect des présentes CGV, de
           comportement abusif envers l’exploitant ou son personnel, ou de
-          contestations de paiement infondées répétées. Le client en est
-          informé par e-mail, avec le motif, sauf si cela compromettrait une
-          procédure en cours. Les commandes déjà payées et non litigieuses
-          restent honorées.
+          contestations de paiement infondées répétées. Le client en est informé
+          par e-mail, avec le motif, sauf si cela compromettrait une procédure
+          en cours. Les commandes déjà payées et non litigieuses restent
+          honorées.
         </p>
       ),
     },
@@ -129,16 +128,16 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Les prestations personnalisées (fichiers fournis par le client ou
           projets spécifiques) font l’objet d’un devis. Le contrat est conclu à
           l’acceptation du devis et au paiement. Le client peut annuler sa
-          commande ou en demander la modification tant que l’impression n’a
-          pas commencé ; une fois l’impression commencée, la commande ne peut
-          plus être annulée ni modifiée. Les articles personnalisés ne sont
-          ni repris ni échangés (voir « Retours »). Le client garantit
-          détenir les droits sur les fichiers transmis et que leur impression ne
-          viole aucun droit de tiers ni aucune disposition légale ; l’exploitant
-          peut refuser tout fichier sans justification. Le client indemnise
-          l’exploitant contre toute prétention de tiers découlant de ses
-          fichiers. Sont notamment exclus les fichiers d’armes ou de pièces
-          d’armes, de contrefaçons et de tout objet illicite.
+          commande ou en demander la modification tant que l’impression n’a pas
+          commencé ; une fois l’impression commencée, la commande ne peut plus
+          être annulée ni modifiée. Les articles personnalisés ne sont ni repris
+          ni échangés (voir « Retours »). Le client garantit détenir les droits
+          sur les fichiers transmis et que leur impression ne viole aucun droit
+          de tiers ni aucune disposition légale ; l’exploitant peut refuser tout
+          fichier sans justification. Le client indemnise l’exploitant contre
+          toute prétention de tiers découlant de ses fichiers. Sont notamment
+          exclus les fichiers d’armes ou de pièces d’armes, de contrefaçons et
+          de tout objet illicite.
         </p>
       ),
     },
@@ -175,12 +174,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Un avis ne peut porter que sur un achat effectivement réalisé et
-          livré. L’exploitant modère les avis avant publication et peut
-          refuser ou retirer, sans justification préalable, tout avis
-          mensonger, diffamatoire, injurieux ou manifestement rédigé de
-          mauvaise foi. Un avis négatif fondé, respectueux et en lien avec le
-          produit ou le service n’est jamais retiré au seul motif qu’il est
-          défavorable.
+          livré. L’exploitant modère les avis avant publication et peut refuser
+          ou retirer, sans justification préalable, tout avis mensonger,
+          diffamatoire, injurieux ou manifestement rédigé de mauvaise foi. Un
+          avis négatif fondé, respectueux et en lien avec le produit ou le
+          service n’est jamais retiré au seul motif qu’il est défavorable.
         </p>
       ),
     },
@@ -192,13 +190,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           est limitée au dommage direct et prouvé, à concurrence du montant de
           la commande concernée. Tout dommage indirect, perte de profit, perte
           de données ou dommage consécutif est exclu dans la même mesure. Sauf
-          indication contraire expresse, les objets
-          imprimés en 3D ne sont pas destinés à un usage de sécurité, au contact
-          alimentaire prolongé, ni à un usage médical, et ne sont pas des jouets
-          pour enfants de moins de 3 ans. Les limitations qui précèdent ne
-          s’appliquent pas dans les cas où la loi exclut toute limitation,
-          notamment en cas de dommages corporels ou au titre de la loi fédérale
-          sur la responsabilité du fait des produits (LRFP).
+          indication contraire expresse, les objets imprimés en 3D ne sont pas
+          destinés à un usage de sécurité, au contact alimentaire prolongé, ni à
+          un usage médical, et ne sont pas des jouets pour enfants de moins de 3
+          ans. Les limitations qui précèdent ne s’appliquent pas dans les cas où
+          la loi exclut toute limitation, notamment en cas de dommages corporels
+          ou au titre de la loi fédérale sur la responsabilité du fait des
+          produits (LRFP).
         </p>
       ),
     },
@@ -329,8 +327,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Bei Unstimmigkeiten zu einer Bestellung wird der Kunde gebeten, den
-          Betreiber unter contact@swiss3design.ch zu kontaktieren, bevor er
-          sich direkt an seine Bank oder Stripe wendet. Eine offensichtlich
+          Betreiber unter contact@swiss3design.ch zu kontaktieren, bevor er sich
+          direkt an seine Bank oder Stripe wendet. Eine offensichtlich
           unbegründete Zahlungsanfechtung («Chargeback») — insbesondere bei
           einer nachweislich gelieferten und vertragsgemässen Bestellung, belegt
           durch die Sendungsverfolgung — kann zur Sperrung des betroffenen
@@ -381,14 +379,14 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Der Kunde kann seine Bestellung stornieren oder deren Änderung
           verlangen, solange der Druckvorgang noch nicht begonnen hat; sobald
           der Druck begonnen hat, kann die Bestellung weder storniert noch
-          geändert werden. Personalisierte Artikel werden weder
-          zurückgenommen noch umgetauscht (siehe «Rücksendungen»). Der Kunde gewährleistet, dass er über die
-          Rechte an den übermittelten Dateien verfügt und deren Druck weder
-          Rechte Dritter noch gesetzliche Bestimmungen verletzt; der Betreiber
-          kann jede Datei ohne Begründung ablehnen. Der Kunde stellt den
-          Betreiber von sämtlichen Ansprüchen Dritter frei, die sich aus seinen
-          Dateien ergeben. Ausgeschlossen sind insbesondere Dateien von Waffen
-          oder Waffenteilen, von Fälschungen sowie von jeglichen
+          geändert werden. Personalisierte Artikel werden weder zurückgenommen
+          noch umgetauscht (siehe «Rücksendungen»). Der Kunde gewährleistet,
+          dass er über die Rechte an den übermittelten Dateien verfügt und deren
+          Druck weder Rechte Dritter noch gesetzliche Bestimmungen verletzt; der
+          Betreiber kann jede Datei ohne Begründung ablehnen. Der Kunde stellt
+          den Betreiber von sämtlichen Ansprüchen Dritter frei, die sich aus
+          seinen Dateien ergeben. Ausgeschlossen sind insbesondere Dateien von
+          Waffen oder Waffenteilen, von Fälschungen sowie von jeglichen
           widerrechtlichen Gegenständen.
         </p>
       ),
@@ -426,11 +424,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Eine Bewertung darf sich nur auf einen tatsächlich getätigten und
           gelieferten Kauf beziehen. Der Betreiber prüft Bewertungen vor der
-          Veröffentlichung und kann jede unwahre, verleumderische,
-          beleidigende oder offensichtlich in böser Absicht verfasste
-          Bewertung ohne vorherige Begründung ablehnen oder entfernen. Eine
-          begründete, respektvolle und sachbezogene negative Bewertung wird
-          niemals allein deshalb entfernt, weil sie ungünstig ausfällt.
+          Veröffentlichung und kann jede unwahre, verleumderische, beleidigende
+          oder offensichtlich in böser Absicht verfasste Bewertung ohne
+          vorherige Begründung ablehnen oder entfernen. Eine begründete,
+          respektvolle und sachbezogene negative Bewertung wird niemals allein
+          deshalb entfernt, weil sie ungünstig ausfällt.
         </p>
       ),
     },
@@ -442,14 +440,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Betreibers auf den direkten und nachgewiesenen Schaden beschränkt,
           höchstens jedoch auf den Betrag der betreffenden Bestellung. Jeder
           indirekte Schaden, Gewinnausfall, Datenverlust oder Folgeschaden ist
-          im gleichen Umfang ausgeschlossen. Sofern
-          nicht ausdrücklich anders angegeben, sind 3D-gedruckte Objekte weder
-          für sicherheitsrelevante Anwendungen noch für längeren
-          Lebensmittelkontakt oder medizinische Zwecke bestimmt und sind kein
-          Spielzeug für Kinder unter 3 Jahren. Die vorstehenden Beschränkungen
-          gelten nicht, soweit das Gesetz jegliche Beschränkung ausschliesst,
-          insbesondere bei Personenschäden oder nach dem
-          Produktehaftpflichtgesetz (PrHG).
+          im gleichen Umfang ausgeschlossen. Sofern nicht ausdrücklich anders
+          angegeben, sind 3D-gedruckte Objekte weder für sicherheitsrelevante
+          Anwendungen noch für längeren Lebensmittelkontakt oder medizinische
+          Zwecke bestimmt und sind kein Spielzeug für Kinder unter 3 Jahren. Die
+          vorstehenden Beschränkungen gelten nicht, soweit das Gesetz jegliche
+          Beschränkung ausschliesst, insbesondere bei Personenschäden oder nach
+          dem Produktehaftpflichtgesetz (PrHG).
         </p>
       ),
     },
@@ -578,15 +575,15 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Controversie di pagamento",
       body: (
         <p>
-          In caso di disaccordo su un ordine, il cliente è invitato a
-          contattare il gestore all’indirizzo contact@swiss3design.ch prima di
-          qualsiasi contestazione diretta presso la propria banca o Stripe.
-          Una contestazione di pagamento («chargeback») manifestamente
-          infondata — in particolare per un ordine consegnato e conforme,
-          comprovato dal tracciamento — può comportare la sospensione
-          dell’account interessato e l’addebito delle spese da essa generate
-          (spese di contestazione del prestatore di pagamento, spese di
-          recupero crediti), fatta salva un’azione legale.
+          In caso di disaccordo su un ordine, il cliente è invitato a contattare
+          il gestore all’indirizzo contact@swiss3design.ch prima di qualsiasi
+          contestazione diretta presso la propria banca o Stripe. Una
+          contestazione di pagamento («chargeback») manifestamente infondata —
+          in particolare per un ordine consegnato e conforme, comprovato dal
+          tracciamento — può comportare la sospensione dell’account interessato
+          e l’addebito delle spese da essa generate (spese di contestazione del
+          prestatore di pagamento, spese di recupero crediti), fatta salva
+          un’azione legale.
         </p>
       ),
     },
@@ -595,12 +592,12 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Il gestore può sospendere o chiudere un account cliente in caso di
-          frode accertata o sospetta, di mancato rispetto delle presenti CGV,
-          di comportamento abusivo nei confronti del gestore o del suo
-          personale, o di contestazioni di pagamento infondate ripetute. Il
-          cliente ne viene informato via e-mail, con la motivazione, salvo che
-          ciò comprometta un procedimento in corso. Gli ordini già pagati e
-          non contestati restano validi.
+          frode accertata o sospetta, di mancato rispetto delle presenti CGV, di
+          comportamento abusivo nei confronti del gestore o del suo personale, o
+          di contestazioni di pagamento infondate ripetute. Il cliente ne viene
+          informato via e-mail, con la motivazione, salvo che ciò comprometta un
+          procedimento in corso. Gli ordini già pagati e non contestati restano
+          validi.
         </p>
       ),
     },
@@ -630,13 +627,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           annullare l’ordine o richiederne la modifica finché la stampa non è
           iniziata; una volta iniziata la stampa, l’ordine non può più essere
           annullato né modificato. Gli articoli personalizzati non vengono né
-          ripresi né cambiati (vedere «Resi»). Il
-          cliente garantisce di detenere i diritti sui file trasmessi e che la
-          loro stampa non viola alcun diritto di terzi né alcuna disposizione
-          legale; il gestore può rifiutare qualsiasi file senza giustificazione.
-          Il cliente tiene indenne il gestore da qualsiasi pretesa di terzi
-          derivante dai suoi file. Sono in particolare esclusi i file di armi o
-          di parti di armi, di contraffazioni e di qualsiasi oggetto illecito.
+          ripresi né cambiati (vedere «Resi»). Il cliente garantisce di detenere
+          i diritti sui file trasmessi e che la loro stampa non viola alcun
+          diritto di terzi né alcuna disposizione legale; il gestore può
+          rifiutare qualsiasi file senza giustificazione. Il cliente tiene
+          indenne il gestore da qualsiasi pretesa di terzi derivante dai suoi
+          file. Sono in particolare esclusi i file di armi o di parti di armi,
+          di contraffazioni e di qualsiasi oggetto illecito.
         </p>
       ),
     },
@@ -672,8 +669,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Recensioni dei clienti",
       body: (
         <p>
-          Una recensione può riguardare solo un acquisto effettivamente
-          concluso e consegnato. Il gestore modera le recensioni prima della
+          Una recensione può riguardare solo un acquisto effettivamente concluso
+          e consegnato. Il gestore modera le recensioni prima della
           pubblicazione e può rifiutare o rimuovere, senza obbligo di
           motivazione preventiva, qualsiasi recensione falsa, diffamatoria,
           ingiuriosa o manifestamente scritta in mala fede. Una recensione
@@ -690,13 +687,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           danno diretto e provato, fino a concorrenza dell’importo dell’ordine
           interessato. Qualsiasi danno indiretto, perdita di profitto, perdita
           di dati o danno consequenziale è escluso nella stessa misura. Salvo
-          indicazione contraria espressa, gli oggetti
-          stampati in 3D non sono destinati a un uso di sicurezza, al contatto
-          alimentare prolungato né a un uso medico, e non sono giocattoli per
-          bambini di età inferiore a 3 anni. Le limitazioni che precedono non si
-          applicano nei casi in cui la legge esclude qualsiasi limitazione, in
-          particolare in caso di danni alle persone o ai sensi della legge sulla
-          responsabilità per danno da prodotti (LRDP).
+          indicazione contraria espressa, gli oggetti stampati in 3D non sono
+          destinati a un uso di sicurezza, al contatto alimentare prolungato né
+          a un uso medico, e non sono giocattoli per bambini di età inferiore a
+          3 anni. Le limitazioni che precedono non si applicano nei casi in cui
+          la legge esclude qualsiasi limitazione, in particolare in caso di
+          danni alle persone o ai sensi della legge sulla responsabilità per
+          danno da prodotti (LRDP).
         </p>
       ),
     },
@@ -820,14 +817,14 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Payment disputes",
       body: (
         <p>
-          In the event of a disagreement over an order, the customer is
-          invited to contact the Operator at contact@swiss3design.ch before
-          raising any dispute directly with their bank or Stripe. A manifestly
-          unfounded payment dispute ("chargeback") — in particular for an
-          order delivered as agreed, supported by tracking evidence — may
-          result in suspension of the account concerned and the billing of any
-          costs it generates (payment-provider dispute fees, collection
-          costs), without prejudice to legal action.
+          In the event of a disagreement over an order, the customer is invited
+          to contact the Operator at contact@swiss3design.ch before raising any
+          dispute directly with their bank or Stripe. A manifestly unfounded
+          payment dispute ("chargeback") — in particular for an order delivered
+          as agreed, supported by tracking evidence — may result in suspension
+          of the account concerned and the billing of any costs it generates
+          (payment-provider dispute fees, collection costs), without prejudice
+          to legal action.
         </p>
       ),
     },
@@ -839,8 +836,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           proven or suspected fraud, non-compliance with these GTC, abusive
           behaviour towards the Operator or its staff, or repeated unfounded
           payment disputes. The customer is informed by e-mail of the reason,
-          unless doing so would compromise an ongoing procedure. Orders
-          already paid for and not in dispute remain honoured.
+          unless doing so would compromise an ongoing procedure. Orders already
+          paid for and not in dispute remain honoured.
         </p>
       ),
     },
@@ -865,17 +862,17 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Customised services (files supplied by the customer or specific
           projects) are subject to a quote. The contract is concluded upon
-          acceptance of the quote and payment. The customer may cancel the
-          order or request changes as long as printing has not yet started;
-          once printing has started, the order can no longer be cancelled or
-          changed. Customised items can be neither returned nor exchanged
-          (see “Returns”). The customer warrants that
-          they hold the rights to the files submitted and that printing them
-          does not infringe any third-party rights or legal provisions; the
-          Operator may refuse any file without justification. The customer shall
-          indemnify the Operator against any third-party claim arising from
-          their files. Files of weapons or weapon parts, counterfeits and any
-          unlawful object are in particular excluded.
+          acceptance of the quote and payment. The customer may cancel the order
+          or request changes as long as printing has not yet started; once
+          printing has started, the order can no longer be cancelled or changed.
+          Customised items can be neither returned nor exchanged (see
+          “Returns”). The customer warrants that they hold the rights to the
+          files submitted and that printing them does not infringe any
+          third-party rights or legal provisions; the Operator may refuse any
+          file without justification. The customer shall indemnify the Operator
+          against any third-party claim arising from their files. Files of
+          weapons or weapon parts, counterfeits and any unlawful object are in
+          particular excluded.
         </p>
       ),
     },
@@ -915,9 +912,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           The Operator moderates reviews before publication and may refuse or
           remove, without prior justification, any review that is false,
           defamatory, abusive, or manifestly written in bad faith. A negative
-          review that is well-founded, respectful and relevant to the product
-          or service is never removed on the sole ground that it is
-          unfavourable.
+          review that is well-founded, respectful and relevant to the product or
+          service is never removed on the sole ground that it is unfavourable.
         </p>
       ),
     },
@@ -929,12 +925,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Operator’s liability is limited to direct and proven damage, up to the
           amount of the order concerned. Any indirect damage, loss of profit,
           loss of data or consequential damage is excluded to the same extent.
-          Unless expressly stated otherwise,
-          3D-printed objects are not intended for safety-related use, prolonged
-          food contact or medical use, and are not toys for children under 3
-          years of age. The foregoing limitations do not apply where the law
-          excludes any limitation, in particular in the event of personal injury
-          or under the Swiss Product Liability Act.
+          Unless expressly stated otherwise, 3D-printed objects are not intended
+          for safety-related use, prolonged food contact or medical use, and are
+          not toys for children under 3 years of age. The foregoing limitations
+          do not apply where the law excludes any limitation, in particular in
+          the event of personal injury or under the Swiss Product Liability Act.
         </p>
       ),
     },

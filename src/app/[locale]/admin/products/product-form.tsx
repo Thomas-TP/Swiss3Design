@@ -621,7 +621,13 @@ function VariantManager({ initial }: { initial: VariantInitial[] }) {
         onClick={() =>
           setRows((prev) => [
             ...prev,
-            { id: crypto.randomUUID(), name: "", sku: "", price: "", stock: "" },
+            {
+              id: crypto.randomUUID(),
+              name: "",
+              sku: "",
+              price: "",
+              stock: "",
+            },
           ])
         }
         className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 text-sm font-semibold text-soft transition-colors hover:border-ink hover:text-ink"

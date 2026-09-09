@@ -12,12 +12,15 @@ Workers**. Return a serializable state object and navigate on the client.
 ```ts
 // src/app/[locale]/admin/settings/actions.ts
 "use server";
-export async function saveSettings(_prev: State, formData: FormData): Promise<State> {
+export async function saveSettings(
+  _prev: State,
+  formData: FormData,
+): Promise<State> {
   await requireAdmin();
   if (!valid) return { error: "Valeurs invalides." };
   // …write…
   revalidatePath("/", "layout");
-  return { saved: true };           // ← no redirect()
+  return { saved: true }; // ← no redirect()
 }
 ```
 
@@ -25,7 +28,9 @@ export async function saveSettings(_prev: State, formData: FormData): Promise<St
 // client component
 const [state, action] = useActionState(saveSettings, {});
 const router = useRouter();
-useEffect(() => { if (state.saved) router.push("/admin"); }, [state.saved]);
+useEffect(() => {
+  if (state.saved) router.push("/admin");
+}, [state.saved]);
 ```
 
 Actions return `{ saved }` / `{ success }` / `{ error }`; the client reacts and
@@ -38,7 +43,7 @@ Always per-request, inside the handler:
 
 ```ts
 import { getDb } from "@/db";
-const db = await getDb();                 // Drizzle on env.HYPERDRIVE (Postgres/Neon)
+const db = await getDb(); // Drizzle on env.HYPERDRIVE (Postgres/Neon)
 ```
 
 - Schema source of truth: [`src/db/schema.pg.ts`](../src/db/schema.pg.ts)
@@ -80,11 +85,12 @@ run from **both** the Stripe webhook and the success/return page. Keep them
 idempotent:
 
 ```ts
-const claimed = await db.update(orders)
+const claimed = await db
+  .update(orders)
   .set({ status: "paid" })
-  .where(and(eq(orders.id, id), ne(orders.status, "paid")))   // claim once
+  .where(and(eq(orders.id, id), ne(orders.status, "paid"))) // claim once
   .returning({ id: orders.id });
-if (claimed.length === 0) return;                              // already done
+if (claimed.length === 0) return; // already done
 ```
 
 Stock decrement is atomic with a `gte(stock, qty)` guard to prevent oversell on
@@ -95,8 +101,8 @@ they never fail a captured payment.
 
 ```ts
 import { requireAdmin, getServerSession } from "@/lib/session";
-await requireAdmin();                 // throws "unauthorized" if not admin
-const session = await getServerSession();   // or null
+await requireAdmin(); // throws "unauthorized" if not admin
+const session = await getServerSession(); // or null
 ```
 
 - Admin = email listed in `ADMIN_EMAILS` (assigned at signup via Better Auth db
@@ -117,7 +123,7 @@ Protect abusable endpoints (email send, uploads):
 ```ts
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 if (!(await rateLimit(request, "quote-upload", { limit: 5, windowS: 60 })))
-  return tooManyRequests();           // 429
+  return tooManyRequests(); // 429
 ```
 
 KV-backed fixed window, per IP + route; a no-op locally (no `cf-connecting-ip`).
@@ -129,7 +135,7 @@ KV-backed fixed window, per IP + route; a no-op locally (no `cf-connecting-ip`).
   add the key to **all four** files (fr is the fallback).
 - Navigate with the locale-aware helpers from
   [`src/i18n/navigation.ts`](../src/i18n/navigation.ts) (`Link`, `redirect`,
-  `useRouter`), not bare `next/link` / `next/navigation`, so the `/fr` `/de` … 
+  `useRouter`), not bare `next/link` / `next/navigation`, so the `/fr` `/de` …
   prefix is preserved.
 - DB content is localized via `*_translations` tables, not message files.
 
@@ -172,11 +178,15 @@ Workers runtime + prod CSP).
 ## Style
 
 - **Comments and user-facing copy in French**; code identifiers in English.
-- Keep the existing dense, explanatory comment style: explain the *why* (the Workers
-  constraint, the idempotency reason, the nLPD rule), not the obvious *what*.
+- Keep the existing dense, explanatory comment style: explain the _why_ (the Workers
+  constraint, the idempotency reason, the nLPD rule), not the obvious _what_.
 - TypeScript **6** strict (7 was attempted and reverted 2026-07-09 — its
   package no longer exports the classic compiler API, which breaks `next
-  build` itself, not just tooling; revisit once 7.1 ships a JS API again).
+build` itself, not just tooling; revisit once 7.1 ships a JS API again).
   Prefer the `@/…` import alias over deep relative paths.
-- Lint + format = **Biome** (`biome.jsonc`), ESLint fully removed 2026-07-09.
-  Run `bun run lint` before finishing; `bun run format` to auto-fix style.
+- Lint + format = **Oxlint** (`.oxlintrc.json`) + **Oxfmt** (`.oxfmtrc.json`),
+  replacing Biome 2026-09-09 (ESLint had already been fully removed
+  2026-07-09; see AGENTS.md for why). Run `bun run lint` before finishing;
+  `bun run format` to auto-fix style. Suppress a rule with
+  `// oxlint-disable`/`oxlint-enable <bare-rule-name> -- reason` bracketing
+  the block — bare rule name, no plugin prefix.

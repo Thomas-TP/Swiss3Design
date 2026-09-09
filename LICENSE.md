@@ -24,7 +24,7 @@ interdit à toute personne ou entité externe de :
 - l'utiliser, l'exécuter ou le déployer, à des fins commerciales ou non ;
 - le modifier, l'adapter, le traduire ou en créer des œuvres dérivées ;
 - le redistribuer, le publier, le revendre ou le sous-licencier ;
-- soumettre des contributions, *commits*, *push*, *pull requests* ou toute autre
+- soumettre des contributions, _commits_, _push_, _pull requests_ ou toute autre
   modification au dépôt.
 
 ## 4. Aucune contribution externe

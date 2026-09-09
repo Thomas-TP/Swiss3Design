@@ -32,10 +32,10 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Délais",
       body: (
         <p>
-          Les articles en stock sont remis à la Poste sous 1 à 3 jours
-          ouvrés. Les pièces imprimées à la demande le sont après le délai de
-          production indiqué sur la fiche produit (ou dans le devis pour une
-          création sur mesure). Ces délais sont indicatifs.
+          Les articles en stock sont remis à la Poste sous 1 à 3 jours ouvrés.
+          Les pièces imprimées à la demande le sont après le délai de production
+          indiqué sur la fiche produit (ou dans le devis pour une création sur
+          mesure). Ces délais sont indicatifs.
         </p>
       ),
     },
@@ -54,8 +54,8 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       body: (
         <p>
           Un numéro de suivi vous est envoyé par e-mail dès l'expédition. Vous
-          pouvez aussi suivre une commande à tout moment, avec ou sans
-          compte, depuis{" "}
+          pouvez aussi suivre une commande à tout moment, avec ou sans compte,
+          depuis{" "}
           <Link href="/track" className={link}>
             la page de suivi
           </Link>
@@ -67,13 +67,12 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Retours",
       body: (
         <p>
-          Le droit suisse ne prévoit pas de droit de rétractation légal pour
-          les achats en ligne. Nous acceptons néanmoins, à titre commercial,
-          le retour des articles de catalogue dans les{" "}
-          <strong>14 jours</strong> suivant la réception, s'ils sont non
-          utilisés et dans leur état d'origine. Les frais de retour sont à
-          votre charge ; le prix de l'article est remboursé, hors frais
-          d'envoi initiaux.
+          Le droit suisse ne prévoit pas de droit de rétractation légal pour les
+          achats en ligne. Nous acceptons néanmoins, à titre commercial, le
+          retour des articles de catalogue dans les <strong>14 jours</strong>{" "}
+          suivant la réception, s'ils sont non utilisés et dans leur état
+          d'origine. Les frais de retour sont à votre charge ; le prix de
+          l'article est remboursé, hors frais d'envoi initiaux.
         </p>
       ),
     },
@@ -81,8 +80,8 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Articles sur mesure",
       body: (
         <p>
-          Les pièces imprimées à partir d'un devis personnalisé sont exclues
-          du retour, sauf défaut de fabrication (voir « Garantie »).
+          Les pièces imprimées à partir d'un devis personnalisé sont exclues du
+          retour, sauf défaut de fabrication (voir « Garantie »).
         </p>
       ),
     },
@@ -90,8 +89,8 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Garantie",
       body: (
         <p>
-          La garantie légale suisse (2 ans dès la livraison) couvre tout
-          défaut de fabrication — détails dans{" "}
+          La garantie légale suisse (2 ans dès la livraison) couvre tout défaut
+          de fabrication — détails dans{" "}
           <Link href="/legal/terms" className={link}>
             les conditions générales
           </Link>
@@ -128,9 +127,8 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
         <p>
           Lagerartikel werden innerhalb von 1 bis 3 Werktagen der Post
           übergeben. Auf Bestellung gedruckte Stücke werden nach der auf der
-          Produktseite (oder in der Offerte für Massanfertigungen)
-          angegebenen Produktionszeit versandt. Diese Fristen sind
-          unverbindlich.
+          Produktseite (oder in der Offerte für Massanfertigungen) angegebenen
+          Produktionszeit versandt. Diese Fristen sind unverbindlich.
         </p>
       ),
     },
@@ -149,8 +147,8 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       body: (
         <p>
           Sie erhalten eine Sendungsnummer per E-Mail, sobald Ihre Bestellung
-          versandt wurde. Sie können eine Bestellung jederzeit — mit oder
-          ohne Konto — auf der{" "}
+          versandt wurde. Sie können eine Bestellung jederzeit — mit oder ohne
+          Konto — auf der{" "}
           <Link href="/track" className={link}>
             Sendungsverfolgungsseite
           </Link>{" "}
@@ -163,9 +161,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       body: (
         <p>
           Das Schweizer Recht sieht kein gesetzliches Widerrufsrecht für
-          Online-Käufe vor. Wir akzeptieren jedoch kulanzhalber die Rückgabe
-          von Katalogartikeln innerhalb von <strong>14 Tagen</strong> nach
-          Erhalt, sofern diese unbenutzt und im Originalzustand sind. Die
+          Online-Käufe vor. Wir akzeptieren jedoch kulanzhalber die Rückgabe von
+          Katalogartikeln innerhalb von <strong>14 Tagen</strong> nach Erhalt,
+          sofern diese unbenutzt und im Originalzustand sind. Die
           Rücksendekosten trägt der Kunde; der Artikelpreis wird ohne die
           ursprünglichen Versandkosten zurückerstattet.
         </p>
@@ -222,10 +220,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       body: (
         <p>
           Gli articoli disponibili vengono consegnati alla Posta entro 1-3
-          giorni lavorativi. I pezzi stampati su richiesta vengono spediti
-          dopo il tempo di produzione indicato sulla scheda prodotto (o nel
-          preventivo per le creazioni su misura). Questi tempi sono
-          indicativi.
+          giorni lavorativi. I pezzi stampati su richiesta vengono spediti dopo
+          il tempo di produzione indicato sulla scheda prodotto (o nel
+          preventivo per le creazioni su misura). Questi tempi sono indicativi.
         </p>
       ),
     },
@@ -243,9 +240,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Tracciamento dell'ordine",
       body: (
         <p>
-          Un numero di tracciamento vi viene inviato via e-mail al momento
-          della spedizione. Potete anche tracciare un ordine in qualsiasi
-          momento, con o senza account, dalla{" "}
+          Un numero di tracciamento vi viene inviato via e-mail al momento della
+          spedizione. Potete anche tracciare un ordine in qualsiasi momento, con
+          o senza account, dalla{" "}
           <Link href="/track" className={link}>
             pagina di tracciamento
           </Link>
@@ -257,12 +254,12 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Resi",
       body: (
         <p>
-          Il diritto svizzero non prevede un diritto di recesso legale per
-          gli acquisti online. Accettiamo comunque, a titolo commerciale, il
-          reso degli articoli di catalogo entro <strong>14 giorni</strong>{" "}
-          dal ricevimento, se non utilizzati e nel loro stato originale. Le
-          spese di reso sono a carico del cliente; il prezzo dell'articolo
-          viene rimborsato, escluse le spese di spedizione iniziali.
+          Il diritto svizzero non prevede un diritto di recesso legale per gli
+          acquisti online. Accettiamo comunque, a titolo commerciale, il reso
+          degli articoli di catalogo entro <strong>14 giorni</strong> dal
+          ricevimento, se non utilizzati e nel loro stato originale. Le spese di
+          reso sono a carico del cliente; il prezzo dell'articolo viene
+          rimborsato, escluse le spese di spedizione iniziali.
         </p>
       ),
     },
@@ -279,8 +276,8 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Garanzia",
       body: (
         <p>
-          La garanzia legale svizzera (2 anni dalla consegna) copre ogni
-          difetto di fabbricazione — dettagli nelle{" "}
+          La garanzia legale svizzera (2 anni dalla consegna) copre ogni difetto
+          di fabbricazione — dettagli nelle{" "}
           <Link href="/legal/terms" className={link}>
             condizioni generali
           </Link>
@@ -315,10 +312,10 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Timelines",
       body: (
         <p>
-          In-stock items are handed to Swiss Post within 1 to 3 business
-          days. Made-to-order pieces ship after the production time shown on
-          the product page (or in the quote for custom work). These
-          timelines are indicative.
+          In-stock items are handed to Swiss Post within 1 to 3 business days.
+          Made-to-order pieces ship after the production time shown on the
+          product page (or in the quote for custom work). These timelines are
+          indicative.
         </p>
       ),
     },
@@ -353,9 +350,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
           Swiss law does not provide for a statutory right of withdrawal for
           online purchases. As a commercial courtesy, we accept returns of
           catalog items within <strong>14 days</strong> of receipt, provided
-          they are unused and in original condition. Return shipping is at
-          your expense; the item price is refunded, excluding the original
-          shipping cost.
+          they are unused and in original condition. Return shipping is at your
+          expense; the item price is refunded, excluding the original shipping
+          cost.
         </p>
       ),
     },
@@ -363,8 +360,8 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Custom pieces",
       body: (
         <p>
-          Pieces printed from a personalized quote are excluded from
-          returns, except for manufacturing defects (see "Warranty").
+          Pieces printed from a personalized quote are excluded from returns,
+          except for manufacturing defects (see "Warranty").
         </p>
       ),
     },

@@ -11,7 +11,7 @@ Operational reference for the **live** store (swiss3design.ch). Architecture is 
   applies **D1** migrations if any are pending — but D1 is the inactive rollback
   safety net, not the live database, see below). No GitHub Actions.
 - **Postgres (the live database) has no deploy-time migration step at all** —
-  `bun run db:generate:pg` + `db:push:pg` are manual, run *before* deploying code
+  `bun run db:generate:pg` + `db:push:pg` are manual, run _before_ deploying code
   that needs the new schema. See "Postgres schema changes" below.
 - **Status:** the "Cloudflare Workers Builds" check on the commit. Green = build
   **and** deploy succeeded. Red = nothing shipped, the previous version stays live.
@@ -29,13 +29,13 @@ Cloudflare dash → `swiss3design` → **Deployments** → pick a previous deplo
 Open the failed check → **Details** → **Rerun** (or dash → Builds → Retry). Common
 causes:
 
-| Symptom | Cause | Fix |
-| --- | --- | --- |
-| Build fails bundling | Turbopack used for prod build | Build must be `opennextjs-cloudflare build`; no `--turbopack` |
-| "Node.js middleware is not supported" | `proxy.ts` (Node runtime) | Keep `src/middleware.ts` (Edge); never rename to `proxy.ts` |
-| Type / lint errors | strict TS | `bun run lint` + fix; reproduce build with `bun run preview` |
-| Deploy stops after migrations | a **D1** (inactive rollback DB) migration failed | Harmless for the live site — see below |
-| Page 500s right after a deploy that touched `schema.pg.ts` | forgot to `db:push:pg` before deploying, or a query that worked on SQLite/D1 is invalid Postgres (e.g. `SELECT DISTINCT` + `ORDER BY` on a column outside the select list, `42P10`) | Check `wrangler tail` for the real Postgres error (Drizzle hides it behind "Failed query") |
+| Symptom                                                                    | Cause                                                                                                                                                                                                                                                    | Fix                                                                                                                                                                                                                                                                                                         |
+| -------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Build fails bundling                                                       | Turbopack used for prod build                                                                                                                                                                                                                            | Build must be `opennextjs-cloudflare build`; no `--turbopack`                                                                                                                                                                                                                                               |
+| "Node.js middleware is not supported"                                      | `proxy.ts` (Node runtime)                                                                                                                                                                                                                                | Keep `src/middleware.ts` (Edge); never rename to `proxy.ts`                                                                                                                                                                                                                                                 |
+| Type / lint errors                                                         | strict TS                                                                                                                                                                                                                                                | `bun run lint` + fix; reproduce build with `bun run preview`                                                                                                                                                                                                                                                |
+| Deploy stops after migrations                                              | a **D1** (inactive rollback DB) migration failed                                                                                                                                                                                                         | Harmless for the live site — see below                                                                                                                                                                                                                                                                      |
+| Page 500s right after a deploy that touched `schema.pg.ts`                 | forgot to `db:push:pg` before deploying, or a query that worked on SQLite/D1 is invalid Postgres (e.g. `SELECT DISTINCT` + `ORDER BY` on a column outside the select list, `42P10`)                                                                      | Check `wrangler tail` for the real Postgres error (Drizzle hides it behind "Failed query")                                                                                                                                                                                                                  |
 | Build fails at `next build` with `"no local hyperdrive connection string"` | `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` missing from the Workers Builds environment — `next build` executes page code at build time and needs a working DB connection, but this variable only lives in local `.env*` files by default | Add it as a **Build variable** (Worker → Settings → **Build** tab → "Build variables and secrets" — not the "Variables & Secrets" tab, that's runtime-only) — dashboard-only, no `wrangler.jsonc`/CLI/API path. Different value per Worker (prod vs. preview branch). See `docs/deploiement-cloudflare.md`. |
 
 ## Postgres schema changes (the live database)
@@ -144,10 +144,10 @@ To exercise prod-only behaviour (CSP nonce, Workers runtime): `bun run preview`.
 
 ## Incident quick reference
 
-| Situation | First move |
-| --- | --- |
-| Site down after a deploy | Dashboard → Deployments → **Rollback** |
-| Build red on a commit | Open check → Details → read logs → Rerun |
+| Situation                                 | First move                                     |
+| ----------------------------------------- | ---------------------------------------------- |
+| Site down after a deploy                  | Dashboard → Deployments → **Rollback**         |
+| Build red on a commit                     | Open check → Details → read logs → Rerun       |
 | Payments captured, orders stuck `pending` | Check Stripe webhook + `STRIPE_WEBHOOK_SECRET` |
-| Inline script blocked in prod only | Missing CSP nonce — `bun run preview` to repro |
-| Suspected secret leak | Rotate via `wrangler secret put` (instant) |
+| Inline script blocked in prod only        | Missing CSP nonce — `bun run preview` to repro |
+| Suspected secret leak                     | Rotate via `wrangler secret put` (instant)     |

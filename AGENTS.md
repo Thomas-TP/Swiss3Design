@@ -1,4 +1,5 @@
 <!-- BEGIN:nextjs-agent-rules -->
+
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -16,22 +17,22 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Every `.md` in this repo, what it's for, and who reads it:
 
-| File | Audience | Read it for |
-| --- | --- | --- |
-| [`docs/codemap.md`](docs/codemap.md) | Agents | **Start here for any code task** — "I need to do X" → exact file(s) |
-| [`docs/architecture.md`](docs/architecture.md) | Agents / dev | Data model, request flows (checkout, quotes, auth), runtime model |
-| [`docs/conventions.md`](docs/conventions.md) | Agents / dev | Code patterns, CSP nonce contract, i18n, Swiss specifics, style |
-| [`docs/playbook.md`](docs/playbook.md) | Human ↔ agent | How to phrase a request well, task recipes, prompt templates |
-| [`docs/runbook.md`](docs/runbook.md) | Ops | Deploy/rollback steps, incident procedures, secrets rotation |
-| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md) | Ops | Git ↔ Cloudflare Workers Builds wiring, preview env, PR-stack pitfall |
-| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md) | Product | Forward-looking redesign proposal — **not implemented**, don't treat as current state |
-| [`README.md`](README.md) | Human (public) | Project overview, stack, setup, for anyone landing on the repo |
-| [`ROADMAP.md`](ROADMAP.md) | Product | What's shipped vs. what's next, budget |
-| [`SECURITY.md`](SECURITY.md) | Security | Vulnerability disclosure process |
-| [`LICENSE.md`](LICENSE.md) | Legal | All-rights-reserved terms |
+| File                                                                 | Audience       | Read it for                                                                           |
+| -------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------- |
+| [`docs/codemap.md`](docs/codemap.md)                                 | Agents         | **Start here for any code task** — "I need to do X" → exact file(s)                   |
+| [`docs/architecture.md`](docs/architecture.md)                       | Agents / dev   | Data model, request flows (checkout, quotes, auth), runtime model                     |
+| [`docs/conventions.md`](docs/conventions.md)                         | Agents / dev   | Code patterns, CSP nonce contract, i18n, Swiss specifics, style                       |
+| [`docs/playbook.md`](docs/playbook.md)                               | Human ↔ agent  | How to phrase a request well, task recipes, prompt templates                          |
+| [`docs/runbook.md`](docs/runbook.md)                                 | Ops            | Deploy/rollback steps, incident procedures, secrets rotation                          |
+| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)   | Ops            | Git ↔ Cloudflare Workers Builds wiring, preview env, PR-stack pitfall                 |
+| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md) | Product        | Forward-looking redesign proposal — **not implemented**, don't treat as current state |
+| [`README.md`](README.md)                                             | Human (public) | Project overview, stack, setup, for anyone landing on the repo                        |
+| [`ROADMAP.md`](ROADMAP.md)                                           | Product        | What's shipped vs. what's next, budget                                                |
+| [`SECURITY.md`](SECURITY.md)                                         | Security       | Vulnerability disclosure process                                                      |
+| [`LICENSE.md`](LICENSE.md)                                           | Legal          | All-rights-reserved terms                                                             |
 
 `CLAUDE.md` at the repo root is a one-line `@AGENTS.md` import — this file
-*is* the actual source of truth Claude Code loads every session.
+_is_ the actual source of truth Claude Code loads every session.
 
 ## What this is
 
@@ -64,6 +65,47 @@ upstream reports. No config flag bypasses it. Stays on **TypeScript 6**
 until TS 7.1 reintroduces a JS API. D1 stays wired in `wrangler.jsonc` for
 now as a rollback safety net, not the active database.
 
+**Driver + tooling refresh (2026-09-09):** the Postgres runtime driver moved
+from `postgres.js` to **node-postgres (`pg`)** — Cloudflare's Hyperdrive docs
+name `pg` as _the_ recommended driver (better prepared-statement caching,
+fewer round-trips to Neon); `postgres.js` is still supported, just no longer
+recommended. `getPgDb()` ([`src/db/index.pg.ts`](src/db/index.pg.ts)) uses a
+request-scoped `pg.Pool` (`max: 5`), **not** a bare `Client`: this app
+parallelizes independent reads with `Promise.all` (e.g. the product page), and
+a `Client` only handles one query at a time — confirmed in real testing
+against the preview DB (a silent `DeprecationWarning` under concurrent
+queries; becomes a hard error in pg@9). The pool has an `.on("error", ...)`
+handler — without it, Neon closing an idle connection (Postgres error
+`57P01`) surfaces as an uncaught exception (also hit live in testing, not
+hypothetical). Old code comment claimed `better-auth-cloudflare` required
+`postgres.js`: false — that package is an unused dependency in this codebase;
+`src/lib/auth.ts` wires plain `betterAuth()` + the driver-agnostic
+`better-auth/adapters/drizzle`, confirmed by reading its source (no reference
+to either Postgres driver) and by a real sign-up/login/2FA round-trip against
+`pg`.
+**Biome replaced by Oxlint + Oxfmt** (same date): `oxlint` (`.oxlintrc.json`)
+covers everything Biome did, including both of Biome's own accepted gaps
+above — `react/purity` (Date.now-during-render) and the `nextjs` plugin
+rules — plus noticeably deeper `jsx-a11y` coverage. `nextjs/no-img-element`
+is kept **off**, same reasoning as Biome's old override: Cloudflare Images
+already handles optimization (`images.unoptimized` in `next.config.ts`), so
+converting `<img>` to `next/image` is a real UI change, not a lint fix.
+`oxfmt` (`.oxfmtrc.json`) is Prettier-compatible, configured to match Biome's
+prior formatting exactly (CRLF, double quotes, printWidth 80, etc.) —
+`sortPackageJson`/`sortImports`/`sortTailwindcss` left off on purpose to avoid
+a repo-wide reorder diff unrelated to any real change. Caveat: **oxfmt is
+still beta (0.x)**, no stable 1.0 as of this date. `biome-ignore` comments
+don't port automatically — the ones that mattered (exhaustive-deps
+exemptions, one deliberate a11y-role exemption) were translated to
+`// oxlint-disable`/`oxlint-enable <bare-rule-name> -- reason` pairs bracketing
+the block (bare rule name, no plugin prefix — e.g. `exhaustive-deps`, not
+`react-hooks/exhaustive-deps`; `oxlint-disable-line`/`-next-line` only reaches
+the _exact_ reported line, which for a multi-line hook body is rarely the
+line the old single comment sat above). Two gaps vs. Biome: oxfmt doesn't
+format CSS (`src/app/globals.css` needs another tool if it drifts), and
+doesn't organize imports (no active equivalent of Biome's
+`assist.organizeImports` here).
+
 ## Golden rules (these break production — read first)
 
 1. **Never `redirect()` from a Server Action.** On Cloudflare Workers it freezes
@@ -82,11 +124,11 @@ now as a rollback safety net, not the active database.
 5. **Money is always integer centimes CHF** (`*_cents`). Never floats, never a
    plain `price`. Format for display via [`src/lib/format.ts`](src/lib/format.ts).
 6. **Cloudflare bindings only exist inside a request.** Always obtain DB/auth via
-   `await getDb()` / `await getAuth()` *inside* the handler — never at module top
+   `await getDb()` / `await getAuth()` _inside_ the handler — never at module top
    level.
-6b. **Postgres is stricter than SQLite — don't assume a query that worked on D1
+   6b. **Postgres is stricter than SQLite — don't assume a query that worked on D1
    still works.** Concretely: `SELECT DISTINCT` + `ORDER BY` on a column absent
-   from the SELECT list is *tolerated* by SQLite but a hard Postgres error
+   from the SELECT list is _tolerated_ by SQLite but a hard Postgres error
    (`42P10`), and TypeScript/Drizzle's types don't catch it — this broke
    `/products/[slug]` in production right after the Hyperdrive cutover. When
    `DISTINCT` exists only to dedupe rows from a join, prefer a correlated
@@ -94,7 +136,7 @@ now as a rollback safety net, not the active database.
 7. **Never commit secrets.** Local secrets live in `.dev.vars`; prod secrets in
    Cloudflare (`wrangler secret put` / dashboard). The committed `.env.*` files
    hold only the **public** Stripe publishable key. **Never run `wrangler secret
-   put` on an environment with real users without `--env <name>` explicitly
+put` on an environment with real users without `--env <name>` explicitly
    set and double-checked** — a shared secret like `BETTER_AUTH_SECRET`
    encrypts existing 2FA/backup-code data; overwriting it silently locks users
    out with no self-service recovery (real incident, see
@@ -111,47 +153,47 @@ now as a rollback safety net, not the active database.
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
 10. **The Worker bundle has ~120 KiB of headroom under a hard 3 MiB cap. Never
-   add a binary asset through a Next file convention.** The Workers **Free**
-   plan caps a Worker at 3 MiB **gzipped** (`Total Upload: … / gzip:` in the
-   deploy log is the number that counts — the uncompressed figure is 5× larger
-   and irrelevant). The `app/icon.*` & `app/apple-icon.*` conventions inline
-   their file as base64 **into that bundle** — a full icon set cost ~135 KiB
-   and broke the deploy in August 2026 (`error 10027`). Icons therefore live in
-   `public/` and are declared via `metadata.icons` in
-   [`src/app/[locale]/layout.tsx`](src/app/[locale]/layout.tsx): `public/` ships
-   as Cloudflare **static assets**, outside the bundle and outside the cap. The
-   same trap applies to `opengraph-image.*`, `twitter-image.*` and any
-   `import`ed image. Measure before pushing — `bunx wrangler deploy --dry-run`
-   prints the gzip size in ~1 min without deploying. Known remaining fat:
-   `three.js` sits in the **server** bundle (~718 KiB raw) because the 3D
-   viewer's client component is server-rendered; moving it out is the next real
-   win if headroom runs short.
+    add a binary asset through a Next file convention.** The Workers **Free**
+    plan caps a Worker at 3 MiB **gzipped** (`Total Upload: … / gzip:` in the
+    deploy log is the number that counts — the uncompressed figure is 5× larger
+    and irrelevant). The `app/icon.*` & `app/apple-icon.*` conventions inline
+    their file as base64 **into that bundle** — a full icon set cost ~135 KiB
+    and broke the deploy in August 2026 (`error 10027`). Icons therefore live in
+    `public/` and are declared via `metadata.icons` in
+    [`src/app/[locale]/layout.tsx`](src/app/[locale]/layout.tsx): `public/` ships
+    as Cloudflare **static assets**, outside the bundle and outside the cap. The
+    same trap applies to `opengraph-image.*`, `twitter-image.*` and any
+    `import`ed image. Measure before pushing — `bunx wrangler deploy --dry-run`
+    prints the gzip size in ~1 min without deploying. Known remaining fat:
+    `three.js` sits in the **server** bundle (~718 KiB raw) because the 3D
+    viewer's client component is server-rendered; moving it out is the next real
+    win if headroom runs short.
 
 ## Tech stack
 
-| Area | Choice |
-| --- | --- |
-| Runtime & package manager | Bun (install/scripts/dev) — deploy target is still `workerd` (Cloudflare Workers) |
-| Framework | Next.js 16 (App Router, RSC) + React 19 |
-| Language | TypeScript 6 (strict). Import alias `@/* → src/*` |
-| Styling | Tailwind CSS 4 (`src/app/globals.css`), `motion`, `lucide-react` |
-| DB | Postgres (Neon) via Cloudflare Hyperdrive + Drizzle ORM (pg dialect, `postgres.js` driver) |
-| Auth | `better-auth` via `better-auth-cloudflare` (email + Google OAuth, TOTP 2FA, passkeys) — Postgres-backed |
-| Lint/format | Biome (sole linter + formatter — ESLint removed 2026-07-09, see stack-pivot note) |
-| Payments | Stripe Payment Element + webhooks (LIVE in prod) |
-| Email | Resend (REST) — no-op if `RESEND_API_KEY` unset |
-| i18n | `next-intl` (fr/de/it/en, auto-detect, fr fallback) |
-| Files / cache | Cloudflare R2 / KV |
-| Hosting | Cloudflare Workers via `@opennextjs/cloudflare` |
+| Area                      | Choice                                                                                                                                                                                                                    |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime & package manager | Bun (install/scripts/dev) — deploy target is still `workerd` (Cloudflare Workers)                                                                                                                                         |
+| Framework                 | Next.js 16 (App Router, RSC) + React 19                                                                                                                                                                                   |
+| Language                  | TypeScript 6 (strict). Import alias `@/* → src/*`                                                                                                                                                                         |
+| Styling                   | Tailwind CSS 4 (`src/app/globals.css`), `motion`, `lucide-react`                                                                                                                                                          |
+| DB                        | Postgres (Neon) via Cloudflare Hyperdrive + Drizzle ORM (pg dialect, `node-postgres`/`pg` driver)                                                                                                                         |
+| Auth                      | `better-auth` (+`@better-auth/passkey`) via the driver-agnostic `better-auth/adapters/drizzle` (email + Google OAuth, TOTP 2FA, passkeys) — Postgres-backed. `better-auth-cloudflare` is a declared but unused dependency |
+| Lint/format               | Oxlint + Oxfmt (Biome removed 2026-09-09, see driver + tooling refresh note; oxfmt is still beta)                                                                                                                         |
+| Payments                  | Stripe Payment Element + webhooks (LIVE in prod)                                                                                                                                                                          |
+| Email                     | Resend (REST) — no-op if `RESEND_API_KEY` unset                                                                                                                                                                           |
+| i18n                      | `next-intl` (fr/de/it/en, auto-detect, fr fallback)                                                                                                                                                                       |
+| Files / cache             | Cloudflare R2 / KV                                                                                                                                                                                                        |
+| Hosting                   | Cloudflare Workers via `@opennextjs/cloudflare`                                                                                                                                                                           |
 
 ## Commands
 
 ```bash
 bun run dev               # dev server :3000 (loads Hyperdrive/R2/KV bindings via OpenNext)
-bun run lint              # biome lint (run before declaring a change done)
+bun run lint              # oxlint (run before declaring a change done)
 bun run typecheck         # tsc --noEmit — fast type check (no heavy OpenNext build)
 bun run test              # Vitest (unit tests for pure domain logic in src/lib)
-bun run format             # Biome --write (format:check to verify only)
+bun run format             # oxfmt (writes by default; format:check verifies only)
 bun run preview           # OpenNext build + local Workers preview — tests prod CSP/nonce
 bun run deploy            # OpenNext build + deploy from local machine (manual)
 bun run cf-typegen        # regenerate cloudflare-env.d.ts after editing wrangler.jsonc
@@ -173,7 +215,7 @@ bun run db:push:pg        # push schema changes to Postgres directly (drizzle-ki
 > NOT loaded outside dev mode. The separate `wrangler preview`/`deploy`
 > subprocess spawned by `opennextjs-cloudflare` does **not** inherit Next's
 > dotenv-loaded values at all — on Windows/PowerShell, set it as a real
-> `$env:` variable in the *same* command as `bun run preview`/`deploy`
+> `$env:` variable in the _same_ command as `bun run preview`/`deploy`
 > (PowerShell doesn't persist shell state between separate tool calls).
 
 > **Lockfile:** the project is on **Bun** (`packageManager` in `package.json`,
@@ -218,7 +260,7 @@ scripts/          push.bat (one-click publish), seed*.sql, migrate-d1-to-pg.ts (
                   needs resyncing before the rollback safety net is retired)
 workers/cron/     standalone Cloudflare Cron Worker → POST /api/cron/maintenance
                   (purge R2 + cart reminders); deployed separately, excluded from
-                  the app's tsconfig/Biome/OpenNext build
+                  the app's tsconfig/oxlint/OpenNext build
 ```
 
 Server-side data access patterns to reuse: `getDb()` ([src/db/index.ts](src/db/index.ts)),
@@ -227,7 +269,7 @@ Server-side data access patterns to reuse: `getDb()` ([src/db/index.ts](src/db/i
 
 ## Deployment
 
-`git push` to `main` is *supposed* to trigger **Cloudflare Workers Builds**
+`git push` to `main` is _supposed_ to trigger **Cloudflare Workers Builds**
 (Git-native): build + deploy, with Cloudflare's own credentials — but this has
 proven unreliable in practice (see golden rule 9), and from Phase 2 of the
 stack pivot until 2026-07-09 it was **outright broken** for a real reason, not
@@ -271,7 +313,7 @@ under D1.
   with `git log --oneline main -- <file only the last phase adds>` afterwards.
 - Match the surrounding style: **comments and user-facing copy are in French**;
   code identifiers in English. Keep the dense, explanatory comment style already
-  in the codebase (the *why*, not the *what*).
+  in the codebase (the _why_, not the _what_).
 - Run `bun run lint` before declaring work done. When a change touches CSP, inline
   scripts, or anything runtime-specific, also run `bun run preview`.
 

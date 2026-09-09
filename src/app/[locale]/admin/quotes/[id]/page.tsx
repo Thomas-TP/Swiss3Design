@@ -222,7 +222,9 @@ export default async function AdminQuoteDetailPage({
             className={FIELD}
           />
         </label>
-        <button type="submit" className={BTN_PRIMARY}>Enregistrer la réponse</button>
+        <button type="submit" className={BTN_PRIMARY}>
+          Enregistrer la réponse
+        </button>
         <p className="text-xs leading-relaxed text-soft">
           E-mails automatiques au client : passer en{" "}
           <strong>« Devis envoyé »</strong> avec un prix → e-mail avec la

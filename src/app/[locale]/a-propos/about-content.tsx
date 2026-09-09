@@ -172,7 +172,10 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
           { label: "Hauteur de couche", value: "0,05 – 0,3 mm" },
           { label: "Buse", value: "0,4 mm — jusqu’à 300 °C" },
           { label: "Vitesse maximale", value: "600 mm/s" },
-          { label: "Stockage filament", value: "CFS étanche, hygrométrie affichée" },
+          {
+            label: "Stockage filament",
+            value: "CFS étanche, hygrométrie affichée",
+          },
           { label: "Encombrement", value: "404 × 436 × 545 mm" },
         ],
       },
@@ -411,8 +414,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       <>
         Unsere Stücke entstehen auf zwei geschlossenen Druckern, jeder mit
         seinem eigenen Mehrfilament-System: einer <strong>Bambu Lab P1S</strong>{" "}
-        in Gland und einer <strong>Creality K2</strong> in Pully. Beide
-        vereinen bis zu vier Farben in einem Objekt und halten die Filamente vor
+        in Gland und einer <strong>Creality K2</strong> in Pully. Beide vereinen
+        bis zu vier Farben in einem Objekt und halten die Filamente vor
         Feuchtigkeit geschützt — das sorgt für gleichbleibende Qualität, ganz
         gleich, welches Atelier den Druck startet.
       </>
@@ -741,7 +744,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       </>
     ),
     specsTitle: "Scheda tecnica",
-    legendHint: "Passate su un punto dello schema per individuare il componente",
+    legendHint:
+      "Passate su un punto dello schema per individuare il componente",
     printers: [
       {
         variant: "p1s",

@@ -5,9 +5,8 @@ import { useCart } from "@/lib/cart";
 
 export function ClearCart() {
   const { clear } = useCart();
-  // biome-ignore lint/correctness/useExhaustiveDependencies: vide le panier une seule fois au montage
   useEffect(() => {
     clear();
-  }, []);
+  }, []); // oxlint-disable-line exhaustive-deps -- vide le panier une seule fois au montage
   return null;
 }

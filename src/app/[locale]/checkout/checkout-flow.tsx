@@ -600,7 +600,7 @@ export function CheckoutFlow({
   // télécharge en parallèle de la saisie de l'adresse, donc le passage à
   // l'étape paiement n'attend plus que le PaymentIntent. Différé en idle pour
   // ne pas concurrencer le premier rendu de la page.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: precharge une seule fois au montage, jamais a chaque changement de cle
+  // oxlint-disable exhaustive-deps -- precharge une seule fois au montage, jamais a chaque changement de cle
   useEffect(() => {
     const warm = () => void getStripePromise(stripePublishableKey);
     if ("requestIdleCallback" in window) {
@@ -610,6 +610,7 @@ export function CheckoutFlow({
     const timer = setTimeout(warm, 1200);
     return () => clearTimeout(timer);
   }, []);
+  // oxlint-enable exhaustive-deps
 
   const shippingCents = clientSecret
     ? serverShipping

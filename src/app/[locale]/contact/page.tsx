@@ -18,7 +18,11 @@ export async function generateMetadata({
   return {
     title: t("pageTitle"),
     description: t("pageIntro"),
-    openGraph: { title: t("pageTitle"), description: t("pageIntro"), type: "website" },
+    openGraph: {
+      title: t("pageTitle"),
+      description: t("pageIntro"),
+      type: "website",
+    },
   };
 }
 

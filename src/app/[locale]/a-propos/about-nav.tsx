@@ -65,7 +65,10 @@ export function AboutNav({ items }: { items: AboutNavItem[] }) {
     if (!container || !activeEl) return;
     const containerRect = container.getBoundingClientRect();
     const elRect = activeEl.getBoundingClientRect();
-    if (elRect.left < containerRect.left || elRect.right > containerRect.right) {
+    if (
+      elRect.left < containerRect.left ||
+      elRect.right > containerRect.right
+    ) {
       const delta =
         elRect.left -
         containerRect.left -

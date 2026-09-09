@@ -39,8 +39,7 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
   // enregistrée directement dans la liste d'autocomplétion du champ e-mail
   // (autoComplete="username webauthn") — sans ça, une clé créée dans le compte
   // n'est jamais proposée et reste lettre morte.
-  // router/next stables sur la durée de vie du formulaire
-  // biome-ignore lint/correctness/useExhaustiveDependencies: router/next stables sur la durée de vie du formulaire
+  // oxlint-disable exhaustive-deps -- router/next stables sur la duree de vie du formulaire
   useEffect(() => {
     if (!passkeySupported) return;
     let cancelled = false;
@@ -59,6 +58,7 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
       cancelled = true;
     };
   }, [passkeySupported]);
+  // oxlint-enable exhaustive-deps
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();

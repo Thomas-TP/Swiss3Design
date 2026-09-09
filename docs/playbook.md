@@ -13,7 +13,7 @@ works) and [`conventions.md`](conventions.md) (how to write code here).
   agent already has the file map in `AGENTS.md`.
 - **Name the surface**: which locales, admin vs storefront, dev vs prod.
 - You don't need to paste conventions — the agent reads `AGENTS.md` + `docs/`
-  automatically. Do flag anything *not* in those docs.
+  automatically. Do flag anything _not_ in those docs.
 
 ## The standing workflow (what the agent does by default)
 
@@ -21,7 +21,7 @@ works) and [`conventions.md`](conventions.md) (how to write code here).
 2. Implements, matching existing style (French comments, English identifiers).
 3. Runs `bun run lint`; runs `bun run preview` when the change touches CSP, inline
    scripts, runtime, or anything prod-only.
-4. **Pushes to `main`** (this *should* trigger the Cloudflare deploy, but that
+4. **Pushes to `main`** (this _should_ trigger the Cloudflare deploy, but that
    auto-trigger has proven unreliable — see `AGENTS.md` golden rule 9) and
    starts `bun run dev` so Thomas can test. **Verifies the deploy actually
    happened** (Worker `modified_on` moved) and deploys manually if not. Browser
@@ -40,6 +40,7 @@ request · never commit secrets · translate every UI string (fr/de/it/en).
 ## Task recipes
 
 ### Add / change a product field
+
 1. Edit [`src/db/schema.pg.ts`](../src/db/schema.pg.ts) (`products` or a
    related table) — **not** `schema.ts`, which is just a re-export shim.
 2. `bun run db:generate:pg` → review the new file in `drizzle-pg/` (never
@@ -50,30 +51,35 @@ request · never commit secrets · translate every UI string (fr/de/it/en).
 5. Display it on the storefront (`product-card`, `products/[slug]`).
 6. If it's user-visible text, add keys to all four `messages/*.json`.
 7. **Prod migration does NOT apply automatically on deploy** — step 3 must run
-   *before* pushing code that depends on the new column/table, or the deployed
+   _before_ pushing code that depends on the new column/table, or the deployed
    code will query a column that doesn't exist yet. Unlike the old D1 setup,
    `bun run deploy` / a `main` push never touches the Postgres schema.
 
 ### Add a UI string
+
 Add the key to **all four** `messages/{fr,de,it,en}.json`; read it with
 `next-intl` (`useTranslations` / `getTranslations`). Never hardcode.
 
 ### Add an API route
+
 Under `src/app/api/**`. Inside the handler: `const db = await getDb()`, gate with
 `requireAdmin()` if admin-only, and `rateLimit(request, "<route>", {limit, windowS})`
 on anything abusable (email, upload). Return `Response.json(...)`.
 
 ### Touch a payment flow
+
 Keep finalization **idempotent** — both the Stripe webhook and the success/return
 page call `markOrderPaid` / `markQuotePaid`. Use the conditional `UPDATE` claim
 pattern; never assume a single call. Stripe is **LIVE in prod**.
 
 ### Add an admin action
+
 `"use server"`, call `await requireAdmin()` first, return a state object
 (`{ saved }` / `{ error }`) — **never `redirect()`**; navigate client-side. Call
 `revalidatePath()` after a mutation.
 
 ### "It works in dev but breaks in prod"
+
 Almost always the **CSP nonce** (inline script without `x-nonce`) — invisible in
 `bun run dev`. Reproduce with `bun run preview`, then pass `nonce={...}` from
 `(await headers()).get("x-nonce")`. See [conventions.md](conventions.md).
@@ -96,13 +102,16 @@ often the right call; see `AGENTS.md` golden rule 9.
 ## Prompt templates
 
 **Feature**
+
 > Goal: <user outcome>. Surface: <storefront/admin, locales>. Done when:
 > <observable criteria>. Anchor: like <existing flow> if relevant.
 
 **Bug**
+
 > Symptom: <what happens> on <page/flow>, <dev or prod>. Expected: <…>.
 > Repro: <steps>. (If prod-only, suspect CSP/nonce — check `bun run preview`.)
 
 **Refactor**
+
 > Refactor <area> for <reason>. Keep behaviour identical. Don't touch <X>.
 > Verify with `bun run lint` (+ `bun run preview` if runtime-affecting).

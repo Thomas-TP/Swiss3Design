@@ -43,7 +43,7 @@ export function ProductGallery({
   // l'image (toDataURL). Donne un aperçu fidèle de la visualisation interactive.
   const [thumb3d, setThumb3d] = useState<string | null>(null);
   // Snapshot unique : couleur par défaut, ne se régénère pas au changement de teinte.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: snapshot unique, ne doit pas se regenerer au changement de teinte
+  // oxlint-disable exhaustive-deps -- snapshot unique, ne doit pas se regenerer au changement de teinte
   useEffect(() => {
     if (!model3dUrl) return;
     let cancelled = false;
@@ -78,6 +78,7 @@ export function ProductGallery({
       cancelled = true;
     };
   }, [model3dUrl]);
+  // oxlint-enable exhaustive-deps
 
   return (
     <div>

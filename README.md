@@ -18,7 +18,7 @@ fabriqués à **Gland (VD)** et livrés dans toute la Suisse.
 ![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38BDF8?style=flat-square&logo=tailwindcss&logoColor=white)
 ![Bun](https://img.shields.io/badge/Bun-1.3-000000?style=flat-square&logo=bun&logoColor=white)
-![Biome](https://img.shields.io/badge/Biome-lint%20%2B%20format-60A5FA?style=flat-square&logo=biome&logoColor=white)
+![Oxlint](https://img.shields.io/badge/Oxlint%20%2B%20Oxfmt-lint%20%2B%20format-60A5FA?style=flat-square)
 ![Postgres](https://img.shields.io/badge/Postgres-Neon%20%2B%20Hyperdrive-4169E1?style=flat-square&logo=postgresql&logoColor=white)
 ![Cloudflare Workers](https://img.shields.io/badge/Cloudflare-Workers-F38020?style=flat-square&logo=cloudflare&logoColor=white)
 ![Stripe](https://img.shields.io/badge/Stripe-LIVE-635BFF?style=flat-square&logo=stripe&logoColor=white)
@@ -139,13 +139,13 @@ en accent, typographie nette, et un logomark géométrique.
 
 </div>
 
-| Élément | Valeur |
-| --- | --- |
-| 🔴 Rouge marque | `#E5231C` (accent foncé : `#C01D14`) |
-| ⚫ Encre (texte) | `#1A1614` clair · `#F4F1ED` sombre |
-| ⚪ Papier (fond) | `#FAFAF9` clair · `#0B0A09` sombre |
-| 🔤 Police | **Geist Sans** (`next/font`) |
-| ⛰️ Logo | Pic géométrique en couches — couches d'impression + clin d'œil alpin |
+| Élément          | Valeur                                                               |
+| ---------------- | -------------------------------------------------------------------- |
+| 🔴 Rouge marque  | `#E5231C` (accent foncé : `#C01D14`)                                 |
+| ⚫ Encre (texte) | `#1A1614` clair · `#F4F1ED` sombre                                   |
+| ⚪ Papier (fond) | `#FAFAF9` clair · `#0B0A09` sombre                                   |
+| 🔤 Police        | **Geist Sans** (`next/font`)                                         |
+| ⛰️ Logo          | Pic géométrique en couches — couches d'impression + clin d'œil alpin |
 
 Le logo est en **rouge de marque uniquement, sur fond transparent** : ni blanc
 ni noir dans le mark, donc **un seul fichier** suffit pour le thème clair et le
@@ -169,28 +169,28 @@ Le **kit de marque** est versionné dans [`public/brand/`](public/brand) :
 - **Illustrations produits** — [`public/products/`](public/products) (SVG).
 
 > 🎨 **Contraintes de marque** : rouge de marque `#E5231C` sur neutres chauds ;
-> pas de blanc ni de noir *dans* le mark ; pas de « 3 », pas de « S ». Toute
+> pas de blanc ni de noir _dans_ le mark ; pas de « 3 », pas de « S ». Toute
 > nouvelle identité visuelle doit être validée avant usage.
 
 ---
 
 ## Stack technique
 
-| Domaine | Technologie |
-| --- | --- |
-| Framework | **Next.js 16** (App Router, React Server Components) |
-| UI | **React 19**, **Tailwind CSS 4**, [`motion`](https://motion.dev), `lucide-react` |
-| Langage | **TypeScript 6** (strict) |
-| Runtime & package manager | **Bun** (install / scripts / dev) — déploiement sur `workerd` (Cloudflare Workers) |
-| Lint / format | **Biome** (linter + formatter, remplace ESLint depuis 2026-07-09) |
-| Base de données | **Postgres (Neon)** via **Cloudflare Hyperdrive** + **Drizzle ORM** |
-| Authentification | **better-auth** (e-mail + Google OAuth, 2FA TOTP, passkeys) |
-| Paiement | **Stripe** (Payment Element + webhooks, **LIVE** en prod) |
-| E-mails | **Resend** (API REST) |
-| i18n | **next-intl** (fr/de/it/en) |
-| Stockage fichiers | **Cloudflare R2** |
-| Cache / rate-limit | **Cloudflare KV** |
-| Hébergement | **Cloudflare Workers** via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare) |
+| Domaine                   | Technologie                                                                                    |
+| ------------------------- | ---------------------------------------------------------------------------------------------- |
+| Framework                 | **Next.js 16** (App Router, React Server Components)                                           |
+| UI                        | **React 19**, **Tailwind CSS 4**, [`motion`](https://motion.dev), `lucide-react`               |
+| Langage                   | **TypeScript 6** (strict)                                                                      |
+| Runtime & package manager | **Bun** (install / scripts / dev) — déploiement sur `workerd` (Cloudflare Workers)             |
+| Lint / format             | **Oxlint + Oxfmt** (remplace Biome depuis 2026-09-09, qui remplaçait ESLint depuis 2026-07-09) |
+| Base de données           | **Postgres (Neon)** via **Cloudflare Hyperdrive** + **Drizzle ORM**                            |
+| Authentification          | **better-auth** (e-mail + Google OAuth, 2FA TOTP, passkeys)                                    |
+| Paiement                  | **Stripe** (Payment Element + webhooks, **LIVE** en prod)                                      |
+| E-mails                   | **Resend** (API REST)                                                                          |
+| i18n                      | **next-intl** (fr/de/it/en)                                                                    |
+| Stockage fichiers         | **Cloudflare R2**                                                                              |
+| Cache / rate-limit        | **Cloudflare KV**                                                                              |
+| Hébergement               | **Cloudflare Workers** via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare)      |
 
 > ℹ️ Le projet a migré de D1/SQLite vers Postgres/Hyperdrive le 2026-07-09
 > (voir [`AGENTS.md`](AGENTS.md#what-this-is)). D1 reste câblé dans
@@ -200,7 +200,7 @@ Le **kit de marque** est versionné dans [`public/brand/`](public/brand) :
 
 ## Intégrations
 
-- **Stripe** *(LIVE en production)* — Payment Element pour les commandes et le
+- **Stripe** _(LIVE en production)_ — Payment Element pour les commandes et le
   paiement des devis, webhooks pour la confirmation des paiements.
 - **better-auth + Google OAuth** — sessions, comptes, rôle admin attribué
   automatiquement aux adresses de `ADMIN_EMAILS`.
@@ -249,7 +249,7 @@ Swiss3Design/
 ├─ wrangler.jsonc                 # Bindings Cloudflare (Hyperdrive, R2, KV, D1) + domaine
 ├─ drizzle.config.pg.ts           # Config drizzle-kit — Postgres (actif)
 ├─ drizzle.config.ts              # Config drizzle-kit — D1 (legacy)
-├─ biome.jsonc                    # Lint + format (Biome)
+├─ .oxlintrc.json / .oxfmtrc.json # Lint + format (Oxlint + Oxfmt)
 ├─ AGENTS.md                      # Guide pour agents IA (CLAUDE.md l'importe)
 └─ ROADMAP.md                     # Feuille de route
 ```
@@ -293,8 +293,8 @@ bindings Cloudflare (Hyperdrive, R2, KV) via OpenNext.
 
 `.env.development` (Stripe **test**) et `.env.production` (Stripe **live**) :
 
-| Variable | Rôle |
-| --- | --- |
+| Variable                             | Rôle                                             |
+| ------------------------------------ | ------------------------------------------------ |
 | `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Clé publiable Stripe (test en dev, live en prod) |
 
 </details>
@@ -307,17 +307,17 @@ bindings Cloudflare (Hyperdrive, R2, KV) via OpenNext.
 > ⚠️ Jamais versionnés. En production, gérés via `wrangler secret put` ou le
 > dashboard Cloudflare.
 
-| Variable | Rôle |
-| --- | --- |
-| `DATABASE_URL` | Connexion Postgres (dev local / `drizzle-kit`) |
-| `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` | Émulation Hyperdrive locale (même Postgres) |
-| `STRIPE_SECRET_KEY` | Clé secrète Stripe |
-| `STRIPE_WEBHOOK_SECRET` | Signature des webhooks Stripe |
-| `BETTER_AUTH_SECRET` | Secret de signature des sessions |
-| `RESEND_API_KEY` | Envoi d'e-mails (optionnel — sans clé, l'envoi est ignoré) |
-| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | Connexion Google |
-| `CRON_SECRET` | Jeton de la maintenance planifiée (purge R2) |
-| `ADMIN_EMAILS` | Adresses recevant le rôle admin (secret plutôt que var en clair — dépôt public) |
+| Variable                                                   | Rôle                                                                            |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                             | Connexion Postgres (dev local / `drizzle-kit`)                                  |
+| `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` | Émulation Hyperdrive locale (même Postgres)                                     |
+| `STRIPE_SECRET_KEY`                                        | Clé secrète Stripe                                                              |
+| `STRIPE_WEBHOOK_SECRET`                                    | Signature des webhooks Stripe                                                   |
+| `BETTER_AUTH_SECRET`                                       | Secret de signature des sessions                                                |
+| `RESEND_API_KEY`                                           | Envoi d'e-mails (optionnel — sans clé, l'envoi est ignoré)                      |
+| `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET`                | Connexion Google                                                                |
+| `CRON_SECRET`                                              | Jeton de la maintenance planifiée (purge R2)                                    |
+| `ADMIN_EMAILS`                                             | Adresses recevant le rôle admin (secret plutôt que var en clair — dépôt public) |
 
 </details>
 
@@ -326,10 +326,10 @@ bindings Cloudflare (Hyperdrive, R2, KV) via OpenNext.
 
 <br />
 
-| Variable | Valeur |
-| --- | --- |
+| Variable          | Valeur                    |
+| ----------------- | ------------------------- |
 | `BETTER_AUTH_URL` | `https://swiss3design.ch` |
-| `EMAIL_FROM` | Expéditeur des e-mails |
+| `EMAIL_FROM`      | Expéditeur des e-mails    |
 
 Bindings : `HYPERDRIVE` (Postgres actif) · `DB` (D1, filet de secours) ·
 `R2` (fichiers) · `KV` (cache / rate-limit) · `ASSETS` ·
@@ -346,19 +346,19 @@ Bindings : `HYPERDRIVE` (Postgres actif) · `DB` (D1, filet de secours) ·
 
 <br />
 
-| Script | Action |
-| --- | --- |
-| `bun run dev` | Serveur de développement (bindings Cloudflare inclus) |
-| `bun run build` | Build Next.js |
-| `bun run lint` | Biome (lint) |
-| `bun run format` | Biome (format --write) |
-| `bun run typecheck` | `tsc --noEmit` |
-| `bun run test` | Vitest |
-| `bun run preview` | Build OpenNext + aperçu Workers en local (teste la CSP prod) |
-| `bun run deploy` | Build OpenNext + déploiement Cloudflare |
-| `bun run cf-typegen` | Régénère `cloudflare-env.d.ts` depuis `wrangler.jsonc` |
-| `bun run db:generate:pg` | Génère une migration Drizzle depuis `src/db/schema.pg.ts` |
-| `bun run db:push:pg` | Applique le schéma directement sur Postgres |
+| Script                   | Action                                                       |
+| ------------------------ | ------------------------------------------------------------ |
+| `bun run dev`            | Serveur de développement (bindings Cloudflare inclus)        |
+| `bun run build`          | Build Next.js                                                |
+| `bun run lint`           | Oxlint (lint)                                                |
+| `bun run format`         | Oxfmt (format, écrit par défaut)                             |
+| `bun run typecheck`      | `tsc --noEmit`                                               |
+| `bun run test`           | Vitest                                                       |
+| `bun run preview`        | Build OpenNext + aperçu Workers en local (teste la CSP prod) |
+| `bun run deploy`         | Build OpenNext + déploiement Cloudflare                      |
+| `bun run cf-typegen`     | Régénère `cloudflare-env.d.ts` depuis `wrangler.jsonc`       |
+| `bun run db:generate:pg` | Génère une migration Drizzle depuis `src/db/schema.pg.ts`    |
+| `bun run db:push:pg`     | Applique le schéma directement sur Postgres                  |
 
 </details>
 
@@ -381,7 +381,7 @@ bun run db:push:pg       # applique sur la vraie base Neon
 
 **Contrairement à l'ancien D1** (migrations auto-appliquées par Cloudflare
 Workers Builds à chaque déploiement), **un `git push`/`bun run deploy` ne
-touche jamais le schéma Postgres.** Toujours exécuter `db:push:pg` *avant* de
+touche jamais le schéma Postgres.** Toujours exécuter `db:push:pg` _avant_ de
 déployer du code qui dépend de nouvelles colonnes/tables — l'ordre compte.
 
 Les migrations sont stockées dans [`drizzle-pg/`](drizzle-pg) — ne jamais
@@ -404,7 +404,7 @@ Tout push sur `main` déclenche, côté Cloudflare et avec ses propres identifia
 2. **déploiement** sur Cloudflare Workers.
 
 > Il n'y a **plus de workflow GitHub Actions** : le statut de déploiement est porté
-> par le *check* « Cloudflare Workers Builds » sur le commit (vert = build **et**
+> par le _check_ « Cloudflare Workers Builds » sur le commit (vert = build **et**
 > deploy réussis ; rouge = l'ancienne version reste en ligne, rien n'est cassé).
 > **Toujours vérifier qu'un push a réellement déployé** — l'auto-trigger
 > Cloudflare s'est déjà avéré peu fiable. Détails, filet de secours manuel et
@@ -419,7 +419,7 @@ Pour publier en un clic : double-cliquer sur [`scripts/push.bat`](scripts/push.b
 bun run deploy   # build + déploiement depuis la machine locale
 ```
 
-Le domaine `swiss3design.ch` (et `www`) est routé en *custom domain* dans
+Le domaine `swiss3design.ch` (et `www`) est routé en _custom domain_ dans
 [`wrangler.jsonc`](wrangler.jsonc).
 
 ---
@@ -447,19 +447,19 @@ reflétée dans l'URL (`/fr`, `/de`, `/it`, `/en`). Les traductions vivent dans
 
 ## Documentation
 
-| Document | Pour qui | Contenu |
-| --- | --- | --- |
-| [`AGENTS.md`](AGENTS.md) | Agents IA | Brief opérationnel + règles d'or (chargé via `CLAUDE.md`) |
-| [`docs/architecture.md`](docs/architecture.md) | Agents / dev | Modèle de données, flux, runtime |
-| [`docs/conventions.md`](docs/conventions.md) | Agents / dev | Patterns de code & pièges |
-| [`docs/playbook.md`](docs/playbook.md) | Humain ↔ IA | Comment demander et réaliser une tâche efficacement |
-| [`docs/runbook.md`](docs/runbook.md) | Ops | Déploiement, rollback, incidents, secrets |
-| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md) | Ops | Connexion Git ↔ Cloudflare Workers Builds |
-| [`docs/codemap.md`](docs/codemap.md) | Agents / dev | « Je dois faire X » → fichier(s) exact(s) |
-| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md) | Produit | Proposition de refonte (pas encore implémentée) |
-| [`SECURITY.md`](SECURITY.md) | Sécurité | Signalement de vulnérabilité |
-| [`ROADMAP.md`](ROADMAP.md) | Produit | État du projet & suite envisagée |
-| [`LICENSE.md`](LICENSE.md) | Légal | Propriété & interdictions (tous droits réservés) |
+| Document                                                             | Pour qui     | Contenu                                                   |
+| -------------------------------------------------------------------- | ------------ | --------------------------------------------------------- |
+| [`AGENTS.md`](AGENTS.md)                                             | Agents IA    | Brief opérationnel + règles d'or (chargé via `CLAUDE.md`) |
+| [`docs/architecture.md`](docs/architecture.md)                       | Agents / dev | Modèle de données, flux, runtime                          |
+| [`docs/conventions.md`](docs/conventions.md)                         | Agents / dev | Patterns de code & pièges                                 |
+| [`docs/playbook.md`](docs/playbook.md)                               | Humain ↔ IA  | Comment demander et réaliser une tâche efficacement       |
+| [`docs/runbook.md`](docs/runbook.md)                                 | Ops          | Déploiement, rollback, incidents, secrets                 |
+| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)   | Ops          | Connexion Git ↔ Cloudflare Workers Builds                 |
+| [`docs/codemap.md`](docs/codemap.md)                                 | Agents / dev | « Je dois faire X » → fichier(s) exact(s)                 |
+| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md) | Produit      | Proposition de refonte (pas encore implémentée)           |
+| [`SECURITY.md`](SECURITY.md)                                         | Sécurité     | Signalement de vulnérabilité                              |
+| [`ROADMAP.md`](ROADMAP.md)                                           | Produit      | État du projet & suite envisagée                          |
+| [`LICENSE.md`](LICENSE.md)                                           | Légal        | Propriété & interdictions (tous droits réservés)          |
 
 ## Propriété & licences
 

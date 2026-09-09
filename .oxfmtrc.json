@@ -1,0 +1,30 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "useTabs": false,
+  "tabWidth": 2,
+  "printWidth": 80,
+  "endOfLine": "crlf",
+  "singleQuote": false,
+  "jsxSingleQuote": false,
+  "quoteProps": "as-needed",
+  "trailingComma": "all",
+  "semi": true,
+  "arrowParens": "always",
+  "bracketSameLine": false,
+  "bracketSpacing": true,
+  "singleAttributePerLine": false,
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    ".claude/**",
+    "drizzle/**",
+    "drizzle-pg/**",
+    ".next/**",
+    ".open-next/**",
+    ".wrangler/**",
+    "public/**",
+    "workers/**",
+    "cloudflare-env.d.ts",
+    "next-env.d.ts",
+    "src/app/icon.svg"
+  ]
+}

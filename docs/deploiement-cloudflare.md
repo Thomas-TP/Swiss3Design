@@ -45,10 +45,10 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 > **🔴 Deuxième panne, trouvée juste après la première (2026-07-09)** : une
 > fois la variable Hyperdrive posée au bon endroit, `next build` réussissait
 > enfin — mais le déploiement échouait ensuite avec `duplicate column name:
-> failed_verification_count: SQLITE_ERROR`. Cause : le **Deploy command** du
+failed_verification_count: SQLITE_ERROR`. Cause : le **Deploy command** du
 > Worker `swiss3design` (Settings → Build → Build configuration), configuré
 > avant le pivot Postgres, contenait encore `npx wrangler d1 migrations apply
-> swiss3design-db --remote && npx wrangler deploy` — la partie migrations D1
+swiss3design-db --remote && npx wrangler deploy` — la partie migrations D1
 > tentait de réappliquer une migration déjà passée sur la base D1 (inactive)
 > et bloquait tout le reste. **Fix** : Deploy command simplifié en
 > `npx wrangler deploy` (retrait complet de l'étape migrations D1, qui n'a
@@ -95,10 +95,10 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 1. Aller sur https://dash.cloudflare.com → **Workers & Pages** (ou **Compute**).
 2. Ouvrir le Worker existant **swiss3design**.
 3. Onglet **Settings** → section **Builds** → cliquer **Connect** (connexion à Git).
-   *(Le nom du Worker doit correspondre au `name` de `wrangler.jsonc` — ici les deux
-   valent `swiss3design`, donc OK.)*
+   _(Le nom du Worker doit correspondre au `name` de `wrangler.jsonc` — ici les deux
+   valent `swiss3design`, donc OK.)_
 4. **Autoriser** l'app GitHub « Cloudflare Workers & Pages » (popup GitHub).
-   Choisir *Only select repositories* → **Swiss3Design** → valider.
+   Choisir _Only select repositories_ → **Swiss3Design** → valider.
 5. De retour sur Cloudflare :
    - **Repository** : `Thomas-TP/Swiss3Design`
    - **Production branch** : `main`
@@ -126,14 +126,14 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 > schéma incohérent. **Ce n'est plus le cas** : le Deploy command est
 > aujourd'hui un simple `npx wrangler deploy`, la ligne `d1 migrations apply`
 > a été retirée (elle causait un vrai échec de déploiement, `duplicate column
-> name`, voir l'avertissement 🔴 plus haut). Postgres/Hyperdrive n'a
+name`, voir l'avertissement 🔴 plus haut). Postgres/Hyperdrive n'a
 > **aucune** étape de migration dans ce pipeline — volontairement, voir
 > `AGENTS.md` § Deployment et « Postgres schema changes » dans `runbook.md`.
 
 ## Vérifier que ça marche
 
-- Worker **swiss3design → Deployments / Builds** : le build passe de *Building* à
-  *Success*. Les logs montrent `opennextjs-cloudflare build`, l'application des
+- Worker **swiss3design → Deployments / Builds** : le build passe de _Building_ à
+  _Success_. Les logs montrent `opennextjs-cloudflare build`, l'application des
   migrations, puis le deploy.
 - Ouvrir https://swiss3design.ch pour confirmer.
 
@@ -158,20 +158,20 @@ Worker séparé **`swiss3design-preview`**, accessible en permanence à
 **https://swiss3design-preview.thomastp.workers.dev** — toujours la dernière
 branche déployée. Totalement isolé de la prod :
 
-| | Production (`swiss3design`) | Preview (`swiss3design-preview`) |
-| --- | --- | --- |
-| Hyperdrive/Postgres | `swiss3design` (Neon, données clients réelles) | **branche Neon isolée `preview`** (child de `production`, Hyperdrive config `swiss3design-preview-db`/`4262c933ec8f45259643b190d701e8cd`) — catalogue produits de démo (6 articles, `scripts/seed.sql`), toutes les tables PII/secrets (orders, user, session, two_factor, passkey, account, customer_addresses, quote_requests, quote_messages, reviews, abandoned_carts, notification_preferences, newsletter_sends, verification) tronquées après clonage |
-| D1 (inactif, filet de secours) | `swiss3design-db` (données clients réelles) | `swiss3design-preview-db` (vide, migrée) |
-| R2 | `swiss3design-files` | `swiss3design-preview-files` (vide) |
-| KV | namespace prod | namespace preview dédié |
-| Stripe | clé **LIVE** | aucune clé définie (checkout désactivé en preview) |
-| E-mails | Resend actif | `RESEND_API_KEY` non définie → e-mails no-op |
-| SEO | indexable | `X-Robots-Tag: noindex, nofollow, noarchive` sur tout |
-| Secrets | secrets prod | `BETTER_AUTH_SECRET` dédié, généré à part |
-| Routes | `swiss3design.ch` + `www` | aucune (uniquement `*.workers.dev`) |
+|                                | Production (`swiss3design`)                    | Preview (`swiss3design-preview`)                                                                                                                                                                                                                                                                                                                                                                                                                             |
+| ------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Hyperdrive/Postgres            | `swiss3design` (Neon, données clients réelles) | **branche Neon isolée `preview`** (child de `production`, Hyperdrive config `swiss3design-preview-db`/`4262c933ec8f45259643b190d701e8cd`) — catalogue produits de démo (6 articles, `scripts/seed.sql`), toutes les tables PII/secrets (orders, user, session, two_factor, passkey, account, customer_addresses, quote_requests, quote_messages, reviews, abandoned_carts, notification_preferences, newsletter_sends, verification) tronquées après clonage |
+| D1 (inactif, filet de secours) | `swiss3design-db` (données clients réelles)    | `swiss3design-preview-db` (vide, migrée)                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| R2                             | `swiss3design-files`                           | `swiss3design-preview-files` (vide)                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| KV                             | namespace prod                                 | namespace preview dédié                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| Stripe                         | clé **LIVE**                                   | aucune clé définie (checkout désactivé en preview)                                                                                                                                                                                                                                                                                                                                                                                                           |
+| E-mails                        | Resend actif                                   | `RESEND_API_KEY` non définie → e-mails no-op                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| SEO                            | indexable                                      | `X-Robots-Tag: noindex, nofollow, noarchive` sur tout                                                                                                                                                                                                                                                                                                                                                                                                        |
+| Secrets                        | secrets prod                                   | `BETTER_AUTH_SECRET` dédié, généré à part                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| Routes                         | `swiss3design.ch` + `www`                      | aucune (uniquement `*.workers.dev`)                                                                                                                                                                                                                                                                                                                                                                                                                          |
 
 Config dans [`wrangler.jsonc`](../wrangler.jsonc) → bloc `env.preview`. **Important** :
-`routes` et `workers_dev` sont des clés *héritables* — le bloc `env.preview` les
+`routes` et `workers_dev` sont des clés _héritables_ — le bloc `env.preview` les
 réécrit explicitement (`routes: []`, `workers_dev: true`) pour ne jamais hériter
 des routes du domaine custom par accident.
 
@@ -179,6 +179,7 @@ des routes du domaine custom par accident.
 
 **Manuellement** (n'importe quand, fiable, méthode utilisée tout au long du
 développement du compte — voir aussi la section [Déployer manuellement](#déployer-manuellement--filet-de-sécurité-fiable)) :
+
 ```
 npx opennextjs-cloudflare build
 npx wrangler deploy --env preview
@@ -200,7 +201,7 @@ possible) :
    - Build variable (onglet **Build**, pas "Variables & Secrets") :
      `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
 2. **Worker `swiss3design-preview`** → Settings → Builds → **Connect** le
-   *même* dépôt ici, séparément :
+   _même_ dépôt ici, séparément :
    - Production branch : `main` (garde preview synchro par défaut)
    - Builds for non-production branches : **activé**
    - Deploy command (déclenché sur push `main`) : `npx wrangler deploy --env preview`
@@ -223,6 +224,7 @@ un push sur une branche jetable ne fait bouger **que** `swiss3design-preview`,
 jamais `swiss3design`.
 
 ### Si un jour la preview a besoin de Stripe ou Google OAuth
+
 Définir les secrets/vars sur l'environnement preview précisément (jamais ceux
 de prod) : `npx wrangler secret put STRIPE_SECRET_KEY --env preview` avec une
 clé **test** Stripe, `GOOGLE_CLIENT_ID`/`GOOGLE_CLIENT_SECRET` avec un client
@@ -247,6 +249,7 @@ bun run deploy   # = opennextjs-cloudflare build && opennextjs-cloudflare deploy
 
 Pour la preview, même principe avec la connection string de la branche Neon
 `preview` (différente) et `--env preview` :
+
 ```powershell
 $env:CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE = "<connection string preview>"
 npx opennextjs-cloudflare build
@@ -260,6 +263,7 @@ inactif (filet de secours), et un changement de schéma Postgres se fait
 
 **Vérifier après coup** (obligatoire, ne pas supposer que « la commande a
 tourné sans erreur » = « c'est en ligne ») :
+
 - `curl -I https://swiss3design.ch/fr` → 200.
 - Comparer le `Current Version ID` affiché par `wrangler deploy` avec celui du
   dashboard (Worker → Deployments) si un doute persiste.
@@ -300,14 +304,15 @@ signale. Repéré uniquement en remarquant que le Worker prod ne bougeait pas
 après le merge, puis confirmé via `git log --oneline main -- <fichier connu>`.
 
 **Comment merger une pile correctement** — deux options :
+
 1. **Le plus sûr** : une fois toutes les PR de la pile approuvées, merger
    directement en local la branche la **plus haute de la pile** (celle qui
    contient tout, cumulée) dans `main` : `git checkout main && git merge
-   <branche-la-plus-haute> --no-ff`, puis push. Ferme les PR intermédiaires
+<branche-la-plus-haute> --no-ff`, puis push. Ferme les PR intermédiaires
    manuellement sur GitHub une fois `main` à jour (elles n'ont plus de diff).
 2. Ou re-cibler chaque PR sur `main` avant de merger (`gh pr edit N --base
-   main`) — fonctionne mais casse la lecture en pile sur GitHub (chaque PR
-   affichera alors *tout* le diff cumulé, pas juste sa propre phase).
+main`) — fonctionne mais casse la lecture en pile sur GitHub (chaque PR
+   affichera alors _tout_ le diff cumulé, pas juste sa propre phase).
 
 **Avant de merger quoi que ce soit** : vérifier avec `git log --oneline main --
 <fichier introduit par la dernière phase>` que le contenu attendu est bien
@@ -361,11 +366,12 @@ auth@latest generate` — non testé par nous, à vérifier avant de s'y fier.)
 
 **Règles secrets, toujours valables** (hygiène générale, même si ce n'était
 pas la cause cette fois) :
+
 - **Ne jamais faire tourner `wrangler secret put BETTER_AUTH_SECRET`** (ou tout
   secret partagé par plusieurs comptes réels) **sur un environnement qui a déjà
   des utilisateurs actifs**, sauf rotation planifiée et assumée (voir plus bas).
 - Toute commande `wrangler secret put` doit **explicitement** porter `--env
-  preview` quand elle vise la preview — jamais de commande « nue » en espérant
+preview` quand elle vise la preview — jamais de commande « nue » en espérant
   qu'elle vise le bon environnement par défaut.
 - Avant toute commande touchant un secret : relire la commande à voix haute
   (ou la faire relire) en vérifiant le nom du Worker cible, comme pour un
@@ -383,21 +389,21 @@ pas la cause cette fois) :
 **Obtenir la vraie erreur serveur sans risque** : `wrangler tail` sur le
 Worker de prod est bloqué par défaut (il peut streamer des tokens/secrets en
 clair). Plus simple et à risque nul : dashboard Cloudflare → Workers & Pages
-→ `swiss3design` → onglet **Logs** → *Begin log stream*, reproduire l'action
+→ `swiss3design` → onglet **Logs** → _Begin log stream_, reproduire l'action
 une fois, lire l'erreur affichée. C'est ce qui a permis de trouver la vraie
 cause ci-dessus en quelques secondes, après plusieurs allers-retours à
 deviner depuis le code seul.
 
 ## Réessayer / revenir en arrière
 
-- **Retry** : depuis GitHub, ouvrir le Check Run échoué → *Details* → **Rerun**
-  (ou dashboard Cloudflare → Builds → *Retry*).
+- **Retry** : depuis GitHub, ouvrir le Check Run échoué → _Details_ → **Rerun**
+  (ou dashboard Cloudflare → Builds → _Retry_).
 - **Rollback** : dashboard → swiss3design → **Deployments** → choisir un
   déploiement précédent → **Rollback**.
 
 ## Nettoyage (optionnel)
 
-- GitHub → repo → *Settings → Secrets and variables → Actions* : le secret
+- GitHub → repo → _Settings → Secrets and variables → Actions_ : le secret
   `CLOUDFLARE_API_TOKEN` n'est plus utilisé, tu peux le **supprimer**.
 - Le workflow `.github/workflows/deploy.yml` a été supprimé : le check de
   déploiement vient désormais de Cloudflare. Plus aucun workflow GitHub Actions.

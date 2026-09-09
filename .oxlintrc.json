@@ -1,0 +1,34 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc",
+    "react",
+    "jsx-a11y",
+    "nextjs",
+    "vitest"
+  ],
+  "rules": {
+    "react/rules-of-hooks": "error",
+    // next.config.ts delegue deja l'optimisation d'image a Cloudflare Images
+    // (images.unoptimized: true) -- convertir les <img> en next/image est un
+    // vrai changement UI a part, pas un correctif de lint (meme override que
+    // sous Biome, voir AGENTS.md).
+    "nextjs/no-img-element": "off"
+  },
+  "ignorePatterns": [
+    ".claude/**",
+    "drizzle/**",
+    "drizzle-pg/**",
+    ".next/**",
+    ".open-next/**",
+    ".wrangler/**",
+    "public/**",
+    "workers/**",
+    "cloudflare-env.d.ts",
+    "next-env.d.ts",
+    "src/app/icon.svg"
+  ]
+}

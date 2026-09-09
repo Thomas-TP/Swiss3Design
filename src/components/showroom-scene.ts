@@ -112,9 +112,8 @@ export async function buildShowroomScene(
   aspect: number,
 ): Promise<ShowroomScene> {
   const THREE = await import("three");
-  const { RoomEnvironment } = await import(
-    "three/addons/environments/RoomEnvironment.js"
-  );
+  const { RoomEnvironment } =
+    await import("three/addons/environments/RoomEnvironment.js");
 
   // Configuration de rendu (identique partout : viewer & snapshot).
   renderer.shadowMap.enabled = true;
