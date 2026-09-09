@@ -75,10 +75,23 @@ interface Suggestion extends CheckoutAddress {
   label: string;
 }
 
+// Un seul passage de `/<[^>]+>/g` peut laisser passer des balises imbriquées
+// (ex. "<<script>x</script>>" ne se nettoie pas en un seul passage) : on
+// répète jusqu'à stabilité.
+function stripTags(s: string): string {
+  let out = s;
+  let prev: string;
+  do {
+    prev = out;
+    out = out.replace(/<[^>]+>/g, "");
+  } while (out !== prev);
+  return out;
+}
+
 function parseGeoAdminResult(r: {
   attrs?: { label?: string; detail?: string };
 }): Suggestion | null {
-  const raw = (r.attrs?.label ?? "").replace(/<[^>]+>/g, "").trim();
+  const raw = stripTags(r.attrs?.label ?? "").trim();
   const m = raw.match(/^(.*?)\s+(\d{4})\s+(.+)$/);
   if (!m) return null;
   const cantonMatch = (r.attrs?.detail ?? "").trim().match(/\b([a-z]{2})$/);

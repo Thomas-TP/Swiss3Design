@@ -40,6 +40,20 @@ async function sha256Hex(input: string): Promise<string> {
     .join("");
 }
 
+// `% range` sur un Uint32 aléatoire introduit un biais (2^32 n'est pas un
+// multiple exact de `range`) : on rejette les tirages au-delà du plus grand
+// multiple de `range` sous 2^32 pour rester uniforme (probabilité de rejet
+// ~0.004% ici, boucle négligeable en pratique).
+function unbiasedRandomInt(range: number): number {
+  const max32 = 0x100000000;
+  const limit = max32 - (max32 % range);
+  let x: number;
+  do {
+    x = crypto.getRandomValues(new Uint32Array(1))[0];
+  } while (x >= limit);
+  return x % range;
+}
+
 export async function POST(request: Request) {
   const parsed = bodySchema.safeParse(await request.json().catch(() => null));
   if (!parsed.success) {
@@ -70,9 +84,7 @@ export async function POST(request: Request) {
       return Response.json({ error: "too_many_requests" }, { status: 429 });
     }
 
-    const code = String(
-      (crypto.getRandomValues(new Uint32Array(1))[0] % 900000) + 100000,
-    );
+    const code = String(unbiasedRandomInt(900000) + 100000);
 
     await db
       .delete(verification)
