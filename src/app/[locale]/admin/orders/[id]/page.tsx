@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+import { canTransitionOrder } from "@/lib/payment-state";
 import { notFound } from "next/navigation";
 import { eq } from "drizzle-orm";
 import { ArrowLeft, UserCircle, StickyNote, Truck } from "lucide-react";
@@ -32,6 +34,10 @@ export default async function AdminOrderDetailPage({
 }) {
   await requireAdmin();
   const { locale, id } = await params;
+  const paymentText = await getTranslations({
+    locale,
+    namespace: "orderPayment",
+  });
   const db = await getDb();
 
   const [order] = await db
@@ -112,7 +118,9 @@ export default async function AdminOrderDetailPage({
             defaultValue={order.status}
             className={`${FIELD} w-auto`}
           >
-            {ORDER_STATUSES.map((s) => (
+            {ORDER_STATUSES.filter((s) =>
+              canTransitionOrder(order.status, s),
+            ).map((s) => (
               <option key={s} value={s}>
                 {ORDER_STATUS_FR[s]}
               </option>
@@ -149,6 +157,34 @@ export default async function AdminOrderDetailPage({
         </p>
       </section>
 
+      {order.stripePaymentIntentId && (
+        <section className="mt-4 rounded-card border border-line bg-surface p-5 text-sm">
+          <p>
+            {paymentText("refunded", {
+              amount: formatChf(order.refundedCents, locale),
+            })}
+          </p>
+          {order.status === "cancelled" &&
+            order.refundedCents < order.totalCents && (
+              <p className="mt-2 font-medium text-accent">
+                {paymentText("refundPending")}
+              </p>
+            )}
+          {order.stripePaymentIntentId.startsWith("pi_") && (
+            <a
+              className="mt-2 inline-block underline"
+              href={
+                "https://dashboard.stripe.com/payments/" +
+                order.stripePaymentIntentId
+              }
+              target="_blank"
+              rel="noreferrer"
+            >
+              {paymentText("openStripe")}
+            </a>
+          )}
+        </section>
+      )}
       <section className="mt-4 rounded-card border border-line bg-surface p-5">
         <h3 className="mb-3 font-semibold">Articles</h3>
         <ul className="divide-y divide-line text-sm">

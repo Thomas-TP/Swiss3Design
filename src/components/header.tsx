@@ -28,20 +28,20 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-40 border-b border-line bg-paper/80 backdrop-blur-lg">
-      <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
+      <div className="relative mx-auto flex h-16 max-w-6xl items-center justify-between px-3 sm:px-6">
         <Link
           href="/"
-          className="flex items-center gap-2.5"
+          className="flex items-center gap-2 sm:gap-2.5"
           aria-label="Swiss3Design"
         >
           <BrandMark className="h-8 w-8 text-ink" />
-          <span className="text-[17px] tracking-tight text-ink">
+          <span className="hidden min-[360px]:inline text-[14px] sm:text-[17px] tracking-tight text-ink">
             <span className="font-medium">Swiss</span>
             <span className="font-bold">3Design</span>
           </span>
         </Link>
 
-        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border border-line/70 bg-surface/60 p-1 backdrop-blur md:flex">
+        <nav className="absolute left-1/2 hidden -translate-x-1/2 items-center gap-1 rounded-full border border-line/70 bg-surface/60 p-1 backdrop-blur xl:flex">
           {links.map(({ href, key }) => {
             const active =
               href === "/" ? pathname === "/" : pathname.startsWith(href);
@@ -67,7 +67,7 @@ export function Header() {
           })}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1 sm:gap-3">
           <ThemeToggle />
           <LocaleSwitcher />
           <Link

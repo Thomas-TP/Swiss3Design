@@ -7,7 +7,9 @@ import {
   primaryKey,
   index,
   uniqueIndex,
+  check,
 } from "drizzle-orm/pg-core";
+import { sql } from "drizzle-orm";
 
 // Traduction mécanique de schema.ts (D1/SQLite) vers Postgres (Hyperdrive) —
 // mêmes tables/colonnes/contraintes, adaptées aux types natifs Postgres :
@@ -35,25 +37,32 @@ export const LOCALES = ["fr", "de", "it", "en"] as const;
 
 // ── Catalogue ────────────────────────────────────────────────────────────────
 
-export const products = pgTable("products", {
-  id: id(),
-  slug: text("slug").notNull().unique(),
-  priceCents: integer("price_cents").notNull(),
-  saleType: text("sale_type", { enum: ["stock", "on_demand"] })
-    .notNull()
-    .default("stock"),
-  productionDays: integer("production_days"),
-  material: text("material").notNull().default("PLA"),
-  dimensionsMm: text("dimensions_mm"),
-  weightGrams: integer("weight_grams"),
-  model3dUrl: text("model_3d_url"),
-  multicolor: boolean("multicolor").notNull().default(false),
-  featured: boolean("featured").notNull().default(false),
-  featuredOrder: integer("featured_order").notNull().default(0),
-  active: boolean("active").notNull().default(true),
-  stock: integer("stock"),
-  createdAt: createdAt(),
-});
+export const products = pgTable(
+  "products",
+  {
+    id: id(),
+    slug: text("slug").notNull().unique(),
+    priceCents: integer("price_cents").notNull(),
+    saleType: text("sale_type", { enum: ["stock", "on_demand"] })
+      .notNull()
+      .default("stock"),
+    productionDays: integer("production_days"),
+    material: text("material").notNull().default("PLA"),
+    dimensionsMm: text("dimensions_mm"),
+    weightGrams: integer("weight_grams"),
+    model3dUrl: text("model_3d_url"),
+    multicolor: boolean("multicolor").notNull().default(false),
+    featured: boolean("featured").notNull().default(false),
+    featuredOrder: integer("featured_order").notNull().default(0),
+    active: boolean("active").notNull().default(true),
+    stock: integer("stock"),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    check("products_price_nonnegative", sql`${t.priceCents} >= 0`),
+    check("products_stock_nonnegative", sql`${t.stock} >= 0`),
+  ],
+);
 
 export const productTranslations = pgTable(
   "product_translations",
@@ -94,7 +103,11 @@ export const productVariants = pgTable(
     priceCents: integer("price_cents"),
     stock: integer("stock"),
   },
-  (t) => [index("product_variants_product_idx").on(t.productId)],
+  (t) => [
+    index("product_variants_product_idx").on(t.productId),
+    check("variants_stock_nonnegative", sql`${t.stock} >= 0`),
+    check("variants_price_nonnegative", sql`${t.priceCents} >= 0`),
+  ],
 );
 
 export const materials = pgTable("materials", {
@@ -198,12 +211,35 @@ export const orders = pgTable(
     totalCents: integer("total_cents").notNull(),
     shippingAddress: text("shipping_address").notNull(),
     stripePaymentIntentId: text("stripe_payment_intent_id"),
+    checkoutSessionId: text("checkout_session_id").unique(),
+    checkoutAttemptKey: text("checkout_attempt_key").unique(),
+    stripeCustomerId: text("stripe_customer_id"),
+    checkoutFingerprint: text("checkout_fingerprint"),
+    paidAt: timestamp("paid_at", { withTimezone: true }),
+    stockReservedAt: timestamp("stock_reserved_at", { withTimezone: true }),
+    stockReleasedAt: timestamp("stock_released_at", { withTimezone: true }),
+    reservationExpiresAt: timestamp("reservation_expires_at", {
+      withTimezone: true,
+    }),
+    refundedCents: integer("refunded_cents").notNull().default(0),
     trackingNumber: text("tracking_number"),
     adminNote: text("admin_note"),
     locale: text("locale", { enum: LOCALES }).notNull().default("fr"),
     createdAt: createdAt(),
   },
-  (t) => [index("orders_customer_idx").on(t.customerId)],
+  (t) => [
+    index("orders_customer_idx").on(t.customerId),
+    index("orders_pending_expiry_idx").on(t.status, t.reservationExpiresAt),
+    uniqueIndex("orders_payment_intent_unique").on(t.stripePaymentIntentId),
+    check(
+      "orders_amounts_valid",
+      sql`${t.subtotalCents} >= 0 AND ${t.shippingCents} >= 0 AND ${t.discountCents} >= 0 AND ${t.discountCents} <= ${t.subtotalCents} AND ${t.totalCents} = ${t.subtotalCents} + ${t.shippingCents} - ${t.discountCents} AND ${t.refundedCents} >= 0 AND ${t.refundedCents} <= ${t.totalCents}`,
+    ),
+    check(
+      "orders_status_valid",
+      sql`${t.status} IN ('pending','paid','in_production','shipped','delivered','cancelled')`,
+    ),
+  ],
 );
 
 export const orderItems = pgTable(
@@ -221,7 +257,11 @@ export const orderItems = pgTable(
     priceCentsSnapshot: integer("price_cents_snapshot").notNull(),
     quantity: integer("quantity").notNull(),
   },
-  (t) => [index("order_items_order_idx").on(t.orderId)],
+  (t) => [
+    index("order_items_order_idx").on(t.orderId),
+    check("order_items_quantity_positive", sql`${t.quantity} > 0`),
+    check("order_items_price_nonnegative", sql`${t.priceCentsSnapshot} >= 0`),
+  ],
 );
 
 // ── Avis produits ────────────────────────────────────────────────────────────
@@ -278,6 +318,15 @@ export const quoteRequests = pgTable("quote_requests", {
   })
     .notNull()
     .default("received"),
+  checkoutSessionId: text("checkout_session_id").unique(),
+  offerVersion: integer("offer_version").notNull().default(1),
+  paidAt: timestamp("paid_at", { withTimezone: true }),
+  stripePaymentIntentId: text("stripe_payment_intent_id").unique(),
+  paidPriceCents: integer("paid_price_cents"),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
   quotedPriceCents: integer("quoted_price_cents"),
   adminMessage: text("admin_message"),
   validUntil: timestamp("valid_until", { withTimezone: true }),
@@ -511,3 +560,37 @@ export const verification = pgTable("verification", {
   createdAt: timestamp("created_at", { withTimezone: true }),
   updatedAt: timestamp("updated_at", { withTimezone: true }),
 });
+
+/** File persistante : les e-mails sont insérés dans la transaction métier. */
+export const emailOutbox = pgTable(
+  "email_outbox",
+  {
+    key: text("key").primaryKey(),
+    messageJson: text("message_json").notNull(),
+    attempts: integer("attempts").notNull().default(0),
+    availableAt: timestamp("available_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    lockedAt: timestamp("locked_at", { withTimezone: true }),
+    sentAt: timestamp("sent_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [index("email_outbox_pending_idx").on(t.sentAt, t.availableAt)],
+);
+
+export const paymentEvents = pgTable("payment_events", {
+  id: text("id").primaryKey(),
+  type: text("type").notNull(),
+  objectId: text("object_id").notNull(),
+  createdAt: createdAt(),
+});
+
+export const requestLimits = pgTable(
+  "request_limits",
+  {
+    key: text("key").primaryKey(),
+    count: integer("count").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  },
+  (t) => [index("request_limits_expiry_idx").on(t.expiresAt)],
+);

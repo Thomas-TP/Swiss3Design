@@ -1,12 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Box } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cfImage } from "@/lib/cf-image";
-import { ModelViewer } from "./product-viewer-3d";
-import { useProductColor } from "./product-color-context";
-import { buildShowroomScene } from "./showroom-scene";
+import dynamic from "next/dynamic";
+const ModelViewer = dynamic(
+  () => import("./product-viewer-3d").then((m) => m.ModelViewer),
+  { ssr: false },
+);
 
 interface GalleryImage {
   url: string;
@@ -17,8 +19,8 @@ interface GalleryImage {
 // modèle 3D, celui-ci devient le **dernier slot** de la galerie — une vignette
 // qui, sélectionnée, remplace la grande image par le viewer interactif. Plus de
 // bouton « Voir en 3D » séparé : la 3D vit parmi les images. La vignette est un
-// **vrai rendu de la scène 3D** (snapshot hors-écran de `showroom-scene`), pas
-// la photo produit. La teinte du modèle suit la couleur du bloc d'achat.
+// repère statique : aucune géométrie ni WebGL avant sélection explicite.
+// La teinte du modèle suit la couleur du bloc d'achat.
 export function ProductGallery({
   images,
   name,
@@ -29,57 +31,16 @@ export function ProductGallery({
   model3dUrl?: string | null;
 }) {
   const t = useTranslations("viewer");
-  const { colors } = useProductColor();
   const has3d = Boolean(model3dUrl);
   // Le slot 3D occupe l'index juste après la dernière image.
   const slot3dIndex = images.length;
   const slotCount = images.length + (has3d ? 1 : 0);
 
-  const [index, setIndex] = useState(0);
+  const [index, setIndex] = useState(images.length ? 0 : -1);
   const is3d = has3d && index === slot3dIndex;
   const current = images[index] ?? images[0];
 
-  // Vignette 3D : on rend une fois la scène showroom hors-écran et on capture
-  // l'image (toDataURL). Donne un aperçu fidèle de la visualisation interactive.
-  const [thumb3d, setThumb3d] = useState<string | null>(null);
-  // Snapshot unique : couleur par défaut, ne se régénère pas au changement de teinte.
-  // oxlint-disable exhaustive-deps -- snapshot unique, ne doit pas se regenerer au changement de teinte
-  useEffect(() => {
-    if (!model3dUrl) return;
-    let cancelled = false;
-    (async () => {
-      const THREE = await import("three");
-      const renderer = new THREE.WebGLRenderer({
-        antialias: true,
-        preserveDrawingBuffer: true,
-      });
-      try {
-        renderer.setPixelRatio(1);
-        renderer.setSize(384, 384);
-        const built = await buildShowroomScene(
-          renderer,
-          model3dUrl,
-          colors[0]?.hex ?? "#E5231C",
-          1,
-        );
-        renderer.render(built.scene, built.camera);
-        const url = renderer.domElement.toDataURL("image/png");
-        built.dispose();
-        if (!cancelled) setThumb3d(url);
-      } catch {
-        // En cas d'échec, la vignette de repli (dégradé + badge) reste affichée.
-      } finally {
-        // Toujours libérer le contexte WebGL hors-écran (ressource limitée).
-        renderer.dispose();
-        renderer.forceContextLoss();
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, [model3dUrl]);
-  // oxlint-enable exhaustive-deps
-
+  // La 3D est chargée uniquement à la demande ; aucune scène WebGL hors écran.
   return (
     <div>
       <div className="overflow-hidden rounded-card border border-line bg-gradient-to-br from-paper to-line/40">
@@ -97,7 +58,7 @@ export function ProductGallery({
           )
         )}
       </div>
-      {slotCount > 1 && (
+      {(slotCount > 1 || has3d) && (
         <div className="mt-3 grid grid-cols-5 gap-3">
           {images.map((img, i) => (
             <button
@@ -129,16 +90,9 @@ export function ProductGallery({
                 is3d ? "border-ink" : "border-line hover:border-ink/40"
               }`}
             >
-              {thumb3d ? (
-                <img
-                  src={thumb3d}
-                  alt=""
-                  decoding="async"
-                  className="aspect-square w-full object-cover"
-                />
-              ) : (
-                <span className="block aspect-square w-full animate-pulse bg-gradient-to-br from-ink/80 to-black" />
-              )}
+              <span className="grid aspect-square w-full place-items-center bg-paper text-ink">
+                <Box size={26} />
+              </span>
               {/* Petite pastille : signale une visualisation 3D interactive. */}
               <span className="absolute bottom-1 right-1 flex items-center gap-0.5 rounded-md bg-black/60 px-1.5 py-0.5 text-[9px] font-bold text-white backdrop-blur">
                 <Box size={9} />

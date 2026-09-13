@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 // Import « /pure » : la variante par défaut injecte le script Stripe (et ses
 // iframes antifraude) dès l'import du module, même sans appeler loadStripe.
 import { loadStripe } from "@stripe/stripe-js/pure";
@@ -15,13 +15,14 @@ import {
   Check,
   CheckCircle2,
   Lock,
-  MailCheck,
-  MapPin,
-  Pencil,
   ShoppingBag,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
+import {
+  GuestEmailVerification,
+  type EmailProof,
+} from "@/components/guest-email-verification";
 import { Select } from "@/components/select";
 import { useCart } from "@/lib/cart";
 import { useSession } from "@/lib/auth-client";
@@ -118,66 +119,71 @@ function StreetAutocomplete({
   placeholder: string;
 }) {
   const [items, setItems] = useState<Suggestion[]>([]);
-  const [open, setOpen] = useState(false);
+  const listId = useId();
+  const pending = useRef<AbortController | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  function handleInput(v: string) {
-    onChange(v);
+  useEffect(
+    () => () => {
+      pending.current?.abort();
+      if (timer.current) clearTimeout(timer.current);
+    },
+    [],
+  );
+  function handleInput(value: string) {
+    pending.current?.abort();
     if (timer.current) clearTimeout(timer.current);
-    if (v.trim().length < 3) {
-      setOpen(false);
+    const selected = items.find((item) => item.label === value);
+    if (selected) {
+      onPick(selected);
       setItems([]);
       return;
     }
+    onChange(value);
+    setItems([]);
+    if (value.trim().length < 3) return;
+    const controller = new AbortController();
+    pending.current = controller;
     timer.current = setTimeout(async () => {
       try {
         const res = await fetch(
-          `https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=${encodeURIComponent(v)}&type=locations&origins=address&limit=5`,
+          "https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=" +
+            encodeURIComponent(value) +
+            "&type=locations&origins=address&limit=5",
+          { signal: controller.signal },
         );
-        const data = (await res.json()) as { results?: unknown[] };
-        const parsed = (data.results ?? [])
-          .map((r) =>
-            parseGeoAdminResult(r as Parameters<typeof parseGeoAdminResult>[0]),
-          )
-          .filter((s): s is Suggestion => s !== null);
-        setItems(parsed);
-        setOpen(parsed.length > 0);
+        const data = (await res.json()) as {
+          results?: Parameters<typeof parseGeoAdminResult>[0][];
+        };
+        if (!controller.signal.aborted)
+          setItems(
+            (data.results ?? [])
+              .map(parseGeoAdminResult)
+              .filter((item): item is Suggestion => item !== null),
+          );
       } catch {
-        // API indisponible — la saisie manuelle reste possible
+        /* La saisie manuelle reste utilisable hors réseau. */
       }
     }, 250);
   }
-
   return (
     <div className="relative">
       <input
         value={value}
         onChange={(e) => handleInput(e.target.value)}
-        onBlur={() => setTimeout(() => setOpen(false), 150)}
+        list={listId}
+        aria-label={placeholder}
         required
         autoComplete="street-address"
         placeholder={placeholder}
         className={field}
       />
-      {open && (
-        <ul className="absolute z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-line bg-surface shadow-lg shadow-ink/5">
-          {items.map((s) => (
-            <li key={s.label}>
-              <button
-                type="button"
-                onMouseDown={() => {
-                  onPick(s);
-                  setOpen(false);
-                }}
-                className="flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper"
-              >
-                <MapPin size={14} className="shrink-0 text-soft" />
-                {s.label}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      <datalist id={listId}>
+        {items.map((item) => (
+          <option key={item.label} value={item.label}>
+            {item.label}
+          </option>
+        ))}
+      </datalist>
     </div>
   );
 }
@@ -229,16 +235,19 @@ function SummaryCard({
   discount,
   setDiscount,
   editable,
+  confirmedSubtotal,
 }: {
   shippingCents: number;
   discountCents: number;
   discount: { code: string; discountCents: number } | null;
   setDiscount: (d: { code: string; discountCents: number } | null) => void;
   editable: boolean;
+  confirmedSubtotal?: number;
 }) {
   const t = useTranslations("checkout");
   const locale = useLocale();
-  const { items, subtotalCents } = useCart();
+  const { items, subtotalCents: cartSubtotal } = useCart();
+  const subtotalCents = confirmedSubtotal ?? cartSubtotal;
   const [code, setCode] = useState(discount?.code ?? "");
   const [applying, setApplying] = useState(false);
   const [promoError, setPromoError] = useState<string | null>(null);
@@ -383,205 +392,16 @@ function SummaryCard({
 
 // ── Vérification de l'e-mail invité (code à 6 chiffres) ─────────────────────
 
-type EmailProof = { email: string; token: string };
-
-function GuestEmailVerification({
-  proof,
-  onProof,
-}: {
-  proof: EmailProof | null;
-  onProof: (p: EmailProof | null) => void;
-}) {
-  const t = useTranslations("checkout");
-  const locale = useLocale();
-  const [email, setEmail] = useState("");
-  const [code, setCode] = useState("");
-  const [codeSent, setCodeSent] = useState(false);
-  const [pending, setPending] = useState<"send" | "verify" | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [cooldown, setCooldown] = useState(0);
-
-  useEffect(() => {
-    if (cooldown <= 0) return;
-    const id = setTimeout(() => setCooldown((c) => c - 1), 1000);
-    return () => clearTimeout(id);
-  }, [cooldown]);
-
-  const emailValid = /^\S+@\S+\.\S+$/.test(email.trim());
-
-  async function sendCode() {
-    if (!emailValid || pending) return;
-    setPending("send");
-    setError(null);
-    try {
-      const res = await fetch("/api/checkout/verify-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "send",
-          email: email.trim().toLowerCase(),
-          locale,
-        }),
-      });
-      // 429 = un code vient déjà d'être envoyé à cette adresse
-      if (!res.ok && res.status !== 429) throw new Error("send_failed");
-      setCodeSent(true);
-      setCooldown(30);
-      setCode("");
-    } catch {
-      setError(t("errorSendCode"));
-    } finally {
-      setPending(null);
-    }
-  }
-
-  async function verifyCode() {
-    if (code.length !== 6 || pending) return;
-    setPending("verify");
-    setError(null);
-    try {
-      const target = email.trim().toLowerCase();
-      const res = await fetch("/api/checkout/verify-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "verify", email: target, code }),
-      });
-      if (!res.ok) {
-        setError(t("errorCodeInvalid"));
-        return;
-      }
-      const data = (await res.json()) as { proof: string };
-      onProof({ email: target, token: data.proof });
-    } catch {
-      setError(t("errorGeneric"));
-    } finally {
-      setPending(null);
-    }
-  }
-
-  if (proof) {
-    return (
-      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-        <span className="flex min-w-0 items-center gap-2.5 text-sm font-medium text-emerald-800 dark:text-emerald-200">
-          <CheckCircle2 size={17} className="shrink-0 text-emerald-600" />
-          <span className="truncate">{proof.email}</span>
-          <span className="hidden shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 sm:inline">
-            {t("emailVerified")}
-          </span>
-        </span>
-        <button
-          type="button"
-          onClick={() => {
-            onProof(null);
-            setCodeSent(false);
-            setCode("");
-          }}
-          aria-label={t("email")}
-          className="shrink-0 rounded-full p-1.5 text-emerald-700 transition-colors hover:bg-emerald-100"
-        >
-          <Pencil size={14} />
-        </button>
-      </div>
-    );
-  }
-
-  return (
-    <div className="mt-3 space-y-3">
-      <p className="text-xs leading-relaxed text-soft">{t("guestNotice")}</p>
-      <div className="flex gap-2">
-        <input
-          value={email}
-          onChange={(e) => {
-            setEmail(e.target.value);
-            setCodeSent(false);
-            setError(null);
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              e.preventDefault();
-              sendCode();
-            }
-          }}
-          type="email"
-          autoComplete="email"
-          placeholder={t("email")}
-          className={field}
-        />
-        <button
-          type="button"
-          onClick={sendCode}
-          disabled={!emailValid || pending !== null || cooldown > 0}
-          className="shrink-0 rounded-xl bg-ink px-4 py-3 text-sm font-semibold text-paper transition-all hover:bg-ink/85 active:scale-[0.98] disabled:opacity-50"
-        >
-          {pending === "send"
-            ? t("processing")
-            : cooldown > 0
-              ? t("resendIn", { s: cooldown })
-              : codeSent
-                ? t("resendCode")
-                : t("sendCode")}
-        </button>
-      </div>
-      {codeSent && (
-        <div className="rounded-xl bg-paper p-3.5 ring-1 ring-line">
-          <p className="flex items-center gap-2 text-xs font-medium text-soft">
-            <MailCheck size={14} className="shrink-0 text-emerald-600" />
-            {t("codeSentTo", { email: email.trim().toLowerCase() })}
-          </p>
-          <div className="mt-2.5 flex gap-2">
-            <input
-              value={code}
-              onChange={(e) =>
-                setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-              }
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  verifyCode();
-                }
-              }}
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              placeholder={t("codePlaceholder")}
-              className={`${field} tracking-[0.3em]`}
-            />
-            <button
-              type="button"
-              onClick={verifyCode}
-              disabled={code.length !== 6 || pending !== null}
-              className="shrink-0 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-50"
-            >
-              {pending === "verify" ? t("processing") : t("verifyCode")}
-            </button>
-          </div>
-        </div>
-      )}
-      {error && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
-          {error}
-        </p>
-      )}
-      <p className="text-xs text-soft">
-        {t("haveAccount")}{" "}
-        <Link
-          href={{ pathname: "/account/login", query: { next: "/checkout" } }}
-          className="font-semibold text-accent hover:underline"
-        >
-          {t("loginCta")}
-        </Link>
-      </p>
-    </div>
-  );
-}
-
 // ── Flux de commande ─────────────────────────────────────────────────────────
 
 export function CheckoutFlow({
   initialAddress,
+  shippingSettings,
   sessionEmail,
   stripePublishableKey,
 }: {
   initialAddress: CheckoutAddress | null;
+  shippingSettings: { shippingCents: number; freeOverCents: number };
   sessionEmail: string | null;
   stripePublishableKey?: string;
 }) {
@@ -596,6 +416,9 @@ export function CheckoutFlow({
     initialAddress ?? EMPTY_ADDRESS,
   );
   const [proof, setProof] = useState<EmailProof | null>(null);
+  const checkoutAttempt = useRef<{ fingerprint: string; id: string } | null>(
+    null,
+  );
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [totalCents, setTotalCents] = useState(0);
   const [discount, setDiscount] = useState<{
@@ -627,7 +450,7 @@ export function CheckoutFlow({
 
   const shippingCents = clientSecret
     ? serverShipping
-    : shippingFor(subtotalCents);
+    : shippingFor(subtotalCents, shippingSettings);
   const discountCents = clientSecret
     ? serverDiscount
     : (discount?.discountCents ?? 0);
@@ -656,7 +479,7 @@ export function CheckoutFlow({
 
   async function startPayment(formData: FormData) {
     if (!emailReady) return;
-    // Le canton n'est plus un <select> natif : validation manuelle
+    // Garder la validation métier du canton même avec un sélecteur natif.
     if (!addr.canton) {
       setError(t("errorCanton"));
       return;
@@ -664,25 +487,83 @@ export function CheckoutFlow({
     setSubmitting(true);
     setError(null);
     try {
+      const payload = {
+        items: items.map((i) => ({
+          productId: i.productId,
+          variantId: i.variantId ?? undefined,
+          color: i.colorName ?? undefined,
+          quantity: i.quantity,
+        })),
+        email: accountEmail ?? proof!.email,
+        emailProof: proof?.token,
+        address: addr,
+        saveAddress: formData.get("saveAddress") === "on",
+        locale,
+        discountCode: discount?.code,
+      };
+      const encoded = new TextEncoder().encode(
+        JSON.stringify({ ...payload, emailProof: undefined }),
+      );
+      const fingerprint = Array.from(
+        new Uint8Array(await crypto.subtle.digest("SHA-256", encoded)),
+        (b) => b.toString(16).padStart(2, "0"),
+      ).join("");
+      // La reprise ne stocke ni adresse ni preuve d'e-mail dans sessionStorage.
+      try {
+        const saved = JSON.parse(
+          sessionStorage.getItem("s3d-checkout-attempt") ?? "null",
+        );
+        if (
+          saved?.fingerprint === fingerprint &&
+          typeof saved.id === "string" &&
+          /^[0-9a-f-]{36}$/i.test(saved.id)
+        )
+          checkoutAttempt.current = saved;
+      } catch {
+        /* Le stockage peut être désactivé. */
+      }
+      if (checkoutAttempt.current?.fingerprint !== fingerprint)
+        checkoutAttempt.current = { fingerprint, id: crypto.randomUUID() };
+      try {
+        sessionStorage.setItem(
+          "s3d-checkout-attempt",
+          JSON.stringify(checkoutAttempt.current),
+        );
+      } catch {
+        /* Reprise en mémoire disponible. */
+      }
       const res = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          items: items.map((i) => ({
-            productId: i.productId,
-            variantId: i.variantId ?? undefined,
-            color: i.colorName ?? undefined,
-            quantity: i.quantity,
-          })),
-          email: accountEmail ?? proof!.email,
-          emailProof: proof?.token,
-          address: addr,
-          saveAddress: formData.get("saveAddress") === "on",
-          locale,
-          discountCode: discount?.code,
+          ...payload,
+          attemptId: checkoutAttempt.current.id,
         }),
       });
-      if (!res.ok) throw new Error("checkout_failed");
+      if (!res.ok) {
+        const failure = (await res.json()) as { error?: string };
+        const key =
+          failure.error === "insufficient_stock"
+            ? "errorStock"
+            : failure.error === "email_not_verified"
+              ? "errorVerifyAgain"
+              : failure.error === "unknown_product"
+                ? "errorProductChanged"
+                : "errorGeneric";
+        if (
+          failure.error === "checkout_closed" ||
+          failure.error === "checkout_changed"
+        ) {
+          checkoutAttempt.current = null;
+          try {
+            sessionStorage.removeItem("s3d-checkout-attempt");
+          } catch {
+            /* Stockage facultatif. */
+          }
+        }
+        setError(t(key));
+        return;
+      }
       const data = (await res.json()) as {
         clientSecret: string;
         totalCents: number;
@@ -767,6 +648,7 @@ export function CheckoutFlow({
                     onChange={(e) => setAddr({ ...addr, name: e.target.value })}
                     required
                     autoComplete="name"
+                    aria-label={t("name")}
                     placeholder={t("name")}
                     className={field}
                   />
@@ -793,6 +675,7 @@ export function CheckoutFlow({
                       required
                       inputMode="numeric"
                       pattern="\d{4}"
+                      aria-label={t("npa")}
                       title={t("errorNpa")}
                       autoComplete="postal-code"
                       placeholder={t("npa")}
@@ -805,6 +688,7 @@ export function CheckoutFlow({
                       }
                       required
                       autoComplete="address-level2"
+                      aria-label={t("city")}
                       placeholder={t("city")}
                       className={field}
                     />
@@ -880,6 +764,11 @@ export function CheckoutFlow({
             discountCents={discountCents}
             discount={discount}
             setDiscount={setDiscount}
+            confirmedSubtotal={
+              clientSecret
+                ? totalCents + serverDiscount - serverShipping
+                : undefined
+            }
             editable={!clientSecret}
           />
         </aside>

@@ -33,75 +33,104 @@ export async function POST(request: Request) {
   }
 
   const db = await getDb();
-  const [quote] = await db
-    .select()
-    .from(quoteRequests)
-    .where(eq(quoteRequests.id, parsed.data.quoteId))
-    .limit(1);
-  if (!quote) {
-    return Response.json({ error: "not_found" }, { status: 404 });
-  }
+  return db.transaction(async (tx) => {
+    const [quote] = await tx
+      .select()
+      .from(quoteRequests)
+      .where(eq(quoteRequests.id, parsed.data.quoteId))
+      .limit(1)
+      .for("update");
+    if (!quote) {
+      return Response.json({ error: "not_found" }, { status: 404 });
+    }
 
-  // Le devis doit appartenir au client connecté
-  const owns =
-    quote.customerId === authSession.user.id ||
-    quote.email.toLowerCase() === authSession.user.email.toLowerCase();
-  if (!owns) {
-    return Response.json({ error: "forbidden" }, { status: 403 });
-  }
+    // Le devis doit appartenir au client connecté
+    const owns =
+      quote.customerId === authSession.user.id ||
+      quote.email.toLowerCase() === authSession.user.email.toLowerCase();
+    if (!owns) {
+      return Response.json({ error: "forbidden" }, { status: 403 });
+    }
 
-  // Seuls les devis chiffrés, non expirés et non encore payés sont payables
-  const expired = !!quote.validUntil && quote.validUntil.getTime() < Date.now();
-  if (
-    expired ||
-    (quote.status !== "quoted" && quote.status !== "accepted") ||
-    !quote.quotedPriceCents ||
-    quote.quotedPriceCents <= 0
-  ) {
-    return Response.json({ error: "not_payable" }, { status: 409 });
-  }
+    // Seuls les devis chiffrés, non expirés et non encore payés sont payables
+    const expired =
+      !!quote.validUntil && quote.validUntil.getTime() < Date.now();
+    if (
+      expired ||
+      (quote.status !== "quoted" && quote.status !== "accepted") ||
+      !quote.quotedPriceCents ||
+      quote.quotedPriceCents <= 0
+    ) {
+      return Response.json({ error: "not_payable" }, { status: 409 });
+    }
 
-  const { env } = await getCloudflareContext({ async: true });
-  const stripe = getStripe(env.STRIPE_SECRET_KEY);
+    const { env } = await getCloudflareContext({ async: true });
+    const stripe = getStripe(env.STRIPE_SECRET_KEY);
 
-  // Toujours un client connecté ici (garde plus haut) : rattache le paiement
-  // à son identité Stripe, comme le checkout panier (Link 1-clic).
-  const stripeCustomerId = await getOrCreateStripeCustomer(stripe, db, {
-    id: authSession.user.id,
-    email: authSession.user.email,
-    name: authSession.user.name,
-    stripeCustomerId: authSession.user.stripeCustomerId ?? null,
-  });
+    let previousSessionId = "initial";
+    if (quote.checkoutSessionId) {
+      const existing = await stripe.checkout.sessions.retrieve(
+        quote.checkoutSessionId,
+      );
+      if (existing.status === "open")
+        return Response.json({
+          clientSecret: existing.client_secret,
+          totalCents: quote.quotedPriceCents,
+        });
+      if (existing.status === "complete")
+        return Response.json({ error: "not_payable" }, { status: 409 });
+      previousSessionId = existing.id;
+    }
+    // Toujours un client connecté ici (garde plus haut) : rattache le paiement
+    // à son identité Stripe, comme le checkout panier (Link 1-clic).
+    const stripeCustomerId = await getOrCreateStripeCustomer(stripe, tx, {
+      id: authSession.user.id,
+      email: authSession.user.email,
+      name: authSession.user.name,
+      stripeCustomerId: authSession.user.stripeCustomerId ?? null,
+    });
 
-  const session = await createCheckoutSession(
-    stripe,
-    {
-      ui_mode: "elements",
-      mode: "payment",
-      locale: parsed.data.locale,
-      line_items: [
-        {
-          price_data: {
-            currency: "chf",
-            product_data: { name: `Devis ${quote.id.slice(0, 8)}` },
-            unit_amount: quote.quotedPriceCents,
+    const session = await createCheckoutSession(
+      stripe,
+      {
+        ui_mode: "elements",
+        mode: "payment",
+        locale: parsed.data.locale,
+        line_items: [
+          {
+            price_data: {
+              currency: "chf",
+              product_data: { name: `Devis ${quote.id.slice(0, 8)}` },
+              unit_amount: quote.quotedPriceCents,
+            },
+            quantity: 1,
           },
-          quantity: 1,
+        ],
+        return_url: `${env.BETTER_AUTH_URL}/${parsed.data.locale}/account/quotes/${quote.id}/pay?session_id={CHECKOUT_SESSION_ID}`,
+        customer: stripeCustomerId,
+        payment_intent_data: {
+          receipt_email: quote.email,
+          metadata: {
+            quoteId: quote.id,
+            offerVersion: String(quote.offerVersion),
+          },
         },
-      ],
-      return_url: `${env.BETTER_AUTH_URL}/${parsed.data.locale}/account/quotes/${quote.id}/pay?session_id={CHECKOUT_SESSION_ID}`,
-      customer: stripeCustomerId,
-      payment_intent_data: {
-        receipt_email: quote.email,
-        metadata: { quoteId: quote.id },
+        metadata: {
+          quoteId: quote.id,
+          offerVersion: String(quote.offerVersion),
+        },
       },
-      metadata: { quoteId: quote.id },
-    },
-    env.STRIPE_PAYMENT_METHOD_CONFIGURATION,
-  );
+      env.STRIPE_PAYMENT_METHOD_CONFIGURATION,
+      "quote:" + quote.id + ":" + quote.offerVersion + ":" + previousSessionId,
+    );
 
-  return Response.json({
-    clientSecret: session.client_secret,
-    totalCents: quote.quotedPriceCents,
+    await tx
+      .update(quoteRequests)
+      .set({ checkoutSessionId: session.id })
+      .where(eq(quoteRequests.id, quote.id));
+    return Response.json({
+      clientSecret: session.client_secret,
+      totalCents: quote.quotedPriceCents,
+    });
   });
 }

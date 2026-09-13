@@ -455,28 +455,28 @@ const CANCELLED_TEXTS: Record<
     title: "Commande annulée",
     body: "Votre commande <strong>{n}</strong> a été annulée.",
     refund:
-      "Si vous aviez déjà payé, le montant est remboursé sur votre moyen de paiement d'origine — il apparaît généralement sous 5 à 10 jours ouvrés.",
+      "Si vous avez déjà payé, nous vous confirmerons séparément le remboursement après son traitement. Contactez-nous pour toute question.",
   },
   de: {
     subject: "Ihre Bestellung {n} wurde storniert",
     title: "Bestellung storniert",
     body: "Ihre Bestellung <strong>{n}</strong> wurde storniert.",
     refund:
-      "Falls Sie bereits bezahlt haben, wird der Betrag auf Ihr ursprüngliches Zahlungsmittel zurückerstattet — in der Regel innerhalb von 5–10 Werktagen sichtbar.",
+      "Falls Sie bereits bezahlt haben, bestätigen wir die Erstattung separat nach der Bearbeitung. Bei Fragen kontaktieren Sie uns.",
   },
   it: {
     subject: "Il vostro ordine {n} è stato annullato",
     title: "Ordine annullato",
     body: "Il vostro ordine <strong>{n}</strong> è stato annullato.",
     refund:
-      "Se avevate già pagato, l'importo viene rimborsato sul vostro metodo di pagamento originale — di solito appare entro 5–10 giorni lavorativi.",
+      "Se avete già pagato, confermeremo separatamente il rimborso dopo l’elaborazione. Contattateci per qualsiasi domanda.",
   },
   en: {
     subject: "Your order {n} has been cancelled",
     title: "Order cancelled",
     body: "Your order <strong>{n}</strong> has been cancelled.",
     refund:
-      "If you had already paid, the amount is refunded to your original payment method — it usually shows up within 5–10 business days.",
+      "If you have already paid, we will confirm your refund separately once it has been processed. Please contact us with any questions.",
   },
 };
 

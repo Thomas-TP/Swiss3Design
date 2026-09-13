@@ -4,7 +4,6 @@ import { formatChf } from "@/lib/format";
 import { cfImage } from "@/lib/cf-image";
 import type { ProductListItem } from "@/db/queries";
 import { MulticolorDots } from "./multicolor-dots";
-import { AddToCartMini } from "./add-to-cart";
 import { FavoriteButton } from "./favorite-button";
 
 export function ProductCard({ product }: { product: ProductListItem }) {
@@ -26,10 +25,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
   };
 
   return (
-    <Link
-      href={`/products/${product.slug}`}
-      className="group flex flex-col overflow-hidden rounded-card border border-line bg-surface transition-all duration-300 hover:-translate-y-1 hover:border-soft/30 hover:shadow-xl hover:shadow-ink/[0.07] dark:hover:shadow-black/40"
-    >
+    <article className="group relative flex flex-col overflow-hidden rounded-card border border-line bg-surface transition-all duration-300 hover:-translate-y-1 hover:border-soft/30 hover:shadow-xl hover:shadow-ink/[0.07] dark:hover:shadow-black/40">
       <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-paper to-line/40">
         {product.imageUrl && (
           <img
@@ -48,11 +44,18 @@ export function ProductCard({ product }: { product: ProductListItem }) {
         )}
         <FavoriteButton
           item={item}
-          className="absolute right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-surface/90 backdrop-blur"
+          className="absolute z-10 right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-surface/90 backdrop-blur"
         />
       </div>
       <div className="flex flex-1 flex-col gap-1 p-4">
-        <h3 className="font-semibold leading-snug">{product.name}</h3>
+        <h2 className="font-semibold leading-snug">
+          <Link
+            href={`/products/${product.slug}`}
+            className="after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-accent"
+          >
+            {product.name}
+          </Link>
+        </h2>
         <p
           className={`text-xs ${
             product.saleType === "stock" && product.stock === 0
@@ -86,13 +89,15 @@ export function ProductCard({ product }: { product: ProductListItem }) {
             )}
           </div>
         )}
-        <div className="mt-3">
-          <AddToCartMini
-            item={item}
-            disabled={product.saleType === "stock" && product.stock === 0}
-          />
+        <div className="relative z-10 mt-3">
+          <Link
+            href={`/products/${product.slug}`}
+            className="flex justify-center rounded-full bg-accent px-3 py-2 text-xs font-semibold text-white hover:bg-accent-dark"
+          >
+            {t("chooseOptions")}
+          </Link>
         </div>
       </div>
-    </Link>
+    </article>
   );
 }

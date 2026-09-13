@@ -8,6 +8,34 @@
       "when": 1783596529166,
       "tag": "0000_slim_black_bolt",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1789250202719,
+      "tag": "0001_purple_tusk",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1789250819151,
+      "tag": "0002_breezy_famine",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1789304864140,
+      "tag": "0003_pretty_magdalene",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1789305282129,
+      "tag": "0004_groovy_forgotten_one",
+      "breakpoints": true
     }
   ]
 }

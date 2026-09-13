@@ -11,7 +11,9 @@
     "cart": "Carrello",
     "account": "Account",
     "favorites": "Preferiti",
-    "theme": "Cambia tema"
+    "theme": "Cambia tema",
+    "language": "Lingua",
+    "skipContent": "Vai al contenuto"
   },
   "home": {
     "heroBadge": "Stampato nell'arco lemanico · Consegna in tutta la Svizzera",
@@ -72,7 +74,8 @@
     "weight": "Peso",
     "details": "Caratteristiche",
     "backToShop": "Torna al catalogo",
-    "notFound": "Prodotto non trovato."
+    "notFound": "Prodotto non trovato.",
+    "chooseOptions": "Scegli le opzioni"
   },
   "reviews": {
     "title": "Recensioni dei clienti",
@@ -99,7 +102,10 @@
     "consent": "Inviami un promemoria del carrello via e-mail. Posso annullare l'iscrizione in qualsiasi momento.",
     "cta": "Inviami un promemoria",
     "done": "Fatto — ti ricorderemo il tuo carrello.",
-    "error": "Si è verificato un errore, riprova."
+    "error": "Si è verificato un errore, riprova.",
+    "verifyNotice": "Conferma la tua e-mail per ricevere il carrello su un altro dispositivo.",
+    "restored": "Carrello ripristinato con prezzi e disponibilità aggiornati. Gli altri articoli sono stati conservati.",
+    "restoreError": "Questo carrello non può più essere ripristinato. Trovi gli articoli disponibili nel catalogo."
   },
   "cart": {
     "title": "Carrello",
@@ -171,7 +177,10 @@
     "promoRemove": "Rimuovi",
     "promoInvalid": "Codice non valido o scaduto.",
     "totalToPay": "Totale da pagare",
-    "paymentReassurance": "Pagamento cifrato. I dati della tua carta non passano mai dai nostri server."
+    "paymentReassurance": "Pagamento cifrato. I dati della tua carta non passano mai dai nostri server.",
+    "errorStock": "La disponibilità è cambiata. Aggiornate le quantità nel carrello.",
+    "errorVerifyAgain": "Verificate nuovamente l’indirizzo e-mail prima di pagare.",
+    "errorProductChanged": "Un articolo o un’opzione è cambiato. Selezionatelo nuovamente dalla scheda prodotto."
   },
   "orderSuccess": {
     "title": "Grazie per il vostro ordine!",
@@ -556,7 +565,8 @@
       "error": "Impossibile inviare l'e-mail. Controllate l'indirizzo inserito.",
       "magicSent": "Link inviato! Controllate la vostra casella di posta e cliccateci sopra per accedere.",
       "otpSentTo": "Codice inviato a {email}. Inseritelo qui sotto:"
-    }
+    },
+    "reauthNotice": "Accedi di nuovo per confermare la tua identità prima di esportare i tuoi dati personali."
   },
   "errors": {
     "notFoundTitle": "Pagina non trovata",
@@ -597,5 +607,10 @@
     "securePayment": "Pagamento sicuro",
     "copyright": "© {year} Swiss3Design — arco lemanico, Svizzera",
     "createdBy": "Sito creato da"
+  },
+  "orderPayment": {
+    "refunded": "Rimborsato: {amount}",
+    "refundPending": "Ordine annullato: il rimborso deve ancora essere elaborato in Stripe.",
+    "openStripe": "Apri il pagamento in Stripe"
   }
 }

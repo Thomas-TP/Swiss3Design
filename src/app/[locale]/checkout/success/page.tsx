@@ -10,7 +10,7 @@ import { getTranslations } from "next-intl/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { Link } from "@/i18n/navigation";
 import { getDb } from "@/db";
-import { markOrderPaid } from "@/lib/orders";
+import { settleSession } from "@/lib/checkout-session";
 import { getStripe } from "@/lib/stripe";
 import { getServerSession } from "@/lib/session";
 import { ClearCart } from "./clear-cart";
@@ -40,24 +40,16 @@ export default async function CheckoutSuccessPage({
         sessionId,
         { expand: ["payment_intent"] },
       );
-      const pi = checkoutSession.payment_intent;
-      if (pi && typeof pi !== "string") {
-        orderNumber = pi.metadata?.orderNumber ?? null;
-        receiptEmail = pi.receipt_email ?? null;
-        if (pi.status === "succeeded") {
-          status = "succeeded";
-          // Filet de sécurité si le webhook n'est pas encore passé (idempotent)
-          const orderId = pi.metadata?.orderId;
-          if (orderId) {
-            const db = await getDb();
-            await markOrderPaid(db, orderId);
-          }
-        } else if (pi.status === "processing") {
-          status = "processing";
-        }
-      }
+      orderNumber = checkoutSession.metadata?.orderNumber ?? null;
+      receiptEmail =
+        checkoutSession.customer_details?.email ??
+        checkoutSession.customer_email;
+      const db = await getDb();
+      if (await settleSession(db, checkoutSession)) status = "succeeded";
+      else if (checkoutSession.status === "complete") status = "processing";
     } catch {
-      status = "failed";
+      // Une réponse réseau perdue ne prouve pas un refus du paiement.
+      status = "processing";
     }
   }
 
@@ -70,7 +62,7 @@ export default async function CheckoutSuccessPage({
 
   return (
     <div className="mx-auto max-w-xl px-4 py-20 sm:px-6">
-      {status !== "failed" && <ClearCart />}
+      {status === "succeeded" && <ClearCart />}
       <div className="rounded-card border border-line bg-surface p-10 text-center">
         <span
           className={`mx-auto grid h-16 w-16 place-items-center rounded-full ${

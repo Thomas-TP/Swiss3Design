@@ -24,42 +24,44 @@
     "db:push:pg": "drizzle-kit push --config=drizzle.config.pg.ts"
   },
   "dependencies": {
-    "@better-auth/passkey": "^1.7.3",
+    "@better-auth/passkey": "^1.7.4",
     "@opennextjs/cloudflare": "^1.20.6",
-    "@stripe/react-stripe-js": "^6.9.0",
-    "@stripe/stripe-js": "^9.15.0",
+    "@stripe/react-stripe-js": "^6.10.0",
+    "@stripe/stripe-js": "^9.16.0",
     "@types/three": "^0.185.4",
-    "better-auth": "^1.7.3",
-    "better-auth-cloudflare": "^0.3.1",
+    "better-auth": "^1.7.4",
     "drizzle-orm": "^0.45.2",
-    "lucide-react": "^1.43.0",
+    "lucide-react": "^1.45.0",
     "motion": "^13.2.0",
-    "next": "16.3.4",
-    "next-intl": "^4.14.2",
+    "next": "16.3.5",
+    "next-intl": "^4.14.4",
     "pg": "^8.23.0",
     "postgres": "^3.4.9",
     "qrcode.react": "^4.2.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "stripe": "^22.6.1",
+    "stripe": "^22.6.2",
     "three": "^0.186.0",
-    "zod": "^4.5.4"
+    "zod": "^4.6.4"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^5.20260908.1",
+    "@cloudflare/workers-types": "^5.20260911.1",
     "@swc/helpers": "^0.5.23",
     "@tailwindcss/postcss": "^4.3.3",
     "@types/bun": "^1.4.2",
-    "@types/node": "^26.5.0",
+    "@types/node": "^26.5.1",
     "@types/pg": "^8.23.1",
-    "@types/react": "^19.2.18",
-    "@types/react-dom": "^19.2.7",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "drizzle-kit": "^0.31.10",
     "oxfmt": "^0.67.0",
     "oxlint": "^1.82.0",
     "tailwindcss": "^4.3.3",
     "typescript": "^6.0.3",
     "vitest": "^5.0.0",
-    "wrangler": "^4.130.0"
+    "wrangler": "^4.131.1"
+  },
+  "overrides": {
+    "esbuild": "^0.28.1"
   }
 }

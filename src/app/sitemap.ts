@@ -15,7 +15,6 @@ const STATIC_PATHS = [
   "/custom",
   "/a-propos",
   "/contact",
-  "/track",
   "/legal/terms",
   "/legal/privacy",
   "/legal/shipping",
@@ -40,6 +39,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const items = await getSitemapProducts();
   return [
     ...STATIC_PATHS.map((p) => entry(p)),
-    ...items.map((p) => entry(`/products/${p.slug}`, p.createdAt)),
+    ...items.map((p) => entry(`/products/${p.slug}`)),
   ];
 }

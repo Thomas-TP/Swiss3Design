@@ -78,7 +78,7 @@ export async function getAuth() {
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 8,
-      requireEmailVerification: canSendEmails,
+      requireEmailVerification: true,
       sendResetPassword: async ({ user, url }) => {
         await sendEmail(resetPasswordEmail(user.email, url));
       },
@@ -131,23 +131,38 @@ export async function getAuth() {
         // comptes OAuth et la 2FA sont supprimés par Better Auth ; on nettoie
         // ici nos propres tables.
         beforeDelete: async (u) => {
-          // Devis + fichiers 3D (R2) : données personnelles non requises légalement
+          // Les devis payés restent des pièces de vente ; seul le lien de compte est retiré.
           const quotes = await db
-            .select({ fileUrl: schema.quoteRequests.fileUrl })
+            .select()
             .from(schema.quoteRequests)
             .where(eq(schema.quoteRequests.customerId, u.id));
-          for (const q of quotes) {
-            if (q.fileUrl) {
-              try {
-                await env.R2.delete(q.fileUrl);
-              } catch {
-                // fichier déjà absent — sans gravité
-              }
-            }
+          for (const quote of quotes) {
+            const files = await db
+              .select({ fileUrl: schema.quoteMessages.fileUrl })
+              .from(schema.quoteMessages)
+              .where(eq(schema.quoteMessages.quoteId, quote.id));
+            const paid =
+              !!quote.paidAt ||
+              ["paid", "in_production", "done"].includes(quote.status);
+            for (const key of [quote.fileUrl, ...files.map((f) => f.fileUrl)])
+              if (key) await env.R2.delete(key);
+            await db
+              .update(schema.quoteMessages)
+              .set({ fileUrl: null, fileName: null })
+              .where(eq(schema.quoteMessages.quoteId, quote.id));
+            if (paid)
+              await db
+                .update(schema.quoteRequests)
+                .set({ customerId: null, fileUrl: null, fileName: null })
+                .where(eq(schema.quoteRequests.id, quote.id));
+            else
+              await db
+                .delete(schema.quoteRequests)
+                .where(eq(schema.quoteRequests.id, quote.id));
           }
           await db
-            .delete(schema.quoteRequests)
-            .where(eq(schema.quoteRequests.customerId, u.id));
+            .delete(schema.abandonedCarts)
+            .where(eq(schema.abandonedCarts.email, u.email.toLowerCase()));
           await db
             .delete(schema.customerAddresses)
             .where(eq(schema.customerAddresses.userId, u.id));

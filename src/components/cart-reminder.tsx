@@ -3,6 +3,11 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useSession } from "@/lib/auth-client";
+import {
+  GuestEmailVerification,
+  type EmailProof,
+} from "./guest-email-verification";
 import { useCart } from "@/lib/cart";
 
 // Opt-in nLPD de relance de panier : case décochée par défaut, consentement
@@ -12,7 +17,9 @@ export function CartReminder() {
   const t = useTranslations("cartReminder");
   const locale = useLocale();
   const { items } = useCart();
-  const [email, setEmail] = useState("");
+  const { data: session } = useSession();
+  const [proof, setProof] = useState<EmailProof | null>(null);
+  const email = session?.user.emailVerified ? session.user.email : proof?.email;
   const [consent, setConsent] = useState(false);
   const [status, setStatus] = useState<"idle" | "sending" | "done" | "error">(
     "idle",
@@ -40,11 +47,9 @@ export function CartReminder() {
         body: JSON.stringify({
           email,
           locale,
-          items: items.map((i) => ({
-            name: i.name,
-            quantity: i.quantity,
-            priceCents: i.priceCents,
-          })),
+          emailProof: proof?.token,
+          consent: true,
+          items,
         }),
       });
       setStatus(res.ok ? "done" : "error");
@@ -59,14 +64,16 @@ export function CartReminder() {
       className="mt-5 rounded-xl border border-line bg-paper p-4"
     >
       <p className="text-xs font-semibold">{t("title")}</p>
-      <input
-        type="email"
-        inputMode="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder={t("emailPlaceholder")}
-        className="mt-2 w-full rounded-lg border border-line bg-surface px-3 py-2 text-sm outline-none transition-colors focus:border-soft/50"
-      />
+      {session?.user.emailVerified ? (
+        <p className="mt-2 break-all text-sm">{email}</p>
+      ) : (
+        <GuestEmailVerification
+          proof={proof}
+          onProof={setProof}
+          notice={t("verifyNotice")}
+          next="/cart"
+        />
+      )}
       <label className="mt-2 flex items-start gap-2 text-xs text-soft">
         <input
           type="checkbox"
@@ -84,7 +91,9 @@ export function CartReminder() {
         {status === "sending" ? "…" : t("cta")}
       </button>
       {status === "error" && (
-        <p className="mt-2 text-xs text-accent">{t("error")}</p>
+        <p role="alert" className="mt-2 text-xs text-accent">
+          {t("error")}
+        </p>
       )}
     </form>
   );

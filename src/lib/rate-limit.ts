@@ -1,31 +1,48 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
-
-// Limiteur de débit à fenêtre fixe sur KV, par IP et par route.
-// KV est éventuellement cohérent : la limite est approximative, ce qui
-// suffit largement contre l'abus (spam d'e-mails, remplissage du bucket R2).
-
+import { getDb } from "@/db";
+import { requestLimits } from "@/db/schema";
+import { lt, sql } from "drizzle-orm";
+// Compteur atomique Postgres ; aucune course get/put KV ni écriture limitée à 1/s.
 export async function rateLimit(
   request: Request,
   route: string,
   { limit, windowS }: { limit: number; windowS: number },
 ): Promise<boolean> {
-  const { env } = await getCloudflareContext({ async: true });
   const ip = request.headers.get("cf-connecting-ip");
-  // En local (pas derrière Cloudflare), pas d'IP fiable : on ne limite pas
-  if (!ip) return true;
-
-  const window = Math.floor(Date.now() / (windowS * 1000));
-  const key = `rl:${route}:${ip}:${window}`;
-
-  const count = Number((await env.KV.get(key)) ?? 0);
-  if (count >= limit) return false;
-
-  // expirationTtl minimal accepté par KV : 60 s
-  await env.KV.put(key, String(count + 1), {
-    expirationTtl: Math.max(windowS, 60),
-  });
-  return true;
+  if (!ip)
+    return (
+      process.env.NODE_ENV !== "production" ||
+      ["localhost", "127.0.0.1", "[::1]"].includes(
+        new URL(request.url).hostname,
+      )
+    );
+  try {
+    const digest = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(ip),
+    );
+    const hash = Array.from(new Uint8Array(digest), (v) =>
+      v.toString(16).padStart(2, "0"),
+    ).join("");
+    const window = Math.floor(Date.now() / (windowS * 1000));
+    const db = await getDb();
+    const rows = await db
+      .insert(requestLimits)
+      .values({
+        key: route + ":" + hash + ":" + window,
+        count: 1,
+        expiresAt: new Date((window + 1) * windowS * 1000),
+      })
+      .onConflictDoUpdate({
+        target: requestLimits.key,
+        set: { count: sql`${requestLimits.count}+1` },
+        setWhere: lt(requestLimits.count, limit),
+      })
+      .returning({ key: requestLimits.key });
+    return rows.length > 0;
+  } catch {
+    console.error("[rate-limit] indisponible", { route });
+    return false;
+  }
 }
-
 export const tooManyRequests = (headers?: HeadersInit) =>
   Response.json({ error: "too_many_requests" }, { status: 429, headers });

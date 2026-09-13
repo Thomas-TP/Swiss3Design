@@ -103,7 +103,9 @@ export default async function ProductPage({
       <script
         type="application/ld+json"
         nonce={nonce}
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
       />
       <Link
         href="/shop"
@@ -190,8 +192,10 @@ export default async function ProductPage({
             </ul>
 
             {specs.length > 0 && (
-              <dl className="mt-8 divide-y divide-line border-t border-line text-sm">
-                <p className="pt-4 font-semibold">{t("details")}</p>
+              <dl
+                aria-label={t("details")}
+                className="mt-8 divide-y divide-line border-t border-line text-sm"
+              >
                 {specs.map((s) => (
                   <div key={s.label} className="flex justify-between py-3">
                     <dt className="text-soft">{s.label}</dt>

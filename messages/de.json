@@ -11,7 +11,9 @@
     "cart": "Warenkorb",
     "account": "Konto",
     "favorites": "Favoriten",
-    "theme": "Erscheinungsbild wechseln"
+    "theme": "Erscheinungsbild wechseln",
+    "language": "Sprache",
+    "skipContent": "Zum Inhalt"
   },
   "home": {
     "heroBadge": "Gedruckt in der Genferseeregion · Lieferung in die ganze Schweiz",
@@ -72,7 +74,8 @@
     "weight": "Gewicht",
     "details": "Eigenschaften",
     "backToShop": "Zurück zum Katalog",
-    "notFound": "Produkt nicht gefunden."
+    "notFound": "Produkt nicht gefunden.",
+    "chooseOptions": "Optionen wählen"
   },
   "reviews": {
     "title": "Kundenbewertungen",
@@ -99,7 +102,10 @@
     "consent": "Senden Sie mir eine Erinnerung an meinen Warenkorb. Ich kann mich jederzeit abmelden.",
     "cta": "Erinnerung senden",
     "done": "Notiert — wir erinnern Sie an Ihren Warenkorb.",
-    "error": "Ein Fehler ist aufgetreten, bitte erneut versuchen."
+    "error": "Ein Fehler ist aufgetreten, bitte erneut versuchen.",
+    "verifyNotice": "Bestätigen Sie Ihre E-Mail-Adresse, um Ihren Warenkorb auf einem anderen Gerät zu erhalten.",
+    "restored": "Warenkorb mit aktuellen Preisen und Verfügbarkeiten wiederhergestellt. Ihre anderen Artikel bleiben erhalten.",
+    "restoreError": "Dieser Warenkorb kann nicht mehr wiederhergestellt werden. Verfügbare Artikel finden Sie im Katalog."
   },
   "cart": {
     "title": "Warenkorb",
@@ -171,7 +177,10 @@
     "promoRemove": "Entfernen",
     "promoInvalid": "Code ungültig oder abgelaufen.",
     "totalToPay": "Zu zahlender Betrag",
-    "paymentReassurance": "Verschlüsselte Zahlung. Ihre Kartendaten erreichen unsere Server nie."
+    "paymentReassurance": "Verschlüsselte Zahlung. Ihre Kartendaten erreichen unsere Server nie.",
+    "errorStock": "Der verfügbare Bestand hat sich geändert. Passen Sie die Mengen im Warenkorb an.",
+    "errorVerifyAgain": "Bestätigen Sie Ihre E-Mail-Adresse erneut, bevor Sie bezahlen.",
+    "errorProductChanged": "Ein Artikel oder eine Option hat sich geändert. Wählen Sie ihn auf der Produktseite erneut aus."
   },
   "orderSuccess": {
     "title": "Vielen Dank für Ihre Bestellung!",
@@ -556,7 +565,8 @@
       "error": "E-Mail konnte nicht gesendet werden. Prüfen Sie die eingegebene Adresse.",
       "magicSent": "Link gesendet! Prüfen Sie Ihr Postfach und klicken Sie darauf, um sich anzumelden.",
       "otpSentTo": "Code an {email} gesendet. Geben Sie ihn unten ein:"
-    }
+    },
+    "reauthNotice": "Melden Sie sich erneut an, um Ihre Identität vor dem Export Ihrer persönlichen Daten zu bestätigen."
   },
   "errors": {
     "notFoundTitle": "Seite nicht gefunden",
@@ -597,5 +607,10 @@
     "securePayment": "Sichere Zahlung",
     "copyright": "© {year} Swiss3Design — Genferseeregion, Schweiz",
     "createdBy": "Website erstellt von"
+  },
+  "orderPayment": {
+    "refunded": "Erstattet: {amount}",
+    "refundPending": "Bestellung storniert: Die Erstattung muss noch in Stripe bearbeitet werden.",
+    "openStripe": "Zahlung in Stripe öffnen"
   }
 }

@@ -1,11 +1,12 @@
 "use server";
 
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { canTransitionOrder } from "@/lib/payment-state";
 import { getDb } from "@/db";
 import { orders } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
-import { sendEmail } from "@/lib/email";
+import { queueEmail, drainEmailOutbox } from "@/lib/outbox";
 import {
   orderShippedEmail,
   orderDeliveredEmail,
@@ -28,42 +29,61 @@ export async function updateOrderStatus(formData: FormData) {
       .slice(0, 60) || null;
 
   const db = await getDb();
-  const [previous] = await db
-    .select()
-    .from(orders)
-    .where(eq(orders.id, id))
-    .limit(1);
-  if (!previous) {
-    revalidatePath("/", "layout");
-    return;
-  }
+  await db.transaction(async (db) => {
+    const [previous] = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.id, id))
+      .limit(1)
+      .for("update");
+    if (!previous) {
+      revalidatePath("/", "layout");
+      return;
+    }
 
-  await db
-    .update(orders)
-    .set({
-      status: status as (typeof ORDER_STATUSES)[number],
-      // Le suivi saisi remplace l'ancien ; un champ vidé le supprime
-      trackingNumber,
-    })
-    .where(eq(orders.id, id));
+    if (!canTransitionOrder(previous.status, status)) return;
+    const changed = await db
+      .update(orders)
+      .set({
+        status: status as (typeof ORDER_STATUSES)[number],
+        // Le suivi saisi remplace l'ancien ; un champ vidé le supprime
+        trackingNumber,
+      })
+      .where(and(eq(orders.id, id), eq(orders.status, previous.status)))
+      .returning({ id: orders.id });
+    if (!changed.length) return;
 
-  // E-mails de suivi du cycle de vie — envoyés une seule fois, au premier
-  // passage dans le statut. Un échec d'envoi ne bloque jamais la mise à jour.
-  try {
+    // E-mails de suivi du cycle de vie — envoyés une seule fois, au premier
+    // passage dans le statut. Un échec d'envoi ne bloque jamais la mise à jour.
     if (status === "shipped" && previous.status !== "shipped") {
-      await sendEmail(orderShippedEmail(previous, trackingNumber));
+      await queueEmail(
+        db,
+        "order-shipped:" + id,
+        orderShippedEmail(previous, trackingNumber),
+      );
     } else if (status === "delivered" && previous.status !== "delivered") {
-      await sendEmail(orderDeliveredEmail(previous));
+      await queueEmail(
+        db,
+        "order-delivered:" + id,
+        orderDeliveredEmail(previous),
+      );
     } else if (
       status === "cancelled" &&
       ["paid", "in_production", "shipped"].includes(previous.status)
     ) {
       // Annulation d'une commande déjà payée : le client est prévenu
       // (le remboursement se fait manuellement dans Stripe).
-      await sendEmail(orderCancelledEmail(previous));
+      await queueEmail(
+        db,
+        "order-cancelled:" + id,
+        orderCancelledEmail(previous),
+      );
     }
-  } catch (e) {
-    console.error("[email statut commande]", e);
+  });
+  try {
+    await drainEmailOutbox(db);
+  } catch {
+    console.error("[outbox] reprise par maintenance");
   }
 
   revalidatePath("/", "layout");

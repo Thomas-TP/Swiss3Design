@@ -11,7 +11,9 @@
     "cart": "Cart",
     "account": "Account",
     "favorites": "Favorites",
-    "theme": "Toggle theme"
+    "theme": "Toggle theme",
+    "language": "Language",
+    "skipContent": "Skip to content"
   },
   "home": {
     "heroBadge": "Printed in the Lake Geneva region · Delivered across Switzerland",
@@ -72,7 +74,8 @@
     "weight": "Weight",
     "details": "Specifications",
     "backToShop": "Back to shop",
-    "notFound": "Product not found."
+    "notFound": "Product not found.",
+    "chooseOptions": "Choose options"
   },
   "reviews": {
     "title": "Customer reviews",
@@ -99,7 +102,10 @@
     "consent": "Email me a reminder of my cart. I can unsubscribe at any time.",
     "cta": "Send me a reminder",
     "done": "Done — we'll remind you about your cart.",
-    "error": "Something went wrong, please try again."
+    "error": "Something went wrong, please try again.",
+    "verifyNotice": "Verify your email address to receive your cart on another device.",
+    "restored": "Cart restored with current prices and availability. Your other items were kept.",
+    "restoreError": "This cart can no longer be restored. Find available items in the catalogue."
   },
   "cart": {
     "title": "Cart",
@@ -171,7 +177,10 @@
     "promoRemove": "Remove",
     "promoInvalid": "Invalid or expired code.",
     "totalToPay": "Total to pay",
-    "paymentReassurance": "Encrypted payment. Your card details never touch our servers."
+    "paymentReassurance": "Encrypted payment. Your card details never touch our servers.",
+    "errorStock": "Available stock has changed. Return to your cart to adjust quantities.",
+    "errorVerifyAgain": "Verify your email address again before paying.",
+    "errorProductChanged": "An item or option has changed. Select it again from the product page."
   },
   "orderSuccess": {
     "title": "Thank you for your order!",
@@ -556,7 +565,8 @@
       "error": "Couldn't send the email. Check the address you entered.",
       "magicSent": "Link sent! Check your inbox and click it to sign in.",
       "otpSentTo": "Code sent to {email}. Enter it below:"
-    }
+    },
+    "reauthNotice": "Sign in again to confirm your identity before exporting your personal data."
   },
   "errors": {
     "notFoundTitle": "Page not found",
@@ -597,5 +607,10 @@
     "securePayment": "Secure payment",
     "copyright": "© {year} Swiss3Design — Lake Geneva region, Switzerland",
     "createdBy": "Site built by"
+  },
+  "orderPayment": {
+    "refunded": "Refunded: {amount}",
+    "refundPending": "Order cancelled: the refund still needs to be processed in Stripe.",
+    "openStripe": "Open payment in Stripe"
   }
 }

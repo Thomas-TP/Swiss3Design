@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { headers } from "next/headers";
@@ -106,6 +107,7 @@ export default async function LocaleLayout({
 
   // Nonce CSP posé par le middleware (prod uniquement) : autorise le script
   // inline anti-flash sous une politique sans 'unsafe-inline'.
+  const nav = await getTranslations("nav");
   const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
@@ -129,15 +131,30 @@ export default async function LocaleLayout({
           type="application/ld+json"
           nonce={nonce}
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationJsonLd()),
+            __html: JSON.stringify(organizationJsonLd()).replace(
+              /</g,
+              "\\u003c",
+            ),
           }}
         />
         <ThemeManager />
         <NextIntlClientProvider>
           <CartProvider>
             <FavoritesProvider>
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-surface focus:p-4"
+              >
+                {nav("skipContent")}
+              </a>
               <Header />
-              <main className="flex-1 pb-24 md:pb-0">{children}</main>
+              <main
+                id="main-content"
+                tabIndex={-1}
+                className="flex-1 pb-24 xl:pb-0"
+              >
+                {children}
+              </main>
               <Footer />
               <BottomNav />
             </FavoritesProvider>

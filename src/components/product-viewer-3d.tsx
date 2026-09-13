@@ -32,6 +32,11 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
     if (!el) return;
 
     let disposed = false;
+    let visible = true;
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+    });
+    observer.observe(el);
     let frame = 0;
     let renderer: THREE.WebGLRenderer | undefined;
     let controls: OrbitControls | undefined;
@@ -47,6 +52,8 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(el.clientWidth, el.clientHeight);
+      renderer.domElement.tabIndex = 0;
+      renderer.domElement.setAttribute("aria-label", t("dragHint"));
       el.appendChild(renderer.domElement);
 
       try {
@@ -72,7 +79,8 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
       const { scene, camera, target, maxDim } = built;
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
-      controls.enablePan = false;
+      controls.enablePan = true;
+      controls.listenToKeyEvents(renderer.domElement);
       controls.target.copy(target);
       controls.maxPolarAngle = Math.PI / 2 - 0.05; // reste au-dessus du sol
       controls.minDistance = maxDim * 1.2;
@@ -90,6 +98,7 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
 
       const animate = () => {
         frame = requestAnimationFrame(animate);
+        if (document.hidden || !visible) return;
         controls!.update();
         renderer!.render(scene, camera);
       };
@@ -98,6 +107,7 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
 
     return () => {
       disposed = true;
+      observer.disconnect();
       cancelAnimationFrame(frame);
       if (onResize) window.removeEventListener("resize", onResize);
       controls?.dispose();

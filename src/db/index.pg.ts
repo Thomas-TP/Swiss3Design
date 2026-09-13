@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -17,8 +18,16 @@ import * as schema from "./schema.pg";
 // "already executing a query", constaté en test réel, deviendra une erreur
 // dure en pg@9). `max: 5` reprend la taille déjà utilisée côté postgres.js ;
 // Cloudflare recommande explicitement un petit pool local par Worker.
+const requestDatabases = new WeakMap<
+  object,
+  ReturnType<typeof drizzle<typeof schema>>
+>();
+
 export async function getPgDb() {
-  const { env } = await getCloudflareContext({ async: true });
+  const { env, ctx, cf } = await getCloudflareContext({ async: true });
+  const requestKey = cf ? ctx : undefined;
+  const existing = requestKey && requestDatabases.get(requestKey);
+  if (existing) return existing;
   if (!env.HYPERDRIVE) {
     // Non lié dans cet environnement (ex. "preview", pas encore câblé —
     // voir wrangler.jsonc). Erreur explicite plutôt qu'un crash opaque plus
@@ -30,6 +39,8 @@ export async function getPgDb() {
   const pool = new Pool({
     connectionString: env.HYPERDRIVE.connectionString,
     max: 5,
+    connectionTimeoutMillis: 10000,
+    idleTimeoutMillis: 5000,
   });
   // node-postgres émet un événement "error" quand Neon/Hyperdrive coupe une
   // connexion inactive côté serveur (constaté en test réel : erreurs Postgres
@@ -39,7 +50,13 @@ export async function getPgDb() {
   pool.on("error", (err) => {
     console.error("[db] Erreur de connexion Postgres (pool) :", err);
   });
-  return drizzle(pool, { schema });
+  const db = drizzle(pool, { schema });
+  if (requestKey) requestDatabases.set(requestKey, db);
+  after(async () => {
+    await pool.end();
+    if (requestKey) requestDatabases.delete(requestKey);
+  });
+  return db;
 }
 
 export { schema };

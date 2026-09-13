@@ -54,6 +54,7 @@
     },
   ],
   "observability": {
+    "redact_query_string": true,
     "enabled": true,
   },
   // ADMIN_EMAILS n'est PAS ici : dépôt public, posé comme secret Cloudflare
@@ -129,6 +130,7 @@
         },
       ],
       "observability": {
+        "redact_query_string": true,
         "enabled": true,
       },
       // ADMIN_EMAILS n'est pas ici non plus — même secret Cloudflare que la
