@@ -39,9 +39,9 @@ Les contrôles navigateur sur six routes publiques à 320 et 1440 px n'ont relev
 
 Le serveur Chrome DevTools requis pour une mesure Core Web Vitals instrumentée n'est pas disponible dans cet environnement. Aucune nouvelle trace LCP/INP/CLS ne doit donc être présentée comme réalisée ; les validations effectuées ici portent sur le build, les réponses HTTP, les parcours, le responsive et l'accessibilité automatisée.
 
-Les migrations 0001 à 0005 sont additives et appliquées sur preview. Elles ne sont pas encore appliquées en production. La CI Quality est préparée pour créer un Postgres jetable, appliquer les migrations et exécuter les contrôles sans secret de production.
+Les migrations 0001 à 0005 sont additives et appliquées sur preview. Elles ne sont pas encore appliquées en production. La CI Quality crée un Postgres jetable, applique les migrations et exécute les contrôles sans secret de production. La branche `main` exige désormais une pull request à jour, le contrôle `quality` et la résolution des conversations ; force-push et suppression sont interdits.
 
-Points encore ouverts avant production : passage Workers Paid et nouvelle rafale 1102 ; test Stripe complet et abonnement aux nouveaux événements webhook ; réauthentification forte de toutes les actions administratives sensibles ; protection de `main` ; exercice réel de restauration Neon/R2 ; alertes opérationnelles ; application des migrations de production puis déploiement et validation finale.
+Points encore ouverts avant production : passage Workers Paid et nouvelle rafale 1102 ; test Stripe complet et abonnement aux nouveaux événements webhook ; réauthentification forte de toutes les actions administratives sensibles ; exercice réel de restauration Neon/R2 ; alertes opérationnelles ; application des migrations de production puis déploiement et validation finale.
 
 ## Exploitation après livraison
 
