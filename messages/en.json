@@ -565,7 +565,8 @@
       "magicSent": "Link sent! Check your inbox and click it to sign in.",
       "otpSentTo": "Code sent to {email}. Enter it below:"
     },
-    "reauthNotice": "Sign in again to confirm your identity before exporting your personal data."
+    "reauthNotice": "Sign in again to confirm your identity before exporting your personal data.",
+    "adminReauthNotice": "Sign in again with your password and second factor, or with a passkey, before continuing in administration."
   },
   "errors": {
     "notFoundTitle": "Page not found",

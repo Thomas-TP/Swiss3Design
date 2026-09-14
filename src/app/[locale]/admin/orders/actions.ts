@@ -5,7 +5,7 @@ import { revalidatePath } from "next/cache";
 import { canTransitionOrder } from "@/lib/payment-state";
 import { getDb } from "@/db";
 import { orders } from "@/db/schema";
-import { requireAdmin } from "@/lib/session";
+import { requireFreshAdmin } from "@/lib/session";
 import { queueEmail, drainEmailOutbox } from "@/lib/outbox";
 import {
   orderShippedEmail,
@@ -16,7 +16,7 @@ import { ORDER_STATUSES } from "../ui";
 import { recordStatusTransition } from "@/lib/status-history";
 
 export async function updateOrderStatus(formData: FormData) {
-  const session = await requireAdmin();
+  const session = await requireFreshAdmin();
   const id = String(formData.get("id") || "");
   const status = String(formData.get("status") || "");
   if (!id || !(ORDER_STATUSES as readonly string[]).includes(status)) {
@@ -100,7 +100,7 @@ export async function updateOrderStatus(formData: FormData) {
 
 // Note interne (jamais visible par le client)
 export async function updateOrderNote(formData: FormData) {
-  await requireAdmin();
+  await requireFreshAdmin();
   const id = String(formData.get("id") || "");
   if (!id) return;
   const adminNote =

@@ -16,6 +16,7 @@ import {
   sendAnnouncement,
   sendTestEmail,
 } from "./actions";
+import { redirectToAdminReauthentication } from "@/lib/admin-reauth-client";
 
 interface Product {
   id: string;
@@ -75,6 +76,10 @@ export function ComposeForm({ products }: { products: Product[] }) {
       body.append("file", file);
       body.append("folder", "newsletter");
       const res = await fetch("/api/admin/upload", { method: "POST", body });
+      if (res.status === 401) {
+        redirectToAdminReauthentication();
+        return;
+      }
       if (!res.ok) {
         throw new Error(
           res.status === 413

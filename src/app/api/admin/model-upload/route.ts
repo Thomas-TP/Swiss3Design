@@ -2,6 +2,7 @@ import { hasExpectedSignature } from "@/lib/file-signature";
 import { boundedFormData } from "@/lib/upload";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getServerSession } from "@/lib/session";
+import { isSessionFresh } from "@/lib/session-freshness";
 
 // Upload d'un modèle 3D pour le viewer produit. Validation par EXTENSION : les
 // types MIME STL/GLB ne sont pas fiables (souvent application/octet-stream).
@@ -18,6 +19,9 @@ export async function POST(request: Request) {
   const session = await getServerSession();
   if (session?.user.role !== "admin") {
     return Response.json({ error: "unauthorized" }, { status: 403 });
+  }
+  if (!isSessionFresh(session.session.createdAt)) {
+    return Response.json({ error: "reauth_required" }, { status: 401 });
   }
 
   const form = await boundedFormData(request, MAX_BYTES);

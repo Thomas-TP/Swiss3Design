@@ -565,7 +565,8 @@
       "magicSent": "Link inviato! Controllate la vostra casella di posta e cliccateci sopra per accedere.",
       "otpSentTo": "Codice inviato a {email}. Inseritelo qui sotto:"
     },
-    "reauthNotice": "Accedi di nuovo per confermare la tua identità prima di esportare i tuoi dati personali."
+    "reauthNotice": "Accedi di nuovo per confermare la tua identità prima di esportare i tuoi dati personali.",
+    "adminReauthNotice": "Accedi di nuovo con la password e il secondo fattore, oppure con una passkey, prima di continuare nella sezione Amministrazione."
   },
   "errors": {
     "notFoundTitle": "Pagina non trovata",

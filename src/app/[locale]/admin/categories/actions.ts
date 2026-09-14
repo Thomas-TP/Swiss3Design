@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { categories, categoryTranslations, LOCALES } from "@/db/schema";
-import { requireAdmin } from "@/lib/session";
+import { requireFreshAdmin } from "@/lib/session";
 
 export interface CategoryFormState {
   error?: string;
@@ -26,7 +26,7 @@ export async function saveCategory(
   _prev: CategoryFormState,
   formData: FormData,
 ): Promise<CategoryFormState> {
-  await requireAdmin();
+  await requireFreshAdmin();
 
   const id = String(formData.get("id") || "");
   const nameFr = String(formData.get("name_fr") || "").trim();
@@ -80,7 +80,7 @@ export async function saveCategory(
 }
 
 export async function deleteCategory(id: string): Promise<void> {
-  await requireAdmin();
+  await requireFreshAdmin();
   if (id) {
     const db = await getDb();
     // Les liens produit↔catégorie sont supprimés par cascade (FK)

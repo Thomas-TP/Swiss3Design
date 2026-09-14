@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { discountCodes } from "@/db/schema";
-import { requireAdmin } from "@/lib/session";
+import { requireFreshAdmin } from "@/lib/session";
 
 export interface DiscountFormState {
   error?: string;
@@ -21,7 +21,7 @@ export async function saveDiscount(
   _prev: DiscountFormState,
   formData: FormData,
 ): Promise<DiscountFormState> {
-  await requireAdmin();
+  await requireFreshAdmin();
 
   const id = String(formData.get("id") || "");
   const code = String(formData.get("code") || "")
@@ -92,7 +92,7 @@ export async function saveDiscount(
 }
 
 export async function deleteDiscount(id: string): Promise<void> {
-  await requireAdmin();
+  await requireFreshAdmin();
   if (id) {
     const db = await getDb();
     await db.delete(discountCodes).where(eq(discountCodes.id, id));

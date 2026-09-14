@@ -565,7 +565,8 @@
       "magicSent": "Link gesendet! Prüfen Sie Ihr Postfach und klicken Sie darauf, um sich anzumelden.",
       "otpSentTo": "Code an {email} gesendet. Geben Sie ihn unten ein:"
     },
-    "reauthNotice": "Melden Sie sich erneut an, um Ihre Identität vor dem Export Ihrer persönlichen Daten zu bestätigen."
+    "reauthNotice": "Melden Sie sich erneut an, um Ihre Identität vor dem Export Ihrer persönlichen Daten zu bestätigen.",
+    "adminReauthNotice": "Melden Sie sich mit Passwort und Zwei-Faktor-Code oder mit einem Passkey erneut an, bevor Sie in der Verwaltung fortfahren."
   },
   "errors": {
     "notFoundTitle": "Seite nicht gefunden",

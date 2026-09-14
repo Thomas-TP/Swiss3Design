@@ -565,7 +565,8 @@
       "magicSent": "Lien envoyé ! Consultez votre boîte mail et cliquez dessus pour vous connecter.",
       "otpSentTo": "Code envoyé à {email}. Saisissez-le ci-dessous :"
     },
-    "reauthNotice": "Reconnectez-vous pour confirmer votre identité avant d’exporter vos données personnelles."
+    "reauthNotice": "Reconnectez-vous pour confirmer votre identité avant d’exporter vos données personnelles.",
+    "adminReauthNotice": "Reconnectez-vous avec votre mot de passe et votre double facteur, ou avec votre clé de connexion, avant de continuer dans la zone Administration."
   },
   "errors": {
     "notFoundTitle": "Page introuvable",

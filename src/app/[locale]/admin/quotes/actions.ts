@@ -5,7 +5,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { quoteRequests, quoteMessages } from "@/db/schema";
-import { requireAdmin } from "@/lib/session";
+import { requireFreshAdmin } from "@/lib/session";
 import { queueEmail, drainEmailOutbox } from "@/lib/outbox";
 import { quoteReplyEmail, quoteRejectedEmail } from "@/lib/email-templates";
 import { QUOTE_STATUSES } from "../ui";
@@ -15,7 +15,7 @@ import { recordStatusTransition } from "@/lib/status-history";
 const QUOTE_VALIDITY_DAYS = 30;
 
 export async function updateQuote(formData: FormData) {
-  const session = await requireAdmin();
+  const session = await requireFreshAdmin();
   const id = String(formData.get("id") || "");
   const status = String(formData.get("status") || "");
   if (!id || !(QUOTE_STATUSES as readonly string[]).includes(status)) {

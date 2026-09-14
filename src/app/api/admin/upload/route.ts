@@ -2,6 +2,7 @@ import { hasExpectedSignature } from "@/lib/file-signature";
 import { boundedFormData } from "@/lib/upload";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getServerSession } from "@/lib/session";
+import { isSessionFresh } from "@/lib/session-freshness";
 
 // Formats raster uniquement : le SVG peut embarquer du JavaScript (XSS)
 const ALLOWED = new Map([
@@ -16,6 +17,9 @@ export async function POST(request: Request) {
   const session = await getServerSession();
   if (session?.user.role !== "admin") {
     return Response.json({ error: "unauthorized" }, { status: 403 });
+  }
+  if (!isSessionFresh(session.session.createdAt)) {
+    return Response.json({ error: "reauth_required" }, { status: 401 });
   }
 
   const form = await boundedFormData(request, MAX_BYTES);

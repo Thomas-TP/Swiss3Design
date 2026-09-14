@@ -13,6 +13,7 @@ import {
   notificationPreferences,
 } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
+import { isSessionFresh } from "@/lib/session-freshness";
 
 // Export de mes données (droit d'accès nLPD/RGPD) : agrège les données
 // personnelles détenues par Swiss3Design en un objet JSON téléchargeable
@@ -23,7 +24,7 @@ export async function exportMyData(): Promise<
 > {
   const session = await getServerSession();
   if (!session || !session.user.emailVerified) return { error: "unauthorized" };
-  if (Date.now() - new Date(session.session.createdAt).getTime() > 30 * 60000)
+  if (!isSessionFresh(session.session.createdAt))
     return { error: "reauth_required" };
   const { user } = session;
 

@@ -1,5 +1,6 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getServerSession } from "@/lib/session";
+import { isSessionFresh } from "@/lib/session-freshness";
 import { runMaintenance } from "@/lib/maintenance";
 
 // Purge des fichiers R2 orphelins + rétention des devis (>2 ans).
@@ -14,6 +15,9 @@ export async function POST(request: Request) {
     const session = await getServerSession();
     if (session?.user.role !== "admin") {
       return new Response("Forbidden", { status: 403 });
+    }
+    if (!isSessionFresh(session.session.createdAt)) {
+      return Response.json({ error: "reauth_required" }, { status: 401 });
     }
   }
 
