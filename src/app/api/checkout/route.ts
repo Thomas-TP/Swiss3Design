@@ -1,5 +1,9 @@
+import { alias } from "drizzle-orm/pg-core";
+import { reserveStock } from "@/lib/stock";
+import { resumeOrderCheckout } from "@/lib/checkout-session";
+import { aggregateStock } from "@/lib/payment-state";
 import { z } from "zod";
-import { and, eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, isNull, lt, or, sql } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import {
@@ -11,17 +15,18 @@ import {
   productColors,
   filamentColors,
   customerAddresses,
+  discountCodes,
 } from "@/db/schema";
 import { getSetting } from "@/db/queries";
-import { getStripe, createCheckoutSession } from "@/lib/stripe";
-import { getOrCreateStripeCustomer } from "@/lib/stripe-customer";
 import { getAuth } from "@/lib/auth";
 import { verifyEmailProof } from "@/lib/email-proof";
 import { validateDiscount } from "@/lib/discounts";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { SHIPPING_CENTS, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
+import { recordStatusTransition } from "@/lib/status-history";
 
 const bodySchema = z.object({
+  attemptId: z.uuid().optional(),
   items: z
     .array(
       z.object({
@@ -75,7 +80,9 @@ export async function POST(request: Request) {
   const authSession = await auth.api.getSession({ headers: request.headers });
   let email: string;
   if (authSession) {
-    email = authSession.user.email;
+    if (!authSession.user.emailVerified)
+      return Response.json({ error: "email_not_verified" }, { status: 403 });
+    email = authSession.user.email.toLowerCase();
   } else {
     const claimed = parsed.data.email.trim().toLowerCase();
     const { env } = await getCloudflareContext({ async: true });
@@ -93,11 +100,29 @@ export async function POST(request: Request) {
   }
 
   const db = await getDb();
+  const attemptKey =
+    email.toLowerCase() + ":" + (parsed.data.attemptId ?? crypto.randomUUID());
+  const fingerprint = JSON.stringify({
+    email,
+    items,
+    address,
+    locale,
+    discountCode: parsed.data.discountCode ?? "",
+  });
+  const [existingAttempt] = await db
+    .select()
+    .from(orders)
+    .where(eq(orders.checkoutAttemptKey, attemptKey));
+  if (existingAttempt) {
+    if (existingAttempt.checkoutFingerprint !== fingerprint)
+      return Response.json({ error: "checkout_changed" }, { status: 409 });
+    return resumeOrderCheckout(db, existingAttempt);
+  }
+  const fallbackTranslation = alias(
+    productTranslations,
+    "fallback_translation",
+  );
   const productIds = [...new Set(items.map((i) => i.productId))];
-  const variantIds = [
-    ...new Set(items.map((i) => i.variantId).filter((v): v is string => !!v)),
-  ];
-
   // Prix et noms relus en base : on ne fait jamais confiance au client.
   // Produits, variantes et couleurs sont des lectures indépendantes → en parallèle.
   const [dbProducts, dbVariants, dbColors] = await Promise.all([
@@ -106,37 +131,28 @@ export async function POST(request: Request) {
         id: products.id,
         priceCents: products.priceCents,
         stock: products.stock,
-        name: productTranslations.name,
+        name: sql<string>`coalesce(${productTranslations.name},${fallbackTranslation.name},${products.slug})`,
       })
       .from(products)
-      .innerJoin(
+      .leftJoin(
         productTranslations,
         and(
           eq(productTranslations.productId, products.id),
           eq(productTranslations.locale, locale),
         ),
       )
-      .where(and(inArray(products.id, productIds), eq(products.active, true))),
-    variantIds.length
-      ? db
-          .select({
-            id: productVariants.id,
-            productId: productVariants.productId,
-            priceCents: productVariants.priceCents,
-            stock: productVariants.stock,
-            name: productVariants.name,
-          })
-          .from(productVariants)
-          .where(inArray(productVariants.id, variantIds))
-      : Promise.resolve(
-          [] as {
-            id: string;
-            productId: string;
-            priceCents: number | null;
-            stock: number | null;
-            name: string;
-          }[],
+      .leftJoin(
+        fallbackTranslation,
+        and(
+          eq(fallbackTranslation.productId, products.id),
+          eq(fallbackTranslation.locale, "fr"),
         ),
+      )
+      .where(and(inArray(products.id, productIds), eq(products.active, true))),
+    db
+      .select()
+      .from(productVariants)
+      .where(inArray(productVariants.productId, productIds)),
     db
       .select({
         productId: productColors.productId,
@@ -171,6 +187,13 @@ export async function POST(request: Request) {
   const lines = items.map((i) => {
     const product = byId.get(i.productId);
     if (!product) return null;
+    if (!i.variantId && dbVariants.some((v) => v.productId === i.productId))
+      return null;
+    if (
+      colorsByProduct.has(i.productId) &&
+      (!i.color || !colorsByProduct.get(i.productId)?.has(i.color))
+    )
+      return null;
     const { colorName, colorHex } = resolveColor(i.productId, i.color);
     if (i.variantId) {
       const v = variantById.get(i.variantId);
@@ -202,7 +225,7 @@ export async function POST(request: Request) {
   }
   const validLines = lines as NonNullable<(typeof lines)[number]>[];
 
-  const outOfStock = validLines.find(
+  const outOfStock = aggregateStock(validLines).find(
     (l) => l.stock !== null && l.stock < l.quantity,
   );
   if (outOfStock) {
@@ -272,109 +295,91 @@ export async function POST(request: Request) {
   }
 
   const orderNumber = makeOrderNumber();
-  const [order] = await db
-    .insert(orders)
-    .values({
-      orderNumber,
-      customerId: authSession?.user.id ?? null,
-      email,
-      status: "pending",
-      subtotalCents,
-      shippingCents,
-      discountCents,
-      discountCode: appliedCode,
-      totalCents,
-      shippingAddress: JSON.stringify({ ...address, country: "CH" }),
-      locale,
-    })
-    .returning({ id: orders.id });
+  let order;
+  try {
+    order = await db.transaction(async (tx) => {
+      const [order] = await tx
+        .insert(orders)
+        .values({
+          orderNumber,
+          checkoutAttemptKey: attemptKey,
+          checkoutFingerprint: fingerprint,
+          stockReservedAt: new Date(),
+          reservationExpiresAt: new Date(Date.now() + 3600000),
+          customerId: authSession?.user.id ?? null,
+          email,
+          status: "pending",
+          subtotalCents,
+          shippingCents,
+          discountCents,
+          discountCode: appliedCode,
+          totalCents,
+          shippingAddress: JSON.stringify({ ...address, country: "CH" }),
+          locale,
+        })
+        .returning();
+      await recordStatusTransition(tx, {
+        entityType: "order",
+        entityId: order.id,
+        fromStatus: null,
+        toStatus: "pending",
+        source: "checkout",
+        actorId: authSession?.user.id ?? null,
+      });
 
-  await db.insert(orderItems).values(
-    validLines.map((l) => ({
-      orderId: order.id,
-      productId: l.productId,
-      variantId: l.variantId,
-      nameSnapshot: l.name,
-      colorName: l.colorName,
-      colorHex: l.colorHex,
-      priceCentsSnapshot: l.priceCents,
-      quantity: l.quantity,
-    })),
-  );
+      await tx.insert(orderItems).values(
+        validLines.map((l) => ({
+          orderId: order.id,
+          productId: l.productId,
+          variantId: l.variantId,
+          nameSnapshot: l.name,
+          colorName: l.colorName,
+          colorHex: l.colorHex,
+          priceCentsSnapshot: l.priceCents,
+          quantity: l.quantity,
+        })),
+      );
 
-  const { env } = await getCloudflareContext({ async: true });
-  const stripe = getStripe(env.STRIPE_SECRET_KEY);
-
-  // Client connecté : rattache le paiement à son identité Stripe (Customer).
-  // Stripe Link peut alors proposer en 1 clic les cartes déjà enregistrées
-  // par ce client — aucun coffre-fort de moyens de paiement côté serveur.
-  const stripeCustomerId = authSession
-    ? await getOrCreateStripeCustomer(stripe, db, {
-        id: authSession.user.id,
-        email: authSession.user.email,
-        name: authSession.user.name,
-        stripeCustomerId: authSession.user.stripeCustomerId ?? null,
-      })
-    : undefined;
-
-  // Checkout Session (ui_mode "elements") : un seul article couvrant le total
-  // déjà calculé et validé côté serveur (sous-total − remise + livraison).
-  // Stripe crée toujours un PaymentIntent réel dessous en mode "payment" — le
-  // webhook (payment_intent.succeeded, cf. api/stripe/webhook) continue de le
-  // recevoir tel quel, metadata comprise, sans aucun changement de sa part.
-  const session = await createCheckoutSession(
-    stripe,
-    {
-      ui_mode: "elements",
-      mode: "payment",
-      locale,
-      line_items: [
-        {
-          price_data: {
-            currency: "chf",
-            product_data: { name: `Commande ${orderNumber}` },
-            unit_amount: totalCents,
-          },
-          quantity: 1,
-        },
-      ],
-      return_url: `${env.BETTER_AUTH_URL}/${locale}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-      ...(stripeCustomerId
-        ? { customer: stripeCustomerId }
-        : { customer_email: email }),
-      payment_intent_data: {
-        receipt_email: email,
-        shipping: {
-          name: address.name,
-          address: {
-            line1: address.street,
-            postal_code: address.npa,
-            city: address.city,
-            country: "CH",
-          },
-        },
-        metadata: { orderId: order.id, orderNumber },
+      await reserveStock(tx, validLines, order.id);
+      if (appliedCode) {
+        const [coupon] = await tx
+          .update(discountCodes)
+          .set({ usedCount: sql`${discountCodes.usedCount}+1` })
+          .where(
+            and(
+              eq(discountCodes.code, appliedCode),
+              eq(discountCodes.active, true),
+              or(
+                isNull(discountCodes.maxUses),
+                lt(discountCodes.usedCount, discountCodes.maxUses),
+              ),
+              or(
+                isNull(discountCodes.expiresAt),
+                sql`${discountCodes.expiresAt} > now()`,
+              ),
+            ),
+          )
+          .returning();
+        if (!coupon) throw new Error("discount_unavailable");
+      }
+      return order;
+    });
+  } catch (error) {
+    // Une tentative concurrente avec la même clé reprend sa propre session.
+    const [retry] = await db
+      .select()
+      .from(orders)
+      .where(eq(orders.checkoutAttemptKey, attemptKey));
+    if (retry && retry.checkoutFingerprint === fingerprint)
+      return resumeOrderCheckout(db, retry);
+    const message = error instanceof Error ? error.message : "";
+    return Response.json(
+      {
+        error:
+          message === "insufficient_stock" ? message : "checkout_unavailable",
       },
-      metadata: { orderId: order.id, orderNumber },
-    },
-    env.STRIPE_PAYMENT_METHOD_CONFIGURATION,
-  );
-
-  // Le PaymentIntent est créé de façon synchrone en mode "payment" : on le
-  // rattache tout de suite à la commande (lien de remboursement admin). Si ce
-  // n'était pas le cas, la commande reste malgré tout finalisable normalement
-  // (webhook + page de succès ne dépendent pas de cette colonne).
-  if (session.payment_intent) {
-    await db
-      .update(orders)
-      .set({ stripePaymentIntentId: String(session.payment_intent) })
-      .where(eq(orders.id, order.id));
+      { status: 409 },
+    );
   }
-
-  return Response.json({
-    clientSecret: session.client_secret,
-    totalCents,
-    shippingCents,
-    discountCents,
-  });
+  return resumeOrderCheckout(db, order);
 }

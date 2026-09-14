@@ -14,6 +14,61 @@ import { buildShowroomScene, type ShowroomScene } from "./showroom-scene";
 // suit la couleur choisie dans le bloc d'achat (contexte partagé) : un seul
 // sélecteur de couleur sur la fiche. La mise en scène (pièce galerie meublée,
 // éclairage, socle…) vit dans `showroom-scene.ts`, partagée avec la vignette.
+export function ModelThumbnail3D({
+  modelUrl,
+  color,
+}: {
+  modelUrl: string;
+  color: string;
+}) {
+  const [thumbnail, setThumbnail] = useState<string | null>(null);
+
+  useEffect(() => {
+    let disposed = false;
+    let renderer: THREE.WebGLRenderer | undefined;
+    let built: ShowroomScene | undefined;
+    void (async () => {
+      const THREE = await import("three");
+      if (disposed) return;
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        preserveDrawingBuffer: true,
+      });
+      try {
+        renderer.setPixelRatio(1);
+        renderer.setSize(384, 384);
+        built = await buildShowroomScene(renderer, modelUrl, color, 1);
+        renderer.render(built.scene, built.camera);
+        const image = renderer.domElement.toDataURL("image/png");
+        if (!disposed) setThumbnail(image);
+      } catch {
+        /* La vignette de repli reste visible si WebGL ou le modèle échoue. */
+      } finally {
+        built?.dispose();
+        renderer.dispose();
+        renderer.forceContextLoss();
+      }
+    })();
+    return () => {
+      disposed = true;
+      built?.dispose();
+      renderer?.dispose();
+      renderer?.forceContextLoss();
+    };
+  }, [color, modelUrl]);
+
+  return thumbnail ? (
+    <img
+      src={thumbnail}
+      alt=""
+      decoding="async"
+      className="aspect-square w-full object-cover"
+    />
+  ) : (
+    <span className="block aspect-square w-full animate-pulse bg-gradient-to-br from-ink/80 to-black" />
+  );
+}
+
 export function ModelViewer({ modelUrl }: { modelUrl: string }) {
   const t = useTranslations("viewer");
   const { selected, colors } = useProductColor();
@@ -32,6 +87,11 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
     if (!el) return;
 
     let disposed = false;
+    let visible = true;
+    const observer = new IntersectionObserver(([entry]) => {
+      visible = entry.isIntersecting;
+    });
+    observer.observe(el);
     let frame = 0;
     let renderer: THREE.WebGLRenderer | undefined;
     let controls: OrbitControls | undefined;
@@ -47,6 +107,8 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
       renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
       renderer.setSize(el.clientWidth, el.clientHeight);
+      renderer.domElement.tabIndex = 0;
+      renderer.domElement.setAttribute("aria-label", t("dragHint"));
       el.appendChild(renderer.domElement);
 
       try {
@@ -72,7 +134,8 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
       const { scene, camera, target, maxDim } = built;
       controls = new OrbitControls(camera, renderer.domElement);
       controls.enableDamping = true;
-      controls.enablePan = false;
+      controls.enablePan = true;
+      controls.listenToKeyEvents(renderer.domElement);
       controls.target.copy(target);
       controls.maxPolarAngle = Math.PI / 2 - 0.05; // reste au-dessus du sol
       controls.minDistance = maxDim * 1.2;
@@ -90,6 +153,7 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
 
       const animate = () => {
         frame = requestAnimationFrame(animate);
+        if (document.hidden || !visible) return;
         controls!.update();
         renderer!.render(scene, camera);
       };
@@ -98,6 +162,7 @@ export function ModelViewer({ modelUrl }: { modelUrl: string }) {
 
     return () => {
       disposed = true;
+      observer.disconnect();
       cancelAnimationFrame(frame);
       if (onResize) window.removeEventListener("resize", onResize);
       controls?.dispose();

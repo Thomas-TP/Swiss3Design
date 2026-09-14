@@ -1,6 +1,7 @@
+import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
@@ -106,7 +107,15 @@ export default async function LocaleLayout({
 
   // Nonce CSP posé par le middleware (prod uniquement) : autorise le script
   // inline anti-flash sous une politique sans 'unsafe-inline'.
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const nav = await getTranslations("nav");
+  const [requestHeaders, cookieStore] = await Promise.all([
+    headers(),
+    cookies(),
+  ]);
+  const nonce = requestHeaders.get("x-nonce") ?? undefined;
+  const hasSession = cookieStore
+    .getAll()
+    .some(({ name }) => name.endsWith("better-auth.session_token"));
 
   return (
     <html
@@ -129,17 +138,32 @@ export default async function LocaleLayout({
           type="application/ld+json"
           nonce={nonce}
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationJsonLd()),
+            __html: JSON.stringify(organizationJsonLd()).replace(
+              /</g,
+              "\\u003c",
+            ),
           }}
         />
         <ThemeManager />
         <NextIntlClientProvider>
           <CartProvider>
             <FavoritesProvider>
-              <Header />
-              <main className="flex-1 pb-24 md:pb-0">{children}</main>
+              <a
+                href="#main-content"
+                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-surface focus:p-4"
+              >
+                {nav("skipContent")}
+              </a>
+              <Header hasSession={hasSession} />
+              <main
+                id="main-content"
+                tabIndex={-1}
+                className="flex-1 pb-24 lg:pb-0"
+              >
+                {children}
+              </main>
               <Footer />
-              <BottomNav />
+              <BottomNav hasSession={hasSession} />
             </FavoritesProvider>
           </CartProvider>
         </NextIntlClientProvider>

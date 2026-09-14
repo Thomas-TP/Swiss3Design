@@ -1,3 +1,4 @@
+import { getShippingSettings } from "@/lib/shipping-settings";
 import { and, desc, eq } from "drizzle-orm";
 import { getTranslations } from "next-intl/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -47,6 +48,7 @@ export default async function CheckoutPage() {
       </h1>
       <div className="mt-8">
         <CheckoutFlow
+          shippingSettings={await getShippingSettings()}
           initialAddress={initialAddress}
           sessionEmail={session?.user.email ?? null}
           stripePublishableKey={env.STRIPE_PUBLISHABLE_KEY ?? ""}

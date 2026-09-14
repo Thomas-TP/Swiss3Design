@@ -20,16 +20,27 @@ export async function createCheckoutSession(
   stripe: Stripe,
   params: Stripe.Checkout.SessionCreateParams,
   paymentMethodConfiguration?: string,
+  idempotencyKey?: string,
 ): Promise<Stripe.Checkout.Session> {
   if (paymentMethodConfiguration) {
     try {
-      return await stripe.checkout.sessions.create({
-        ...params,
-        payment_method_configuration: paymentMethodConfiguration,
-      });
+      return await stripe.checkout.sessions.create(
+        {
+          ...params,
+          payment_method_configuration: paymentMethodConfiguration,
+        },
+        { idempotencyKey },
+      );
     } catch (err) {
-      console.error("payment_method_configuration rejetée, repli défaut", err);
+      if (
+        !(err instanceof Stripe.errors.StripeInvalidRequestError) ||
+        err.param !== "payment_method_configuration"
+      )
+        throw err;
+      console.error("[Stripe] configuration des moyens de paiement rejetée");
     }
   }
-  return stripe.checkout.sessions.create(params);
+  return stripe.checkout.sessions.create(params, {
+    idempotencyKey: idempotencyKey ? idempotencyKey + ":default" : undefined,
+  });
 }

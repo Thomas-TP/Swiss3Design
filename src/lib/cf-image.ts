@@ -15,7 +15,11 @@ export function cfImage(
   if (!url) return undefined;
   // On ne transforme que nos images locales (chemin relatif /api/files/…).
   // Les URL externes (avatars Google, etc.) passent telles quelles.
-  if (!url.startsWith("/") || process.env.NODE_ENV !== "production") {
+  if (
+    !url.startsWith("/api/files/") ||
+    /\.svg(?:[?#]|$)/i.test(url) ||
+    process.env.NODE_ENV !== "production"
+  ) {
     return url;
   }
   const params = [

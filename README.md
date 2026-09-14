@@ -64,7 +64,7 @@ flowchart LR
     App --> PG[("Postgres<br/>via Hyperdrive")]
     API --> PG
     API --> R2[("R2<br/>fichiers")]
-    API --> KV[("KV<br/>cache · rate-limit")]
+    API --> KV[("KV<br/>cache")]
 ```
 
 Le paiement (commande **et** devis) se finalise via une écriture **idempotente**
@@ -84,11 +84,11 @@ sequenceDiagram
     Stripe->>Webhook: payment_intent.succeeded
     Stripe-->>Retour: redirection client
     par
-        Webhook->>DB: UPDATE ... WHERE status != paid
+        Webhook->>DB: transaction verrouillée, paid_at IS NULL
     and
-        Retour->>DB: UPDATE ... WHERE status != paid
+        Retour->>DB: même finalisation idempotente
     end
-    Note over DB: un seul UPDATE réussit → stock décrémenté une seule fois
+    Note over DB: stock déjà réservé · un seul paiement · outbox + historique atomiques
 ```
 
 Détails complets (modèle de données, auth, R2, CSP) :

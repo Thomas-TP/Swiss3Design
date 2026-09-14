@@ -1,3 +1,5 @@
+import { hasExpectedSignature } from "@/lib/file-signature";
+import { boundedFormData } from "@/lib/upload";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getServerSession } from "@/lib/session";
 
@@ -18,7 +20,7 @@ export async function POST(request: Request) {
     return Response.json({ error: "unauthorized" }, { status: 403 });
   }
 
-  const form = await request.formData().catch(() => null);
+  const form = await boundedFormData(request, MAX_BYTES);
   const file = form?.get("file");
   if (!(file instanceof File)) {
     return Response.json({ error: "missing_file" }, { status: 400 });
@@ -27,13 +29,15 @@ export async function POST(request: Request) {
   if (!ALLOWED_EXT.has(ext)) {
     return Response.json({ error: "unsupported_type" }, { status: 415 });
   }
+  if (!(await hasExpectedSignature(file, ext)))
+    return Response.json({ error: "unsupported_type" }, { status: 415 });
   if (file.size > MAX_BYTES) {
     return Response.json({ error: "too_large" }, { status: 413 });
   }
 
   const key = `products/${crypto.randomUUID()}.${ext}`;
   const { env } = await getCloudflareContext({ async: true });
-  await env.R2.put(key, await file.arrayBuffer(), {
+  await env.R2.put(key, file.stream(), {
     httpMetadata: { contentType: CONTENT_TYPE[ext] },
   });
 

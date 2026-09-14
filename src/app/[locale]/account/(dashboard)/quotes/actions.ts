@@ -1,12 +1,16 @@
 "use server";
 
+import { expireQuoteSession } from "@/lib/quote-session";
+import { verifyOwnedUpload } from "@/lib/upload";
 import { z } from "zod";
 import { and, eq, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { quoteRequests, quoteMessages } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
-import { sendEmail, getAdminEmails } from "@/lib/email";
+import { getAdminEmails } from "@/lib/email";
+import { recordStatusTransition } from "@/lib/status-history";
+import { queueEmail, drainEmailOutbox } from "@/lib/outbox";
 import {
   adminQuoteRevisionEmail,
   adminQuoteDeclinedEmail,
@@ -30,7 +34,7 @@ const declineSchema = z.object({
 
 // Charge un devis en vérifiant qu'il appartient bien au client connecté.
 async function loadOwnedQuote(
-  db: Awaited<ReturnType<typeof getDb>>,
+  db: Pick<Awaited<ReturnType<typeof getDb>>, "select">,
   quoteId: string,
   user: { id: string; email: string },
 ) {
@@ -46,7 +50,8 @@ async function loadOwnedQuote(
         ),
       ),
     )
-    .limit(1);
+    .limit(1)
+    .for("update");
   return quote ?? null;
 }
 
@@ -57,7 +62,7 @@ export async function requestQuoteRevision(
   formData: FormData,
 ): Promise<QuoteActionState> {
   const session = await getServerSession();
-  if (!session) return { status: "error" };
+  if (!session) return { status: "error" as const };
 
   const parsed = reviseSchema.safeParse({
     quoteId: formData.get("quoteId"),
@@ -65,48 +70,71 @@ export async function requestQuoteRevision(
     fileKey: (formData.get("fileKey") as string) || undefined,
     fileName: (formData.get("fileName") as string) || undefined,
   });
-  if (!parsed.success) return { status: "error" };
+  if (!parsed.success) return { status: "error" as const };
 
   try {
     const db = await getDb();
-    const quote = await loadOwnedQuote(db, parsed.data.quoteId, session.user);
-    // Une modification ne se demande que sur un devis chiffré encore actif
-    if (!quote || !["quoted", "accepted"].includes(quote.status)) {
-      return { status: "error" };
-    }
-
-    await db.insert(quoteMessages).values({
-      quoteId: quote.id,
-      sender: "customer",
-      body: parsed.data.message,
-      fileUrl: parsed.data.fileKey ?? null,
-      fileName: parsed.data.fileName ?? null,
-    });
-    await db
-      .update(quoteRequests)
-      .set({ status: "revision_requested" })
-      .where(eq(quoteRequests.id, quote.id));
-
-    try {
-      const adminEmails = await getAdminEmails();
-      if (adminEmails.length > 0) {
-        await sendEmail(
-          adminQuoteRevisionEmail(
-            { id: quote.id, email: quote.email, locale: quote.locale },
-            parsed.data.message,
-            parsed.data.fileName ?? null,
-            adminEmails,
-          ),
-        );
+    const result = await db.transaction(async (db) => {
+      const quote = await loadOwnedQuote(db, parsed.data.quoteId, session.user);
+      // Une modification ne se demande que sur un devis chiffré encore actif
+      if (!quote || !["quoted", "accepted"].includes(quote.status)) {
+        return { status: "error" as const };
       }
-    } catch (e) {
-      console.error("[email modif devis]", e);
-    }
 
-    revalidatePath("/", "layout");
-    return { status: "success" };
+      if (!(await verifyOwnedUpload(parsed.data.fileKey)))
+        return { status: "error" as const };
+      await expireQuoteSession(quote);
+      await db.insert(quoteMessages).values({
+        quoteId: quote.id,
+        sender: "customer",
+        body: parsed.data.message,
+        fileUrl: parsed.data.fileKey ?? null,
+        fileName: parsed.data.fileName ?? null,
+      });
+      await db
+        .update(quoteRequests)
+        .set({
+          status: "revision_requested",
+          checkoutSessionId: null,
+          offerVersion: quote.offerVersion + 1,
+        })
+        .where(eq(quoteRequests.id, quote.id));
+      await recordStatusTransition(db, {
+        entityType: "quote",
+        entityId: quote.id,
+        fromStatus: quote.status,
+        toStatus: "revision_requested",
+        source: "customer",
+        actorId: session.user.id,
+      });
+
+      {
+        const adminEmails = await getAdminEmails();
+        if (adminEmails.length > 0) {
+          await queueEmail(
+            db,
+            "quote-revision:" + quote.id + ":" + (quote.offerVersion + 1),
+            adminQuoteRevisionEmail(
+              { id: quote.id, email: quote.email, locale: quote.locale },
+              parsed.data.message,
+              parsed.data.fileName ?? null,
+              adminEmails,
+            ),
+          );
+        }
+      }
+
+      revalidatePath("/", "layout");
+      return { status: "success" as const };
+    });
+    try {
+      await drainEmailOutbox(db);
+    } catch {
+      console.error("[outbox] reprise par maintenance");
+    }
+    return result;
   } catch {
-    return { status: "error" };
+    return { status: "error" as const };
   }
 }
 
@@ -116,60 +144,81 @@ export async function declineQuote(
   formData: FormData,
 ): Promise<QuoteActionState> {
   const session = await getServerSession();
-  if (!session) return { status: "error" };
+  if (!session) return { status: "error" as const };
 
   const parsed = declineSchema.safeParse({
     quoteId: formData.get("quoteId"),
     reason: (formData.get("reason") as string) || undefined,
   });
-  if (!parsed.success) return { status: "error" };
+  if (!parsed.success) return { status: "error" as const };
 
   try {
     const db = await getDb();
-    const quote = await loadOwnedQuote(db, parsed.data.quoteId, session.user);
-    if (
-      !quote ||
-      !["quoted", "accepted", "revision_requested"].includes(quote.status)
-    ) {
-      return { status: "error" };
-    }
-
-    const reason = parsed.data.reason?.trim() || null;
-    if (reason) {
-      await db.insert(quoteMessages).values({
-        quoteId: quote.id,
-        sender: "customer",
-        body: reason,
-      });
-    }
-    await db
-      .update(quoteRequests)
-      .set({ status: "declined" })
-      .where(eq(quoteRequests.id, quote.id));
-
-    try {
-      const adminEmails = await getAdminEmails();
-      if (adminEmails.length > 0) {
-        await sendEmail(
-          adminQuoteDeclinedEmail(
-            {
-              id: quote.id,
-              email: quote.email,
-              locale: quote.locale,
-              quotedPriceCents: quote.quotedPriceCents,
-            },
-            reason,
-            adminEmails,
-          ),
-        );
+    const result = await db.transaction(async (db) => {
+      const quote = await loadOwnedQuote(db, parsed.data.quoteId, session.user);
+      if (
+        !quote ||
+        !["quoted", "accepted", "revision_requested"].includes(quote.status)
+      ) {
+        return { status: "error" as const };
       }
-    } catch (e) {
-      console.error("[email refus devis]", e);
-    }
 
-    revalidatePath("/", "layout");
-    return { status: "success" };
+      await expireQuoteSession(quote);
+      const reason = parsed.data.reason?.trim() || null;
+      if (reason) {
+        await db.insert(quoteMessages).values({
+          quoteId: quote.id,
+          sender: "customer",
+          body: reason,
+        });
+      }
+      await db
+        .update(quoteRequests)
+        .set({
+          status: "declined",
+          checkoutSessionId: null,
+          offerVersion: quote.offerVersion + 1,
+        })
+        .where(eq(quoteRequests.id, quote.id));
+      await recordStatusTransition(db, {
+        entityType: "quote",
+        entityId: quote.id,
+        fromStatus: quote.status,
+        toStatus: "declined",
+        source: "customer",
+        actorId: session.user.id,
+      });
+
+      {
+        const adminEmails = await getAdminEmails();
+        if (adminEmails.length > 0) {
+          await queueEmail(
+            db,
+            "quote-declined:" + quote.id + ":" + (quote.offerVersion + 1),
+            adminQuoteDeclinedEmail(
+              {
+                id: quote.id,
+                email: quote.email,
+                locale: quote.locale,
+                quotedPriceCents: quote.quotedPriceCents,
+              },
+              reason,
+              adminEmails,
+            ),
+          );
+        }
+      }
+
+      revalidatePath("/", "layout");
+      return { status: "success" as const };
+    });
+    try {
+      await drainEmailOutbox(db);
+    } catch {
+      console.error("[outbox] reprise par maintenance");
+    }
+    return result;
   } catch {
-    return { status: "error" };
+    return { status: "error" as const };
   }
 }

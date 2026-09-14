@@ -13,7 +13,7 @@ export interface DiscountResult {
 // si le code est inconnu, inactif, expiré, épuisé, ou si le minimum d'achat
 // n'est pas atteint. La remise ne dépasse jamais le sous-total.
 export async function validateDiscount(
-  db: Db,
+  db: Pick<Db, "select" | "update">,
   rawCode: string,
   subtotalCents: number,
 ): Promise<DiscountResult | null> {
@@ -43,7 +43,7 @@ export async function validateDiscount(
 
 // Incrémente le compteur d'utilisations à la vente (paiement confirmé)
 export async function incrementDiscountUse(
-  db: Db,
+  db: Pick<Db, "select" | "update">,
   code: string,
 ): Promise<void> {
   await db

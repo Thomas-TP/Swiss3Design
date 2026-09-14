@@ -1,0 +1,54 @@
+# Remédiation de l'audit — septembre 2026
+
+État de travail du 14 septembre 2026. Les changements sont déployés sur la preview isolée. Les validations navigateur ci-dessous ont été exécutées sur la version manuelle `359015ff-e898-4ba2-bec2-4e1b56222e88` ; les builds Cloudflare de la PR passent ensuite sur son dernier commit. Le nouveau code n'est pas encore en production.
+
+## Incident 1102 : cause mesurée
+
+L'erreur n'est pas liée à l'italien. Elle apparaît lorsque plusieurs pages dynamiques sont chargées ou rafraîchies rapidement, quelle que soit la langue : `/fr`, `/it`, `/de` et `/en` ont toutes été concernées.
+
+Deux rafales contrôlées de 60 navigations complètes ont donné 47 réponses HTTP 200 puis 13 erreurs 503, et 46 réponses 200 puis 14 erreurs 503 après suppression de la requête de session automatique. Le tail Cloudflare associe les erreurs à `outcome=exceededCpu` et « Worker exceeded CPU time limit » ; la première réponse interrompue de la seconde série a consommé 17 ms CPU, les suivantes 10 ms. Un audit navigateur combiné sur la version finale a de nouveau obtenu l'erreur 1102 après une quinzaine de chargements complets. Le comportement décrit par le propriétaire est donc reproduit.
+
+La suppression de `get-session` sur chaque page publique réduit le nombre d'invocations, mais le rendu serveur Next.js dépasse encore régulièrement les 10 ms disponibles. Même l'endpoint anonyme Better Auth a consommé 490 ms CPU lors d'un démarrage observé, tout en terminant correctement grâce à la tolérance ponctuelle de Cloudflare.
+
+Cloudflare documente 10 ms CPU sur Workers Free et une tolérance ponctuelle avant interruption lorsque les dépassements deviennent réguliers. Le passage à [Workers Paid](https://developers.cloudflare.com/workers/platform/pricing/) commence à 5 USD/mois, hors dépassements, et permet une limite CPU adaptée ; voir les [limites CPU Workers](https://developers.cloudflare.com/workers/platform/limits/#cpu-time). Ce changement d'abonnement reste la condition pour annoncer l'incident résolu.
+
+## Correctifs implémentés
+
+- Paiements : verrouillage transactionnel, contrôle montant/devise/identifiant, protection des statuts avancés contre les événements rejoués ou livrés dans le désordre. Les créations et transitions commande/devis sont journalisées dans la même transaction et visibles dans les fiches admin.
+- Stock : réservation atomique, agrégation des couleurs partageant le même stock, restitution idempotente après expiration confirmée. Les erreurs réseau Stripe conservent la réservation jusqu'au rapprochement.
+- Reprise du checkout : clé de tentative persistée dans la session du navigateur ; identité Stripe conservée pour les clients connectés. Les totaux retournés par le serveur alimentent le récapitulatif.
+- Devis : version d'offre et prix payé enregistrés, invalidation des sessions connues avant modification, conservation des fichiers de révision et de fabrication payée en cours. Une clé d'idempotence déterministe couvre la reprise normale après perte de réponse Stripe ; Stripe peut purger une clé après au moins 24 h, ce qui reste une limite opérationnelle documentée.
+- E-mails métier : file persistante avec clés de déduplication et reprises. Désinscription/achat contrôlés avant une relance. Les messages dépassant la fenêtre de déduplication nécessitent une revue manuelle.
+- Remboursements : montant reçu de Stripe conservé sans régression sur un événement ancien ; affichage administration et accès au paiement Stripe. Aucun remboursement réel déclenché par les tests.
+- Panier : validation du stockage local, identité produit/variante/couleur, synchronisation entre onglets, restauration par jeton aléatoire expirant, données commerciales relues côté serveur et adresse de relance vérifiée.
+- Sécurité : limites atomiques Postgres, y compris le stockage partagé Better Auth ; IP issue de `cf-connecting-ip` ; vérification obligatoire des e-mails ; export personnel réservé à une connexion récente ; uploads bornés et signatures de conteneurs contrôlées ; propriété des fichiers vérifiée ; logs CSP minimisés et paramètres d'URL masqués.
+- Infrastructure : pool Postgres limité et fermé par requête ; préchargements des liens désactivés par défaut ; session du header chargée uniquement lorsqu’un cookie de connexion existe ; redirection HTTPS applicative ; cache long des assets versionnés ; date de compatibilité Worker portée au 14 septembre 2026.
+- UX/accessibilité : recherche insensible à la casse, paramètres et ancre conservés au changement de langue, listes déroulantes personnalisées conservant le style de production et commandes clavier complètes, sélecteur de langue court FR/DE/IT/EN, autocomplétion avec annulation des requêtes, lien d'évitement, sémantique des cartes, responsive, respect des animations réduites, chargement 3D au clic.
+- SEO : images publiques autorisées dans robots.txt, retrait du suivi de commande du sitemap, suppression de dates artificielles, échappement des données structurées.
+- Dépendances : mises à jour compatibles appliquées à React 19.3.0, next-intl 4.14.5, lucide-react 1.46.0, zod 4.6.5, three/@types 0.186.0, wrangler 4.131.2 et workers-types du 14 septembre. `bun audit` ne signale aucune vulnérabilité. TypeScript reste en 6.0.3 car la version 7 casse l'API compilateur attendue par Next 16 dans ce projet.
+
+## Validation et limites
+
+La suite Postgres preview passe avec **41 tests réussis et 1 test ignoré**. Elle couvre notamment la concurrence sur le dernier article, le quota atomique concurrent, le rejouement du paiement, le retour après expédition, l'annulation de réservation et la reprise d'e-mails. Les envois sont simulés. Le test Stripe API est ignoré faute de clé TEST locale utilisable ; une session et un paiement Stripe complets ne sont donc pas encore certifiés.
+
+`bun run lint`, `bun run typecheck`, `bun run format:check` et le build OpenNext passent. Le bundle final mesure 2 811,08 KiB gzip, soit environ 260,92 KiB de marge sous la limite de 3 MiB, avec un démarrage Worker mesuré à 67 ms lors du déploiement. Cette marge doit être surveillée à chaque ajout de dépendance ou d'asset importé.
+
+Les contrôles navigateur sur six routes publiques à 320 et 1440 px n'ont relevé ni débordement horizontal ni image cassée. Après restauration visuelle, les listes de langue et de canton sont de nouveau des cartes personnalisées arrondies avec ombre et coche, sans aucun `<select>` natif dans le checkout. Le bouton fermé affiche FR, la sélection clavier atteint Deutsch et conserve l'URL complète. Le checkout à 320 px et l'accueil à 1024 px ne débordent pas ; la navigation bureau réapparaît à 1024 px. Axe ne relève aucune violation WCAG A/AA sur le checkout mobile, comme sur l'accueil et le catalogue contrôlés auparavant aux largeurs 320 et 1440 px. La preview de démonstration ne contient aucun modèle 3D : la vignette restaurée est validée par le build et son extraction du Worker, mais pas sur un modèle réel dans ce lot. Cette automatisation ne certifie pas tous les états connectés, le Payment Element ni l'usage avec un lecteur d'écran réel.
+
+`Vase`, `vase` et `VASE` renvoient tous `/fr/products/vase-spirale`. Le changement de langue conserve exactement `/de/shop?q=Vase#catalogue`. Une page publique ne déclenche plus `/api/auth/get-session`; l'appel direct répond 200 avec une session nulle et le tail n'émet plus l'avertissement Better Auth sur l'adresse IP.
+
+Le serveur Chrome DevTools requis pour une mesure Core Web Vitals instrumentée n'est pas disponible dans cet environnement. Aucune nouvelle trace LCP/INP/CLS ne doit donc être présentée comme réalisée ; les validations effectuées ici portent sur le build, les réponses HTTP, les parcours, le responsive et l'accessibilité automatisée.
+
+Les migrations additives 0001 à 0005 sont appliquées sur preview et sur la base de production identifiée le 14 septembre 2026. Avant la transaction de production, les contrôles ont confirmé l'absence des tables et colonnes cibles, ainsi que zéro prix, stock, quantité ou total invalide et zéro identifiant de paiement dupliqué. L'application a utilisé un verrou consultatif et des délais bornés ; la vérification après validation confirme 4 tables, 15 colonnes, 10 contraintes et 3 index attendus. Le Worker temporaire protégé par jeton a ensuite été arrêté et son port fermé. La CI Quality crée aussi un Postgres jetable, applique les migrations et exécute les contrôles sans secret de production. La branche `main` exige désormais une pull request à jour, le contrôle `quality` et la résolution des conversations ; force-push et suppression sont interdits.
+
+Points encore ouverts avant production : passage Workers Paid et nouvelle rafale 1102 ; test Stripe complet et abonnement aux nouveaux événements webhook ; réauthentification forte de toutes les actions administratives sensibles ; exercice réel de restauration Neon/R2 ; alertes opérationnelles ; déploiement du nouveau code puis validation finale.
+
+## Exploitation après livraison
+
+1. **Réalisé le 14 septembre 2026 :** contrôler les données existantes avant les nouvelles contraintes — prix et stock positifs, totaux cohérents, identifiant de paiement unique.
+2. **Réalisé le 14 septembre 2026 :** appliquer uniquement les migrations 0001 à 0005 sur la base de production identifiée, dans une transaction, avec verrou consultatif et délais bornés. La migration 0000 n'a pas été rejouée.
+3. Après autorisation du plan Workers Paid et vérifications Stripe, déployer puis vérifier l'identifiant de version, HTTP/HTTPS, recherche, parcours panier, erreurs Worker et événements Stripe.
+4. Surveiller les commandes `pending` expirées, les erreurs de rapprochement et `email_outbox`. Ne pas libérer du stock lorsqu'un paiement reste incertain.
+5. En cas de retour arrière, arrêter les nouveaux checkouts et rapprocher les réservations avant de revenir à un ancien code qui ne connaît pas la réservation. Un rollback aveugle du Worker vers l'ancien checkout pourrait décrémenter deux fois le stock. Les migrations additives restent en place.
+
+Les propositions de design de l'audit initial restent un backlog produit : photos authentiques, preuves multicolores, contenu traduit du catalogue, délais détaillés, conseils d'entretien et comparaison des options. Aucun avis, aucune photo de réalisation et aucune promesse commerciale ne doivent être inventés pour remplir ces sections.

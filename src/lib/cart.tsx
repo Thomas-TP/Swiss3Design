@@ -5,38 +5,15 @@ import {
   useContext,
   useEffect,
   useReducer,
+  useState,
   type ReactNode,
 } from "react";
 
-export interface CartItem {
-  productId: string;
-  // Variante choisie (taille/finition). null = produit sans variante.
-  variantId?: string | null;
-  variantName?: string | null;
-  // Couleur choisie (palette du filament). null = produit sans couleur.
-  colorName?: string | null;
-  colorHex?: string | null;
-  slug: string;
-  name: string;
-  priceCents: number;
-  imageUrl: string | null;
-  saleType: "stock" | "on_demand";
-  quantity: number;
-}
-
-// Une ligne de panier est identifiée par le triplet produit + variante + couleur
-type LineRef = {
-  productId: string;
-  variantId?: string | null;
-  colorName?: string | null;
-};
-const sameLine = (a: LineRef, b: LineRef) =>
-  a.productId === b.productId &&
-  (a.variantId ?? null) === (b.variantId ?? null) &&
-  (a.colorName ?? null) === (b.colorName ?? null);
-
+import { sameLine, parseCart, type CartItem } from "./cart-data";
+export { sameLine, parseCart, type CartItem } from "./cart-data";
 type CartAction =
   | { type: "hydrate"; items: CartItem[] }
+  | { type: "restore"; items: CartItem[] }
   | { type: "add"; item: Omit<CartItem, "quantity"> }
   | {
       type: "setQuantity";
@@ -59,21 +36,46 @@ function reducer(state: CartItem[], action: CartAction): CartItem[] {
   switch (action.type) {
     case "hydrate":
       return action.items;
+    case "restore": {
+      const next = [...state];
+      for (const item of action.items) {
+        const index = next.findIndex((i) => sameLine(i, item));
+        if (index < 0) next.push(item);
+        else
+          next[index] = {
+            ...item,
+            quantity: Math.max(next[index].quantity, item.quantity),
+          };
+      }
+      return next.slice(0, 50);
+    }
     case "add": {
       const existing = state.find((i) => sameLine(i, action.item));
       if (existing) {
         return state.map((i) =>
-          sameLine(i, action.item) ? { ...i, quantity: i.quantity + 1 } : i,
+          sameLine(i, action.item)
+            ? { ...i, quantity: Math.min(99, i.quantity + 1) }
+            : i,
         );
       }
-      return [...state, { ...action.item, quantity: 1 }];
+      return state.length >= 50
+        ? state
+        : [...state, { ...action.item, quantity: 1 }];
     }
     case "setQuantity":
       if (action.quantity <= 0) {
         return state.filter((i) => !sameLine(i, action));
       }
       return state.map((i) =>
-        sameLine(i, action) ? { ...i, quantity: action.quantity } : i,
+        sameLine(i, action)
+          ? {
+              ...i,
+              quantity: Math.min(
+                99,
+                Math.max(1, Math.trunc(action.quantity) || 1),
+              ),
+            }
+          : i,
       );
     case "remove":
       return state.filter((i) => !sameLine(i, action));
@@ -98,6 +100,7 @@ interface CartContextValue {
     variantId: string | null,
     colorName: string | null,
   ) => void;
+  restore: (items: CartItem[]) => void;
   clear: () => void;
 }
 
@@ -105,19 +108,36 @@ const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
   const [items, dispatch] = useReducer(reducer, []);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) dispatch({ type: "hydrate", items: JSON.parse(raw) });
+      if (raw) dispatch({ type: "hydrate", items: parseCart(raw) });
     } catch {
       // panier corrompu → on repart à vide
+    } finally {
+      setHydrated(true);
     }
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+    const synchronize = (event: StorageEvent) => {
+      if (event.key === STORAGE_KEY || event.key === null)
+        dispatch({ type: "hydrate", items: parseCart(event.newValue ?? "[]") });
+    };
+    window.addEventListener("storage", synchronize);
+    return () => window.removeEventListener("storage", synchronize);
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      /* Stockage privé ou plein : le panier en mémoire reste utilisable. */
+    }
+  }, [items, hydrated]);
 
   const value: CartContextValue = {
     items,
@@ -134,6 +154,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
       }),
     remove: (productId, variantId, colorName) =>
       dispatch({ type: "remove", productId, variantId, colorName }),
+    restore: (items) => dispatch({ type: "restore", items }),
     clear: () => {
       dispatch({ type: "clear" });
       // Supprime aussi la copie persistée. Sur /checkout/success, chargée via

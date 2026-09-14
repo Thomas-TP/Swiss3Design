@@ -11,7 +11,9 @@
     "cart": "Panier",
     "account": "Compte",
     "favorites": "Favoris",
-    "theme": "Changer de thème"
+    "theme": "Changer de thème",
+    "language": "Langue",
+    "skipContent": "Aller au contenu"
   },
   "home": {
     "heroBadge": "Imprimé dans l'arc lémanique · Livré dans toute la Suisse",
@@ -99,7 +101,10 @@
     "consent": "Envoyez-moi un rappel de mon panier par e-mail. Je peux me désinscrire à tout moment.",
     "cta": "M'envoyer un rappel",
     "done": "C'est noté — nous vous rappellerons votre panier.",
-    "error": "Une erreur est survenue, réessayez."
+    "error": "Une erreur est survenue, réessayez.",
+    "verifyNotice": "Confirmez votre adresse e-mail pour recevoir votre panier sur un autre appareil.",
+    "restored": "Panier restauré avec les prix et disponibilités actuels. Vos autres articles ont été conservés.",
+    "restoreError": "Ce panier ne peut plus être restauré. Retrouvez les articles disponibles dans le catalogue."
   },
   "cart": {
     "title": "Panier",
@@ -171,7 +176,10 @@
     "promoRemove": "Retirer",
     "promoInvalid": "Code invalide ou expiré.",
     "totalToPay": "Total à payer",
-    "paymentReassurance": "Paiement chiffré. Vos données bancaires ne transitent jamais par nos serveurs."
+    "paymentReassurance": "Paiement chiffré. Vos données bancaires ne transitent jamais par nos serveurs.",
+    "errorStock": "Le stock disponible a changé. Revenez au panier pour ajuster les quantités.",
+    "errorVerifyAgain": "Vérifiez de nouveau votre adresse e-mail avant de payer.",
+    "errorProductChanged": "Un article ou une option a changé. Revenez à sa fiche pour le sélectionner de nouveau."
   },
   "orderSuccess": {
     "title": "Merci pour votre commande !",
@@ -556,7 +564,8 @@
       "error": "Impossible d'envoyer l'e-mail. Vérifiez l'adresse saisie.",
       "magicSent": "Lien envoyé ! Consultez votre boîte mail et cliquez dessus pour vous connecter.",
       "otpSentTo": "Code envoyé à {email}. Saisissez-le ci-dessous :"
-    }
+    },
+    "reauthNotice": "Reconnectez-vous pour confirmer votre identité avant d’exporter vos données personnelles."
   },
   "errors": {
     "notFoundTitle": "Page introuvable",
@@ -597,5 +606,10 @@
     "securePayment": "Paiement sécurisé",
     "copyright": "© {year} Swiss3Design — arc lémanique, Suisse",
     "createdBy": "Site créé par"
+  },
+  "orderPayment": {
+    "refunded": "Remboursé : {amount}",
+    "refundPending": "Commande annulée : le remboursement reste à traiter dans Stripe.",
+    "openStripe": "Ouvrir le paiement dans Stripe"
   }
 }

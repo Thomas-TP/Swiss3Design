@@ -1,3 +1,4 @@
+import { alias } from "drizzle-orm/pg-core";
 import {
   and,
   asc,
@@ -5,7 +6,7 @@ import {
   eq,
   exists,
   inArray,
-  like,
+  ilike,
   ne,
   notInArray,
   or,
@@ -27,6 +28,10 @@ import {
   reviews,
 } from "./schema";
 import type { Locale } from "@/i18n/routing";
+
+const fallbackTranslation = alias(productTranslations, "fallback_translation");
+const translatedName = sql<string>`coalesce(${productTranslations.name},${fallbackTranslation.name},${products.slug})`;
+const translatedDescription = sql<string>`coalesce(${productTranslations.description},${fallbackTranslation.description},'')`;
 
 export interface ColorSwatch {
   name: string;
@@ -120,14 +125,14 @@ export async function getProducts(
 
   // Recherche plein-texte simple sur le nom + la description traduits. On
   // neutralise les jokers LIKE (% _) saisis par l'utilisateur. Insensible à la
-  // casse pour l'ASCII (comportement LIKE de SQLite).
+  // casse avec ILIKE (Postgres).
   if (opts.q) {
     const term = opts.q.trim().replace(/[%_]/g, "");
     if (term) {
       const pattern = `%${term}%`;
       const match = or(
-        like(productTranslations.name, pattern),
-        like(productTranslations.description, pattern),
+        ilike(translatedName, pattern),
+        ilike(translatedDescription, pattern),
       );
       if (match) conditions.push(match);
     }
@@ -165,15 +170,22 @@ export async function getProducts(
       material: products.material,
       multicolor: products.multicolor,
       stock: products.stock,
-      name: productTranslations.name,
-      description: productTranslations.description,
+      name: translatedName,
+      description: translatedDescription,
     })
     .from(products)
-    .innerJoin(
+    .leftJoin(
       productTranslations,
       and(
         eq(productTranslations.productId, products.id),
         eq(productTranslations.locale, locale),
+      ),
+    )
+    .leftJoin(
+      fallbackTranslation,
+      and(
+        eq(fallbackTranslation.productId, products.id),
+        eq(fallbackTranslation.locale, "fr"),
       ),
     )
     .where(and(...conditions))
@@ -336,15 +348,22 @@ export async function getProductBySlug(slug: string, locale: Locale) {
       model3dUrl: products.model3dUrl,
       multicolor: products.multicolor,
       stock: products.stock,
-      name: productTranslations.name,
-      description: productTranslations.description,
+      name: translatedName,
+      description: translatedDescription,
     })
     .from(products)
-    .innerJoin(
+    .leftJoin(
       productTranslations,
       and(
         eq(productTranslations.productId, products.id),
         eq(productTranslations.locale, locale),
+      ),
+    )
+    .leftJoin(
+      fallbackTranslation,
+      and(
+        eq(fallbackTranslation.productId, products.id),
+        eq(fallbackTranslation.locale, "fr"),
       ),
     )
     .where(and(eq(products.slug, slug), eq(products.active, true)))
@@ -397,8 +416,8 @@ export async function getRelatedProducts(
     material: products.material,
     multicolor: products.multicolor,
     stock: products.stock,
-    name: productTranslations.name,
-    description: productTranslations.description,
+    name: translatedName,
+    description: translatedDescription,
   };
   const withTranslation = and(
     eq(productTranslations.productId, products.id),
@@ -417,7 +436,14 @@ export async function getRelatedProducts(
     rows = await db
       .select(cols)
       .from(products)
-      .innerJoin(productTranslations, withTranslation)
+      .leftJoin(productTranslations, withTranslation)
+      .leftJoin(
+        fallbackTranslation,
+        and(
+          eq(fallbackTranslation.productId, products.id),
+          eq(fallbackTranslation.locale, "fr"),
+        ),
+      )
       .where(
         and(
           eq(products.active, true),
@@ -445,7 +471,14 @@ export async function getRelatedProducts(
     const fillers = await db
       .select(cols)
       .from(products)
-      .innerJoin(productTranslations, withTranslation)
+      .leftJoin(productTranslations, withTranslation)
+      .leftJoin(
+        fallbackTranslation,
+        and(
+          eq(fallbackTranslation.productId, products.id),
+          eq(fallbackTranslation.locale, "fr"),
+        ),
+      )
       .where(and(eq(products.active, true), notInArray(products.id, exclude)))
       .orderBy(desc(products.createdAt))
       .limit(limit - rows.length);

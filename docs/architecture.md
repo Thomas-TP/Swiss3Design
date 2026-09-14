@@ -67,7 +67,9 @@ of truth.
   (`pending → paid → in_production → shipped → delivered`, plus `cancelled`),
   `subtotalCents` / `shippingCents` / `discountCents` / `totalCents`,
   `discountCode`, `shippingAddress` (JSON snapshot, **CH only**),
-  `stripePaymentIntentId`, `trackingNumber`, `adminNote` (internal), `locale`.
+  `stripePaymentIntentId`, clés de reprise Checkout, dates de réservation et de
+  paiement, montant remboursé, `trackingNumber`, `adminNote` (internal),
+  `locale`.
 - **order_items** — **snapshots**: `nameSnapshot`, `colorName`/`colorHex`,
   `priceCentsSnapshot`, `quantity`. History never changes when products change.
 
@@ -85,6 +87,8 @@ revision_requested → accepted/declined → paid → in_production → done`, p
 ### Stock & settings
 
 - **inventory_log** — stock movements (`delta`, `reason`: order/restock/adjustment).
+- **status_events** — journal append-only des créations et transitions de commandes/devis,
+  écrit dans la même transaction que l'état courant (source + acteur éventuel).
 - **settings** — key/value store (e.g. `shipping_cents`,
   `free_shipping_over_cents`), edited in `/admin/settings`.
 - **discount_codes** — `type` (`percent` | `fixed`), `value`, `minSubtotalCents`,
@@ -119,16 +123,18 @@ saved CH address per user) and `notification_preferences` (`newsletter` /
 1. Cart lives client-side in `localStorage` (`src/lib/cart.tsx`, key `s3d-cart-v1`).
 2. `POST /api/checkout` validates the cart + CH address server-side, computes
    shipping ([`src/lib/shipping.ts`](../src/lib/shipping.ts)) and any discount
-   ([`src/lib/discounts.ts`](../src/lib/discounts.ts)), creates the `orders` row
-   (`pending`) and a Stripe **PaymentIntent** (CHF).
-3. The client confirms payment with the Stripe **Payment Element**.
+   ([`src/lib/discounts.ts`](../src/lib/discounts.ts)), then creates the `orders`
+   row, its immutable lines and the stock reservation in one transaction. A stable
+   attempt key resumes the same Stripe Checkout Session after a retry.
+3. The client confirms payment with the Stripe **Payment Element** embedded in that
+   Checkout Session.
 4. **Finalization is idempotent and runs twice on purpose** — from the Stripe
    **webhook** (`src/app/api/stripe/webhook/route.ts`) _and_ the success page as a
-   safety net. `markOrderPaid()` ([`src/lib/orders.ts`](../src/lib/orders.ts)) uses
-   a conditional `UPDATE ... WHERE status != 'paid'` to claim the order once, then
-   decrements stock atomically (`stock >= qty` guard prevents oversell), logs
-   inventory, increments discount usage, and sends confirmation + admin emails.
-   Email failures never fail the payment.
+   safety net. `markOrderPaid()` ([`src/lib/orders.ts`](../src/lib/orders.ts)) locks
+   the row and only acquires payment while `paidAt` is null. Payment state, status
+   history and outbox messages commit together; repeated or out-of-order calls have
+   no second stock, discount or e-mail effect. E-mail transport failures remain in
+   the persistent outbox for the maintenance job.
 
 ### Quote lifecycle
 
@@ -141,8 +147,8 @@ dedicated PaymentIntent (`/api/quote-checkout`); `markQuotePaid()` is idempotent
 
 - `getAuth()` ([`src/lib/auth.ts`](../src/lib/auth.ts)) builds a per-request
   Better Auth instance (plain `betterAuth()` + the driver-agnostic
-  `better-auth/adapters/drizzle` on Postgres/Hyperdrive — `better-auth-cloudflare`
-  is a declared but unused dependency, see AGENTS.md's 2026-09-09 note).
+  `better-auth/adapters/drizzle` on Postgres/Hyperdrive). Its rate limit uses the
+  shared atomic Postgres counter and the Cloudflare-controlled client IP header.
 - **Admin role** is assigned by a `databaseHooks.user.create.before` hook: emails
   in `ADMIN_EMAILS` get `role: "admin"`. `role` has `input: false` — **never**
   client-settable. Server code gates on `requireAdmin()`.
