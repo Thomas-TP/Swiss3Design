@@ -9,6 +9,7 @@ import {
 } from "@/db/schema";
 import type { Transaction } from "./outbox";
 import { aggregateStock } from "./payment-state";
+import { recordStatusTransition } from "./status-history";
 export async function reserveStock(
   tx: Transaction,
   lines: {
@@ -89,4 +90,11 @@ export async function releaseOrderStock(tx: Transaction, orderId: string) {
     .update(orders)
     .set({ status: "cancelled", stockReleasedAt: new Date() })
     .where(eq(orders.id, orderId));
+  await recordStatusTransition(tx, {
+    entityType: "order",
+    entityId: orderId,
+    fromStatus: order.status,
+    toStatus: "cancelled",
+    source: "system",
+  });
 }

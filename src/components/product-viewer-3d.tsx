@@ -14,6 +14,61 @@ import { buildShowroomScene, type ShowroomScene } from "./showroom-scene";
 // suit la couleur choisie dans le bloc d'achat (contexte partagé) : un seul
 // sélecteur de couleur sur la fiche. La mise en scène (pièce galerie meublée,
 // éclairage, socle…) vit dans `showroom-scene.ts`, partagée avec la vignette.
+export function ModelThumbnail3D({
+  modelUrl,
+  color,
+}: {
+  modelUrl: string;
+  color: string;
+}) {
+  const [thumbnail, setThumbnail] = useState<string | null>(null);
+
+  useEffect(() => {
+    let disposed = false;
+    let renderer: THREE.WebGLRenderer | undefined;
+    let built: ShowroomScene | undefined;
+    void (async () => {
+      const THREE = await import("three");
+      if (disposed) return;
+      renderer = new THREE.WebGLRenderer({
+        antialias: true,
+        preserveDrawingBuffer: true,
+      });
+      try {
+        renderer.setPixelRatio(1);
+        renderer.setSize(384, 384);
+        built = await buildShowroomScene(renderer, modelUrl, color, 1);
+        renderer.render(built.scene, built.camera);
+        const image = renderer.domElement.toDataURL("image/png");
+        if (!disposed) setThumbnail(image);
+      } catch {
+        /* La vignette de repli reste visible si WebGL ou le modèle échoue. */
+      } finally {
+        built?.dispose();
+        renderer.dispose();
+        renderer.forceContextLoss();
+      }
+    })();
+    return () => {
+      disposed = true;
+      built?.dispose();
+      renderer?.dispose();
+      renderer?.forceContextLoss();
+    };
+  }, [color, modelUrl]);
+
+  return thumbnail ? (
+    <img
+      src={thumbnail}
+      alt=""
+      decoding="async"
+      className="aspect-square w-full object-cover"
+    />
+  ) : (
+    <span className="block aspect-square w-full animate-pulse bg-gradient-to-br from-ink/80 to-black" />
+  );
+}
+
 export function ModelViewer({ modelUrl }: { modelUrl: string }) {
   const t = useTranslations("viewer");
   const { selected, colors } = useProductColor();

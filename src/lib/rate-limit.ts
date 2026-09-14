@@ -1,11 +1,62 @@
 import { getDb } from "@/db";
 import { requestLimits } from "@/db/schema";
 import { lt, sql } from "drizzle-orm";
-// Compteur atomique Postgres ; aucune course get/put KV ni écriture limitée à 1/s.
+
+type Database = Awaited<ReturnType<typeof getDb>>;
+
+type LimitOptions = { limit: number; windowS: number };
+
+export interface LimitDecision {
+  allowed: boolean;
+  retryAfter: number | null;
+}
+
+async function hashSubject(subject: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(subject),
+  );
+  return Array.from(new Uint8Array(digest), (value) =>
+    value.toString(16).padStart(2, "0"),
+  ).join("");
+}
+
+// Compteur Postgres atomique partagé entre tous les isolates Cloudflare. Le
+// sujet (IP ou clé Better Auth IP+route) est haché avant stockage.
+export async function consumeRequestLimit(
+  db: Database,
+  namespace: string,
+  subject: string,
+  { limit, windowS }: LimitOptions,
+): Promise<LimitDecision> {
+  const now = Date.now();
+  const window = Math.floor(now / (windowS * 1000));
+  const expiresAt = new Date((window + 1) * windowS * 1000);
+  const hash = await hashSubject(subject);
+  const rows = await db
+    .insert(requestLimits)
+    .values({
+      key: namespace + ":" + hash + ":" + window,
+      count: 1,
+      expiresAt,
+    })
+    .onConflictDoUpdate({
+      target: requestLimits.key,
+      set: { count: sql`${requestLimits.count}+1` },
+      setWhere: lt(requestLimits.count, limit),
+    })
+    .returning({ key: requestLimits.key });
+  if (rows.length > 0) return { allowed: true, retryAfter: null };
+  return {
+    allowed: false,
+    retryAfter: Math.max(1, Math.ceil((expiresAt.getTime() - now) / 1000)),
+  };
+}
+
 export async function rateLimit(
   request: Request,
   route: string,
-  { limit, windowS }: { limit: number; windowS: number },
+  options: LimitOptions,
 ): Promise<boolean> {
   const ip = request.headers.get("cf-connecting-ip");
   if (!ip)
@@ -16,33 +67,13 @@ export async function rateLimit(
       )
     );
   try {
-    const digest = await crypto.subtle.digest(
-      "SHA-256",
-      new TextEncoder().encode(ip),
-    );
-    const hash = Array.from(new Uint8Array(digest), (v) =>
-      v.toString(16).padStart(2, "0"),
-    ).join("");
-    const window = Math.floor(Date.now() / (windowS * 1000));
     const db = await getDb();
-    const rows = await db
-      .insert(requestLimits)
-      .values({
-        key: route + ":" + hash + ":" + window,
-        count: 1,
-        expiresAt: new Date((window + 1) * windowS * 1000),
-      })
-      .onConflictDoUpdate({
-        target: requestLimits.key,
-        set: { count: sql`${requestLimits.count}+1` },
-        setWhere: lt(requestLimits.count, limit),
-      })
-      .returning({ key: requestLimits.key });
-    return rows.length > 0;
+    return (await consumeRequestLimit(db, route, ip, options)).allowed;
   } catch {
     console.error("[rate-limit] indisponible", { route });
     return false;
   }
 }
+
 export const tooManyRequests = (headers?: HeadersInit) =>
   Response.json({ error: "too_many_requests" }, { status: 429, headers });

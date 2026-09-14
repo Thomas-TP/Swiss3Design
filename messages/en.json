@@ -74,8 +74,7 @@
     "weight": "Weight",
     "details": "Specifications",
     "backToShop": "Back to shop",
-    "notFound": "Product not found.",
-    "chooseOptions": "Choose options"
+    "notFound": "Product not found."
   },
   "reviews": {
     "title": "Customer reviews",

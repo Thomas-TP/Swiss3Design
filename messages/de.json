@@ -74,8 +74,7 @@
     "weight": "Gewicht",
     "details": "Eigenschaften",
     "backToShop": "Zurück zum Katalog",
-    "notFound": "Produkt nicht gefunden.",
-    "chooseOptions": "Optionen wählen"
+    "notFound": "Produkt nicht gefunden."
   },
   "reviews": {
     "title": "Kundenbewertungen",

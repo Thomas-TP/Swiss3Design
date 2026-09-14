@@ -9,7 +9,7 @@ import {
 } from "vitest";
 import { Pool } from "pg";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { eq, inArray } from "drizzle-orm";
+import { and, eq, inArray, like } from "drizzle-orm";
 import * as schema from "@/db/schema";
 import { currentCartSnapshot } from "./cart-snapshot";
 import { getStripe } from "./stripe";
@@ -17,6 +17,7 @@ import { getOrderCheckout } from "./checkout-session";
 import { markOrderPaid, markQuotePaid } from "./orders";
 import { reserveStock, releaseOrderStock } from "./stock";
 import { drainEmailOutbox, queueEmail } from "./outbox";
+import { consumeRequestLimit } from "./rate-limit";
 
 const database = vi.hoisted(() => ({ current: null as unknown }));
 vi.mock("@/db", () => ({ getDb: async () => database.current }));
@@ -44,6 +45,7 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
   const products: string[] = [];
   const quotes: string[] = [];
   const keys: string[] = [];
+  const limitNamespaces: string[] = [];
   beforeAll(() => {
     database.current = db;
     if (
@@ -122,6 +124,17 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
       .from(schema.emailOutbox)
       .where(eq(schema.emailOutbox.key, "order-confirmation:" + f.id));
     expect(messages).toHaveLength(1);
+    const paidEvents = await db
+      .select()
+      .from(schema.statusEvents)
+      .where(
+        and(
+          eq(schema.statusEvents.entityType, "order"),
+          eq(schema.statusEvents.entityId, f.id),
+          eq(schema.statusEvents.toStatus, "paid"),
+        ),
+      );
+    expect(paidEvents).toHaveLength(1);
   });
   it("revisiter après expédition ne réinitialise ni le statut ni le stock", async () => {
     const f = await fixture();
@@ -301,6 +314,17 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
         offerVersion: 2,
       }),
     ).rejects.toThrow("payment_mismatch");
+    const paidEvents = await db
+      .select()
+      .from(schema.statusEvents)
+      .where(
+        and(
+          eq(schema.statusEvents.entityType, "quote"),
+          eq(schema.statusEvents.entityId, id),
+          eq(schema.statusEvents.toStatus, "paid"),
+        ),
+      );
+    expect(paidEvents).toHaveLength(1);
   });
   it("une réponse false de l'e-mail reste à reprendre", async () => {
     const key = "audit-mail:" + crypto.randomUUID();
@@ -349,6 +373,23 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
         .from(schema.emailOutbox)
         .where(eq(schema.emailOutbox.key, key)),
     ).toHaveLength(0);
+  });
+  it("le quota partagé reste atomique sous concurrence", async () => {
+    const namespace = "audit-limit-" + crypto.randomUUID();
+    limitNamespaces.push(namespace);
+    const decisions = await Promise.all(
+      Array.from({ length: 8 }, () =>
+        consumeRequestLimit(db, namespace, "same-ip", {
+          limit: 3,
+          windowS: 60,
+        }),
+      ),
+    );
+    expect(decisions.filter((decision) => decision.allowed)).toHaveLength(3);
+    expect(decisions.filter((decision) => !decision.allowed)).toHaveLength(5);
+    expect(
+      decisions.find((decision) => !decision.allowed)?.retryAfter,
+    ).toBeGreaterThan(0);
   });
   it.skipIf(!stripeKey)(
     "Stripe TEST réutilise la session et confirme un paiement sans e-mail réel",
@@ -449,6 +490,11 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
     ).toBe(1000);
   });
   afterAll(async () => {
+    const entityIds = [...ids, ...quotes];
+    if (entityIds.length)
+      await db
+        .delete(schema.statusEvents)
+        .where(inArray(schema.statusEvents.entityId, entityIds));
     if (ids.length) {
       await db.delete(schema.emailOutbox).where(
         inArray(
@@ -477,6 +523,10 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
       await db
         .delete(schema.emailOutbox)
         .where(inArray(schema.emailOutbox.key, keys));
+    for (const namespace of limitNamespaces)
+      await db
+        .delete(schema.requestLimits)
+        .where(like(schema.requestLimits.key, namespace + ":%"));
     await pool.end();
   });
 });

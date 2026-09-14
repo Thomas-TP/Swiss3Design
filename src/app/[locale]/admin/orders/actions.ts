@@ -13,9 +13,10 @@ import {
   orderCancelledEmail,
 } from "@/lib/email-templates";
 import { ORDER_STATUSES } from "../ui";
+import { recordStatusTransition } from "@/lib/status-history";
 
 export async function updateOrderStatus(formData: FormData) {
-  await requireAdmin();
+  const session = await requireAdmin();
   const id = String(formData.get("id") || "");
   const status = String(formData.get("status") || "");
   if (!id || !(ORDER_STATUSES as readonly string[]).includes(status)) {
@@ -52,6 +53,14 @@ export async function updateOrderStatus(formData: FormData) {
       .where(and(eq(orders.id, id), eq(orders.status, previous.status)))
       .returning({ id: orders.id });
     if (!changed.length) return;
+    await recordStatusTransition(db, {
+      entityType: "order",
+      entityId: id,
+      fromStatus: previous.status,
+      toStatus: status,
+      source: "admin",
+      actorId: session.user.id,
+    });
 
     // E-mails de suivi du cycle de vie — envoyés une seule fois, au premier
     // passage dans le statut. Un échec d'envoi ne bloque jamais la mise à jour.

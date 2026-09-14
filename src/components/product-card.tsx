@@ -4,6 +4,7 @@ import { formatChf } from "@/lib/format";
 import { cfImage } from "@/lib/cf-image";
 import type { ProductListItem } from "@/db/queries";
 import { MulticolorDots } from "./multicolor-dots";
+import { AddToCartMini } from "./add-to-cart";
 import { FavoriteButton } from "./favorite-button";
 
 export function ProductCard({ product }: { product: ProductListItem }) {
@@ -90,12 +91,10 @@ export function ProductCard({ product }: { product: ProductListItem }) {
           </div>
         )}
         <div className="relative z-10 mt-3">
-          <Link
-            href={`/products/${product.slug}`}
-            className="flex justify-center rounded-full bg-accent px-3 py-2 text-xs font-semibold text-white hover:bg-accent-dark"
-          >
-            {t("chooseOptions")}
-          </Link>
+          <AddToCartMini
+            item={item}
+            disabled={product.saleType === "stock" && product.stock === 0}
+          />
         </div>
       </div>
     </article>

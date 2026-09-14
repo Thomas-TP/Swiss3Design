@@ -13,6 +13,7 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import * as schema from "@/db/schema";
 import { sendEmail } from "./email";
+import { consumeRequestLimit } from "./rate-limit";
 import {
   verificationEmail,
   resetPasswordEmail,
@@ -74,7 +75,23 @@ export async function getAuth() {
       env.APP_ENV === "preview"
         ? [env.BETTER_AUTH_URL]
         : ["https://swiss3design.ch", "https://www.swiss3design.ch"],
+    // Cloudflare remplace cet en-tête à l'edge : Better Auth peut donc limiter
+    // chaque visiteur séparément au lieu de partager un seul quota par route.
+    advanced: {
+      ipAddress: { ipAddressHeaders: ["cf-connecting-ip"] },
+    },
     database: drizzleAdapter(db, { provider: "pg" }),
+    // Le stockage mémoire par défaut est local à un isolate. Ce compteur
+    // Postgres ferme aussi les courses entre tentatives simultanées.
+    rateLimit: {
+      customStorage: {
+        consume: (key, rule) =>
+          consumeRequestLimit(db, "better-auth", key, {
+            limit: rule.max,
+            windowS: rule.window,
+          }),
+      },
+    },
     emailAndPassword: {
       enabled: true,
       minPasswordLength: 8,

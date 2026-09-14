@@ -41,6 +41,7 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | `stripe-appearance.ts` | Thème visuel du Payment Element                                              | —                                                            |
 | `format.ts`            | Formatage CHF/locale (jamais `toFixed` à la main)                            | `formatChf()`                                                |
 | `rate-limit.ts`        | Compteur atomique Postgres par IP hachée + route                             | `rateLimit()`, `tooManyRequests()`                           |
+| `status-history.ts`    | Journal transactionnel des transitions commande/devis                        | `recordStatusTransition()`                                   |
 | `email.ts`             | Envoi via Resend (no-op si pas de clé)                                       | —                                                            |
 | `email-templates.ts`   | Gabarits HTML d'e-mails (4 langues) — **gros, surtout du texte**             | —                                                            |
 | `email-proof.ts`       | Aperçu d'e-mails pour `/admin/emails`                                        | —                                                            |
@@ -108,6 +109,7 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 ## Remédiation septembre 2026
 
 - Paiement/réservation : `lib/payment-state.ts`, `lib/stock.ts`, `lib/checkout-session.ts`, `lib/quote-session.ts`.
+- Traçabilité des statuts : `lib/status-history.ts`, table `status_events`, affichage `admin/status-history.tsx`.
 - E-mails persistants : `lib/outbox.ts` ; reprise par `lib/maintenance.ts`.
 - Panier/restauration : `lib/cart-data.ts`, `lib/cart-snapshot.ts`, `components/cart-recovery.tsx`, `api/cart-reminder/restore/route.ts`.
 - Entrées/fichiers : `lib/upload.ts`, `lib/file-signature.ts` ; vérification d'e-mail partagée dans `components/guest-email-verification.tsx`.

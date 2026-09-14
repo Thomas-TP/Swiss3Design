@@ -23,6 +23,7 @@ import { verifyEmailProof } from "@/lib/email-proof";
 import { validateDiscount } from "@/lib/discounts";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { SHIPPING_CENTS, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
+import { recordStatusTransition } from "@/lib/status-history";
 
 const bodySchema = z.object({
   attemptId: z.uuid().optional(),
@@ -317,6 +318,14 @@ export async function POST(request: Request) {
           locale,
         })
         .returning();
+      await recordStatusTransition(tx, {
+        entityType: "order",
+        entityId: order.id,
+        fromStatus: null,
+        toStatus: "pending",
+        source: "checkout",
+        actorId: authSession?.user.id ?? null,
+      });
 
       await tx.insert(orderItems).values(
         validLines.map((l) => ({

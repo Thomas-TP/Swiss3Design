@@ -74,8 +74,7 @@
     "weight": "Poids",
     "details": "Caractéristiques",
     "backToShop": "Retour au catalogue",
-    "notFound": "Produit introuvable.",
-    "chooseOptions": "Choisir mes options"
+    "notFound": "Produit introuvable."
   },
   "reviews": {
     "title": "Avis clients",

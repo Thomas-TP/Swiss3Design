@@ -10,6 +10,7 @@ import { getServerSession } from "@/lib/session";
 import { queueEmail, drainEmailOutbox } from "@/lib/outbox";
 import { getAdminEmails } from "@/lib/email";
 import { adminNewQuoteEmail } from "@/lib/email-templates";
+import { recordStatusTransition } from "@/lib/status-history";
 
 const schema = z.object({
   email: z.email(),
@@ -68,6 +69,14 @@ export async function submitQuoteRequest(
           customerId: session?.user.id ?? null,
         })
         .returning({ id: quoteRequests.id });
+      await recordStatusTransition(db, {
+        entityType: "quote",
+        entityId: created.id,
+        fromStatus: null,
+        toStatus: "received",
+        source: "customer",
+        actorId: session?.user.id ?? null,
+      });
 
       // Notification interne : nouvelle demande à chiffrer.
       // Ne doit jamais faire échouer l'enregistrement de la demande.

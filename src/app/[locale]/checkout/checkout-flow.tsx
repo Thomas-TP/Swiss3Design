@@ -15,6 +15,7 @@ import {
   Check,
   CheckCircle2,
   Lock,
+  MapPin,
   ShoppingBag,
 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
@@ -119,9 +120,12 @@ function StreetAutocomplete({
   placeholder: string;
 }) {
   const [items, setItems] = useState<Suggestion[]>([]);
+  const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const listId = useId();
   const pending = useRef<AbortController | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   useEffect(
     () => () => {
       pending.current?.abort();
@@ -129,61 +133,119 @@ function StreetAutocomplete({
     },
     [],
   );
-  function handleInput(value: string) {
+
+  function choose(item: Suggestion) {
     pending.current?.abort();
     if (timer.current) clearTimeout(timer.current);
-    const selected = items.find((item) => item.label === value);
-    if (selected) {
-      onPick(selected);
-      setItems([]);
-      return;
-    }
-    onChange(value);
+    onPick(item);
     setItems([]);
-    if (value.trim().length < 3) return;
+    setOpen(false);
+  }
+
+  function handleInput(nextValue: string) {
+    onChange(nextValue);
+    pending.current?.abort();
+    if (timer.current) clearTimeout(timer.current);
+    setItems([]);
+    setOpen(false);
+    if (nextValue.trim().length < 3) return;
     const controller = new AbortController();
     pending.current = controller;
     timer.current = setTimeout(async () => {
       try {
         const res = await fetch(
           "https://api3.geo.admin.ch/rest/services/api/SearchServer?searchText=" +
-            encodeURIComponent(value) +
+            encodeURIComponent(nextValue) +
             "&type=locations&origins=address&limit=5",
           { signal: controller.signal },
         );
         const data = (await res.json()) as {
           results?: Parameters<typeof parseGeoAdminResult>[0][];
         };
-        if (!controller.signal.aborted)
-          setItems(
-            (data.results ?? [])
-              .map(parseGeoAdminResult)
-              .filter((item): item is Suggestion => item !== null),
-          );
+        if (controller.signal.aborted) return;
+        const suggestions = (data.results ?? [])
+          .map(parseGeoAdminResult)
+          .filter((item): item is Suggestion => item !== null);
+        setItems(suggestions);
+        setActiveIndex(0);
+        setOpen(suggestions.length > 0);
       } catch {
-        /* La saisie manuelle reste utilisable hors réseau. */
+        /* API indisponible : la saisie manuelle reste utilisable. */
       }
     }, 250);
   }
+
   return (
     <div className="relative">
       <input
         value={value}
-        onChange={(e) => handleInput(e.target.value)}
-        list={listId}
+        onChange={(event) => handleInput(event.target.value)}
+        onBlur={() => setTimeout(() => setOpen(false), 100)}
+        onKeyDown={(event) => {
+          if (!open || items.length === 0) return;
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            setActiveIndex((index) => (index + 1) % items.length);
+          } else if (event.key === "ArrowUp") {
+            event.preventDefault();
+            setActiveIndex(
+              (index) => (index - 1 + items.length) % items.length,
+            );
+          } else if (event.key === "Home") {
+            event.preventDefault();
+            setActiveIndex(0);
+          } else if (event.key === "End") {
+            event.preventDefault();
+            setActiveIndex(items.length - 1);
+          } else if (event.key === "Enter") {
+            event.preventDefault();
+            choose(items[activeIndex]);
+          } else if (event.key === "Escape") {
+            event.preventDefault();
+            setOpen(false);
+          }
+        }}
+        role="combobox"
         aria-label={placeholder}
+        aria-autocomplete="list"
+        aria-expanded={open}
+        aria-controls={listId}
+        aria-activedescendant={open ? `${listId}-${activeIndex}` : undefined}
         required
         autoComplete="street-address"
         placeholder={placeholder}
         className={field}
       />
-      <datalist id={listId}>
-        {items.map((item) => (
-          <option key={item.label} value={item.label}>
-            {item.label}
-          </option>
-        ))}
-      </datalist>
+      {/* oxlint-disable prefer-tag-over-role no-noninteractive-element-to-interactive-role -- suggestions personnalisees avec focus conserve sur le champ */}
+      {open && (
+        <ul
+          id={listId}
+          role="listbox"
+          className="absolute z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-line bg-surface shadow-lg shadow-ink/5"
+        >
+          {items.map((item, index) => (
+            <li key={item.label}>
+              <button
+                id={`${listId}-${index}`}
+                type="button"
+                role="option"
+                aria-selected={index === activeIndex}
+                tabIndex={-1}
+                onMouseEnter={() => setActiveIndex(index)}
+                onMouseDown={(event) => event.preventDefault()}
+                onClick={() => choose(item)}
+                className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper ${
+                  index === activeIndex ? "bg-paper" : ""
+                }`}
+              >
+                <MapPin size={14} className="shrink-0 text-soft" />
+                {item.label}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+      {/* oxlint-enable prefer-tag-over-role no-noninteractive-element-to-interactive-role */}
     </div>
   );
 }
@@ -479,7 +541,7 @@ export function CheckoutFlow({
 
   async function startPayment(formData: FormData) {
     if (!emailReady) return;
-    // Garder la validation métier du canton même avec un sélecteur natif.
+    // Garder la validation métier du canton même avec un sélecteur personnalisé.
     if (!addr.canton) {
       setError(t("errorCanton"));
       return;

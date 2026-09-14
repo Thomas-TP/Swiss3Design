@@ -1,14 +1,19 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useState } from "react";
 import { Box } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { cfImage } from "@/lib/cf-image";
-import dynamic from "next/dynamic";
 const ModelViewer = dynamic(
   () => import("./product-viewer-3d").then((m) => m.ModelViewer),
   { ssr: false },
 );
+const ModelThumbnail3D = dynamic(
+  () => import("./product-viewer-3d").then((m) => m.ModelThumbnail3D),
+  { ssr: false },
+);
+import { useProductColor } from "./product-color-context";
 
 interface GalleryImage {
   url: string;
@@ -19,8 +24,8 @@ interface GalleryImage {
 // modèle 3D, celui-ci devient le **dernier slot** de la galerie — une vignette
 // qui, sélectionnée, remplace la grande image par le viewer interactif. Plus de
 // bouton « Voir en 3D » séparé : la 3D vit parmi les images. La vignette est un
-// repère statique : aucune géométrie ni WebGL avant sélection explicite.
-// La teinte du modèle suit la couleur du bloc d'achat.
+// **vrai rendu de la scène 3D** (snapshot hors-écran de `showroom-scene`), pas
+// la photo produit. La teinte du modèle suit la couleur du bloc d'achat.
 export function ProductGallery({
   images,
   name,
@@ -31,6 +36,7 @@ export function ProductGallery({
   model3dUrl?: string | null;
 }) {
   const t = useTranslations("viewer");
+  const { colors } = useProductColor();
   const has3d = Boolean(model3dUrl);
   // Le slot 3D occupe l'index juste après la dernière image.
   const slot3dIndex = images.length;
@@ -40,7 +46,6 @@ export function ProductGallery({
   const is3d = has3d && index === slot3dIndex;
   const current = images[index] ?? images[0];
 
-  // La 3D est chargée uniquement à la demande ; aucune scène WebGL hors écran.
   return (
     <div>
       <div className="overflow-hidden rounded-card border border-line bg-gradient-to-br from-paper to-line/40">
@@ -90,9 +95,10 @@ export function ProductGallery({
                 is3d ? "border-ink" : "border-line hover:border-ink/40"
               }`}
             >
-              <span className="grid aspect-square w-full place-items-center bg-paper text-ink">
-                <Box size={26} />
-              </span>
+              <ModelThumbnail3D
+                modelUrl={model3dUrl!}
+                color={colors[0]?.hex ?? "#E5231C"}
+              />
               {/* Petite pastille : signale une visualisation 3D interactive. */}
               <span className="absolute bottom-1 right-1 flex items-center gap-0.5 rounded-md bg-black/60 px-1.5 py-0.5 text-[9px] font-bold text-white backdrop-blur">
                 <Box size={9} />

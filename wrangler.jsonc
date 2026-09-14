@@ -6,7 +6,7 @@
   // wrangler le résout tout seul (CLOUDFLARE_ACCOUNT_ID en variable
   // d'environnement reste possible mais inutile ici).
   "main": ".open-next/worker.js",
-  "compatibility_date": "2026-07-09",
+  "compatibility_date": "2026-09-14",
   "compatibility_flags": ["nodejs_compat"],
   "assets": {
     "directory": ".open-next/assets",

@@ -9,6 +9,7 @@ import { getDb } from "@/db";
 import { quoteRequests, quoteMessages } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { getAdminEmails } from "@/lib/email";
+import { recordStatusTransition } from "@/lib/status-history";
 import { queueEmail, drainEmailOutbox } from "@/lib/outbox";
 import {
   adminQuoteRevisionEmail,
@@ -98,6 +99,14 @@ export async function requestQuoteRevision(
           offerVersion: quote.offerVersion + 1,
         })
         .where(eq(quoteRequests.id, quote.id));
+      await recordStatusTransition(db, {
+        entityType: "quote",
+        entityId: quote.id,
+        fromStatus: quote.status,
+        toStatus: "revision_requested",
+        source: "customer",
+        actorId: session.user.id,
+      });
 
       {
         const adminEmails = await getAdminEmails();
@@ -171,6 +180,14 @@ export async function declineQuote(
           offerVersion: quote.offerVersion + 1,
         })
         .where(eq(quoteRequests.id, quote.id));
+      await recordStatusTransition(db, {
+        entityType: "quote",
+        entityId: quote.id,
+        fromStatus: quote.status,
+        toStatus: "declined",
+        source: "customer",
+        actorId: session.user.id,
+      });
 
       {
         const adminEmails = await getAdminEmails();

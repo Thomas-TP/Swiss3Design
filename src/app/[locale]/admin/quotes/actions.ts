@@ -9,12 +9,13 @@ import { requireAdmin } from "@/lib/session";
 import { queueEmail, drainEmailOutbox } from "@/lib/outbox";
 import { quoteReplyEmail, quoteRejectedEmail } from "@/lib/email-templates";
 import { QUOTE_STATUSES } from "../ui";
+import { recordStatusTransition } from "@/lib/status-history";
 
 // Durée de validité d'un devis, posée (et réinitialisée) à chaque chiffrage.
 const QUOTE_VALIDITY_DAYS = 30;
 
 export async function updateQuote(formData: FormData) {
-  await requireAdmin();
+  const session = await requireAdmin();
   const id = String(formData.get("id") || "");
   const status = String(formData.get("status") || "");
   if (!id || !(QUOTE_STATUSES as readonly string[]).includes(status)) {
@@ -91,6 +92,14 @@ export async function updateQuote(formData: FormData) {
         ...(enteringQuoted ? { validUntil } : {}),
       })
       .where(eq(quoteRequests.id, id));
+    await recordStatusTransition(db, {
+      entityType: "quote",
+      entityId: id,
+      fromStatus: previous.status,
+      toStatus: status,
+      source: "admin",
+      actorId: session.user.id,
+    });
 
     // Journalise le (re-)devis dans le fil de discussion
     if (enteringQuoted) {

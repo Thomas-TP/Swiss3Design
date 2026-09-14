@@ -10,6 +10,7 @@ import {
 } from "./email-templates";
 import { queueEmail, drainEmailOutbox } from "./outbox";
 import { reserveStock } from "./stock";
+import { recordStatusTransition } from "./status-history";
 import { isOrderPaid, verifyPayment, type PaymentProof } from "./payment-state";
 type Db = Awaited<ReturnType<typeof getDb>>;
 
@@ -51,6 +52,13 @@ export async function markOrderPaid(
         stripePaymentIntentId: proof.id,
       })
       .where(and(eq(orders.id, orderId), isNull(orders.paidAt)));
+    await recordStatusTransition(tx, {
+      entityType: "order",
+      entityId: orderId,
+      fromStatus: order.status,
+      toStatus: "paid",
+      source: "payment",
+    });
     await tx
       .delete(abandonedCarts)
       .where(eq(abandonedCarts.email, order.email.toLowerCase()));
@@ -112,6 +120,13 @@ export async function markQuotePaid(
         stripePaymentIntentId: proof.id,
       })
       .where(eq(quoteRequests.id, quoteId));
+    await recordStatusTransition(tx, {
+      entityType: "quote",
+      entityId: quoteId,
+      fromStatus: quote.status,
+      toStatus: "paid",
+      source: "payment",
+    });
     if (admins.length)
       await queueEmail(
         tx,

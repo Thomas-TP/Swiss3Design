@@ -1,7 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
@@ -108,7 +108,14 @@ export default async function LocaleLayout({
   // Nonce CSP posé par le middleware (prod uniquement) : autorise le script
   // inline anti-flash sous une politique sans 'unsafe-inline'.
   const nav = await getTranslations("nav");
-  const nonce = (await headers()).get("x-nonce") ?? undefined;
+  const [requestHeaders, cookieStore] = await Promise.all([
+    headers(),
+    cookies(),
+  ]);
+  const nonce = requestHeaders.get("x-nonce") ?? undefined;
+  const hasSession = cookieStore
+    .getAll()
+    .some(({ name }) => name.endsWith("better-auth.session_token"));
 
   return (
     <html
@@ -147,16 +154,16 @@ export default async function LocaleLayout({
               >
                 {nav("skipContent")}
               </a>
-              <Header />
+              <Header hasSession={hasSession} />
               <main
                 id="main-content"
                 tabIndex={-1}
-                className="flex-1 pb-24 xl:pb-0"
+                className="flex-1 pb-24 lg:pb-0"
               >
                 {children}
               </main>
               <Footer />
-              <BottomNav />
+              <BottomNav hasSession={hasSession} />
             </FavoritesProvider>
           </CartProvider>
         </NextIntlClientProvider>

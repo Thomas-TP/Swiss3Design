@@ -585,6 +585,33 @@ export const paymentEvents = pgTable("payment_events", {
   createdAt: createdAt(),
 });
 
+export const statusEvents = pgTable(
+  "status_events",
+  {
+    id: id(),
+    entityType: text("entity_type", { enum: ["order", "quote"] }).notNull(),
+    entityId: text("entity_id").notNull(),
+    fromStatus: text("from_status"),
+    toStatus: text("to_status").notNull(),
+    source: text("source", {
+      enum: ["checkout", "payment", "admin", "customer", "system"],
+    }).notNull(),
+    actorId: text("actor_id"),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("status_events_entity_idx").on(t.entityType, t.entityId, t.createdAt),
+    check(
+      "status_events_entity_valid",
+      sql`${t.entityType} IN ('order','quote')`,
+    ),
+    check(
+      "status_events_source_valid",
+      sql`${t.source} IN ('checkout','payment','admin','customer','system')`,
+    ),
+  ],
+);
+
 export const requestLimits = pgTable(
   "request_limits",
   {
