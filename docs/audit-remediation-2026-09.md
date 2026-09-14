@@ -1,6 +1,6 @@
 # Remédiation de l'audit — septembre 2026
 
-État de travail du 14 septembre 2026. Les changements sont déployés sur la preview isolée, version `359015ff-e898-4ba2-bec2-4e1b56222e88`. Ils ne sont pas encore en production.
+État de travail du 14 septembre 2026. Les changements sont déployés sur la preview isolée. Les validations navigateur ci-dessous ont été exécutées sur la version manuelle `359015ff-e898-4ba2-bec2-4e1b56222e88` ; les builds Cloudflare de la PR passent ensuite sur son dernier commit. Le nouveau code n'est pas encore en production.
 
 ## Incident 1102 : cause mesurée
 
@@ -39,15 +39,15 @@ Les contrôles navigateur sur six routes publiques à 320 et 1440 px n'ont relev
 
 Le serveur Chrome DevTools requis pour une mesure Core Web Vitals instrumentée n'est pas disponible dans cet environnement. Aucune nouvelle trace LCP/INP/CLS ne doit donc être présentée comme réalisée ; les validations effectuées ici portent sur le build, les réponses HTTP, les parcours, le responsive et l'accessibilité automatisée.
 
-Les migrations 0001 à 0005 sont additives et appliquées sur preview. Elles ne sont pas encore appliquées en production. La CI Quality crée un Postgres jetable, applique les migrations et exécute les contrôles sans secret de production. La branche `main` exige désormais une pull request à jour, le contrôle `quality` et la résolution des conversations ; force-push et suppression sont interdits.
+Les migrations additives 0001 à 0005 sont appliquées sur preview et sur la base de production identifiée le 14 septembre 2026. Avant la transaction de production, les contrôles ont confirmé l'absence des tables et colonnes cibles, ainsi que zéro prix, stock, quantité ou total invalide et zéro identifiant de paiement dupliqué. L'application a utilisé un verrou consultatif et des délais bornés ; la vérification après validation confirme 4 tables, 15 colonnes, 10 contraintes et 3 index attendus. Le Worker temporaire protégé par jeton a ensuite été arrêté et son port fermé. La CI Quality crée aussi un Postgres jetable, applique les migrations et exécute les contrôles sans secret de production. La branche `main` exige désormais une pull request à jour, le contrôle `quality` et la résolution des conversations ; force-push et suppression sont interdits.
 
-Points encore ouverts avant production : passage Workers Paid et nouvelle rafale 1102 ; test Stripe complet et abonnement aux nouveaux événements webhook ; réauthentification forte de toutes les actions administratives sensibles ; exercice réel de restauration Neon/R2 ; alertes opérationnelles ; application des migrations de production puis déploiement et validation finale.
+Points encore ouverts avant production : passage Workers Paid et nouvelle rafale 1102 ; test Stripe complet et abonnement aux nouveaux événements webhook ; réauthentification forte de toutes les actions administratives sensibles ; exercice réel de restauration Neon/R2 ; alertes opérationnelles ; déploiement du nouveau code puis validation finale.
 
 ## Exploitation après livraison
 
-1. Contrôler les données existantes avant les nouvelles contraintes : prix et stock positifs, totaux cohérents, identifiant de paiement unique.
-2. Appliquer uniquement les migrations 0001 à 0005 sur la base de production identifiée, dans une transaction et avec un délai de verrouillage borné. Ne jamais rejouer 0000 sur une base existante.
-3. Déployer puis vérifier l'identifiant de version, HTTP/HTTPS, recherche, parcours panier, erreurs Worker et événements Stripe.
+1. **Réalisé le 14 septembre 2026 :** contrôler les données existantes avant les nouvelles contraintes — prix et stock positifs, totaux cohérents, identifiant de paiement unique.
+2. **Réalisé le 14 septembre 2026 :** appliquer uniquement les migrations 0001 à 0005 sur la base de production identifiée, dans une transaction, avec verrou consultatif et délais bornés. La migration 0000 n'a pas été rejouée.
+3. Après autorisation du plan Workers Paid et vérifications Stripe, déployer puis vérifier l'identifiant de version, HTTP/HTTPS, recherche, parcours panier, erreurs Worker et événements Stripe.
 4. Surveiller les commandes `pending` expirées, les erreurs de rapprochement et `email_outbox`. Ne pas libérer du stock lorsqu'un paiement reste incertain.
 5. En cas de retour arrière, arrêter les nouveaux checkouts et rapprocher les réservations avant de revenir à un ancien code qui ne connaît pas la réservation. Un rollback aveugle du Worker vers l'ancien checkout pourrait décrémenter deux fois le stock. Les migrations additives restent en place.
 
