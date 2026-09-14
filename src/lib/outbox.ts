@@ -14,7 +14,7 @@ export async function queueEmail(
     .values({ key, messageJson: JSON.stringify(message) })
     .onConflictDoNothing();
 }
-export async function drainEmailOutbox(db: Db, limit = 10) {
+export async function drainEmailOutbox(db: Db, limit = 10, onlyKey?: string) {
   const now = new Date();
   const available = and(
     isNull(emailOutbox.sentAt),
@@ -27,7 +27,7 @@ export async function drainEmailOutbox(db: Db, limit = 10) {
   const rows = await db
     .select()
     .from(emailOutbox)
-    .where(available)
+    .where(onlyKey ? and(available, eq(emailOutbox.key, onlyKey)) : available)
     .limit(limit);
   let sent = 0;
   for (const row of rows) {

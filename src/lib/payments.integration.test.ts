@@ -334,8 +334,12 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
       subject: "Test",
       html: "Test",
     });
+    await db
+      .update(schema.emailOutbox)
+      .set({ availableAt: new Date(0) })
+      .where(eq(schema.emailOutbox.key, key));
     mail.send.mockResolvedValue(false);
-    await drainEmailOutbox(db, 100);
+    await drainEmailOutbox(db, 100, key);
     const [row] = await db
       .select()
       .from(schema.emailOutbox)
@@ -347,7 +351,7 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
       .set({ availableAt: new Date(0) })
       .where(eq(schema.emailOutbox.key, key));
     mail.send.mockResolvedValue(true);
-    await drainEmailOutbox(db, 100);
+    await drainEmailOutbox(db, 100, key);
     expect(
       (
         await db
@@ -365,7 +369,11 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
       subject: "Rappel",
       html: "Test",
     });
-    await drainEmailOutbox(db, 100);
+    await db
+      .update(schema.emailOutbox)
+      .set({ availableAt: new Date(0) })
+      .where(eq(schema.emailOutbox.key, key));
+    await drainEmailOutbox(db, 100, key);
     expect(mail.send).not.toHaveBeenCalled();
     expect(
       await db
