@@ -91,7 +91,8 @@ is kept **off**, same reasoning as Biome's old override: Cloudflare Images
 already handles optimization (`images.unoptimized` in `next.config.ts`), so
 converting `<img>` to `next/image` is a real UI change, not a lint fix.
 `oxfmt` (`.oxfmtrc.json`) is Prettier-compatible, configured to match Biome's
-prior formatting exactly (CRLF, double quotes, printWidth 80, etc.) —
+prior formatting (LF line endings on every platform, double quotes, printWidth 80,
+etc.) —
 `sortPackageJson`/`sortImports`/`sortTailwindcss` left off on purpose to avoid
 a repo-wide reorder diff unrelated to any real change. Caveat: **oxfmt is
 still beta (0.x)**, no stable 1.0 as of this date. `biome-ignore` comments
