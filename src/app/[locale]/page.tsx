@@ -10,7 +10,7 @@ import { MulticolorDots } from "@/components/multicolor-dots";
 import { HeroScene } from "@/components/hero-scene";
 import { Reveal } from "@/components/reveal";
 import type { Metadata } from "next";
-import { alternatesFor } from "@/lib/seo";
+import { pageMetadata } from "@/lib/seo";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +20,15 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  return { alternates: alternatesFor(locale, "") };
+  const t = await getTranslations({ locale, namespace: "seo" });
+  return pageMetadata({
+    locale,
+    path: "",
+    title: t("homeTitle"),
+    description: t("homeDescription"),
+    imageAlt: t("ogImageAlt"),
+    absoluteTitle: true,
+  });
 }
 
 export default async function HomePage({

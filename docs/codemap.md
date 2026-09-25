@@ -27,33 +27,34 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 
 ## `src/lib` — logique métier (1 ligne chacun)
 
-| Fichier                | Rôle                                                                         | Exports clés                                                 |
-| ---------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| `auth.ts`              | Instance Better Auth par requête (adapter Drizzle/Postgres, driver-agnostic) | `getAuth()`                                                  |
-| `auth-client.ts`       | Client Better Auth (côté navigateur)                                         | `authClient`                                                 |
-| `session.ts`           | Garde d'autorisation                                                         | `requireAdmin()`, `getServerSession()`                       |
-| `cart.tsx`             | Panier client (localStorage `s3d-cart-v1`)                                   | `CartProvider`, `useCart()`                                  |
-| `favorites.tsx`        | Favoris client                                                               | `FavoritesProvider`, `useFavorites()`                        |
-| `orders.ts`            | Finalisation paiement **idempotente**                                        | `markOrderPaid()`, `markQuotePaid()`                         |
-| `discounts.ts`         | Validation & calcul des codes promo                                          | —                                                            |
-| `shipping.ts`          | Frais de port CH + seuil gratuité                                            | `FREE_SHIPPING_OVER_CENTS`                                   |
-| `stripe.ts`            | Instance Stripe (serveur)                                                    | —                                                            |
-| `stripe-appearance.ts` | Thème visuel du Payment Element                                              | —                                                            |
-| `format.ts`            | Formatage CHF/locale (jamais `toFixed` à la main)                            | `formatChf()`                                                |
-| `rate-limit.ts`        | Compteur atomique Postgres par IP hachée + route                             | `rateLimit()`, `tooManyRequests()`                           |
-| `status-history.ts`    | Journal transactionnel des transitions commande/devis                        | `recordStatusTransition()`                                   |
-| `email.ts`             | Envoi via Resend (no-op si pas de clé)                                       | —                                                            |
-| `email-templates.ts`   | Gabarits HTML d'e-mails (4 langues) — **gros, surtout du texte**             | —                                                            |
-| `email-proof.ts`       | Aperçu d'e-mails pour `/admin/emails`                                        | —                                                            |
-| `maintenance.ts`       | Mode maintenance                                                             | —                                                            |
-| `theme.ts`             | Constantes/aides de thème (clair/sombre)                                     | —                                                            |
-| `seo.ts`               | Helpers SEO : hreflang + JSON-LD produit/Organization                        | `alternatesFor()`, `productJsonLd()`, `organizationJsonLd()` |
-| `cf-image.ts`          | URL image Cloudflare Transformations (`/cdn-cgi/image`, prod only)           | `cfImage()`                                                  |
-| `cantons.ts`           | Les 26 cantons suisses (code + nom), partagé checkout/carnet d'adresses      | `CANTONS`                                                    |
-| `stripe-customer.ts`   | Identité Stripe client, créée paresseusement au 1er checkout connecté        | `getOrCreateStripeCustomer()`                                |
-| `newsletter.ts`        | Destinataires + jeton HMAC de désabonnement pour les annonces                | —                                                            |
-| `session-groups.ts`    | Regroupe les sessions Better Auth par appareil (écran « Sessions »)          | —                                                            |
-| `user-agent.ts`        | Lecture indicative du user-agent (« Chrome sur Windows »)                    | `describeUserAgent()`                                        |
+| Fichier                | Rôle                                                                         | Exports clés                                                   |
+| ---------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `auth.ts`              | Instance Better Auth par requête (adapter Drizzle/Postgres, driver-agnostic) | `getAuth()`                                                    |
+| `auth-client.ts`       | Client Better Auth (côté navigateur)                                         | `authClient`                                                   |
+| `session.ts`           | Garde d'autorisation                                                         | `requireAdmin()`, `getServerSession()`                         |
+| `cart.tsx`             | Panier client (localStorage `s3d-cart-v1`)                                   | `CartProvider`, `useCart()`                                    |
+| `favorites.tsx`        | Favoris client                                                               | `FavoritesProvider`, `useFavorites()`                          |
+| `orders.ts`            | Finalisation paiement **idempotente**                                        | `markOrderPaid()`, `markQuotePaid()`                           |
+| `discounts.ts`         | Validation & calcul des codes promo                                          | —                                                              |
+| `shipping.ts`          | Frais de port CH + seuil gratuité                                            | `FREE_SHIPPING_OVER_CENTS`                                     |
+| `stripe.ts`            | Instance Stripe (serveur)                                                    | —                                                              |
+| `stripe-appearance.ts` | Thème visuel du Payment Element                                              | —                                                              |
+| `format.ts`            | Formatage CHF/locale (jamais `toFixed` à la main)                            | `formatChf()`                                                  |
+| `rate-limit.ts`        | Compteur atomique Postgres par IP hachée + route                             | `rateLimit()`, `tooManyRequests()`                             |
+| `status-history.ts`    | Journal transactionnel des transitions commande/devis                        | `recordStatusTransition()`                                     |
+| `email.ts`             | Envoi via Resend (no-op si pas de clé)                                       | —                                                              |
+| `email-templates.ts`   | Gabarits HTML d'e-mails (4 langues) — **gros, surtout du texte**             | —                                                              |
+| `email-proof.ts`       | Aperçu d'e-mails pour `/admin/emails`                                        | —                                                              |
+| `maintenance.ts`       | Mode maintenance                                                             | —                                                              |
+| `theme.ts`             | Constantes/aides de thème (clair/sombre)                                     | —                                                              |
+| `seo.ts`               | Métadonnées complètes par page (canonical, hreflang, OG) + tous les JSON-LD  | `pageMetadata()`, `NOINDEX`, `siteJsonLd()`, `productJsonLd()` |
+| `indexnow.ts`          | Notifie IndexNow (Bing, Yandex…) des URL produit modifiées — fire-and-forget | `notifyIndexNow()`                                             |
+| `cf-image.ts`          | URL image Cloudflare Transformations (`/cdn-cgi/image`, prod only)           | `cfImage()`                                                    |
+| `cantons.ts`           | Les 26 cantons suisses (code + nom), partagé checkout/carnet d'adresses      | `CANTONS`                                                      |
+| `stripe-customer.ts`   | Identité Stripe client, créée paresseusement au 1er checkout connecté        | `getOrCreateStripeCustomer()`                                  |
+| `newsletter.ts`        | Destinataires + jeton HMAC de désabonnement pour les annonces                | —                                                              |
+| `session-groups.ts`    | Regroupe les sessions Better Auth par appareil (écran « Sessions »)          | —                                                              |
+| `user-agent.ts`        | Lecture indicative du user-agent (« Chrome sur Windows »)                    | `describeUserAgent()`                                          |
 
 ## `src/db` & `src/i18n`
 
@@ -89,22 +90,22 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 
 ## « Je dois… » → où commencer
 
-| Tâche                                  | Point d'entrée                                                                                                                                                                        |
-| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Ajouter/modifier un champ produit      | `db/schema.pg.ts` → `bun run db:generate:pg` + `db:push:pg` → admin `products/product-form.tsx` + `actions.ts` → affichage `products/[slug]/page.tsx` + `components/product-card.tsx` |
-| Toucher au tunnel de paiement          | `app/[locale]/checkout/checkout-flow.tsx` + `api/checkout/route.ts` + `lib/orders.ts` (idempotence)                                                                                   |
-| Toucher aux devis                      | `app/[locale]/custom/` + `api/quote-*` + admin `quotes/` + `lib/orders.ts`                                                                                                            |
-| Modifier les frais de port             | `lib/shipping.ts` + admin `settings/`                                                                                                                                                 |
-| Ajouter un code promo / une règle      | `lib/discounts.ts` + admin `discounts/` + `api/discount/validate`                                                                                                                     |
-| Changer un e-mail                      | `lib/email-templates.ts` (+ `email.ts` pour l'envoi)                                                                                                                                  |
-| Ajouter une chaîne UI                  | les 4 `messages/*.json` (cherche la clé dans `fr.json`, recopie partout)                                                                                                              |
-| Sécurité / en-têtes / CSP nonce        | `src/middleware.ts`                                                                                                                                                                   |
-| Auth / rôle admin                      | `lib/auth.ts` + `lib/session.ts`                                                                                                                                                      |
-| Toucher aux avis                       | `db/schema.pg.ts` (`reviews`) + `account/orders/[id]/` (dépôt, livré) + `admin/reviews/` (modération) + `products/[slug]` (affichage)                                                 |
-| Viewer 3D produit                      | `components/product-viewer-3d.tsx` + `api/admin/model-upload` + champ `products.model3dUrl`                                                                                           |
-| Recherche / produits liés              | `db/queries.ts` (`getProducts` param `q`, `getRelatedProducts`) + `shop/page.tsx`                                                                                                     |
-| SEO d'une page                         | `app/sitemap.ts` · `app/robots.ts` · `lib/seo.ts` + `generateMetadata` de la page                                                                                                     |
-| Tâches planifiées (purge R2, relances) | `lib/maintenance.ts` + `api/cron/maintenance` ← déclenché par `workers/cron` (Worker Cron horaire, déployé à part)                                                                    |
+| Tâche                                  | Point d'entrée                                                                                                                                                                                              |
+| -------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Ajouter/modifier un champ produit      | `db/schema.pg.ts` → `bun run db:generate:pg` + `db:push:pg` → admin `products/product-form.tsx` + `actions.ts` → affichage `products/[slug]/page.tsx` + `components/product-card.tsx`                       |
+| Toucher au tunnel de paiement          | `app/[locale]/checkout/checkout-flow.tsx` + `api/checkout/route.ts` + `lib/orders.ts` (idempotence)                                                                                                         |
+| Toucher aux devis                      | `app/[locale]/custom/` + `api/quote-*` + admin `quotes/` + `lib/orders.ts`                                                                                                                                  |
+| Modifier les frais de port             | `lib/shipping.ts` + admin `settings/`                                                                                                                                                                       |
+| Ajouter un code promo / une règle      | `lib/discounts.ts` + admin `discounts/` + `api/discount/validate`                                                                                                                                           |
+| Changer un e-mail                      | `lib/email-templates.ts` (+ `email.ts` pour l'envoi)                                                                                                                                                        |
+| Ajouter une chaîne UI                  | les 4 `messages/*.json` (cherche la clé dans `fr.json`, recopie partout)                                                                                                                                    |
+| Sécurité / en-têtes / CSP nonce        | `src/middleware.ts`                                                                                                                                                                                         |
+| Auth / rôle admin                      | `lib/auth.ts` + `lib/session.ts`                                                                                                                                                                            |
+| Toucher aux avis                       | `db/schema.pg.ts` (`reviews`) + `account/orders/[id]/` (dépôt, livré) + `admin/reviews/` (modération) + `products/[slug]` (affichage)                                                                       |
+| Viewer 3D produit                      | `components/product-viewer-3d.tsx` + `api/admin/model-upload` + champ `products.model3dUrl`                                                                                                                 |
+| Recherche / produits liés              | `db/queries.ts` (`getProducts` param `q`, `getRelatedProducts`) + `shop/page.tsx`                                                                                                                           |
+| SEO d'une page                         | `generateMetadata` → `pageMetadata()` (`lib/seo.ts`) · JSON-LD via `components/json-ld.tsx` · `app/sitemap.xml/route.ts` · `app/robots.ts` · `app/llms.txt/route.ts` · textes `seo.*` des `messages/*.json` |
+| Tâches planifiées (purge R2, relances) | `lib/maintenance.ts` + `api/cron/maintenance` ← déclenché par `workers/cron` (Worker Cron horaire, déployé à part)                                                                                          |
 
 ## Remédiation septembre 2026
 

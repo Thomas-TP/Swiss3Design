@@ -16,6 +16,14 @@ import {
   LOCALES,
 } from "@/db/schema";
 import { requireFreshAdmin } from "@/lib/session";
+import { notifyIndexNow } from "@/lib/indexnow";
+
+// Fiche(s) + catalogue à signaler à IndexNow après une modification : le
+// catalogue liste les produits, il change donc avec eux.
+const changedPaths = (...slugs: (string | null | undefined)[]) => [
+  ...new Set(slugs.filter(Boolean).map((s) => `/products/${s}`)),
+  "/shop",
+];
 
 export interface ProductFormState {
   error?: string;
@@ -191,6 +199,17 @@ export async function saveProduct(
     }
   }
 
+  // Ancien slug (renommage) : l'ancienne URL devient une 404 à signaler aussi.
+  const previousSlug = id
+    ? (
+        await db
+          .select({ slug: products.slug })
+          .from(products)
+          .where(eq(products.id, id))
+          .limit(1)
+      )[0]?.slug
+    : undefined;
+
   let productId = id;
   try {
     if (id) {
@@ -252,6 +271,7 @@ export async function saveProduct(
   }
 
   revalidatePath("/", "layout");
+  await notifyIndexNow(changedPaths(slug, previousSlug));
   return { success: true };
 }
 
@@ -261,7 +281,11 @@ export async function deleteProduct(id: string): Promise<void> {
   await requireFreshAdmin();
   if (id) {
     const db = await getDb();
-    await db.delete(products).where(eq(products.id, id));
+    const [deleted] = await db
+      .delete(products)
+      .where(eq(products.id, id))
+      .returning({ slug: products.slug });
+    await notifyIndexNow(changedPaths(deleted?.slug));
   }
   revalidatePath("/", "layout");
 }
@@ -277,7 +301,11 @@ export async function updateProductStock(formData: FormData) {
 
   const db = await getDb();
   const [row] = await db
-    .select({ stock: products.stock, saleType: products.saleType })
+    .select({
+      stock: products.stock,
+      saleType: products.saleType,
+      slug: products.slug,
+    })
     .from(products)
     .where(eq(products.id, id))
     .limit(1);
@@ -286,6 +314,9 @@ export async function updateProductStock(formData: FormData) {
 
   await db.update(products).set({ stock }).where(eq(products.id, id));
   revalidatePath("/", "layout");
+  // Passage en rupture / retour en stock : la disponibilité du JSON-LD change.
+  const wasAvailable = (row.stock ?? 0) > 0;
+  if (wasAvailable !== stock > 0) await notifyIndexNow(changedPaths(row.slug));
 }
 
 export async function toggleProductActive(formData: FormData) {
@@ -294,7 +325,7 @@ export async function toggleProductActive(formData: FormData) {
   if (id) {
     const db = await getDb();
     const [row] = await db
-      .select({ active: products.active })
+      .select({ active: products.active, slug: products.slug })
       .from(products)
       .where(eq(products.id, id))
       .limit(1);
@@ -303,6 +334,8 @@ export async function toggleProductActive(formData: FormData) {
         .update(products)
         .set({ active: !row.active })
         .where(eq(products.id, id));
+      // Publiée ou retirée : la fiche apparaît ou devient une 404.
+      await notifyIndexNow(changedPaths(row.slug));
     }
   }
   revalidatePath("/", "layout");

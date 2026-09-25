@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { cache } from "react";
-import { headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Truck, Factory, ShieldCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -12,7 +11,17 @@ import {
   getPublishedReviews,
   getRatingSummary,
 } from "@/db/queries";
-import { alternatesFor, productJsonLd } from "@/lib/seo";
+import {
+  breadcrumbJsonLd,
+  clampText,
+  pageMetadata,
+  productJsonLd,
+  type OgImage,
+} from "@/lib/seo";
+import { cfOgImage } from "@/lib/cf-image";
+import { formatChf } from "@/lib/format";
+import { getShippingSettings } from "@/lib/shipping-settings";
+import { JsonLd } from "@/components/json-ld";
 import { MulticolorDots } from "@/components/multicolor-dots";
 import { ProductGallery } from "@/components/product-gallery";
 import { ProductColorProvider } from "@/components/product-color-context";
@@ -26,27 +35,62 @@ export const dynamic = "force-dynamic";
 // rendu de la page partagent ainsi UNE seule lecture D1 au lieu de deux.
 const getProduct = cache(getProductBySlug);
 
+// Description de la fiche pour les moteurs : le texte produit s'il est assez
+// riche (≥ 110 caractères, seuil Ahrefs), sinon une phrase factuelle générée
+// (nom, matière, prix, provenance) — la description saisie à l'admin peut
+// n'être qu'un nom (« Vase spirale »), ce qui donnait une meta de 12 signes.
+async function productMetaDescription(
+  product: NonNullable<Awaited<ReturnType<typeof getProduct>>>,
+  locale: Locale,
+) {
+  const own = product.description.replace(/\s+/g, " ").trim();
+  if (own.length >= 110) return clampText(own);
+  const t = await getTranslations({ locale, namespace: "seo" });
+  const generated = t("productDescription", {
+    name: product.name,
+    material: product.material,
+    price: formatChf(product.priceCents, locale),
+  });
+  const isJustTheName = own.toLowerCase() === product.name.toLowerCase();
+  return clampText(own && !isJustTheName ? `${own} — ${generated}` : generated);
+}
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: Locale; slug: string }>;
 }): Promise<Metadata> {
   const { locale, slug } = await params;
-  const product = await getProduct(slug, locale);
+  const [product, t] = await Promise.all([
+    getProduct(slug, locale),
+    getTranslations({ locale, namespace: "seo" }),
+  ]);
   if (!product) return {};
-  const description = product.description.slice(0, 160);
-  const images = product.images.map((i) => i.url);
-  return {
-    title: product.name,
-    description,
-    alternates: alternatesFor(locale, `/products/${slug}`),
-    openGraph: {
-      type: "website",
-      title: product.name,
-      description,
-      images: images.length > 0 ? images : undefined,
-    },
-  };
+  // Titre enrichi (« Vase spirale — imprimé en 3D en Suisse ») tant qu'il
+  // tient dans ~60 caractères avec la marque ; un nom long reste seul.
+  const title =
+    product.name.length <= 20
+      ? t("productTitle", { name: product.name })
+      : product.name;
+  // Les SVG (visuels de démo) ne sont lus par aucun réseau social : écartés,
+  // l'image de partage par défaut prend alors le relais.
+  const images: OgImage[] = product.images
+    .filter((i) => !/\.svg(?:[?#]|$)/i.test(i.url))
+    .slice(0, 4)
+    .map((i) => {
+      const og = cfOgImage(i.url);
+      return og
+        ? { url: og, width: 1200, height: 630, alt: i.alt ?? product.name }
+        : { url: i.url, alt: i.alt ?? product.name };
+    });
+  return pageMetadata({
+    locale,
+    path: `/products/${slug}`,
+    title,
+    description: await productMetaDescription(product, locale),
+    images,
+    imageAlt: t("ogImageAlt"),
+  });
 }
 
 export default async function ProductPage({
@@ -55,38 +99,59 @@ export default async function ProductPage({
   params: Promise<{ locale: Locale; slug: string }>;
 }) {
   const { locale, slug } = await params;
-  const [t, product, nonce] = await Promise.all([
+  const [t, product] = await Promise.all([
     getTranslations("product"),
     getProduct(slug, locale),
-    headers().then((h) => h.get("x-nonce") ?? undefined),
   ]);
   if (!product) notFound();
 
-  const [related, productReviews, ratingSummary, tReviews, tHome] =
-    await Promise.all([
-      getRelatedProducts(product.id, locale),
-      getPublishedReviews(product.id),
-      getRatingSummary(product.id),
-      getTranslations("reviews"),
-      getTranslations("home"),
-    ]);
+  const [
+    related,
+    productReviews,
+    ratingSummary,
+    tReviews,
+    tHome,
+    tSeo,
+    tShop,
+    shippingSettings,
+  ] = await Promise.all([
+    getRelatedProducts(product.id, locale),
+    getPublishedReviews(product.id),
+    getRatingSummary(product.id),
+    getTranslations("reviews"),
+    getTranslations("home"),
+    getTranslations("seo"),
+    getTranslations("shop"),
+    getShippingSettings(),
+  ]);
 
-  // Données structurées Product (prix/dispo CHF) → résultats enrichis Google.
-  // Le nonce est requis en prod (CSP sans 'unsafe-inline'), cf. golden rule #4.
+  // Données structurées Product (prix/dispo CHF, livraison, retours) →
+  // résultats enrichis et fiches marchandes Google, et une fiche lisible sans
+  // ambiguïté par les moteurs IA. Nonce CSP géré par <JsonLd>.
   const jsonLd = productJsonLd(
     {
       slug: product.slug,
       name: product.name,
-      description: product.description,
+      description: await productMetaDescription(product, locale),
       priceCents: product.priceCents,
       saleType: product.saleType,
+      productionDays: product.productionDays,
       stock: product.stock,
       material: product.material,
+      weightGrams: product.weightGrams,
+      dimensionsMm: product.dimensionsMm,
+      colors: product.colors.map((c) => c.name),
       imageUrls: product.images.map((i) => i.url),
     },
     locale,
+    shippingSettings,
     ratingSummary,
   );
+  const breadcrumb = breadcrumbJsonLd([
+    { name: tSeo("breadcrumbHome"), path: `/${locale}` },
+    { name: tShop("title"), path: `/${locale}/shop` },
+    { name: product.name, path: `/${locale}/products/${product.slug}` },
+  ]);
 
   const image = product.images[0];
   const specs = [
@@ -100,13 +165,8 @@ export default async function ProductPage({
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-16">
-      <script
-        type="application/ld+json"
-        nonce={nonce}
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumb} />
       <Link
         href="/shop"
         className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"

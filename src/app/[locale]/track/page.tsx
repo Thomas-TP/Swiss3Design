@@ -1,7 +1,22 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
+import type { Locale } from "@/i18n/routing";
+import { NOINDEX } from "@/lib/seo";
 import { TrackFlow } from "./track-flow";
 
 export const dynamic = "force-dynamic";
+
+// Outil de suivi (formulaire n° de commande + e-mail) : sans contenu propre
+// pour les moteurs, et ?order= ne doit jamais se retrouver indexé.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "track" });
+  return { title: t("title"), robots: NOINDEX };
+}
 
 export default async function TrackPage({
   searchParams,

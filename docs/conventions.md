@@ -139,6 +139,47 @@ KV-backed fixed window, per IP + route; a no-op locally (no `cf-connecting-ip`).
   prefix is preserved.
 - DB content is localized via `*_translations` tables, not message files.
 
+## SEO & GEO (every public page)
+
+Derived from the Ahrefs Site Audit of September 2026 (health score 85, every
+error and warning traced to one of the rules below). Break one and it errors
+on _every_ page at once.
+
+- **Indexable page** → `generateMetadata` returns
+  `pageMetadata({ locale, path, title, description })` from
+  [`src/lib/seo.ts`](../src/lib/seo.ts). It sets title, description, canonical,
+  hreflang (4 locales + `x-default` → the **French** URL, never `/` which
+  307-redirects) and a **complete** Open Graph set (`og:url`, image, locale…).
+  Next merges metadata **shallowly**: a page that sets only `openGraph.title`
+  silently loses the layout's `og:image`. Titles/descriptions come from the
+  `seo.*` keys of `messages/*.json`: full title ≤ 60 chars (the layout template
+  appends ` · Swiss3Design`), description 110–160 chars.
+- **Private / transactional page** (account, admin, cart, checkout, track,
+  favorites) → `robots: NOINDEX` (layout or page) **and** a `Disallow` in
+  `app/robots.ts`.
+- **hreflang comes only from `alternatesFor()`**. next-intl's HTTP `Link`
+  header is disabled (`alternateLinks: false` in `i18n/routing.ts`); turning it
+  back on duplicates every hreflang and points `x-default` at an unprefixed
+  (redirecting) URL.
+- **Structured data** → `<JsonLd data={…} />`
+  ([`components/json-ld.tsx`](../src/components/json-ld.tsx), reads the CSP
+  nonce itself). Reference the company/site by `@id` instead of redeclaring
+  them. `OnlineStore` is an Organization, **not** a LocalBusiness:
+  `currenciesAccepted`, `priceRange`, `openingHours` are invalid on it.
+- **New page** → add it to `STATIC_PAGES` in `app/sitemap.xml/route.ts` (every
+  locale gets its own `<loc>`) and, if useful to AI assistants, to
+  `app/llms.txt/route.ts`.
+- **Shop facets** (`sort`, `material`, `color`, `q`) are closed to crawlers in
+  `robots.ts` and canonicalised to `/shop`; don't add a new filter parameter
+  without adding its `Disallow`.
+- **Product availability** in JSON-LD is `InStock` / `OutOfStock` only:
+  `MadeToOrder` is valid schema.org but rejected by Google merchant listings —
+  printed-to-order pieces are `InStock` with a longer `handlingTime`.
+- **IndexNow**: any admin action that creates, renames, deletes, publishes or
+  sells out a product calls `notifyIndexNow()`
+  ([`src/lib/indexnow.ts`](../src/lib/indexnow.ts), Bing/Yandex/Seznam…). The
+  key file `public/867cd9af686842c88e46c3f656218246.txt` must stay deployed.
+
 ## CSP nonce contract (prod only)
 
 In production every inline `<script>` must carry the per-request nonce or it's

@@ -4,20 +4,31 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getUsedFilters, getProducts, type ProductSort } from "@/db/queries";
-import { alternatesFor } from "@/lib/seo";
+import { collectionJsonLd, pageMetadata } from "@/lib/seo";
+import { JsonLd } from "@/components/json-ld";
 import { ProductCard } from "@/components/product-card";
 import { PageHeader } from "@/components/page-header";
 
 export const dynamic = "force-dynamic";
 
+// Toutes les variantes filtrées/triées (?category=, ?sort=…) déclarent le
+// catalogue nu comme canonical : une seule page indexable, pas de contenu
+// dupliqué. Les combinaisons de facettes sont en plus fermées au crawl dans
+// robots.ts (piège à robots : des centaines d'URL pour quelques produits).
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "shop" });
-  return { title: t("title"), alternates: alternatesFor(locale, "/shop") };
+  const t = await getTranslations({ locale, namespace: "seo" });
+  return pageMetadata({
+    locale,
+    path: "/shop",
+    title: t("shopTitle"),
+    description: t("shopDescription"),
+    imageAlt: t("ogImageAlt"),
+  });
 }
 
 const SORTS: ProductSort[] = ["new", "price_asc", "price_desc"];
@@ -58,8 +69,9 @@ export default async function ShopPage({
   const linkFor = (query: Parameters<typeof hrefFor>[0]) =>
     hrefFor({ ...query, q: searchParam });
 
-  const [t, filters, products] = await Promise.all([
+  const [t, tSeo, filters, products] = await Promise.all([
     getTranslations("shop"),
+    getTranslations("seo"),
     getUsedFilters(locale),
     getProducts(locale, {
       categorySlug: category,
@@ -82,8 +94,23 @@ export default async function ShopPage({
       active ? "bg-ink text-paper shadow-sm" : "text-soft hover:text-ink"
     }`;
 
+  // Le schéma ItemList ne décrit que le catalogue complet (la page canonique),
+  // pas une vue filtrée.
+  const isFullCatalog =
+    !category && !material && !color && !multicolorOn && !searchParam;
+
   return (
     <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-16">
+      {isFullCatalog && (
+        <JsonLd
+          data={collectionJsonLd({
+            locale,
+            name: tSeo("shopTitle"),
+            description: tSeo("shopDescription"),
+            products,
+          })}
+        />
+      )}
       <PageHeader title={t("title")} intro={t("subtitle")} />
 
       {/* Barre de filtres groupée */}
@@ -192,14 +219,18 @@ export default async function ShopPage({
                     sort: sortParam,
                   })}
                   title={c.name}
-                  aria-label={c.name}
                   className={`h-7 w-7 rounded-full border transition-transform hover:scale-110 ${
                     active
                       ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-surface"
                       : "border-swatch-ring"
                   }`}
                   style={{ backgroundColor: c.hex }}
-                />
+                >
+                  {/* Texte d'ancre réel (masqué) plutôt qu'un aria-label :
+                      lecteurs d'écran ET robots (Semrush signale les liens
+                      sans ancre) lisent le nom de la couleur. */}
+                  <span className="sr-only">{c.name}</span>
+                </Link>
               );
             })}
           </div>

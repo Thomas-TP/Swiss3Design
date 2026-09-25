@@ -58,7 +58,8 @@ const link =
 
 export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   fr: {
-    metaTitle: "À propos — Swiss3Design",
+    // Sans la marque : le gabarit du layout ajoute « · Swiss3Design ».
+    metaTitle: "À propos : nos ateliers d’impression 3D",
     metaDescription:
       "Les ateliers d'impression 3D Swiss3Design dans l'arc lémanique : nos deux machines multicolores, notre procédé, nos matières et les réponses à vos questions.",
 
@@ -384,7 +385,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   },
 
   de: {
-    metaTitle: "Über uns — Swiss3Design",
+    metaTitle: "Über uns: unsere 3D-Druck-Ateliers",
     metaDescription:
       "Die 3D-Druck-Ateliers von Swiss3Design in der Genferseeregion: unsere zwei Mehrfarbdrucker, unser Verfahren, unsere Materialien und Antworten auf Ihre Fragen.",
 
@@ -708,7 +709,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   },
 
   it: {
-    metaTitle: "Chi siamo — Swiss3Design",
+    metaTitle: "Chi siamo: i nostri atelier di stampa 3D",
     metaDescription:
       "Gli atelier di stampa 3D Swiss3Design nell’arco lemanico: le nostre due stampanti multicolore, il procedimento, i materiali e le risposte alle vostre domande.",
 
@@ -1035,7 +1036,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   },
 
   en: {
-    metaTitle: "About — Swiss3Design",
+    metaTitle: "About us: our 3D printing workshops",
     metaDescription:
       "The Swiss3Design 3D-printing workshops in the Lake Geneva region: our two multicolour printers, our process, our materials and answers to your questions.",
 

@@ -63,6 +63,18 @@ function buildCsp({
   ].join("; ");
 }
 
+// Fichiers racine générés par l'app : hors préfixe de langue, mais ils doivent
+// passer ici pour la redirection http→https / www→apex. Sans elle,
+// http://…/robots.txt répondait 200 et déclarait http://…/sitemap.xml : Ahrefs
+// voyait deux sitemaps (« Page in multiple sitemaps ») et des URL http.
+const ROOT_FILES = new Set(["/robots.txt", "/sitemap.xml", "/llms.txt"]);
+
+function withSecurityHeaders(response: NextResponse) {
+  for (const [key, value] of Object.entries(SECURITY_HEADERS))
+    response.headers.set(key, value);
+  return response;
+}
+
 export default function middleware(request: NextRequest) {
   const original = new URL(request.url);
   if (
@@ -73,18 +85,22 @@ export default function middleware(request: NextRequest) {
     original.hostname = "swiss3design.ch";
     return NextResponse.redirect(original, 308);
   }
+  // Les routes API ne sont jamais redirigées (webhooks, callbacks OAuth : un
+  // 301 sur un POST les casserait).
   if (original.pathname.startsWith("/api/")) {
-    const response = NextResponse.next();
-    for (const [key, value] of Object.entries(SECURITY_HEADERS))
-      response.headers.set(key, value);
-    return response;
+    return withSecurityHeaders(NextResponse.next());
   }
-  // www.swiss3design.ch → swiss3design.ch (canonique)
+  // www.swiss3design.ch → swiss3design.ch (canonique). La redirection porte
+  // elle aussi HSTS : sans lui, le sous-domaine www était signalé « ne
+  // supporte pas HSTS » (Semrush), le preload exigeant l'en-tête partout.
   const host = request.headers.get("host") ?? "";
   if (host.startsWith("www.")) {
     const url = new URL(request.url);
     url.host = host.slice(4);
-    return NextResponse.redirect(url, 301);
+    return withSecurityHeaders(NextResponse.redirect(url, 301));
+  }
+  if (ROOT_FILES.has(original.pathname)) {
+    return withSecurityHeaders(NextResponse.next());
   }
 
   const isProd = process.env.NODE_ENV === "production";
@@ -106,11 +122,7 @@ export default function middleware(request: NextRequest) {
     req = new NextRequest(request.url, { headers });
   }
 
-  const response = intlMiddleware(req);
-
-  for (const [name, value] of Object.entries(SECURITY_HEADERS)) {
-    response.headers.set(name, value);
-  }
+  const response = withSecurityHeaders(intlMiddleware(req));
   response.headers.set("Content-Security-Policy", csp);
   response.headers.set("Reporting-Endpoints", `csp="${origin}/api/csp-report"`);
 
@@ -142,5 +154,12 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!_next|_vercel|.*\\..*).*)",
+  // Tout sauf les assets (chemins avec un point)… à l'exception des fichiers
+  // racine générés (ROOT_FILES), qui ont besoin des redirections canoniques.
+  matcher: [
+    "/((?!_next|_vercel|.*\\..*).*)",
+    "/robots.txt",
+    "/sitemap.xml",
+    "/llms.txt",
+  ],
 };

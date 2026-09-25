@@ -612,5 +612,27 @@
     "refunded": "Erstattet: {amount}",
     "refundPending": "Bestellung storniert: Die Erstattung muss noch in Stripe bearbeitet werden.",
     "openStripe": "Zahlung in Stripe öffnen"
+  },
+  "seo": {
+    "ogImageAlt": "Swiss3Design — mehrfarbige 3D-gedruckte Designobjekte aus der Schweiz",
+    "organizationDescription": "Schweizer Onlineshop für 3D-gedruckte Designobjekte mit bis zu 4 Farben, gefertigt in zwei Ateliers in der Genferseeregion (Gland und Pully, VD) und in die ganze Schweiz geliefert. 3D-Druck nach Mass auf Offerte.",
+    "breadcrumbHome": "Startseite",
+    "homeTitle": "Swiss3Design — Mehrfarbiger 3D-Druck in der Schweiz",
+    "homeDescription": "3D-gedruckte Designobjekte mit bis zu 4 Farben, einzeln gefertigt in der Genferseeregion (VD) und in die ganze Schweiz geliefert. Massanfertigung auf Offerte.",
+    "shopTitle": "Katalog: 3D-gedruckte Designobjekte",
+    "shopDescription": "Der ganze Swiss3Design-Katalog: 3D-gedruckte Deko- und Designobjekte mit bis zu 4 Farben, auf Bestellung oder sofort lieferbar. Versand in die ganze Schweiz.",
+    "customTitle": "3D-Druck nach Mass, Offerte in 48 Std.",
+    "customDescription": "Lassen Sie Ihr 3D-Modell (STL, 3MF, OBJ, STEP) oder Ihre Idee in der Schweiz drucken: mehrfarbig mit bis zu 4 Farben, persönliche Offerte innert 48 Stunden.",
+    "customServiceName": "3D-Druck nach Mass",
+    "contactTitle": "Kontakt: Bestellungen, Offerten, Fragen",
+    "contactDescription": "Eine Frage zu Bestellung, Offerte oder unserem 3D-Druck-Atelier in der Genferseeregion? Schreiben Sie uns per Formular oder E-Mail – Antwort innert 48 Std.",
+    "termsTitle": "Allgemeine Geschäftsbedingungen (AGB)",
+    "termsDescription": "Allgemeine Geschäftsbedingungen von Swiss3Design: Bestellung, Preise in CHF, Zahlung, Lieferung in der Schweiz, gesetzliche Garantie und 3D-Druck nach Mass.",
+    "privacyTitle": "Datenschutzerklärung (nDSG)",
+    "privacyDescription": "Wie Swiss3Design Ihre Personendaten gemäss dem Schweizer Datenschutzgesetz (nDSG) erhebt, verwendet und schützt – und welche Rechte Sie dabei haben.",
+    "shippingTitle": "Versand und Rückgabe in der Schweiz",
+    "shippingDescription": "Lieferung ausschliesslich in die Schweiz mit der Post: Fristen, Versandkosten, Sendungsverfolgung, Rückgabe innert 14 Tagen und 2 Jahre gesetzliche Garantie.",
+    "productTitle": "{name} — 3D-gedruckt in der Schweiz",
+    "productDescription": "{name} aus {material}, einzeln 3D-gedruckt in unseren Ateliers in der Genferseeregion (VD). {price}, Lieferung in die ganze Schweiz."
   }
 }

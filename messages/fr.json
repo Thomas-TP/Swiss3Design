@@ -612,5 +612,27 @@
     "refunded": "Remboursé : {amount}",
     "refundPending": "Commande annulée : le remboursement reste à traiter dans Stripe.",
     "openStripe": "Ouvrir le paiement dans Stripe"
+  },
+  "seo": {
+    "ogImageAlt": "Swiss3Design — objets design imprimés en 3D multicolores en Suisse",
+    "organizationDescription": "Boutique en ligne suisse d'objets design imprimés en 3D jusqu'à 4 couleurs, fabriqués dans deux ateliers de l'arc lémanique (Gland et Pully, VD) et livrés dans toute la Suisse. Impression 3D sur mesure sur devis.",
+    "breadcrumbHome": "Accueil",
+    "homeTitle": "Swiss3Design — Impression 3D multicolore en Suisse",
+    "homeDescription": "Objets design imprimés en 3D jusqu'à 4 couleurs, fabriqués à la pièce dans l'arc lémanique (VD) et livrés partout en Suisse. Impression sur mesure sur devis.",
+    "shopTitle": "Catalogue d'objets design imprimés en 3D",
+    "shopDescription": "Tout le catalogue Swiss3Design : objets déco et design imprimés en 3D, jusqu'à 4 couleurs, à la demande ou prêts à partir. Livraison dans toute la Suisse.",
+    "customTitle": "Impression 3D sur mesure, devis sous 48 h",
+    "customDescription": "Faites imprimer votre modèle 3D (STL, 3MF, OBJ, STEP) ou votre idée en Suisse : impression multicolore jusqu'à 4 couleurs, devis personnalisé sous 48 h.",
+    "customServiceName": "Impression 3D sur mesure",
+    "contactTitle": "Contact : commandes, devis et questions",
+    "contactDescription": "Une question sur une commande, un devis ou notre atelier d'impression 3D de l'arc lémanique ? Écrivez-nous via le formulaire ou par e-mail, réponse sous 48 h.",
+    "termsTitle": "Conditions générales de vente (CGV)",
+    "termsDescription": "Conditions générales de vente de Swiss3Design : commandes, prix en CHF, paiement, livraison en Suisse, garantie légale et impressions 3D sur mesure.",
+    "privacyTitle": "Politique de confidentialité (nLPD)",
+    "privacyDescription": "Comment Swiss3Design collecte, utilise et protège vos données personnelles selon la loi suisse sur la protection des données (nLPD), et quels sont vos droits.",
+    "shippingTitle": "Livraison et retours en Suisse",
+    "shippingDescription": "Livraison exclusivement en Suisse par la Poste : délais, frais de port, suivi de commande, retours sous 14 jours et garantie légale de 2 ans chez Swiss3Design.",
+    "productTitle": "{name} — imprimé en 3D en Suisse",
+    "productDescription": "{name} en {material}, imprimé en 3D à la pièce dans nos ateliers de l'arc lémanique (VD). {price}, livraison dans toute la Suisse."
   }
 }
