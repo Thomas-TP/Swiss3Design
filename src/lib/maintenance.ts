@@ -1,19 +1,32 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { and, eq, inArray, isNotNull, isNull, lt } from "drizzle-orm";
 import { getDb } from "@/db";
-import { quoteRequests, abandonedCarts } from "@/db/schema";
-import { sendEmail } from "./email";
+import {
+  quoteRequests,
+  quoteMessages,
+  abandonedCarts,
+  requestLimits,
+  emailOutbox,
+} from "@/db/schema";
 import { abandonedCartEmail } from "./email-templates";
+import { drainEmailOutbox, queueEmail } from "./outbox";
+import { reconcilePendingOrders } from "./checkout-session";
 import { SITE_URL } from "./seo";
 
 // Rétention (politique de confidentialité) : fichiers/devis supprimés au plus
-// tard 2 ans après la demande. On garde la ligne pour les devis payés/produits
-// (valeur comptable), mais on supprime toujours le fichier 3D.
+// tard 2 ans après la dernière activité des devis clos ou sans suite. Les fichiers
+// nécessaires à une fabrication payée en cours restent disponibles.
 const TWO_YEARS_MS = 2 * 365 * 24 * 60 * 60 * 1000;
 // Délai de grâce avant de considérer un fichier comme orphelin (upload en cours)
 const ORPHAN_GRACE_MS = 24 * 60 * 60 * 1000;
 // Statuts dont la ligne de devis peut être entièrement supprimée après 2 ans
-const DELETABLE_STATUSES = ["received", "quoted", "rejected"];
+const DELETABLE_STATUSES = [
+  "received",
+  "quoted",
+  "rejected",
+  "declined",
+  "revision_requested",
+];
 
 // Relance panier : envoyée 1 h après le consentement (laisse le temps de
 // finaliser), une seule fois. Purge des paniers à 30 jours (minimisation nLPD).
@@ -32,6 +45,12 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
   const { env } = await getCloudflareContext({ async: true });
   const db = await getDb();
   const now = Date.now();
+  await db.delete(requestLimits).where(lt(requestLimits.expiresAt, new Date()));
+  await db
+    .delete(emailOutbox)
+    .where(lt(emailOutbox.sentAt, new Date(now - 30 * 86400000)));
+  await reconcilePendingOrders(db);
+  await drainEmailOutbox(db, 20);
 
   // 1) Rétention : devis de plus de 2 ans
   const cutoff = new Date(now - TWO_YEARS_MS);
@@ -42,11 +61,37 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
       status: quoteRequests.status,
     })
     .from(quoteRequests)
-    .where(lt(quoteRequests.createdAt, cutoff));
+    .where(
+      and(
+        lt(quoteRequests.updatedAt, cutoff),
+        inArray(quoteRequests.status, [
+          "received",
+          "quoted",
+          "rejected",
+          "declined",
+          "revision_requested",
+          "done",
+        ]),
+      ),
+    )
+    .limit(100);
 
   let retentionFilesDeleted = 0;
   const rowsToDelete: string[] = [];
   for (const q of oldQuotes) {
+    const attachments = await db
+      .select({ id: quoteMessages.id, fileUrl: quoteMessages.fileUrl })
+      .from(quoteMessages)
+      .where(eq(quoteMessages.quoteId, q.id));
+    for (const attachment of attachments) {
+      if (!attachment.fileUrl) continue;
+      await env.R2.delete(attachment.fileUrl);
+      await db
+        .update(quoteMessages)
+        .set({ fileUrl: null, fileName: null })
+        .where(eq(quoteMessages.id, attachment.id));
+      retentionFilesDeleted++;
+    }
     if (q.fileUrl) {
       try {
         await env.R2.delete(q.fileUrl);
@@ -81,6 +126,12 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
         .where(isNotNull(quoteRequests.fileUrl))
     ).map((r) => r.fileUrl as string),
   );
+
+  const messageFiles = await db
+    .select({ fileUrl: quoteMessages.fileUrl })
+    .from(quoteMessages)
+    .where(isNotNull(quoteMessages.fileUrl));
+  for (const row of messageFiles) if (row.fileUrl) referenced.add(row.fileUrl);
 
   let orphansDeleted = 0;
   let cursor: string | undefined;
@@ -126,23 +177,37 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
         quantity: number;
         priceCents: number;
       }[];
-      await sendEmail(
+      await queueEmail(
+        db,
+        "cart-reminder:" + c.id,
         abandonedCartEmail({
           to: c.email,
           items,
           locale: c.locale,
-          cartUrl: `${SITE_URL}/${c.locale}/cart`,
+          cartUrl: `${SITE_URL}/${c.locale}/cart#restore=${c.token}`,
           unsubscribeUrl: `${SITE_URL}/api/cart-reminder/unsubscribe?token=${c.token}`,
         }),
       );
-      await db
-        .update(abandonedCarts)
-        .set({ reminderSentAt: new Date() })
-        .where(eq(abandonedCarts.id, c.id));
-      cartRemindersSent++;
     } catch {
       // échec d'envoi : reminderSentAt non posé → réessayé au prochain passage
     }
+  }
+
+  await drainEmailOutbox(db, 20);
+  if (pendingCarts.length) {
+    const delivered = await db
+      .select({ id: abandonedCarts.id })
+      .from(abandonedCarts)
+      .where(
+        and(
+          inArray(
+            abandonedCarts.id,
+            pendingCarts.map((c) => c.id),
+          ),
+          isNotNull(abandonedCarts.reminderSentAt),
+        ),
+      );
+    cartRemindersSent = delivered.length;
   }
 
   // 4) Purge des paniers abandonnés de plus de 30 jours (minimisation nLPD)

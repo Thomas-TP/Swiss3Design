@@ -15,7 +15,7 @@ import {
   materials,
   LOCALES,
 } from "@/db/schema";
-import { requireAdmin } from "@/lib/session";
+import { requireFreshAdmin } from "@/lib/session";
 
 export interface ProductFormState {
   error?: string;
@@ -73,7 +73,7 @@ export async function saveProduct(
   _prev: ProductFormState,
   formData: FormData,
 ): Promise<ProductFormState> {
-  await requireAdmin();
+  await requireFreshAdmin();
 
   const id = String(formData.get("id") || "");
   const nameFr = String(formData.get("name_fr") || "").trim();
@@ -258,7 +258,7 @@ export async function saveProduct(
 // Appelée directement depuis le client (pas via <form>) : la navigation
 // après suppression est gérée par l'appelant.
 export async function deleteProduct(id: string): Promise<void> {
-  await requireAdmin();
+  await requireFreshAdmin();
   if (id) {
     const db = await getDb();
     await db.delete(products).where(eq(products.id, id));
@@ -268,7 +268,7 @@ export async function deleteProduct(id: string): Promise<void> {
 
 // Édition rapide du stock depuis la liste (réimpression terminée, recomptage…)
 export async function updateProductStock(formData: FormData) {
-  await requireAdmin();
+  await requireFreshAdmin();
   const id = String(formData.get("id") || "");
   const raw = String(formData.get("stock") || "").trim();
   if (!id || raw === "") return;
@@ -289,7 +289,7 @@ export async function updateProductStock(formData: FormData) {
 }
 
 export async function toggleProductActive(formData: FormData) {
-  await requireAdmin();
+  await requireFreshAdmin();
   const id = String(formData.get("id") || "");
   if (id) {
     const db = await getDb();

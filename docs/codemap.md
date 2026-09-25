@@ -40,7 +40,8 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | `stripe.ts`            | Instance Stripe (serveur)                                                    | —                                                            |
 | `stripe-appearance.ts` | Thème visuel du Payment Element                                              | —                                                            |
 | `format.ts`            | Formatage CHF/locale (jamais `toFixed` à la main)                            | `formatChf()`                                                |
-| `rate-limit.ts`        | Fenêtre fixe KV par IP+route                                                 | `rateLimit()`, `tooManyRequests()`                           |
+| `rate-limit.ts`        | Compteur atomique Postgres par IP hachée + route                             | `rateLimit()`, `tooManyRequests()`                           |
+| `status-history.ts`    | Journal transactionnel des transitions commande/devis                        | `recordStatusTransition()`                                   |
 | `email.ts`             | Envoi via Resend (no-op si pas de clé)                                       | —                                                            |
 | `email-templates.ts`   | Gabarits HTML d'e-mails (4 langues) — **gros, surtout du texte**             | —                                                            |
 | `email-proof.ts`       | Aperçu d'e-mails pour `/admin/emails`                                        | —                                                            |
@@ -68,23 +69,23 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 
 ## Routes API (`src/app/api`)
 
-| Route                                                           | Rôle                                                                 |
-| --------------------------------------------------------------- | -------------------------------------------------------------------- |
-| `checkout/route.ts`                                             | Valide panier+adresse CH, crée la commande `pending` + PaymentIntent |
-| `stripe/webhook/route.ts`                                       | Webhook signé → finalise (idempotent avec la page de retour)         |
-| `quote-checkout/route.ts`                                       | PaymentIntent dédié au paiement d'un devis                           |
-| `quote-upload/route.ts`                                         | Upload STL/3MF client → R2                                           |
-| `discount/validate/route.ts`                                    | Validation live d'un code promo                                      |
-| `track-order/route.ts`                                          | Suivi commande invité (page `/track`)                                |
-| `files/[...path]/route.ts`                                      | Sert un fichier R2 (privé)                                           |
-| `admin/files/[...path]/route.ts` · `admin/upload/route.ts`      | R2 côté admin (gardé)                                                |
-| `auth/[...all]/route.ts`                                        | Handler Better Auth                                                  |
-| `cron/maintenance/route.ts`                                     | Purge R2 orphelins (bearer `CRON_SECRET`)                            |
-| `csp-report/route.ts`                                           | Réception des violations CSP                                         |
-| `cart-reminder/route.ts` · `cart-reminder/unsubscribe/route.ts` | Opt-in relance panier (nLPD) + désinscription par token              |
-| `admin/model-upload/route.ts`                                   | Upload d'un modèle 3D (.stl/.glb) → R2                               |
-| `checkout/verify-email/route.ts`                                | Vérification e-mail pour un checkout invité                          |
-| `newsletter/unsubscribe/route.ts`                               | Désinscription 1 clic aux annonces newsletter (jeton HMAC)           |
+| Route                                                           | Rôle                                                                                   |
+| --------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| `checkout/route.ts`                                             | Valide panier+adresse CH, réserve le stock et reprend une Checkout Session idempotente |
+| `stripe/webhook/route.ts`                                       | Webhook signé → finalise (idempotent avec la page de retour)                           |
+| `quote-checkout/route.ts`                                       | Checkout Session liée à la version d'offre du devis                                    |
+| `quote-upload/route.ts`                                         | Upload STL/3MF client → R2                                                             |
+| `discount/validate/route.ts`                                    | Validation live d'un code promo                                                        |
+| `track-order/route.ts`                                          | Suivi commande invité (page `/track`)                                                  |
+| `files/[...path]/route.ts`                                      | Sert un fichier R2 (privé)                                                             |
+| `admin/files/[...path]/route.ts` · `admin/upload/route.ts`      | R2 côté admin (gardé)                                                                  |
+| `auth/[...all]/route.ts`                                        | Handler Better Auth                                                                    |
+| `cron/maintenance/route.ts`                                     | Purge R2 orphelins (bearer `CRON_SECRET`)                                              |
+| `csp-report/route.ts`                                           | Réception des violations CSP                                                           |
+| `cart-reminder/route.ts` · `cart-reminder/unsubscribe/route.ts` | Opt-in relance panier (nLPD) + désinscription par token                                |
+| `admin/model-upload/route.ts`                                   | Upload d'un modèle 3D (.stl/.glb) → R2                                                 |
+| `checkout/verify-email/route.ts`                                | Vérification e-mail pour un checkout invité                                            |
+| `newsletter/unsubscribe/route.ts`                               | Désinscription 1 clic aux annonces newsletter (jeton HMAC)                             |
 
 ## « Je dois… » → où commencer
 
@@ -104,6 +105,16 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | Recherche / produits liés              | `db/queries.ts` (`getProducts` param `q`, `getRelatedProducts`) + `shop/page.tsx`                                                                                                     |
 | SEO d'une page                         | `app/sitemap.ts` · `app/robots.ts` · `lib/seo.ts` + `generateMetadata` de la page                                                                                                     |
 | Tâches planifiées (purge R2, relances) | `lib/maintenance.ts` + `api/cron/maintenance` ← déclenché par `workers/cron` (Worker Cron horaire, déployé à part)                                                                    |
+
+## Remédiation septembre 2026
+
+- Paiement/réservation : `lib/payment-state.ts`, `lib/stock.ts`, `lib/checkout-session.ts`, `lib/quote-session.ts`.
+- Traçabilité des statuts : `lib/status-history.ts`, table `status_events`, affichage `admin/status-history.tsx`.
+- E-mails persistants : `lib/outbox.ts` ; reprise par `lib/maintenance.ts`.
+- Panier/restauration : `lib/cart-data.ts`, `lib/cart-snapshot.ts`, `components/cart-recovery.tsx`, `api/cart-reminder/restore/route.ts`.
+- Entrées/fichiers : `lib/upload.ts`, `lib/file-signature.ts` ; vérification d'e-mail partagée dans `components/guest-email-verification.tsx`.
+- Tests Postgres : `lib/payments.integration.test.ts`. CI : `.github/workflows/quality.yml`, `scripts/ci-migrate.ts` (base jetable exclusivement).
+- État des vérifications et limites : [audit-remediation-2026-09.md](audit-remediation-2026-09.md).
 
 ## Gros fichiers — **ne pas lire en entier** sauf si tu édites le contenu
 

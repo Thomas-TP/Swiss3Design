@@ -54,3 +54,7 @@ key.txt
 
 # Claude Code - reglages personnels (le partage va dans .claude/settings.json)
 .claude/settings.local.json
+
+# Preuves locales, captures et scripts temporaires de diagnostic
+/output/
+/.playwright-cli/

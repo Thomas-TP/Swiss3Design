@@ -8,8 +8,8 @@ Operational reference for the **live** store (swiss3design.ch). Architecture is 
 
 - **Trigger:** `git push` to `main` (or `scripts/push.bat`). **Cloudflare Workers
   Builds** runs `opennextjs-cloudflare build`, then `wrangler deploy` (which also
-  applies **D1** migrations if any are pending — but D1 is the inactive rollback
-  safety net, not the live database, see below). No GitHub Actions.
+  deploys the Worker; Postgres migrations remain a separate operation). GitHub
+  Actions Quality checks the code and isolated Postgres tests; it does not deploy.
 - **Postgres (the live database) has no deploy-time migration step at all** —
   `bun run db:generate:pg` + `db:push:pg` are manual, run _before_ deploying code
   that needs the new schema. See "Postgres schema changes" below.
@@ -22,7 +22,9 @@ Operational reference for the **live** store (swiss3design.ch). Architecture is 
 ## Rollback
 
 Cloudflare dash → `swiss3design` → **Deployments** → pick a previous deployment →
-**Rollback**. Instant; no rebuild. Use when a deploy is bad but the build was green.
+**Rollback**. Instant; no rebuild. Before rolling back checkout changes, read the reservation
+warning in [the remediation notes](audit-remediation-2026-09.md). Old code must not
+reapply a stock decrement to orders already reserved by the new version.
 
 ## Failed build / deploy
 

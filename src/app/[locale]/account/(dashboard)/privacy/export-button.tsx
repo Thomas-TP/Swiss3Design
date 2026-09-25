@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "@/i18n/navigation";
 import { useState } from "react";
 import { Download } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -8,6 +9,7 @@ import { exportMyData } from "./actions";
 
 export function ExportButton() {
   const t = useTranslations("account");
+  const router = useRouter();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,6 +19,13 @@ export function ExportButton() {
     const res = await exportMyData();
     setPending(false);
     if ("error" in res) {
+      if (res.error === "reauth_required") {
+        router.push({
+          pathname: "/account/login",
+          query: { next: "/account/privacy", reauth: "1" },
+        });
+        return;
+      }
       setError(t("privacy.exportError"));
       return;
     }

@@ -10,7 +10,7 @@ import { user as userTable } from "@/db/schema";
 // (pas de stockage de moyen de paiement côté serveur — voir docs/codemap.md).
 export async function getOrCreateStripeCustomer(
   stripe: Stripe,
-  db: Awaited<ReturnType<typeof getDb>>,
+  db: Pick<Awaited<ReturnType<typeof getDb>>, "update">,
   user: {
     id: string;
     email: string;
@@ -20,11 +20,14 @@ export async function getOrCreateStripeCustomer(
 ): Promise<string> {
   if (user.stripeCustomerId) return user.stripeCustomerId;
 
-  const customer = await stripe.customers.create({
-    email: user.email,
-    name: user.name,
-    metadata: { userId: user.id },
-  });
+  const customer = await stripe.customers.create(
+    {
+      email: user.email,
+      name: user.name,
+      metadata: { userId: user.id },
+    },
+    { idempotencyKey: "customer:" + user.id },
+  );
 
   await db
     .update(userTable)

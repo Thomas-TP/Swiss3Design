@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Check, CreditCard, ShoppingBag } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { useCart, type CartItem } from "@/lib/cart";
+import { useCart, sameLine, type CartItem } from "@/lib/cart";
 
 export function AddToCart({
   item,
@@ -32,6 +32,7 @@ export function AddToCart({
   return (
     <button
       type="button"
+      aria-live="polite"
       onClick={() => {
         add(item);
         setAdded(true);
@@ -76,6 +77,7 @@ export function AddToCartMini({
   return (
     <button
       type="button"
+      aria-live="polite"
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -112,8 +114,9 @@ export function BuyNow({
   return (
     <button
       type="button"
+      aria-live="polite"
       onClick={() => {
-        if (!items.some((i) => i.productId === item.productId)) add(item);
+        if (!items.some((i) => sameLine(i, item))) add(item);
         router.push("/checkout");
       }}
       className="flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-paper transition-all hover:bg-ink/85 active:scale-[0.98]"

@@ -1,30 +1,78 @@
-import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { getDb } from "@/db";
+import { requestLimits } from "@/db/schema";
+import { lt, sql } from "drizzle-orm";
 
-// Limiteur de débit à fenêtre fixe sur KV, par IP et par route.
-// KV est éventuellement cohérent : la limite est approximative, ce qui
-// suffit largement contre l'abus (spam d'e-mails, remplissage du bucket R2).
+type Database = Awaited<ReturnType<typeof getDb>>;
+
+type LimitOptions = { limit: number; windowS: number };
+
+export interface LimitDecision {
+  allowed: boolean;
+  retryAfter: number | null;
+}
+
+async function hashSubject(subject: string): Promise<string> {
+  const digest = await crypto.subtle.digest(
+    "SHA-256",
+    new TextEncoder().encode(subject),
+  );
+  return Array.from(new Uint8Array(digest), (value) =>
+    value.toString(16).padStart(2, "0"),
+  ).join("");
+}
+
+// Compteur Postgres atomique partagé entre tous les isolates Cloudflare. Le
+// sujet (IP ou clé Better Auth IP+route) est haché avant stockage.
+export async function consumeRequestLimit(
+  db: Database,
+  namespace: string,
+  subject: string,
+  { limit, windowS }: LimitOptions,
+): Promise<LimitDecision> {
+  const now = Date.now();
+  const window = Math.floor(now / (windowS * 1000));
+  const expiresAt = new Date((window + 1) * windowS * 1000);
+  const hash = await hashSubject(subject);
+  const rows = await db
+    .insert(requestLimits)
+    .values({
+      key: namespace + ":" + hash + ":" + window,
+      count: 1,
+      expiresAt,
+    })
+    .onConflictDoUpdate({
+      target: requestLimits.key,
+      set: { count: sql`${requestLimits.count}+1` },
+      setWhere: lt(requestLimits.count, limit),
+    })
+    .returning({ key: requestLimits.key });
+  if (rows.length > 0) return { allowed: true, retryAfter: null };
+  return {
+    allowed: false,
+    retryAfter: Math.max(1, Math.ceil((expiresAt.getTime() - now) / 1000)),
+  };
+}
 
 export async function rateLimit(
   request: Request,
   route: string,
-  { limit, windowS }: { limit: number; windowS: number },
+  options: LimitOptions,
 ): Promise<boolean> {
-  const { env } = await getCloudflareContext({ async: true });
   const ip = request.headers.get("cf-connecting-ip");
-  // En local (pas derrière Cloudflare), pas d'IP fiable : on ne limite pas
-  if (!ip) return true;
-
-  const window = Math.floor(Date.now() / (windowS * 1000));
-  const key = `rl:${route}:${ip}:${window}`;
-
-  const count = Number((await env.KV.get(key)) ?? 0);
-  if (count >= limit) return false;
-
-  // expirationTtl minimal accepté par KV : 60 s
-  await env.KV.put(key, String(count + 1), {
-    expirationTtl: Math.max(windowS, 60),
-  });
-  return true;
+  if (!ip)
+    return (
+      process.env.NODE_ENV !== "production" ||
+      ["localhost", "127.0.0.1", "[::1]"].includes(
+        new URL(request.url).hostname,
+      )
+    );
+  try {
+    const db = await getDb();
+    return (await consumeRequestLimit(db, route, ip, options)).allowed;
+  } catch {
+    console.error("[rate-limit] indisponible", { route });
+    return false;
+  }
 }
 
 export const tooManyRequests = (headers?: HeadersInit) =>

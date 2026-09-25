@@ -1,13 +1,14 @@
 import { notFound } from "next/navigation";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, desc, eq } from "drizzle-orm";
 import { ArrowLeft, Paperclip } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
-import { quoteRequests, quoteMessages } from "@/db/schema";
+import { quoteRequests, quoteMessages, statusEvents } from "@/db/schema";
 import { requireAdmin } from "@/lib/session";
 import { formatChf, renderTime } from "@/lib/format";
 import { updateQuote } from "../actions";
+import { StatusHistory } from "../../status-history";
 import {
   QUOTE_STATUSES,
   QUOTE_STATUS_FR,
@@ -32,11 +33,23 @@ export default async function AdminQuoteDetailPage({
     .limit(1);
   if (!quote) notFound();
 
-  const messages = await db
-    .select()
-    .from(quoteMessages)
-    .where(eq(quoteMessages.quoteId, id))
-    .orderBy(asc(quoteMessages.createdAt));
+  const [messages, history] = await Promise.all([
+    db
+      .select()
+      .from(quoteMessages)
+      .where(eq(quoteMessages.quoteId, id))
+      .orderBy(asc(quoteMessages.createdAt)),
+    db
+      .select()
+      .from(statusEvents)
+      .where(
+        and(
+          eq(statusEvents.entityType, "quote"),
+          eq(statusEvents.entityId, id),
+        ),
+      )
+      .orderBy(desc(statusEvents.createdAt)),
+  ]);
 
   const specs = [
     ["Matière", quote.material],
@@ -157,6 +170,8 @@ export default async function AdminQuoteDetailPage({
           </ul>
         </section>
       )}
+
+      <StatusHistory events={history} statusLabels={QUOTE_STATUS_FR} />
 
       <form
         action={updateQuote}

@@ -4,14 +4,14 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { reviews } from "@/db/schema";
-import { requireAdmin } from "@/lib/session";
+import { requireFreshAdmin } from "@/lib/session";
 
 const ALLOWED = ["published", "rejected", "pending"] as const;
 type ReviewStatus = (typeof ALLOWED)[number];
 
 // Modération d'un avis : publication / rejet / remise en attente.
 export async function setReviewStatus(formData: FormData) {
-  await requireAdmin();
+  await requireFreshAdmin();
   const id = String(formData.get("id") ?? "");
   const status = String(formData.get("status") ?? "");
   if (!id || !ALLOWED.includes(status as ReviewStatus)) return;

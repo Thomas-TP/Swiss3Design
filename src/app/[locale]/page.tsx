@@ -4,7 +4,7 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getProducts } from "@/db/queries";
 import { formatChf } from "@/lib/format";
-import { FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
+import { getShippingSettings } from "@/lib/shipping-settings";
 import { ProductCard } from "@/components/product-card";
 import { MulticolorDots } from "@/components/multicolor-dots";
 import { HeroScene } from "@/components/hero-scene";
@@ -29,10 +29,11 @@ export default async function HomePage({
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
-  const [t, tNav, featured] = await Promise.all([
+  const [t, tNav, featured, shippingSettings] = await Promise.all([
     getTranslations("home"),
     getTranslations("nav"),
     getProducts(locale, { featuredOnly: true }),
+    getShippingSettings(),
   ]);
 
   const trust = [
@@ -40,7 +41,7 @@ export default async function HomePage({
       Icon: Truck,
       title: t("trustShippingTitle"),
       text: t("trustShippingText", {
-        amount: formatChf(FREE_SHIPPING_OVER_CENTS, locale),
+        amount: formatChf(shippingSettings.freeOverCents, locale),
       }),
     },
     { Icon: Factory, title: t("trustMadeTitle"), text: t("trustMadeText") },
@@ -54,12 +55,12 @@ export default async function HomePage({
   return (
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
       {/* Hero */}
-      <section className="grid items-center gap-10 py-14 md:grid-cols-2 md:gap-14 md:py-24">
+      <section className="grid grid-cols-1 items-center gap-10 py-14 md:grid-cols-2 md:gap-14 md:py-24">
         <div>
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-medium text-soft">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-              {t("heroBadge")}
+            <span className="inline-flex max-w-full items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-medium text-soft">
+              <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
+              <span className="min-w-0">{t("heroBadge")}</span>
             </span>
           </Reveal>
           <Reveal delay={0.08}>
@@ -185,7 +186,7 @@ export default async function HomePage({
                 </p>
                 <p className="mt-1.5 text-sm leading-relaxed text-soft">
                   {t(`processStep${n}Text`, {
-                    amount: formatChf(FREE_SHIPPING_OVER_CENTS, locale),
+                    amount: formatChf(shippingSettings.freeOverCents, locale),
                   })}
                 </p>
               </li>

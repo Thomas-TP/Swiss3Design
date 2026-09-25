@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { settings } from "@/db/schema";
-import { requireAdmin } from "@/lib/session";
+import { requireFreshAdmin } from "@/lib/session";
 
 export interface SettingsState {
   saved?: boolean;
@@ -20,7 +20,7 @@ export async function saveSettings(
   _prev: SettingsState,
   formData: FormData,
 ): Promise<SettingsState> {
-  await requireAdmin();
+  await requireFreshAdmin();
 
   const shipping = chfToCents(String(formData.get("shipping") || ""));
   const freeOver = chfToCents(String(formData.get("freeOver") || ""));

@@ -13,6 +13,7 @@ import {
 } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { saveProduct, deleteProduct, type ProductFormState } from "./actions";
+import { redirectToAdminReauthentication } from "@/lib/admin-reauth-client";
 import { FIELD, BTN_PRIMARY, BTN_GHOST } from "../ui";
 
 interface Img {
@@ -435,6 +436,10 @@ function ModelManager({ initial }: { initial: string | null }) {
         method: "POST",
         body,
       });
+      if (res.status === 401) {
+        redirectToAdminReauthentication();
+        return;
+      }
       if (!res.ok) {
         const reason =
           res.status === 413
@@ -654,6 +659,10 @@ function ImageManager({ initial }: { initial: Img[] }) {
       body.append("file", file);
       try {
         const res = await fetch("/api/admin/upload", { method: "POST", body });
+        if (res.status === 401) {
+          redirectToAdminReauthentication();
+          return;
+        }
         if (!res.ok) {
           const reason =
             res.status === 413

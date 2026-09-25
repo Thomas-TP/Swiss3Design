@@ -4,7 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { newsletterSends } from "@/db/schema";
-import { requireAdmin } from "@/lib/session";
+import { requireFreshAdmin } from "@/lib/session";
 import { sendBulkEmail, sendEmail } from "@/lib/email";
 import { newsletterAnnouncementEmail } from "@/lib/email-templates";
 import {
@@ -77,7 +77,7 @@ export async function previewAnnouncement(
 ): Promise<
   { subject: string; html: string; recipientCount: number } | { error: string }
 > {
-  await requireAdmin();
+  await requireFreshAdmin();
   const input = parseInput(formData);
   if ("error" in input) return input;
 
@@ -109,7 +109,7 @@ export async function previewAnnouncement(
 export async function sendTestEmail(
   formData: FormData,
 ): Promise<{ success: true } | { error: string }> {
-  const session = await requireAdmin();
+  const session = await requireFreshAdmin();
   const input = parseInput(formData);
   if ("error" in input) return input;
 
@@ -134,7 +134,7 @@ export async function sendTestEmail(
 export async function sendAnnouncement(
   formData: FormData,
 ): Promise<{ success: true; count: number } | { error: string }> {
-  const session = await requireAdmin();
+  const session = await requireFreshAdmin();
   const input = parseInput(formData);
   if ("error" in input) return input;
 

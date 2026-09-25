@@ -5,7 +5,7 @@ import { eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { products } from "@/db/schema";
-import { requireAdmin } from "@/lib/session";
+import { requireFreshAdmin } from "@/lib/session";
 
 const selectionSchema = z.array(z.string().min(1).max(64)).max(48);
 
@@ -16,7 +16,7 @@ const selectionSchema = z.array(z.string().min(1).max(64)).max(48);
 export async function saveFeaturedSelection(
   orderedIds: string[],
 ): Promise<void> {
-  await requireAdmin();
+  await requireFreshAdmin();
 
   const parsed = selectionSchema.safeParse(orderedIds);
   if (!parsed.success) return;

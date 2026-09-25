@@ -11,7 +11,13 @@ const field =
 const btnGhost =
   "flex w-full items-center justify-center gap-2 rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-ink disabled:opacity-60";
 
-export function LoginForm({ next = "/account" }: { next?: string }) {
+export function LoginForm({
+  next = "/account",
+  strongReauthentication = false,
+}: {
+  next?: string;
+  strongReauthentication?: boolean;
+}) {
   const t = useTranslations("auth");
   const locale = useLocale();
   const router = useRouter();
@@ -431,16 +437,18 @@ export function LoginForm({ next = "/account" }: { next?: string }) {
           {t("passwordless.usePasskey")}
         </button>
       )}
-      <button
-        type="button"
-        onClick={() => {
-          setStage("passwordless");
-          setError(null);
-        }}
-        className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink"
-      >
-        {t("passwordless.toggle")}
-      </button>
+      {!strongReauthentication && (
+        <button
+          type="button"
+          onClick={() => {
+            setStage("passwordless");
+            setError(null);
+          }}
+          className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink"
+        >
+          {t("passwordless.toggle")}
+        </button>
+      )}
     </form>
   );
 }

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Trash2, CheckCircle2 } from "lucide-react";
 import { BTN_GHOST } from "../ui";
+import { redirectToAdminReauthentication } from "@/lib/admin-reauth-client";
 
 interface Report {
   retentionFilesDeleted: number;
@@ -21,6 +22,10 @@ export function MaintenanceButton() {
     setError(false);
     try {
       const res = await fetch("/api/cron/maintenance", { method: "POST" });
+      if (res.status === 401) {
+        redirectToAdminReauthentication();
+        return;
+      }
       if (!res.ok) throw new Error();
       setReport((await res.json()) as Report);
     } catch {

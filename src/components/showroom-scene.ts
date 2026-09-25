@@ -117,7 +117,7 @@ export async function buildShowroomScene(
 
   // Configuration de rendu (identique partout : viewer & snapshot).
   renderer.shadowMap.enabled = true;
-  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  renderer.shadowMap.type = THREE.PCFShadowMap;
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.05;
 

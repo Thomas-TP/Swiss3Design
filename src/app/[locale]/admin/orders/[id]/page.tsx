@@ -1,13 +1,16 @@
+import { getTranslations } from "next-intl/server";
+import { canTransitionOrder } from "@/lib/payment-state";
 import { notFound } from "next/navigation";
-import { eq } from "drizzle-orm";
+import { and, desc, eq } from "drizzle-orm";
 import { ArrowLeft, UserCircle, StickyNote, Truck } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
-import { orders, orderItems, user } from "@/db/schema";
+import { orders, orderItems, statusEvents, user } from "@/db/schema";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { updateOrderStatus, updateOrderNote } from "../actions";
+import { StatusHistory } from "../../status-history";
 import {
   ORDER_STATUSES,
   ORDER_STATUS_FR,
@@ -32,6 +35,10 @@ export default async function AdminOrderDetailPage({
 }) {
   await requireAdmin();
   const { locale, id } = await params;
+  const paymentText = await getTranslations({
+    locale,
+    namespace: "orderPayment",
+  });
   const db = await getDb();
 
   const [order] = await db
@@ -41,7 +48,7 @@ export default async function AdminOrderDetailPage({
     .limit(1);
   if (!order) notFound();
 
-  const [items, [customer]] = await Promise.all([
+  const [items, [customer], history] = await Promise.all([
     db.select().from(orderItems).where(eq(orderItems.orderId, id)),
     db
       .select({
@@ -58,6 +65,16 @@ export default async function AdminOrderDetailPage({
           : eq(user.email, order.email),
       )
       .limit(1),
+    db
+      .select()
+      .from(statusEvents)
+      .where(
+        and(
+          eq(statusEvents.entityType, "order"),
+          eq(statusEvents.entityId, id),
+        ),
+      )
+      .orderBy(desc(statusEvents.createdAt)),
   ]);
 
   let address: Address = {};
@@ -112,7 +129,9 @@ export default async function AdminOrderDetailPage({
             defaultValue={order.status}
             className={`${FIELD} w-auto`}
           >
-            {ORDER_STATUSES.map((s) => (
+            {ORDER_STATUSES.filter((s) =>
+              canTransitionOrder(order.status, s),
+            ).map((s) => (
               <option key={s} value={s}>
                 {ORDER_STATUS_FR[s]}
               </option>
@@ -149,6 +168,36 @@ export default async function AdminOrderDetailPage({
         </p>
       </section>
 
+      <StatusHistory events={history} statusLabels={ORDER_STATUS_FR} />
+
+      {order.stripePaymentIntentId && (
+        <section className="mt-4 rounded-card border border-line bg-surface p-5 text-sm">
+          <p>
+            {paymentText("refunded", {
+              amount: formatChf(order.refundedCents, locale),
+            })}
+          </p>
+          {order.status === "cancelled" &&
+            order.refundedCents < order.totalCents && (
+              <p className="mt-2 font-medium text-accent">
+                {paymentText("refundPending")}
+              </p>
+            )}
+          {order.stripePaymentIntentId.startsWith("pi_") && (
+            <a
+              className="mt-2 inline-block underline"
+              href={
+                "https://dashboard.stripe.com/payments/" +
+                order.stripePaymentIntentId
+              }
+              target="_blank"
+              rel="noreferrer"
+            >
+              {paymentText("openStripe")}
+            </a>
+          )}
+        </section>
+      )}
       <section className="mt-4 rounded-card border border-line bg-surface p-5">
         <h3 className="mb-3 font-semibold">Articles</h3>
         <ul className="divide-y divide-line text-sm">

@@ -64,6 +64,21 @@ function buildCsp({
 }
 
 export default function middleware(request: NextRequest) {
+  const original = new URL(request.url);
+  if (
+    ["swiss3design.ch", "www.swiss3design.ch"].includes(original.hostname) &&
+    original.protocol === "http:"
+  ) {
+    original.protocol = "https:";
+    original.hostname = "swiss3design.ch";
+    return NextResponse.redirect(original, 308);
+  }
+  if (original.pathname.startsWith("/api/")) {
+    const response = NextResponse.next();
+    for (const [key, value] of Object.entries(SECURITY_HEADERS))
+      response.headers.set(key, value);
+    return response;
+  }
   // www.swiss3design.ch → swiss3design.ch (canonique)
   const host = request.headers.get("host") ?? "";
   if (host.startsWith("www.")) {
@@ -127,5 +142,5 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: "/((?!api|_next|_vercel|.*\\..*).*)",
+  matcher: "/((?!_next|_vercel|.*\\..*).*)",
 };

@@ -91,7 +91,8 @@ is kept **off**, same reasoning as Biome's old override: Cloudflare Images
 already handles optimization (`images.unoptimized` in `next.config.ts`), so
 converting `<img>` to `next/image` is a real UI change, not a lint fix.
 `oxfmt` (`.oxfmtrc.json`) is Prettier-compatible, configured to match Biome's
-prior formatting exactly (CRLF, double quotes, printWidth 80, etc.) —
+prior formatting (LF line endings on every platform, double quotes, printWidth 80,
+etc.) —
 `sortPackageJson`/`sortImports`/`sortTailwindcss` left off on purpose to avoid
 a repo-wide reorder diff unrelated to any real change. Caveat: **oxfmt is
 still beta (0.x)**, no stable 1.0 as of this date. `biome-ignore` comments
@@ -152,7 +153,7 @@ put` on an environment with real users without `--env <name>` explicitly
    **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
-10. **The Worker bundle has ~312 KiB of headroom under a hard 3 MiB cap (2026-09-09
+10. **The Worker bundle has ~261 KiB of headroom under a hard 3 MiB cap (2026-09-14
     measurement — grew from ~120 KiB after the pg/oxlint migration, re-measure
     rather than trust this figure as it ages). Never add a binary asset through
     a Next file convention.** The Workers **Free**
@@ -166,10 +167,11 @@ put` on an environment with real users without `--env <name>` explicitly
     as Cloudflare **static assets**, outside the bundle and outside the cap. The
     same trap applies to `opengraph-image.*`, `twitter-image.*` and any
     `import`ed image. Measure before pushing — `bunx wrangler deploy --dry-run`
-    prints the gzip size in ~1 min without deploying. Known remaining fat:
-    `three.js` sits in the **server** bundle (~718 KiB raw) because the 3D
-    viewer's client component is server-rendered; moving it out is the next real
-    win if headroom runs short.
+    prints the gzip size in ~1 min without deploying. The interactive viewer
+    and the production-style 3D thumbnail renderer are both exported from
+    `product-viewer-3d.tsx` behind `next/dynamic({ ssr: false })`; importing
+    `showroom-scene.ts` directly from `product-gallery.tsx` puts Three.js back
+    into the server Worker and costs about 243 KiB gzip.
 
 ## Tech stack
 
@@ -194,7 +196,8 @@ put` on an environment with real users without `--env <name>` explicitly
 bun run dev               # dev server :3000 (loads Hyperdrive/R2/KV bindings via OpenNext)
 bun run lint              # oxlint (run before declaring a change done)
 bun run typecheck         # tsc --noEmit — fast type check (no heavy OpenNext build)
-bun run test              # Vitest (unit tests for pure domain logic in src/lib)
+bun run test              # Vitest (tests unitaires ; intégrations ignorées sans URL)
+bun run test:preview      # Suite complète sur la branche Neon preview verrouillée
 bun run format             # oxfmt (writes by default; format:check verifies only)
 bun run preview           # OpenNext build + local Workers preview — tests prod CSP/nonce
 bun run deploy            # OpenNext build + deploy from local machine (manual)

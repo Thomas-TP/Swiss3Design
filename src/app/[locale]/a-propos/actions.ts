@@ -1,7 +1,11 @@
 "use server";
 
+import { headers } from "next/headers";
+import { rateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
-import { sendEmail, getAdminEmails } from "@/lib/email";
+import { getDb } from "@/db";
+import { queueEmail, drainEmailOutbox } from "@/lib/outbox";
+import { getAdminEmails } from "@/lib/email";
 import {
   adminContactEmail,
   contactConfirmationEmail,
@@ -26,6 +30,14 @@ export async function submitContactMessage(
   _prev: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
+  if (
+    !(await rateLimit(
+      new Request("https://swiss3design.ch", { headers: await headers() }),
+      "contact",
+      { limit: 5, windowS: 600 },
+    ))
+  )
+    return { status: "error" };
   const parsed = schema.safeParse({
     name: formData.get("name"),
     email: formData.get("email"),
@@ -53,27 +65,29 @@ export async function submitContactMessage(
     const recipients =
       adminEmails.length > 0 ? adminEmails : ["contact@swiss3design.ch"];
 
-    const sent = await sendEmail(
-      adminContactEmail(
-        { name, email, subject: subject ?? null, body: message, locale },
-        recipients,
-      ),
-    );
+    const db = await getDb();
+    const key = "contact:" + crypto.randomUUID();
+    await db.transaction(async (db) => {
+      await queueEmail(
+        db,
+        key + ":admin",
+        adminContactEmail(
+          { name, email, subject: subject ?? null, body: message, locale },
+          recipients,
+        ),
+      );
 
-    // Sans RESEND_API_KEY (dev local), sendEmail renvoie false : on log mais on
-    // ne bloque pas le test du formulaire.
-    if (!sent && process.env.NODE_ENV === "production") {
-      return { status: "error" };
-    }
-
-    // Accusé de réception au client — best-effort, ne doit jamais faire échouer
-    // l'envoi principal.
+      await queueEmail(
+        db,
+        key + ":confirmation",
+        contactConfirmationEmail(email, message, locale),
+      );
+    });
     try {
-      await sendEmail(contactConfirmationEmail(email, message, locale));
-    } catch (e) {
-      console.error("[email confirmation contact]", e);
+      await drainEmailOutbox(db);
+    } catch {
+      console.error("[outbox] reprise par maintenance");
     }
-
     return { status: "success" };
   } catch (e) {
     console.error("[contact]", e);

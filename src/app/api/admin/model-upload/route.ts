@@ -1,5 +1,8 @@
+import { hasExpectedSignature } from "@/lib/file-signature";
+import { boundedFormData } from "@/lib/upload";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getServerSession } from "@/lib/session";
+import { isSessionFresh } from "@/lib/session-freshness";
 
 // Upload d'un modèle 3D pour le viewer produit. Validation par EXTENSION : les
 // types MIME STL/GLB ne sont pas fiables (souvent application/octet-stream).
@@ -17,8 +20,11 @@ export async function POST(request: Request) {
   if (session?.user.role !== "admin") {
     return Response.json({ error: "unauthorized" }, { status: 403 });
   }
+  if (!isSessionFresh(session.session.createdAt)) {
+    return Response.json({ error: "reauth_required" }, { status: 401 });
+  }
 
-  const form = await request.formData().catch(() => null);
+  const form = await boundedFormData(request, MAX_BYTES);
   const file = form?.get("file");
   if (!(file instanceof File)) {
     return Response.json({ error: "missing_file" }, { status: 400 });
@@ -27,13 +33,15 @@ export async function POST(request: Request) {
   if (!ALLOWED_EXT.has(ext)) {
     return Response.json({ error: "unsupported_type" }, { status: 415 });
   }
+  if (!(await hasExpectedSignature(file, ext)))
+    return Response.json({ error: "unsupported_type" }, { status: 415 });
   if (file.size > MAX_BYTES) {
     return Response.json({ error: "too_large" }, { status: 413 });
   }
 
   const key = `products/${crypto.randomUUID()}.${ext}`;
   const { env } = await getCloudflareContext({ async: true });
-  await env.R2.put(key, await file.arrayBuffer(), {
+  await env.R2.put(key, file.stream(), {
     httpMetadata: { contentType: CONTENT_TYPE[ext] },
   });
 

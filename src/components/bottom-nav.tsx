@@ -10,7 +10,7 @@ import {
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { useCart } from "@/lib/cart";
-import { useSession } from "@/lib/auth-client";
+import { SessionAvatar } from "./session-avatar";
 
 const items = [
   { href: "/", key: "home", Icon: Home },
@@ -20,16 +20,14 @@ const items = [
   { href: "/account", key: "account", Icon: CircleUser },
 ] as const;
 
-export function BottomNav() {
+export function BottomNav({ hasSession = false }: { hasSession?: boolean }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const { count } = useCart();
-  const { data: authSession } = useSession();
-  const avatar = authSession?.user.image ?? null;
 
   return (
     <nav
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-surface/90 backdrop-blur-lg md:hidden"
+      className="fixed inset-x-0 bottom-0 z-50 border-t border-line bg-surface/90 backdrop-blur-lg lg:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
       <ul className="grid grid-cols-5">
@@ -43,15 +41,8 @@ export function BottomNav() {
                 className="relative flex flex-col items-center gap-1 py-2.5 text-[11px] font-medium"
               >
                 <span className="relative">
-                  {key === "account" && avatar ? (
-                    <img
-                      src={avatar}
-                      alt=""
-                      referrerPolicy="no-referrer"
-                      className={`h-[22px] w-[22px] rounded-full object-cover ${
-                        active ? "ring-2 ring-ink" : "ring-1 ring-line"
-                      }`}
-                    />
+                  {key === "account" && hasSession ? (
+                    <SessionAvatar variant="bottom" active={active} />
                   ) : (
                     <Icon
                       size={22}

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { verification } from "@/db/schema";
@@ -72,82 +72,90 @@ export async function POST(request: Request) {
   const email = parsed.data.email.trim().toLowerCase();
   const identifier = identifierFor(email);
 
-  const [existing] = await db
-    .select()
-    .from(verification)
-    .where(eq(verification.identifier, identifier))
-    .limit(1);
+  return db.transaction(async (db) => {
+    // Le verrou couvre aussi la création initiale, lorsqu'aucune ligne n'existe.
+    await db.execute(
+      sql`select pg_advisory_xact_lock(hashtextextended(${identifier},0))`,
+    );
+    const [existing] = await db
+      .select()
+      .from(verification)
+      .where(eq(verification.identifier, identifier))
+      .limit(1);
 
-  if (parsed.data.action === "send") {
-    const sentAt = existing?.createdAt?.getTime() ?? 0;
-    if (Date.now() - sentAt < RESEND_COOLDOWN_MS) {
-      return Response.json({ error: "too_many_requests" }, { status: 429 });
+    if (parsed.data.action === "send") {
+      const sentAt = existing?.createdAt?.getTime() ?? 0;
+      if (Date.now() - sentAt < RESEND_COOLDOWN_MS) {
+        return Response.json({ error: "too_many_requests" }, { status: 429 });
+      }
+
+      const code = String(unbiasedRandomInt(900000) + 100000);
+
+      await db
+        .delete(verification)
+        .where(eq(verification.identifier, identifier));
+      await db.insert(verification).values({
+        id: crypto.randomUUID(),
+        identifier,
+        value: JSON.stringify({
+          hash: await sha256Hex(`${email}:${code}`),
+          attempts: 0,
+        }),
+        expiresAt: new Date(Date.now() + CODE_TTL_MS),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+
+      const sent = await sendEmail(
+        checkoutCodeEmail(email, code, parsed.data.locale),
+      );
+      // Sans RESEND_API_KEY (dev local), l'envoi est loggé au lieu d'être
+      // expédié : on ne traite l'échec comme une erreur qu'en configuration réelle.
+      const { env } = await getCloudflareContext({ async: true });
+      if (!sent && env.RESEND_API_KEY) {
+        return Response.json({ error: "email_failed" }, { status: 502 });
+      }
+      return Response.json({ ok: true });
     }
 
-    const code = String(unbiasedRandomInt(900000) + 100000);
+    // action === "verify"
+    if (!existing || existing.expiresAt.getTime() < Date.now()) {
+      return Response.json({ error: "invalid_code" }, { status: 400 });
+    }
+
+    let stored = { hash: "", attempts: 0 };
+    try {
+      stored = { ...stored, ...JSON.parse(existing.value) };
+    } catch {
+      // valeur illisible — traitée comme code invalide
+    }
+
+    if (
+      stored.attempts >= MAX_ATTEMPTS ||
+      stored.hash !== (await sha256Hex(`${email}:${parsed.data.code}`))
+    ) {
+      if (stored.attempts + 1 >= MAX_ATTEMPTS) {
+        await db
+          .delete(verification)
+          .where(eq(verification.identifier, identifier));
+      } else {
+        await db
+          .update(verification)
+          .set({
+            value: JSON.stringify({ ...stored, attempts: stored.attempts + 1 }),
+            updatedAt: new Date(),
+          })
+          .where(eq(verification.identifier, identifier));
+      }
+      return Response.json({ error: "invalid_code" }, { status: 400 });
+    }
 
     await db
       .delete(verification)
       .where(eq(verification.identifier, identifier));
-    await db.insert(verification).values({
-      id: crypto.randomUUID(),
-      identifier,
-      value: JSON.stringify({
-        hash: await sha256Hex(`${email}:${code}`),
-        attempts: 0,
-      }),
-      expiresAt: new Date(Date.now() + CODE_TTL_MS),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
 
-    const sent = await sendEmail(
-      checkoutCodeEmail(email, code, parsed.data.locale),
-    );
-    // Sans RESEND_API_KEY (dev local), l'envoi est loggé au lieu d'être
-    // expédié : on ne traite l'échec comme une erreur qu'en configuration réelle.
     const { env } = await getCloudflareContext({ async: true });
-    if (!sent && env.RESEND_API_KEY) {
-      return Response.json({ error: "email_failed" }, { status: 502 });
-    }
-    return Response.json({ ok: true });
-  }
-
-  // action === "verify"
-  if (!existing || existing.expiresAt.getTime() < Date.now()) {
-    return Response.json({ error: "invalid_code" }, { status: 400 });
-  }
-
-  let stored = { hash: "", attempts: 0 };
-  try {
-    stored = { ...stored, ...JSON.parse(existing.value) };
-  } catch {
-    // valeur illisible — traitée comme code invalide
-  }
-
-  if (
-    stored.attempts >= MAX_ATTEMPTS ||
-    stored.hash !== (await sha256Hex(`${email}:${parsed.data.code}`))
-  ) {
-    if (stored.attempts + 1 >= MAX_ATTEMPTS) {
-      await db
-        .delete(verification)
-        .where(eq(verification.identifier, identifier));
-    } else {
-      await db
-        .update(verification)
-        .set({
-          value: JSON.stringify({ ...stored, attempts: stored.attempts + 1 }),
-          updatedAt: new Date(),
-        })
-        .where(eq(verification.identifier, identifier));
-    }
-    return Response.json({ error: "invalid_code" }, { status: 400 });
-  }
-
-  await db.delete(verification).where(eq(verification.identifier, identifier));
-
-  const { env } = await getCloudflareContext({ async: true });
-  const proof = await createEmailProof(email, env.BETTER_AUTH_SECRET);
-  return Response.json({ proof });
+    const proof = await createEmailProof(email, env.BETTER_AUTH_SECRET);
+    return Response.json({ proof });
+  });
 }

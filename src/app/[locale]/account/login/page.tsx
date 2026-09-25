@@ -11,16 +11,17 @@ export const dynamic = "force-dynamic";
 export default async function LoginPage({
   searchParams,
 }: {
-  searchParams: Promise<{ next?: string }>;
+  searchParams: Promise<{ next?: string; reauth?: string }>;
 }) {
   const t = await getTranslations("auth");
   const { env } = await getCloudflareContext({ async: true });
   const providers = enabledSocialProviders(env);
 
   // Destination après connexion (ex. retour au checkout) — chemins internes uniquement
-  const { next } = await searchParams;
+  const { next, reauth } = await searchParams;
   const nextPath =
     next && next.startsWith("/") && !next.startsWith("//") ? next : "/account";
+  const isAdminReauthentication = reauth === "admin";
 
   return (
     <div className="mx-auto max-w-md px-4 py-14 sm:px-6 md:py-20">
@@ -28,9 +29,19 @@ export default async function LoginPage({
       <h1 className="mt-5 text-center text-3xl font-bold tracking-tight">
         {t("signInTitle")}
       </h1>
+      {reauth && (
+        <p className="mt-4 text-center text-sm text-soft">
+          {t(isAdminReauthentication ? "adminReauthNotice" : "reauthNotice")}
+        </p>
+      )}
       <div className="mt-8 rounded-card border border-line bg-surface p-6 sm:p-8">
-        <LoginForm next={nextPath} />
-        <SocialButtons providers={providers} next={nextPath} />
+        <LoginForm
+          next={nextPath}
+          strongReauthentication={isAdminReauthentication}
+        />
+        {!isAdminReauthentication && (
+          <SocialButtons providers={providers} next={nextPath} />
+        )}
       </div>
       <p className="mt-5 text-center text-sm text-soft">
         {t("noAccount")}{" "}

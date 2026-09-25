@@ -4,7 +4,7 @@ import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import { materials, filamentColors } from "@/db/schema";
-import { requireAdmin } from "@/lib/session";
+import { requireFreshAdmin } from "@/lib/session";
 
 export interface MaterialFormState {
   error?: string;
@@ -15,7 +15,7 @@ export async function addMaterial(
   _prev: MaterialFormState,
   formData: FormData,
 ): Promise<MaterialFormState> {
-  await requireAdmin();
+  await requireFreshAdmin();
 
   const name = String(formData.get("name") || "")
     .trim()
@@ -42,7 +42,7 @@ export async function addMaterial(
 // matière (texte) : le filtre boutique reste dérivé de l'usage réel. Les
 // couleurs du filament partent en cascade (FK ON DELETE CASCADE).
 export async function deleteMaterial(id: string): Promise<void> {
-  await requireAdmin();
+  await requireFreshAdmin();
   if (id) {
     const db = await getDb();
     await db.delete(materials).where(eq(materials.id, id));
@@ -62,7 +62,7 @@ export async function addColor(
   _prev: ColorFormState,
   formData: FormData,
 ): Promise<ColorFormState> {
-  await requireAdmin();
+  await requireFreshAdmin();
 
   const materialId = String(formData.get("materialId") || "");
   const name = String(formData.get("name") || "")
@@ -105,7 +105,7 @@ export async function addColor(
 }
 
 export async function deleteColor(id: string): Promise<void> {
-  await requireAdmin();
+  await requireFreshAdmin();
   if (id) {
     const db = await getDb();
     await db.delete(filamentColors).where(eq(filamentColors.id, id));

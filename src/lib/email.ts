@@ -14,7 +14,10 @@ export interface EmailMessage {
 
 // Envoi via l'API REST Resend. Sans RESEND_API_KEY, l'envoi est ignoré
 // silencieusement (loggé) — le site reste fonctionnel sans e-mails.
-export async function sendEmail(message: EmailMessage): Promise<boolean> {
+export async function sendEmail(
+  message: EmailMessage,
+  idempotencyKey?: string,
+): Promise<boolean> {
   const { env } = await getCloudflareContext({ async: true });
   if (!env.RESEND_API_KEY) {
     console.log(
@@ -28,6 +31,7 @@ export async function sendEmail(message: EmailMessage): Promise<boolean> {
     headers: {
       Authorization: `Bearer ${env.RESEND_API_KEY}`,
       "Content-Type": "application/json",
+      ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
     },
     body: JSON.stringify({
       from:

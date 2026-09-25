@@ -66,8 +66,14 @@ export default async function QuotePayPage({
         pi.status === "succeeded" &&
         pi.metadata?.quoteId === quote.id
       ) {
-        await markQuotePaid(db, quote.id);
-        paid = true;
+        paid = await markQuotePaid(db, quote.id, {
+          id: pi.id,
+          amount: pi.amount_received,
+          currency: pi.currency,
+          offerVersion: pi.metadata.offerVersion
+            ? Number(pi.metadata.offerVersion)
+            : undefined,
+        });
       }
     } catch {
       // ignore — le webhook reste la source de vérité

@@ -1,9 +1,19 @@
 "use server";
 
-import { eq, or } from "drizzle-orm";
+import { eq, or, inArray } from "drizzle-orm";
 import { getDb } from "@/db";
-import { orders, quoteRequests, customerAddresses, passkey } from "@/db/schema";
+import {
+  orders,
+  quoteRequests,
+  customerAddresses,
+  passkey,
+  orderItems,
+  quoteMessages,
+  reviews,
+  notificationPreferences,
+} from "@/db/schema";
 import { getServerSession } from "@/lib/session";
+import { isSessionFresh } from "@/lib/session-freshness";
 
 // Export de mes données (droit d'accès nLPD/RGPD) : agrège les données
 // personnelles détenues par Swiss3Design en un objet JSON téléchargeable
@@ -13,13 +23,16 @@ export async function exportMyData(): Promise<
   { data: object } | { error: string }
 > {
   const session = await getServerSession();
-  if (!session) return { error: "unauthorized" };
+  if (!session || !session.user.emailVerified) return { error: "unauthorized" };
+  if (!isSessionFresh(session.session.createdAt))
+    return { error: "reauth_required" };
   const { user } = session;
 
   const db = await getDb();
   const [myOrders, myQuotes, myAddresses, myPasskeys] = await Promise.all([
     db
       .select({
+        id: orders.id,
         orderNumber: orders.orderNumber,
         status: orders.status,
         totalCents: orders.totalCents,
@@ -30,7 +43,12 @@ export async function exportMyData(): Promise<
       .where(or(eq(orders.customerId, user.id), eq(orders.email, user.email))),
     db
       .select({
+        id: quoteRequests.id,
         description: quoteRequests.description,
+        material: quoteRequests.material,
+        colors: quoteRequests.colors,
+        dimensions: quoteRequests.dimensions,
+        adminMessage: quoteRequests.adminMessage,
         status: quoteRequests.status,
         quotedPriceCents: quoteRequests.quotedPriceCents,
         createdAt: quoteRequests.createdAt,
@@ -67,6 +85,42 @@ export async function exportMyData(): Promise<
       .where(eq(passkey.userId, user.id)),
   ]);
 
+  const [items, messages, myReviews, preferences] = await Promise.all([
+    myOrders.length
+      ? db
+          .select()
+          .from(orderItems)
+          .where(
+            inArray(
+              orderItems.orderId,
+              myOrders.map((o) => o.id),
+            ),
+          )
+      : [],
+    myQuotes.length
+      ? db
+          .select({
+            quoteId: quoteMessages.quoteId,
+            sender: quoteMessages.sender,
+            body: quoteMessages.body,
+            priceCents: quoteMessages.priceCents,
+            fileName: quoteMessages.fileName,
+            createdAt: quoteMessages.createdAt,
+          })
+          .from(quoteMessages)
+          .where(
+            inArray(
+              quoteMessages.quoteId,
+              myQuotes.map((q) => q.id),
+            ),
+          )
+      : [],
+    db.select().from(reviews).where(eq(reviews.customerId, user.id)),
+    db
+      .select()
+      .from(notificationPreferences)
+      .where(eq(notificationPreferences.userId, user.id)),
+  ]);
   return {
     data: {
       exportedAt: new Date().toISOString(),
@@ -78,6 +132,10 @@ export async function exportMyData(): Promise<
         createdAt: user.createdAt,
       },
       orders: myOrders,
+      orderItems: items,
+      quoteMessages: messages,
+      reviews: myReviews,
+      notificationPreferences: preferences,
       quotes: myQuotes,
       addresses: myAddresses,
       passkeys: myPasskeys,

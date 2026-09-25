@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
 
 export interface SelectOption {
@@ -8,8 +8,8 @@ export interface SelectOption {
   label: string;
 }
 
-// Liste déroulante maison : les <select> natifs ne se stylent pas, celle-ci
-// reprend les codes du site (rounded-xl, border-line, ombre douce).
+// Liste déroulante visuellement identique à la version de production, avec
+// déplacement du focus et commandes clavier explicites.
 export function Select({
   value,
   onChange,
@@ -26,38 +26,64 @@ export function Select({
   ariaLabel?: string;
 }) {
   const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const optionRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const listId = useId();
+  const selectedIndex = options.findIndex((option) => option.value === value);
+  const selected = options[selectedIndex];
 
   useEffect(() => {
     if (!open) return;
-    function onPointerDown(e: PointerEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) {
+    optionRefs.current[activeIndex]?.focus();
+    function onPointerDown(event: PointerEvent) {
+      if (ref.current && !ref.current.contains(event.target as Node))
         setOpen(false);
-      }
-    }
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOpen(false);
     }
     document.addEventListener("pointerdown", onPointerDown);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("pointerdown", onPointerDown);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
+    return () => document.removeEventListener("pointerdown", onPointerDown);
+  }, [activeIndex, open]);
 
-  const selected = options.find((o) => o.value === value);
+  function openAt(index: number) {
+    if (options.length === 0) return;
+    setActiveIndex(Math.max(0, Math.min(index, options.length - 1)));
+    setOpen(true);
+  }
+
+  function close(focusTrigger = false) {
+    setOpen(false);
+    if (focusTrigger) requestAnimationFrame(() => triggerRef.current?.focus());
+  }
+
+  function choose(option: SelectOption) {
+    onChange(option.value);
+    close(true);
+  }
 
   return (
     <div ref={ref} className="relative">
       {name && <input type="hidden" name={name} value={value} />}
       <button
+        ref={triggerRef}
         type="button"
         aria-haspopup="listbox"
         aria-expanded={open}
+        aria-controls={listId}
         aria-label={ariaLabel}
-        onClick={() => setOpen((o) => !o)}
-        className="flex w-full items-center justify-between gap-2 rounded-xl border border-line bg-surface px-4 py-3 text-left text-sm transition-colors focus:border-ink focus:outline-none"
+        onClick={() =>
+          open ? close() : openAt(selectedIndex >= 0 ? selectedIndex : 0)
+        }
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            openAt(selectedIndex >= 0 ? selectedIndex : 0);
+          } else if (event.key === "ArrowUp") {
+            event.preventDefault();
+            openAt(selectedIndex >= 0 ? selectedIndex : options.length - 1);
+          }
+        }}
+        className="flex w-full items-center justify-between gap-2 rounded-xl border border-line bg-surface px-4 py-3 text-left text-sm transition-colors focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
       >
         <span className={`truncate ${selected ? "" : "text-soft/60"}`}>
           {selected?.label ?? placeholder}
@@ -67,28 +93,52 @@ export function Select({
           className={`shrink-0 text-soft transition-transform duration-200 ${open ? "rotate-180" : ""}`}
         />
       </button>
-      {/* oxlint-disable prefer-tag-over-role -- liste deroulante maison stylee (les <select>/<option> natifs ne se stylent pas), role="listbox"/"option" est le pattern WAI-ARIA standard pour ce cas */}
+      {/* oxlint-disable prefer-tag-over-role -- liste deroulante maison necessaire au style de marque */}
       {open && (
         <div
+          id={listId}
           role="listbox"
+          aria-label={ariaLabel ?? placeholder}
           className="absolute z-30 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border border-line bg-surface py-1.5 shadow-lg shadow-ink/5"
         >
-          {options.map((o) => (
+          {options.map((option, index) => (
             <button
-              key={o.value}
+              ref={(node) => {
+                optionRefs.current[index] = node;
+              }}
+              key={option.value}
               type="button"
               role="option"
-              aria-selected={o.value === value}
-              onClick={() => {
-                onChange(o.value);
-                setOpen(false);
+              aria-selected={option.value === value}
+              tabIndex={index === activeIndex ? 0 : -1}
+              onClick={() => choose(option)}
+              onMouseEnter={() => setActiveIndex(index)}
+              onKeyDown={(event) => {
+                if (event.key === "ArrowDown") {
+                  event.preventDefault();
+                  setActiveIndex((index + 1) % options.length);
+                } else if (event.key === "ArrowUp") {
+                  event.preventDefault();
+                  setActiveIndex((index - 1 + options.length) % options.length);
+                } else if (event.key === "Home") {
+                  event.preventDefault();
+                  setActiveIndex(0);
+                } else if (event.key === "End") {
+                  event.preventDefault();
+                  setActiveIndex(options.length - 1);
+                } else if (event.key === "Escape") {
+                  event.preventDefault();
+                  close(true);
+                } else if (event.key === "Tab") {
+                  close();
+                }
               }}
-              className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper ${
-                o.value === value ? "font-semibold" : ""
+              className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper focus:bg-paper focus:outline-none ${
+                option.value === value ? "font-semibold" : ""
               }`}
             >
-              <span className="truncate">{o.label}</span>
-              {o.value === value && (
+              <span className="truncate">{option.label}</span>
+              {option.value === value && (
                 <Check size={15} className="shrink-0 text-accent" />
               )}
             </button>
