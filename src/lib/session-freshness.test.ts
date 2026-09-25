@@ -21,4 +21,8 @@ describe("isSessionFresh", () => {
   it("refuse une date de création illisible", () => {
     expect(isSessionFresh("date-invalide", now)).toBe(false);
   });
+
+  it("refuse une date de création dans le futur", () => {
+    expect(isSessionFresh(now + 1, now)).toBe(false);
+  });
 });

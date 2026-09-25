@@ -12,6 +12,7 @@ export function isSessionFresh(
   return (
     Number.isFinite(createdAtMs) &&
     maxAgeMs >= 0 &&
+    createdAtMs <= nowMs &&
     nowMs - createdAtMs <= maxAgeMs
   );
 }
