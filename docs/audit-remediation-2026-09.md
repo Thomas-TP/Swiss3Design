@@ -1,6 +1,6 @@
 # Remédiation de l'audit — septembre 2026
 
-État de travail mis à jour le 25 septembre 2026. Les changements antérieurs sont déployés sur la preview isolée. Les validations navigateur publiques ci-dessous ont été exécutées sur la version manuelle `359015ff-e898-4ba2-bec2-4e1b56222e88` ; les builds Cloudflare de la PR passaient sur le dernier commit distant contrôlé. Le correctif récent de reconnexion administrateur est validé localement seulement : la branche distante et la production ne le contiennent pas encore.
+État mis à jour le 25 septembre 2026. La PR #27 a été fusionnée dans `main` (`6de5787`) et le nouveau code est en production. Le Worker `swiss3design` est passé de la version `4b80ef6d-9c21-4848-88df-9df736952140` à `67d30af2-11d0-45df-bb87-33764f89abe3` le 25 septembre à 12:11 UTC ; le build Cloudflare de production et le contrôle `quality` sont verts. Les validations navigateur antérieures sur la preview et les contrôles post-déploiement ci-dessous ont des périmètres distincts.
 
 ## Incident 1102 : cause mesurée
 
@@ -41,14 +41,17 @@ Le serveur Chrome DevTools requis pour une mesure Core Web Vitals instrumentée 
 
 Les migrations additives 0001 à 0005 sont appliquées sur preview et sur la base de production identifiée le 14 septembre 2026. Avant la transaction de production, les contrôles ont confirmé l'absence des tables et colonnes cibles, ainsi que zéro prix, stock, quantité ou total invalide et zéro identifiant de paiement dupliqué. L'application a utilisé un verrou consultatif et des délais bornés ; la vérification après validation confirme 4 tables, 15 colonnes, 10 contraintes et 3 index attendus. Le Worker temporaire protégé par jeton a ensuite été arrêté et son port fermé. La CI Quality crée aussi un Postgres jetable, applique les migrations et exécute les contrôles sans secret de production. La branche `main` exige désormais une pull request à jour, le contrôle `quality` et la résolution des conversations ; force-push et suppression sont interdits.
 
-Points encore ouverts avant production : passage Workers Paid et nouvelle rafale 1102 ; test Stripe complet et abonnement aux nouveaux événements webhook ; parcours réel de reconnexion admin avec 2FA ou clé d'accès ; exercice réel de restauration Neon/R2 ; alertes opérationnelles ; publication du dernier correctif sur la PR, déploiement du nouveau code puis validation finale.
+Après déploiement, `Vase`, `vase` et `VASE` trouvent chacun le vase en production (HTTP 200). L'accueil, `/it` et la fiche produit répondent 200 ; HTTP redirige vers HTTPS en 308. Dans Edge, le parcours produit → panier → checkout sans paiement fonctionne, les menus langue et canton sont des panneaux personnalisés et le bouton de langue affiche FR. Aucune erreur JavaScript n'a été relevée ; deux avertissements WebGL ont été observés lors de la navigation depuis la fiche produit. Le paiement et la réservation de stock n'ont pas été déclenchés par ce contrôle.
+
+Points encore ouverts après publication : le propriétaire reporte Workers Paid, donc le 1102 peut encore se produire lors de navigations rapides ; tester à nouveau après tout changement de plan CPU. Le paiement Stripe complet et l'abonnement aux nouveaux événements webhook, un parcours réel admin avec 2FA ou clé d'accès, un exercice de restauration Neon/R2 et des alertes opérationnelles restent à vérifier.
 
 ## Exploitation après livraison
 
 1. **Réalisé le 14 septembre 2026 :** contrôler les données existantes avant les nouvelles contraintes — prix et stock positifs, totaux cohérents, identifiant de paiement unique.
 2. **Réalisé le 14 septembre 2026 :** appliquer uniquement les migrations 0001 à 0005 sur la base de production identifiée, dans une transaction, avec verrou consultatif et délais bornés. La migration 0000 n'a pas été rejouée.
-3. Après autorisation du plan Workers Paid et vérifications Stripe, déployer puis vérifier l'identifiant de version, HTTP/HTTPS, recherche, parcours panier, erreurs Worker et événements Stripe.
-4. Surveiller les commandes `pending` expirées, les erreurs de rapprochement et `email_outbox`. Ne pas libérer du stock lorsqu'un paiement reste incertain.
-5. En cas de retour arrière, arrêter les nouveaux checkouts et rapprocher les réservations avant de revenir à un ancien code qui ne connaît pas la réservation. Un rollback aveugle du Worker vers l'ancien checkout pourrait décrémenter deux fois le stock. Les migrations additives restent en place.
+3. **Réalisé le 25 septembre 2026 :** fusionner la PR #27, vérifier le changement réel de version du Worker et contrôler HTTPS, recherche, langues, fiche produit et parcours panier → checkout sans paiement. Workers Paid n'a pas été activé.
+4. Après décision sur Workers Paid, refaire une rafale contrôlée pour mesurer le 1102. Vérifier aussi le paiement Stripe complet et les événements webhook avant de déclarer ces flux certifiés.
+5. Surveiller les commandes `pending` expirées, les erreurs de rapprochement et `email_outbox`. Ne pas libérer du stock lorsqu'un paiement reste incertain.
+6. En cas de retour arrière, arrêter les nouveaux checkouts et rapprocher les réservations avant de revenir à un ancien code qui ne connaît pas la réservation. Un rollback aveugle du Worker vers l'ancien checkout pourrait décrémenter deux fois le stock. Les migrations additives restent en place.
 
 Les propositions de design de l'audit initial restent un backlog produit : photos authentiques, preuves multicolores, contenu traduit du catalogue, délais détaillés, conseils d'entretien et comparaison des options. Aucun avis, aucune photo de réalisation et aucune promesse commerciale ne doivent être inventés pour remplir ces sections.
