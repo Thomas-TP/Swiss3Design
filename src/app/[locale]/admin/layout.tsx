@@ -1,5 +1,7 @@
+import type { Metadata } from "next";
 import { redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
+import { NOINDEX } from "@/lib/seo";
 import { getServerSession } from "@/lib/session";
 import {
   isSessionFresh,
@@ -9,6 +11,8 @@ import { AdminFreshnessGuard } from "./admin-freshness-guard";
 import { AdminShell } from "./admin-shell";
 
 export const dynamic = "force-dynamic";
+
+export const metadata: Metadata = { robots: NOINDEX };
 
 export default async function AdminLayout({
   children,

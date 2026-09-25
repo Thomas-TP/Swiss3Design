@@ -517,18 +517,47 @@ export async function getCategories(locale: Locale) {
     .orderBy(asc(categories.sortOrder));
 }
 
-// Slugs des produits actifs pour le sitemap : lecture légère (ni traduction ni
-// jointure d'images). Relue à chaque requête du sitemap (route force-dynamic),
-// donc toujours à jour à la création/suppression d'un produit.
+// Produits actifs pour le sitemap : slug, date et URL des images (sitemap
+// images → Google Images), sans traduction. Relue à chaque requête du sitemap
+// (route force-dynamic), donc toujours à jour à la création/suppression d'un
+// produit. Deux lectures groupées, jamais une par produit.
 export async function getSitemapProducts(): Promise<
-  { slug: string; createdAt: Date }[]
+  { slug: string; createdAt: Date; images: string[] }[]
 > {
   const db = await getDb();
-  return db
-    .select({ slug: products.slug, createdAt: products.createdAt })
+  const rows = await db
+    .select({
+      id: products.id,
+      slug: products.slug,
+      createdAt: products.createdAt,
+    })
     .from(products)
     .where(eq(products.active, true))
     .orderBy(desc(products.createdAt));
+  if (rows.length === 0) return [];
+
+  const images = await db
+    .select({ productId: productImages.productId, url: productImages.url })
+    .from(productImages)
+    .where(
+      inArray(
+        productImages.productId,
+        rows.map((r) => r.id),
+      ),
+    )
+    .orderBy(asc(productImages.sortOrder));
+  const byProduct = new Map<string, string[]>();
+  for (const img of images) {
+    const list = byProduct.get(img.productId) ?? [];
+    list.push(img.url);
+    byProduct.set(img.productId, list);
+  }
+
+  return rows.map((r) => ({
+    slug: r.slug,
+    createdAt: r.createdAt,
+    images: byProduct.get(r.id) ?? [],
+  }));
 }
 
 export async function getSetting(key: string): Promise<string | null> {

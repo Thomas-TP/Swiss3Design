@@ -1,6 +1,14 @@
 import type { ReactNode } from "react";
 import type { Locale } from "@/i18n/routing";
 
+// Dernière mise à jour de chaque document : affichée en tête de page ET
+// reprise comme <lastmod> du sitemap (une seule source, jamais désynchronisées).
+export const LEGAL_UPDATED = {
+  terms: "2026-07-10",
+  privacy: "2026-07-10",
+  shipping: "2026-07-10",
+} as const;
+
 export interface LegalSection {
   title: string;
   body: ReactNode;

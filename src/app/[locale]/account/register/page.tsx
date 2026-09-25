@@ -1,12 +1,25 @@
+import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { Link } from "@/i18n/navigation";
+import type { Locale } from "@/i18n/routing";
 import { enabledSocialProviders } from "@/lib/auth";
 import { SocialButtons } from "../social-buttons";
 import { RegisterForm } from "./register-form";
 import { BrandMark } from "@/components/brand-mark";
 
 export const dynamic = "force-dynamic";
+
+// Titre d'onglet uniquement : l'espace compte est en noindex (account/layout).
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "auth" });
+  return { title: t("signUpTitle") };
+}
 
 export default async function RegisterPage({
   searchParams,

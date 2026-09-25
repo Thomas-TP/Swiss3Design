@@ -11,7 +11,8 @@ import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
 import { Footer } from "@/components/footer";
 import { ThemeManager } from "@/components/theme-manager";
-import { organizationJsonLd } from "@/lib/seo";
+import { JsonLd } from "@/components/json-ld";
+import { SITE_URL, siteJsonLd } from "@/lib/seo";
 import "../globals.css";
 
 const geist = Geist({
@@ -19,44 +20,27 @@ const geist = Geist({
   variable: "--font-geist-sans",
 });
 
-const META: Record<string, { title: string; description: string }> = {
-  fr: {
-    title: "Impression 3D multicolore en Suisse",
-    description:
-      "Objets design imprimés en 3D jusqu'à 4 couleurs, fabriqués à Gland et livrés dans toute la Suisse.",
-  },
-  de: {
-    title: "Mehrfarbiger 3D-Druck in der Schweiz",
-    description:
-      "3D-gedruckte Designobjekte mit bis zu 4 Farben, gefertigt in Gland und in die ganze Schweiz geliefert.",
-  },
-  it: {
-    title: "Stampa 3D multicolore in Svizzera",
-    description:
-      "Oggetti di design stampati in 3D fino a 4 colori, realizzati a Gland e consegnati in tutta la Svizzera.",
-  },
-  en: {
-    title: "Multicolor 3D printing in Switzerland",
-    description:
-      "Design objects 3D-printed in up to 4 colors, made in Gland and delivered across Switzerland.",
-  },
-};
-
+// Métadonnées PAR DÉFAUT : chaque page indexable pose les siennes via
+// pageMetadata() (lib/seo.ts), avec canonical, hreflang et og:url. Ce socle ne
+// sert qu'aux pages sans generateMetadata (espaces privés, en noindex).
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ locale: string }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const meta = META[locale] ?? META.fr;
-  const title = `Swiss3Design — ${meta.title}`;
+  const t = await getTranslations({
+    locale: hasLocale(routing.locales, locale) ? locale : routing.defaultLocale,
+    namespace: "seo",
+  });
+  const title = t("homeTitle");
   return {
-    metadataBase: new URL("https://swiss3design.ch"),
+    metadataBase: new URL(SITE_URL),
     title: {
       default: title,
       template: "%s · Swiss3Design",
     },
-    description: meta.description,
+    description: t("homeDescription"),
     // Icônes déclarées à la main (et non via les conventions app/icon.png &
     // app/apple-icon.png) : Next inline les fichiers de ces conventions en
     // base64 DANS le bundle du Worker, qui est plafonné à 3 Mio — un jeu
@@ -74,22 +58,21 @@ export async function generateMetadata({
     openGraph: {
       type: "website",
       siteName: "Swiss3Design",
-      locale,
       title,
-      description: meta.description,
+      description: t("homeDescription"),
       images: [
         {
           url: "/brand/social/og-image.png",
           width: 1200,
           height: 630,
-          alt: "Swiss3Design",
+          alt: t("ogImageAlt"),
         },
       ],
     },
     twitter: {
       card: "summary_large_image",
       title,
-      description: meta.description,
+      description: t("homeDescription"),
       images: ["/brand/social/og-image.png"],
     },
   };
@@ -107,8 +90,9 @@ export default async function LocaleLayout({
 
   // Nonce CSP posé par le middleware (prod uniquement) : autorise le script
   // inline anti-flash sous une politique sans 'unsafe-inline'.
-  const nav = await getTranslations("nav");
-  const [requestHeaders, cookieStore] = await Promise.all([
+  const [nav, seo, requestHeaders, cookieStore] = await Promise.all([
+    getTranslations("nav"),
+    getTranslations("seo"),
     headers(),
     cookies(),
   ]);
@@ -133,17 +117,9 @@ export default async function LocaleLayout({
             __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;var r=document.documentElement;r.classList.toggle('dark',d);r.style.colorScheme=d?'dark':'light';}catch(e){}})();`,
           }}
         />
-        {/* Données structurées de l'entreprise (Organization) — rich results. */}
-        <script
-          type="application/ld+json"
-          nonce={nonce}
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(organizationJsonLd()).replace(
-              /</g,
-              "\\u003c",
-            ),
-          }}
-        />
+        {/* Données structurées de l'entreprise + du site (OnlineStore +
+            WebSite, référencés par @id depuis les schémas de chaque page). */}
+        <JsonLd data={siteJsonLd(locale, seo("organizationDescription"))} />
         <ThemeManager />
         <NextIntlClientProvider>
           <CartProvider>

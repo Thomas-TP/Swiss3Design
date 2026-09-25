@@ -4,6 +4,8 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { Reveal } from "@/components/reveal";
+import { JsonLd } from "@/components/json-ld";
+import { pageMetadata, webPageJsonLd } from "@/lib/seo";
 import { ContactForm } from "../a-propos/contact-form";
 
 const CONTACT_EMAIL = "contact@swiss3design.ch";
@@ -14,23 +16,38 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "contact" });
-  return {
-    title: t("pageTitle"),
-    description: t("pageIntro"),
-    openGraph: {
-      title: t("pageTitle"),
-      description: t("pageIntro"),
-      type: "website",
-    },
-  };
+  const t = await getTranslations({ locale, namespace: "seo" });
+  return pageMetadata({
+    locale,
+    path: "/contact",
+    title: t("contactTitle"),
+    description: t("contactDescription"),
+    imageAlt: t("ogImageAlt"),
+  });
 }
 
-export default async function ContactPage() {
-  const t = await getTranslations("contact");
+export default async function ContactPage({
+  params,
+}: {
+  params: Promise<{ locale: Locale }>;
+}) {
+  const { locale } = await params;
+  const [t, tSeo] = await Promise.all([
+    getTranslations("contact"),
+    getTranslations("seo"),
+  ]);
 
   return (
     <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 md:py-16">
+      <JsonLd
+        data={webPageJsonLd({
+          type: "ContactPage",
+          locale,
+          path: "/contact",
+          name: tSeo("contactTitle"),
+          description: tSeo("contactDescription"),
+        })}
+      />
       <Reveal>
         <span className="flex h-1 w-10 rounded-full bg-accent" />
         <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">

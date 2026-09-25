@@ -13,6 +13,8 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { Reveal } from "@/components/reveal";
+import { JsonLd } from "@/components/json-ld";
+import { faqJsonLd, pageMetadata, webPageJsonLd } from "@/lib/seo";
 import { ContactForm } from "./contact-form";
 import { ABOUT_CONTENT } from "./about-content";
 import { AboutNav } from "./about-nav";
@@ -28,15 +30,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const c = ABOUT_CONTENT[locale] ?? ABOUT_CONTENT.fr;
-  return {
+  const tSeo = await getTranslations({ locale, namespace: "seo" });
+  return pageMetadata({
+    locale,
+    path: "/a-propos",
     title: c.metaTitle,
     description: c.metaDescription,
-    openGraph: {
-      title: c.metaTitle,
-      description: c.metaDescription,
-      type: "website",
-    },
-  };
+    imageAlt: tSeo("ogImageAlt"),
+  });
 }
 
 function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
@@ -64,6 +65,18 @@ export default async function AboutPage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 sm:px-6">
+      {/* Page « À propos » rattachée à l'entreprise + FAQ visible plus bas :
+          deux schémas très lus par les moteurs de réponse (IA). */}
+      <JsonLd
+        data={webPageJsonLd({
+          type: "AboutPage",
+          locale,
+          path: "/a-propos",
+          name: c.metaTitle,
+          description: c.metaDescription,
+        })}
+      />
+      <JsonLd data={faqJsonLd(c.faq)} />
       {/* Hero */}
       <section className="py-14 md:py-20">
         <Reveal>

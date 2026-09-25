@@ -31,3 +31,30 @@ export function cfImage(
   ].join(",");
   return `/cdn-cgi/image/${params}${url}`;
 }
+
+/**
+ * Image de partage (og:image) d'une photo produit : JPEG 1200×630, le seul
+ * format/ratio lu de façon fiable par tous les réseaux (WhatsApp, LinkedIn,
+ * Facebook…) — nos originaux sont en WebP carré. `fit=pad` ajoute des marges
+ * couleur papier au lieu de rogner l'objet. Hors production (pas de
+ * /cdn-cgi/image), renvoie `null` : l'appelant garde alors l'original.
+ */
+export function cfOgImage(url: string | null | undefined): string | null {
+  if (
+    !url?.startsWith("/api/files/") ||
+    /\.svg(?:[?#]|$)/i.test(url) ||
+    process.env.NODE_ENV !== "production"
+  ) {
+    return null;
+  }
+  const params = [
+    "format=jpeg",
+    "width=1200",
+    "height=630",
+    "fit=pad",
+    "background=%23fafaf9",
+    "quality=85",
+    "onerror=redirect",
+  ].join(",");
+  return `/cdn-cgi/image/${params}${url}`;
+}

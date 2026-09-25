@@ -612,5 +612,27 @@
     "refunded": "Refunded: {amount}",
     "refundPending": "Order cancelled: the refund still needs to be processed in Stripe.",
     "openStripe": "Open payment in Stripe"
+  },
+  "seo": {
+    "ogImageAlt": "Swiss3Design — multicolor 3D-printed design objects from Switzerland",
+    "organizationDescription": "Swiss online store for design objects 3D-printed in up to 4 colors, made in two workshops in the Lake Geneva region (Gland and Pully, VD) and delivered across Switzerland. Custom 3D printing on quote.",
+    "breadcrumbHome": "Home",
+    "homeTitle": "Swiss3Design — Multicolor 3D printing in Switzerland",
+    "homeDescription": "Design objects 3D-printed in up to 4 colors, made piece by piece in the Lake Geneva region (VD) and delivered across Switzerland. Custom printing on quote.",
+    "shopTitle": "Shop: 3D-printed design objects",
+    "shopDescription": "The full Swiss3Design catalog: 3D-printed decor and design objects in up to 4 colors, made to order or ready to ship. Delivery anywhere in Switzerland.",
+    "customTitle": "Custom 3D printing, quote within 48 h",
+    "customDescription": "Get your 3D model (STL, 3MF, OBJ, STEP) or idea printed in Switzerland: multicolor printing in up to 4 colors, with a personalized quote within 48 hours.",
+    "customServiceName": "Custom 3D printing",
+    "contactTitle": "Contact us: orders, quotes and questions",
+    "contactDescription": "A question about an order, a quote or our 3D printing workshop in the Lake Geneva region? Write to us via the form or by email, we reply within 48 hours.",
+    "termsTitle": "Terms and conditions of sale",
+    "termsDescription": "Swiss3Design terms and conditions of sale: orders, prices in CHF, payment, delivery in Switzerland, statutory warranty and custom 3D printing services.",
+    "privacyTitle": "Privacy policy (Swiss FADP)",
+    "privacyDescription": "How Swiss3Design collects, uses and protects your personal data under the Swiss Federal Act on Data Protection (FADP), and what your rights are.",
+    "shippingTitle": "Shipping and returns in Switzerland",
+    "shippingDescription": "Delivery within Switzerland only, by Swiss Post: timelines, shipping costs, order tracking, 14-day returns and the 2-year statutory warranty at Swiss3Design.",
+    "productTitle": "{name} — 3D-printed in Switzerland",
+    "productDescription": "{name} in {material}, 3D-printed piece by piece in our Lake Geneva workshops (VD). {price}, delivered anywhere in Switzerland."
   }
 }
