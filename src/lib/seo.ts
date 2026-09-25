@@ -154,16 +154,24 @@ const abs = (url: string) =>
   url.startsWith("http") ? url : `${SITE_URL}${url}`;
 
 // Politique de retour (miroir de /legal/shipping) : articles de catalogue
-// retournables 14 jours, frais de retour à la charge du client. Déclarée au
-// niveau de l'entreprise ET de chaque offre (Google privilégie l'offre).
-const RETURN_POLICY = {
-  "@type": "MerchantReturnPolicy",
-  applicableCountry: "CH",
-  returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
-  merchantReturnDays: 14,
-  returnMethod: "https://schema.org/ReturnByMail",
-  returnFees: "https://schema.org/ReturnFeesCustomerResponsibility",
-};
+// neufs retournables 14 jours, renvoi par la Poste à la charge du client, prix
+// de l'article remboursé. Déclarée au niveau de l'entreprise ET de chaque offre
+// (Google privilégie l'offre). Propriétés : doc « return policy » de Google.
+function returnPolicy(locale: Locale) {
+  return {
+    "@type": "MerchantReturnPolicy",
+    applicableCountry: "CH",
+    returnPolicyCountry: "CH",
+    returnPolicyCategory: "https://schema.org/MerchantReturnFiniteReturnWindow",
+    merchantReturnDays: 14,
+    returnMethod: "https://schema.org/ReturnByMail",
+    returnFees: "https://schema.org/ReturnFeesCustomerResponsibility",
+    returnLabelSource: "https://schema.org/ReturnLabelCustomerResponsibility",
+    refundType: "https://schema.org/FullRefund",
+    itemCondition: "https://schema.org/NewCondition",
+    merchantReturnLink: `${SITE_URL}/${locale}/legal/shipping`,
+  };
+}
 
 /**
  * Entreprise + site (un seul bloc `@graph`, posé une fois dans le layout).
@@ -211,7 +219,7 @@ export function siteJsonLd(locale: Locale, description: string) {
           "PETG",
           "Custom 3D printing",
         ],
-        hasMerchantReturnPolicy: RETURN_POLICY,
+        hasMerchantReturnPolicy: returnPolicy(locale),
       },
       {
         "@type": "WebSite",
@@ -370,8 +378,10 @@ export interface ProductJsonLdInput {
 
 // Données structurées d'un produit (prix, devise, disponibilité, livraison,
 // retours) → éligibilité aux résultats enrichis « produit » et fiches
-// marchandes de Google. Les disponibilités suivent le modèle de vente :
-// rupture > impression à la demande > en stock.
+// marchandes de Google. Une pièce imprimée à la demande est « InStock » avec
+// un délai de préparation allongé : `MadeToOrder` existe dans schema.org mais
+// ne fait PAS partie des valeurs acceptées par Google pour les fiches
+// marchandes (ni par Merchant Center). Seule une vraie rupture l'exclut.
 export function productJsonLd(
   p: ProductJsonLdInput,
   locale: Locale,
@@ -382,9 +392,7 @@ export function productJsonLd(
   const availability =
     p.stock != null && p.stock <= 0
       ? "https://schema.org/OutOfStock"
-      : p.saleType === "on_demand"
-        ? "https://schema.org/MadeToOrder"
-        : "https://schema.org/InStock";
+      : "https://schema.org/InStock";
   // Délai de préparation : 1–3 jours ouvrés en stock (cf. /legal/shipping),
   // délai de production de la fiche pour une pièce imprimée à la demande.
   const production = p.saleType === "on_demand" ? (p.productionDays ?? 3) : 1;
@@ -469,7 +477,7 @@ export function productJsonLd(
           },
         },
       },
-      hasMerchantReturnPolicy: RETURN_POLICY,
+      hasMerchantReturnPolicy: returnPolicy(locale),
     },
   };
 }

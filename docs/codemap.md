@@ -48,6 +48,7 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | `maintenance.ts`       | Mode maintenance                                                             | —                                                              |
 | `theme.ts`             | Constantes/aides de thème (clair/sombre)                                     | —                                                              |
 | `seo.ts`               | Métadonnées complètes par page (canonical, hreflang, OG) + tous les JSON-LD  | `pageMetadata()`, `NOINDEX`, `siteJsonLd()`, `productJsonLd()` |
+| `indexnow.ts`          | Notifie IndexNow (Bing, Yandex…) des URL produit modifiées — fire-and-forget | `notifyIndexNow()`                                             |
 | `cf-image.ts`          | URL image Cloudflare Transformations (`/cdn-cgi/image`, prod only)           | `cfImage()`                                                    |
 | `cantons.ts`           | Les 26 cantons suisses (code + nom), partagé checkout/carnet d'adresses      | `CANTONS`                                                      |
 | `stripe-customer.ts`   | Identité Stripe client, créée paresseusement au 1er checkout connecté        | `getOrCreateStripeCustomer()`                                  |

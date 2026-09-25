@@ -2,6 +2,7 @@ import { getProducts } from "@/db/queries";
 import { formatChf } from "@/lib/format";
 import { SITE_URL } from "@/lib/seo";
 import { getShippingSettings } from "@/lib/shipping-settings";
+import { FREE_SHIPPING_OVER_CENTS, SHIPPING_CENTS } from "@/lib/shipping";
 
 // /llms.txt (convention llmstxt.org) : résumé Markdown du site destiné aux
 // assistants IA et agents — qui nous sommes, les faits vérifiables (livraison,
@@ -23,17 +24,25 @@ const PAGES = {
 const url = (path: string, locale = "en") => `${SITE_URL}/${locale}${path}`;
 
 export async function GET() {
+  // Base indisponible → le fichier reste servi (200), sans la liste produits
+  // et avec les frais de port par défaut : un 5xx ici fait échouer l'audit
+  // « agentic browsing » de Lighthouse, alors qu'un résumé partiel reste utile.
   const [products, shipping] = await Promise.all([
-    getProducts("en"),
-    getShippingSettings(),
+    getProducts("en").catch(() => []),
+    getShippingSettings().catch(() => ({
+      shippingCents: SHIPPING_CENTS,
+      freeOverCents: FREE_SHIPPING_OVER_CENTS,
+    })),
   ]);
   const chf = (cents: number) => formatChf(cents, "en");
 
   const productLines = products.map((p) => {
     const sale =
-      p.saleType === "on_demand"
-        ? `printed to order${p.productionDays ? ` in ${p.productionDays} days` : ""}`
-        : "in stock";
+      p.stock != null && p.stock <= 0
+        ? "currently out of stock"
+        : p.saleType === "on_demand"
+          ? `printed to order${p.productionDays ? ` in ${p.productionDays} days` : ""}`
+          : "in stock";
     return `- [${p.name}](${url(`/products/${p.slug}`)}): ${chf(p.priceCents)}, ${p.material}${p.multicolor ? ", multicolour" : ""}, ${sale}`;
   });
 

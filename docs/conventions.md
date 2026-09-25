@@ -172,6 +172,13 @@ on _every_ page at once.
 - **Shop facets** (`sort`, `material`, `color`, `q`) are closed to crawlers in
   `robots.ts` and canonicalised to `/shop`; don't add a new filter parameter
   without adding its `Disallow`.
+- **Product availability** in JSON-LD is `InStock` / `OutOfStock` only:
+  `MadeToOrder` is valid schema.org but rejected by Google merchant listings —
+  printed-to-order pieces are `InStock` with a longer `handlingTime`.
+- **IndexNow**: any admin action that creates, renames, deletes, publishes or
+  sells out a product calls `notifyIndexNow()`
+  ([`src/lib/indexnow.ts`](../src/lib/indexnow.ts), Bing/Yandex/Seznam…). The
+  key file `public/867cd9af686842c88e46c3f656218246.txt` must stay deployed.
 
 ## CSP nonce contract (prod only)
 

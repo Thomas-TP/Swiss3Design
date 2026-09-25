@@ -106,7 +106,19 @@ describe("SEO — données structurées", () => {
     };
     const shipping = { shippingCents: 890, freeOverCents: 6000 };
     const cheap = productJsonLd({ ...base, priceCents: 2400 }, "fr", shipping);
-    expect(cheap.offers.availability).toBe("https://schema.org/MadeToOrder");
+    // À la demande = en stock + délai de production (MadeToOrder refusé par
+    // Google pour les fiches marchandes).
+    expect(cheap.offers.availability).toBe("https://schema.org/InStock");
+    expect(
+      cheap.offers.shippingDetails.deliveryTime.handlingTime.minValue,
+    ).toBe(3);
+    expect(cheap.offers.hasMerchantReturnPolicy.merchantReturnLink).toBe(
+      "https://swiss3design.ch/fr/legal/shipping",
+    );
+    expect(
+      productJsonLd({ ...base, priceCents: 2400, stock: 0 }, "fr", shipping)
+        .offers.availability,
+    ).toBe("https://schema.org/OutOfStock");
     expect(cheap.offers.shippingDetails.shippingRate.value).toBe("8.90");
     expect(
       cheap.offers.shippingDetails.shippingDestination.addressCountry,
