@@ -1,5 +1,6 @@
 import type { Locale } from "@/i18n/routing";
 import { AnalyticsOptOut } from "@/components/analytics-opt-out";
+import { RecordingConsent } from "@/components/recording-consent";
 import type { LegalSection } from "../legal-layout";
 
 // Politique de confidentialité dans les 4 langues. Seule la version
@@ -126,6 +127,31 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Enregistrements de visite (sur accord)",
+      body: (
+        <p>
+          Uniquement si vous l’acceptez (bandeau « Accepter » ou bouton
+          ci-dessous), PostHog enregistre aussi le déroulé anonyme de votre
+          visite (pages, clics, défilement) pour nous aider à repérer ce qui
+          gêne sur le site. Les champs de saisie et les données personnelles
+          affichées sont masqués, les enregistrements sont supprimés après 30
+          jours, et un identifiant anonyme est alors conservé dans votre
+          navigateur (cookie « ph_… » et stockage local, jusqu’à un an) pour
+          relier les pages d’une même visite. Sans accord : aucun enregistrement
+          ni cookie, la mesure reste anonyme et sans cookie. Vous pouvez changer
+          d’avis à tout moment :
+          <RecordingConsent
+            labels={{
+              granted: "Enregistrements acceptés dans ce navigateur.",
+              notGranted: "Enregistrements non autorisés dans ce navigateur.",
+              grant: "Accepter",
+              revoke: "Retirer mon accord",
+            }}
+          />
+        </p>
+      ),
+    },
+    {
       title: "Profilage et décisions automatisées",
       body: (
         <p>
@@ -164,9 +190,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Le site n’utilise que des éléments techniques indispensables : un
           cookie de session pour rester connecté à son compte et le stockage
           local du navigateur pour le panier, les favoris, la reprise d’un
-          paiement et, le cas échéant, votre refus de la mesure d’audience. La
-          mesure d’audience ne dépose aucun cookie. Aucun cookie publicitaire ni
-          de suivi d’un site à l’autre.
+          paiement et, le cas échéant, vos choix concernant la mesure
+          d’audience. La mesure d’audience ne dépose aucun cookie, sauf si vous
+          acceptez les enregistrements de visite (identifiant anonyme, voir
+          ci-dessus). Aucun cookie publicitaire ni de suivi d’un site à l’autre.
         </p>
       ),
     },
@@ -348,6 +375,31 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Besuchsaufzeichnungen (mit Einwilligung)",
+      body: (
+        <p>
+          Nur wenn Sie zustimmen (Banner «Akzeptieren» oder Schaltfläche unten),
+          zeichnet PostHog zusätzlich den anonymen Ablauf Ihres Besuchs auf
+          (Seiten, Klicks, Scrollen), damit wir erkennen, was auf der Website
+          stört. Eingabefelder und angezeigte persönliche Daten werden
+          verborgen, die Aufzeichnungen werden nach 30 Tagen gelöscht, und eine
+          anonyme Kennung wird dann in Ihrem Browser gespeichert (Cookie «ph_…»
+          und lokaler Speicher, bis zu einem Jahr), um die Seiten eines Besuchs
+          zu verknüpfen. Ohne Einwilligung: keine Aufzeichnung und kein Cookie,
+          die Messung bleibt anonym und cookiefrei. Sie können Ihre Wahl
+          jederzeit ändern:
+          <RecordingConsent
+            labels={{
+              granted: "Aufzeichnungen in diesem Browser erlaubt.",
+              notGranted: "Aufzeichnungen in diesem Browser nicht erlaubt.",
+              grant: "Akzeptieren",
+              revoke: "Einwilligung widerrufen",
+            }}
+          />
+        </p>
+      ),
+    },
+    {
       title: "Profiling und automatisierte Entscheidungen",
       body: (
         <p>
@@ -387,8 +439,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           ein Session-Cookie, um im Konto angemeldet zu bleiben, und den lokalen
           Speicher des Browsers für den Warenkorb, die Favoriten, die
           Wiederaufnahme einer Zahlung und gegebenenfalls Ihren Widerspruch
-          gegen die Reichweitenmessung. Die Reichweitenmessung setzt keine
-          Cookies. Keine Werbe-Cookies und kein websiteübergreifendes Tracking.
+          gegen die Reichweitenmessung bzw. Ihre Einwilligung. Die
+          Reichweitenmessung setzt keine Cookies, ausser Sie erlauben die
+          Besuchsaufzeichnungen (anonyme Kennung, siehe oben). Keine
+          Werbe-Cookies und kein websiteübergreifendes Tracking.
         </p>
       ),
     },
@@ -572,6 +626,31 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Registrazioni delle visite (con consenso)",
+      body: (
+        <p>
+          Solo se lo accettate (banner «Accetta» o pulsante qui sotto), PostHog
+          registra anche lo svolgimento anonimo della vostra visita (pagine,
+          clic, scorrimento) per aiutarci a individuare ciò che crea difficoltà
+          sul sito. I campi di inserimento e i dati personali visualizzati sono
+          nascosti, le registrazioni vengono eliminate dopo 30 giorni e un
+          identificativo anonimo viene allora conservato nel vostro browser
+          (cookie «ph_…» e memoria locale, fino a un anno) per collegare le
+          pagine di una stessa visita. Senza consenso: nessuna registrazione né
+          cookie, la misurazione resta anonima e senza cookie. Potete cambiare
+          idea in qualsiasi momento:
+          <RecordingConsent
+            labels={{
+              granted: "Registrazioni accettate in questo browser.",
+              notGranted: "Registrazioni non autorizzate in questo browser.",
+              grant: "Accetta",
+              revoke: "Revoca il consenso",
+            }}
+          />
+        </p>
+      ),
+    },
+    {
       title: "Profilazione e decisioni automatizzate",
       body: (
         <p>
@@ -609,9 +688,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Il sito utilizza solo elementi tecnici indispensabili: un cookie di
           sessione per restare connessi al proprio conto e la memoria locale del
           browser per il carrello, i preferiti, la ripresa di un pagamento e, se
-          del caso, la vostra opposizione alla misurazione dell’audience. La
-          misurazione dell’audience non deposita alcun cookie. Nessun cookie
-          pubblicitario né tracciamento da un sito all’altro.
+          del caso, le vostre scelte sulla misurazione dell’audience. La
+          misurazione dell’audience non deposita alcun cookie, salvo se
+          accettate le registrazioni delle visite (identificativo anonimo, vedi
+          sopra). Nessun cookie pubblicitario né tracciamento da un sito
+          all’altro.
         </p>
       ),
     },
@@ -784,6 +865,30 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Visit recordings (with consent)",
+      body: (
+        <p>
+          Only if you accept (the “Accept” banner or the button below), PostHog
+          also records an anonymous replay of your visit (pages, clicks,
+          scrolling) to help us spot what gets in the way on the site. Input
+          fields and displayed personal data are hidden, recordings are deleted
+          after 30 days, and an anonymous identifier is then kept in your
+          browser (a “ph_…” cookie and local storage, for up to one year) to
+          link the pages of a single visit. Without consent: no recording and no
+          cookie, measurement stays anonymous and cookie-free. You can change
+          your mind at any time:
+          <RecordingConsent
+            labels={{
+              granted: "Recordings allowed in this browser.",
+              notGranted: "Recordings not allowed in this browser.",
+              grant: "Accept",
+              revoke: "Withdraw consent",
+            }}
+          />
+        </p>
+      ),
+    },
+    {
       title: "Profiling and automated decisions",
       body: (
         <p>
@@ -819,9 +924,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           The site only uses strictly necessary technical elements: a session
           cookie to stay signed in to your account and the browser’s local
           storage for the cart, favourites, resuming a payment and, where
-          applicable, your objection to audience measurement. Audience
-          measurement sets no cookies. No advertising cookies and no cross-site
-          tracking.
+          applicable, your choices about audience measurement. Audience
+          measurement sets no cookies unless you allow visit recordings
+          (anonymous identifier, see above). No advertising cookies and no
+          cross-site tracking.
         </p>
       ),
     },

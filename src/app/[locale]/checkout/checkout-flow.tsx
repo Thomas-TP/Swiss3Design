@@ -714,7 +714,8 @@ export function CheckoutFlow({
                       size={17}
                       className="shrink-0 text-emerald-600"
                     />
-                    <span className="truncate">{accountEmail}</span>
+                    {/* ph-mask : masqué dans les enregistrements de visite. */}
+                    <span className="ph-mask truncate">{accountEmail}</span>
                   </div>
                 ) : (
                   <GuestEmailVerification proof={proof} onProof={setProof} />
