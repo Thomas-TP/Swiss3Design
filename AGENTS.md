@@ -153,8 +153,9 @@ put` on an environment with real users without `--env <name>` explicitly
    **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
-10. **Keep the Worker bundle lean: 2 851 KiB gzip (2026-09-26 measurement,
-    after PostHog — re-measure rather than trust this figure as it ages).
+10. **Keep the Worker bundle lean: 2 676 KiB gzip (2026-09-26 measurement,
+    after PostHog and the PR #36 dependency refresh — re-measure rather than
+    trust this figure as it ages).
     Never add a binary asset through a Next file convention.** Since
     2026-09-26 the account is on **Workers Paid**, whose cap is 10 MiB
     **gzipped**. The **Free** plan's 3 MiB cap is what broke the deploy in
@@ -189,7 +190,7 @@ put` on an environment with real users without `--env <name>` explicitly
 | Email                     | Resend (REST) — no-op if `RESEND_API_KEY` unset                                                                                                                                                                           |
 | i18n                      | `next-intl` (fr/de/it/en, auto-detect, fr fallback)                                                                                                                                                                       |
 | Files / cache             | Cloudflare R2 / KV                                                                                                                                                                                                        |
-| Analytics                 | PostHog Cloud EU, cookieless, via the first-party relay `/api/relay` (middleware) — `posthog-js` only in `src/instrumentation-client.ts`; see `docs/conventions.md` → Analytics                                           |
+| Analytics                 | PostHog Cloud EU, cookie `ph_…` + replay, Swiss opt-out (« OK / Refuser »), via the relay `/api/relay` (middleware) — `posthog-js` only in `src/instrumentation-client.ts`; see `docs/conventions.md` → Analytics         |
 | Hosting                   | Cloudflare Workers via `@opennextjs/cloudflare`                                                                                                                                                                           |
 
 ## Commands
@@ -289,9 +290,12 @@ build; dashboard-only, no `wrangler.jsonc`/CLI/API equivalent) on both
 `swiss3design` and `swiss3design-preview`. **Always verify the push actually
 deployed**; fall
 back to a manual deploy (`bunx opennextjs-cloudflare build && bunx
-opennextjs-cloudflare deploy`, i.e. `bun run deploy`) if it didn't. **There is
-no GitHub Actions workflow** — the green commit check, when it appears, comes
-from Cloudflare. One-click publish: run [`scripts/push.bat`](scripts/push.bat).
+opennextjs-cloudflare deploy`, i.e. `bun run deploy`) if it didn't. GitHub
+Actions runs [`quality.yml`](.github/workflows/quality.yml) (lint,
+format:check, typecheck, migrations against a throwaway Postgres, tests,
+`bun audit`) and CodeQL on every PR and every push to `main`, but deploys
+nothing: only the Cloudflare checks (« Workers Builds: … ») deploy. One-click
+publish: run [`scripts/push.bat`](scripts/push.bat).
 Full details, the two-separate-Worker preview setup, the stacked-PR merge
 pitfall, and the secrets-rotation incident:
 [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
@@ -323,6 +327,14 @@ under D1.
   in the codebase (the _why_, not the _what_).
 - Run `bun run lint` before declaring work done. When a change touches CSP, inline
   scripts, or anything runtime-specific, also run `bun run preview`.
+- **Dependabot PRs (bun):** Dependabot's lockfile update can leave a stale
+  hoisted copy of a peer dependency. In PR #36 (2026-09-26), `@better-auth/core`
+  1.7.4 stayed at the root while every 1.7.5 package nested its own 1.7.5 copy.
+  The duplicate, incompatible types broke `typecheck` and the Cloudflare
+  build. To fix it on the branch: merge `main` in, run
+  `bun update <direct deps involved>`, then check that `node_modules` holds a
+  single copy. Merge only when both `quality` and « Workers Builds:
+  swiss3design-preview » are green.
 
 ## Brand constraints
 
