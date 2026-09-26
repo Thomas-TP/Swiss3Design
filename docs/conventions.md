@@ -180,7 +180,7 @@ on _every_ page at once.
   ([`src/lib/indexnow.ts`](../src/lib/indexnow.ts), Bing/Yandex/Seznam…). The
   key file `public/867cd9af686842c88e46c3f656218246.txt` must stay deployed.
 
-## Analytics (PostHog, EU, cookieless)
+## Analytics (PostHog, EU, Swiss opt-out regime)
 
 - **Track with `track(event, props)`** from [`src/lib/analytics.ts`](../src/lib/analytics.ts)
   in client code. From a Server Component, render
@@ -206,28 +206,32 @@ on _every_ page at once.
 - **Relay:** the browser only calls `/api/relay/*` on our own domain, which the
   middleware relays to `eu.i.posthog.com` (a static `/static/*` script goes to
   `eu-assets`). Only allowlisted headers are forwarded, so the session cookie
-  never leaves. The visitor IP goes as `x-forwarded-for` for the cookieless
-  hash; the project discards it. `Origin`/`Referer` are set to the site
-  origin only: PostHog needs them to match the project's recording domains,
-  and without them session replay silently stays disabled.
+  never leaves. The visitor IP goes as `x-forwarded-for`; the project discards
+  it (`anonymize_ips`). `Origin`/`Referer` are set to the site origin only:
+  PostHog needs them to match the project's recording domains, and without
+  them session replay silently stays disabled.
 - **Location** comes from Cloudflare (`cf` → `data-geo-*` on `<html>`, set in
-  the `[locale]` layout). In cookieless mode PostHog drops the IP before its
-  own GeoIP runs.
-- **Cookieless by default, cookies only after consent.** posthog-js runs with
-  `cookieless_mode: "on_reject"` and `opt_out_capturing_by_default: true`: an
-  undecided visitor counts as a refusal, so they are measured without any
-  cookie or storage. "Accepter" in
-  [`<ConsentBanner>`](../src/components/consent-banner.tsx) calls
-  `setConsent(true)` → `opt_in_capturing()`: cookies, session replay and
-  surveys start for that visitor only. The PostHog project must keep
-  "Cookieless server hash mode" on, otherwise every cookieless event is
-  discarded.
+  the `[locale]` layout) with `$geoip_disable`, so there is one source and the
+  IP never needs to be kept.
+- **Swiss opt-out regime (art. 45c LTC, nLPD), not EU opt-in.** The target
+  market is Switzerland, so GDPR-style prior consent is deliberately not
+  implemented. Measurement, the `ph_…` cookie and session replay run from the
+  first page view. [`<ConsentBanner>`](../src/components/consent-banner.tsx)
+  informs the visitor. "OK" closes it; "Refuser" (and the privacy-page button)
+  call `setAnalyticsOptOut(true)`, which runs `opt_out_capturing()`, clears
+  PostHog storage (`opt_out_persistence_by_default`), and makes `before_send`
+  drop everything. The choice lives in `localStorage["s3d-consent"]`. No
+  `identify()`: visitors stay random IDs, which keeps the "no profiling"
+  statement of the privacy policy true.
 - **Personal data on screen** (an email, an address) gets the `ph-mask`
   class, so it is masked in replays; inputs are always masked. `/account` and
   `/track` are excluded from recording in the project settings.
-- **Full opt-out** (privacy page) and the team's own browser are dropped in
-  `before_send`, not with `opt_out_capturing()`: under `on_reject` that call
-  only switches back to cookieless measurement.
+- **Attribution:** AI assistants are a custom channel type ("AI") in the
+  PostHog project (referring domain or `utm_source`). ChatGPT adds
+  `utm_source=chatgpt.com` to its links; Claude, Perplexity and Gemini only
+  send a referrer. Site links in customer e-mails go through `withUtm()`
+  (`lib/email-templates.ts`: `utm_medium=email`, campaign per e-mail type).
+  Never put UTM on authentication links.
 
 ## CSP nonce contract (prod only)
 

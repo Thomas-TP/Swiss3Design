@@ -209,9 +209,9 @@
     "thanks": "Merci, cela nous aide beaucoup !"
   },
   "consent": {
-    "title": "Aidez-nous à améliorer la boutique",
-    "text": "Nous mesurons déjà la fréquentation sans cookie. Acceptez-vous aussi l'enregistrement anonyme de votre visite (clics et défilement, saisies masquées) ?",
-    "accept": "Accepter",
+    "title": "Mesure d'audience",
+    "text": "Pour améliorer la boutique, nous utilisons des cookies de mesure d'audience et enregistrons le déroulé des visites (saisies masquées). Vous pouvez refuser à tout moment.",
+    "accept": "OK",
     "decline": "Refuser",
     "learnMore": "En savoir plus"
   },

@@ -209,9 +209,9 @@
     "thanks": "Danke, das hilft uns sehr!"
   },
   "consent": {
-    "title": "Helfen Sie uns, den Shop zu verbessern",
-    "text": "Wir messen die Besuche bereits ohne Cookies. Erlauben Sie zusätzlich die anonyme Aufzeichnung Ihres Besuchs (Klicks und Scrollen, Eingaben verborgen)?",
-    "accept": "Akzeptieren",
+    "title": "Reichweitenmessung",
+    "text": "Um den Shop zu verbessern, verwenden wir Cookies zur Reichweitenmessung und zeichnen den Ablauf der Besuche auf (Eingaben verborgen). Sie können jederzeit ablehnen.",
+    "accept": "OK",
     "decline": "Ablehnen",
     "learnMore": "Mehr erfahren"
   },

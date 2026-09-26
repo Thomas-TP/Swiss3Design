@@ -209,9 +209,9 @@
     "thanks": "Thank you, that helps us a lot!"
   },
   "consent": {
-    "title": "Help us improve the shop",
-    "text": "We already measure visits without cookies. Do you also accept an anonymous recording of your visit (clicks and scrolling, inputs hidden)?",
-    "accept": "Accept",
+    "title": "Audience measurement",
+    "text": "To improve the shop, we use audience measurement cookies and record how visits unfold (inputs hidden). You can decline at any time.",
+    "accept": "OK",
     "decline": "Decline",
     "learnMore": "Learn more"
   },
