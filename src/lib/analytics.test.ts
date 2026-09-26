@@ -28,6 +28,16 @@ describe("sanitizeUrl", () => {
     ).toBe("https://swiss3design.ch/fr/shop?q=vase&utm_source=chatgpt.com");
   });
 
+  it("garde les marqueurs de provenance (IA, Google Shopping, régies)", () => {
+    expect(
+      sanitizeUrl(
+        "https://swiss3design.ch/fr?utm_source=chatgpt.com&srsltid=AfmBOo&gad_source=1&token=secret",
+      ),
+    ).toBe(
+      "https://swiss3design.ch/fr?utm_source=chatgpt.com&srsltid=AfmBOo&gad_source=1",
+    );
+  });
+
   it("vide complètement la requête de la confirmation Stripe", () => {
     expect(
       sanitizeUrl(

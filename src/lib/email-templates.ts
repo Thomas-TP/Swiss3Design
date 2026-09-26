@@ -16,6 +16,20 @@ function trackingUrl(trackingNumber: string): string {
   return `https://service.post.ch/ekp-web/ui/entry/search/${encodeURIComponent(trackingNumber)}`;
 }
 
+// Liens vers le site dans les e-mails clients (relance panier, devis,
+// newsletter) : marqués utm_* pour que la mesure d'audience classe ces
+// retours dans le canal « Email », campagne par campagne, au lieu de
+// « Direct ». Jamais sur les liens d'authentification (jetons) ni vers
+// d'autres sites.
+export function withUtm(url: string, campaign: string): string {
+  if (!url.startsWith(`${SITE_URL}/`)) return url;
+  const target = new URL(url);
+  target.searchParams.set("utm_source", "swiss3design");
+  target.searchParams.set("utm_medium", "email");
+  target.searchParams.set("utm_campaign", campaign);
+  return target.toString();
+}
+
 function button(href: string, label: string): string {
   return `<p style="margin:0 0 18px;text-align:center;">
       <a href="${href}" style="display:inline-block;background:#e5231c;color:#ffffff;text-decoration:none;font-weight:600;font-size:14px;padding:13px 28px;border-radius:999px;">${label}</a>
@@ -173,7 +187,7 @@ export function abandonedCartEmail(params: {
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" width="100%" style="margin:0 0 22px;font-size:14px;color:#1c1917;">
       ${rows}
     </table>
-    ${button(params.cartUrl, t.cta)}
+    ${button(withUtm(params.cartUrl, "cart_reminder"), t.cta)}
     <p style="margin:0;font-size:13px;color:#78716c;line-height:1.6;">${t.outro}</p>`;
   const footer = `${t.consentNote}<br/><a href="${params.unsubscribeUrl}" style="color:#78716c;text-decoration:underline;">${t.unsubscribe}</a>`;
   return {
@@ -593,7 +607,7 @@ export function quoteReplyEmail(quote: {
         ? `<p style="margin:0 0 18px;font-size:13px;color:#78716c;">${t.valid.replace("{date}", formatDate(quote.validUntil, locale))}</p>`
         : ""
     }
-    ${button(`${SITE_URL}/${locale}/account/quotes/${quote.id}`, t.review)}
+    ${button(withUtm(`${SITE_URL}/${locale}/account/quotes/${quote.id}`, "quote"), t.review)}
     <p style="margin:0;font-size:13px;color:#78716c;line-height:1.6;">${t.cta}</p>`;
   return {
     to: quote.email,
@@ -1240,14 +1254,16 @@ export function newsletterAnnouncementEmail(params: {
           <td style="padding:14px 16px;vertical-align:middle;">
             <p style="margin:0 0 4px;font-weight:600;color:#1c1917;">${esc(product.name)}</p>
             <p style="margin:0 0 10px;color:#78716c;font-size:13px;">${chf(product.priceCents)}</p>
-            <a href="${product.url}" style="color:#e5231c;font-weight:600;font-size:13px;text-decoration:none;">Découvrir →</a>
+            <a href="${withUtm(product.url, "newsletter")}" style="color:#e5231c;font-weight:600;font-size:13px;text-decoration:none;">Découvrir →</a>
           </td>
         </tr>
       </table>`,
     )
     .join("");
 
-  const cta = params.cta ? button(params.cta.url, params.cta.label) : "";
+  const cta = params.cta
+    ? button(withUtm(params.cta.url, "newsletter"), params.cta.label)
+    : "";
 
   const body = `${banner}${paragraphs}${productCards}${cta}`;
   const footer = `Vous recevez cet e-mail car vous êtes inscrit·e aux communications Swiss3Design.<br/><a href="${params.unsubscribeUrl}" style="color:#78716c;text-decoration:underline;">Se désabonner en un clic</a>`;

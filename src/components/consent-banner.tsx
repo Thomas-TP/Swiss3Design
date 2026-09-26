@@ -3,18 +3,23 @@
 import { useSyncExternalStore } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
-import { consentStatus, setConsent, subscribeConsent } from "@/lib/analytics";
+import {
+  noticeStatus,
+  setAnalyticsOptOut,
+  subscribeAnalyticsOptOut,
+} from "@/lib/analytics";
 
-// Accord aux enregistrements de visite (PostHog). La mesure d'audience, elle,
-// tourne sans cookie pour tout le monde : ce bandeau ne bloque rien, n'écrit
-// rien avant un clic, et « Refuser » pèse autant qu'« Accepter ». Masqué au
-// paiement (il couvrirait le bouton de commande sur mobile) et dans l'admin.
+// Information sur la mesure d'audience, au régime suisse (art. 45c LTC :
+// informer et permettre de refuser) : la mesure tourne déjà, le bandeau ne
+// bloque rien. « OK » le referme, « Refuser » coupe toute mesure et tout
+// enregistrement. Masqué au paiement (il couvrirait le bouton de commande
+// sur mobile) et dans l'admin.
 export function ConsentBanner() {
   const t = useTranslations("consent");
   const pathname = usePathname();
   const status = useSyncExternalStore(
-    subscribeConsent,
-    consentStatus,
+    subscribeAnalyticsOptOut,
+    noticeStatus,
     () => "unavailable" as const,
   );
   if (
@@ -42,14 +47,14 @@ export function ConsentBanner() {
       <div className="mt-3.5 flex gap-2">
         <button
           type="button"
-          onClick={() => setConsent(false)}
+          onClick={() => setAnalyticsOptOut(true)}
           className="flex-1 rounded-full border border-line px-4 py-2 text-sm font-semibold transition-colors hover:border-ink"
         >
           {t("decline")}
         </button>
         <button
           type="button"
-          onClick={() => setConsent(true)}
+          onClick={() => setAnalyticsOptOut(false)}
           className="flex-1 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-paper transition-opacity hover:opacity-90"
         >
           {t("accept")}

@@ -1,6 +1,5 @@
 import type { Locale } from "@/i18n/routing";
 import { AnalyticsOptOut } from "@/components/analytics-opt-out";
-import { RecordingConsent } from "@/components/recording-consent";
 import type { LegalSection } from "../legal-layout";
 
 // Politique de confidentialité dans les 4 langues. Seule la version
@@ -100,26 +99,24 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           consultées, provenance des visites, produits vus ou ajoutés au panier,
           étapes de commande et montant des achats, erreurs techniques, rapidité
           d’affichage), nous utilisons <strong>PostHog</strong>, dont les
-          données sont hébergées dans l’Union européenne (Francfort). Cette
-          mesure fonctionne{" "}
-          <strong>sans cookie ni stockage dans votre navigateur</strong> : les
-          visites sont comptées au moyen d’un identifiant anonyme que PostHog
-          calcule (hachage irréversible) à partir de données techniques (adresse
-          IP, type de navigateur) et d’une valeur aléatoire renouvelée chaque
-          jour, ce qui ne permet pas de vous reconnaître d’un jour à l’autre.
-          Votre adresse IP n’est pas conservée ; le pays, le canton et la ville
-          sont déduits par Cloudflare au moment de la visite. Aucun nom, adresse
-          e-mail, adresse postale ni donnée de paiement n’est transmis, et les
-          adresses des pages sont épurées de leurs paramètres personnels. Les
-          statistiques sont conservées selon les conditions de PostHog (un an
-          avec notre offre actuelle). Cette mesure repose sur notre intérêt
-          légitime à améliorer le site ; vous pouvez vous y opposer à tout
-          moment :
+          données sont hébergées dans l’Union européenne (Francfort). Un cookie
+          « ph_… » contenant un identifiant aléatoire (conservé jusqu’à un an)
+          permet de reconnaître un navigateur qui revient. Votre adresse IP
+          n’est pas conservée ; le pays, le canton et la ville sont déduits par
+          Cloudflare au moment de la visite. Aucun nom, adresse e-mail, adresse
+          postale ni donnée de paiement n’est transmis, et les adresses des
+          pages sont épurées de leurs paramètres personnels. Les statistiques
+          sont conservées selon les conditions de PostHog (un an avec notre
+          offre actuelle). Cette mesure repose sur notre intérêt légitime à
+          améliorer le site. Conformément à l’art. 45c de la loi sur les
+          télécommunications, le bandeau affiché lors de votre première visite
+          vous en informe, et vous pouvez la refuser à tout moment, ce qui
+          arrête aussi les enregistrements de visite :
           <AnalyticsOptOut
             labels={{
               active: "Mesure d’audience active dans ce navigateur.",
               inactive: "Mesure d’audience désactivée dans ce navigateur.",
-              disable: "Désactiver",
+              disable: "Refuser",
               enable: "Réactiver",
             }}
           />
@@ -127,27 +124,16 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
-      title: "Enregistrements de visite (sur accord)",
+      title: "Enregistrements de visite",
       body: (
         <p>
-          Uniquement si vous l’acceptez (bandeau « Accepter » ou bouton
-          ci-dessous), PostHog enregistre aussi le déroulé anonyme de votre
-          visite (pages, clics, défilement) pour nous aider à repérer ce qui
+          PostHog enregistre également le déroulé des visites (pages, clics,
+          défilement, mouvements de la souris) pour nous aider à repérer ce qui
           gêne sur le site. Les champs de saisie et les données personnelles
-          affichées sont masqués, les enregistrements sont supprimés après 30
-          jours, et un identifiant anonyme est alors conservé dans votre
-          navigateur (cookie « ph_… » et stockage local, jusqu’à un an) pour
-          relier les pages d’une même visite. Sans accord : aucun enregistrement
-          ni cookie, la mesure reste anonyme et sans cookie. Vous pouvez changer
-          d’avis à tout moment :
-          <RecordingConsent
-            labels={{
-              granted: "Enregistrements acceptés dans ce navigateur.",
-              notGranted: "Enregistrements non autorisés dans ce navigateur.",
-              grant: "Accepter",
-              revoke: "Retirer mon accord",
-            }}
-          />
+          affichées sont masqués, les pages de votre compte et le suivi de
+          commande ne sont jamais enregistrés, et les enregistrements sont
+          supprimés après 30 jours. Refuser la mesure d’audience (bandeau ou
+          bouton ci-dessus) arrête aussi les enregistrements.
         </p>
       ),
     },
@@ -187,13 +173,13 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Cookies et stockage local",
       body: (
         <p>
-          Le site n’utilise que des éléments techniques indispensables : un
-          cookie de session pour rester connecté à son compte et le stockage
-          local du navigateur pour le panier, les favoris, la reprise d’un
-          paiement et, le cas échéant, vos choix concernant la mesure
-          d’audience. La mesure d’audience ne dépose aucun cookie, sauf si vous
-          acceptez les enregistrements de visite (identifiant anonyme, voir
-          ci-dessus). Aucun cookie publicitaire ni de suivi d’un site à l’autre.
+          Le site utilise un cookie de session pour rester connecté à son compte
+          et le stockage local du navigateur pour le panier, les favoris, la
+          reprise d’un paiement et vos choix concernant la mesure d’audience. La
+          mesure d’audience dépose en outre un cookie « ph_… » et utilise le
+          stockage local (identifiant aléatoire, jusqu’à un an), que vous pouvez
+          refuser (voir « Mesure d’audience »). Aucun cookie publicitaire ni de
+          suivi d’un site à l’autre.
         </p>
       ),
     },
@@ -348,26 +334,24 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           (aufgerufene Seiten, Herkunft der Besuche, angesehene oder in den
           Warenkorb gelegte Produkte, Bestellschritte und Kaufbetrag, technische
           Fehler, Ladegeschwindigkeit), verwenden wir <strong>PostHog</strong>;
-          die Daten werden in der Europäischen Union (Frankfurt) gehostet. Diese
-          Messung funktioniert{" "}
-          <strong>ohne Cookies und ohne Speicherung in Ihrem Browser</strong>:
-          Besuche werden über eine anonyme Kennung gezählt, die PostHog aus
-          technischen Daten (IP-Adresse, Browsertyp) und einem täglich neu
-          erzeugten Zufallswert berechnet (irreversibler Hashwert), sodass Sie
-          nicht von einem Tag zum nächsten wiedererkannt werden können. Ihre
-          IP-Adresse wird nicht gespeichert; Land, Kanton und Ort werden beim
-          Besuch von Cloudflare abgeleitet. Weder Name, E-Mail-Adresse,
-          Postanschrift noch Zahlungsdaten werden übermittelt, und
-          Seitenadressen werden von persönlichen Parametern bereinigt. Die
-          Statistiken werden gemäss den Bedingungen von PostHog aufbewahrt (ein
-          Jahr in unserem aktuellen Tarif). Diese Messung stützt sich auf unser
-          berechtigtes Interesse an der Verbesserung der Website; Sie können ihr
-          jederzeit widersprechen:
+          die Daten werden in der Europäischen Union (Frankfurt) gehostet. Ein
+          Cookie «ph_…» mit einer zufälligen Kennung (bis zu einem Jahr
+          gespeichert) erkennt einen wiederkehrenden Browser. Ihre IP-Adresse
+          wird nicht gespeichert; Land, Kanton und Ort werden beim Besuch von
+          Cloudflare abgeleitet. Weder Name, E-Mail-Adresse, Postanschrift noch
+          Zahlungsdaten werden übermittelt, und Seitenadressen werden von
+          persönlichen Parametern bereinigt. Die Statistiken werden gemäss den
+          Bedingungen von PostHog aufbewahrt (ein Jahr in unserem aktuellen
+          Tarif). Diese Messung stützt sich auf unser berechtigtes Interesse an
+          der Verbesserung der Website. Gemäss Art. 45c des Fernmeldegesetzes
+          informiert Sie das beim ersten Besuch angezeigte Banner darüber, und
+          Sie können sie jederzeit ablehnen, was auch die Besuchsaufzeichnungen
+          beendet:
           <AnalyticsOptOut
             labels={{
               active: "Reichweitenmessung in diesem Browser aktiv.",
               inactive: "Reichweitenmessung in diesem Browser deaktiviert.",
-              disable: "Deaktivieren",
+              disable: "Ablehnen",
               enable: "Wieder aktivieren",
             }}
           />
@@ -375,27 +359,16 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
-      title: "Besuchsaufzeichnungen (mit Einwilligung)",
+      title: "Besuchsaufzeichnungen",
       body: (
         <p>
-          Nur wenn Sie zustimmen (Banner «Akzeptieren» oder Schaltfläche unten),
-          zeichnet PostHog zusätzlich den anonymen Ablauf Ihres Besuchs auf
-          (Seiten, Klicks, Scrollen), damit wir erkennen, was auf der Website
+          PostHog zeichnet zudem den Ablauf der Besuche auf (Seiten, Klicks,
+          Scrollen, Mausbewegungen), damit wir erkennen, was auf der Website
           stört. Eingabefelder und angezeigte persönliche Daten werden
-          verborgen, die Aufzeichnungen werden nach 30 Tagen gelöscht, und eine
-          anonyme Kennung wird dann in Ihrem Browser gespeichert (Cookie «ph_…»
-          und lokaler Speicher, bis zu einem Jahr), um die Seiten eines Besuchs
-          zu verknüpfen. Ohne Einwilligung: keine Aufzeichnung und kein Cookie,
-          die Messung bleibt anonym und cookiefrei. Sie können Ihre Wahl
-          jederzeit ändern:
-          <RecordingConsent
-            labels={{
-              granted: "Aufzeichnungen in diesem Browser erlaubt.",
-              notGranted: "Aufzeichnungen in diesem Browser nicht erlaubt.",
-              grant: "Akzeptieren",
-              revoke: "Einwilligung widerrufen",
-            }}
-          />
+          verborgen, die Seiten Ihres Kontos und die Sendungsverfolgung werden
+          nie aufgezeichnet, und die Aufzeichnungen werden nach 30 Tagen
+          gelöscht. Wenn Sie die Reichweitenmessung ablehnen (Banner oder
+          Schaltfläche oben), enden auch die Aufzeichnungen.
         </p>
       ),
     },
@@ -435,13 +408,12 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Cookies und lokale Speicherung",
       body: (
         <p>
-          Die Website verwendet ausschliesslich technisch notwendige Elemente:
-          ein Session-Cookie, um im Konto angemeldet zu bleiben, und den lokalen
-          Speicher des Browsers für den Warenkorb, die Favoriten, die
-          Wiederaufnahme einer Zahlung und gegebenenfalls Ihren Widerspruch
-          gegen die Reichweitenmessung bzw. Ihre Einwilligung. Die
-          Reichweitenmessung setzt keine Cookies, ausser Sie erlauben die
-          Besuchsaufzeichnungen (anonyme Kennung, siehe oben). Keine
+          Die Website verwendet ein Session-Cookie, um im Konto angemeldet zu
+          bleiben, und den lokalen Speicher des Browsers für den Warenkorb, die
+          Favoriten, die Wiederaufnahme einer Zahlung und Ihre Wahl zur
+          Reichweitenmessung. Die Reichweitenmessung setzt zudem ein Cookie
+          «ph_…» und nutzt den lokalen Speicher (zufällige Kennung, bis zu einem
+          Jahr), was Sie ablehnen können (siehe «Reichweitenmessung»). Keine
           Werbe-Cookies und kein websiteübergreifendes Tracking.
         </p>
       ),
@@ -599,26 +571,25 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           al carrello, fasi dell’ordine e importo degli acquisti, errori
           tecnici, velocità di visualizzazione), utilizziamo{" "}
           <strong>PostHog</strong>, i cui dati sono ospitati nell’Unione europea
-          (Francoforte). Questa misurazione funziona{" "}
-          <strong>senza cookie né memorizzazione nel vostro browser</strong>: le
-          visite sono conteggiate tramite un identificativo anonimo che PostHog
-          calcola (hash irreversibile) a partire da dati tecnici (indirizzo IP,
-          tipo di browser) e da un valore casuale rinnovato ogni giorno, il che
-          non permette di riconoscervi da un giorno all’altro. Il vostro
-          indirizzo IP non viene conservato; paese, cantone e località sono
-          dedotti da Cloudflare al momento della visita. Non vengono trasmessi
-          nome, indirizzo e-mail, indirizzo postale né dati di pagamento, e gli
-          indirizzi delle pagine vengono ripuliti dai parametri personali. Le
-          statistiche sono conservate secondo le condizioni di PostHog (un anno
-          con la nostra offerta attuale). Questa misurazione si basa sul nostro
-          interesse legittimo a migliorare il sito; potete opporvi in qualsiasi
-          momento:
+          (Francoforte). Un cookie «ph_…» contenente un identificativo casuale
+          (conservato fino a un anno) permette di riconoscere un browser che
+          ritorna. Il vostro indirizzo IP non viene conservato; paese, cantone e
+          località sono dedotti da Cloudflare al momento della visita. Non
+          vengono trasmessi nome, indirizzo e-mail, indirizzo postale né dati di
+          pagamento, e gli indirizzi delle pagine vengono ripuliti dai parametri
+          personali. Le statistiche sono conservate secondo le condizioni di
+          PostHog (un anno con la nostra offerta attuale). Questa misurazione si
+          basa sul nostro interesse legittimo a migliorare il sito.
+          Conformemente all’art. 45c della legge sulle telecomunicazioni, il
+          banner mostrato alla vostra prima visita ve ne informa e potete
+          rifiutarla in qualsiasi momento, il che interrompe anche le
+          registrazioni delle visite:
           <AnalyticsOptOut
             labels={{
               active: "Misurazione dell’audience attiva in questo browser.",
               inactive:
                 "Misurazione dell’audience disattivata in questo browser.",
-              disable: "Disattiva",
+              disable: "Rifiuta",
               enable: "Riattiva",
             }}
           />
@@ -626,27 +597,17 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
-      title: "Registrazioni delle visite (con consenso)",
+      title: "Registrazioni delle visite",
       body: (
         <p>
-          Solo se lo accettate (banner «Accetta» o pulsante qui sotto), PostHog
-          registra anche lo svolgimento anonimo della vostra visita (pagine,
-          clic, scorrimento) per aiutarci a individuare ciò che crea difficoltà
-          sul sito. I campi di inserimento e i dati personali visualizzati sono
-          nascosti, le registrazioni vengono eliminate dopo 30 giorni e un
-          identificativo anonimo viene allora conservato nel vostro browser
-          (cookie «ph_…» e memoria locale, fino a un anno) per collegare le
-          pagine di una stessa visita. Senza consenso: nessuna registrazione né
-          cookie, la misurazione resta anonima e senza cookie. Potete cambiare
-          idea in qualsiasi momento:
-          <RecordingConsent
-            labels={{
-              granted: "Registrazioni accettate in questo browser.",
-              notGranted: "Registrazioni non autorizzate in questo browser.",
-              grant: "Accetta",
-              revoke: "Revoca il consenso",
-            }}
-          />
+          PostHog registra inoltre lo svolgimento delle visite (pagine, clic,
+          scorrimento, movimenti del mouse) per aiutarci a individuare ciò che
+          crea difficoltà sul sito. I campi di inserimento e i dati personali
+          visualizzati sono nascosti, le pagine del vostro conto e il
+          tracciamento degli ordini non vengono mai registrati e le
+          registrazioni vengono eliminate dopo 30 giorni. Rifiutare la
+          misurazione dell’audience (banner o pulsante qui sopra) interrompe
+          anche le registrazioni.
         </p>
       ),
     },
@@ -685,14 +646,13 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Cookie e memorizzazione locale",
       body: (
         <p>
-          Il sito utilizza solo elementi tecnici indispensabili: un cookie di
-          sessione per restare connessi al proprio conto e la memoria locale del
-          browser per il carrello, i preferiti, la ripresa di un pagamento e, se
-          del caso, le vostre scelte sulla misurazione dell’audience. La
-          misurazione dell’audience non deposita alcun cookie, salvo se
-          accettate le registrazioni delle visite (identificativo anonimo, vedi
-          sopra). Nessun cookie pubblicitario né tracciamento da un sito
-          all’altro.
+          Il sito utilizza un cookie di sessione per restare connessi al proprio
+          conto e la memoria locale del browser per il carrello, i preferiti, la
+          ripresa di un pagamento e le vostre scelte sulla misurazione
+          dell’audience. La misurazione dell’audience deposita inoltre un cookie
+          «ph_…» e utilizza la memoria locale (identificativo casuale, fino a un
+          anno), che potete rifiutare (vedi «Misurazione dell’audience»). Nessun
+          cookie pubblicitario né tracciamento da un sito all’altro.
         </p>
       ),
     },
@@ -841,23 +801,21 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           visits come from, products viewed or added to the cart, checkout steps
           and purchase amounts, technical errors, loading speed), we use{" "}
           <strong>PostHog</strong>, whose data is hosted in the European Union
-          (Frankfurt). This measurement works{" "}
-          <strong>without cookies or any storage in your browser</strong>:
-          visits are counted using an anonymous identifier that PostHog computes
-          (an irreversible hash) from technical data (IP address, browser type)
-          and a random value renewed every day, so you cannot be recognised from
-          one day to the next. Your IP address is not stored; country, canton
-          and city are derived by Cloudflare at the time of the visit. No name,
-          e-mail address, postal address or payment data is sent, and page
-          addresses are stripped of personal parameters. Statistics are kept
-          under PostHog’s terms (one year on our current plan). This measurement
-          is based on our legitimate interest in improving the site; you can
-          object to it at any time:
+          (Frankfurt). A “ph_…” cookie holding a random identifier (kept for up
+          to one year) recognises a returning browser. Your IP address is not
+          stored; country, canton and city are derived by Cloudflare at the time
+          of the visit. No name, e-mail address, postal address or payment data
+          is sent, and page addresses are stripped of personal parameters.
+          Statistics are kept under PostHog’s terms (one year on our current
+          plan). This measurement is based on our legitimate interest in
+          improving the site. In line with Art. 45c of the Telecommunications
+          Act, the banner shown on your first visit informs you about it, and
+          you can decline it at any time, which also stops visit recordings:
           <AnalyticsOptOut
             labels={{
               active: "Audience measurement is active in this browser.",
               inactive: "Audience measurement is disabled in this browser.",
-              disable: "Disable",
+              disable: "Decline",
               enable: "Re-enable",
             }}
           />
@@ -865,26 +823,15 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
-      title: "Visit recordings (with consent)",
+      title: "Visit recordings",
       body: (
         <p>
-          Only if you accept (the “Accept” banner or the button below), PostHog
-          also records an anonymous replay of your visit (pages, clicks,
-          scrolling) to help us spot what gets in the way on the site. Input
-          fields and displayed personal data are hidden, recordings are deleted
-          after 30 days, and an anonymous identifier is then kept in your
-          browser (a “ph_…” cookie and local storage, for up to one year) to
-          link the pages of a single visit. Without consent: no recording and no
-          cookie, measurement stays anonymous and cookie-free. You can change
-          your mind at any time:
-          <RecordingConsent
-            labels={{
-              granted: "Recordings allowed in this browser.",
-              notGranted: "Recordings not allowed in this browser.",
-              grant: "Accept",
-              revoke: "Withdraw consent",
-            }}
-          />
+          PostHog also records how visits unfold (pages, clicks, scrolling,
+          mouse movements) to help us spot what gets in the way on the site.
+          Input fields and displayed personal data are hidden, your account
+          pages and order tracking are never recorded, and recordings are
+          deleted after 30 days. Declining audience measurement (banner or
+          button above) also stops recordings.
         </p>
       ),
     },
@@ -921,13 +868,12 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Cookies and local storage",
       body: (
         <p>
-          The site only uses strictly necessary technical elements: a session
-          cookie to stay signed in to your account and the browser’s local
-          storage for the cart, favourites, resuming a payment and, where
-          applicable, your choices about audience measurement. Audience
-          measurement sets no cookies unless you allow visit recordings
-          (anonymous identifier, see above). No advertising cookies and no
-          cross-site tracking.
+          The site uses a session cookie to keep you signed in to your account
+          and the browser’s local storage for the cart, favourites, resuming a
+          payment and your choices about audience measurement. Audience
+          measurement also sets a “ph_…” cookie and uses local storage (random
+          identifier, up to one year), which you can decline (see “Audience
+          measurement”). No advertising cookies and no cross-site tracking.
         </p>
       ),
     },

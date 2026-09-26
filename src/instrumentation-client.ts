@@ -14,6 +14,12 @@ function load() {
   loading = true;
   import("posthog-js")
     .then(({ default: posthog }) => {
+      // « Refuser » cliqué pendant le téléchargement : ne rien initialiser,
+      // sinon PostHog écrirait son cookie malgré le refus.
+      if (!analyticsAllowed()) {
+        loading = false;
+        return;
+      }
       posthog.init(POSTHOG_TOKEN!, posthogConfig());
       attachPostHog(posthog);
     })
