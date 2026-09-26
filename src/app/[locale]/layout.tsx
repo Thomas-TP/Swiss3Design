@@ -11,10 +11,12 @@ import { FavoritesProvider } from "@/lib/favorites";
 import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
 import { ConsentBanner } from "@/components/consent-banner";
+import { WebMcpTools } from "@/components/webmcp-tools";
 import { Footer } from "@/components/footer";
 import { ThemeManager } from "@/components/theme-manager";
 import { JsonLd } from "@/components/json-ld";
 import { SITE_URL, siteJsonLd } from "@/lib/seo";
+import { PATHS } from "@/lib/agent/paths";
 import "../globals.css";
 
 const geist = Geist({
@@ -132,6 +134,9 @@ export default async function LocaleLayout({
         {/* Données structurées de l'entreprise + du site (OnlineStore +
             WebSite, référencés par @id depuis les schémas de chaque page). */}
         <JsonLd data={siteJsonLd(locale, seo("organizationDescription"))} />
+        {/* Catalogue ARD (ce que les agents peuvent utiliser ici) ; React 19
+            remonte ce <link> dans le <head>. */}
+        <link rel="ai-catalog" href={PATHS.aiCatalog} type="application/json" />
         <ThemeManager />
         <NextIntlClientProvider>
           <CartProvider>
@@ -153,6 +158,7 @@ export default async function LocaleLayout({
               <Footer />
               <BottomNav hasSession={hasSession} />
               <ConsentBanner />
+              <WebMcpTools />
             </FavoritesProvider>
           </CartProvider>
         </NextIntlClientProvider>

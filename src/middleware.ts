@@ -7,6 +7,8 @@ import {
   POSTHOG_ASSET_HOST,
   POSTHOG_INGEST_HOST,
 } from "./lib/analytics-config";
+import { AGENT_LINK_HEADER, isAgentRoute } from "./lib/agent/paths";
+import { isMarkdownPath, prefersMarkdown } from "./lib/agent/markdown";
 
 // Next 16 a renommé « middleware » en « proxy », mais proxy.ts impose le
 // runtime Node.js, que l'adaptateur OpenNext Cloudflare ne supporte pas encore
@@ -182,6 +184,29 @@ export default function middleware(request: NextRequest) {
   if (ROOT_FILES.has(original.pathname)) {
     return withSecurityHeaders(NextResponse.next());
   }
+  // Surfaces agents (MCP, A2A, /.well-known/…) : jamais de préfixe de langue
+  // ni de redirection — un 307 vers /fr/mcp casserait tout client.
+  if (isAgentRoute(original.pathname)) {
+    return withSecurityHeaders(NextResponse.next());
+  }
+  // Négociation Markdown : un agent qui préfère text/markdown reçoit la page
+  // convertie (même URL, réécriture interne). Les navigateurs ne sont jamais
+  // concernés (text/html en tête de leur Accept).
+  if (
+    (request.method === "GET" || request.method === "HEAD") &&
+    isMarkdownPath(original.pathname) &&
+    prefersMarkdown(request.headers.get("accept"))
+  ) {
+    // Le chemin voyage dans un en-tête : sur une réécriture, Next ne transmet
+    // pas à la route les paramètres d'URL de la destination.
+    const headers = new Headers(request.headers);
+    headers.set("x-markdown-path", `${original.pathname}${original.search}`);
+    return withSecurityHeaders(
+      NextResponse.rewrite(new URL("/api/agent/markdown", request.url), {
+        request: { headers },
+      }),
+    );
+  }
 
   const isProd = process.env.NODE_ENV === "production";
   const origin = new URL(request.url).origin;
@@ -205,6 +230,10 @@ export default function middleware(request: NextRequest) {
   const response = withSecurityHeaders(intlMiddleware(req));
   response.headers.set("Content-Security-Policy", csp);
   response.headers.set("Reporting-Endpoints", `csp="${origin}/api/csp-report"`);
+  // Découverte agents (catalogue d'API, OpenAPI, doc, ARD) sur chaque page, et
+  // Vary: Accept puisque la même URL sert aussi du Markdown.
+  response.headers.append("Link", AGENT_LINK_HEADER);
+  response.headers.append("Vary", "Accept");
 
   // Environnement de preview (wrangler.jsonc → env.preview.vars.APP_ENV) :
   // désindexation complète, indépendante de robots.txt qui ne couvre que la

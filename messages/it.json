@@ -99,6 +99,10 @@
     "badge3d": "Vista 3D",
     "dragHint": "Trascina per ruotare"
   },
+  "cartLink": {
+    "added": "Gli articoli del link sono stati aggiunti al carrello.",
+    "error": "Alcuni articoli del link non hanno potuto essere aggiunti (prodotto non disponibile o opzione mancante)."
+  },
   "cartReminder": {
     "title": "Non hai tempo ora?",
     "emailPlaceholder": "La tua e-mail",

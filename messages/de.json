@@ -99,6 +99,10 @@
     "badge3d": "3D-Ansicht",
     "dragHint": "Zum Drehen ziehen"
   },
+  "cartLink": {
+    "added": "Die Artikel aus dem Link wurden Ihrem Warenkorb hinzugefügt.",
+    "error": "Einige Artikel aus dem Link konnten nicht hinzugefügt werden (Produkt nicht verfügbar oder Option fehlt)."
+  },
   "cartReminder": {
     "title": "Gerade keine Zeit?",
     "emailPlaceholder": "Ihre E-Mail",

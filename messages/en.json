@@ -99,6 +99,10 @@
     "badge3d": "3D view",
     "dragHint": "Drag to rotate"
   },
+  "cartLink": {
+    "added": "The items from the link have been added to your cart.",
+    "error": "Some items from the link could not be added (product unavailable or option missing)."
+  },
   "cartReminder": {
     "title": "No time right now?",
     "emailPlaceholder": "Your email",

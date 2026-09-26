@@ -99,6 +99,10 @@
     "badge3d": "Vue 3D",
     "dragHint": "Glissez pour pivoter"
   },
+  "cartLink": {
+    "added": "Les articles du lien ont été ajoutés à votre panier.",
+    "error": "Certains articles du lien n'ont pas pu être ajoutés (produit indisponible ou option manquante)."
+  },
   "cartReminder": {
     "title": "Pas le temps maintenant ?",
     "emailPlaceholder": "Votre e-mail",
