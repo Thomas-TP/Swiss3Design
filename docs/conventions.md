@@ -211,9 +211,21 @@ on _every_ page at once.
 - **Location** comes from Cloudflare (`cf` → `data-geo-*` on `<html>`, set in
   the `[locale]` layout). In cookieless mode PostHog drops the IP before its
   own GeoIP runs.
-- **Cookieless only for now.** The PostHog project must keep "Cookieless server
-  hash mode" on, otherwise every event is discarded. Replays, surveys and flags
-  wait for a consent banner (phase 2).
+- **Cookieless by default, cookies only after consent.** posthog-js runs with
+  `cookieless_mode: "on_reject"` and `opt_out_capturing_by_default: true`: an
+  undecided visitor counts as a refusal, so they are measured without any
+  cookie or storage. "Accepter" in
+  [`<ConsentBanner>`](../src/components/consent-banner.tsx) calls
+  `setConsent(true)` → `opt_in_capturing()`: cookies, session replay and
+  surveys start for that visitor only. The PostHog project must keep
+  "Cookieless server hash mode" on, otherwise every cookieless event is
+  discarded.
+- **Personal data on screen** (an email, an address) gets the `ph-mask`
+  class, so it is masked in replays; inputs are always masked. `/account` and
+  `/track` are excluded from recording in the project settings.
+- **Full opt-out** (privacy page) and the team's own browser are dropped in
+  `before_send`, not with `opt_out_capturing()`: under `on_reject` that call
+  only switches back to cookieless measurement.
 
 ## CSP nonce contract (prod only)
 

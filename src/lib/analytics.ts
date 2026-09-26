@@ -1,5 +1,6 @@
-// Mesure d'audience : PostHog, région UE (Francfort), en mode sans cookie.
-// Trois règles :
+// Mesure d'audience : PostHog, région UE (Francfort). Sans cookie pour tout
+// le monde par défaut ; cookies et enregistrements de visite seulement après
+// « Accepter » dans le bandeau (consent-banner.tsx). Trois règles :
 //  1. posthog-js n'est importé QUE par instrumentation-client.ts, en idle.
 //     Ce module-ci n'en dépend pas (types seulement) : pages serveur et
 //     composants client peuvent l'importer sans que posthog-js entre dans
@@ -181,10 +182,14 @@ export function posthogConfig(): Partial<PostHogConfig> {
     // Figé volontairement : les millésimes suivants activent la capture des
     // corps de requêtes réseau dans les enregistrements.
     defaults: "2026-05-30",
-    // Aucun cookie ni stockage local : visiteurs comptés par une empreinte
-    // anonyme calculée chez PostHog (réglage « Cookieless server hash mode »
-    // activé dans le projet, sinon les événements sont ignorés).
-    cookieless_mode: "always",
+    // Par défaut (aucun choix, ou refus) : aucun cookie ni stockage local,
+    // visiteurs comptés par une empreinte anonyme calculée chez PostHog
+    // (réglage « Cookieless server hash mode » du projet, sinon les
+    // événements sont ignorés). opt_out_capturing_by_default fait compter
+    // l'indécis comme un refus : mesuré, mais sans rien écrire chez lui.
+    // Cookies et enregistrements seulement après « Accepter » (setConsent).
+    cookieless_mode: "on_reject",
+    opt_out_capturing_by_default: true,
     person_profiles: "identified_only",
     capture_pageview: "history_change",
     capture_pageleave: true,
@@ -197,14 +202,20 @@ export function posthogConfig(): Partial<PostHogConfig> {
       capture_unhandled_rejections: true,
       capture_console_errors: false,
     },
-    // Réservés à la phase 2 (bandeau de consentement) : enregistrements,
-    // sondages et flags exigent un stockage dans le navigateur.
-    disable_session_recording: true,
-    disable_surveys: true,
+    // Enregistrements et sondages : PostHog ne les démarre qu'après
+    // opt_in_capturing(), jamais en mode sans cookie. Saisies masquées, et
+    // tout élément marqué .ph-mask (données personnelles affichées) aussi.
+    disable_session_recording: false,
+    session_recording: { maskAllInputs: true, maskTextSelector: ".ph-mask" },
+    disable_surveys: false,
     disable_web_experiments: true,
-    // Sans flags, pas de configuration distante : tout est explicite ici.
-    advanced_disable_flags: true,
+    // La configuration distante (/flags) active l'enregistrement une fois
+    // l'accord donné : elle doit rester chargée.
+    advanced_disable_flags: false,
     before_send: [
+      // Refus complet (politique de confidentialité) ou navigateur de
+      // l'équipe, décidé en cours de page : plus rien ne part.
+      (event) => (flag(OPT_OUT_KEY) || flag(INTERNAL_KEY) ? null : event),
       (event) =>
         event && { ...event, properties: { ...geo, ...event.properties } },
       sanitizeEvent,
@@ -271,12 +282,12 @@ export function setAnalyticsOptOut(optOut: boolean) {
     /* Stockage bloqué : le choix vaut pour la page en cours. */
   }
   window.dispatchEvent(new Event(OPT_OUT_EVENT));
-  if (optOut) {
-    client?.opt_out_capturing();
-    queue = null;
-  } else if (client) {
-    client.opt_in_capturing();
-  } else {
+  // En mode on_reject, opt_out_capturing() ne coupe pas la mesure : il la
+  // repasse sans cookie. Le refus complet passe donc par before_send, qui
+  // lit l'indicateur à chaque événement ; au chargement suivant, PostHog
+  // n'est même plus chargé (analyticsAllowed).
+  if (optOut) queue = null;
+  else if (!client) {
     queue = [];
     loader?.();
   }
@@ -290,8 +301,50 @@ export function markInternalVisitor() {
   } catch {
     /* Stockage bloqué : l'admin reste de toute façon exclu (sanitizeEvent). */
   }
-  client?.opt_out_capturing();
   queue = null;
+}
+
+// ── Accord aux enregistrements de visite (bandeau) ──────────────────────────
+
+// Notre propre trace du choix, écrite seulement au clic : elle décide de
+// l'affichage du bandeau. PostHog garde de son côté l'état opt-in/opt-out.
+const CONSENT_KEY = "s3d-consent";
+const CONSENT_EVENT = "s3d-consent";
+
+export type ConsentStatus = "pending" | "granted" | "denied" | "unavailable";
+
+export function consentStatus(): ConsentStatus {
+  // En dev, le bandeau s'affiche quand même, pour travailler son design.
+  if (process.env.NODE_ENV !== "development" && !analyticsAllowed())
+    return "unavailable";
+  try {
+    const value = localStorage.getItem(CONSENT_KEY);
+    return value === "granted" || value === "denied" ? value : "pending";
+  } catch {
+    return "unavailable";
+  }
+}
+
+export function subscribeConsent(onChange: () => void) {
+  window.addEventListener(CONSENT_EVENT, onChange);
+  window.addEventListener("storage", onChange);
+  return () => {
+    window.removeEventListener(CONSENT_EVENT, onChange);
+    window.removeEventListener("storage", onChange);
+  };
+}
+
+export function setConsent(granted: boolean) {
+  try {
+    localStorage.setItem(CONSENT_KEY, granted ? "granted" : "denied");
+  } catch {
+    /* Stockage bloqué : le choix vaut pour la page en cours. */
+  }
+  window.dispatchEvent(new Event(CONSENT_EVENT));
+  withPostHog((posthog) => {
+    if (granted) posthog.opt_in_capturing();
+    else posthog.opt_out_capturing();
+  });
 }
 
 // ── Propriétés e-commerce (spécification PostHog) ────────────────────────────

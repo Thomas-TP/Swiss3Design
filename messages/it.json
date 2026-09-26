@@ -199,6 +199,22 @@
     "createAccountCta": "Crea il mio account",
     "trackGuestCta": "Segui il mio ordine"
   },
+  "attribution": {
+    "question": "Come avete scoperto Swiss3Design?",
+    "google": "Google",
+    "ai": "ChatGPT o un'altra IA",
+    "social": "Instagram, Facebook o TikTok",
+    "friend": "Passaparola",
+    "other": "Altro",
+    "thanks": "Grazie, ci aiuta molto!"
+  },
+  "consent": {
+    "title": "Aiutateci a migliorare il negozio",
+    "text": "Misuriamo già le visite senza cookie. Accettate anche la registrazione anonima della vostra visita (clic e scorrimento, dati inseriti nascosti)?",
+    "accept": "Accetta",
+    "decline": "Rifiuta",
+    "learnMore": "Per saperne di più"
+  },
   "track": {
     "title": "Tracciamento ordine",
     "subtitle": "Controlla lo stato del tuo ordine senza creare un account.",
