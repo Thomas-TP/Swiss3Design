@@ -78,8 +78,8 @@ queries; becomes a hard error in pg@9). The pool has an `.on("error", ...)`
 handler — without it, Neon closing an idle connection (Postgres error
 `57P01`) surfaces as an uncaught exception (also hit live in testing, not
 hypothetical). Old code comment claimed `better-auth-cloudflare` required
-`postgres.js`: false — that package is an unused dependency in this codebase;
-`src/lib/auth.ts` wires plain `betterAuth()` + the driver-agnostic
+`postgres.js`: false — that package was never used here and is no longer
+installed; `src/lib/auth.ts` wires plain `betterAuth()` + the driver-agnostic
 `better-auth/adapters/drizzle`, confirmed by reading its source (no reference
 to either Postgres driver) and by a real sign-up/login/2FA round-trip against
 `pg`.
@@ -177,21 +177,21 @@ put` on an environment with real users without `--env <name>` explicitly
 
 ## Tech stack
 
-| Area                      | Choice                                                                                                                                                                                                                    |
-| ------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runtime & package manager | Bun (install/scripts/dev) — deploy target is still `workerd` (Cloudflare Workers)                                                                                                                                         |
-| Framework                 | Next.js 16 (App Router, RSC) + React 19                                                                                                                                                                                   |
-| Language                  | TypeScript 6 (strict). Import alias `@/* → src/*`                                                                                                                                                                         |
-| Styling                   | Tailwind CSS 4 (`src/app/globals.css`), `motion`, `lucide-react`                                                                                                                                                          |
-| DB                        | Postgres (Neon) via Cloudflare Hyperdrive + Drizzle ORM (pg dialect, `node-postgres`/`pg` driver)                                                                                                                         |
-| Auth                      | `better-auth` (+`@better-auth/passkey`) via the driver-agnostic `better-auth/adapters/drizzle` (email + Google OAuth, TOTP 2FA, passkeys) — Postgres-backed. `better-auth-cloudflare` is a declared but unused dependency |
-| Lint/format               | Oxlint + Oxfmt (Biome removed 2026-09-09, see driver + tooling refresh note; oxfmt is still beta)                                                                                                                         |
-| Payments                  | Stripe Payment Element + webhooks (LIVE in prod)                                                                                                                                                                          |
-| Email                     | Resend (REST) — no-op if `RESEND_API_KEY` unset                                                                                                                                                                           |
-| i18n                      | `next-intl` (fr/de/it/en, auto-detect, fr fallback)                                                                                                                                                                       |
-| Files / cache             | Cloudflare R2 / KV                                                                                                                                                                                                        |
-| Analytics                 | PostHog Cloud EU, cookie `ph_…` + replay, Swiss opt-out (« OK / Refuser »), via the relay `/api/relay` (middleware) — `posthog-js` only in `src/instrumentation-client.ts`; see `docs/conventions.md` → Analytics         |
-| Hosting                   | Cloudflare Workers via `@opennextjs/cloudflare`                                                                                                                                                                           |
+| Area                      | Choice                                                                                                                                                                                                            |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime & package manager | Bun (install/scripts/dev) — deploy target is still `workerd` (Cloudflare Workers)                                                                                                                                 |
+| Framework                 | Next.js 16 (App Router, RSC) + React 19                                                                                                                                                                           |
+| Language                  | TypeScript 6 (strict). Import alias `@/* → src/*`                                                                                                                                                                 |
+| Styling                   | Tailwind CSS 4 (`src/app/globals.css`), `motion`, `lucide-react`                                                                                                                                                  |
+| DB                        | Postgres (Neon) via Cloudflare Hyperdrive + Drizzle ORM (pg dialect, `node-postgres`/`pg` driver)                                                                                                                 |
+| Auth                      | `better-auth` (+`@better-auth/passkey`) via the driver-agnostic `better-auth/adapters/drizzle` (email + Google OAuth, TOTP 2FA, passkeys) — Postgres-backed                                                       |
+| Lint/format               | Oxlint + Oxfmt (Biome removed 2026-09-09, see driver + tooling refresh note; oxfmt is still beta)                                                                                                                 |
+| Payments                  | Stripe Payment Element + webhooks (LIVE in prod)                                                                                                                                                                  |
+| Email                     | Resend (REST) — no-op if `RESEND_API_KEY` unset                                                                                                                                                                   |
+| i18n                      | `next-intl` (fr/de/it/en, auto-detect, fr fallback)                                                                                                                                                               |
+| Files / cache             | Cloudflare R2 / KV                                                                                                                                                                                                |
+| Analytics                 | PostHog Cloud EU, cookie `ph_…` + replay, Swiss opt-out (« OK / Refuser »), via the relay `/api/relay` (middleware) — `posthog-js` only in `src/instrumentation-client.ts`; see `docs/conventions.md` → Analytics |
+| Hosting                   | Cloudflare Workers via `@opennextjs/cloudflare`                                                                                                                                                                   |
 
 ## Commands
 

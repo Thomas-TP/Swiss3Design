@@ -225,7 +225,15 @@ on _every_ page at once.
   statement of the privacy policy true.
 - **Personal data on screen** (an email, an address) gets the `ph-mask`
   class, so it is masked in replays; inputs are always masked. `/account` and
-  `/track` are excluded from recording in the project settings.
+  `/track` are excluded from recording in the project settings. Network request
+  bodies and headers are never recorded: `recordBody`/`recordHeaders` are
+  `false` in `posthogConfig()`, and an explicit `false` overrides the project
+  setting even if someone enables it.
+- **`defaults` tracks the newest posthog-js preset.** A test in
+  `analytics.test.ts` fails when a posthog-js update ships a newer date. Read
+  what it changes (the `defaults` doc in `@posthog/types`,
+  `posthog-config.d.ts`), then bump it in `posthogConfig()`, keeping the
+  privacy overrides above.
 - **Attribution:** AI assistants are a custom channel type ("AI") in the
   PostHog project (referring domain or `utm_source`). ChatGPT adds
   `utm_source=chatgpt.com` to its links; Claude, Perplexity and Gemini only
