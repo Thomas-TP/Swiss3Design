@@ -18,6 +18,7 @@ import { getStripe } from "@/lib/stripe";
 import { getServerSession } from "@/lib/session";
 import { chf } from "@/lib/analytics";
 import { TrackEvent } from "@/components/track-event";
+import { AttributionQuestion } from "./attribution-question";
 import { ClearCart } from "./clear-cart";
 
 // « Order Completed » (spécification e-commerce PostHog). `revenue` = montant
@@ -163,6 +164,8 @@ export default async function CheckoutSuccessPage({
           <ArrowRight size={16} />
         </Link>
       </div>
+
+      {purchase && <AttributionQuestion orderId={purchase.order_id} />}
 
       {/* Conversion invité → compte : seulement après un paiement réussi et
           si le client n'est pas déjà connecté. L'e-mail (déjà vérifié au

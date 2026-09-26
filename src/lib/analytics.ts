@@ -1,5 +1,8 @@
-// Mesure d'audience : PostHog, région UE (Francfort), en mode sans cookie.
-// Trois règles :
+// Mesure d'audience : PostHog, région UE (Francfort), au régime suisse
+// (art. 45c LTC, nLPD) : mesure, cookie et enregistrements de visite actifs
+// d'emblée, visiteur informé par le bandeau (consent-banner.tsx) et libre
+// de refuser — le refus coupe alors toute mesure. Le public visé est suisse :
+// pas d'accord préalable à l'européenne. Trois règles :
 //  1. posthog-js n'est importé QUE par instrumentation-client.ts, en idle.
 //     Ce module-ci n'en dépend pas (types seulement) : pages serveur et
 //     composants client peuvent l'importer sans que posthog-js entre dans
@@ -27,10 +30,12 @@ const OPT_OUT_KEY = "s3d-analytics-optout";
 const INTERNAL_KEY = "s3d-internal";
 const MAX_QUEUE = 50;
 
-// Paramètres d'URL conservés : campagnes (utm, identifiants de clic) et
-// recherche/filtres du catalogue. Tout le reste disparaît avant l'envoi :
-// session_id Stripe de la confirmation, email pré-rempli de l'inscription,
-// order du suivi de commande, jetons de réinitialisation…
+// Paramètres d'URL conservés : campagnes (utm, dont utm_source=chatgpt.com
+// ajouté par ChatGPT), identifiants de clic des régies et réseaux, srsltid
+// (clic sur une fiche produit gratuite Google), recherche/filtres du
+// catalogue. Tout le reste disparaît avant l'envoi : session_id Stripe de la
+// confirmation, email pré-rempli de l'inscription, order du suivi de
+// commande, jetons de réinitialisation…
 const KEPT_PARAMS = new Set([
   "utm_source",
   "utm_medium",
@@ -38,14 +43,28 @@ const KEPT_PARAMS = new Set([
   "utm_term",
   "utm_content",
   "utm_id",
+  "utm_source_platform",
+  "utm_creative_format",
+  "utm_marketing_tactic",
   "gclid",
+  "gclsrc",
+  "gad_source",
+  "gad_campaignid",
   "gbraid",
   "wbraid",
+  "dclid",
+  "srsltid",
   "fbclid",
+  "igshid",
   "msclkid",
   "ttclid",
   "li_fat_id",
   "twclid",
+  "rdt_cid",
+  "epik",
+  "sccid",
+  "yclid",
+  "mc_cid",
   "ref",
   "q",
   "sort",
@@ -134,19 +153,38 @@ function flag(key: string): boolean {
   }
 }
 
-export function analyticsAllowed(): boolean {
+// Choix du visiteur, écrit seulement au clic (bandeau ou politique de
+// confidentialité) : "granted" = informé, mesure active ; "denied" = refus,
+// plus aucune mesure. OPT_OUT_KEY est l'ancien indicateur de refus, relu
+// pour honorer les choix déjà faits.
+const CHOICE_KEY = "s3d-consent";
+
+function storedChoice(): "granted" | "denied" | null {
+  try {
+    const value = localStorage.getItem(CHOICE_KEY);
+    if (value === "granted" || value === "denied") return value;
+  } catch {
+    /* Stockage bloqué : aucun choix mémorisé. */
+  }
+  return flag(OPT_OUT_KEY) ? "denied" : null;
+}
+
+function measurableHost(): boolean {
   return (
     Boolean(POSTHOG_TOKEN) &&
     window.location.hostname === ANALYTICS_HOSTNAME &&
-    !flag(OPT_OUT_KEY) &&
     !flag(INTERNAL_KEY)
   );
 }
 
+export function analyticsAllowed(): boolean {
+  return measurableHost() && storedChoice() !== "denied";
+}
+
 // Pays, canton et ville posés sur <html> par le layout (géolocalisation
-// Cloudflare). En mode sans cookie, PostHog retire l'IP avant son propre
-// enrichissement GeoIP : sans ces propriétés, aucun pays ni région dans les
-// rapports. $geoip_disable empêche PostHog de les écraser par la suite.
+// Cloudflare), pour tous les visiteurs : une seule source, précise, et l'IP
+// n'a pas à être conservée chez PostHog. $geoip_disable empêche PostHog de
+// les recalculer par-dessus.
 function geoProperties(): Properties {
   const data = document.documentElement.dataset;
   const country = data.geoCountry;
@@ -181,10 +219,12 @@ export function posthogConfig(): Partial<PostHogConfig> {
     // Figé volontairement : les millésimes suivants activent la capture des
     // corps de requêtes réseau dans les enregistrements.
     defaults: "2026-05-30",
-    // Aucun cookie ni stockage local : visiteurs comptés par une empreinte
-    // anonyme calculée chez PostHog (réglage « Cookieless server hash mode »
-    // activé dans le projet, sinon les événements sont ignorés).
-    cookieless_mode: "always",
+    // Cookie « ph_… » (identifiant aléatoire) : visiteurs qui reviennent,
+    // rétention, parcours et entonnoirs sur plusieurs jours. Un refus
+    // (opt_out_capturing) coupe la mesure ET vide ce stockage.
+    opt_out_persistence_by_default: true,
+    // Aucune identification (identify) : pas de fiche personne, les
+    // visiteurs restent des identifiants aléatoires.
     person_profiles: "identified_only",
     capture_pageview: "history_change",
     capture_pageleave: true,
@@ -197,14 +237,21 @@ export function posthogConfig(): Partial<PostHogConfig> {
       capture_unhandled_rejections: true,
       capture_console_errors: false,
     },
-    // Réservés à la phase 2 (bandeau de consentement) : enregistrements,
-    // sondages et flags exigent un stockage dans le navigateur.
-    disable_session_recording: true,
-    disable_surveys: true,
+    // Enregistrements de visite pour tous (réglés dans le projet : 30 jours,
+    // /account et /track exclus). Saisies masquées, et tout élément marqué
+    // .ph-mask (données personnelles affichées) aussi.
+    disable_session_recording: false,
+    session_recording: { maskAllInputs: true, maskTextSelector: ".ph-mask" },
+    disable_surveys: false,
     disable_web_experiments: true,
-    // Sans flags, pas de configuration distante : tout est explicite ici.
-    advanced_disable_flags: true,
+    // La configuration distante (/flags) active enregistrements et sondages :
+    // elle doit rester chargée.
+    advanced_disable_flags: false,
     before_send: [
+      // Refus ou navigateur de l'équipe décidé en cours de page : plus rien
+      // ne part, même avant que PostHog n'ait appliqué l'opt-out.
+      (event) =>
+        storedChoice() === "denied" || flag(INTERNAL_KEY) ? null : event,
       (event) =>
         event && { ...event, properties: { ...geo, ...event.properties } },
       sanitizeEvent,
@@ -244,12 +291,20 @@ export function trackException(error: unknown, properties?: Properties) {
   });
 }
 
-// ── Refus (politique de confidentialité) et exclusion de l'équipe ───────────
+// ── Bandeau d'information, refus et exclusion de l'équipe ───────────────────
 
 const OPT_OUT_EVENT = "s3d-analytics-optout";
 
 export function isAnalyticsOptedOut(): boolean {
-  return flag(OPT_OUT_KEY);
+  return storedChoice() === "denied";
+}
+
+// Bandeau à afficher tant que le visiteur n'a ni validé ni refusé. En dev, il
+// s'affiche aussi, pour travailler son design.
+export function noticeStatus(): "pending" | "answered" | "unavailable" {
+  if (process.env.NODE_ENV !== "development" && !measurableHost())
+    return "unavailable";
+  return storedChoice() ? "answered" : "pending";
 }
 
 // Pour useSyncExternalStore : le choix peut changer ici ou dans un autre
@@ -263,10 +318,13 @@ export function subscribeAnalyticsOptOut(onChange: () => void) {
   };
 }
 
+// « OK » (bandeau) ou « Réactiver » : optOut = false ; « Refuser » ou
+// « Désactiver » : optOut = true, plus aucune mesure ni enregistrement, et
+// PostHog vide son stockage (opt_out_persistence_by_default).
 export function setAnalyticsOptOut(optOut: boolean) {
   try {
-    if (optOut) localStorage.setItem(OPT_OUT_KEY, "1");
-    else localStorage.removeItem(OPT_OUT_KEY);
+    localStorage.setItem(CHOICE_KEY, optOut ? "denied" : "granted");
+    localStorage.removeItem(OPT_OUT_KEY);
   } catch {
     /* Stockage bloqué : le choix vaut pour la page en cours. */
   }
@@ -275,7 +333,7 @@ export function setAnalyticsOptOut(optOut: boolean) {
     client?.opt_out_capturing();
     queue = null;
   } else if (client) {
-    client.opt_in_capturing();
+    if (client.has_opted_out_capturing()) client.opt_in_capturing();
   } else {
     queue = [];
     loader?.();
@@ -290,7 +348,6 @@ export function markInternalVisitor() {
   } catch {
     /* Stockage bloqué : l'admin reste de toute façon exclu (sanitizeEvent). */
   }
-  client?.opt_out_capturing();
   queue = null;
 }
 

@@ -10,6 +10,7 @@ import { CartProvider } from "@/lib/cart";
 import { FavoritesProvider } from "@/lib/favorites";
 import { Header } from "@/components/header";
 import { BottomNav } from "@/components/bottom-nav";
+import { ConsentBanner } from "@/components/consent-banner";
 import { Footer } from "@/components/footer";
 import { ThemeManager } from "@/components/theme-manager";
 import { JsonLd } from "@/components/json-ld";
@@ -151,6 +152,7 @@ export default async function LocaleLayout({
               </main>
               <Footer />
               <BottomNav hasSession={hasSession} />
+              <ConsentBanner />
             </FavoritesProvider>
           </CartProvider>
         </NextIntlClientProvider>
