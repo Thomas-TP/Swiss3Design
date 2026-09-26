@@ -27,34 +27,36 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 
 ## `src/lib` — logique métier (1 ligne chacun)
 
-| Fichier                | Rôle                                                                         | Exports clés                                                   |
-| ---------------------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------- |
-| `auth.ts`              | Instance Better Auth par requête (adapter Drizzle/Postgres, driver-agnostic) | `getAuth()`                                                    |
-| `auth-client.ts`       | Client Better Auth (côté navigateur)                                         | `authClient`                                                   |
-| `session.ts`           | Garde d'autorisation                                                         | `requireAdmin()`, `getServerSession()`                         |
-| `cart.tsx`             | Panier client (localStorage `s3d-cart-v1`)                                   | `CartProvider`, `useCart()`                                    |
-| `favorites.tsx`        | Favoris client                                                               | `FavoritesProvider`, `useFavorites()`                          |
-| `orders.ts`            | Finalisation paiement **idempotente**                                        | `markOrderPaid()`, `markQuotePaid()`                           |
-| `discounts.ts`         | Validation & calcul des codes promo                                          | —                                                              |
-| `shipping.ts`          | Frais de port CH + seuil gratuité                                            | `FREE_SHIPPING_OVER_CENTS`                                     |
-| `stripe.ts`            | Instance Stripe (serveur)                                                    | —                                                              |
-| `stripe-appearance.ts` | Thème visuel du Payment Element                                              | —                                                              |
-| `format.ts`            | Formatage CHF/locale (jamais `toFixed` à la main)                            | `formatChf()`                                                  |
-| `rate-limit.ts`        | Compteur atomique Postgres par IP hachée + route                             | `rateLimit()`, `tooManyRequests()`                             |
-| `status-history.ts`    | Journal transactionnel des transitions commande/devis                        | `recordStatusTransition()`                                     |
-| `email.ts`             | Envoi via Resend (no-op si pas de clé)                                       | —                                                              |
-| `email-templates.ts`   | Gabarits HTML d'e-mails (4 langues) — **gros, surtout du texte**             | —                                                              |
-| `email-proof.ts`       | Aperçu d'e-mails pour `/admin/emails`                                        | —                                                              |
-| `maintenance.ts`       | Mode maintenance                                                             | —                                                              |
-| `theme.ts`             | Constantes/aides de thème (clair/sombre)                                     | —                                                              |
-| `seo.ts`               | Métadonnées complètes par page (canonical, hreflang, OG) + tous les JSON-LD  | `pageMetadata()`, `NOINDEX`, `siteJsonLd()`, `productJsonLd()` |
-| `indexnow.ts`          | Notifie IndexNow (Bing, Yandex…) des URL produit modifiées — fire-and-forget | `notifyIndexNow()`                                             |
-| `cf-image.ts`          | URL image Cloudflare Transformations (`/cdn-cgi/image`, prod only)           | `cfImage()`                                                    |
-| `cantons.ts`           | Les 26 cantons suisses (code + nom), partagé checkout/carnet d'adresses      | `CANTONS`                                                      |
-| `stripe-customer.ts`   | Identité Stripe client, créée paresseusement au 1er checkout connecté        | `getOrCreateStripeCustomer()`                                  |
-| `newsletter.ts`        | Destinataires + jeton HMAC de désabonnement pour les annonces                | —                                                              |
-| `session-groups.ts`    | Regroupe les sessions Better Auth par appareil (écran « Sessions »)          | —                                                              |
-| `user-agent.ts`        | Lecture indicative du user-agent (« Chrome sur Windows »)                    | `describeUserAgent()`                                          |
+| Fichier                | Rôle                                                                                | Exports clés                                                   |
+| ---------------------- | ----------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| `auth.ts`              | Instance Better Auth par requête (adapter Drizzle/Postgres, driver-agnostic)        | `getAuth()`                                                    |
+| `auth-client.ts`       | Client Better Auth (côté navigateur)                                                | `authClient`                                                   |
+| `session.ts`           | Garde d'autorisation                                                                | `requireAdmin()`, `getServerSession()`                         |
+| `cart.tsx`             | Panier client (localStorage `s3d-cart-v1`)                                          | `CartProvider`, `useCart()`                                    |
+| `favorites.tsx`        | Favoris client                                                                      | `FavoritesProvider`, `useFavorites()`                          |
+| `orders.ts`            | Finalisation paiement **idempotente**                                               | `markOrderPaid()`, `markQuotePaid()`                           |
+| `discounts.ts`         | Validation & calcul des codes promo                                                 | —                                                              |
+| `shipping.ts`          | Frais de port CH + seuil gratuité                                                   | `FREE_SHIPPING_OVER_CENTS`                                     |
+| `stripe.ts`            | Instance Stripe (serveur)                                                           | —                                                              |
+| `stripe-appearance.ts` | Thème visuel du Payment Element                                                     | —                                                              |
+| `format.ts`            | Formatage CHF/locale (jamais `toFixed` à la main)                                   | `formatChf()`                                                  |
+| `rate-limit.ts`        | Compteur atomique Postgres par IP hachée + route                                    | `rateLimit()`, `tooManyRequests()`                             |
+| `status-history.ts`    | Journal transactionnel des transitions commande/devis                               | `recordStatusTransition()`                                     |
+| `email.ts`             | Envoi via Resend (no-op si pas de clé)                                              | —                                                              |
+| `email-templates.ts`   | Gabarits HTML d'e-mails (4 langues) — **gros, surtout du texte**                    | —                                                              |
+| `email-proof.ts`       | Aperçu d'e-mails pour `/admin/emails`                                               | —                                                              |
+| `maintenance.ts`       | Mode maintenance                                                                    | —                                                              |
+| `theme.ts`             | Constantes/aides de thème (clair/sombre)                                            | —                                                              |
+| `seo.ts`               | Métadonnées complètes par page (canonical, hreflang, OG) + tous les JSON-LD         | `pageMetadata()`, `NOINDEX`, `siteJsonLd()`, `productJsonLd()` |
+| `indexnow.ts`          | Notifie IndexNow (Bing, Yandex…) des URL produit modifiées — fire-and-forget        | `notifyIndexNow()`                                             |
+| `analytics.ts`         | Mesure d'audience PostHog : file d'attente, nettoyage des données, props e-commerce | `track()`, `productProperties()`, `sanitizeEvent()`            |
+| `analytics-config.ts`  | Constantes PostHog partagées middleware/navigateur (relais, hôtes UE)               | `ANALYTICS_RELAY_PATH`                                         |
+| `cf-image.ts`          | URL image Cloudflare Transformations (`/cdn-cgi/image`, prod only)                  | `cfImage()`                                                    |
+| `cantons.ts`           | Les 26 cantons suisses (code + nom), partagé checkout/carnet d'adresses             | `CANTONS`                                                      |
+| `stripe-customer.ts`   | Identité Stripe client, créée paresseusement au 1er checkout connecté               | `getOrCreateStripeCustomer()`                                  |
+| `newsletter.ts`        | Destinataires + jeton HMAC de désabonnement pour les annonces                       | —                                                              |
+| `session-groups.ts`    | Regroupe les sessions Better Auth par appareil (écran « Sessions »)                 | —                                                              |
+| `user-agent.ts`        | Lecture indicative du user-agent (« Chrome sur Windows »)                           | `describeUserAgent()`                                          |
 
 ## `src/db` & `src/i18n`
 
@@ -106,6 +108,7 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | Recherche / produits liés              | `db/queries.ts` (`getProducts` param `q`, `getRelatedProducts`) + `shop/page.tsx`                                                                                                                           |
 | SEO d'une page                         | `generateMetadata` → `pageMetadata()` (`lib/seo.ts`) · JSON-LD via `components/json-ld.tsx` · `app/sitemap.xml/route.ts` · `app/robots.ts` · `app/llms.txt/route.ts` · textes `seo.*` des `messages/*.json` |
 | Tâches planifiées (purge R2, relances) | `lib/maintenance.ts` + `api/cron/maintenance` ← déclenché par `workers/cron` (Worker Cron horaire, déployé à part)                                                                                          |
+| Mesure d'audience (PostHog)            | `lib/analytics.ts` (`track()`) · chargement `src/instrumentation-client.ts` · relais `/api/relay` dans `middleware.ts` · `components/track-event.tsx` · refus : `components/analytics-opt-out.tsx`          |
 
 ## Remédiation septembre 2026
 

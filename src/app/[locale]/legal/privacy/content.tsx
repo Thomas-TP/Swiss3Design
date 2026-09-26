@@ -1,4 +1,5 @@
 import type { Locale } from "@/i18n/routing";
+import { AnalyticsOptOut } from "@/components/analytics-opt-out";
 import type { LegalSection } from "../legal-layout";
 
 // Politique de confidentialité dans les 4 langues. Seule la version
@@ -53,7 +54,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           fins publicitaires. À la seule exception d’un rappel de panier que
           vous auriez <strong>expressément demandé</strong> (voir ci-dessous),
           nous n’envoyons aucun e-mail publicitaire : les autres e-mails sont
-          strictement transactionnels (commandes, compte).
+          strictement transactionnels (commandes, compte). Nous mesurons aussi,
+          de façon anonyme, la fréquentation et l’utilisation du site pour
+          l’améliorer (voir « Mesure d’audience »).
         </p>
       ),
     },
@@ -89,6 +92,40 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Mesure d’audience",
+      body: (
+        <p>
+          Pour comprendre comment le site est utilisé et l’améliorer (pages
+          consultées, provenance des visites, produits vus ou ajoutés au panier,
+          étapes de commande et montant des achats, erreurs techniques, rapidité
+          d’affichage), nous utilisons <strong>PostHog</strong>, dont les
+          données sont hébergées dans l’Union européenne (Francfort). Cette
+          mesure fonctionne{" "}
+          <strong>sans cookie ni stockage dans votre navigateur</strong> : les
+          visites sont comptées au moyen d’un identifiant anonyme que PostHog
+          calcule (hachage irréversible) à partir de données techniques (adresse
+          IP, type de navigateur) et d’une valeur aléatoire renouvelée chaque
+          jour, ce qui ne permet pas de vous reconnaître d’un jour à l’autre.
+          Votre adresse IP n’est pas conservée ; le pays, le canton et la ville
+          sont déduits par Cloudflare au moment de la visite. Aucun nom, adresse
+          e-mail, adresse postale ni donnée de paiement n’est transmis, et les
+          adresses des pages sont épurées de leurs paramètres personnels. Les
+          statistiques sont conservées selon les conditions de PostHog (un an
+          avec notre offre actuelle). Cette mesure repose sur notre intérêt
+          légitime à améliorer le site ; vous pouvez vous y opposer à tout
+          moment :
+          <AnalyticsOptOut
+            labels={{
+              active: "Mesure d’audience active dans ce navigateur.",
+              inactive: "Mesure d’audience désactivée dans ce navigateur.",
+              disable: "Désactiver",
+              enable: "Réactiver",
+            }}
+          />
+        </p>
+      ),
+    },
+    {
       title: "Profilage et décisions automatisées",
       body: (
         <p>
@@ -109,13 +146,14 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           <strong>Stripe Link</strong> qui permet de réutiliser une carte déjà
           enregistrée auprès d’un autre marchand utilisant Stripe ; nous ne
           conservons nous-mêmes aucune donnée de carte), Resend (envoi
-          d’e-mails), Google (connexion Google, si utilisée). Certains de ces
-          prestataires traitent des données à l’étranger, en particulier dans
-          l’Union européenne et aux États-Unis ; ces transferts reposent sur des
-          garanties reconnues (l’Union européenne assure un niveau de protection
-          adéquat reconnu par la Suisse ; Swiss-U.S. Data Privacy Framework pour
-          les prestataires américains certifiés, ou clauses contractuelles
-          types).
+          d’e-mails), Google (connexion Google, si utilisée), PostHog (mesure
+          d’audience, données hébergées dans l’Union européenne). Certains de
+          ces prestataires traitent des données à l’étranger, en particulier
+          dans l’Union européenne et aux États-Unis ; ces transferts reposent
+          sur des garanties reconnues (l’Union européenne assure un niveau de
+          protection adéquat reconnu par la Suisse ; Swiss-U.S. Data Privacy
+          Framework pour les prestataires américains certifiés, ou clauses
+          contractuelles types).
         </p>
       ),
     },
@@ -125,8 +163,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Le site n’utilise que des éléments techniques indispensables : un
           cookie de session pour rester connecté à son compte et le stockage
-          local du navigateur pour le panier. Aucun cookie publicitaire, aucun
-          traceur tiers.
+          local du navigateur pour le panier, les favoris, la reprise d’un
+          paiement et, le cas échéant, votre refus de la mesure d’audience. La
+          mesure d’audience ne dépose aucun cookie. Aucun cookie publicitaire ni
+          de suivi d’un site à l’autre.
         </p>
       ),
     },
@@ -237,7 +277,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Warenkorb-Erinnerung, die Sie{" "}
           <strong>ausdrücklich angefordert</strong> haben (siehe unten),
           versenden wir keine Werbe-E-Mails; alle übrigen E-Mails sind rein
-          transaktionsbezogen (Bestellungen, Konto).
+          transaktionsbezogen (Bestellungen, Konto). Zudem messen wir anonym die
+          Besucherzahlen und die Nutzung der Website, um sie zu verbessern
+          (siehe «Reichweitenmessung»).
         </p>
       ),
     },
@@ -272,6 +314,40 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Reichweitenmessung",
+      body: (
+        <p>
+          Um zu verstehen, wie die Website genutzt wird, und sie zu verbessern
+          (aufgerufene Seiten, Herkunft der Besuche, angesehene oder in den
+          Warenkorb gelegte Produkte, Bestellschritte und Kaufbetrag, technische
+          Fehler, Ladegeschwindigkeit), verwenden wir <strong>PostHog</strong>;
+          die Daten werden in der Europäischen Union (Frankfurt) gehostet. Diese
+          Messung funktioniert{" "}
+          <strong>ohne Cookies und ohne Speicherung in Ihrem Browser</strong>:
+          Besuche werden über eine anonyme Kennung gezählt, die PostHog aus
+          technischen Daten (IP-Adresse, Browsertyp) und einem täglich neu
+          erzeugten Zufallswert berechnet (irreversibler Hashwert), sodass Sie
+          nicht von einem Tag zum nächsten wiedererkannt werden können. Ihre
+          IP-Adresse wird nicht gespeichert; Land, Kanton und Ort werden beim
+          Besuch von Cloudflare abgeleitet. Weder Name, E-Mail-Adresse,
+          Postanschrift noch Zahlungsdaten werden übermittelt, und
+          Seitenadressen werden von persönlichen Parametern bereinigt. Die
+          Statistiken werden gemäss den Bedingungen von PostHog aufbewahrt (ein
+          Jahr in unserem aktuellen Tarif). Diese Messung stützt sich auf unser
+          berechtigtes Interesse an der Verbesserung der Website; Sie können ihr
+          jederzeit widersprechen:
+          <AnalyticsOptOut
+            labels={{
+              active: "Reichweitenmessung in diesem Browser aktiv.",
+              inactive: "Reichweitenmessung in diesem Browser deaktiviert.",
+              disable: "Deaktivieren",
+              enable: "Wieder aktivieren",
+            }}
+          />
+        </p>
+      ),
+    },
+    {
       title: "Profiling und automatisierte Entscheidungen",
       body: (
         <p>
@@ -292,7 +368,8 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           <strong>Stripe Link</strong>, die es ermöglicht, eine bereits bei
           einem anderen Stripe-Händler gespeicherte Karte wiederzuverwenden; wir
           selbst speichern keinerlei Kartendaten), Resend (E-Mail-Versand),
-          Google (Google-Anmeldung, falls genutzt). Einige dieser Anbieter
+          Google (Google-Anmeldung, falls genutzt), PostHog (Reichweitenmessung,
+          Daten gehostet in der Europäischen Union). Einige dieser Anbieter
           bearbeiten Daten im Ausland, insbesondere in der Europäischen Union
           und in den USA; diese Übermittlungen stützen sich auf anerkannte
           Garantien (die Europäische Union gewährleistet ein von der Schweiz
@@ -308,8 +385,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Die Website verwendet ausschliesslich technisch notwendige Elemente:
           ein Session-Cookie, um im Konto angemeldet zu bleiben, und den lokalen
-          Speicher des Browsers für den Warenkorb. Keine Werbe-Cookies, keine
-          Tracker von Drittanbietern.
+          Speicher des Browsers für den Warenkorb, die Favoriten, die
+          Wiederaufnahme einer Zahlung und gegebenenfalls Ihren Widerspruch
+          gegen die Reichweitenmessung. Die Reichweitenmessung setzt keine
+          Cookies. Keine Werbe-Cookies und kein websiteübergreifendes Tracking.
         </p>
       ),
     },
@@ -421,7 +500,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           utilizzato a fini pubblicitari. Con la sola eccezione di un promemoria
           del carrello che abbiate <strong>espressamente richiesto</strong>{" "}
           (vedi sotto), non inviamo alcuna e-mail pubblicitaria; le altre e-mail
-          sono strettamente transazionali (ordini, conto).
+          sono strettamente transazionali (ordini, conto). Misuriamo inoltre, in
+          forma anonima, la frequentazione e l’utilizzo del sito per migliorarlo
+          (vedi «Misurazione dell’audience»).
         </p>
       ),
     },
@@ -456,6 +537,41 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Misurazione dell’audience",
+      body: (
+        <p>
+          Per capire come viene utilizzato il sito e migliorarlo (pagine
+          visitate, provenienza delle visite, prodotti visualizzati o aggiunti
+          al carrello, fasi dell’ordine e importo degli acquisti, errori
+          tecnici, velocità di visualizzazione), utilizziamo{" "}
+          <strong>PostHog</strong>, i cui dati sono ospitati nell’Unione europea
+          (Francoforte). Questa misurazione funziona{" "}
+          <strong>senza cookie né memorizzazione nel vostro browser</strong>: le
+          visite sono conteggiate tramite un identificativo anonimo che PostHog
+          calcola (hash irreversibile) a partire da dati tecnici (indirizzo IP,
+          tipo di browser) e da un valore casuale rinnovato ogni giorno, il che
+          non permette di riconoscervi da un giorno all’altro. Il vostro
+          indirizzo IP non viene conservato; paese, cantone e località sono
+          dedotti da Cloudflare al momento della visita. Non vengono trasmessi
+          nome, indirizzo e-mail, indirizzo postale né dati di pagamento, e gli
+          indirizzi delle pagine vengono ripuliti dai parametri personali. Le
+          statistiche sono conservate secondo le condizioni di PostHog (un anno
+          con la nostra offerta attuale). Questa misurazione si basa sul nostro
+          interesse legittimo a migliorare il sito; potete opporvi in qualsiasi
+          momento:
+          <AnalyticsOptOut
+            labels={{
+              active: "Misurazione dell’audience attiva in questo browser.",
+              inactive:
+                "Misurazione dell’audience disattivata in questo browser.",
+              disable: "Disattiva",
+              enable: "Riattiva",
+            }}
+          />
+        </p>
+      ),
+    },
+    {
       title: "Profilazione e decisioni automatizzate",
       body: (
         <p>
@@ -476,11 +592,12 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           consente di riutilizzare una carta già registrata presso un altro
           esercente che utilizza Stripe; noi stessi non conserviamo alcun dato
           della carta), Resend (invio di e-mail), Google (accesso Google, se
-          utilizzato). Alcuni di questi fornitori trattano dati all’estero, in
-          particolare nell’Unione europea e negli Stati Uniti; tali
-          trasferimenti si basano su garanzie riconosciute (l’Unione europea
-          garantisce un livello di protezione adeguato riconosciuto dalla
-          Svizzera; Swiss-U.S. Data Privacy Framework per i fornitori
+          utilizzato), PostHog (misurazione dell’audience, dati ospitati
+          nell’Unione europea). Alcuni di questi fornitori trattano dati
+          all’estero, in particolare nell’Unione europea e negli Stati Uniti;
+          tali trasferimenti si basano su garanzie riconosciute (l’Unione
+          europea garantisce un livello di protezione adeguato riconosciuto
+          dalla Svizzera; Swiss-U.S. Data Privacy Framework per i fornitori
           statunitensi certificati o clausole contrattuali tipo).
         </p>
       ),
@@ -491,8 +608,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Il sito utilizza solo elementi tecnici indispensabili: un cookie di
           sessione per restare connessi al proprio conto e la memoria locale del
-          browser per il carrello. Nessun cookie pubblicitario, nessun
-          tracciante di terzi.
+          browser per il carrello, i preferiti, la ripresa di un pagamento e, se
+          del caso, la vostra opposizione alla misurazione dell’audience. La
+          misurazione dell’audience non deposita alcun cookie. Nessun cookie
+          pubblicitario né tracciamento da un sito all’altro.
         </p>
       ),
     },
@@ -600,7 +719,8 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           With the sole exception of a cart reminder you have{" "}
           <strong>explicitly requested</strong> (see below), we do not send any
           advertising e-mails; all other e-mails are strictly transactional
-          (orders, account).
+          (orders, account). We also anonymously measure traffic to and use of
+          the site in order to improve it (see “Audience measurement”).
         </p>
       ),
     },
@@ -633,6 +753,37 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Audience measurement",
+      body: (
+        <p>
+          To understand how the site is used and improve it (pages viewed, where
+          visits come from, products viewed or added to the cart, checkout steps
+          and purchase amounts, technical errors, loading speed), we use{" "}
+          <strong>PostHog</strong>, whose data is hosted in the European Union
+          (Frankfurt). This measurement works{" "}
+          <strong>without cookies or any storage in your browser</strong>:
+          visits are counted using an anonymous identifier that PostHog computes
+          (an irreversible hash) from technical data (IP address, browser type)
+          and a random value renewed every day, so you cannot be recognised from
+          one day to the next. Your IP address is not stored; country, canton
+          and city are derived by Cloudflare at the time of the visit. No name,
+          e-mail address, postal address or payment data is sent, and page
+          addresses are stripped of personal parameters. Statistics are kept
+          under PostHog’s terms (one year on our current plan). This measurement
+          is based on our legitimate interest in improving the site; you can
+          object to it at any time:
+          <AnalyticsOptOut
+            labels={{
+              active: "Audience measurement is active in this browser.",
+              inactive: "Audience measurement is disabled in this browser.",
+              disable: "Disable",
+              enable: "Re-enable",
+            }}
+          />
+        </p>
+      ),
+    },
+    {
       title: "Profiling and automated decisions",
       body: (
         <p>
@@ -651,7 +802,8 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           <strong>Stripe Link</strong>, which lets you reuse a card already
           saved with another merchant using Stripe; we ourselves never store any
           card data), Resend (e-mail delivery), Google (Google sign-in, if
-          used). Some of these providers process data abroad, in particular in
+          used), PostHog (audience measurement, data hosted in the European
+          Union). Some of these providers process data abroad, in particular in
           the European Union and the United States; these transfers are based on
           recognised safeguards (the European Union provides an adequate level
           of protection recognised by Switzerland; the Swiss-U.S. Data Privacy
@@ -666,7 +818,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           The site only uses strictly necessary technical elements: a session
           cookie to stay signed in to your account and the browser’s local
-          storage for the cart. No advertising cookies, no third-party trackers.
+          storage for the cart, favourites, resuming a payment and, where
+          applicable, your objection to audience measurement. Audience
+          measurement sets no cookies. No advertising cookies and no cross-site
+          tracking.
         </p>
       ),
     },

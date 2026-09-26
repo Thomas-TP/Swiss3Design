@@ -1,6 +1,11 @@
 import { NextResponse, NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
+import {
+  ANALYTICS_RELAY_PATH,
+  POSTHOG_ASSET_HOST,
+  POSTHOG_INGEST_HOST,
+} from "./lib/analytics-config";
 
 // Next 16 a renommé « middleware » en « proxy », mais proxy.ts impose le
 // runtime Node.js, que l'adaptateur OpenNext Cloudflare ne supporte pas encore
@@ -24,6 +29,9 @@ const SECURITY_HEADERS: Record<string, string> = {
 //  • Google Fonts (CSS lu par Stripe Elements pour la police Geist des iframes)
 //  • autocomplétion d'adresse geo.admin.ch (connect)
 //  • Cloudflare Web Analytics (beacon, sans cookie) — à activer dans le dashboard
+//  • PostHog : la mesure passe par le relais first-party ('self') ; les hôtes
+//    *.posthog.com ne servent qu'au toolbar (heatmaps affichées sur le site
+//    réel, ouvert depuis l'application PostHog)
 //  • avatars Google et images produits (img https:)
 //
 // En production, les scripts inline injectés par Next sont autorisés via un
@@ -41,8 +49,8 @@ function buildCsp({
   origin: string;
 }): string {
   const scriptSrc = nonce
-    ? `script-src 'self' 'nonce-${nonce}' https://js.stripe.com https://static.cloudflareinsights.com`
-    : `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://static.cloudflareinsights.com`;
+    ? `script-src 'self' 'nonce-${nonce}' https://js.stripe.com https://static.cloudflareinsights.com https://*.posthog.com`
+    : `script-src 'self' 'unsafe-inline' 'unsafe-eval' https://js.stripe.com https://static.cloudflareinsights.com https://*.posthog.com`;
   return [
     "default-src 'self'",
     "base-uri 'self'",
@@ -50,12 +58,12 @@ function buildCsp({
     "frame-ancestors 'none'",
     "form-action 'self'",
     scriptSrc,
-    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-    "font-src 'self' https://fonts.gstatic.com data:",
+    "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://*.posthog.com",
+    "font-src 'self' https://fonts.gstatic.com https://*.posthog.com data:",
     "img-src 'self' data: blob: https:",
-    `connect-src 'self' https://*.stripe.com https://m.stripe.network https://fonts.googleapis.com https://api3.geo.admin.ch https://cloudflareinsights.com${isProd ? "" : " ws: wss:"}`,
+    `connect-src 'self' https://*.stripe.com https://m.stripe.network https://fonts.googleapis.com https://api3.geo.admin.ch https://cloudflareinsights.com https://*.posthog.com${isProd ? "" : " ws: wss:"}`,
     "frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://m.stripe.network",
-    "worker-src 'self' blob:",
+    "worker-src 'self' blob: data:",
     "manifest-src 'self'",
     `report-uri ${origin}/api/csp-report`,
     "report-to csp",
@@ -75,6 +83,63 @@ function withSecurityHeaders(response: NextResponse) {
   return response;
 }
 
+// Relais PostHog, traité ici plutôt que par une route Next : la requête ne
+// traverse pas le serveur Next (quelques millisecondes de CPU au lieu d'un
+// rendu complet, à chaque lot d'événements) et on choisit précisément les
+// en-têtes transmis. Une réécriture next.config ferait suivre TOUS les
+// en-têtes, dont le cookie de session better-auth, jusque chez PostHog.
+const RELAY_REQUEST_HEADERS = [
+  "content-type",
+  "user-agent",
+  "accept",
+  "accept-language",
+];
+const RELAY_RESPONSE_HEADERS = [
+  "content-type",
+  "cache-control",
+  "etag",
+  "last-modified",
+];
+
+async function relayToPostHog(request: NextRequest, url: URL) {
+  if (!["GET", "HEAD", "POST"].includes(request.method))
+    return new Response(null, { status: 405 });
+  const path = url.pathname.slice(ANALYTICS_RELAY_PATH.length) || "/";
+  // Hôte cible fixe : un chemin forgé ne peut pas viser un autre domaine.
+  const target = new URL(
+    `${path}${url.search}`,
+    path.startsWith("/static/") ? POSTHOG_ASSET_HOST : POSTHOG_INGEST_HOST,
+  );
+  const headers = new Headers();
+  for (const name of RELAY_REQUEST_HEADERS) {
+    const value = request.headers.get(name);
+    if (value) headers.set(name, value);
+  }
+  // Géolocalisation (pays, ville) : PostHog lit l'IP du visiteur ici, puis
+  // l'écarte (réglage « Discard client IP data » du projet).
+  const ip = request.headers.get("cf-connecting-ip");
+  if (ip) headers.set("x-forwarded-for", ip);
+  try {
+    const upstream = await fetch(target, {
+      method: request.method,
+      headers,
+      body: request.method === "POST" ? await request.arrayBuffer() : null,
+      redirect: "manual",
+    });
+    const out = new Headers({ "X-Content-Type-Options": "nosniff" });
+    for (const name of RELAY_RESPONSE_HEADERS) {
+      const value = upstream.headers.get(name);
+      if (value) out.set(name, value);
+    }
+    return new Response(upstream.body, {
+      status: upstream.status,
+      headers: out,
+    });
+  } catch {
+    return new Response(null, { status: 502 });
+  }
+}
+
 export default function middleware(request: NextRequest) {
   const original = new URL(request.url);
   if (
@@ -84,6 +149,12 @@ export default function middleware(request: NextRequest) {
     original.protocol = "https:";
     original.hostname = "swiss3design.ch";
     return NextResponse.redirect(original, 308);
+  }
+  if (
+    original.pathname === ANALYTICS_RELAY_PATH ||
+    original.pathname.startsWith(`${ANALYTICS_RELAY_PATH}/`)
+  ) {
+    return relayToPostHog(request, original);
   }
   // Les routes API ne sont jamais redirigées (webhooks, callbacks OAuth : un
   // 301 sur un POST les casserait).
@@ -155,11 +226,13 @@ export default function middleware(request: NextRequest) {
 
 export const config = {
   // Tout sauf les assets (chemins avec un point)… à l'exception des fichiers
-  // racine générés (ROOT_FILES), qui ont besoin des redirections canoniques.
+  // racine générés (ROOT_FILES), qui ont besoin des redirections canoniques,
+  // et du relais PostHog, dont les scripts (…/static/recorder.js) ont un point.
   matcher: [
     "/((?!_next|_vercel|.*\\..*).*)",
     "/robots.txt",
     "/sitemap.xml",
     "/llms.txt",
+    "/api/relay/:path*",
   ],
 };

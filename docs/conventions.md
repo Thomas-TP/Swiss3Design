@@ -180,6 +180,41 @@ on _every_ page at once.
   ([`src/lib/indexnow.ts`](../src/lib/indexnow.ts), Bing/Yandex/Seznam…). The
   key file `public/867cd9af686842c88e46c3f656218246.txt` must stay deployed.
 
+## Analytics (PostHog, EU, cookieless)
+
+- **Track with `track(event, props)`** from [`src/lib/analytics.ts`](../src/lib/analytics.ts)
+  in client code. From a Server Component, render
+  [`<TrackEvent>`](../src/components/track-event.tsx); pass `onceKey` for
+  anything that must not double-count on reload (e.g. `Order Completed`).
+- **Event names follow PostHog's e-commerce spec**: `Product Viewed`,
+  `Product Added`, `Product Removed`, `Cart Viewed`, `Checkout Started`,
+  `Checkout Step Viewed`, `Payment Info Entered`, `Order Completed`, and so on.
+  Build product props with `productProperties()` / `cartProperties()`. Amounts
+  are **CHF decimals** via `chf()`; never send cents.
+  `Order Completed.revenue` is the amount actually paid, shipping included (the
+  Stripe figure), and PostHog revenue analytics reads that exact property.
+  Renaming it breaks the project config.
+- **Never send personal data.** No email, name, address or payment message goes
+  into a property. URLs are reduced to an allowlist of query params
+  (`KEPT_PARAMS`: utm, click IDs, shop search and filters), and email-looking
+  strings are masked, both in `sanitizeEvent`. A new query param that is useful
+  in analytics must be added to that allowlist. Admin paths are never sent.
+- **Bundle rule:** `posthog-js` is imported **only** by
+  `src/instrumentation-client.ts`, lazily on idle. `lib/analytics.ts` holds
+  types and a queue only. Importing `posthog-js` anywhere else puts it into the
+  server Worker bundle, because client components are rendered server-side too.
+- **Relay:** the browser only calls `/api/relay/*` on our own domain, which the
+  middleware relays to `eu.i.posthog.com` (a static `/static/*` script goes to
+  `eu-assets`). Only allowlisted headers are forwarded, so the session cookie
+  never leaves. The visitor IP goes as `x-forwarded-for` for the cookieless
+  hash; the project discards it.
+- **Location** comes from Cloudflare (`cf` → `data-geo-*` on `<html>`, set in
+  the `[locale]` layout). In cookieless mode PostHog drops the IP before its
+  own GeoIP runs.
+- **Cookieless only for now.** The PostHog project must keep "Cookieless server
+  hash mode" on, otherwise every event is discarded. Replays, surveys and flags
+  wait for a consent banner (phase 2).
+
 ## CSP nonce contract (prod only)
 
 In production every inline `<script>` must carry the per-request nonce or it's

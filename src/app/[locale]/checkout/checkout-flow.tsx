@@ -26,6 +26,7 @@ import {
 } from "@/components/guest-email-verification";
 import { Select } from "@/components/select";
 import { useCart } from "@/lib/cart";
+import { cartProperties, chf, track } from "@/lib/analytics";
 import { useSession } from "@/lib/auth-client";
 import { useIsDark } from "@/lib/theme";
 import { stripeAppearance } from "@/lib/stripe-appearance";
@@ -332,9 +333,15 @@ function SummaryCard({
       };
       if (data.valid && data.code && data.discountCents) {
         setDiscount({ code: data.code, discountCents: data.discountCents });
+        track("Coupon Applied", {
+          coupon: data.code,
+          discount: chf(data.discountCents),
+          currency: "CHF",
+        });
       } else {
         setDiscount(null);
         setPromoError(t("promoInvalid"));
+        track("Coupon Denied", { coupon: c });
       }
     } catch {
       setPromoError(t("promoInvalid"));
@@ -510,6 +517,15 @@ export function CheckoutFlow({
   }, []);
   // oxlint-enable exhaustive-deps
 
+  // « Checkout Started » une seule fois, dès que le panier (relu depuis le
+  // stockage local après le montage) contient des articles.
+  const checkoutTracked = useRef(false);
+  useEffect(() => {
+    if (checkoutTracked.current || items.length === 0) return;
+    checkoutTracked.current = true;
+    track("Checkout Started", cartProperties(items));
+  }, [items]);
+
   const shippingCents = clientSecret
     ? serverShipping
     : shippingFor(subtotalCents, shippingSettings);
@@ -636,6 +652,15 @@ export function CheckoutFlow({
       setServerShipping(data.shippingCents);
       setServerDiscount(data.discountCents);
       setClientSecret(data.clientSecret);
+      track("Checkout Step Viewed", {
+        step: 2,
+        step_name: "payment",
+        value: chf(data.totalCents),
+        shipping: chf(data.shippingCents),
+        discount: chf(data.discountCents),
+        currency: "CHF",
+        guest: !accountEmail,
+      });
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch {
       setError(t("errorGeneric"));
@@ -858,10 +883,23 @@ function PaymentStep({
     if (checkoutState.type !== "success") return;
     setPaying(true);
     setError(null);
+    track("Payment Info Entered", {
+      value: chf(totalCents),
+      currency: "CHF",
+    });
     const result = await checkoutState.checkout.confirm();
     if (result.type === "error") {
       setError(result.error.message ?? t("errorGeneric"));
       setPaying(false);
+      // Code Stripe et motif de refus seulement (paymentFailed, insufficient_
+      // funds…) : jamais le message, qui peut reprendre des données saisies.
+      track("Payment Failed", {
+        error_code: result.error.code ?? "unknown",
+        decline_code:
+          result.error.code === "paymentFailed"
+            ? result.error.paymentFailed.declineCode
+            : null,
+      });
       return;
     }
     // Certains moyens de paiement (TWINT, virements…) font déjà naviguer le

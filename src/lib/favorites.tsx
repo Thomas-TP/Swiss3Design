@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from "react";
 import type { CartItem } from "./cart";
+import { productProperties, track } from "./analytics";
 
 // Même snapshot que le panier (sans quantité) : la liste reste affichable
 // même si le produit change côté serveur.
@@ -66,8 +67,21 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     items,
     count: items.length,
     has: (productId) => items.some((i) => i.productId === productId),
-    toggle: (item) => dispatch({ type: "toggle", item }),
-    remove: (productId) => dispatch({ type: "remove", productId }),
+    toggle: (item) => {
+      const removing = items.some((i) => i.productId === item.productId);
+      dispatch({ type: "toggle", item });
+      track(
+        removing
+          ? "Product Removed from Wishlist"
+          : "Product Added to Wishlist",
+        productProperties(item),
+      );
+    },
+    remove: (productId) => {
+      const item = items.find((i) => i.productId === productId);
+      dispatch({ type: "remove", productId });
+      if (item) track("Product Removed from Wishlist", productProperties(item));
+    },
   };
 
   return (

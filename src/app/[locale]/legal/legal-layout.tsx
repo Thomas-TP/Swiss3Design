@@ -5,7 +5,7 @@ import type { Locale } from "@/i18n/routing";
 // reprise comme <lastmod> du sitemap (une seule source, jamais désynchronisées).
 export const LEGAL_UPDATED = {
   terms: "2026-07-10",
-  privacy: "2026-07-10",
+  privacy: "2026-09-26",
   shipping: "2026-07-10",
 } as const;
 
