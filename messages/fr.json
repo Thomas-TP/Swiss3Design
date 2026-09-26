@@ -73,6 +73,10 @@
     "dimensions": "Dimensions",
     "weight": "Poids",
     "details": "Caractéristiques",
+    "productionTime": "Délai de fabrication",
+    "productionDays": "{days} jours",
+    "origin": "Provenance",
+    "originValue": "Imprimé dans l'arc lémanique (VD), Suisse",
     "backToShop": "Retour au catalogue",
     "notFound": "Produit introuvable."
   },

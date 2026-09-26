@@ -73,6 +73,10 @@
     "dimensions": "Abmessungen",
     "weight": "Gewicht",
     "details": "Eigenschaften",
+    "productionTime": "Fertigungszeit",
+    "productionDays": "{days} Tage",
+    "origin": "Herkunft",
+    "originValue": "Gedruckt in der Genferseeregion (VD), Schweiz",
     "backToShop": "Zurück zum Katalog",
     "notFound": "Produkt nicht gefunden."
   },

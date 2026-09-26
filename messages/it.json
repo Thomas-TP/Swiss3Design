@@ -73,6 +73,10 @@
     "dimensions": "Dimensioni",
     "weight": "Peso",
     "details": "Caratteristiche",
+    "productionTime": "Tempo di produzione",
+    "productionDays": "{days} giorni",
+    "origin": "Provenienza",
+    "originValue": "Stampato nell'arco lemanico (VD), Svizzera",
     "backToShop": "Torna al catalogo",
     "notFound": "Prodotto non trovato."
   },
