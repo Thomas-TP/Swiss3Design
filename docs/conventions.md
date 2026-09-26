@@ -207,7 +207,9 @@ on _every_ page at once.
   middleware relays to `eu.i.posthog.com` (a static `/static/*` script goes to
   `eu-assets`). Only allowlisted headers are forwarded, so the session cookie
   never leaves. The visitor IP goes as `x-forwarded-for` for the cookieless
-  hash; the project discards it.
+  hash; the project discards it. `Origin`/`Referer` are set to the site
+  origin only: PostHog needs them to match the project's recording domains,
+  and without them session replay silently stays disabled.
 - **Location** comes from Cloudflare (`cf` → `data-geo-*` on `<html>`, set in
   the `[locale]` layout). In cookieless mode PostHog drops the IP before its
   own GeoIP runs.

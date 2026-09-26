@@ -2,6 +2,7 @@ import { NextResponse, NextRequest } from "next/server";
 import createMiddleware from "next-intl/middleware";
 import { routing } from "./i18n/routing";
 import {
+  ANALYTICS_HOSTNAME,
   ANALYTICS_RELAY_PATH,
   POSTHOG_ASSET_HOST,
   POSTHOG_INGEST_HOST,
@@ -119,6 +120,14 @@ async function relayToPostHog(request: NextRequest, url: URL) {
   // l'écarte (réglage « Discard client IP data » du projet).
   const ip = request.headers.get("cf-connecting-ip");
   if (ip) headers.set("x-forwarded-for", ip);
+  // PostHog n'active les enregistrements que pour les domaines autorisés
+  // du projet, qu'il reconnaît à l'Origin/Referer (sans eux : configuration
+  // distante « sessionRecording: false »). On transmet l'origine du site,
+  // jamais l'URL complète de la page, qui peut porter des paramètres
+  // personnels.
+  const siteOrigin = `https://${ANALYTICS_HOSTNAME}`;
+  headers.set("origin", siteOrigin);
+  headers.set("referer", `${siteOrigin}/`);
   try {
     const upstream = await fetch(target, {
       method: request.method,
