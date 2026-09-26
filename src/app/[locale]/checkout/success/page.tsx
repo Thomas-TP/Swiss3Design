@@ -8,12 +8,62 @@ import {
 } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { eq } from "drizzle-orm";
+import type Stripe from "stripe";
 import { Link } from "@/i18n/navigation";
 import { getDb } from "@/db";
+import { orderItems, orders } from "@/db/schema";
 import { settleSession } from "@/lib/checkout-session";
 import { getStripe } from "@/lib/stripe";
 import { getServerSession } from "@/lib/session";
+import { chf } from "@/lib/analytics";
+import { TrackEvent } from "@/components/track-event";
 import { ClearCart } from "./clear-cart";
+
+// « Order Completed » (spécification e-commerce PostHog). `revenue` = montant
+// réellement encaissé, livraison comprise : le même chiffre que Stripe.
+async function orderCompletedProperties(
+  db: Awaited<ReturnType<typeof getDb>>,
+  session: Stripe.Checkout.Session,
+  orderNumber: string | null,
+) {
+  const orderId = session.metadata?.orderId;
+  const [items, [order]] = orderId
+    ? await Promise.all([
+        db
+          .select({
+            productId: orderItems.productId,
+            name: orderItems.nameSnapshot,
+            color: orderItems.colorName,
+            priceCents: orderItems.priceCentsSnapshot,
+            quantity: orderItems.quantity,
+          })
+          .from(orderItems)
+          .where(eq(orderItems.orderId, orderId)),
+        db
+          .select({ coupon: orders.discountCode })
+          .from(orders)
+          .where(eq(orders.id, orderId)),
+      ])
+    : [[], []];
+  return {
+    order_id: orderNumber ?? session.id.slice(-12),
+    order_type: session.metadata?.quoteId ? "custom_quote" : "shop",
+    coupon: order?.coupon ?? undefined,
+    revenue: chf(session.amount_total ?? 0),
+    subtotal: chf(session.amount_subtotal ?? 0),
+    shipping: chf(session.total_details?.amount_shipping ?? 0),
+    discount: chf(session.total_details?.amount_discount ?? 0),
+    currency: (session.currency ?? "chf").toUpperCase(),
+    products: items.map((i) => ({
+      product_id: i.productId,
+      name: i.name,
+      variant: i.color ?? undefined,
+      price: chf(i.priceCents),
+      quantity: i.quantity,
+    })),
+  };
+}
 
 export const dynamic = "force-dynamic";
 
@@ -31,6 +81,8 @@ export default async function CheckoutSuccessPage({
   let status: "succeeded" | "processing" | "failed" = "failed";
   let orderNumber: string | null = null;
   let receiptEmail: string | null = null;
+  let purchase: Awaited<ReturnType<typeof orderCompletedProperties>> | null =
+    null;
 
   if (sessionId) {
     const { env } = await getCloudflareContext({ async: true });
@@ -45,8 +97,15 @@ export default async function CheckoutSuccessPage({
         checkoutSession.customer_details?.email ??
         checkoutSession.customer_email;
       const db = await getDb();
-      if (await settleSession(db, checkoutSession)) status = "succeeded";
-      else if (checkoutSession.status === "complete") status = "processing";
+      if (await settleSession(db, checkoutSession)) {
+        status = "succeeded";
+        // La mesure ne doit jamais masquer une confirmation de paiement.
+        purchase = await orderCompletedProperties(
+          db,
+          checkoutSession,
+          orderNumber,
+        ).catch(() => null);
+      } else if (checkoutSession.status === "complete") status = "processing";
     } catch {
       // Une réponse réseau perdue ne prouve pas un refus du paiement.
       status = "processing";
@@ -63,6 +122,13 @@ export default async function CheckoutSuccessPage({
   return (
     <div className="mx-auto max-w-xl px-4 py-20 sm:px-6">
       {status === "succeeded" && <ClearCart />}
+      {purchase && (
+        <TrackEvent
+          event="Order Completed"
+          properties={purchase}
+          onceKey={purchase.order_id}
+        />
+      )}
       <div className="rounded-card border border-line bg-surface p-10 text-center">
         <span
           className={`mx-auto grid h-16 w-16 place-items-center rounded-full ${

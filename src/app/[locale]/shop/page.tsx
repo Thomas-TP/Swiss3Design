@@ -6,6 +6,7 @@ import type { Locale } from "@/i18n/routing";
 import { getUsedFilters, getProducts, type ProductSort } from "@/db/queries";
 import { collectionJsonLd, pageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
+import { TrackEvent } from "@/components/track-event";
 import { ProductCard } from "@/components/product-card";
 import { PageHeader } from "@/components/page-header";
 
@@ -112,6 +113,26 @@ export default async function ShopPage({
         />
       )}
       <PageHeader title={t("title")} intro={t("subtitle")} />
+      {/* Recherches sans résultat = produits que les visiteurs attendent. */}
+      {searchParam && (
+        <TrackEvent
+          event="Products Searched"
+          properties={{ query: searchParam, results: products.length }}
+        />
+      )}
+      {(category || material || color || multicolorOn || sortParam) && (
+        <TrackEvent
+          event="Product List Filtered"
+          properties={{
+            category,
+            material,
+            color,
+            multicolor: multicolorOn || undefined,
+            sort: sortParam,
+            results: products.length,
+          }}
+        />
+      )}
 
       {/* Barre de filtres groupée */}
       <div className="mt-8 rounded-card border border-line bg-surface/60 p-3 backdrop-blur-sm sm:p-4">

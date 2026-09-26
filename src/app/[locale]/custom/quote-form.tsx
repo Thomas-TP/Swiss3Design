@@ -1,10 +1,11 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { CheckCircle2, Send, Paperclip, X } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Select } from "@/components/select";
 import { useSession } from "@/lib/auth-client";
+import { track } from "@/lib/analytics";
 import { submitQuoteRequest, type QuoteFormState } from "./actions";
 
 const field =
@@ -22,6 +23,18 @@ export function QuoteForm({ materials }: { materials: string[] }) {
   const [file, setFile] = useState<{ key: string; name: string } | null>(null);
   const [uploading, setUploading] = useState(false);
   const [fileError, setFileError] = useState(false);
+
+  // Demande de devis = lead principal de l'impression sur mesure.
+  // oxlint-disable exhaustive-deps -- un seul envoi, au passage en succès ; matière et fichier sont lus à cet instant
+  useEffect(() => {
+    if (state.status !== "success") return;
+    track("Quote Requested", {
+      material: material || undefined,
+      has_file: Boolean(file),
+      signed_in: Boolean(authSession),
+    });
+  }, [state.status]);
+  // oxlint-enable exhaustive-deps
 
   async function onFile(input: HTMLInputElement) {
     const selected = input.files?.[0];

@@ -22,6 +22,8 @@ import { cfOgImage } from "@/lib/cf-image";
 import { formatChf } from "@/lib/format";
 import { getShippingSettings } from "@/lib/shipping-settings";
 import { JsonLd } from "@/components/json-ld";
+import { TrackEvent } from "@/components/track-event";
+import { productProperties } from "@/lib/analytics";
 import { MulticolorDots } from "@/components/multicolor-dots";
 import { ProductGallery } from "@/components/product-gallery";
 import { ProductColorProvider } from "@/components/product-color-context";
@@ -189,6 +191,21 @@ export default async function ProductPage({
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-16">
       <JsonLd data={jsonLd} />
       <JsonLd data={breadcrumb} />
+      <TrackEvent
+        event="Product Viewed"
+        properties={{
+          ...productProperties({
+            productId: product.id,
+            slug: product.slug,
+            name: product.name,
+            priceCents: product.priceCents,
+            saleType: product.saleType,
+          }),
+          in_stock: product.stock == null || product.stock > 0,
+          rating: ratingSummary.count > 0 ? ratingSummary.average : null,
+          reviews: ratingSummary.count,
+        }}
+      />
       <Link
         href="/shop"
         className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"

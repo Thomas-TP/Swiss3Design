@@ -5,6 +5,11 @@ import { Check, CreditCard, ShoppingBag } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useCart, sameLine, type CartItem } from "@/lib/cart";
+import { productProperties, track } from "@/lib/analytics";
+
+function trackAdded(item: Omit<CartItem, "quantity">, source: string) {
+  track("Product Added", { ...productProperties(item), source });
+}
 
 export function AddToCart({
   item,
@@ -35,6 +40,7 @@ export function AddToCart({
       aria-live="polite"
       onClick={() => {
         add(item);
+        trackAdded(item, "product_page");
         setAdded(true);
         setTimeout(() => setAdded(false), 1600);
       }}
@@ -82,6 +88,7 @@ export function AddToCartMini({
         e.preventDefault();
         e.stopPropagation();
         add(item);
+        trackAdded(item, "catalog");
         setAdded(true);
         setTimeout(() => setAdded(false), 1600);
       }}
@@ -116,7 +123,10 @@ export function BuyNow({
       type="button"
       aria-live="polite"
       onClick={() => {
-        if (!items.some((i) => sameLine(i, item))) add(item);
+        if (!items.some((i) => sameLine(i, item))) {
+          add(item);
+          trackAdded(item, "buy_now");
+        }
         router.push("/checkout");
       }}
       className="flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-paper transition-all hover:bg-ink/85 active:scale-[0.98]"

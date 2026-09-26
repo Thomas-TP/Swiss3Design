@@ -5,6 +5,7 @@ import { UserPlus, MailCheck, LoaderCircle } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { signUp, signIn } from "@/lib/auth-client";
+import { track } from "@/lib/analytics";
 
 const field =
   "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
@@ -86,6 +87,11 @@ export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
       setPending(false);
       return;
     }
+    // Aucune donnée du compte : seulement le fait qu'il a été créé.
+    track("Signed Up", {
+      method: "email",
+      needs_verification: !result?.token,
+    });
     // Sans token = vérification d'e-mail requise avant connexion
     if (!result?.token) {
       setWaiting({ email, password });

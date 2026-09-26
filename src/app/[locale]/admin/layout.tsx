@@ -7,6 +7,7 @@ import {
   isSessionFresh,
   SENSITIVE_SESSION_MAX_AGE_MS,
 } from "@/lib/session-freshness";
+import { MarkInternalVisitor } from "@/components/mark-internal-visitor";
 import { AdminFreshnessGuard } from "./admin-freshness-guard";
 import { AdminShell } from "./admin-shell";
 
@@ -42,6 +43,7 @@ export default async function AdminLayout({
     SENSITIVE_SESSION_MAX_AGE_MS;
   return (
     <AdminFreshnessGuard expiresAt={expiresAt}>
+      <MarkInternalVisitor />
       <AdminShell>{children}</AdminShell>
     </AdminFreshnessGuard>
   );

@@ -1,9 +1,11 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Minus, Plus, ShoppingBag, Trash2, ArrowRight } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
 import { useCart } from "@/lib/cart";
+import { cartProperties, productProperties, track } from "@/lib/analytics";
 import { formatChf } from "@/lib/format";
 import { shippingFor } from "@/lib/shipping";
 import { CartReminder } from "@/components/cart-reminder";
@@ -17,6 +19,15 @@ export default function CartContent({
   const t = useTranslations("cart");
   const locale = useLocale();
   const { items, subtotalCents, setQuantity, remove } = useCart();
+
+  // « Cart Viewed » une fois, dès que le panier relu du stockage local est
+  // non vide (il est vide au premier rendu, avant l'hydratation).
+  const viewTracked = useRef(false);
+  useEffect(() => {
+    if (viewTracked.current || items.length === 0) return;
+    viewTracked.current = true;
+    track("Cart Viewed", cartProperties(items));
+  }, [items]);
 
   const shippingCents = shippingFor(subtotalCents, shippingSettings);
   const totalCents = subtotalCents + shippingCents;
@@ -90,13 +101,14 @@ export default function CartContent({
                   </div>
                   <button
                     type="button"
-                    onClick={() =>
+                    onClick={() => {
                       remove(
                         item.productId,
                         item.variantId ?? null,
                         item.colorName ?? null,
-                      )
-                    }
+                      );
+                      track("Product Removed", productProperties(item));
+                    }}
                     aria-label={t("remove")}
                     className="rounded-full p-1.5 text-soft transition-colors hover:bg-line/60 hover:text-accent"
                   >

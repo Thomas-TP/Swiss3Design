@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { TriangleAlert, RotateCcw } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { trackException } from "@/lib/analytics";
 
 // Filet pour toute erreur non gérée dans l'arbre [locale]
 export default function ErrorPage({
@@ -16,6 +17,9 @@ export default function ErrorPage({
 
   useEffect(() => {
     console.error(error);
+    // Une erreur rattrapée par React ne remonte pas jusqu'à window.onerror :
+    // sans cet envoi, le suivi d'erreurs de PostHog ne la verrait jamais.
+    trackException(error, { digest: error.digest, boundary: "locale" });
   }, [error]);
 
   return (

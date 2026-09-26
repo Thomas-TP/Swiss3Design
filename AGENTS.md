@@ -153,13 +153,14 @@ put` on an environment with real users without `--env <name>` explicitly
    **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
-10. **The Worker bundle has ~236 KiB of headroom under a hard 3 MiB cap (2026-09-25
-    measurement: 2 835.6 KiB gzip after the SEO overhaul — re-measure rather
-    than trust this figure as it ages). Never add a binary asset through
-    a Next file convention.** The Workers **Free**
-    plan caps a Worker at 3 MiB **gzipped** (`Total Upload: … / gzip:` in the
-    deploy log is the number that counts — the uncompressed figure is 5× larger
-    and irrelevant). The `app/icon.*` & `app/apple-icon.*` conventions inline
+10. **Keep the Worker bundle lean: 2 851 KiB gzip (2026-09-26 measurement,
+    after PostHog — re-measure rather than trust this figure as it ages).
+    Never add a binary asset through a Next file convention.** Since
+    2026-09-26 the account is on **Workers Paid**, whose cap is 10 MiB
+    **gzipped**. The **Free** plan's 3 MiB cap is what broke the deploy in
+    August 2026, and every KiB still lengthens cold starts. The number that
+    counts is `Total Upload: … / gzip:` in the deploy log; the uncompressed
+    figure is 5× larger and irrelevant. The `app/icon.*` & `app/apple-icon.*` conventions inline
     their file as base64 **into that bundle** — a full icon set cost ~135 KiB
     and broke the deploy in August 2026 (`error 10027`). Icons therefore live in
     `public/` and are declared via `metadata.icons` in
@@ -188,6 +189,7 @@ put` on an environment with real users without `--env <name>` explicitly
 | Email                     | Resend (REST) — no-op if `RESEND_API_KEY` unset                                                                                                                                                                           |
 | i18n                      | `next-intl` (fr/de/it/en, auto-detect, fr fallback)                                                                                                                                                                       |
 | Files / cache             | Cloudflare R2 / KV                                                                                                                                                                                                        |
+| Analytics                 | PostHog Cloud EU, cookieless, via the first-party relay `/api/relay` (middleware) — `posthog-js` only in `src/instrumentation-client.ts`; see `docs/conventions.md` → Analytics                                           |
 | Hosting                   | Cloudflare Workers via `@opennextjs/cloudflare`                                                                                                                                                                           |
 
 ## Commands

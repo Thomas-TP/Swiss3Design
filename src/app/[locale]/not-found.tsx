@@ -1,6 +1,7 @@
 import { SearchX, ArrowRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { TrackEvent } from "@/components/track-event";
 
 // Rendu pour tout notFound() dans l'arbre [locale] (ex. produit supprimé)
 export default async function NotFoundPage() {
@@ -8,6 +9,9 @@ export default async function NotFoundPage() {
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-24 text-center sm:px-6">
+      {/* Liens cassés (internes ou venus d'ailleurs) : URL et provenance
+          partent avec l'événement, de quoi corriger ou rediriger. */}
+      <TrackEvent event="Page Not Found" />
       <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-surface ring-1 ring-line">
         <SearchX size={26} strokeWidth={1.6} className="text-soft" />
       </span>

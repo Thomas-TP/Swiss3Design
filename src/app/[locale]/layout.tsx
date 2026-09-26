@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { NextIntlClientProvider, hasLocale } from "next-intl";
 import { routing } from "@/i18n/routing";
 import { CartProvider } from "@/lib/cart";
@@ -90,11 +91,12 @@ export default async function LocaleLayout({
 
   // Nonce CSP posé par le middleware (prod uniquement) : autorise le script
   // inline anti-flash sous une politique sans 'unsafe-inline'.
-  const [nav, seo, requestHeaders, cookieStore] = await Promise.all([
+  const [nav, seo, requestHeaders, cookieStore, { cf }] = await Promise.all([
     getTranslations("nav"),
     getTranslations("seo"),
     headers(),
     cookies(),
+    getCloudflareContext({ async: true }),
   ]);
   const nonce = requestHeaders.get("x-nonce") ?? undefined;
   const hasSession = cookieStore
@@ -106,6 +108,15 @@ export default async function LocaleLayout({
       lang={locale}
       className={`${geist.variable} antialiased`}
       suppressHydrationWarning
+      // Localisation approximative du visiteur (pays, canton, ville), déduite
+      // de son IP par Cloudflare, lue par la mesure d'audience : en mode sans
+      // cookie, PostHog écarte l'IP avant tout enrichissement géographique.
+      data-geo-country={cf?.country}
+      data-geo-continent={cf?.continent}
+      data-geo-region={cf?.region}
+      data-geo-region-code={cf?.regionCode}
+      data-geo-city={cf?.city}
+      data-geo-tz={cf?.timezone}
     >
       <body className="flex min-h-screen flex-col">
         {/* Applique le thème avant le 1er rendu : évite le flash clair→sombre.
