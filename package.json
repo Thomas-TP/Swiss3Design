@@ -25,12 +25,12 @@
     "db:push:pg": "drizzle-kit push --config=drizzle.config.pg.ts"
   },
   "dependencies": {
-    "@better-auth/passkey": "^1.7.5",
+    "@better-auth/passkey": "^1.7.6",
     "@opennextjs/cloudflare": "^1.20.6",
     "@stripe/react-stripe-js": "^6.11.0",
     "@stripe/stripe-js": "^9.17.0",
     "@types/three": "^0.186.0",
-    "better-auth": "^1.7.5",
+    "better-auth": "^1.7.6",
     "drizzle-orm": "^0.45.3",
     "lucide-react": "^1.47.0",
     "motion": "^13.4.1",
