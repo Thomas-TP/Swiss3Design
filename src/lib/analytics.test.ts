@@ -1,8 +1,11 @@
-import { describe, expect, it } from "vitest";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import type { CaptureResult } from "posthog-js";
 import {
   cartProperties,
   chf,
+  posthogConfig,
   productProperties,
   sanitizeEvent,
   sanitizeUrl,
@@ -133,6 +136,45 @@ describe("sanitizeEvent", () => {
       },
     );
     expect(sanitizeEvent(snapshot)).toBe(snapshot);
+  });
+});
+
+describe("posthogConfig", () => {
+  afterEach(() => vi.unstubAllGlobals());
+  // posthogConfig lit la géolocalisation posée sur <html> par le layout.
+  const config = () => {
+    vi.stubGlobal("document", { documentElement: { dataset: {} } });
+    return posthogConfig();
+  };
+
+  it("n'enregistre jamais le contenu ni les en-têtes des requêtes réseau", () => {
+    expect(config().session_recording).toMatchObject({
+      maskAllInputs: true,
+      recordBody: false,
+      recordHeaders: false,
+    });
+  });
+
+  // Échoue dès qu'une mise à jour de posthog-js apporte un nouveau millésime :
+  // relire ce qu'il change (doc de `defaults` dans @posthog/types,
+  // posthog-config.d.ts), puis monter `defaults` dans analytics.ts.
+  it("suit le dernier millésime de `defaults` de posthog-js", () => {
+    const types = readFileSync(
+      join(
+        process.cwd(),
+        "node_modules/@posthog/types/dist/posthog-config.d.ts",
+      ),
+      "utf8",
+    );
+    const union = types.match(/type ConfigDefaults = ([^;]+);/)?.[1] ?? "";
+    const latest = Array.from(
+      union.matchAll(/'(\d{4}-\d{2}-\d{2})'/g),
+      (match) => match[1],
+    )
+      .sort()
+      .at(-1);
+    expect(latest).toBeDefined();
+    expect(config().defaults).toBe(latest);
   });
 });
 

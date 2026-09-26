@@ -216,9 +216,12 @@ export function posthogConfig(): Partial<PostHogConfig> {
   return {
     api_host: ANALYTICS_RELAY_PATH,
     ui_host: POSTHOG_UI_HOST,
-    // Figé volontairement : les millésimes suivants activent la capture des
-    // corps de requêtes réseau dans les enregistrements.
-    defaults: "2026-05-30",
+    // Dernier millésime de comportements par défaut (à suivre à chaque mise à
+    // jour de posthog-js). Depuis 2026-06-25 : ancres (#…) retirées des URL,
+    // corps réseau lus en flux s'ils sont enregistrés ; 2026-08-29 : le cookie
+    // prime sur le localStorage ; 2026-08-30 : les données structurées
+    // JSON-LD (publiques) accompagnent les enregistrements.
+    defaults: "2026-08-30",
     // Cookie « ph_… » (identifiant aléatoire) : visiteurs qui reviennent,
     // rétention, parcours et entonnoirs sur plusieurs jours. Un refus
     // (opt_out_capturing) coupe la mesure ET vide ce stockage.
@@ -239,9 +242,16 @@ export function posthogConfig(): Partial<PostHogConfig> {
     },
     // Enregistrements de visite pour tous (réglés dans le projet : 30 jours,
     // /account et /track exclus). Saisies masquées, et tout élément marqué
-    // .ph-mask (données personnelles affichées) aussi.
+    // .ph-mask (données personnelles affichées) aussi. Jamais le contenu ni
+    // les en-têtes des requêtes réseau (adresses, e-mails, réponses Stripe) :
+    // un `false` explicite l'emporte sur le réglage du projet, même activé.
     disable_session_recording: false,
-    session_recording: { maskAllInputs: true, maskTextSelector: ".ph-mask" },
+    session_recording: {
+      maskAllInputs: true,
+      maskTextSelector: ".ph-mask",
+      recordBody: false,
+      recordHeaders: false,
+    },
     disable_surveys: false,
     disable_web_experiments: true,
     // La configuration distante (/flags) active enregistrements et sondages :

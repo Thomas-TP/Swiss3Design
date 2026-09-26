@@ -16,8 +16,26 @@ updates:
         update-types:
           - "minor"
           - "patch"
-    # Les MAJ MAJEURES restent en PR isolées : Next.js, React et OpenNext sont
-    # sensibles (cf. AGENTS.md), elles demandent une revue manuelle + preview.
+    # Les MAJ MAJEURES, hors groupe, arrivent chacune dans sa propre PR :
+    # Next.js, React et OpenNext sont sensibles (cf. AGENTS.md), elles demandent
+    # une revue manuelle + la preview. (Elles étaient toutes ignorées jusqu'en
+    # septembre 2026, contrairement à ce que disait ce commentaire.)
     ignore:
-      - dependency-name: "*"
-        update-types: ["version-update:semver-major"]
+      # TypeScript 7.0 casse `next build` (plus d'API JS, cf. AGENTS.md) :
+      # attendre la 7.1, qui sera proposée normalement.
+      - dependency-name: "typescript"
+        versions: ["7.0.x"]
+
+  # Actions GitHub de la CI (quality.yml) : sans cette entrée, actions/checkout
+  # était resté en v4, trois versions majeures en retard.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    commit-message:
+      prefix: "ci"
+    groups:
+      github-actions:
+        patterns:
+          - "*"

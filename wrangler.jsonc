@@ -6,7 +6,12 @@
   // wrangler le résout tout seul (CLOUDFLARE_ACCOUNT_ID en variable
   // d'environnement reste possible mais inutile ici).
   "main": ".open-next/worker.js",
-  "compatibility_date": "2026-09-14",
+  // Pas plus récente que le runtime local (workerd livré avec wrangler) : au-delà,
+  // `preview` retombe sur la date de workerd, avec un avertissement, et ne reflète
+  // plus la prod. À remonter à chaque mise à jour de wrangler.
+  "compatibility_date": "2026-09-25",
+  // Redondant depuis la date 2026-08-04 (Node.js activé par défaut), gardé
+  // pour rester explicite : inoffensif selon Cloudflare.
   "compatibility_flags": ["nodejs_compat"],
   // Exécute le Worker au plus près de Neon (aws-eu-central-1, Francfort) :
   // une page fait plusieurs requêtes Postgres en série, chacune paie
