@@ -198,8 +198,13 @@ export function siteJsonLd(locale: Locale, description: string) {
         },
         image: `${SITE_URL}${DEFAULT_OG_IMAGE.url}`,
         email: CONTACT_EMAIL,
+        // Adresse de l'exploitant, identique à celle des CGV et de la politique
+        // de confidentialité (même NAP partout : cohérence pour Google et les
+        // moteurs IA).
         address: {
           "@type": "PostalAddress",
+          streetAddress: "Chemin de l’Aubépine 9B",
+          postalCode: "1196",
           addressLocality: "Gland",
           addressRegion: "VD",
           addressCountry: "CH",

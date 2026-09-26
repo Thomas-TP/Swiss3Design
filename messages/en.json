@@ -73,6 +73,10 @@
     "dimensions": "Dimensions",
     "weight": "Weight",
     "details": "Specifications",
+    "productionTime": "Production time",
+    "productionDays": "{days} days",
+    "origin": "Made in",
+    "originValue": "Printed in the Lake Geneva region (VD), Switzerland",
     "backToShop": "Back to shop",
     "notFound": "Product not found."
   },

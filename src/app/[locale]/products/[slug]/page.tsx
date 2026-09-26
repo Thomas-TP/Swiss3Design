@@ -43,6 +43,11 @@ async function productMetaDescription(
   product: NonNullable<Awaited<ReturnType<typeof getProduct>>>,
   locale: Locale,
 ) {
+  // Un premier paragraphe de 110–160 signes est un résumé rédigé pour ça :
+  // repris tel quel, sans coupure au milieu du paragraphe suivant.
+  const lead = product.description.split(/\n\s*\n/)[0]?.replace(/\s+/g, " ");
+  if (lead && lead.trim().length >= 110 && lead.trim().length <= 160)
+    return lead.trim();
   const own = product.description.replace(/\s+/g, " ").trim();
   if (own.length >= 110) return clampText(own);
   const t = await getTranslations({ locale, namespace: "seo" });
@@ -154,6 +159,9 @@ export default async function ProductPage({
   ]);
 
   const image = product.images[0];
+  // Fiche technique rendue côté serveur : un bloc de faits nets (matière,
+  // taille, poids, délai, provenance) que moteurs et assistants IA reprennent
+  // tels quels, sans dépendre du sélecteur d'achat (composant client).
   const specs = [
     { label: t("material"), value: product.material },
     { label: t("dimensions"), value: product.dimensionsMm },
@@ -161,7 +169,21 @@ export default async function ProductPage({
       label: t("weight"),
       value: product.weightGrams ? `${product.weightGrams} g` : null,
     },
+    {
+      label: t("productionTime"),
+      value:
+        product.saleType === "on_demand"
+          ? t("productionDays", { days: product.productionDays ?? 3 })
+          : null,
+    },
+    { label: t("origin"), value: t("originValue") },
   ].filter((s) => s.value);
+  // Paragraphes saisis à l'admin (ligne vide = nouveau paragraphe) : une
+  // description structurée se lit mieux et se découpe mieux pour les moteurs.
+  const paragraphs = product.description
+    .split(/\n\s*\n/)
+    .map((p) => p.trim())
+    .filter(Boolean);
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-16">
@@ -196,9 +218,11 @@ export default async function ProductPage({
             <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
               {product.name}
             </h1>
-            <p className="mt-4 leading-relaxed text-soft">
-              {product.description}
-            </p>
+            {/* Premier paragraphe = résumé (et meta description) : juste sous
+                le titre ; la suite vient après l'achat, qui reste visible. */}
+            {paragraphs[0] && (
+              <p className="mt-4 leading-relaxed text-soft">{paragraphs[0]}</p>
+            )}
 
             {ratingSummary.count > 0 && (
               <div className="mt-3 flex items-center gap-2">
@@ -251,6 +275,14 @@ export default async function ProductPage({
               ))}
             </ul>
 
+            {paragraphs.length > 1 && (
+              <div className="mt-8 space-y-3 text-[15px] leading-relaxed text-soft">
+                {paragraphs.slice(1).map((p) => (
+                  <p key={p}>{p}</p>
+                ))}
+              </div>
+            )}
+
             {specs.length > 0 && (
               <div className="mt-8 border-t border-line text-sm">
                 <p className="border-b border-line pt-4 font-semibold">
@@ -258,9 +290,12 @@ export default async function ProductPage({
                 </p>
                 <dl aria-label={t("details")} className="divide-y divide-line">
                   {specs.map((s) => (
-                    <div key={s.label} className="flex justify-between py-3">
-                      <dt className="text-soft">{s.label}</dt>
-                      <dd className="font-medium">{s.value}</dd>
+                    <div
+                      key={s.label}
+                      className="flex justify-between gap-4 py-3"
+                    >
+                      <dt className="shrink-0 text-soft">{s.label}</dt>
+                      <dd className="text-right font-medium">{s.value}</dd>
                     </div>
                   ))}
                 </dl>
