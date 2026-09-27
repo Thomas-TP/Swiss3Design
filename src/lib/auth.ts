@@ -7,6 +7,7 @@ import {
   emailOTP,
   haveIBeenPwned,
   jwt,
+  type Jwk,
   type JwtOptions,
 } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
@@ -14,6 +15,7 @@ import { oauthProvider } from "@better-auth/oauth-provider";
 import { and, eq, isNull } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
+import { uncached } from "@/db/fresh";
 import * as schema from "@/db/schema";
 import { sendEmail } from "./email";
 import { consumeRequestLimit } from "./rate-limit";
@@ -83,6 +85,22 @@ export async function getAuth() {
     disableSettingJwtHeader: true,
     jwt: { issuer },
     jwks: { keyPairConfig: { alg: "RS256", modulusLength: 2048 } },
+    // Clés lues hors cache Hyperdrive (AGENTS.md règle 6c) : sans cela, la
+    // lecture qui suit la création de la clé renvoyait encore une table vide
+    // (constaté en prod) — vérification refusée, et une seconde clé créée par
+    // la requête suivante.
+    adapter: {
+      getJwks: async (): Promise<Jwk[]> =>
+        (await db.select().from(schema.jwks).where(uncached)).map((key) => ({
+          id: key.id,
+          publicKey: key.publicKey,
+          privateKey: key.privateKey,
+          createdAt: key.createdAt,
+          expiresAt: key.expiresAt ?? undefined,
+          alg: (key.alg ?? undefined) as Jwk["alg"],
+          crv: (key.crv ?? undefined) as Jwk["crv"],
+        })),
+    },
   };
   const agentAuth = { issuer, jwtOptions };
 
