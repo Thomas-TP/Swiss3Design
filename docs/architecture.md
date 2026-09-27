@@ -201,9 +201,11 @@ customer's own account goes through the **customer-account MCP server
   requires, on every call, the customer's OAuth consent (Path A) or an active
   registration at the token's `ver` (Path B). The customer removes access in
   `/account/agents`; account deletion cascades.
-- `getAuth({ seedOAuthResources })`: oauth-provider checks each declared
-  resource in the DB at every instance init, so resources are only declared on
-  `/api/auth/oauth2|agent/*` requests until the isolate has seen them seeded.
+- Protected resources are not declared in the plugin config (it would re-read
+  each one at every instance init, through Hyperdrive's cache):
+  `ensureProtectedResources()` inserts them with `ON CONFLICT DO NOTHING` once
+  per isolate on `/api/auth/oauth2|agent/*` requests. Registration, claim and
+  revocation reads use `uncached` (`src/db/fresh.ts`, AGENTS.md rule 6c).
 - Cleanup: `lib/maintenance.ts` purges expired auth.md registrations, expired
   tokens and dynamically registered clients never authorized in 90 days.
 

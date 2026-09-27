@@ -2,6 +2,7 @@ import { and, desc, eq } from "drizzle-orm";
 import { Bot } from "lucide-react";
 import { getFormatter, getTranslations } from "next-intl/server";
 import { getDb } from "@/db";
+import { uncached } from "@/db/fresh";
 import { agentRegistrations, oauthClient, oauthConsent } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { ScopeList } from "@/components/agent-scope-list";
@@ -43,7 +44,8 @@ export default async function AgentsTab() {
       })
       .from(oauthConsent)
       .innerJoin(oauthClient, eq(oauthClient.clientId, oauthConsent.clientId))
-      .where(eq(oauthConsent.userId, user.id))
+      // Hors cache Hyperdrive : un accès retiré disparaît dès le rechargement.
+      .where(and(eq(oauthConsent.userId, user.id), uncached))
       .orderBy(desc(oauthConsent.updatedAt)),
     db
       .select({
@@ -56,6 +58,7 @@ export default async function AgentsTab() {
         and(
           eq(agentRegistrations.userId, user.id),
           eq(agentRegistrations.status, "claimed"),
+          uncached,
         ),
       )
       .orderBy(desc(agentRegistrations.claimedAt)),

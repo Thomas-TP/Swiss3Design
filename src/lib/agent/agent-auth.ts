@@ -5,11 +5,12 @@ import type {
   OAuthExtensionGrantHandlerInput,
   OAuthProviderExtension,
 } from "@better-auth/oauth-provider";
-import { and, eq, isNull, sql } from "drizzle-orm";
+import { and, eq, isNull, sql, type SQL } from "drizzle-orm";
 import { decodeProtectedHeader } from "jose";
 import { z } from "zod";
 import { getDb } from "@/db";
-import { agentRegistrations } from "@/db/schema";
+import { uncached } from "@/db/fresh";
+import { agentRegistrations, oauthResource } from "@/db/schema";
 import {
   ATTEMPT_TTL_S,
   CLAIM_GRANT,
@@ -51,6 +52,35 @@ type AgentRegistration = typeof agentRegistrations.$inferSelect;
 interface AgentAuthOptions {
   issuer: string;
   jwtOptions: JwtOptions;
+}
+
+// Ressources protégées (oauth.ts) déclarées en base pour oauth-provider, qui
+// refuse tout `resource` inconnu (invalid_target). Écriture idempotente
+// (ON CONFLICT DO NOTHING) plutôt que le « lire puis insérer » du plugin :
+// derrière le cache de Hyperdrive, sa lecture pouvait dater d'avant
+// l'insertion et le doublon faisait échouer la requête. Une fois par isolate.
+const seededIssuers = new Set<string>();
+
+export async function ensureProtectedResources(issuer: string) {
+  if (seededIssuers.has(issuer)) return;
+  const db = await getDb();
+  const now = new Date();
+  await db
+    .insert(oauthResource)
+    .values(
+      protectedResources(issuer).map((identifier) => ({
+        id: crypto.randomUUID(),
+        identifier,
+        name: "Swiss3Design customer account (MCP)",
+        disabled: false,
+        dpopBoundAccessTokensRequired: false,
+        policyVersion: 1,
+        createdAt: now,
+        updatedAt: now,
+      })),
+    )
+    .onConflictDoNothing({ target: oauthResource.identifier });
+  seededIssuers.add(issuer);
 }
 
 const agentError = (
@@ -268,16 +298,9 @@ export function agentAuthPlugin(options: AgentAuthOptions) {
               "email must be the email address of the user who will claim this agent.",
             );
           const db = await getDb();
-          const [reg] = await db
-            .select()
-            .from(agentRegistrations)
-            .where(
-              eq(
-                agentRegistrations.claimTokenHash,
-                await sha256Hex(claimToken),
-              ),
-            )
-            .limit(1);
+          const reg = await findRegistration(
+            eq(agentRegistrations.claimTokenHash, await sha256Hex(claimToken)),
+          );
           if (!reg)
             throw agentError(
               "UNAUTHORIZED",
@@ -352,12 +375,14 @@ export function agentAuthPlugin(options: AgentAuthOptions) {
   } satisfies BetterAuthPlugin;
 }
 
-async function findRegistration(where: ReturnType<typeof eq>) {
+// Toujours lu hors cache Hyperdrive (db/fresh.ts) : revendication, révocation
+// et sondage doivent voir la dernière écriture, pas un état vieux d'une minute.
+async function findRegistration(where: SQL) {
   const db = await getDb();
   const [reg] = await db
     .select()
     .from(agentRegistrations)
-    .where(where)
+    .where(and(where, uncached))
     .limit(1);
   return reg ?? null;
 }

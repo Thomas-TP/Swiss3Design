@@ -1,17 +1,11 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
-import { eq } from "drizzle-orm";
 import { Bot } from "lucide-react";
-import { getDb } from "@/db";
-import { agentRegistrations } from "@/db/schema";
 import { redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getServerSession } from "@/lib/session";
-import {
-  checkClaimAttempt,
-  maskEmail,
-  sha256Hex,
-} from "@/lib/agent/agent-auth-core";
+import { checkClaimAttempt, maskEmail } from "@/lib/agent/agent-auth-core";
+import { findClaimAttempt } from "@/lib/agent/claim-attempt";
 import { POST_CLAIM_SCOPES } from "@/lib/agent/oauth";
 import { PATHS } from "@/lib/agent/paths";
 import { ScopeList } from "@/components/agent-scope-list";
@@ -57,13 +51,8 @@ export default async function AgentClaimPage({
   let state: ReturnType<typeof checkClaimAttempt> = "invalid";
   let expectedEmail: string | null = null;
   if (token && session) {
-    const db = await getDb();
-    const [reg] = await db
-      .select()
-      .from(agentRegistrations)
-      .where(eq(agentRegistrations.attemptTokenHash, await sha256Hex(token)))
-      .limit(1);
-    state = checkClaimAttempt(reg ?? null, session.user.email, new Date());
+    const reg = await findClaimAttempt(token);
+    state = checkClaimAttempt(reg, session.user.email, new Date());
     expectedEmail = reg?.claimEmail ? maskEmail(reg.claimEmail) : null;
   }
 

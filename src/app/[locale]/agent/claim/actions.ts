@@ -11,6 +11,7 @@ import {
   sha256Hex,
   type ClaimCheck,
 } from "@/lib/agent/agent-auth-core";
+import { findClaimAttempt } from "@/lib/agent/claim-attempt";
 
 export interface ClaimState {
   status?: "confirmed" | "denied";
@@ -19,15 +20,7 @@ export interface ClaimState {
 }
 
 async function loadAttempt(token: string) {
-  const db = await getDb();
-  const [reg] = token
-    ? await db
-        .select()
-        .from(agentRegistrations)
-        .where(eq(agentRegistrations.attemptTokenHash, await sha256Hex(token)))
-        .limit(1)
-    : [];
-  return { db, reg: reg ?? null };
+  return { db: await getDb(), reg: await findClaimAttempt(token) };
 }
 
 // Revendication d'un agent auth.md : le client connecté recopie le code que

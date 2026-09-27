@@ -134,6 +134,14 @@ doesn't organize imports (no active equivalent of Biome's
    `/products/[slug]` in production right after the Hyperdrive cutover. When
    `DISTINCT` exists only to dedupe rows from a join, prefer a correlated
    `exists(...)` subquery over the join instead of reaching for `DISTINCT`.
+   6c. **Hyperdrive caches `SELECT` results for 60 s and never invalidates them
+   on write** (query caching is on for both configs). A read that must see a
+   recent write — revocation, claim state, anything shown right after a
+   mutation — adds `uncached` from [`src/db/fresh.ts`](src/db/fresh.ts) to its
+   `where` (a `now()` call, which Hyperdrive never caches); "read then insert"
+   must become `INSERT … ON CONFLICT`. `bun run dev` connects straight to Neon
+   and will NOT reveal stale reads — only preview/prod do (hit live: the OAuth
+   resource seeding failed on preview with a duplicate insert).
 7. **Never commit secrets.** Local secrets live in `.dev.vars`; prod secrets in
    Cloudflare (`wrangler secret put` / dashboard). The committed `.env.*` files
    hold only the **public** Stripe publishable key. **Never run `wrangler secret

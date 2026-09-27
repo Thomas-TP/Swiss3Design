@@ -18,7 +18,7 @@ import * as schema from "@/db/schema";
 import { sendEmail } from "./email";
 import { consumeRequestLimit } from "./rate-limit";
 import { agentAuthExtension, agentAuthPlugin } from "./agent/agent-auth";
-import { OAUTH_SCOPES, oauthIssuer, protectedResources } from "./agent/oauth";
+import { OAUTH_SCOPES, oauthIssuer } from "./agent/oauth";
 import {
   verificationEmail,
   resetPasswordEmail,
@@ -65,13 +65,7 @@ export function enabledSocialProviders(env: CloudflareEnv): string[] {
 
 // Instance par requête : les bindings Cloudflare ne sont disponibles
 // que dans le contexte d'une requête.
-//
-// seedOAuthResources : better-auth initialise ses plugins à chaque instance,
-// et oauth-provider vérifie alors en base chacune des ressources protégées
-// déclarées (une requête par ressource). On ne les déclare donc que sur les
-// requêtes OAuth, tant que l'isolate ne les a pas encore vues insérées — les
-// lignes persistent ensuite, la vérification de `resource` se fait en base.
-export async function getAuth(options: { seedOAuthResources?: boolean } = {}) {
+export async function getAuth() {
   const { env } = await getCloudflareContext({ async: true });
   const db = await getDb();
 
@@ -302,13 +296,9 @@ export async function getAuth(options: { seedOAuthResources?: boolean } = {}) {
         allowUnauthenticatedClientRegistration: true,
         // Une seule API derrière des identifiants alias (oauth.ts) : tout
         // client peut viser n'importe lequel, sans table de liaison par client.
+        // Les ressources ne sont pas déclarées ici (le plugin les relirait en
+        // base à chaque instance) : ensureProtectedResources les insère.
         enforcePerClientResources: false,
-        ...(options.seedOAuthResources && {
-          resources: protectedResources(issuer).map((identifier) => ({
-            identifier,
-            name: "Swiss3Design customer account (MCP)",
-          })),
-        }),
         extensions: [agentAuthExtension(agentAuth)],
       }),
       agentAuthPlugin(agentAuth),

@@ -1,4 +1,7 @@
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getAuth } from "@/lib/auth";
+import { ensureProtectedResources } from "@/lib/agent/agent-auth";
+import { oauthIssuer } from "@/lib/agent/oauth";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
 // Endpoints d'authentification sensibles (mot de passe, envoi d'e-mails),
@@ -18,10 +21,9 @@ const LIMITED_PREFIXES = [
 ];
 
 // Requêtes du serveur OAuth des agents (oauth-provider) et du profil auth.md :
-// seules à déclarer les ressources protégées, jusqu'à ce que l'isolate les ait
-// vues insérées une fois (voir getAuth). Drapeau d'isolate, pas d'état métier.
+// les ressources protégées doivent exister en base avant qu'un `resource` soit
+// vérifié (ensureProtectedResources, une écriture idempotente par isolate).
 const OAUTH_PREFIXES = ["/api/auth/oauth2/", "/api/auth/agent/"];
-let oauthResourcesSeeded = false;
 
 async function handler(request: Request) {
   const { pathname } = new URL(request.url);
@@ -35,12 +37,12 @@ async function handler(request: Request) {
     }
   }
 
-  const seedOAuthResources =
-    !oauthResourcesSeeded && OAUTH_PREFIXES.some((p) => pathname.startsWith(p));
-  const auth = await getAuth({ seedOAuthResources });
-  const response = await auth.handler(request);
-  if (seedOAuthResources && response.status < 500) oauthResourcesSeeded = true;
-  return response;
+  if (OAUTH_PREFIXES.some((p) => pathname.startsWith(p))) {
+    const { env } = await getCloudflareContext({ async: true });
+    await ensureProtectedResources(oauthIssuer(env.BETTER_AUTH_URL));
+  }
+  const auth = await getAuth();
+  return auth.handler(request);
 }
 
 export { handler as GET, handler as POST };

@@ -3,6 +3,7 @@ import { verifyJwsAccessToken } from "better-auth/oauth2";
 import type { JSONWebKeySet } from "jose";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
+import { uncached } from "@/db/fresh";
 import { agentRegistrations, oauthConsent } from "@/db/schema";
 import { getAuth } from "@/lib/auth";
 import {
@@ -125,7 +126,7 @@ export async function authenticateAccountRequest(
         claimExpiresAt: agentRegistrations.claimExpiresAt,
       })
       .from(agentRegistrations)
-      .where(eq(agentRegistrations.id, payload.reg))
+      .where(and(eq(agentRegistrations.id, payload.reg), uncached))
       .limit(1);
     active =
       !!reg &&
@@ -143,6 +144,7 @@ export async function authenticateAccountRequest(
         and(
           eq(oauthConsent.userId, userId),
           eq(oauthConsent.clientId, clientId),
+          uncached,
         ),
       )
       .limit(1);
