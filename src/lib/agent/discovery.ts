@@ -42,6 +42,18 @@ export function apiCatalog() {
         ],
         "service-doc": [docs],
       },
+      // Serveur MCP compte client, protégé par OAuth : ses métadonnées de
+      // ressource protégée (RFC 9728) mènent au serveur d'autorisation.
+      {
+        anchor: abs(PATHS.mcpAccount),
+        "service-meta": [
+          {
+            href: abs(`${PATHS.protectedResource}${PATHS.mcpAccount}`),
+            type: "application/json",
+          },
+        ],
+        "service-doc": [{ href: abs(PATHS.authMd), type: "text/markdown" }],
+      },
     ],
   };
 }
@@ -122,6 +134,18 @@ export function aiCatalog() {
         representativeQueries: [
           "how to buy from swiss3design.ch as an agent",
           "request a custom 3D print quote in Switzerland",
+        ],
+      },
+      {
+        identifier: "urn:air:swiss3design.ch:auth:customer-account",
+        displayName: "Swiss3Design customer account access (OAuth, auth.md)",
+        description:
+          "How an agent gets the customer's consent to read their orders and quotes: OAuth 2.1 with dynamic client registration, or auth.md agent registration with a 6-digit confirmation code.",
+        type: "text/markdown",
+        url: abs(PATHS.authMd),
+        representativeQueries: [
+          "where is my Swiss3Design order",
+          "connect my Swiss3Design account to my assistant",
         ],
       },
       {

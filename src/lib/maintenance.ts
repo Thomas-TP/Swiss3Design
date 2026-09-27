@@ -1,5 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { and, eq, inArray, isNotNull, isNull, lt } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, isNull, lt, or, sql } from "drizzle-orm";
 import { getDb } from "@/db";
 import {
   quoteRequests,
@@ -7,6 +7,11 @@ import {
   abandonedCarts,
   requestLimits,
   emailOutbox,
+  agentRegistrations,
+  oauthAccessToken,
+  oauthClient,
+  oauthClientAssertion,
+  oauthRefreshToken,
 } from "@/db/schema";
 import { abandonedCartEmail } from "./email-templates";
 import { drainEmailOutbox, queueEmail } from "./outbox";
@@ -39,6 +44,68 @@ export interface MaintenanceReport {
   orphansDeleted: number;
   cartRemindersSent: number;
   abandonedCartsPurged: number;
+  oauthClientsPurged: number;
+}
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+// Serveur OAuth des agents : enregistrements auth.md jamais revendiqués (fenêtre
+// close depuis 1 jour) ou révoqués depuis 30 jours — la suppression de leur
+// client OAuth emporte l'enregistrement (cascade) —, jetons expirés, et clients
+// enregistrés dynamiquement (RFC 7591, ouvert) jamais autorisés en 90 jours.
+async function purgeOAuth(
+  db: Awaited<ReturnType<typeof getDb>>,
+  now: number,
+): Promise<number> {
+  const stale = await db
+    .select({ clientId: agentRegistrations.clientId })
+    .from(agentRegistrations)
+    .where(
+      or(
+        and(
+          eq(agentRegistrations.status, "unclaimed"),
+          lt(agentRegistrations.claimExpiresAt, new Date(now - DAY_MS)),
+        ),
+        and(
+          eq(agentRegistrations.status, "revoked"),
+          lt(agentRegistrations.updatedAt, new Date(now - 30 * DAY_MS)),
+        ),
+      ),
+    )
+    .limit(500);
+  const agentClients = stale.length
+    ? await db
+        .delete(oauthClient)
+        .where(
+          inArray(
+            oauthClient.clientId,
+            stale.map((s) => s.clientId),
+          ),
+        )
+        .returning({ id: oauthClient.id })
+    : [];
+  await db
+    .delete(oauthAccessToken)
+    .where(lt(oauthAccessToken.expiresAt, new Date(now - DAY_MS)));
+  await db
+    .delete(oauthRefreshToken)
+    .where(lt(oauthRefreshToken.expiresAt, new Date(now - DAY_MS)));
+  await db
+    .delete(oauthClientAssertion)
+    .where(lt(oauthClientAssertion.expiresAt, new Date(now)));
+  const unusedClients = await db
+    .delete(oauthClient)
+    .where(
+      and(
+        lt(oauthClient.createdAt, new Date(now - 90 * DAY_MS)),
+        isNull(oauthClient.userId),
+        sql`NOT EXISTS (SELECT 1 FROM oauth_consent c WHERE c.client_id = ${oauthClient.clientId})`,
+        sql`NOT EXISTS (SELECT 1 FROM oauth_refresh_token t WHERE t.client_id = ${oauthClient.clientId})`,
+        sql`NOT EXISTS (SELECT 1 FROM agent_registrations r WHERE r.client_id = ${oauthClient.clientId})`,
+      ),
+    )
+    .returning({ id: oauthClient.id });
+  return agentClients.length + unusedClients.length;
 }
 
 export async function runMaintenance(): Promise<MaintenanceReport> {
@@ -217,11 +284,15 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
     .where(lt(abandonedCarts.createdAt, cartPurgeCutoff))
     .returning({ id: abandonedCarts.id });
 
+  // 5) Agents et applications OAuth (voir purgeOAuth)
+  const oauthClientsPurged = await purgeOAuth(db, now);
+
   return {
     retentionFilesDeleted,
     quotesDeleted: rowsToDelete.length,
     orphansDeleted,
     cartRemindersSent,
     abandonedCartsPurged: purgedCarts.length,
+    oauthClientsPurged,
   };
 }

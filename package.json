@@ -25,6 +25,7 @@
     "db:push:pg": "drizzle-kit push --config=drizzle.config.pg.ts"
   },
   "dependencies": {
+    "@better-auth/oauth-provider": "1.7.6",
     "@better-auth/passkey": "^1.7.6",
     "@opennextjs/cloudflare": "^1.20.6",
     "@stripe/react-stripe-js": "^6.12.0",

@@ -153,9 +153,9 @@ put` on an environment with real users without `--env <name>` explicitly
    **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
-10. **Keep the Worker bundle lean: 2 676 KiB gzip (2026-09-26 measurement,
-    after PostHog and the PR #36 dependency refresh — re-measure rather than
-    trust this figure as it ages).
+10. **Keep the Worker bundle lean: 2 946 KiB gzip (2026-09-27 measurement,
+    after the AI-agent surfaces and the OAuth 2.1 provider, ~+270 KiB —
+    re-measure rather than trust this figure as it ages).
     Never add a binary asset through a Next file convention.** Since
     2026-09-26 the account is on **Workers Paid**, whose cap is 10 MiB
     **gzipped**. The **Free** plan's 3 MiB cap is what broke the deploy in
@@ -192,6 +192,7 @@ put` on an environment with real users without `--env <name>` explicitly
 | Files / cache             | Cloudflare R2 / KV                                                                                                                                                                                                |
 | Analytics                 | PostHog Cloud EU, cookie `ph_…` + replay, Swiss opt-out (« OK / Refuser »), via the relay `/api/relay` (middleware) — `posthog-js` only in `src/instrumentation-client.ts`; see `docs/conventions.md` → Analytics |
 | Hosting                   | Cloudflare Workers via `@opennextjs/cloudflare`                                                                                                                                                                   |
+| AI agents                 | Public MCP `/mcp`, A2A, REST `/api/v1`, WebMCP; customer-account MCP `/mcp/account` behind OAuth 2.1 (`@better-auth/oauth-provider`) + auth.md — see `docs/architecture.md` → Agents                              |
 
 ## Commands
 
@@ -259,6 +260,8 @@ src/
   i18n/           next-intl routing / request / navigation
   lib/            domain logic: auth, session, orders, cart, stripe, discounts,
                   shipping, email(+templates), rate-limit, maintenance, format, theme
+  lib/agent/      AI-agent surfaces: MCP (public + /mcp/account), A2A, REST,
+                  discovery, OAuth 2.1 resource server, auth.md agent registration
   middleware.ts   Edge middleware: i18n + security headers + CSP nonce + www→apex
 drizzle/          D1/SQLite migrations + snapshots (legacy, inactive DB) — NEVER hand-edit
 drizzle-pg/       Postgres migrations + snapshots (active DB, drizzle.config.pg.ts) — NEVER hand-edit

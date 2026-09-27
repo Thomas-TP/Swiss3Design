@@ -3,16 +3,23 @@
 
 export const PATHS = {
   mcp: "/mcp",
+  mcpAccount: "/mcp/account",
   a2a: "/a2a",
   api: "/api/v1",
   openapi: "/openapi.json",
   agentsDoc: "/agents.md",
+  authMd: "/auth.md",
   llms: "/llms.txt",
   apiCatalog: "/.well-known/api-catalog",
   mcpServerCard: "/.well-known/mcp/server-card.json",
   agentCard: "/.well-known/agent-card.json",
   agentSkills: "/.well-known/agent-skills/index.json",
   aiCatalog: "/.well-known/ai-catalog.json",
+  authorizationServer: "/.well-known/oauth-authorization-server",
+  openidConfiguration: "/.well-known/openid-configuration",
+  protectedResource: "/.well-known/oauth-protected-resource",
+  // Page (localisée) où le client confirme le code d'un agent auth.md.
+  agentClaim: "/agent/claim",
 } as const;
 
 // Chemins exclus de next-intl dans le middleware : servis tels quels, sans

@@ -184,6 +184,7 @@ describe("documents de découverte", () => {
       "https://swiss3design.ch/api/v1",
       "https://swiss3design.ch/mcp",
       "https://swiss3design.ch/a2a",
+      "https://swiss3design.ch/mcp/account",
     ]);
     const ard = aiCatalog();
     expect(

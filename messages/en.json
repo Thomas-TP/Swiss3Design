@@ -291,7 +291,8 @@
       "security": "Security",
       "notifications": "Notifications",
       "privacy": "Privacy",
-      "admin": "Administration"
+      "admin": "Administration",
+      "agents": "AI agents"
     },
     "overview": {
       "subtitle": "An overview of your activity and account.",
@@ -658,5 +659,90 @@
     "shippingDescription": "Delivery within Switzerland only, by Swiss Post: timelines, shipping costs, order tracking, 14-day returns and the 2-year statutory warranty at Swiss3Design.",
     "productTitle": "{name} — 3D-printed in Switzerland",
     "productDescription": "{name} in {material}, 3D-printed piece by piece in our Lake Geneva workshops (VD). {price}, delivered anywhere in Switzerland."
+  },
+  "agentAccess": {
+    "scopes": {
+      "openid": "Identify you (account ID)",
+      "profile": "See your name",
+      "email": "See your email address",
+      "offline_access": "Keep access without asking you to sign in again",
+      "catalog_read": "Browse the catalogue, prices and availability",
+      "orders_read": "See your orders and their tracking",
+      "quotes_read": "See your quote requests"
+    },
+    "consent": {
+      "title": "Authorize an application",
+      "heading": "{app} wants to access your account",
+      "signedInAs": "Signed in as {email}",
+      "willAccess": "This application will be able to:",
+      "redirectTo": "After you answer, you will be sent back to {host}.",
+      "unverified": "Swiss3Design does not verify the identity of applications. Only authorize the ones you use and trust, such as your AI assistant.",
+      "allow": "Allow",
+      "deny": "Deny",
+      "processing": "One moment…",
+      "error": "Your answer could not be saved. Start again from the application.",
+      "revokeHint": "You can remove this access at any time:",
+      "revokeLink": "My account → AI agents",
+      "invalidTitle": "Invalid or expired request",
+      "invalidBody": "Start the sign-in again from the application or assistant that sent you here.",
+      "unnamed": "An application"
+    },
+    "claim": {
+      "title": "Authorize an AI agent",
+      "heading": "An AI agent wants to access your account",
+      "willAccess": "Once authorized, it will be able to:",
+      "warning": "Only enter a code shown by YOUR agent or assistant. If someone else sent you this link and code, deny.",
+      "codeLabel": "6-digit code from your agent",
+      "confirm": "Authorize the agent",
+      "deny": "Deny",
+      "processing": "One moment…",
+      "confirmed": "Done: your agent now has access to your account. Go back to your agent, it receives access automatically.",
+      "denied": "Request denied: the agent has no access to your account.",
+      "manage": "Manage agents and applications",
+      "errors": {
+        "wrong_code": "Wrong code. Attempts left: {remaining}.",
+        "locked": "Too many attempts. Ask your agent for a new code.",
+        "expired": "This code has expired. Ask your agent for a new code.",
+        "invalid": "This request is no longer valid.",
+        "already_claimed": "This agent was already authorized.",
+        "wrong_account": "This request is meant for another account.",
+        "unauthorized": "Your session expired: please sign in again."
+      },
+      "state": {
+        "invalid": {
+          "title": "Invalid link",
+          "body": "This verification link does not exist or is no longer valid. Ask your agent to start over."
+        },
+        "expired": {
+          "title": "Link expired",
+          "body": "Codes are valid for 10 minutes. Ask your agent for a new link and code."
+        },
+        "already_claimed": {
+          "title": "Already authorized",
+          "body": "This agent already has access to the account. You can remove it in My account → AI agents."
+        },
+        "locked": {
+          "title": "Too many attempts",
+          "body": "The code was entered too many times. Ask your agent for a new code."
+        },
+        "wrong_account": {
+          "title": "Another account is expected",
+          "body": "This request is meant for the account {email}. Sign out, then open the link again with that account."
+        }
+      }
+    },
+    "account": {
+      "title": "AI agents and applications",
+      "subtitle": "AI assistants and applications allowed to view your account.",
+      "empty": "No agent or application has access to your account. When you authorize an AI assistant (ChatGPT, Claude…) or an application, it shows up here and you can remove its access at any time.",
+      "unnamedApp": "Unnamed application",
+      "authMdAgent": "AI agent (auth.md)",
+      "authorizedOn": "Authorized on {date}",
+      "revoke": "Remove access",
+      "revoking": "Removing…",
+      "revoked": "Access removed",
+      "revokeError": "Access could not be removed. Please try again.",
+      "note": "These accesses are read-only: no agent can order, pay or change your data. Removing access takes effect immediately."
+    }
   }
 }

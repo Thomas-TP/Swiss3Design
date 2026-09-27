@@ -7,6 +7,7 @@ import {
   emailOTPClient,
 } from "better-auth/client/plugins";
 import { passkeyClient } from "@better-auth/passkey/client";
+import { oauthProviderClient } from "@better-auth/oauth-provider/client";
 
 export const authClient = createAuthClient({
   plugins: [
@@ -14,6 +15,9 @@ export const authClient = createAuthClient({
     magicLinkClient(),
     emailOTPClient(),
     passkeyClient(),
+    // Joint la requête OAuth signée (?sig=…) aux POST de la page de connexion
+    // et de consentement : better-auth reprend alors l'autorisation en cours.
+    oauthProviderClient(),
   ],
 });
 

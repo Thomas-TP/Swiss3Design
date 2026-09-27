@@ -90,6 +90,25 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | `checkout/verify-email/route.ts`                                | Vérification e-mail pour un checkout invité                                            |
 | `newsletter/unsubscribe/route.ts`                               | Désinscription 1 clic aux annonces newsletter (jeton HMAC)                             |
 
+## Surfaces agents IA (`src/lib/agent`)
+
+| Fichier / route                                  | Rôle                                                                                      |
+| ------------------------------------------------ | ----------------------------------------------------------------------------------------- |
+| `lib/agent/paths.ts` · `config.ts`               | Chemins (sans dépendance, lus par le middleware), boutique, CORS public                   |
+| `lib/agent/tools.ts`                             | Outils publics (zod → JSON Schema) partagés MCP / A2A / REST                              |
+| `lib/agent/mcp.ts` · `app/mcp/route.ts`          | Serveur MCP public (Streamable HTTP sans état)                                            |
+| `lib/agent/a2a.ts` · `app/a2a/route.ts`          | Agent A2A (cartes v0.3 + v1.0)                                                            |
+| `lib/agent/discovery.ts` · `app/.well-known/*`   | Catalogue d'API (RFC 9727), carte MCP, ARD, index de skills                               |
+| `lib/agent/oauth.ts`                             | Serveur OAuth des agents : émetteur, portées, ressources protégées (RFC 9728), défi 401   |
+| `lib/auth.ts` (plugins `jwt` + `oauthProvider`)  | OAuth 2.1 + OIDC : DCR ouvert, PKCE, consentement, jetons RS256                           |
+| `lib/agent/agent-auth.ts` · `agent-auth-core.ts` | Profil auth.md : `/api/auth/agent/identity`, grants jwt-bearer + claim, bloc `agent_auth` |
+| `lib/agent/account-mcp.ts` · `account-tools.ts`  | Serveur MCP compte client `/mcp/account` : vérif. du jeton, révocation immédiate, outils  |
+| `app/[locale]/oauth/consent/` · `agent/claim/`   | Pages de consentement OAuth et de saisie du code d'un agent auth.md                       |
+| `app/[locale]/account/(dashboard)/agents/`       | « Agents IA » : liste et retrait des accès (consentements, agents revendiqués)            |
+| `lib/agent/auth-md.ts` · `app/auth.md/route.ts`  | Document `/auth.md` généré depuis les mêmes constantes                                    |
+| `lib/agent/markdown.ts` · `api/agent/markdown`   | Négociation `Accept: text/markdown` (Workers AI `toMarkdown`)                             |
+| `components/webmcp-tools.tsx`                    | Outils WebMCP enregistrés dans le navigateur                                              |
+
 ## « Je dois… » → où commencer
 
 | Tâche                                  | Point d'entrée                                                                                                                                                                                              |
@@ -109,6 +128,8 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | SEO d'une page                         | `generateMetadata` → `pageMetadata()` (`lib/seo.ts`) · JSON-LD via `components/json-ld.tsx` · `app/sitemap.xml/route.ts` · `app/robots.ts` · `app/llms.txt/route.ts` · textes `seo.*` des `messages/*.json` |
 | Tâches planifiées (purge R2, relances) | `lib/maintenance.ts` + `api/cron/maintenance` ← déclenché par `workers/cron` (Worker Cron horaire, déployé à part)                                                                                          |
 | Mesure d'audience (PostHog)            | `lib/analytics.ts` (`track()`) · chargement `src/instrumentation-client.ts` · relais `/api/relay` dans `middleware.ts` · `components/track-event.tsx` · refus : `components/analytics-opt-out.tsx`          |
+| Ajouter un outil pour les agents       | public : `lib/agent/tools.ts` (repris par MCP, A2A, REST, OpenAPI) · compte client : `lib/agent/account-tools.ts` (+ portée dans `oauth.ts`)                                                                |
+| Toucher à l'OAuth des agents / auth.md | `lib/auth.ts` (config) · `lib/agent/oauth.ts` · `agent-auth.ts` · pages `oauth/consent`, `agent/claim`, `account/agents` · tests `lib/agent/oauth.test.ts`                                                  |
 
 ## Remédiation septembre 2026
 

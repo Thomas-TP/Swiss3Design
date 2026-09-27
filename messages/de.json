@@ -291,7 +291,8 @@
       "security": "Sicherheit",
       "notifications": "Benachrichtigungen",
       "privacy": "Datenschutz",
-      "admin": "Verwaltung"
+      "admin": "Verwaltung",
+      "agents": "KI-Agenten"
     },
     "overview": {
       "subtitle": "Überblick über Ihre Aktivität und Ihr Konto.",
@@ -658,5 +659,90 @@
     "shippingDescription": "Lieferung ausschliesslich in die Schweiz mit der Post: Fristen, Versandkosten, Sendungsverfolgung, Rückgabe innert 14 Tagen und 2 Jahre gesetzliche Garantie.",
     "productTitle": "{name} — 3D-gedruckt in der Schweiz",
     "productDescription": "{name} aus {material}, einzeln 3D-gedruckt in unseren Ateliers in der Genferseeregion (VD). {price}, Lieferung in die ganze Schweiz."
+  },
+  "agentAccess": {
+    "scopes": {
+      "openid": "Sie identifizieren (Konto-ID)",
+      "profile": "Ihren Namen sehen",
+      "email": "Ihre E-Mail-Adresse sehen",
+      "offline_access": "Zugriff behalten, ohne erneute Anmeldung",
+      "catalog_read": "Katalog, Preise und Verfügbarkeit durchsuchen",
+      "orders_read": "Ihre Bestellungen und deren Sendungsverfolgung sehen",
+      "quotes_read": "Ihre Offertanfragen sehen"
+    },
+    "consent": {
+      "title": "Anwendung autorisieren",
+      "heading": "{app} möchte auf Ihr Konto zugreifen",
+      "signedInAs": "Angemeldet als {email}",
+      "willAccess": "Diese Anwendung kann:",
+      "redirectTo": "Nach Ihrer Antwort werden Sie zu {host} weitergeleitet.",
+      "unverified": "Swiss3Design überprüft die Identität von Anwendungen nicht. Autorisieren Sie nur Anwendungen, die Sie nutzen und denen Sie vertrauen, zum Beispiel Ihren KI-Assistenten.",
+      "allow": "Erlauben",
+      "deny": "Ablehnen",
+      "processing": "Einen Moment…",
+      "error": "Ihre Antwort konnte nicht gespeichert werden. Beginnen Sie erneut in der Anwendung.",
+      "revokeHint": "Sie können diesen Zugriff jederzeit entziehen:",
+      "revokeLink": "Mein Konto → KI-Agenten",
+      "invalidTitle": "Ungültige oder abgelaufene Anfrage",
+      "invalidBody": "Starten Sie die Anmeldung erneut in der Anwendung oder dem Assistenten, der Sie hierher geschickt hat.",
+      "unnamed": "Eine Anwendung"
+    },
+    "claim": {
+      "title": "KI-Agenten autorisieren",
+      "heading": "Ein KI-Agent möchte auf Ihr Konto zugreifen",
+      "willAccess": "Nach der Autorisierung kann er:",
+      "warning": "Geben Sie nur einen Code ein, den IHR Agent oder Assistent anzeigt. Hat Ihnen jemand anderes diesen Link und Code geschickt, lehnen Sie ab.",
+      "codeLabel": "6-stelliger Code Ihres Agenten",
+      "confirm": "Agenten autorisieren",
+      "deny": "Ablehnen",
+      "processing": "Einen Moment…",
+      "confirmed": "Erledigt: Ihr Agent hat jetzt Zugriff auf Ihr Konto. Kehren Sie zu Ihrem Agenten zurück, er erhält den Zugriff automatisch.",
+      "denied": "Anfrage abgelehnt: Der Agent hat keinen Zugriff auf Ihr Konto.",
+      "manage": "Agenten und Anwendungen verwalten",
+      "errors": {
+        "wrong_code": "Falscher Code. Verbleibende Versuche: {remaining}.",
+        "locked": "Zu viele Versuche. Bitten Sie Ihren Agenten um einen neuen Code.",
+        "expired": "Dieser Code ist abgelaufen. Bitten Sie Ihren Agenten um einen neuen Code.",
+        "invalid": "Diese Anfrage ist nicht mehr gültig.",
+        "already_claimed": "Dieser Agent wurde bereits autorisiert.",
+        "wrong_account": "Diese Anfrage ist für ein anderes Konto bestimmt.",
+        "unauthorized": "Ihre Sitzung ist abgelaufen: Bitte melden Sie sich erneut an."
+      },
+      "state": {
+        "invalid": {
+          "title": "Ungültiger Link",
+          "body": "Dieser Bestätigungslink existiert nicht oder ist nicht mehr gültig. Bitten Sie Ihren Agenten, neu zu beginnen."
+        },
+        "expired": {
+          "title": "Link abgelaufen",
+          "body": "Codes sind 10 Minuten gültig. Bitten Sie Ihren Agenten um einen neuen Link und Code."
+        },
+        "already_claimed": {
+          "title": "Bereits autorisiert",
+          "body": "Dieser Agent hat bereits Zugriff auf das Konto. Sie können ihn unter Mein Konto → KI-Agenten entziehen."
+        },
+        "locked": {
+          "title": "Zu viele Versuche",
+          "body": "Der Code wurde zu oft eingegeben. Bitten Sie Ihren Agenten um einen neuen Code."
+        },
+        "wrong_account": {
+          "title": "Ein anderes Konto wird erwartet",
+          "body": "Diese Anfrage ist für das Konto {email} bestimmt. Melden Sie sich ab und öffnen Sie den Link mit diesem Konto erneut."
+        }
+      }
+    },
+    "account": {
+      "title": "KI-Agenten und Anwendungen",
+      "subtitle": "KI-Assistenten und Anwendungen, die Ihr Konto einsehen dürfen.",
+      "empty": "Kein Agent und keine Anwendung hat Zugriff auf Ihr Konto. Wenn Sie einen KI-Assistenten (ChatGPT, Claude…) oder eine Anwendung autorisieren, erscheint er hier und Sie können den Zugriff jederzeit entziehen.",
+      "unnamedApp": "Unbenannte Anwendung",
+      "authMdAgent": "KI-Agent (auth.md)",
+      "authorizedOn": "Autorisiert am {date}",
+      "revoke": "Zugriff entziehen",
+      "revoking": "Wird entzogen…",
+      "revoked": "Zugriff entzogen",
+      "revokeError": "Der Zugriff konnte nicht entzogen werden. Bitte erneut versuchen.",
+      "note": "Diese Zugriffe sind schreibgeschützt: Kein Agent kann bestellen, bezahlen oder Ihre Daten ändern. Das Entziehen wirkt sofort."
+    }
   }
 }

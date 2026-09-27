@@ -291,7 +291,8 @@
       "security": "Sicurezza",
       "notifications": "Notifiche",
       "privacy": "Privacy",
-      "admin": "Amministrazione"
+      "admin": "Amministrazione",
+      "agents": "Agenti IA"
     },
     "overview": {
       "subtitle": "Panoramica della tua attività e del tuo account.",
@@ -658,5 +659,90 @@
     "shippingDescription": "Consegna esclusivamente in Svizzera con la Posta: tempi, spese di spedizione, tracciamento, resi entro 14 giorni e garanzia legale di 2 anni da Swiss3Design.",
     "productTitle": "{name} — stampato in 3D in Svizzera",
     "productDescription": "{name} in {material}, stampato in 3D pezzo per pezzo nei nostri atelier dell'arco lemanico (VD). {price}, consegna in tutta la Svizzera."
+  },
+  "agentAccess": {
+    "scopes": {
+      "openid": "Identificarla (ID dell'account)",
+      "profile": "Vedere il suo nome",
+      "email": "Vedere il suo indirizzo e-mail",
+      "offline_access": "Mantenere l'accesso senza chiederle di accedere di nuovo",
+      "catalog_read": "Consultare catalogo, prezzi e disponibilità",
+      "orders_read": "Vedere i suoi ordini e il loro tracciamento",
+      "quotes_read": "Vedere le sue richieste di preventivo"
+    },
+    "consent": {
+      "title": "Autorizzare un'applicazione",
+      "heading": "{app} chiede l'accesso al suo account",
+      "signedInAs": "Connesso come {email}",
+      "willAccess": "Questa applicazione potrà:",
+      "redirectTo": "Dopo la sua risposta sarà reindirizzato a {host}.",
+      "unverified": "Swiss3Design non verifica l'identità delle applicazioni. Autorizzi solo quelle che usa e di cui si fida, per esempio il suo assistente IA.",
+      "allow": "Autorizza",
+      "deny": "Rifiuta",
+      "processing": "Un momento…",
+      "error": "Non è stato possibile registrare la sua risposta. Ricominci dall'applicazione.",
+      "revokeHint": "Potrà revocare questo accesso in qualsiasi momento:",
+      "revokeLink": "Il mio account → Agenti IA",
+      "invalidTitle": "Richiesta non valida o scaduta",
+      "invalidBody": "Ricominci l'accesso dall'applicazione o dall'assistente che l'ha inviata qui.",
+      "unnamed": "Un'applicazione"
+    },
+    "claim": {
+      "title": "Autorizzare un agente IA",
+      "heading": "Un agente IA chiede l'accesso al suo account",
+      "willAccess": "Una volta autorizzato, potrà:",
+      "warning": "Inserisca solo un codice mostrato dal SUO agente o assistente. Se qualcun altro le ha inviato questo link e questo codice, rifiuti.",
+      "codeLabel": "Codice a 6 cifre fornito dal suo agente",
+      "confirm": "Autorizza l'agente",
+      "deny": "Rifiuta",
+      "processing": "Un momento…",
+      "confirmed": "Fatto: il suo agente ha ora accesso al suo account. Torni al suo agente, riceve l'accesso automaticamente.",
+      "denied": "Richiesta rifiutata: l'agente non ha alcun accesso al suo account.",
+      "manage": "Gestire agenti e applicazioni",
+      "errors": {
+        "wrong_code": "Codice errato. Tentativi rimasti: {remaining}.",
+        "locked": "Troppi tentativi. Chieda un nuovo codice al suo agente.",
+        "expired": "Questo codice è scaduto. Chieda un nuovo codice al suo agente.",
+        "invalid": "Questa richiesta non è più valida.",
+        "already_claimed": "Questo agente è già stato autorizzato.",
+        "wrong_account": "Questa richiesta è destinata a un altro account.",
+        "unauthorized": "La sessione è scaduta: acceda di nuovo."
+      },
+      "state": {
+        "invalid": {
+          "title": "Link non valido",
+          "body": "Questo link di verifica non esiste o non è più valido. Chieda al suo agente di ricominciare."
+        },
+        "expired": {
+          "title": "Link scaduto",
+          "body": "I codici sono validi 10 minuti. Chieda al suo agente un nuovo link e un nuovo codice."
+        },
+        "already_claimed": {
+          "title": "Già autorizzato",
+          "body": "Questo agente ha già accesso all'account. Può revocarlo in Il mio account → Agenti IA."
+        },
+        "locked": {
+          "title": "Troppi tentativi",
+          "body": "Il codice è stato inserito troppe volte. Chieda un nuovo codice al suo agente."
+        },
+        "wrong_account": {
+          "title": "È atteso un altro account",
+          "body": "Questa richiesta è destinata all'account {email}. Esca, poi riapra il link con quell'account."
+        }
+      }
+    },
+    "account": {
+      "title": "Agenti IA e applicazioni",
+      "subtitle": "Assistenti IA e applicazioni autorizzati a consultare il suo account.",
+      "empty": "Nessun agente né applicazione ha accesso al suo account. Quando autorizza un assistente IA (ChatGPT, Claude…) o un'applicazione, compare qui e può revocarne l'accesso in qualsiasi momento.",
+      "unnamedApp": "Applicazione senza nome",
+      "authMdAgent": "Agente IA (auth.md)",
+      "authorizedOn": "Autorizzato il {date}",
+      "revoke": "Revoca l'accesso",
+      "revoking": "Revoca…",
+      "revoked": "Accesso revocato",
+      "revokeError": "Impossibile revocare l'accesso. Riprovi.",
+      "note": "Questi accessi sono in sola lettura: nessun agente può ordinare, pagare o modificare i suoi dati. La revoca ha effetto immediato."
+    }
   }
 }
