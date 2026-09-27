@@ -89,17 +89,23 @@ bun run db:seed:local        # seed local D1 from scripts/seed.sql
   `npx wrangler secret put <NAME>`. Rotating one takes effect on next request — no
   redeploy needed.
 - **Which secrets exist:** see [`.dev.vars.example`](../.dev.vars.example)
-  (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BETTER_AUTH_SECRET`,
-  `RESEND_API_KEY`, `GOOGLE_*`, optional `APPLE_*`/`FACEBOOK_*`, `CRON_SECRET`,
-  `ADMIN_EMAILS`, `WEB_BOT_AUTH_PRIVATE_KEY`). `ADMIN_EMAILS` is a secret rather
+  (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_ACS_HOOK_SECRET`,
+  `BETTER_AUTH_SECRET`, `RESEND_API_KEY`, `GOOGLE_*`, optional
+  `APPLE_*`/`FACEBOOK_*`, `CRON_SECRET`, `ADMIN_EMAILS`,
+  `WEB_BOT_AUTH_PRIVATE_KEY`). `ADMIN_EMAILS` is a secret rather
   than a `vars` entry specifically because the repo is public (moved 2026-07-10).
 - **`WEB_BOT_AUTH_PRIVATE_KEY`** (Ed25519 private JWK, one distinct key per
   Worker, set 2026-09-27): signs the site's own bot requests (IndexNow) and the
   `/.well-known/http-message-signatures-directory` response. Rotation = new key
   with `--env preview` / `--name swiss3design`, no user impact; if the key was
   registered with Cloudflare's Bot Submission Form, register the new one too.
-- **Non-secret vars** (`BETTER_AUTH_URL`, `EMAIL_FROM`) live in
-  `wrangler.jsonc`; after editing run `bun run cf-typegen`.
+- **`STRIPE_ACS_HOOK_SECRET`** (`whsec_…`, one per Stripe mode: live on
+  `swiss3design`, test on `swiss3design-preview`): signing secret of the
+  « Agentic Commerce Extension » event destination (Stripe dashboard →
+  Developers → Webhooks). Without it `/api/stripe/agentic-commerce` answers 503
+  and Stripe declines agent checkouts that require the order-approval hook.
+- **Non-secret vars** (`BETTER_AUTH_URL`, `EMAIL_FROM`, `STRIPE_CATALOG_SYNC`)
+  live in `wrangler.jsonc`; after editing run `bun run cf-typegen`.
 - **Local dev:** copy `.dev.vars.example` → `.dev.vars` (gitignored) and fill in
   **test** values.
 
@@ -115,6 +121,25 @@ bun run db:seed:local        # seed local D1 from scripts/seed.sql
   order's `stripePaymentIntentId`). The app has no refund UI.
 - **TWINT:** available via Stripe — enable in the Stripe dashboard (payment
   methods); no code change needed.
+
+### Agentic commerce (sales through AI agents)
+
+- **Settings:** Stripe dashboard → Settings → Agentic commerce (Stripe profile,
+  policy URLs, Stripe Tax without registration, integration endpoint
+  `https://swiss3design.ch/api/stripe/agentic-commerce` with order approvals +
+  custom shipping options + price/availability, agents enabled one by one).
+- **Catalogue:** dashboard → Agentic commerce → Feed history shows every import
+  (errors downloadable for 5 min). The maintenance report returns
+  `stripeCatalog` (`full` / `stock` / `error` + reason). Force a full feed by
+  saving any product in the admin.
+- **Agent order paid but missing:** the webhook endpoint must receive
+  `checkout.session.completed`; logs `[stripe webhook] rapprochement requis`
+  give the reason. Replaying the event from the dashboard is safe (idempotent
+  on the session id). Orders show an « Agent IA » badge in the admin; anomalies
+  (stock shortfall, non-Swiss address, unknown SKU) are in the internal note
+  and the admin e-mail — refund from the Stripe dashboard if needed.
+- **Pause selling:** disable the agent in the dashboard (Agentic commerce →
+  Agents), or set `STRIPE_CATALOG_SYNC` to `off` and upload an empty catalogue.
 
 ## Files (R2) & maintenance
 

@@ -36,6 +36,15 @@ const createdAt = () =>
 
 export const LOCALES = ["fr", "de", "it", "en"] as const;
 
+export const ORDER_CHANNELS = [
+  "web",
+  "stripe_acs",
+  "mpp",
+  "acp",
+  "ucp",
+  "x402",
+] as const;
+
 // ── Catalogue ────────────────────────────────────────────────────────────────
 
 export const products = pgTable(
@@ -226,6 +235,11 @@ export const orders = pgTable(
     trackingNumber: text("tracking_number"),
     adminNote: text("admin_note"),
     locale: text("locale", { enum: LOCALES }).notNull().default("fr"),
+    // Canal de vente : le site, ou un agent IA — via Stripe (Agentic Commerce
+    // Suite : ChatGPT & co.), ou nos propres protocoles MPP, ACP, UCP, x402.
+    channel: text("channel", { enum: ORDER_CHANNELS }).notNull().default("web"),
+    // Agent déclaré par la plateforme (ex. « ChatGPT »), à titre informatif.
+    agentName: text("agent_name"),
     createdAt: createdAt(),
   },
   (t) => [
@@ -239,6 +253,10 @@ export const orders = pgTable(
     check(
       "orders_status_valid",
       sql`${t.status} IN ('pending','paid','in_production','shipped','delivered','cancelled')`,
+    ),
+    check(
+      "orders_channel_valid",
+      sql`${t.channel} IN ('web','stripe_acs','mpp','acp','ucp','x402')`,
     ),
   ],
 );

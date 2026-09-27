@@ -28,6 +28,15 @@ interface Address {
   canton?: string;
 }
 
+// Commandes passées par un agent IA (colonne `channel`) : origine affichée.
+const AGENT_CHANNEL_FR: Record<string, string> = {
+  stripe_acs: "Agent IA · Stripe",
+  mpp: "Agent IA · MPP",
+  acp: "Agent IA · ACP",
+  ucp: "Agent IA · UCP",
+  x402: "Agent IA · x402",
+};
+
 export default async function AdminOrderDetailPage({
   params,
 }: {
@@ -103,6 +112,12 @@ export default async function AdminOrderDetailPage({
             >
               {ORDER_STATUS_FR[order.status]}
             </span>
+            {order.channel !== "web" && (
+              <span className="rounded-full bg-violet-100 px-2.5 py-1 text-[11px] font-semibold text-violet-800 dark:bg-violet-950 dark:text-violet-200">
+                {AGENT_CHANNEL_FR[order.channel]}
+                {order.agentName ? ` · ${order.agentName}` : ""}
+              </span>
+            )}
           </h2>
           <p className="text-sm text-soft">
             {order.createdAt.toLocaleString("fr-CH")} ·{" "}

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { isValidElement, type ReactNode } from "react";
 import { routing, type Locale } from "@/i18n/routing";
+import { handlingDays, TRANSIT_DAYS } from "./shipping";
 
 // URL canonique de production. Les `metadataBase` du layout résout déjà les
 // chemins relatifs des métadonnées Open Graph ; on garde l'absolu ici pour le
@@ -400,7 +401,7 @@ export function productJsonLd(
       : "https://schema.org/InStock";
   // Délai de préparation : 1–3 jours ouvrés en stock (cf. /legal/shipping),
   // délai de production de la fiche pour une pièce imprimée à la demande.
-  const production = p.saleType === "on_demand" ? (p.productionDays ?? 3) : 1;
+  const handling = handlingDays(p);
   const shippingCents =
     p.priceCents >= shipping.freeOverCents ? 0 : shipping.shippingCents;
 
@@ -470,14 +471,14 @@ export function productJsonLd(
           "@type": "ShippingDeliveryTime",
           handlingTime: {
             "@type": "QuantitativeValue",
-            minValue: production,
-            maxValue: production + 2,
+            minValue: handling.min,
+            maxValue: handling.max,
             unitCode: "DAY",
           },
           transitTime: {
             "@type": "QuantitativeValue",
-            minValue: 1,
-            maxValue: 3,
+            minValue: TRANSIT_DAYS.min,
+            maxValue: TRANSIT_DAYS.max,
             unitCode: "DAY",
           },
         },

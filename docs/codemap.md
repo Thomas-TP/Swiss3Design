@@ -110,6 +110,17 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | `components/webmcp-tools.tsx`                    | Outils WebMCP enregistrés dans le navigateur                                              |
 | `lib/web-bot-auth.ts`                            | Web Bot Auth : répertoire JWKS signé + requêtes IndexNow signées (RFC 9421)               |
 
+## Commerce agentique (`src/lib/commerce`)
+
+| Fichier / route                    | Rôle                                                                                        |
+| ---------------------------------- | ------------------------------------------------------------------------------------------- |
+| `lib/commerce/catalog.ts`          | SKU vendables (produit × variante × couleur), identifiants stables, images JPEG             |
+| `lib/commerce/feed.ts`             | Flux CSV Stripe (produits, stock, prix) — port, délai, taxe, avertissement CGV              |
+| `lib/commerce/stripe-catalog.ts`   | Envoi du flux (Product Catalog Import API v2) : cron quotidien/horaire + après modification |
+| `lib/commerce/acs.ts`              | Stripe Agentic Commerce : hooks (validation, port, prix/stock) + session payée → commande   |
+| `lib/commerce/agent-orders.ts`     | Enregistrement d'une commande d'agent déjà payée (idempotent, alertes admin, e-mails)       |
+| `app/api/stripe/agentic-commerce/` | Endpoint des hooks Stripe (signé `STRIPE_ACS_HOOK_SECRET`, réponse < 4 s)                   |
+
 ## « Je dois… » → où commencer
 
 | Tâche                                  | Point d'entrée                                                                                                                                                                                              |
@@ -131,6 +142,7 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | Mesure d'audience (PostHog)            | `lib/analytics.ts` (`track()`) · chargement `src/instrumentation-client.ts` · relais `/api/relay` dans `middleware.ts` · `components/track-event.tsx` · refus : `components/analytics-opt-out.tsx`          |
 | Ajouter un outil pour les agents       | public : `lib/agent/tools.ts` (repris par MCP, A2A, REST, OpenAPI) · compte client : `lib/agent/account-tools.ts` (+ portée dans `oauth.ts`)                                                                |
 | Toucher à l'OAuth des agents / auth.md | `lib/auth.ts` (config) · `lib/agent/oauth.ts` · `agent-auth.ts` · pages `oauth/consent`, `agent/claim`, `account/agents` · tests `lib/agent/oauth.test.ts`                                                  |
+| Ventes par agents IA (Stripe ACS)      | `lib/commerce/` (flux, hooks, commandes) · webhook `api/stripe/webhook` · hooks `api/stripe/agentic-commerce` · tests `lib/commerce/commerce.test.ts`                                                       |
 
 ## Remédiation septembre 2026
 

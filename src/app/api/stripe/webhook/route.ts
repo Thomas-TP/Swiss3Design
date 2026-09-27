@@ -5,6 +5,7 @@ import { getDb } from "@/db";
 import { orders, paymentEvents } from "@/db/schema";
 import { markOrderPaid, markQuotePaid } from "@/lib/orders";
 import { settleSession } from "@/lib/checkout-session";
+import { fulfillAgenticCheckout } from "@/lib/commerce/acs";
 import { releaseOrderStock } from "@/lib/stock";
 import { getStripe, stripeCryptoProvider } from "@/lib/stripe";
 
@@ -46,7 +47,16 @@ export async function POST(request: Request) {
       event.type === "checkout.session.completed" ||
       event.type === "checkout.session.async_payment_succeeded"
     ) {
-      await settleSession(db, event.data.object);
+      const session = event.data.object;
+      // Session sans commande du site : vente d'un agent IA via Stripe
+      // Agentic Commerce (SKU de notre flux sur les lignes) → la commande
+      // est créée ici, faute de quoi le paiement resterait sans commande.
+      if (
+        !(await settleSession(db, session)) &&
+        !session.metadata?.orderId &&
+        !session.metadata?.quoteId
+      )
+        await fulfillAgenticCheckout(db, stripe, session.id);
     } else if (event.type === "checkout.session.expired") {
       const session = event.data.object;
       if (session.metadata?.orderId)

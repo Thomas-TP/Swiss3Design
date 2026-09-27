@@ -17,6 +17,10 @@ import { abandonedCartEmail } from "./email-templates";
 import { drainEmailOutbox, queueEmail } from "./outbox";
 import { reconcilePendingOrders } from "./checkout-session";
 import { SITE_URL } from "./seo";
+import {
+  syncStripeCatalog,
+  type CatalogSyncReport,
+} from "./commerce/stripe-catalog";
 
 // Rétention (politique de confidentialité) : fichiers/devis supprimés au plus
 // tard 2 ans après la dernière activité des devis clos ou sans suite. Les fichiers
@@ -45,6 +49,7 @@ export interface MaintenanceReport {
   cartRemindersSent: number;
   abandonedCartsPurged: number;
   oauthClientsPurged: number;
+  stripeCatalog: CatalogSyncReport;
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -287,6 +292,10 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
   // 5) Agents et applications OAuth (voir purgeOAuth)
   const oauthClientsPurged = await purgeOAuth(db, now);
 
+  // 6) Catalogue Stripe des agents IA : stock et prix à chaque passage, flux
+  //    complet une fois par jour (n'échoue jamais : erreur rapportée).
+  const stripeCatalog = await syncStripeCatalog(db);
+
   return {
     retentionFilesDeleted,
     quotesDeleted: rowsToDelete.length,
@@ -294,5 +303,6 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
     cartRemindersSent,
     abandonedCartsPurged: purgedCarts.length,
     oauthClientsPurged,
+    stripeCatalog,
   };
 }
