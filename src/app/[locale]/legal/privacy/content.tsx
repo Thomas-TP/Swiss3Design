@@ -92,6 +92,41 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Agents IA",
+      body: (
+        <>
+          <p>
+            <strong>Accès d’un agent à votre compte</strong> : si vous autorisez
+            une application ou un agent d’intelligence artificielle (« agent IA
+            ») à accéder à votre compte (écran de consentement ou saisie d’un
+            code à six chiffres), nous enregistrons l’application, les
+            autorisations accordées et les jetons d’accès, conservés sous forme
+            chiffrée ou hachée. L’agent ne lit que les données couvertes par ces
+            autorisations (profil, commandes, devis) ; vous pouvez lui retirer
+            cet accès à tout moment dans <strong>Mon compte → Agents IA</strong>
+            . Les accès expirés, révoqués ou jamais utilisés sont supprimés
+            automatiquement.
+          </p>
+          <p>
+            <strong>Achats par l’intermédiaire d’un agent IA</strong> : lorsque
+            vous commandez via un agent IA (par exemple un assistant
+            conversationnel relié à Stripe), nous recevons de Stripe ou de la
+            plateforme de l’agent les données nécessaires à la commande — nom,
+            adresse e-mail, adresse de livraison, articles, montant et, le cas
+            échéant, le nom de l’agent ; les données de paiement restent chez
+            Stripe. Nous les traitons pour exécuter la commande, comme une
+            commande passée sur le site. Notre catalogue (produits, prix,
+            stock), sans aucune donnée personnelle, est transmis à Stripe, qui
+            le met à disposition des agents IA partenaires. La plateforme de
+            l’agent (par exemple OpenAI, Microsoft, Google ou Perplexity) traite
+            vos échanges et vos données sous sa propre responsabilité et selon
+            sa propre politique de confidentialité ; ces plateformes peuvent
+            traiter des données aux États-Unis.
+          </p>
+        </>
+      ),
+    },
+    {
       title: "Mesure d’audience",
       body: (
         <p>
@@ -165,7 +200,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           sur des garanties reconnues (l’Union européenne assure un niveau de
           protection adéquat reconnu par la Suisse ; Swiss-U.S. Data Privacy
           Framework pour les prestataires américains certifiés, ou clauses
-          contractuelles types).
+          contractuelles types). Pour les ventes par l’intermédiaire d’agents
+          IA, Stripe transmet notre catalogue aux plateformes d’agents
+          partenaires, qui agissent comme responsables de traitement
+          indépendants (voir « Agents IA »).
         </p>
       ),
     },
@@ -327,6 +365,41 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "KI-Agenten",
+      body: (
+        <>
+          <p>
+            <strong>Zugriff eines Agenten auf Ihr Konto</strong>: Wenn Sie einer
+            Anwendung oder einem Agenten mit künstlicher Intelligenz
+            («KI-Agent») den Zugriff auf Ihr Konto erlauben
+            (Einwilligungsbildschirm oder Eingabe eines sechsstelligen Codes),
+            speichern wir die Anwendung, die erteilten Berechtigungen und die
+            Zugriffstoken, verschlüsselt oder gehasht. Der Agent liest nur die
+            von diesen Berechtigungen erfassten Daten (Profil, Bestellungen,
+            Offerten); Sie können ihm den Zugriff jederzeit unter{" "}
+            <strong>Mein Konto → KI-Agenten</strong> entziehen. Abgelaufene,
+            widerrufene oder nie genutzte Zugriffe werden automatisch gelöscht.
+          </p>
+          <p>
+            <strong>Käufe über einen KI-Agenten</strong>: Wenn Sie über einen
+            KI-Agenten bestellen (zum Beispiel einen mit Stripe verbundenen
+            Chat-Assistenten), erhalten wir von Stripe oder von der Plattform
+            des Agenten die für die Bestellung nötigen Daten — Name,
+            E-Mail-Adresse, Lieferadresse, Artikel, Betrag und gegebenenfalls
+            den Namen des Agenten; die Zahlungsdaten bleiben bei Stripe. Wir
+            bearbeiten sie zur Abwicklung der Bestellung, wie eine Bestellung
+            auf der Website. Unser Katalog (Produkte, Preise, Bestand) ohne
+            jegliche Personendaten wird an Stripe übermittelt, das ihn den
+            Partner-KI-Agenten zur Verfügung stellt. Die Plattform des Agenten
+            (zum Beispiel OpenAI, Microsoft, Google oder Perplexity) bearbeitet
+            Ihre Unterhaltungen und Daten in eigener Verantwortung und nach
+            ihrer eigenen Datenschutzerklärung; diese Plattformen können Daten
+            in den USA bearbeiten.
+          </p>
+        </>
+      ),
+    },
+    {
       title: "Reichweitenmessung",
       body: (
         <p>
@@ -400,7 +473,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Garantien (die Europäische Union gewährleistet ein von der Schweiz
           anerkanntes angemessenes Schutzniveau; Swiss-U.S. Data Privacy
           Framework für zertifizierte US-Anbieter oder
-          Standardvertragsklauseln).
+          Standardvertragsklauseln). Für Verkäufe über KI-Agenten übermittelt
+          Stripe unseren Katalog an die Partnerplattformen der Agenten, die als
+          unabhängige Verantwortliche handeln (siehe «KI-Agenten»).
         </p>
       ),
     },
@@ -563,6 +638,41 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Agenti IA",
+      body: (
+        <>
+          <p>
+            <strong>Accesso di un agente al vostro conto</strong>: se
+            autorizzate un’applicazione o un agente di intelligenza artificiale
+            («agente IA») ad accedere al vostro conto (schermata di consenso o
+            inserimento di un codice a sei cifre), registriamo l’applicazione,
+            le autorizzazioni concesse e i token di accesso, conservati in forma
+            cifrata o hash. L’agente legge soltanto i dati coperti da tali
+            autorizzazioni (profilo, ordini, preventivi); potete revocargli
+            l’accesso in qualsiasi momento in{" "}
+            <strong>Il mio conto → Agenti IA</strong>. Gli accessi scaduti,
+            revocati o mai utilizzati vengono eliminati automaticamente.
+          </p>
+          <p>
+            <strong>Acquisti tramite un agente IA</strong>: quando ordinate
+            tramite un agente IA (per esempio un assistente conversazionale
+            collegato a Stripe), riceviamo da Stripe o dalla piattaforma
+            dell’agente i dati necessari all’ordine — nome, indirizzo e-mail,
+            indirizzo di consegna, articoli, importo e, se del caso, il nome
+            dell’agente; i dati di pagamento restano presso Stripe. Li trattiamo
+            per eseguire l’ordine, come un ordine effettuato sul sito. Il nostro
+            catalogo (prodotti, prezzi, scorte), senza alcun dato personale,
+            viene trasmesso a Stripe, che lo mette a disposizione degli agenti
+            IA partner. La piattaforma dell’agente (per esempio OpenAI,
+            Microsoft, Google o Perplexity) tratta le vostre conversazioni e i
+            vostri dati sotto la propria responsabilità e secondo la propria
+            informativa sulla privacy; tali piattaforme possono trattare dati
+            negli Stati Uniti.
+          </p>
+        </>
+      ),
+    },
+    {
       title: "Misurazione dell’audience",
       body: (
         <p>
@@ -638,7 +748,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           tali trasferimenti si basano su garanzie riconosciute (l’Unione
           europea garantisce un livello di protezione adeguato riconosciuto
           dalla Svizzera; Swiss-U.S. Data Privacy Framework per i fornitori
-          statunitensi certificati o clausole contrattuali tipo).
+          statunitensi certificati o clausole contrattuali tipo). Per le vendite
+          tramite agenti IA, Stripe trasmette il nostro catalogo alle
+          piattaforme di agenti partner, che agiscono come titolari del
+          trattamento indipendenti (vedi «Agenti IA»).
         </p>
       ),
     },
@@ -794,6 +907,39 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "AI agents",
+      body: (
+        <>
+          <p>
+            <strong>An agent’s access to your account</strong>: if you allow an
+            application or an artificial intelligence agent (“AI agent”) to
+            access your account (consent screen or entry of a six-digit code),
+            we record the application, the permissions granted and the access
+            tokens, stored encrypted or hashed. The agent only reads the data
+            covered by these permissions (profile, orders, quotes); you can
+            withdraw its access at any time under{" "}
+            <strong>My account → AI agents</strong>. Expired, revoked or never
+            used access is deleted automatically.
+          </p>
+          <p>
+            <strong>Purchases through an AI agent</strong>: when you order
+            through an AI agent (for example a chat assistant connected to
+            Stripe), we receive from Stripe or from the agent’s platform the
+            data needed for the order — name, e-mail address, shipping address,
+            items, amount and, where applicable, the agent’s name; payment data
+            stays with Stripe. We process it to fulfil the order, like an order
+            placed on the website. Our catalogue (products, prices, stock),
+            without any personal data, is sent to Stripe, which makes it
+            available to partner AI agents. The agent’s platform (for example
+            OpenAI, Microsoft, Google or Perplexity) processes your
+            conversations and data under its own responsibility and according to
+            its own privacy policy; these platforms may process data in the
+            United States.
+          </p>
+        </>
+      ),
+    },
+    {
       title: "Audience measurement",
       body: (
         <p>
@@ -860,7 +1006,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           recognised safeguards (the European Union provides an adequate level
           of protection recognised by Switzerland; the Swiss-U.S. Data Privacy
           Framework for certified US providers, or standard contractual
-          clauses).
+          clauses). For sales through AI agents, Stripe passes our catalogue on
+          to partner agent platforms, which act as independent controllers (see
+          “AI agents”).
         </p>
       ),
     },
