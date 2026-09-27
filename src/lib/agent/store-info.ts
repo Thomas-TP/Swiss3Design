@@ -49,6 +49,13 @@ export async function getStoreInfo(locale: Locale) {
       processor: "Stripe",
       checkout: page("/checkout"),
     },
+    // Achat direct par un agent, payé par Shared Payment Token Stripe.
+    agentCheckout: {
+      mpp: `${SITE_URL}/api/v1/purchases`,
+      acp: `${SITE_URL}/.well-known/acp.json`,
+      ucp: `${SITE_URL}/.well-known/ucp`,
+      guide: `${SITE_URL}/agents.md`,
+    },
     customPrinting: {
       description:
         "Custom 3D printing from your own file or idea, with a personalised quote within 48 hours.",

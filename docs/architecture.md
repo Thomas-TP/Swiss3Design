@@ -69,7 +69,8 @@ of truth.
   `discountCode`, `shippingAddress` (JSON snapshot, **CH only**),
   `stripePaymentIntentId`, clés de reprise Checkout, dates de réservation et de
   paiement, montant remboursé, `trackingNumber`, `adminNote` (internal),
-  `locale`.
+  `locale`, `channel` (`web` | `stripe_acs` | `mpp` | `acp` | `ucp` | `x402`,
+  migration `0007`) and `agentName` for orders placed by AI agents.
 - **order_items** — **snapshots**: `nameSnapshot`, `colorName`/`colorHex`,
   `priceCentsSnapshot`, `quantity`. History never changes when products change.
 
@@ -208,6 +209,74 @@ customer's own account goes through the **customer-account MCP server
   revocation reads use `uncached` (`src/db/fresh.ts`, AGENTS.md rule 6c).
 - Cleanup: `lib/maintenance.ts` purges expired auth.md registrations, expired
   tokens and dynamically registered clients never authorized in 90 days.
+
+### Agentic commerce (Stripe Agentic Commerce Suite)
+
+Stripe exposes the catalogue to partner AI agents (ChatGPT & co.), runs the
+checkout inside the agent and captures the payment. Our side
+([`src/lib/commerce/`](../src/lib/commerce)):
+
+- **Catalogue feed** — `catalog.ts` turns active products into sellable SKUs
+  (product × variant × colour). SKU = variant `sku` or product slug, suffixed
+  with the colour (`vase-spirale--noir`): variant ids change at every product
+  save, these don't. `feed.ts` writes the three Stripe CSV feeds (product,
+  inventory, pricing; CHF, JPEG images through `/cdn-cgi/image`, shipping and
+  delivery estimate identical to the site's JSON-LD). `stripe-catalog.ts`
+  uploads them through the Product Catalog Import API v2: full product feed in
+  `replace` mode once a day (maintenance cron) and after each product edit,
+  inventory + pricing in `upsert` mode every cron run and after a sale.
+  Switched by the `STRIPE_CATALOG_SYNC` var.
+- **Hooks** — `POST /api/stripe/agentic-commerce` (signed with
+  `STRIPE_ACS_HOOK_SECRET`, answered in < 4 s, no side effect): order approval
+  before payment (CHF only, Swiss address only, current price, stock, shipping
+  and total identical to the site), shipping options (flat Swiss Post rate, free
+  over the threshold) and real-time price/availability per SKU.
+- **Fulfillment** — Stripe sends `checkout.session.completed` for a session we
+  did not create. The webhook re-reads it with its lines (the SKU is
+  `price.external_reference`, preview API version) and `recordPaidAgentOrder()`
+  (`agent-orders.ts`) creates the order **already paid**: idempotent on the
+  session and PaymentIntent ids, stock taken best-effort (money is already
+  captured — a shortfall, a removed SKU or a non-Swiss address become admin
+  alerts in `adminNote` and the admin e-mail, never an error), confirmation
+  e-mail mentioning the agent.
+- Tax: Stripe Tax without any registration (not subject to VAT, art. 10 LTVA)
+  → no tax, no Stripe Tax fee; the feed still carries `txcd_99999999`.
+
+### Agentic commerce on our own APIs (MPP, ACP, UCP)
+
+Agents can also buy directly from us, paying with a Stripe **Shared Payment
+Token** (SPT, issued to our Stripe profile `STRIPE_PROFILE_ID`, e.g. by the Link
+agent wallet). Unlike Stripe ACS, the money is taken only after the stock is
+reserved ([`checkout-core.ts`](../src/lib/commerce/checkout-core.ts)): resolve
+items (SKU, or slug + variant + colour) → quote (site price, flat Swiss Post
+rate, free over the threshold) → Swiss address → `createPendingAgentOrder()`
+(pending, stock reserved 30 min, idempotent on an attempt key per token) →
+`payOrderWithSpt()` (PaymentIntent confirmed with
+`shared_payment_granted_token`, preview API version) → `markOrderPaid()`, the
+same finalization as the web checkout. A crashed Worker is covered twice: the
+`payment_intent.succeeded` webhook (metadata `orderId`) and the maintenance
+reconciliation, which asks Stripe about pending agent orders before releasing
+their stock.
+
+- **MPP** — `POST /api/v1/purchases` ([`mpp.ts`](../src/lib/commerce/mpp.ts)):
+  HTTP `Payment` auth scheme, method `stripe`, intent `charge`. Without payment:
+  `402`, quote and `WWW-Authenticate: Payment` challenge whose id is an
+  HMAC-SHA256 of all fields (key derived from `STRIPE_SECRET_KEY`: stateless);
+  the challenge's `externalId` is a fingerprint of the order (items, address,
+  email, total). With `Authorization: Payment …` carrying the SPT: order,
+  `Payment-Receipt`. Discovery: `x-payment-info` on the operation in
+  `/openapi.json`.
+- **ACP 2026-04-17** — `/api/acp/checkout_sessions` (create, get, update,
+  complete, cancel) + `/.well-known/acp.json`; handler `dev.acp.tokenized.card`
+  (PSP Stripe); `Idempotency-Key` required on POSTs, responses replayed from KV
+  for 24 h.
+- **UCP 2026-08-25** — `/api/ucp/checkout-sessions` (PUT to update) +
+  `/.well-known/ucp` (service `dev.ucp.shopping` REST, checkout + fulfillment,
+  keys = the Web Bot Auth Ed25519 key); payment handler
+  `ch.swiss3design.stripe_spt`, specified at `/agents/ucp-stripe-spt.md`.
+- Sessions ACP/UCP live in `agent_checkout_sessions` (migration `0008`),
+  recomputed at each call, purged 7 days after expiry. Discovery documents are
+  served only when `STRIPE_PROFILE_ID` is set.
 
 ### Files (R2)
 

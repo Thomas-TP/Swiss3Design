@@ -201,6 +201,7 @@ put` on an environment with real users without `--env <name>` explicitly
 | Analytics                 | PostHog Cloud EU, cookie `ph_…` + replay, Swiss opt-out (« OK / Refuser »), via the relay `/api/relay` (middleware) — `posthog-js` only in `src/instrumentation-client.ts`; see `docs/conventions.md` → Analytics |
 | Hosting                   | Cloudflare Workers via `@opennextjs/cloudflare`                                                                                                                                                                   |
 | AI agents                 | Public MCP `/mcp`, A2A, REST `/api/v1`, WebMCP; customer-account MCP `/mcp/account` behind OAuth 2.1 (`@better-auth/oauth-provider`) + auth.md — see `docs/architecture.md` → Agents                              |
+| Agentic commerce          | Stripe Agentic Commerce Suite (catalogue feed, hooks, webhook orders) in `src/lib/commerce` — see `docs/architecture.md` → Agentic commerce                                                                       |
 
 ## Commands
 
@@ -270,6 +271,8 @@ src/
                   shipping, email(+templates), rate-limit, maintenance, format, theme
   lib/agent/      AI-agent surfaces: MCP (public + /mcp/account), A2A, REST,
                   discovery, OAuth 2.1 resource server, auth.md agent registration
+  lib/commerce/   agentic commerce: Stripe catalogue feed, ACS hooks, agent
+                  orders (paid before they reach us — never fail, alert instead)
   middleware.ts   Edge middleware: i18n + security headers + CSP nonce + www→apex
 drizzle/          D1/SQLite migrations + snapshots (legacy, inactive DB) — NEVER hand-edit
 drizzle-pg/       Postgres migrations + snapshots (active DB, drizzle.config.pg.ts) — NEVER hand-edit

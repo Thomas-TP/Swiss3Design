@@ -42,6 +42,27 @@ export function apiCatalog() {
         ],
         "service-doc": [docs],
       },
+      // Checkout des agents : ACP et UCP (paiement par Shared Payment Token).
+      {
+        anchor: abs("/api/acp"),
+        "service-meta": [
+          { href: abs("/.well-known/acp.json"), type: "application/json" },
+        ],
+        "service-doc": [docs],
+      },
+      {
+        anchor: abs("/api/ucp"),
+        "service-desc": [
+          {
+            href: "https://ucp.dev/2026-08-25/services/shopping/rest.openapi.json",
+            type: "application/vnd.oai.openapi+json",
+          },
+        ],
+        "service-meta": [
+          { href: abs("/.well-known/ucp"), type: "application/json" },
+        ],
+        "service-doc": [docs],
+      },
       // Serveur MCP compte client, protégé par OAuth : ses métadonnées de
       // ressource protégée (RFC 9728) mènent au serveur d'autorisation.
       {
@@ -146,6 +167,18 @@ export function aiCatalog() {
         representativeQueries: [
           "where is my Swiss3Design order",
           "connect my Swiss3Design account to my assistant",
+        ],
+      },
+      {
+        identifier: "urn:air:swiss3design.ch:commerce:checkout",
+        displayName: "Swiss3Design agentic checkout (UCP, ACP, MPP)",
+        description:
+          "Buy directly as an agent: UCP and ACP checkout sessions, or a one-call machine payment (MPP), paid with a Stripe Shared Payment Token. CHF, shipping within Switzerland.",
+        type: "application/json",
+        url: abs("/.well-known/ucp"),
+        representativeQueries: [
+          "buy a 3D-printed vase from Swiss3Design for delivery in Switzerland",
+          "order a Swiss3Design product and pay with my agent wallet",
         ],
       },
       {

@@ -24,6 +24,7 @@ import { validateDiscount } from "@/lib/discounts";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 import { SHIPPING_CENTS, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
 import { recordStatusTransition } from "@/lib/status-history";
+import { makeOrderNumber } from "@/lib/order-number";
 
 const bodySchema = z.object({
   attemptId: z.uuid().optional(),
@@ -56,11 +57,6 @@ const bodySchema = z.object({
   saveAddress: z.boolean().optional(),
   locale: z.enum(["fr", "de", "it", "en"]).catch("fr"),
 });
-
-function makeOrderNumber(): string {
-  const rand = Math.random().toString(36).slice(2, 6).toUpperCase();
-  return `S3D-${Date.now().toString(36).toUpperCase()}${rand}`;
-}
 
 export async function POST(request: Request) {
   // Anti-abus : plafonne la création de PaymentIntents/commandes par IP

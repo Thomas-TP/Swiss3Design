@@ -210,7 +210,19 @@ interface OrderForEmail {
   totalCents: number;
   shippingAddress: string;
   locale: string;
+  channel?: string | null;
+  agentName?: string | null;
+  adminNote?: string | null;
 }
+
+// Canal de vente, pour l'admin (toujours en français).
+const CHANNEL_LABELS: Record<string, string> = {
+  stripe_acs: "Agent IA via Stripe (Agentic Commerce Suite)",
+  mpp: "Agent IA — paiement machine (MPP)",
+  acp: "Agent IA — protocole ACP",
+  ucp: "Agent IA — protocole UCP",
+  x402: "Agent IA — x402 (stablecoin)",
+};
 
 interface ItemForEmail {
   nameSnapshot: string;
@@ -231,6 +243,7 @@ const ORDER_TEXTS: Record<
     discount: string;
     total: string;
     address: string;
+    viaAgent: string;
   }
 > = {
   fr: {
@@ -243,6 +256,8 @@ const ORDER_TEXTS: Record<
     total: "Total",
     discount: "Remise",
     address: "Adresse de livraison",
+    viaAgent:
+      "Commande passée par l'intermédiaire de votre agent IA. Pour toute question, répondez simplement à cet e-mail.",
   },
   de: {
     subject: "Bestellung {n} bestätigt — Swiss3Design",
@@ -254,6 +269,8 @@ const ORDER_TEXTS: Record<
     total: "Total",
     discount: "Rabatt",
     address: "Lieferadresse",
+    viaAgent:
+      "Diese Bestellung wurde über Ihren KI-Agenten aufgegeben. Bei Fragen antworten Sie einfach auf diese E-Mail.",
   },
   it: {
     subject: "Ordine {n} confermato — Swiss3Design",
@@ -265,6 +282,8 @@ const ORDER_TEXTS: Record<
     total: "Totale",
     discount: "Sconto",
     address: "Indirizzo di consegna",
+    viaAgent:
+      "Ordine effettuato tramite il vostro agente IA. Per qualsiasi domanda, rispondete semplicemente a questa e-mail.",
   },
   en: {
     subject: "Order {n} confirmed — Swiss3Design",
@@ -276,6 +295,8 @@ const ORDER_TEXTS: Record<
     total: "Total",
     discount: "Discount",
     address: "Shipping address",
+    viaAgent:
+      "This order was placed through your AI agent. If you have any questions, simply reply to this email.",
   },
 };
 
@@ -298,14 +319,22 @@ export function orderConfirmationEmail(
   const rows = items
     .map(
       (it) => `<tr>
-        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${it.nameSnapshot}${it.colorName ? ` — <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${it.colorHex ?? "#cccccc"};vertical-align:middle;margin:0 3px 1px 0;"></span>${it.colorName}` : ""}</td>
+        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${esc(it.nameSnapshot)}${it.colorName ? ` — <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${esc(it.colorHex ?? "#cccccc")};vertical-align:middle;margin:0 3px 1px 0;"></span>${esc(it.colorName)}` : ""}</td>
         <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;text-align:right;white-space:nowrap;">${chf(it.priceCentsSnapshot * it.quantity)}</td>
       </tr>`,
     )
     .join("");
 
+  // Achat délégué à un agent IA : l'acheteur doit savoir d'où vient la
+  // commande et comment joindre la boutique.
+  const viaAgent =
+    order.channel && order.channel !== "web"
+      ? `<p style="margin:0 0 18px;padding:10px 14px;background:#f5f5f4;border-radius:10px;font-size:13px;color:#57534e;line-height:1.6;">${t.viaAgent}</p>`
+      : "";
+
   const body = `
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">${t.intro.replace("{n}", order.orderNumber)}</p>
+    ${viaAgent}
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
       ${rows}
       ${
@@ -329,7 +358,7 @@ export function orderConfirmationEmail(
     </table>
     <p style="margin:20px 0 0;font-size:13px;color:#78716c;">
       <strong style="color:#1c1917;">${t.address}</strong><br/>
-      ${address.name}<br/>${address.street}<br/>${address.npa} ${address.city}, CH
+      ${esc(address.name)}<br/>${esc(address.street)}<br/>${esc(address.npa)} ${esc(address.city)}, CH
     </p>`;
 
   return {
@@ -725,10 +754,26 @@ export function adminNewOrderEmail(
         </p>`
       : "";
 
+  const channel =
+    order.channel && CHANNEL_LABELS[order.channel]
+      ? `<p style="margin:0 0 18px;font-size:13px;color:#44403c;">
+          <strong>Canal :</strong> ${CHANNEL_LABELS[order.channel]}${order.agentName ? ` — ${esc(order.agentName)}` : ""}
+        </p>`
+      : "";
+  // Anomalies relevées à l'enregistrement (stock insuffisant après un achat
+  // déjà payé, article retiré du catalogue…) : à traiter à la main.
+  const notes = order.adminNote
+    ? `<p style="margin:0 0 18px;padding:12px 16px;background:#fef2f2;border:1px solid #fecaca;border-radius:10px;font-size:13px;color:#991b1b;line-height:1.7;">
+          <strong>⚠ À vérifier :</strong><br/>${esc(order.adminNote).replace(/\n/g, "<br/>")}
+        </p>`
+    : "";
+
   const body = `
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
       Nouvelle commande payée de <strong>${esc(order.email)}</strong> (langue : ${order.locale.toUpperCase()}).
     </p>
+    ${channel}
+    ${notes}
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
       ${rows}
       <tr>

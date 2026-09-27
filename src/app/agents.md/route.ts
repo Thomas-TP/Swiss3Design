@@ -37,7 +37,14 @@ ${tools}
 
 ## Buying
 
-Use \`build_cart_link\` to validate items and get a link that fills the customer's cart on swiss3design.ch; the customer then pays on the website (TWINT, Visa, Mastercard, Google Pay).
+Prices in CHF, shipping within Switzerland only. Four ways to buy:
+
+1. **Cart link** — \`build_cart_link\` validates items and returns a link that fills the customer's cart on swiss3design.ch; the customer pays on the website (TWINT, Visa, Mastercard, Google Pay).
+2. **Machine payment (MPP)** — \`POST ${abs(`${PATHS.api}/purchases`)}\` with the items, the buyer's email and a Swiss address: the answer is \`402\` with the quote and a \`WWW-Authenticate: Payment\` challenge (\`method="stripe"\`, amount in CHF centimes). Pay it with a Stripe Shared Payment Token issued to the challenge's \`networkId\` — e.g. \`npx @stripe/link-cli mpp pay ${abs(`${PATHS.api}/purchases`)} -X POST -d '{…}'\` — and retry: \`201\`, the order and a \`Payment-Receipt\` header.
+3. **ACP checkout** — discovery ${abs("/.well-known/acp.json")}; REST \`${abs("/api/acp")}/checkout_sessions\` (create, update, complete with \`payment_data.instrument.credential.token = "spt_…"\`, cancel). Payment handler \`dev.acp.tokenized.card\`, PSP Stripe.
+4. **UCP checkout** — business profile ${abs("/.well-known/ucp")}; REST \`${abs("/api/ucp")}/checkout-sessions\` (create, update with PUT, complete, cancel). Payment handler \`ch.swiss3design.stripe_spt\` (Stripe Shared Payment Token): ${abs("/agents/ucp-stripe-spt.md")}.
+
+The store's catalogue is also available to Stripe's partner AI agents, which check out through Stripe. Orders placed by an agent follow the store's terms (section on AI agents): ${STORE.url}/legal/terms.
 
 ## Customer account (with the customer's consent)
 

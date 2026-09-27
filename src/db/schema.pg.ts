@@ -36,6 +36,15 @@ const createdAt = () =>
 
 export const LOCALES = ["fr", "de", "it", "en"] as const;
 
+export const ORDER_CHANNELS = [
+  "web",
+  "stripe_acs",
+  "mpp",
+  "acp",
+  "ucp",
+  "x402",
+] as const;
+
 // ── Catalogue ────────────────────────────────────────────────────────────────
 
 export const products = pgTable(
@@ -226,6 +235,11 @@ export const orders = pgTable(
     trackingNumber: text("tracking_number"),
     adminNote: text("admin_note"),
     locale: text("locale", { enum: LOCALES }).notNull().default("fr"),
+    // Canal de vente : le site, ou un agent IA — via Stripe (Agentic Commerce
+    // Suite : ChatGPT & co.), ou nos propres protocoles MPP, ACP, UCP, x402.
+    channel: text("channel", { enum: ORDER_CHANNELS }).notNull().default("web"),
+    // Agent déclaré par la plateforme (ex. « ChatGPT »), à titre informatif.
+    agentName: text("agent_name"),
     createdAt: createdAt(),
   },
   (t) => [
@@ -239,6 +253,10 @@ export const orders = pgTable(
     check(
       "orders_status_valid",
       sql`${t.status} IN ('pending','paid','in_production','shipped','delivered','cancelled')`,
+    ),
+    check(
+      "orders_channel_valid",
+      sql`${t.channel} IN ('web','stripe_acs','mpp','acp','ucp','x402')`,
     ),
   ],
 );
@@ -262,6 +280,45 @@ export const orderItems = pgTable(
     index("order_items_order_idx").on(t.orderId),
     check("order_items_quantity_positive", sql`${t.quantity} > 0`),
     check("order_items_price_nonnegative", sql`${t.priceCentsSnapshot} >= 0`),
+  ],
+);
+
+// Sessions de checkout ouvertes par un agent IA via nos API ACP ou UCP : le
+// panier, l'acheteur et l'adresse vivent ici (JSON) jusqu'au paiement, qui
+// crée une vraie commande (`orderId`). Purgées une semaine après expiration.
+export const agentCheckoutSessions = pgTable(
+  "agent_checkout_sessions",
+  {
+    id: text("id").primaryKey(),
+    protocol: text("protocol", { enum: ["acp", "ucp"] }).notNull(),
+    status: text("status", {
+      enum: ["open", "completed", "canceled"],
+    })
+      .notNull()
+      .default("open"),
+    state: jsonb("state").notNull(),
+    orderId: text("order_id").references(() => orders.id, {
+      onDelete: "set null",
+    }),
+    agent: text("agent"),
+    customerId: text("customer_id"),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    index("agent_checkout_sessions_expiry_idx").on(t.expiresAt),
+    check(
+      "agent_checkout_sessions_status_valid",
+      sql`${t.status} IN ('open','completed','canceled')`,
+    ),
+    check(
+      "agent_checkout_sessions_protocol_valid",
+      sql`${t.protocol} IN ('acp','ucp')`,
+    ),
   ],
 );
 

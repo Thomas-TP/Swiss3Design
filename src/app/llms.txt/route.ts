@@ -70,6 +70,11 @@ ${productLines.join("\n")}
 
 - [Custom 3D printing quote](${url(PAGES.custom)}): file upload (STL, 3MF, OBJ, STEP), material and colour choice, quote within 48 hours
 
+## For AI agents
+
+- [Agent guide](${SITE_URL}/agents.md): MCP, A2A and REST endpoints, customer-account access with consent, and how to buy
+- Buying as an agent: machine payment (MPP) at ${SITE_URL}/api/v1/purchases, ACP checkout (${SITE_URL}/.well-known/acp.json) and UCP checkout (${SITE_URL}/.well-known/ucp), paid with a Stripe Shared Payment Token
+
 ## About
 
 - [About us and FAQ](${url(PAGES.about)}): workshops, machines, process, materials, frequently asked questions

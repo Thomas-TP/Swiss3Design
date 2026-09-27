@@ -17,6 +17,7 @@ import {
 } from "@/db/schema";
 import { requireFreshAdmin } from "@/lib/session";
 import { notifyIndexNow } from "@/lib/indexnow";
+import { pushCatalogChange } from "@/lib/commerce/stripe-catalog";
 
 // Fiche(s) + catalogue à signaler à IndexNow après une modification : le
 // catalogue liste les produits, il change donc avec eux.
@@ -272,6 +273,8 @@ export async function saveProduct(
 
   revalidatePath("/", "layout");
   await notifyIndexNow(changedPaths(slug, previousSlug));
+  // Catalogue des agents IA (Stripe) : fiche complète renvoyée.
+  await pushCatalogChange(db, "product");
   return { success: true };
 }
 
@@ -286,6 +289,7 @@ export async function deleteProduct(id: string): Promise<void> {
       .where(eq(products.id, id))
       .returning({ slug: products.slug });
     await notifyIndexNow(changedPaths(deleted?.slug));
+    await pushCatalogChange(db, "product");
   }
   revalidatePath("/", "layout");
 }
@@ -317,6 +321,7 @@ export async function updateProductStock(formData: FormData) {
   // Passage en rupture / retour en stock : la disponibilité du JSON-LD change.
   const wasAvailable = (row.stock ?? 0) > 0;
   if (wasAvailable !== stock > 0) await notifyIndexNow(changedPaths(row.slug));
+  await pushCatalogChange(db, "stock");
 }
 
 export async function toggleProductActive(formData: FormData) {
@@ -336,6 +341,8 @@ export async function toggleProductActive(formData: FormData) {
         .where(eq(products.id, id));
       // Publiée ou retirée : la fiche apparaît ou devient une 404.
       await notifyIndexNow(changedPaths(row.slug));
+      // Flux complet (mode replace) : une fiche retirée disparaît chez Stripe.
+      await pushCatalogChange(db, "product");
     }
   }
   revalidatePath("/", "layout");

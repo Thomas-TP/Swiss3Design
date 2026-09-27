@@ -50,6 +50,20 @@
       "when": 1790465068398,
       "tag": "0006_luxuriant_roulette",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1790506158773,
+      "tag": "0007_moaning_scorpion",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1790509453124,
+      "tag": "0008_swift_thor",
+      "breakpoints": true
     }
   ]
 }
