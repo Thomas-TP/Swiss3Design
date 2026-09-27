@@ -66,13 +66,63 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Commandes passées par un agent IA",
+      body: (
+        <>
+          <p>
+            Le client peut commander par l’intermédiaire d’un assistant ou d’un
+            agent d’intelligence artificielle (« agent IA »), notamment via les
+            plateformes reliées à Stripe ou via les interfaces pour agents de la
+            boutique. Les présentes CGV s’appliquent alors intégralement.
+            L’exploitant est le seul vendeur ; la plateforme de l’agent et
+            Stripe ne sont pas parties au contrat de vente et n’agissent pas au
+            nom de l’exploitant.
+          </p>
+          <p>
+            L’agent IA agit pour le compte du client, dans les limites des
+            instructions et des autorisations que celui-ci lui a données (art.
+            32 ss CO) : la commande qu’il transmet et paie engage le client. Le
+            client répond du paramétrage de son agent, des moyens de paiement
+            qu’il lui confie et du suivi des commandes passées en son nom. Le
+            contrat est conclu à la confirmation du paiement, attestée par
+            l’e-mail de confirmation envoyé à l’adresse transmise par l’agent ;
+            le client le vérifie dès réception.
+          </p>
+          <p>
+            Les informations présentées par un agent (description, prix,
+            disponibilité, délais) proviennent du catalogue de la boutique mais
+            peuvent être reformulées ou dater de quelques minutes : font foi le
+            prix et les frais confirmés lors du paiement. Si l’agent a commis
+            une erreur manifeste (article, quantité ou adresse non voulus), le
+            client la signale sans délai à contact@swiss3design.ch : tant que la
+            production ou l’expédition n’a pas commencé, la commande est annulée
+            et intégralement remboursée ; ensuite, les règles de la section «
+            Retours » s’appliquent. Une commande à livrer hors de Suisse est
+            annulée et remboursée.
+          </p>
+          <p>
+            L’exploitant ne répond pas du fonctionnement de l’agent ou de la
+            plateforme choisis par le client, ni des décisions prises par
+            l’agent, sous réserve des cas où la loi exclut toute limitation de
+            responsabilité. Retours, garantie et service client se traitent
+            directement avec l’exploitant, comme pour une commande passée sur le
+            site.
+          </p>
+        </>
+      ),
+    },
+    {
       title: "Paiement",
       body: (
         <p>
           Le paiement s’effectue en ligne via le prestataire Stripe (carte de
           crédit/débit, TWINT, Google Pay), y compris via Stripe Link pour
           réutiliser une carte déjà enregistrée. L’exploitant n’a jamais accès
-          aux données de carte et ne les stocke pas.
+          aux données de carte et ne les stocke pas. Pour une commande passée
+          par un agent IA, le paiement est également traité par Stripe, au moyen
+          d’un jeton de paiement à usage unique, limité au montant de la
+          commande et émis par le portefeuille de l’agent ; l’exploitant ne
+          reçoit pas les données complètes de la carte.
         </p>
       ),
     },
@@ -311,6 +361,54 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Bestellungen über einen KI-Agenten",
+      body: (
+        <>
+          <p>
+            Der Kunde kann über einen Assistenten oder Agenten mit künstlicher
+            Intelligenz («KI-Agent») bestellen, insbesondere über mit Stripe
+            verbundene Plattformen oder über die Agenten-Schnittstellen des
+            Shops. Diese AGB gelten dann vollumfänglich. Der Betreiber ist
+            alleiniger Verkäufer; die Plattform des Agenten und Stripe sind
+            nicht Partei des Kaufvertrags und handeln nicht im Namen des
+            Betreibers.
+          </p>
+          <p>
+            Der KI-Agent handelt für den Kunden im Rahmen der Anweisungen und
+            Berechtigungen, die dieser ihm erteilt hat (Art. 32 ff. OR): Die
+            Bestellung, die er übermittelt und bezahlt, verpflichtet den Kunden.
+            Der Kunde ist verantwortlich für die Einstellungen seines Agenten,
+            die ihm anvertrauten Zahlungsmittel und die Kontrolle der in seinem
+            Namen aufgegebenen Bestellungen. Der Vertrag kommt mit der
+            Zahlungsbestätigung zustande, die durch die Bestätigungs-E-Mail an
+            die vom Agenten übermittelte Adresse belegt wird; der Kunde prüft
+            diese nach Erhalt.
+          </p>
+          <p>
+            Die von einem Agenten dargestellten Informationen (Beschreibung,
+            Preis, Verfügbarkeit, Lieferfristen) stammen aus dem Katalog des
+            Shops, können aber umformuliert oder einige Minuten alt sein:
+            Massgebend sind der bei der Zahlung bestätigte Preis und die
+            bestätigten Kosten. Hat der Agent einen offensichtlichen Fehler
+            begangen (ungewollter Artikel, Menge oder Adresse), meldet der Kunde
+            dies unverzüglich an contact@swiss3design.ch: Solange Produktion
+            oder Versand nicht begonnen haben, wird die Bestellung storniert und
+            vollständig zurückerstattet; danach gelten die Regeln des Abschnitts
+            «Rücksendungen». Eine Bestellung mit Lieferadresse ausserhalb der
+            Schweiz wird storniert und zurückerstattet.
+          </p>
+          <p>
+            Der Betreiber haftet weder für das Funktionieren des vom Kunden
+            gewählten Agenten oder der Plattform noch für die Entscheidungen des
+            Agenten, vorbehaltlich der Fälle, in denen das Gesetz jede
+            Haftungsbeschränkung ausschliesst. Rücksendungen, Gewährleistung und
+            Kundendienst werden direkt mit dem Betreiber abgewickelt, wie bei
+            einer Bestellung auf der Website.
+          </p>
+        </>
+      ),
+    },
+    {
       title: "Zahlung",
       body: (
         <p>
@@ -318,7 +416,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           (Kredit-/Debitkarte, TWINT, Google Pay), einschliesslich Stripe Link
           zur Wiederverwendung einer bereits gespeicherten Karte. Der Betreiber
           hat zu keinem Zeitpunkt Zugriff auf Kartendaten und speichert diese
-          nicht.
+          nicht. Bei einer Bestellung über einen KI-Agenten wird die Zahlung
+          ebenfalls über Stripe abgewickelt, mittels eines
+          Einmal-Zahlungstokens, das auf den Bestellbetrag begrenzt ist und von
+          der Wallet des Agenten ausgegeben wird; der Betreiber erhält keine
+          vollständigen Kartendaten.
         </p>
       ),
     },
@@ -561,13 +663,64 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Ordini effettuati tramite un agente IA",
+      body: (
+        <>
+          <p>
+            Il cliente può ordinare tramite un assistente o un agente di
+            intelligenza artificiale («agente IA»), in particolare tramite le
+            piattaforme collegate a Stripe o tramite le interfacce per agenti
+            del negozio. Le presenti CGV si applicano allora integralmente. Il
+            gestore è l’unico venditore; la piattaforma dell’agente e Stripe non
+            sono parti del contratto di vendita e non agiscono in nome del
+            gestore.
+          </p>
+          <p>
+            L’agente IA agisce per conto del cliente, nei limiti delle
+            istruzioni e delle autorizzazioni che questi gli ha conferito (art.
+            32 segg. CO): l’ordine che trasmette e paga vincola il cliente. Il
+            cliente risponde della configurazione del proprio agente, dei mezzi
+            di pagamento che gli affida e del controllo degli ordini effettuati
+            a suo nome. Il contratto è concluso al momento della conferma del
+            pagamento, attestata dall’e-mail di conferma inviata all’indirizzo
+            trasmesso dall’agente; il cliente la verifica non appena ricevuta.
+          </p>
+          <p>
+            Le informazioni presentate da un agente (descrizione, prezzo,
+            disponibilità, termini di consegna) provengono dal catalogo del
+            negozio ma possono essere riformulate o risalire a qualche minuto
+            prima: fanno fede il prezzo e le spese confermati al momento del
+            pagamento. Se l’agente ha commesso un errore manifesto (articolo,
+            quantità o indirizzo non voluti), il cliente lo segnala senza
+            indugio a contact@swiss3design.ch: finché la produzione o la
+            spedizione non sono iniziate, l’ordine viene annullato e interamente
+            rimborsato; in seguito si applicano le regole della sezione «Resi».
+            Un ordine da consegnare fuori dalla Svizzera viene annullato e
+            rimborsato.
+          </p>
+          <p>
+            Il gestore non risponde del funzionamento dell’agente o della
+            piattaforma scelti dal cliente, né delle decisioni prese
+            dall’agente, fatti salvi i casi in cui la legge esclude qualsiasi
+            limitazione di responsabilità. Resi, garanzia e servizio clienti si
+            gestiscono direttamente con il gestore, come per un ordine
+            effettuato sul sito.
+          </p>
+        </>
+      ),
+    },
+    {
       title: "Pagamento",
       body: (
         <p>
           Il pagamento avviene online tramite il prestatore Stripe (carta di
           credito/debito, TWINT, Google Pay), inclusa Stripe Link per
           riutilizzare una carta già registrata. Il gestore non ha mai accesso
-          ai dati della carta e non li memorizza.
+          ai dati della carta e non li memorizza. Per un ordine effettuato
+          tramite un agente IA, il pagamento è anch’esso trattato da Stripe,
+          mediante un token di pagamento monouso, limitato all’importo
+          dell’ordine ed emesso dal portafoglio dell’agente; il gestore non
+          riceve i dati completi della carta.
         </p>
       ),
     },
@@ -803,13 +956,60 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Orders placed through an AI agent",
+      body: (
+        <>
+          <p>
+            The customer may order through an artificial intelligence assistant
+            or agent (“AI agent”), in particular via platforms connected to
+            Stripe or via the shop’s agent interfaces. These GTC then apply in
+            full. The Operator is the sole seller; the agent’s platform and
+            Stripe are not parties to the sales contract and do not act on the
+            Operator’s behalf.
+          </p>
+          <p>
+            The AI agent acts on the customer’s behalf, within the instructions
+            and authorisations the customer has given it (art. 32 et seq. of the
+            Swiss Code of Obligations): an order it submits and pays for binds
+            the customer. The customer is responsible for configuring their
+            agent, for the payment methods entrusted to it and for monitoring
+            orders placed in their name. The contract is concluded upon
+            confirmation of payment, evidenced by the confirmation e-mail sent
+            to the address provided by the agent; the customer checks it upon
+            receipt.
+          </p>
+          <p>
+            Information presented by an agent (description, price, availability,
+            delivery times) comes from the shop’s catalogue but may be reworded
+            or a few minutes old: the price and charges confirmed at payment
+            prevail. If the agent made an obvious mistake (unwanted item,
+            quantity or address), the customer reports it without delay to
+            contact@swiss3design.ch: as long as production or shipping has not
+            started, the order is cancelled and fully refunded; after that, the
+            “Returns” section applies. An order to be delivered outside
+            Switzerland is cancelled and refunded.
+          </p>
+          <p>
+            The Operator is not liable for the functioning of the agent or
+            platform chosen by the customer, nor for decisions made by the
+            agent, except where the law excludes any limitation of liability.
+            Returns, warranty and customer service are handled directly with the
+            Operator, as for an order placed on the website.
+          </p>
+        </>
+      ),
+    },
+    {
       title: "Payment",
       body: (
         <p>
           Payment is made online via the payment provider Stripe (credit/debit
           card, TWINT, Google Pay), including Stripe Link to reuse a card
           already saved. The Operator never has access to card data and does not
-          store it.
+          store it. For an order placed through an AI agent, payment is also
+          processed by Stripe, using a single-use payment token limited to the
+          order amount and issued by the agent’s wallet; the Operator does not
+          receive full card details.
         </p>
       ),
     },
