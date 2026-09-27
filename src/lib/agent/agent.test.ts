@@ -9,7 +9,12 @@ import {
 import { parseItemParam } from "./cart-line";
 import { apiCatalog, aiCatalog, mcpServerCard } from "./discovery";
 import { RpcError, handleJsonRpc } from "./jsonrpc";
-import { isMarkdownPath, prefersMarkdown } from "./markdown";
+import {
+  extractTitle,
+  fallbackHtmlToMarkdown,
+  isMarkdownPath,
+  prefersMarkdown,
+} from "./markdown";
 import { mcpDispatcher } from "./mcp";
 import { openApiDocument } from "./openapi";
 import { isAgentRoute } from "./paths";
@@ -30,6 +35,20 @@ describe("négociation Markdown", () => {
       ),
     ).toBe(false);
     expect(prefersMarkdown(null)).toBe(false);
+  });
+
+  it("convertit sans laisser de balise ni décoder deux fois", () => {
+    const md = fallbackHtmlToMarkdown(
+      `<main><h1>Vase <b>multicolore</b></h1><p>Prix &amp;lt; 50 CHF</p>
+       <scr<script>x</script>ipt>alert(1)</script>
+       <a href="/fr/shop">Boutique</a></main>`,
+      "https://swiss3design.ch",
+    );
+    expect(md).toContain("# Vase multicolore");
+    expect(md).toContain("Prix &lt; 50 CHF");
+    expect(md).toContain("[Boutique](https://swiss3design.ch/fr/shop)");
+    expect(md).not.toMatch(/[<>]/);
+    expect(extractTitle("<title>A &amp;amp; B</title>")).toBe("A &amp; B");
   });
 
   it("ne vise que les pages localisées", () => {

@@ -59,14 +59,41 @@ export function extractJsonLd(html: string): string[] {
   ).filter(Boolean);
 }
 
+const ENTITIES: Record<string, string> = {
+  amp: "&",
+  lt: "<",
+  gt: ">",
+  quot: '"',
+  "#39": "'",
+  "#x27": "'",
+  nbsp: " ",
+};
+
+// Une seule passe : « &amp;lt; » redevient « &lt; » (texte littéral), jamais
+// « < » — décoder &amp; avant les autres entités les décoderait deux fois.
 function decodeEntities(text: string): string {
-  return text
-    .replace(/&amp;/g, "&")
-    .replace(/&lt;/g, "<")
-    .replace(/&gt;/g, ">")
-    .replace(/&quot;/g, '"')
-    .replace(/&#x27;|&#39;/g, "'")
-    .replace(/&nbsp;/g, " ");
+  return text.replace(
+    /&(amp|lt|gt|quot|#39|#x27|nbsp);/g,
+    (_m, name: string) => ENTITIES[name],
+  );
+}
+
+// Remplacement répété jusqu'à stabilité : une balise glissée dans une autre
+// (« <scr<b></b>ipt> ») ne se reforme pas après une seule passe.
+function replaceUntilStable(text: string, pattern: RegExp, by = ""): string {
+  let previous: string;
+  let result = text;
+  do {
+    previous = result;
+    result = result.replace(pattern, by);
+  } while (result !== previous);
+  return result;
+}
+
+// Texte brut d'un fragment HTML : balises retirées jusqu'à stabilité, puis
+// chevrons orphelins (balises mal formées) supprimés.
+function stripTags(fragment: string): string {
+  return replaceUntilStable(fragment, /<[^<>]*>/g).replace(/[<>]/g, "");
 }
 
 // Repli sans Workers AI (dev local, incident) : conversion rudimentaire du
@@ -75,24 +102,26 @@ export function fallbackHtmlToMarkdown(html: string, origin: string): string {
   const main = html.match(/<main[^>]*>([\s\S]*?)<\/main>/i)?.[1] ?? html;
   const absolute = (href: string) =>
     href.startsWith("/") ? `${origin}${href}` : href;
+  const structured = replaceUntilStable(
+    main,
+    /<(script|style|svg|noscript|template)\b[\s\S]*?<\/\1\s*>/gi,
+  )
+    .replace(
+      /<h([1-6])[^>]*>([\s\S]*?)<\/h\1>/gi,
+      (_m, level, inner: string) =>
+        `\n\n${"#".repeat(Number(level))} ${stripTags(inner).trim()}\n\n`,
+    )
+    .replace(
+      /<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi,
+      (_m, href: string, inner: string) => {
+        const text = stripTags(inner).trim();
+        return text ? `[${text}](${absolute(href)})` : "";
+      },
+    )
+    .replace(/<li[^>]*>/gi, "\n- ")
+    .replace(/<(br|\/p|\/div|\/section|\/article|\/ul|\/ol)[^>]*>/gi, "\n");
   return decodeEntities(
-    main
-      .replace(/<(script|style|svg|noscript|template)[\s\S]*?<\/\1>/gi, "")
-      .replace(
-        /<h([1-6])[^>]*>([\s\S]*?)<\/h\1>/gi,
-        (_m, level, inner) =>
-          `\n\n${"#".repeat(Number(level))} ${inner.replace(/<[^>]+>/g, "").trim()}\n\n`,
-      )
-      .replace(
-        /<a[^>]+href="([^"]+)"[^>]*>([\s\S]*?)<\/a>/gi,
-        (_m, href, inner) => {
-          const text = inner.replace(/<[^>]+>/g, "").trim();
-          return text ? `[${text}](${absolute(href)})` : "";
-        },
-      )
-      .replace(/<li[^>]*>/gi, "\n- ")
-      .replace(/<(br|\/p|\/div|\/section|\/article|\/ul|\/ol)[^>]*>/gi, "\n")
-      .replace(/<[^>]+>/g, "")
+    stripTags(structured)
       .replace(/[ \t]+/g, " ")
       .replace(/\n\s*\n\s*\n+/g, "\n\n")
       .trim(),

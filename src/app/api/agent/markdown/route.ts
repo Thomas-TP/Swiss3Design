@@ -36,8 +36,19 @@ export async function GET(request: Request) {
     return new Response("Not found", { status: 404 });
 
   const { env, ctx } = await getCloudflareContext({ async: true });
-  const pageUrl = new URL(target, url.origin);
-  const cacheKey = new Request(`${url.origin}/__markdown${target}`);
+  // Origine issue de la configuration, jamais de la requête ; la page n'est
+  // rendue que par le binding du Worker sur lui-même (aucune sortie vers
+  // Internet). Le chemin est revalidé une fois résolu.
+  const origin = new URL(env.BETTER_AUTH_URL).origin;
+  const pageUrl = new URL(target, origin);
+  if (pageUrl.origin !== origin || !isMarkdownPath(pageUrl.pathname))
+    return new Response("Not found", { status: 404 });
+  if (!env.WORKER_SELF_REFERENCE)
+    return new Response(
+      "Markdown negotiation needs the Worker runtime (bun run preview).",
+      { status: 503 },
+    );
+  const cacheKey = new Request(`${origin}/__markdown${target}`);
   const cache =
     typeof caches !== "undefined" && "default" in caches
       ? (caches as unknown as { default: Cache }).default
@@ -45,13 +56,7 @@ export async function GET(request: Request) {
   const cached = await cache?.match(cacheKey);
   if (cached) return cached;
 
-  // En prod, rendu via le binding sur soi-même (pas d'aller-retour Internet) ;
-  // en dev, simple fetch vers le serveur local.
-  const fetcher =
-    process.env.NODE_ENV === "production" && env.WORKER_SELF_REFERENCE
-      ? env.WORKER_SELF_REFERENCE
-      : { fetch: (input: URL, init?: RequestInit) => fetch(input, init) };
-  const page = await fetcher.fetch(pageUrl, {
+  const page = await env.WORKER_SELF_REFERENCE.fetch(pageUrl, {
     headers: {
       accept: "text/html",
       "user-agent": "Swiss3Design-Markdown/1.0",
@@ -67,7 +72,7 @@ export async function GET(request: Request) {
         { name: "page.html", blob: new Blob([html], { type: "text/html" }) },
         {
           conversionOptions: {
-            html: { cssSelector: "main", hostname: url.hostname },
+            html: { cssSelector: "main", hostname: pageUrl.hostname },
           },
         },
       )) as ToMarkdownResult | ToMarkdownResult[];
@@ -78,7 +83,7 @@ export async function GET(request: Request) {
           // on garde le nôtre, plus complet.
           .replace(/^---\n[\s\S]*?\n---\n+/, "")
           // Liens relatifs → absolus : un agent lit ce texte hors du site.
-          .replace(/\]\(\//g, `](${url.origin}/`)
+          .replace(/\]\(\//g, `](${origin}/`)
           .trim();
         tokens = Number(result.tokens) || null;
       }
@@ -86,7 +91,7 @@ export async function GET(request: Request) {
       console.error("[markdown] toMarkdown", error);
     }
   }
-  body ??= fallbackHtmlToMarkdown(html, url.origin);
+  body ??= fallbackHtmlToMarkdown(html, origin);
 
   const jsonLd = extractJsonLd(html);
   const markdown =
