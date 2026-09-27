@@ -271,6 +271,22 @@ export async function completeUcp(request: Request, id: string) {
         token,
       );
       const fresh = (await loadSession(db, "ucp", id)) ?? session;
+      // 5xx : jamais mis en cache d'idempotence, l'agent peut rejouer tel quel.
+      if (result.status === "retry")
+        return {
+          status: 503,
+          body: ucpError(
+            "payment_outcome_unknown",
+            result.message,
+            "$.payment.instruments",
+            "recoverable",
+          ),
+        };
+      if (result.status === "failed" && result.code === "unavailable")
+        return {
+          status: 503,
+          body: ucpError("payments_unavailable", result.message),
+        };
       if (result.status === "failed")
         return {
           status: 200,

@@ -424,6 +424,25 @@ export async function completeAcp(request: Request, id: string) {
         token,
       );
       const fresh = (await loadSession(db, "acp", id)) ?? session;
+      // 5xx : jamais mis en cache d'idempotence, l'agent peut rejouer tel quel.
+      if (result.status === "retry")
+        return {
+          status: 503,
+          body: acpError(
+            "service_unavailable",
+            "payment_outcome_unknown",
+            result.message,
+          ),
+        };
+      if (result.status === "failed" && result.code === "unavailable")
+        return {
+          status: 503,
+          body: acpError(
+            "service_unavailable",
+            "payments_unavailable",
+            result.message,
+          ),
+        };
       if (result.status === "failed") {
         const body = await view(fresh, db);
         return {

@@ -5,6 +5,7 @@ import {
   CheckoutError,
   normalizeEmail,
   resolveLine,
+  sptFailure,
   swissAddress,
 } from "./checkout-core";
 import {
@@ -240,6 +241,42 @@ describe("cœur du checkout des agents", () => {
     ).toThrow(/4 digits/);
     expect(normalizeEmail(" Client@Example.CH ")).toBe("client@example.ch");
     expect(() => normalizeEmail("pas-un-email")).toThrow(/valid email/);
+  });
+
+  it("ne libère le stock que sur un refus certain de Stripe", () => {
+    expect(
+      sptFailure({
+        type: "StripeCardError",
+        message: "Your card was declined.",
+      }),
+    ).toEqual({
+      status: "failed",
+      code: "payment_declined",
+      message: "Your card was declined.",
+    });
+    expect(
+      sptFailure({
+        type: "StripeInvalidRequestError",
+        message: "No such token",
+      }),
+    ).toMatchObject({ status: "failed", code: "payment_declined" });
+    // Clé invalide : jamais recopiée dans la réponse à l'agent.
+    const config = sptFailure({
+      type: "StripeAuthenticationError",
+      message: "Invalid API Key provided: sk_test_****",
+    });
+    expect(config).toMatchObject({ status: "failed", code: "unavailable" });
+    expect(JSON.stringify(config)).not.toContain("sk_");
+    // Réseau, 5xx, limite de débit, idempotence : Stripe a peut-être débité.
+    for (const type of [
+      "StripeConnectionError",
+      "StripeAPIError",
+      "StripeRateLimitError",
+      "StripeIdempotencyError",
+    ])
+      expect(sptFailure({ type }).status).toBe("unknown");
+    expect(sptFailure(new Error("fetch failed")).status).toBe("unknown");
+    expect(sptFailure(null).status).toBe("unknown");
   });
 });
 

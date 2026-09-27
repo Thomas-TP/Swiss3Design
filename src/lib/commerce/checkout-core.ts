@@ -413,9 +413,50 @@ export type SptPayment =
   | { status: "paid" | "processing"; paymentIntentId: string }
   | {
       status: "failed";
-      code: "payment_declined" | "requires_action";
+      code: "payment_declined" | "requires_action" | "unavailable";
       message: string;
-    };
+    }
+  // Issue inconnue (réseau, 5xx) : la commande reste réservée, à rejouer.
+  | { status: "unknown"; message: string };
+
+// Classe une erreur levée par la création du PaymentIntent. Seules ces
+// erreurs Stripe garantissent qu'aucun débit n'a eu lieu ; tout le reste
+// (réseau coupé, 5xx, limite de débit, idempotence…) laisse l'issue ouverte.
+export function sptFailure(
+  error: unknown,
+): Exclude<SptPayment, { status: "paid" | "processing" }> {
+  const failure = error as { type?: string; message?: string } | null;
+  switch (failure?.type) {
+    case "StripeCardError":
+      // Message Stripe prévu pour l'acheteur (« Your card was declined. »).
+      return {
+        status: "failed",
+        code: "payment_declined",
+        message: failure.message || "The card was declined",
+      };
+    case "StripeInvalidRequestError":
+      return {
+        status: "failed",
+        code: "payment_declined",
+        message:
+          "The Shared Payment Token was refused (expired, already used, or not valid for this seller or amount)",
+      };
+    case "StripeAuthenticationError":
+    case "StripePermissionError":
+      // Problème de configuration de notre côté : jamais détaillé à l'agent.
+      return {
+        status: "failed",
+        code: "unavailable",
+        message: "Payments are temporarily unavailable",
+      };
+    default:
+      return {
+        status: "unknown",
+        message:
+          "The payment outcome is not known yet; retry the same request in a few seconds",
+      };
+  }
+}
 
 // Paiement par Shared Payment Token (émis pour notre profil Stripe par le
 // portefeuille de l'agent, ex. Link). Succès → markOrderPaid (e-mails, statut)
@@ -450,13 +491,25 @@ export async function payOrderWithSpt(
       { apiVersion: SPT_API_VERSION, idempotencyKey },
     );
   } catch (error) {
+    const outcome = sptFailure(error);
+    if (outcome.status === "unknown") {
+      // Stripe a peut-être débité : pas de libération ici. L'agent rejoue la
+      // même requête (même clé d'idempotence → même issue chez Stripe), sinon
+      // la maintenance tranche en retrouvant le PaymentIntent par
+      // metadata.orderId.
+      console.error("[spt] issue du paiement inconnue", order.id, error);
+      return outcome;
+    }
+    if (outcome.code === "unavailable")
+      console.error("[spt] configuration Stripe", error);
+    // Refus certain : rien n'a été débité, la réservation est libérée (et le
+    // PaymentIntent refusé, s'il existe, annulé).
+    const refused = (error as { payment_intent?: { id?: string } })
+      .payment_intent?.id;
+    if (refused)
+      await stripe.paymentIntents.cancel(refused).catch(() => undefined);
     await db.transaction((tx) => releaseOrderStock(tx, order.id));
-    return {
-      status: "failed",
-      code: "payment_declined",
-      message:
-        error instanceof Error ? error.message : "The payment was declined",
-    };
+    return outcome;
   }
   if (intent.status === "succeeded") {
     await markOrderPaid(db, order.id, {

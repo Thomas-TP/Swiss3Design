@@ -312,9 +312,11 @@ export type CompletionResult =
   | { status: "completed" | "processing"; order: Order }
   | {
       status: "failed";
-      code: "payment_declined" | "requires_action";
+      code: "payment_declined" | "requires_action" | "unavailable";
       message: string;
-    };
+    }
+  // Issue du paiement inconnue : session laissée ouverte, à rejouer.
+  | { status: "retry"; message: string };
 
 // Paiement de la session : commande en attente (stock réservé) puis débit du
 // jeton. Une tentative par jeton, idempotente (même jeton rejoué → même
@@ -364,6 +366,8 @@ export async function completeSession(
   const payment = await payOrderWithSpt(db, stripe, order, spt, attemptKey);
   if (payment.status === "failed")
     return { status: "failed", code: payment.code, message: payment.message };
+  if (payment.status === "unknown")
+    return { status: "retry", message: payment.message };
   const [fresh] = await db
     .select()
     .from(orders)

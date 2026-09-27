@@ -240,7 +240,12 @@ const severityOf = (code: string) =>
     ? "requires_buyer_input"
     : "recoverable";
 
-export function ucpError(code: string, content: string, path?: string) {
+export function ucpError(
+  code: string,
+  content: string,
+  path?: string,
+  severity: "recoverable" | "unrecoverable" = "unrecoverable",
+) {
   return {
     ucp: { version: UCP_VERSION, status: "error" },
     messages: [
@@ -248,7 +253,7 @@ export function ucpError(code: string, content: string, path?: string) {
         type: "error",
         code,
         content,
-        severity: "unrecoverable",
+        severity,
         ...(path ? { path } : {}),
       },
     ],

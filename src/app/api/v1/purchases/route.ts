@@ -217,7 +217,8 @@ export async function POST(request: Request) {
     throw error;
   }
 
-  const realm = new URL(env.BETTER_AUTH_URL).host;
+  // Nom d'hôte sans port : c'est ce que les clients MPP comparent au serveur.
+  const realm = new URL(env.BETTER_AUTH_URL).hostname;
   const secret = await challengeSecret(env.STRIPE_SECRET_KEY);
   const externalId = await orderFingerprint({ quote, address, email });
   const description = `Swiss3Design — ${quote.lines.reduce((n, l) => n + l.quantity, 0)} item(s), shipping to Switzerland`;
@@ -335,6 +336,18 @@ export async function POST(request: Request) {
 
   const stripe = getStripe(env.STRIPE_SECRET_KEY);
   const payment = await payOrderWithSpt(db, stripe, order, spt, attemptKey);
+  // Même requête rejouée → même commande et même clé d'idempotence Stripe.
+  if (payment.status === "unknown")
+    return json(
+      { error: { code: "payment_outcome_unknown", message: payment.message } },
+      503,
+      { "Retry-After": "5" },
+    );
+  if (payment.status === "failed" && payment.code === "unavailable")
+    return json(
+      { error: { code: "payments_unavailable", message: payment.message } },
+      503,
+    );
   if (payment.status === "failed")
     return challengeResponse(
       payment.code === "requires_action"
