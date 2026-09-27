@@ -140,6 +140,14 @@ bun run db:seed:local        # seed local D1 from scripts/seed.sql
   and the admin e-mail — refund from the Stripe dashboard if needed.
 - **Pause selling:** disable the agent in the dashboard (Agentic commerce →
   Agents), or set `STRIPE_CATALOG_SYNC` to `off` and upload an empty catalogue.
+- **Our own agent APIs (MPP, ACP, UCP):** need the public var
+  `STRIPE_PROFILE_ID` (Stripe profile network ID: `profile_…` live,
+  `profile_test_…` preview); without it the discovery documents answer 404.
+  Test MPP end to end in test mode with a Stripe test key in the Stripe CLI:
+  `npx mppx@latest validate https://swiss3design-preview.thomastp.workers.dev/api/v1/purchases`,
+  or with the Link CLI: `npx @stripe/link-cli mpp pay <url> -X POST -d '{…}' --test`.
+  A pending agent order is reconciled by the maintenance job with Stripe
+  (PaymentIntent found by `metadata.orderId`) before its stock is released.
 
 ## Files (R2) & maintenance
 

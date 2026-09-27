@@ -203,6 +203,8 @@ describe("documents de découverte", () => {
       "https://swiss3design.ch/api/v1",
       "https://swiss3design.ch/mcp",
       "https://swiss3design.ch/a2a",
+      "https://swiss3design.ch/api/acp",
+      "https://swiss3design.ch/api/ucp",
       "https://swiss3design.ch/mcp/account",
     ]);
     const ard = aiCatalog();
@@ -216,6 +218,15 @@ describe("documents de découverte", () => {
     );
     const openapi = openApiDocument();
     expect(Object.keys(openapi.paths)).toContain("/products/{slug}");
+    // Découverte MPP : opération payante déclarée, avec sa réponse 402.
+    const purchase = openapi.paths["/purchases"].post;
+    expect(purchase["x-payment-info"]).toMatchObject({
+      intent: "charge",
+      method: "stripe",
+      currency: "chf",
+    });
+    expect("amount" in purchase["x-payment-info"]).toBe(true);
+    expect(Object.keys(purchase.responses)).toContain("402");
     expect(
       openapi.paths["/products"].get.parameters.map((p) => p.name),
     ).toContain("max_price_chf");

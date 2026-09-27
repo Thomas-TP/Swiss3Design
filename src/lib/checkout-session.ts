@@ -153,6 +153,32 @@ export async function reconcilePendingOrders(db: Db) {
     .limit(30);
   for (const order of pending) {
     try {
+      // Commande d'agent (MPP/ACP/UCP) : pas de Checkout Session, un
+      // PaymentIntent confirmé avec un jeton. Stripe fait foi : payé →
+      // commande finalisée, échec → stock libéré, en cours → on attend.
+      if (order.channel !== "web") {
+        const intent = order.stripePaymentIntentId
+          ? await stripe.paymentIntents.retrieve(order.stripePaymentIntentId)
+          : (
+              await stripe.paymentIntents.search({
+                query: `metadata['orderId']:'${order.id}'`,
+                limit: 1,
+              })
+            ).data[0];
+        if (intent?.status === "succeeded")
+          await markOrderPaid(db, order.id, {
+            id: intent.id,
+            amount: intent.amount_received || intent.amount,
+            currency: intent.currency,
+          });
+        else if (
+          !intent ||
+          intent.status === "canceled" ||
+          intent.status === "requires_payment_method"
+        )
+          await db.transaction((tx) => releaseOrderStock(tx, order.id));
+        continue;
+      }
       let sessionId = order.checkoutSessionId;
       if (!sessionId) {
         // Attendre l'expiration ferme avant de conclure à l'absence de session.

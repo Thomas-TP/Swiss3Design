@@ -283,6 +283,45 @@ export const orderItems = pgTable(
   ],
 );
 
+// Sessions de checkout ouvertes par un agent IA via nos API ACP ou UCP : le
+// panier, l'acheteur et l'adresse vivent ici (JSON) jusqu'au paiement, qui
+// crée une vraie commande (`orderId`). Purgées une semaine après expiration.
+export const agentCheckoutSessions = pgTable(
+  "agent_checkout_sessions",
+  {
+    id: text("id").primaryKey(),
+    protocol: text("protocol", { enum: ["acp", "ucp"] }).notNull(),
+    status: text("status", {
+      enum: ["open", "completed", "canceled"],
+    })
+      .notNull()
+      .default("open"),
+    state: jsonb("state").notNull(),
+    orderId: text("order_id").references(() => orders.id, {
+      onDelete: "set null",
+    }),
+    agent: text("agent"),
+    customerId: text("customer_id"),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    createdAt: createdAt(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    index("agent_checkout_sessions_expiry_idx").on(t.expiresAt),
+    check(
+      "agent_checkout_sessions_status_valid",
+      sql`${t.status} IN ('open','completed','canceled')`,
+    ),
+    check(
+      "agent_checkout_sessions_protocol_valid",
+      sql`${t.protocol} IN ('acp','ucp')`,
+    ),
+  ],
+);
+
 // ── Avis produits ────────────────────────────────────────────────────────────
 
 export const reviews = pgTable(

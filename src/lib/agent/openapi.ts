@@ -81,17 +81,80 @@ const errors = {
   },
 };
 
+// Achat direct par un agent (MPP) : corps de la commande, identique entre le
+// premier appel (devis + défi 402) et l'appel payé.
+const purchaseBody = {
+  type: "object",
+  required: ["items", "email", "shipping_address"],
+  properties: {
+    items: {
+      type: "array",
+      minItems: 1,
+      maxItems: 20,
+      items: {
+        type: "object",
+        properties: {
+          sku: {
+            type: "string",
+            description:
+              "SKU from the Stripe catalogue feed, e.g. vase-spirale--noir (alternative to slug/variant/color)",
+          },
+          slug: { type: "string", description: "Product slug" },
+          variant: {
+            type: "string",
+            description: "Variant name, required when the product has variants",
+          },
+          color: {
+            type: "string",
+            description:
+              "Colour name, required when the product offers colours",
+          },
+          quantity: { type: "integer", minimum: 1, maximum: 99, default: 1 },
+        },
+      },
+    },
+    email: {
+      type: "string",
+      format: "email",
+      description: "Buyer email: order confirmation and tracking",
+    },
+    shipping_address: {
+      type: "object",
+      required: ["name", "line1", "postal_code", "city"],
+      properties: {
+        name: { type: "string" },
+        line1: { type: "string" },
+        line2: { type: "string" },
+        postal_code: { type: "string", pattern: "^\\d{4}$" },
+        city: { type: "string" },
+        canton: { type: "string", examples: ["VD"] },
+        country: { type: "string", const: "CH" },
+      },
+    },
+    language: { type: "string", enum: ["fr", "de", "it", "en"] },
+  },
+};
+
 export function openApiDocument() {
   return {
     openapi: "3.1.0",
     info: {
       title: "Swiss3Design Store API",
       version: AGENT_SURFACE_VERSION,
-      summary: "Public, read-only API of the Swiss3Design online store.",
+      summary: "Public API of the Swiss3Design online store.",
       description:
-        "Catalogue, store policies, order tracking and cart links of Swiss3Design, a Swiss store of multicolour 3D-printed design objects (prices in CHF, shipping within Switzerland only). No API key needed. The same tools are available over MCP (https://swiss3design.ch/mcp) and A2A (https://swiss3design.ch/a2a).",
+        "Catalogue, store policies, order tracking, cart links and direct purchases (Machine Payments Protocol, card via a Stripe Shared Payment Token) of Swiss3Design, a Swiss store of multicolour 3D-printed design objects (prices in CHF, shipping within Switzerland only). No API key needed. The same tools are available over MCP (https://swiss3design.ch/mcp) and A2A (https://swiss3design.ch/a2a); checkout is also available over ACP (/.well-known/acp.json) and UCP (/.well-known/ucp).",
       contact: { name: STORE.name, email: STORE.email, url: STORE.url },
       termsOfService: `${STORE.url}/en/legal/terms`,
+    },
+    // Découverte des paiements machine (draft-payment-discovery, mpp.dev).
+    "x-service-info": {
+      categories: ["shopping", "ecommerce", "physical-goods"],
+      docs: {
+        homepage: STORE.url,
+        apiReference: abs(PATHS.openapi),
+        llms: abs(PATHS.llms),
+      },
     },
     externalDocs: {
       description: "Guide for AI agents and developers",
@@ -103,6 +166,7 @@ export function openApiDocument() {
       { name: "store" },
       { name: "orders" },
       { name: "cart" },
+      { name: "purchases" },
     ],
     paths: {
       "/products": {
@@ -239,6 +303,55 @@ export function openApiDocument() {
             },
             "400": errors["400"],
             "404": errors["404"],
+          },
+        },
+      },
+      "/purchases": {
+        post: {
+          operationId: "createPurchase",
+          tags: ["purchases"],
+          summary:
+            "Buy products and pay by machine payment (MPP, card via Stripe Shared Payment Token)",
+          description:
+            "Send the order without payment: the answer is 402 with the quote and a WWW-Authenticate: Payment challenge (method=stripe, intent=charge, amount in centimes CHF). Obtain a Shared Payment Token for the challenge's networkId (e.g. `link-cli mpp pay`) and retry the same request with the Authorization: Payment credential. On success: 201, the order and a Payment-Receipt header. Shipping within Switzerland only.",
+          requestBody: { required: true, content: json(purchaseBody) },
+          // Montant variable (panier) : null, le défi 402 fait foi.
+          "x-payment-info": {
+            intent: "charge",
+            method: "stripe",
+            amount: null,
+            currency: "chf",
+            description:
+              "Order total in CHF centimes (items + Swiss Post shipping), stated in the 402 challenge",
+          },
+          responses: {
+            "201": {
+              description: "Order paid and created (Payment-Receipt header)",
+              content: json({ type: "object" }),
+            },
+            "202": {
+              description:
+                "Payment processing; the order is confirmed by email",
+              content: json({ type: "object" }),
+            },
+            "402": {
+              description:
+                "Payment required: quote and WWW-Authenticate: Payment challenge",
+              content: {
+                "application/problem+json": { schema: { type: "object" } },
+              },
+            },
+            "400": errors["400"],
+            "404": errors["404"],
+            "409": {
+              description: "Out of stock or conflicting retry",
+              content: json({ $ref: "#/components/schemas/Error" }),
+            },
+            "422": {
+              description: "Shipping outside Switzerland",
+              content: json({ $ref: "#/components/schemas/Error" }),
+            },
+            "429": errors["429"],
           },
         },
       },

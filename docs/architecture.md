@@ -242,6 +242,42 @@ checkout inside the agent and captures the payment. Our side
 - Tax: Stripe Tax without any registration (not subject to VAT, art. 10 LTVA)
   → no tax, no Stripe Tax fee; the feed still carries `txcd_99999999`.
 
+### Agentic commerce on our own APIs (MPP, ACP, UCP)
+
+Agents can also buy directly from us, paying with a Stripe **Shared Payment
+Token** (SPT, issued to our Stripe profile `STRIPE_PROFILE_ID`, e.g. by the Link
+agent wallet). Unlike Stripe ACS, the money is taken only after the stock is
+reserved ([`checkout-core.ts`](../src/lib/commerce/checkout-core.ts)): resolve
+items (SKU, or slug + variant + colour) → quote (site price, flat Swiss Post
+rate, free over the threshold) → Swiss address → `createPendingAgentOrder()`
+(pending, stock reserved 30 min, idempotent on an attempt key per token) →
+`payOrderWithSpt()` (PaymentIntent confirmed with
+`shared_payment_granted_token`, preview API version) → `markOrderPaid()`, the
+same finalization as the web checkout. A crashed Worker is covered twice: the
+`payment_intent.succeeded` webhook (metadata `orderId`) and the maintenance
+reconciliation, which asks Stripe about pending agent orders before releasing
+their stock.
+
+- **MPP** — `POST /api/v1/purchases` ([`mpp.ts`](../src/lib/commerce/mpp.ts)):
+  HTTP `Payment` auth scheme, method `stripe`, intent `charge`. Without payment:
+  `402`, quote and `WWW-Authenticate: Payment` challenge whose id is an
+  HMAC-SHA256 of all fields (key derived from `STRIPE_SECRET_KEY`: stateless);
+  the challenge's `externalId` is a fingerprint of the order (items, address,
+  email, total). With `Authorization: Payment …` carrying the SPT: order,
+  `Payment-Receipt`. Discovery: `x-payment-info` on the operation in
+  `/openapi.json`.
+- **ACP 2026-04-17** — `/api/acp/checkout_sessions` (create, get, update,
+  complete, cancel) + `/.well-known/acp.json`; handler `dev.acp.tokenized.card`
+  (PSP Stripe); `Idempotency-Key` required on POSTs, responses replayed from KV
+  for 24 h.
+- **UCP 2026-08-25** — `/api/ucp/checkout-sessions` (PUT to update) +
+  `/.well-known/ucp` (service `dev.ucp.shopping` REST, checkout + fulfillment,
+  keys = the Web Bot Auth Ed25519 key); payment handler
+  `ch.swiss3design.stripe_spt`, specified at `/agents/ucp-stripe-spt.md`.
+- Sessions ACP/UCP live in `agent_checkout_sessions` (migration `0008`),
+  recomputed at each call, purged 7 days after expiry. Discovery documents are
+  served only when `STRIPE_PROFILE_ID` is set.
+
 ### Files (R2)
 
 Uploads (`/api/quote-upload`, `/api/admin/upload`) and downloads

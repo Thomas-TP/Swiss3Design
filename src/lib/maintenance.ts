@@ -21,6 +21,7 @@ import {
   syncStripeCatalog,
   type CatalogSyncReport,
 } from "./commerce/stripe-catalog";
+import { purgeAgentSessions } from "./commerce/agent-checkout";
 
 // Rétention (politique de confidentialité) : fichiers/devis supprimés au plus
 // tard 2 ans après la dernière activité des devis clos ou sans suite. Les fichiers
@@ -49,6 +50,7 @@ export interface MaintenanceReport {
   cartRemindersSent: number;
   abandonedCartsPurged: number;
   oauthClientsPurged: number;
+  agentSessionsPurged: number;
   stripeCatalog: CatalogSyncReport;
 }
 
@@ -296,6 +298,9 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
   //    complet une fois par jour (n'échoue jamais : erreur rapportée).
   const stripeCatalog = await syncStripeCatalog(db);
 
+  // 7) Sessions de checkout ACP/UCP closes ou expirées depuis 7 jours.
+  const agentSessionsPurged = await purgeAgentSessions(db);
+
   return {
     retentionFilesDeleted,
     quotesDeleted: rowsToDelete.length,
@@ -303,6 +308,7 @@ export async function runMaintenance(): Promise<MaintenanceReport> {
     cartRemindersSent,
     abandonedCartsPurged: purgedCarts.length,
     oauthClientsPurged,
+    agentSessionsPurged,
     stripeCatalog,
   };
 }

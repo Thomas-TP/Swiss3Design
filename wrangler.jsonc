@@ -97,6 +97,9 @@
     // Flux catalogue Stripe (commerce agentique) : « on » = envoi du catalogue
     // par le cron et après chaque modification, cf. lib/commerce/stripe-catalog.ts.
     "STRIPE_CATALOG_SYNC": "on",
+    // Profil Stripe public (network ID) : destinataire des Shared Payment
+    // Tokens des agents (MPP, ACP, UCP). Identifiant public, pas un secret.
+    "STRIPE_PROFILE_ID": "profile_61UqmZLiCO28hVCTtA6UqmZKB6AF9YCGnK4MMn9QW0s4",
   },
   // Environnement de preview : Worker séparé (swiss3design-preview), bindings
   // isolés (D1/R2/KV propres, vides — aucune donnée client), sans route sur le
@@ -168,6 +171,8 @@
         "STRIPE_PUBLISHABLE_KEY": "pk_test_51TgkbnK4o7ey3lG5CAqK0NBqFazy43LthNOQ0IKgmiTwv6ni7Cd4yiuaM6M0gb5XHF3HI4PAlYCFlqFr9BNIMND000iDY9eEiF",
         // Catalogue de démo envoyé au mode test Stripe (essais du commerce agentique).
         "STRIPE_CATALOG_SYNC": "on",
+        // Profil Stripe du mode test (jetons de paiement de test des agents).
+        "STRIPE_PROFILE_ID": "profile_test_61VTe0mpmo7BhAa1OA6VTe0lB6AFjJzgkHa95rLCqHtQ",
       },
     },
   },
