@@ -66,6 +66,10 @@
       "service": "swiss3design",
     },
   ],
+  // Workers AI : conversion HTML → Markdown (env.AI.toMarkdown) des pages
+  // demandées avec « Accept: text/markdown » par les agents. La conversion de
+  // HTML n'utilise aucun modèle. Binding non hérité : redéclaré en preview.
+  "ai": { "binding": "AI" },
   "observability": {
     "redact_query_string": true,
     "enabled": true,
@@ -142,6 +146,7 @@
           "service": "swiss3design-preview",
         },
       ],
+      "ai": { "binding": "AI" },
       "observability": {
         "redact_query_string": true,
         "enabled": true,

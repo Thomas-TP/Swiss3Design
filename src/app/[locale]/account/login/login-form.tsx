@@ -11,6 +11,26 @@ const field =
 const btnGhost =
   "flex w-full items-center justify-center gap-2 rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-ink disabled:opacity-60";
 
+// Connexion demandée par le serveur OAuth (un agent ou une application veut
+// accéder au compte) : l'URL porte la requête d'autorisation signée (?sig=…).
+// Les POST de connexion la transmettent (plugin client oauth-provider) et
+// better-auth répond { redirect, url } vers le consentement, que son client
+// suit lui-même — il ne faut alors surtout pas naviguer vers `next`.
+function isOAuthRedirect(data: unknown): boolean {
+  return Boolean((data as { redirect?: boolean } | null)?.redirect);
+}
+
+// Lien magique : la vérification a lieu dans un autre onglet, sans la requête
+// signée. On y renvoie donc vers /oauth2/authorize (paramètres d'origine,
+// signature retirée), qui reprend l'autorisation une fois connecté.
+function oauthResumeUrl(): string | null {
+  const params = new URLSearchParams(window.location.search);
+  if (!params.has("sig")) return null;
+  for (const key of ["sig", "exp", "ba_iat", "ba_param", "ba_pl"])
+    params.delete(key);
+  return `/api/auth/oauth2/authorize?${params.toString()}`;
+}
+
 export function LoginForm({
   next = "/account",
   strongReauthentication = false,
@@ -40,6 +60,12 @@ export function LoginForm({
     () => false,
   );
 
+  function signedIn(data: unknown) {
+    if (isOAuthRedirect(data)) return;
+    router.push(next);
+    router.refresh();
+  }
+
   // WebAuthn « conditional UI » : arme une demande de clé d'accès silencieuse
   // dès l'arrivée sur le formulaire. Le navigateur propose alors la clé
   // enregistrée directement dans la liste d'autocomplétion du champ e-mail
@@ -53,10 +79,7 @@ export function LoginForm({
       (available) => {
         if (!available || cancelled) return;
         signIn.passkey({ autoFill: true }).then((res) => {
-          if (!cancelled && res && !res.error) {
-            router.push(next);
-            router.refresh();
-          }
+          if (!cancelled && res && !res.error) signedIn(res.data);
         });
       },
     );
@@ -92,14 +115,13 @@ export function LoginForm({
       setPending(false);
       return;
     }
-    router.push(next);
-    router.refresh();
+    signedIn(res);
   }
 
   async function verify() {
     setPending(true);
     setError(null);
-    const { error: err } =
+    const { data: res, error: err } =
       stage === "backup"
         ? await twoFactor.verifyBackupCode({ code })
         : await twoFactor.verifyTotp({ code });
@@ -108,8 +130,7 @@ export function LoginForm({
       setError(t("twoFactor.error"));
       return;
     }
-    router.push(next);
-    router.refresh();
+    signedIn(res);
   }
 
   async function sendMagicLink() {
@@ -117,7 +138,7 @@ export function LoginForm({
     setError(null);
     const { error: err } = await signIn.magicLink({
       email: plEmail,
-      callbackURL: `/${locale}${next}`,
+      callbackURL: oauthResumeUrl() ?? `/${locale}${next}`,
     });
     setPending(false);
     if (err) {
@@ -130,7 +151,7 @@ export function LoginForm({
   async function onPasskeySignIn() {
     setPending(true);
     setError(null);
-    const { error: err } = await signIn.passkey();
+    const { data: res, error: err } = await signIn.passkey();
     setPending(false);
     if (err) {
       // Annulation par l'utilisateur (boîte de dialogue système) : silencieux
@@ -139,8 +160,7 @@ export function LoginForm({
       }
       return;
     }
-    router.push(next);
-    router.refresh();
+    signedIn(res);
   }
 
   async function sendOtp() {
@@ -174,8 +194,7 @@ export function LoginForm({
       setStage("totp");
       return;
     }
-    router.push(next);
-    router.refresh();
+    signedIn(res);
   }
 
   if (stage === "totp" || stage === "backup") {

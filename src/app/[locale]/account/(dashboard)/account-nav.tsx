@@ -10,6 +10,7 @@ import {
   Bell,
   ShieldCheck,
   Lock,
+  Bot,
   Wrench,
   type LucideIcon,
 } from "lucide-react";
@@ -25,6 +26,7 @@ const tabs: { href: string; key: string; icon: LucideIcon; exact?: boolean }[] =
     { href: "/account/addresses", key: "addresses", icon: MapPin },
     { href: "/account/payment", key: "payment", icon: CreditCard },
     { href: "/account/security", key: "security", icon: ShieldCheck },
+    { href: "/account/agents", key: "agents", icon: Bot },
     { href: "/account/notifications", key: "notifications", icon: Bell },
     { href: "/account/privacy", key: "privacy", icon: Lock },
   ];

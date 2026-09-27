@@ -11,6 +11,9 @@ import {
   quoteMessages,
   reviews,
   notificationPreferences,
+  oauthClient,
+  oauthConsent,
+  agentRegistrations,
 } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { isSessionFresh } from "@/lib/session-freshness";
@@ -85,42 +88,65 @@ export async function exportMyData(): Promise<
       .where(eq(passkey.userId, user.id)),
   ]);
 
-  const [items, messages, myReviews, preferences] = await Promise.all([
-    myOrders.length
-      ? db
-          .select()
-          .from(orderItems)
-          .where(
-            inArray(
-              orderItems.orderId,
-              myOrders.map((o) => o.id),
-            ),
-          )
-      : [],
-    myQuotes.length
-      ? db
-          .select({
-            quoteId: quoteMessages.quoteId,
-            sender: quoteMessages.sender,
-            body: quoteMessages.body,
-            priceCents: quoteMessages.priceCents,
-            fileName: quoteMessages.fileName,
-            createdAt: quoteMessages.createdAt,
-          })
-          .from(quoteMessages)
-          .where(
-            inArray(
-              quoteMessages.quoteId,
-              myQuotes.map((q) => q.id),
-            ),
-          )
-      : [],
-    db.select().from(reviews).where(eq(reviews.customerId, user.id)),
-    db
-      .select()
-      .from(notificationPreferences)
-      .where(eq(notificationPreferences.userId, user.id)),
-  ]);
+  const [items, messages, myReviews, preferences, apps, agents] =
+    await Promise.all([
+      myOrders.length
+        ? db
+            .select()
+            .from(orderItems)
+            .where(
+              inArray(
+                orderItems.orderId,
+                myOrders.map((o) => o.id),
+              ),
+            )
+        : [],
+      myQuotes.length
+        ? db
+            .select({
+              quoteId: quoteMessages.quoteId,
+              sender: quoteMessages.sender,
+              body: quoteMessages.body,
+              priceCents: quoteMessages.priceCents,
+              fileName: quoteMessages.fileName,
+              createdAt: quoteMessages.createdAt,
+            })
+            .from(quoteMessages)
+            .where(
+              inArray(
+                quoteMessages.quoteId,
+                myQuotes.map((q) => q.id),
+              ),
+            )
+        : [],
+      db.select().from(reviews).where(eq(reviews.customerId, user.id)),
+      db
+        .select()
+        .from(notificationPreferences)
+        .where(eq(notificationPreferences.userId, user.id)),
+      // Agents et applications autorisés (consentements OAuth, agents auth.md) :
+      // qui a accès au compte, à quoi, depuis quand — jamais de jeton.
+      db
+        .select({
+          application: oauthClient.name,
+          redirectUris: oauthClient.redirectUris,
+          scopes: oauthConsent.scopes,
+          authorizedAt: oauthConsent.createdAt,
+          updatedAt: oauthConsent.updatedAt,
+        })
+        .from(oauthConsent)
+        .innerJoin(oauthClient, eq(oauthClient.clientId, oauthConsent.clientId))
+        .where(eq(oauthConsent.userId, user.id)),
+      db
+        .select({
+          type: agentRegistrations.type,
+          status: agentRegistrations.status,
+          claimedAt: agentRegistrations.claimedAt,
+          revokedAt: agentRegistrations.revokedAt,
+        })
+        .from(agentRegistrations)
+        .where(eq(agentRegistrations.userId, user.id)),
+    ]);
   return {
     data: {
       exportedAt: new Date().toISOString(),
@@ -139,6 +165,8 @@ export async function exportMyData(): Promise<
       quotes: myQuotes,
       addresses: myAddresses,
       passkeys: myPasskeys,
+      authorizedApplications: apps,
+      authorizedAgents: agents,
     },
   };
 }

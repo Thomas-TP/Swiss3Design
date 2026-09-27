@@ -8,6 +8,7 @@ import {
   index,
   uniqueIndex,
   check,
+  jsonb,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 
@@ -620,4 +621,267 @@ export const requestLimits = pgTable(
     expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
   },
   (t) => [index("request_limits_expiry_idx").on(t.expiresAt)],
+);
+
+// ── Serveur OAuth 2.1 (plugins jwt + @better-auth/oauth-provider) ───────────
+// Généré par la CLI better-auth (`bunx auth@1.7.6 generate`) puis aligné sur
+// les conventions du fichier (timestamps avec fuseau). Sert aux agents et
+// applications (clients MCP, ChatGPT, Claude…) que le client autorise à lire
+// son compte : clients enregistrés, consentements, jetons. Les noms JS
+// (oauthClient, …) sont ceux des modèles better-auth — ne pas renommer.
+
+const tz = (name: string) => timestamp(name, { withTimezone: true });
+
+// Clés de signature des jetons JWT (plugin jwt) — clé privée chiffrée.
+export const jwks = pgTable("jwks", {
+  id: text("id").primaryKey(),
+  publicKey: text("public_key").notNull(),
+  privateKey: text("private_key").notNull(),
+  createdAt: tz("created_at").notNull(),
+  expiresAt: tz("expires_at"),
+  alg: text("alg"),
+  crv: text("crv"),
+});
+
+export const oauthClient = pgTable(
+  "oauth_client",
+  {
+    id: text("id").primaryKey(),
+    clientId: text("client_id").notNull().unique(),
+    clientSecret: text("client_secret"),
+    clientDiscoveryId: text("client_discovery_id"),
+    disabled: boolean("disabled").default(false),
+    skipConsent: boolean("skip_consent"),
+    enableEndSession: boolean("enable_end_session"),
+    subjectType: text("subject_type"),
+    scopes: text("scopes").array(),
+    clientCredentialsScopes: text("client_credentials_scopes")
+      .array()
+      .default([]),
+    userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+    createdAt: tz("created_at"),
+    updatedAt: tz("updated_at"),
+    name: text("name"),
+    uri: text("uri"),
+    icon: text("icon"),
+    contacts: text("contacts").array(),
+    tos: text("tos"),
+    policy: text("policy"),
+    softwareId: text("software_id"),
+    softwareVersion: text("software_version"),
+    softwareStatement: text("software_statement"),
+    redirectUris: text("redirect_uris").array().notNull(),
+    postLogoutRedirectUris: text("post_logout_redirect_uris").array(),
+    backchannelLogoutUri: text("backchannel_logout_uri"),
+    backchannelLogoutSessionRequired: boolean(
+      "backchannel_logout_session_required",
+    ),
+    tokenEndpointAuthMethod: text("token_endpoint_auth_method"),
+    applicationType: text("application_type"),
+    jwks: text("jwks"),
+    jwksUri: text("jwks_uri"),
+    grantTypes: text("grant_types").array(),
+    responseTypes: text("response_types").array(),
+    requirePKCE: boolean("require_pkce"),
+    dpopBoundAccessTokens: boolean("dpop_bound_access_tokens").default(false),
+    referenceId: text("reference_id"),
+    metadata: jsonb("metadata"),
+  },
+  (t) => [index("oauth_client_user_idx").on(t.userId)],
+);
+
+// Ressources protégées (RFC 8707) : ici le serveur MCP « compte client ».
+export const oauthResource = pgTable("oauth_resource", {
+  id: text("id").primaryKey(),
+  identifier: text("identifier").notNull().unique(),
+  name: text("name").notNull(),
+  accessTokenTtl: integer("access_token_ttl"),
+  refreshTokenTtl: integer("refresh_token_ttl"),
+  signingAlgorithm: text("signing_algorithm"),
+  signingKeyId: text("signing_key_id"),
+  allowedScopes: text("allowed_scopes").array(),
+  customClaims: jsonb("custom_claims"),
+  dpopBoundAccessTokensRequired: boolean(
+    "dpop_bound_access_tokens_required",
+  ).default(false),
+  disabled: boolean("disabled").default(false),
+  createdAt: tz("created_at"),
+  updatedAt: tz("updated_at"),
+  policyVersion: integer("policy_version").default(1),
+  metadata: jsonb("metadata"),
+});
+
+export const oauthClientResource = pgTable(
+  "oauth_client_resource",
+  {
+    id: text("id").primaryKey(),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => oauthClient.clientId, { onDelete: "cascade" }),
+    resourceId: text("resource_id")
+      .notNull()
+      .references(() => oauthResource.identifier, { onDelete: "cascade" }),
+    metadata: jsonb("metadata"),
+    createdAt: tz("created_at"),
+  },
+  (t) => [
+    uniqueIndex("oauth_client_resource_uidx").on(t.clientId, t.resourceId),
+    index("oauth_client_resource_client_idx").on(t.clientId),
+    index("oauth_client_resource_resource_idx").on(t.resourceId),
+  ],
+);
+
+export const oauthRefreshToken = pgTable(
+  "oauth_refresh_token",
+  {
+    id: text("id").primaryKey(),
+    token: text("token").notNull().unique(),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => oauthClient.clientId, { onDelete: "cascade" }),
+    sessionId: text("session_id").references(() => session.id, {
+      onDelete: "set null",
+    }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    referenceId: text("reference_id"),
+    authorizationCodeId: text("authorization_code_id"),
+    resources: text("resources").array(),
+    requestedUserInfoClaims: text("requested_user_info_claims").array(),
+    expiresAt: tz("expires_at").notNull(),
+    createdAt: tz("created_at").notNull(),
+    revoked: tz("revoked"),
+    rotatedAt: tz("rotated_at"),
+    rotationReplayResponse: text("rotation_replay_response"),
+    rotationReplayExpiresAt: tz("rotation_replay_expires_at"),
+    authTime: tz("auth_time"),
+    confirmation: jsonb("confirmation"),
+    scopes: text("scopes").array().notNull(),
+  },
+  (t) => [
+    index("oauth_refresh_token_client_idx").on(t.clientId),
+    index("oauth_refresh_token_session_idx").on(t.sessionId),
+    index("oauth_refresh_token_user_idx").on(t.userId),
+    index("oauth_refresh_token_code_idx").on(t.authorizationCodeId),
+  ],
+);
+
+export const oauthAccessToken = pgTable(
+  "oauth_access_token",
+  {
+    id: text("id").primaryKey(),
+    token: text("token").notNull().unique(),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => oauthClient.clientId, { onDelete: "cascade" }),
+    sessionId: text("session_id").references(() => session.id, {
+      onDelete: "set null",
+    }),
+    userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+    referenceId: text("reference_id"),
+    authorizationCodeId: text("authorization_code_id"),
+    resources: text("resources").array(),
+    requestedUserInfoClaims: text("requested_user_info_claims").array(),
+    refreshId: text("refresh_id").references(() => oauthRefreshToken.id, {
+      onDelete: "cascade",
+    }),
+    expiresAt: tz("expires_at").notNull(),
+    createdAt: tz("created_at").notNull(),
+    revoked: tz("revoked"),
+    confirmation: jsonb("confirmation"),
+    scopes: text("scopes").array().notNull(),
+  },
+  (t) => [
+    index("oauth_access_token_client_idx").on(t.clientId),
+    index("oauth_access_token_session_idx").on(t.sessionId),
+    index("oauth_access_token_user_idx").on(t.userId),
+    index("oauth_access_token_code_idx").on(t.authorizationCodeId),
+    index("oauth_access_token_refresh_idx").on(t.refreshId),
+  ],
+);
+
+export const oauthConsent = pgTable(
+  "oauth_consent",
+  {
+    id: text("id").primaryKey(),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => oauthClient.clientId, { onDelete: "cascade" }),
+    userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+    referenceId: text("reference_id"),
+    resources: text("resources").array(),
+    requestedUserInfoClaims: text("requested_user_info_claims").array(),
+    scopes: text("scopes").array().notNull(),
+    createdAt: tz("created_at").notNull(),
+    updatedAt: tz("updated_at").notNull(),
+  },
+  (t) => [
+    index("oauth_consent_client_idx").on(t.clientId),
+    index("oauth_consent_user_idx").on(t.userId),
+  ],
+);
+
+// Anti-rejeu des assertions private_key_jwt (identifiants déjà vus).
+export const oauthClientAssertion = pgTable("oauth_client_assertion", {
+  id: text("id").primaryKey(),
+  expiresAt: tz("expires_at").notNull(),
+});
+
+// ── Enregistrement d'agents « auth.md » (profil WorkOS v0.6) ────────────────
+// Un agent sans compte s'enregistre (anonyme, ou avec l'e-mail du client), puis
+// le client — connecté sur swiss3design.ch — confirme en saisissant le code à
+// 6 chiffres que l'agent lui a montré (cérémonie de revendication). Chaque
+// enregistrement possède son client OAuth public : les jetons sont émis par le
+// même serveur OAuth que pour les applications (src/lib/agent/agent-auth.ts).
+// Les secrets (jeton de revendication, jeton de tentative, code) ne sont
+// stockés que hachés (SHA-256).
+export const agentRegistrations = pgTable(
+  "agent_registrations",
+  {
+    id: text("id").primaryKey(),
+    type: text("type", { enum: ["anonymous", "service_auth"] }).notNull(),
+    clientId: text("client_id")
+      .notNull()
+      .references(() => oauthClient.clientId, { onDelete: "cascade" }),
+    status: text("status", { enum: ["unclaimed", "claimed", "revoked"] })
+      .notNull()
+      .default("unclaimed"),
+    // Renseigné à la revendication ; la suppression du compte supprime
+    // l'enregistrement, donc tous les jetons qui en dérivent.
+    userId: text("user_id").references(() => user.id, { onDelete: "cascade" }),
+    claimTokenHash: text("claim_token_hash").notNull().unique(),
+    // E-mail (minuscules) du seul compte autorisé à revendiquer.
+    claimEmail: text("claim_email"),
+    // Fenêtre extérieure de revendication (24 h).
+    claimExpiresAt: tz("claim_expires_at").notNull(),
+    // Tentative en cours : jeton du lien de vérification + code à 6 chiffres.
+    attemptTokenHash: text("attempt_token_hash").unique(),
+    userCodeHash: text("user_code_hash"),
+    attemptExpiresAt: tz("attempt_expires_at"),
+    attemptFailures: integer("attempt_failures").notNull().default(0),
+    deniedAt: tz("denied_at"),
+    claimedAt: tz("claimed_at"),
+    // Le jeton post-revendication n'est remis qu'une fois (sondage atomique).
+    redeemedAt: tz("redeemed_at"),
+    lastPolledAt: tz("last_polled_at"),
+    // Incrémentée à la revendication et à la révocation : les assertions et
+    // jetons d'accès d'une version antérieure sont refusés.
+    assertionVersion: integer("assertion_version").notNull().default(1),
+    revokedAt: tz("revoked_at"),
+    createdAt: createdAt(),
+    updatedAt: tz("updated_at").notNull().defaultNow(),
+  },
+  (t) => [
+    index("agent_registrations_user_idx").on(t.userId),
+    index("agent_registrations_expiry_idx").on(t.claimExpiresAt),
+    check(
+      "agent_registrations_type_valid",
+      sql`${t.type} IN ('anonymous','service_auth')`,
+    ),
+    check(
+      "agent_registrations_status_valid",
+      sql`${t.status} IN ('unclaimed','claimed','revoked')`,
+    ),
+  ],
 );

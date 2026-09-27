@@ -6,14 +6,19 @@ import {
   magicLink,
   emailOTP,
   haveIBeenPwned,
+  jwt,
+  type JwtOptions,
 } from "better-auth/plugins";
 import { passkey } from "@better-auth/passkey";
+import { oauthProvider } from "@better-auth/oauth-provider";
 import { and, eq, isNull } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import * as schema from "@/db/schema";
 import { sendEmail } from "./email";
 import { consumeRequestLimit } from "./rate-limit";
+import { agentAuthExtension, agentAuthPlugin } from "./agent/agent-auth";
+import { OAUTH_SCOPES, oauthIssuer } from "./agent/oauth";
 import {
   verificationEmail,
   resetPasswordEmail,
@@ -68,6 +73,19 @@ export async function getAuth() {
   // s'active automatiquement dès que RESEND_API_KEY est configurée.
   const canSendEmails = Boolean(env.RESEND_API_KEY);
 
+  // Serveur OAuth 2.1 des agents : émetteur = origine du site (preview : son
+  // URL *.workers.dev). RS256 : seul algorithme que tout client OpenID doit
+  // savoir vérifier (OIDC Core § 15.1).
+  const issuer = oauthIssuer(env.BETTER_AUTH_URL);
+  const jwtOptions: JwtOptions = {
+    // Pas de JWT de session dans /get-session : seuls les jetons OAuth
+    // (accès, identité, assertions d'agent) sont signés.
+    disableSettingJwtHeader: true,
+    jwt: { issuer },
+    jwks: { keyPairConfig: { alg: "RS256", modulusLength: 2048 } },
+  };
+  const agentAuth = { issuer, jwtOptions };
+
   return betterAuth({
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
@@ -80,6 +98,9 @@ export async function getAuth() {
     advanced: {
       ipAddress: { ipAddressHeaders: ["cf-connecting-ip"] },
     },
+    // GET /token (plugin jwt) signerait un JWT de session à la demande : inutile
+    // ici, et on ne veut aucun JWT signé hors des flux OAuth.
+    disabledPaths: ["/token"],
     database: drizzleAdapter(db, { provider: "pg" }),
     // Le stockage mémoire par défaut est local à un isolate. Ce compteur
     // Postgres ferme aussi les courses entre tentatives simultanées.
@@ -259,6 +280,28 @@ export async function getAuth() {
       // rpID dérivé automatiquement de baseURL (env.BETTER_AUTH_URL) : pas de
       // configuration manuelle, fonctionne tel quel en prod comme en preview.
       passkey(),
+      jwt(jwtOptions),
+      // Autorisation des agents et applications (clients MCP, assistants IA)
+      // à lire le compte du client : OAuth 2.1 + PKCE, enregistrement
+      // dynamique ouvert (RFC 7591, comme l'attend MCP), consentement explicite
+      // sur /[locale]/oauth/consent. Métadonnées : /.well-known/*.
+      oauthProvider({
+        // Sans préfixe de langue : next-intl redirige vers la langue du
+        // visiteur en conservant la requête signée.
+        loginPage: "/account/login",
+        consentPage: "/oauth/consent",
+        scopes: [...OAUTH_SCOPES],
+        grantTypes: ["authorization_code", "refresh_token"],
+        allowDynamicClientRegistration: true,
+        allowUnauthenticatedClientRegistration: true,
+        // Une seule API derrière des identifiants alias (oauth.ts) : tout
+        // client peut viser n'importe lequel, sans table de liaison par client.
+        // Les ressources ne sont pas déclarées ici (le plugin les relirait en
+        // base à chaque instance) : ensureProtectedResources les insère.
+        enforcePerClientResources: false,
+        extensions: [agentAuthExtension(agentAuth)],
+      }),
+      agentAuthPlugin(agentAuth),
       nextCookies(),
     ],
   });

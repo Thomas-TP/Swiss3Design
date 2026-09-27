@@ -102,6 +102,14 @@ revision_requested → accepted/declined → paid → in_production → done`, p
 saved CH address per user) and `notification_preferences` (`newsletter` /
 `productNews` opt-ins, one row per user). See [Auth](#auth--accounts).
 
+Agent OAuth server (migration `0006`): `jwks` (RS256 signing key, private half
+encrypted with `BETTER_AUTH_SECRET`), `oauth_client`, `oauth_consent`,
+`oauth_access_token` / `oauth_refresh_token` (hashed), `oauth_resource`,
+`oauth_client_resource`, `oauth_client_assertion`, and our own
+`agent_registrations` (auth.md agents: claim token, 6-digit code and attempt
+token stored as SHA-256 hashes, `assertion_version` for revocation). See
+[Agents](#agents-oauth-21--authmd).
+
 ### Reviews & marketing
 
 - **reviews** — `(productId, orderId)`, `authorName`, `rating`, `body`,
@@ -161,6 +169,45 @@ dedicated PaymentIntent (`/api/quote-checkout`); `markQuotePaid()` is idempotent
 - **Account deletion** (nLPD right to erasure) purges quotes + R2 files +
   addresses, but **keeps orders** (10-year accounting retention, art. 958f CO) by
   nulling `customerId`.
+
+### Agents (OAuth 2.1 + auth.md)
+
+Public agent surfaces (MCP `/mcp`, A2A `/a2a`, REST `/api/v1`, WebMCP,
+Markdown negotiation, `/.well-known/*` discovery) need no credentials. Reading a
+customer's own account goes through the **customer-account MCP server
+`/mcp/account`**, an OAuth 2.1 protected resource:
+
+- **Authorization server** = Better Auth `jwt` + `@better-auth/oauth-provider`
+  plugins. Issuer = the site origin (`BETTER_AUTH_URL`), so its metadata is at
+  `/.well-known/oauth-authorization-server` and `/.well-known/openid-configuration`
+  (Next routes calling `auth.api`); endpoints stay under `/api/auth/oauth2/*`.
+  Open dynamic client registration (RFC 7591, as MCP expects), PKCE, consent page
+  `/[locale]/oauth/consent`, RS256 JWT access tokens bound to a resource
+  (RFC 8707). Protected-resource identifiers: `/mcp/account` (canonical), plus the
+  origin and the four locale roots as aliases, each with its own RFC 9728 document
+  under `/.well-known/oauth-protected-resource/…` (scanners probe `/fr` because
+  `/` redirects there).
+- **Path A (apps, MCP clients)**: register → authorize (sign-in if needed; the
+  login form must not `router.push` when better-auth answers `{ redirect, url }`)
+  → consent → code + PKCE → tokens (refresh tokens rotate).
+- **Path B (auth.md, [`/auth.md`](../src/lib/agent/auth-md.ts))**:
+  `POST /api/auth/agent/identity` (`anonymous` → catalogue-only assertion;
+  `service_auth` → 6-digit code) → the customer, signed in, types the code on
+  `/[locale]/agent/claim` → the agent polls `/oauth2/token` with the
+  `urn:workos:agent-auth:grant-type:claim` grant, then exchanges its identity
+  assertion with the RFC 7523 jwt-bearer grant. Both grants are oauth-provider
+  extensions: tokens come from the same `issueTokens`, signed by the same keys.
+- **Revocation is immediate** although tokens are stateless JWTs: `/mcp/account`
+  requires, on every call, the customer's OAuth consent (Path A) or an active
+  registration at the token's `ver` (Path B). The customer removes access in
+  `/account/agents`; account deletion cascades.
+- Protected resources are not declared in the plugin config (it would re-read
+  each one at every instance init, through Hyperdrive's cache):
+  `ensureProtectedResources()` inserts them with `ON CONFLICT DO NOTHING` once
+  per isolate on `/api/auth/oauth2|agent/*` requests. Registration, claim and
+  revocation reads use `uncached` (`src/db/fresh.ts`, AGENTS.md rule 6c).
+- Cleanup: `lib/maintenance.ts` purges expired auth.md registrations, expired
+  tokens and dynamically registered clients never authorized in 90 days.
 
 ### Files (R2)
 

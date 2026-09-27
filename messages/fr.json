@@ -99,6 +99,10 @@
     "badge3d": "Vue 3D",
     "dragHint": "Glissez pour pivoter"
   },
+  "cartLink": {
+    "added": "Les articles du lien ont été ajoutés à votre panier.",
+    "error": "Certains articles du lien n'ont pas pu être ajoutés (produit indisponible ou option manquante)."
+  },
   "cartReminder": {
     "title": "Pas le temps maintenant ?",
     "emailPlaceholder": "Votre e-mail",
@@ -287,7 +291,8 @@
       "security": "Sécurité",
       "notifications": "Notifications",
       "privacy": "Confidentialité",
-      "admin": "Administration"
+      "admin": "Administration",
+      "agents": "Agents IA"
     },
     "overview": {
       "subtitle": "Aperçu de votre activité et de votre compte.",
@@ -654,5 +659,90 @@
     "shippingDescription": "Livraison exclusivement en Suisse par la Poste : délais, frais de port, suivi de commande, retours sous 14 jours et garantie légale de 2 ans chez Swiss3Design.",
     "productTitle": "{name} — imprimé en 3D en Suisse",
     "productDescription": "{name} en {material}, imprimé en 3D à la pièce dans nos ateliers de l'arc lémanique (VD). {price}, livraison dans toute la Suisse."
+  },
+  "agentAccess": {
+    "scopes": {
+      "openid": "Vous identifier (identifiant de compte)",
+      "profile": "Voir votre nom",
+      "email": "Voir votre adresse e-mail",
+      "offline_access": "Garder l'accès sans vous redemander de vous connecter",
+      "catalog_read": "Parcourir le catalogue, les prix et les disponibilités",
+      "orders_read": "Voir vos commandes et leur suivi",
+      "quotes_read": "Voir vos demandes de devis"
+    },
+    "consent": {
+      "title": "Autoriser une application",
+      "heading": "{app} demande l'accès à votre compte",
+      "signedInAs": "Connecté en tant que {email}",
+      "willAccess": "Cette application pourra :",
+      "redirectTo": "Après votre réponse, vous serez renvoyé vers {host}.",
+      "unverified": "Swiss3Design ne vérifie pas l'identité des applications. N'autorisez que celles que vous utilisez et en qui vous avez confiance, par exemple votre assistant IA.",
+      "allow": "Autoriser",
+      "deny": "Refuser",
+      "processing": "Un instant…",
+      "error": "Votre réponse n'a pas pu être enregistrée. Recommencez depuis l'application.",
+      "revokeHint": "Vous pourrez retirer cet accès à tout moment :",
+      "revokeLink": "Mon compte → Agents IA",
+      "invalidTitle": "Demande invalide ou expirée",
+      "invalidBody": "Recommencez la connexion depuis l'application ou l'assistant qui vous a envoyé ici.",
+      "unnamed": "Une application"
+    },
+    "claim": {
+      "title": "Autoriser un agent IA",
+      "heading": "Un agent IA demande l'accès à votre compte",
+      "willAccess": "Une fois autorisé, il pourra :",
+      "warning": "Ne saisissez qu'un code affiché par VOTRE agent ou assistant. Si quelqu'un d'autre vous a envoyé ce lien et ce code, refusez.",
+      "codeLabel": "Code à 6 chiffres donné par votre agent",
+      "confirm": "Autoriser l'agent",
+      "deny": "Refuser",
+      "processing": "Un instant…",
+      "confirmed": "C'est fait : votre agent a maintenant accès à votre compte. Retournez à votre agent, il reçoit l'accès automatiquement.",
+      "denied": "Demande refusée : l'agent n'a aucun accès à votre compte.",
+      "manage": "Gérer les agents et applications",
+      "errors": {
+        "wrong_code": "Code incorrect. Il vous reste {remaining} essai(s).",
+        "locked": "Trop d'essais. Demandez un nouveau code à votre agent.",
+        "expired": "Ce code a expiré. Demandez un nouveau code à votre agent.",
+        "invalid": "Cette demande n'est plus valable.",
+        "already_claimed": "Cet agent a déjà été autorisé.",
+        "wrong_account": "Cette demande est destinée à un autre compte.",
+        "unauthorized": "Votre session a expiré : reconnectez-vous."
+      },
+      "state": {
+        "invalid": {
+          "title": "Lien invalide",
+          "body": "Ce lien de vérification n'existe pas ou n'est plus valable. Demandez à votre agent de recommencer."
+        },
+        "expired": {
+          "title": "Lien expiré",
+          "body": "Les codes sont valables 10 minutes. Demandez à votre agent un nouveau lien et un nouveau code."
+        },
+        "already_claimed": {
+          "title": "Déjà autorisé",
+          "body": "Cet agent a déjà accès au compte. Vous pouvez lui retirer l'accès dans Mon compte → Agents IA."
+        },
+        "locked": {
+          "title": "Trop d'essais",
+          "body": "Le code a été saisi trop de fois. Demandez un nouveau code à votre agent."
+        },
+        "wrong_account": {
+          "title": "Un autre compte est attendu",
+          "body": "Cette demande est destinée au compte {email}. Déconnectez-vous, puis rouvrez le lien avec ce compte."
+        }
+      }
+    },
+    "account": {
+      "title": "Agents IA et applications",
+      "subtitle": "Assistants IA et applications autorisés à consulter votre compte.",
+      "empty": "Aucun agent ni application n'a accès à votre compte. Quand vous autorisez un assistant IA (ChatGPT, Claude…) ou une application, il apparaît ici et vous pouvez lui retirer l'accès à tout moment.",
+      "unnamedApp": "Application sans nom",
+      "authMdAgent": "Agent IA (auth.md)",
+      "authorizedOn": "Autorisé le {date}",
+      "revoke": "Retirer l'accès",
+      "revoking": "Retrait…",
+      "revoked": "Accès retiré",
+      "revokeError": "Impossible de retirer l'accès. Réessayez.",
+      "note": "Ces accès sont en lecture seule : aucun agent ne peut commander, payer ni modifier vos données. Retirer un accès prend effet immédiatement."
+    }
   }
 }

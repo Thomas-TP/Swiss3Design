@@ -1,7 +1,5 @@
 import { z } from "zod";
-import { and, asc, eq } from "drizzle-orm";
-import { getDb } from "@/db";
-import { orders, orderItems } from "@/db/schema";
+import { findOrderForTracking } from "@/lib/agent/orders";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
 // Suivi de commande sans compte : on retrouve une commande par son numéro ET
@@ -22,34 +20,16 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return Response.json({ error: "invalid_request" }, { status: 400 });
   }
-  const orderNumber = parsed.data.orderNumber.trim().toUpperCase();
-  const email = parsed.data.email.trim().toLowerCase();
-
-  const db = await getDb();
-  const [order] = await db
-    .select()
-    .from(orders)
-    .where(and(eq(orders.orderNumber, orderNumber), eq(orders.email, email)))
-    .limit(1);
-
   // Réponse unique si introuvable OU e-mail non concordant : aucun oracle qui
   // révélerait l'existence d'une commande pour une adresse donnée.
-  if (!order) {
+  const found = await findOrderForTracking(
+    parsed.data.orderNumber,
+    parsed.data.email,
+  );
+  if (!found) {
     return Response.json({ error: "not_found" }, { status: 404 });
   }
-
-  const items = await db
-    .select({
-      id: orderItems.id,
-      nameSnapshot: orderItems.nameSnapshot,
-      colorName: orderItems.colorName,
-      colorHex: orderItems.colorHex,
-      priceCentsSnapshot: orderItems.priceCentsSnapshot,
-      quantity: orderItems.quantity,
-    })
-    .from(orderItems)
-    .where(eq(orderItems.orderId, order.id))
-    .orderBy(asc(orderItems.id));
+  const { order, items } = found;
 
   let address = { name: "", street: "", npa: "", city: "", canton: "" };
   try {

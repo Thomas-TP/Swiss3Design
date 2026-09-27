@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
+import { CartLinkImport } from "@/components/cart-link-import";
 import { CartRecovery } from "@/components/cart-recovery";
 import CartContent from "./cart-content";
 import { getShippingSettings } from "@/lib/shipping-settings";
@@ -19,6 +20,7 @@ export default async function CartPage() {
   return (
     <>
       <CartRecovery />
+      <CartLinkImport />
       <CartContent shippingSettings={await getShippingSettings()} />
     </>
   );
