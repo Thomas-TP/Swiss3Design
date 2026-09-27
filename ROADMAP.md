@@ -165,6 +165,22 @@ Lot SEO / perf / conversion (livré) :
   e-mail de relance (4 langues) + désinscription, déclenché par un **Worker Cron
   Cloudflare dédié** (`workers/cron`).
 - ✅ **Outillage** : Vitest, `typecheck`, Prettier.
+- ✅ **Commerce agentique** (2026-09-27) : catalogue et hooks Stripe Agentic
+  Commerce Suite, achat direct par agent IA (MPP, ACP, UCP) payé par Shared
+  Payment Token, section « agents IA » des CGV et de la confidentialité.
+  Paiements de test réussis de bout en bout sur les trois protocoles.
+
+En attente — à ne pas oublier :
+
+- **Connecter les agents IA** dans Stripe (Commerce agentique → Agents) dès que
+  Stripe a fini de « préparer le flux de produits » : lire puis accepter les
+  conditions de chaque agent avant de l'activer.
+- **x402** (paiements USDC sur Base) : après l'accord de Stripe pour les
+  stablecoins (demande envoyée à machine-payments@stripe.com le 2026-09-27),
+  créer le compte Coinbase CDP et poser `CDP_API_KEY_ID` / `CDP_API_KEY_SECRET`.
+- **TWINT** : réactivation confirmée par le support Stripe, encore en cours le
+  2026-09-27 — vérifier dans Paramètres → Moyens de paiement qu'il est bien
+  « Actif ».
 
 À étudier :
 
