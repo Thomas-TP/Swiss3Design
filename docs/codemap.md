@@ -108,6 +108,7 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 | `lib/agent/auth-md.ts` · `app/auth.md/route.ts`  | Document `/auth.md` généré depuis les mêmes constantes                                    |
 | `lib/agent/markdown.ts` · `api/agent/markdown`   | Négociation `Accept: text/markdown` (Workers AI `toMarkdown`)                             |
 | `components/webmcp-tools.tsx`                    | Outils WebMCP enregistrés dans le navigateur                                              |
+| `lib/web-bot-auth.ts`                            | Web Bot Auth : répertoire JWKS signé + requêtes IndexNow signées (RFC 9421)               |
 
 ## « Je dois… » → où commencer
 
