@@ -49,3 +49,8 @@ FACEBOOK_CLIENT_SECRET=""
 
 # Maintenance planifiée (purge des fichiers R2 orphelins via /api/cron/maintenance)
 CRON_SECRET="change-me"
+
+# Web Bot Auth (optionnel) : clé Ed25519 privée au format JWK {kty,crv,x,d},
+# entre apostrophes. Signe les requêtes du robot du site (IndexNow) et alimente
+# /.well-known/http-message-signatures-directory. Une clé distincte par environnement.
+WEB_BOT_AUTH_PRIVATE_KEY=''

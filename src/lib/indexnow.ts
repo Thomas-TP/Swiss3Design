@@ -1,6 +1,7 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { routing } from "@/i18n/routing";
 import { SITE_URL } from "./seo";
+import { botRequestHeaders, loadBotKey } from "./web-bot-auth";
 
 // IndexNow : prévient Bing (donc Copilot et ChatGPT search, qui s'appuient sur
 // son index), Yandex, Seznam, Naver, Yep… qu'une URL a changé, au lieu
@@ -30,27 +31,32 @@ export async function notifyIndexNow(paths: string[]): Promise<void> {
       paths.flatMap((p) => routing.locales.map((l) => `${SITE_URL}/${l}${p}`)),
     ),
   ];
-  const task = fetch("https://api.indexnow.org/indexnow", {
-    method: "POST",
-    headers: { "Content-Type": "application/json; charset=utf-8" },
-    body: JSON.stringify({
-      host: new URL(SITE_URL).host,
-      key: INDEXNOW_KEY,
-      keyLocation: `${SITE_URL}/${INDEXNOW_KEY}.txt`,
-      urlList,
-    }),
-  })
-    .then((res) => {
-      // 200 = reçu, 202 = reçu (clé en cours de validation).
-      if (res.status !== 200 && res.status !== 202)
-        console.error(`[indexnow] soumission refusée : HTTP ${res.status}`);
-    })
-    .catch((err) => console.error("[indexnow] soumission impossible", err));
+  const endpoint = "https://api.indexnow.org/indexnow";
+  const context = await getCloudflareContext({ async: true }).catch(() => null);
+  const task = (async () => {
+    // Requête de robot : signée Web Bot Auth quand la clé est configurée (le
+    // destinataire peut la vérifier via /.well-known/http-message-signatures-directory).
+    const key = await loadBotKey(context?.env.WEB_BOT_AUTH_PRIVATE_KEY).catch(
+      () => null,
+    );
+    const res = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json; charset=utf-8",
+        ...(key ? await botRequestHeaders(key, endpoint, SITE_URL) : {}),
+      },
+      body: JSON.stringify({
+        host: new URL(SITE_URL).host,
+        key: INDEXNOW_KEY,
+        keyLocation: `${SITE_URL}/${INDEXNOW_KEY}.txt`,
+        urlList,
+      }),
+    });
+    // 200 = reçu, 202 = reçu (clé en cours de validation).
+    if (res.status !== 200 && res.status !== 202)
+      console.error(`[indexnow] soumission refusée : HTTP ${res.status}`);
+  })().catch((err) => console.error("[indexnow] soumission impossible", err));
 
-  try {
-    const { ctx } = await getCloudflareContext({ async: true });
-    ctx.waitUntil(task);
-  } catch {
-    await task;
-  }
+  if (context) context.ctx.waitUntil(task);
+  else await task;
 }

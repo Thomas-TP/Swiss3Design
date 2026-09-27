@@ -91,8 +91,13 @@ bun run db:seed:local        # seed local D1 from scripts/seed.sql
 - **Which secrets exist:** see [`.dev.vars.example`](../.dev.vars.example)
   (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BETTER_AUTH_SECRET`,
   `RESEND_API_KEY`, `GOOGLE_*`, optional `APPLE_*`/`FACEBOOK_*`, `CRON_SECRET`,
-  `ADMIN_EMAILS`). `ADMIN_EMAILS` is a secret rather than a `vars` entry
-  specifically because the repo is public (moved 2026-07-10).
+  `ADMIN_EMAILS`, `WEB_BOT_AUTH_PRIVATE_KEY`). `ADMIN_EMAILS` is a secret rather
+  than a `vars` entry specifically because the repo is public (moved 2026-07-10).
+- **`WEB_BOT_AUTH_PRIVATE_KEY`** (Ed25519 private JWK, one distinct key per
+  Worker, set 2026-09-27): signs the site's own bot requests (IndexNow) and the
+  `/.well-known/http-message-signatures-directory` response. Rotation = new key
+  with `--env preview` / `--name swiss3design`, no user impact; if the key was
+  registered with Cloudflare's Bot Submission Form, register the new one too.
 - **Non-secret vars** (`BETTER_AUTH_URL`, `EMAIL_FROM`) live in
   `wrangler.jsonc`; after editing run `bun run cf-typegen`.
 - **Local dev:** copy `.dev.vars.example` → `.dev.vars` (gitignored) and fill in
