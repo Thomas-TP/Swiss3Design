@@ -167,6 +167,17 @@ describe("flux CSV Stripe", () => {
     expect(row.product_warning.slice(17)).not.toMatch(/[,:]/);
   });
 
+  it("écarte les SVG et retombe sur l'image de marque en PNG", () => {
+    const row = productFeedRow(
+      { ...index.get("boite--rouge-brique")!, imageUrls: ["/products/x.svg"] },
+      rule,
+    );
+    expect(row.image_link).toBe(
+      "https://swiss3design.ch/brand/social/og-image.png",
+    );
+    expect(row.additional_image_link).toBe("");
+  });
+
   it("met en rupture un SKU suivi à zéro et publie son 3D en absolu", () => {
     const row = productFeedRow(index.get("LAMPE-L")!, rule);
     expect(row.availability).toBe("out_of_stock");

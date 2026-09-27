@@ -96,9 +96,14 @@ export const PRODUCT_COLUMNS = [
   "product_warning",
 ] as const;
 
+// Stripe n'accepte que du JPEG ou du PNG : un SVG (visuel d'attente) ne se
+// convertit pas (415 de /cdn-cgi/image), on l'écarte.
+export const rasterImages = (urls: string[]) =>
+  urls.filter((u) => !/\.svg(\?|$)/i.test(u)).map(feedImageUrl);
+
 export function productFeedRow(sku: SellableSku, rule: ShippingRule) {
   const days = deliveryDays(sku);
-  const [image, ...more] = sku.imageUrls.map(feedImageUrl);
+  const [image, ...more] = rasterImages(sku.imageUrls);
   const dims = dimensionsCm(sku.dimensionsMm);
   const tracked = sku.stock != null;
   return {
