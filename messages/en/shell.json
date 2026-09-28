@@ -1,0 +1,53 @@
+{
+  "nav": {
+    "primary": "Main navigation",
+    "mobile": "Mobile navigation",
+    "shop": "Shop",
+    "studio": "Studio",
+    "custom": "Custom",
+    "atelier": "Workshop",
+    "cartCount": "Cart, {count, plural, =0 {empty} one {# item} other {# items}}",
+    "favoritesCount": "Favorites, {count, plural, =0 {none} one {# item} other {# items}}"
+  },
+  "skip": {
+    "footer": "Skip to footer"
+  },
+  "pending": "Loading page…",
+  "footer": {
+    "motto": "You set it. We print it.",
+    "legend": "Contour interval 0.2 mm · Scale 1:1",
+    "gland": "46°25′N 6°16′E · Gland",
+    "pully": "46°31′N 6°40′E · Pully",
+    "preferences": "Preferences"
+  },
+  "motion": {
+    "toggle": "Reduce motion",
+    "hint": "Turns off smooth scrolling, page transitions and animated 3D in this browser."
+  },
+  "stage": {
+    "unavailable": "3D view unavailable on this device: the 2D preview is accurate to a tenth of a millimeter.",
+    "loading": "Preparing the 3D view…",
+    "poster": "2D preview",
+    "interactive": "3D preview: arrow keys to rotate",
+    "rotateLeft": "Rotate left",
+    "rotateRight": "Rotate right",
+    "front": "Front view",
+    "reset": "Reset",
+    "zoomIn": "Zoom in",
+    "zoomOut": "Zoom out"
+  },
+  "cta": {
+    "studio": "Adjust an object",
+    "shop": "Visit the shop",
+    "file": "Send a file"
+  },
+  "ui": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "dismiss": "Dismiss message"
+  },
+  "media": {
+    "illustration": "Illustration",
+    "render": "Render"
+  }
+}

@@ -1,0 +1,53 @@
+{
+  "nav": {
+    "primary": "Hauptnavigation",
+    "mobile": "Mobile Navigation",
+    "shop": "Shop",
+    "studio": "Studio",
+    "custom": "Nach Mass",
+    "atelier": "Atelier",
+    "cartCount": "Warenkorb, {count, plural, =0 {leer} one {# Artikel} other {# Artikel}}",
+    "favoritesCount": "Favoriten, {count, plural, =0 {keine} one {# Objekt} other {# Objekte}}"
+  },
+  "skip": {
+    "footer": "Zur Fusszeile"
+  },
+  "pending": "Seite wird geladen…",
+  "footer": {
+    "motto": "Sie stellen ein. Wir drucken.",
+    "legend": "Äquidistanz 0.2 mm · Massstab 1:1",
+    "gland": "46°25′N 6°16′O · Gland",
+    "pully": "46°31′N 6°40′O · Pully",
+    "preferences": "Einstellungen"
+  },
+  "motion": {
+    "toggle": "Animationen reduzieren",
+    "hint": "Schaltet sanftes Scrollen, Seitenübergänge und animiertes 3D in diesem Browser aus."
+  },
+  "stage": {
+    "unavailable": "3D-Ansicht auf diesem Gerät nicht verfügbar: Die 2D-Vorschau ist auf den Zehntelmillimeter genau.",
+    "loading": "3D-Ansicht wird vorbereitet…",
+    "poster": "2D-Vorschau",
+    "interactive": "3D-Vorschau: Pfeiltasten zum Drehen",
+    "rotateLeft": "Nach links drehen",
+    "rotateRight": "Nach rechts drehen",
+    "front": "Vorderansicht",
+    "reset": "Zurücksetzen",
+    "zoomIn": "Vergrössern",
+    "zoomOut": "Verkleinern"
+  },
+  "cta": {
+    "studio": "Objekt einstellen",
+    "shop": "Zum Shop",
+    "file": "Datei senden"
+  },
+  "ui": {
+    "close": "Schliessen",
+    "cancel": "Abbrechen",
+    "dismiss": "Meldung ausblenden"
+  },
+  "media": {
+    "illustration": "Illustration",
+    "render": "Rendering"
+  }
+}

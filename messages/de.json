@@ -93,7 +93,7 @@
   },
   "viewer": {
     "view3d": "In 3D ansehen",
-    "close": "Schließen",
+    "close": "Schliessen",
     "error": "3D-Vorschau nicht verfügbar.",
     "colorLabel": "Farbe:",
     "badge3d": "3D-Ansicht",
