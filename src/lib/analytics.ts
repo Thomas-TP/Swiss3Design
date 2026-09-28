@@ -17,6 +17,7 @@ import type {
   Properties,
 } from "posthog-js";
 import type { CartItem } from "./cart-data";
+import type { StudioObjectId } from "./studio/types";
 import {
   ANALYTICS_HOSTNAME,
   ANALYTICS_RELAY_PATH,
@@ -79,20 +80,30 @@ const HREF_IN_CHAIN = /((?:attr__)?href=")([^"]*)(")/g;
 const URL_KEY = /(?:url|referrer|href)$/i;
 const ADMIN_PATH = /^\/(?:fr|de|it|en)\/admin(?:\/|$)/;
 const ABSOLUTE_URL = /^[a-z][\w+.-]*:/i;
+// Fragment de configuration du Studio (#c=v1.…, brief de refonte §6.8) :
+// jamais de texte personnel dedans, mais une configuration complète n'a rien
+// à faire dans la mesure d'audience. PostHog retire déjà les ancres
+// (defaults 2026-06-25) : défense en profondeur, liens cliqués compris.
+const STUDIO_FRAGMENT = /^#(?:[^#]*&)?c=/;
 
 export function sanitizeUrl(value: string): string {
-  if (!value.includes("?")) return value;
+  const hashAt = value.indexOf("#");
+  const kept =
+    hashAt !== -1 && STUDIO_FRAGMENT.test(value.slice(hashAt))
+      ? value.slice(0, hashAt)
+      : value;
+  if (!kept.includes("?")) return kept;
   try {
-    const url = new URL(value, "https://relative.invalid");
+    const url = new URL(kept, "https://relative.invalid");
     // Copie des clés : supprimer pendant l'itération du live iterator en
     // sauterait certaines.
     for (const key of Array.from(url.searchParams.keys()))
       if (!KEPT_PARAMS.has(key.toLowerCase())) url.searchParams.delete(key);
-    return ABSOLUTE_URL.test(value)
+    return ABSOLUTE_URL.test(kept)
       ? url.toString()
       : `${url.pathname}${url.search}${url.hash}`;
   } catch {
-    return value.slice(0, value.indexOf("?"));
+    return kept.slice(0, kept.indexOf("?"));
   }
 }
 
@@ -289,9 +300,59 @@ function withPostHog(run: (posthog: PostHog) => void) {
   else if (queue && queue.length < MAX_QUEUE) queue.push(run);
 }
 
-export function track(event: string, properties?: Properties) {
+// ── Événements typés (brief de refonte « Strates », §4.10) ───────────────────
+// Les événements existants gardent noms et propriétés ; ceux-ci ont un contrat
+// écrit, vérifié à la compilation. Règle commune : jamais de texte saisi
+// (nom, fonction, contact, sommet) dans une propriété.
+
+export interface QuoteRequestedProperties {
+  material?: string;
+  has_file: boolean;
+  signed_in: boolean;
+  /** « form » : formulaire /custom ; « studio » : envoi depuis le Studio. Absent : « form ». */
+  source?: "form" | "studio";
+  object?: StudioObjectId;
+}
+
+export interface TrackedEvents {
+  "Quote Requested": QuoteRequestedProperties;
+  /** Premier geste dans le héros, une fois par session. */
+  "Hero Customized": { palette: string; pattern: string };
+  "Studio Viewed": { object: StudioObjectId };
+  /** Premier réglage par objet et par session. */
+  "Studio Configured": { object: StudioObjectId; control: string };
+  /** Upload réussi, avant la Server Action ; estimation en CHF décimaux, si affichée. */
+  "Studio Sent": {
+    object: StudioObjectId;
+    bands: number;
+    triangles: number;
+    bytes: number;
+    estimate_low?: number;
+    estimate_high?: number;
+  };
+  "Studio Link Copied": { object: StudioObjectId };
+  "Studio Saved": { object: StudioObjectId };
+}
+
+// Valeurs par défaut posées à l'envoi : l'ancien formulaire de /custom ne
+// passe pas encore `source`, ses demandes restent comparables aux nouvelles.
+const EVENT_DEFAULTS: {
+  [E in keyof TrackedEvents]?: Partial<TrackedEvents[E]>;
+} = { "Quote Requested": { source: "form" } };
+
+type TrackProperties<E extends string> = E extends keyof TrackedEvents
+  ? TrackedEvents[E]
+  : Properties;
+
+export function track<E extends string>(
+  event: E,
+  properties?: TrackProperties<E>,
+) {
+  const defaults = EVENT_DEFAULTS[event as keyof TrackedEvents];
+  const given = properties as Properties | undefined;
+  const payload = defaults ? { ...defaults, ...given } : given;
   withPostHog((posthog) => {
-    posthog.capture(event, properties);
+    posthog.capture(event, payload);
   });
 }
 

@@ -1,14 +1,16 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, expect, it, vi } from "vitest";
-import type { CaptureResult } from "posthog-js";
+import type { CaptureResult, PostHog } from "posthog-js";
 import {
+  attachPostHog,
   cartProperties,
   chf,
   posthogConfig,
   productProperties,
   sanitizeEvent,
   sanitizeUrl,
+  track,
 } from "./analytics";
 
 const event = (
@@ -62,6 +64,30 @@ describe("sanitizeUrl", () => {
       "/fr/products/vase-spirale",
     );
   });
+
+  it("retire le fragment de configuration du Studio (#c=)", () => {
+    expect(
+      sanitizeUrl("https://swiss3design.ch/fr/studio/lavaux#c=v1.eyJoIjoxNTB9"),
+    ).toBe("https://swiss3design.ch/fr/studio/lavaux");
+    expect(sanitizeUrl("/de/studio/relief#c=v1.e30")).toBe("/de/studio/relief");
+    expect(sanitizeUrl("/fr/studio/borne#vue=plan&c=v1.e30")).toBe(
+      "/fr/studio/borne",
+    );
+    // Avec une requête : la liste blanche s'applique toujours.
+    expect(
+      sanitizeUrl(
+        "https://swiss3design.ch/fr/studio/lavaux?utm_source=chatgpt.com&h=150#c=v1.e30",
+      ),
+    ).toBe("https://swiss3design.ch/fr/studio/lavaux?utm_source=chatgpt.com");
+  });
+
+  it("garde les autres ancres (#studio de /custom, sections)", () => {
+    expect(sanitizeUrl("/fr/custom#studio")).toBe("/fr/custom#studio");
+    expect(sanitizeUrl("/fr/a-propos#abc=1")).toBe("/fr/a-propos#abc=1");
+    expect(sanitizeUrl("/fr/shop?q=vase&x=1#grille")).toBe(
+      "/fr/shop?q=vase#grille",
+    );
+  });
 });
 
 describe("sanitizeEvent", () => {
@@ -113,6 +139,29 @@ describe("sanitizeEvent", () => {
     expect(out?.properties?.$elements_chain).toBe(
       'a:attr__href="/fr/track"href="/fr/track"',
     );
+  });
+
+  it("retire #c= des URL capturées et des liens cliqués", () => {
+    const out = sanitizeEvent(
+      event(
+        {
+          $pathname: "/fr/studio/lavaux",
+          $current_url: "https://swiss3design.ch/fr/studio/lavaux#c=v1.e30",
+          $elements: [
+            { tag_name: "a", attr__href: "/fr/studio/lavaux#c=v1.e30" },
+          ],
+          $elements_chain:
+            'a:attr__href="/fr/studio/lavaux#c=v1.e30"href="/fr/studio/lavaux#c=v1.e30"',
+        },
+        { event: "$autocapture" },
+      ),
+    );
+    expect(out?.properties).toMatchObject({
+      $current_url: "https://swiss3design.ch/fr/studio/lavaux",
+      $elements: [{ tag_name: "a", attr__href: "/fr/studio/lavaux" }],
+      $elements_chain:
+        'a:attr__href="/fr/studio/lavaux"href="/fr/studio/lavaux"',
+    });
   });
 
   it("nettoie aussi $set et laisse passer les enregistrements", () => {
@@ -175,6 +224,60 @@ describe("posthogConfig", () => {
       .at(-1);
     expect(latest).toBeDefined();
     expect(config().defaults).toBe(latest);
+  });
+});
+
+describe("Quote Requested (§4.10)", () => {
+  // Client PostHog factice : attachPostHog vide la file et reçoit la suite.
+  const capture = vi.fn<(event: string, properties?: object) => void>();
+  attachPostHog({ capture } as unknown as PostHog);
+  afterEach(() => capture.mockClear());
+
+  it("l'ancien formulaire garde ses propriétés et gagne source « form »", () => {
+    track("Quote Requested", {
+      material: "PLA",
+      has_file: true,
+      signed_in: false,
+    });
+    expect(capture).toHaveBeenCalledWith("Quote Requested", {
+      source: "form",
+      material: "PLA",
+      has_file: true,
+      signed_in: false,
+    });
+  });
+
+  it("le Studio passe source « studio » et l'objet", () => {
+    track("Quote Requested", {
+      material: "PLA",
+      has_file: true,
+      signed_in: true,
+      source: "studio",
+      object: "lavaux",
+    });
+    expect(capture).toHaveBeenCalledWith(
+      "Quote Requested",
+      expect.objectContaining({ source: "studio", object: "lavaux" }),
+    );
+  });
+
+  it("contrat vérifié à la compilation (tsc lit aussi ce fichier)", () => {
+    track("Quote Requested", {
+      has_file: false,
+      signed_in: false,
+      // @ts-expect-error source hors de « form » | « studio »
+      source: "mail",
+    });
+    // @ts-expect-error objet inconnu du Studio
+    track("Studio Viewed", { object: "vase-spirale" });
+    expect(capture).toHaveBeenCalledTimes(2);
+  });
+
+  it("les autres événements partent tels quels", () => {
+    track("Cart Viewed", { value: 34.9 });
+    track("Page Not Found");
+    expect(capture).toHaveBeenNthCalledWith(1, "Cart Viewed", { value: 34.9 });
+    expect(capture).toHaveBeenNthCalledWith(2, "Page Not Found", undefined);
   });
 });
 
