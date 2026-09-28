@@ -241,7 +241,11 @@ export default async function AboutPage({
               <Reveal key={item.title} inView delay={i * 0.06}>
                 <div className="flex h-full flex-col rounded-2xl border border-line bg-surface p-5 transition-colors hover:border-soft/40">
                   <span className="grid h-10 w-10 place-items-center rounded-xl bg-paper ring-1 ring-line">
-                    <Icon size={19} strokeWidth={1.8} className="text-accent-text" />
+                    <Icon
+                      size={19}
+                      strokeWidth={1.8}
+                      className="text-accent-text"
+                    />
                   </span>
                   <p className="mt-4 text-sm font-semibold">{item.title}</p>
                   <p className="mt-1 text-sm leading-snug text-soft">

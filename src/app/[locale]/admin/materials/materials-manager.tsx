@@ -196,7 +196,9 @@ function AddColorForm({ materialId }: { materialId: string }) {
         {pending ? "Ajout…" : "Couleur"}
       </button>
       {state.error && (
-        <p className="w-full text-xs font-medium text-accent-text">{state.error}</p>
+        <p className="w-full text-xs font-medium text-accent-text">
+          {state.error}
+        </p>
       )}
     </form>
   );

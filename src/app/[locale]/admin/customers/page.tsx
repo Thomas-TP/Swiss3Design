@@ -128,7 +128,10 @@ export default async function AdminCustomersPage({
                   <p className="flex items-center gap-1.5 text-sm font-semibold">
                     <span className="truncate">{c.name}</span>
                     {c.role === "admin" && (
-                      <ShieldUser size={14} className="shrink-0 text-accent-text" />
+                      <ShieldUser
+                        size={14}
+                        className="shrink-0 text-accent-text"
+                      />
                     )}
                     {c.emailVerified && (
                       <BadgeCheck

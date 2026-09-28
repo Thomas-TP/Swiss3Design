@@ -105,7 +105,9 @@ export function PasskeysSection({
         </ul>
       )}
 
-      {error && <p className="mt-3 text-sm font-medium text-accent-text">{error}</p>}
+      {error && (
+        <p className="mt-3 text-sm font-medium text-accent-text">{error}</p>
+      )}
 
       <button
         type="button"

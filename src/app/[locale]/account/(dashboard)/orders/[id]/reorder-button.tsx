@@ -57,7 +57,9 @@ export function ReorderButton({ orderId }: { orderId: string }) {
         <RotateCcw size={15} />
         {pending ? t("security.processing") : t("orderDetail.reorder")}
       </button>
-      {error && <p className="mt-2 text-xs font-medium text-accent-text">{error}</p>}
+      {error && (
+        <p className="mt-2 text-xs font-medium text-accent-text">{error}</p>
+      )}
     </div>
   );
 }

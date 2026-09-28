@@ -757,7 +757,9 @@ function ImageManager({ initial }: { initial: Img[] }) {
           />
         </label>
       </div>
-      {error && <p className="mt-2 text-xs font-medium text-accent-text">{error}</p>}
+      {error && (
+        <p className="mt-2 text-xs font-medium text-accent-text">{error}</p>
+      )}
       <p className="mt-2 text-xs text-soft">
         JPG, PNG ou WebP, 8 Mo max. La première photo est l&apos;image
         principale.

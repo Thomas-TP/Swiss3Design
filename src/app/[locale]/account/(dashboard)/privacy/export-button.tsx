@@ -53,7 +53,9 @@ export function ExportButton() {
         <Download size={15} />
         {pending ? t("security.processing") : t("privacy.exportButton")}
       </button>
-      {error && <p className="mt-2 text-sm font-medium text-accent-text">{error}</p>}
+      {error && (
+        <p className="mt-2 text-sm font-medium text-accent-text">{error}</p>
+      )}
     </div>
   );
 }

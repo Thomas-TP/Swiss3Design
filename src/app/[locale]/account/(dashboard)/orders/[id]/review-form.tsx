@@ -56,7 +56,9 @@ export function ReviewForm({
             <Star
               size={22}
               className={
-                (hover || rating) >= n ? "fill-accent text-accent-text" : "text-line"
+                (hover || rating) >= n
+                  ? "fill-accent text-accent-text"
+                  : "text-line"
               }
             />
           </button>
