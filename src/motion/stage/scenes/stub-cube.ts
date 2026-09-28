@@ -35,6 +35,9 @@ export interface StubController {
 }
 
 const SIZE_MM = 60;
+// Un poil sous 60 mm : le couvercle ne tombe pas pile sur un anneau fantôme
+// (tous les 2 mm), qui le peindrait en entier.
+const HEIGHT_MM = 59;
 const PRINT_SECONDS = 4.2;
 const FOV = 20;
 const ELEVATION = (22 * Math.PI) / 180;
@@ -43,7 +46,7 @@ const AZIMUTH = (-28 * Math.PI) / 180;
 const LEMAN = [
   { topMm: 20, color: "#2e6a9e" },
   { topMm: 40, color: "#5e7f3a" },
-  { topMm: SIZE_MM, color: "#f5f5f4" },
+  { topMm: HEIGHT_MM, color: "#f5f5f4" },
 ];
 
 export function createStubScene<P>(
@@ -61,10 +64,10 @@ export function createStubScene<P>(
   const pivot = new Group();
   scene.add(pivot);
   // Z vers le haut du générateur → Y vers le haut de three : −90° autour de X.
-  const geometry = new BoxGeometry(SIZE_MM, SIZE_MM, SIZE_MM).translate(
+  const geometry = new BoxGeometry(SIZE_MM, SIZE_MM, HEIGHT_MM).translate(
     0,
     0,
-    SIZE_MM / 2,
+    HEIGHT_MM / 2,
   );
   let printMaterial: PrintMaterial | null = null;
   let plainMaterial: MeshStandardMaterial | null = null;
@@ -73,7 +76,7 @@ export function createStubScene<P>(
   object.rotation.x = -Math.PI / 2;
   pivot.add(object);
   if (print) {
-    printMaterial = createPrintMaterial({ heightMm: SIZE_MM, bands: LEMAN });
+    printMaterial = createPrintMaterial({ heightMm: HEIGHT_MM, bands: LEMAN });
     printMaterial.uniforms.uGhost.value = 1;
     object.add(new Mesh(geometry, printMaterial.material));
   } else {
@@ -87,7 +90,7 @@ export function createStubScene<P>(
   }
 
   const camera = new PerspectiveCamera(FOV, 1, 10, 5000);
-  const target = new Vector3(0, SIZE_MM / 2, 0);
+  const target = new Vector3(0, HEIGHT_MM / 2, 0);
   // Sphère englobante du cube dans 78 % de la hauteur de la vue.
   const radius = (SIZE_MM * Math.sqrt(3)) / 2;
   const distance = radius / 0.78 / Math.sin(((FOV / 2) * Math.PI) / 180);
@@ -139,7 +142,7 @@ export function createStubScene<P>(
         const progress = animate
           ? (elapsed % (PRINT_SECONDS + 1)) / PRINT_SECONDS
           : 1;
-        printMaterial.setCut(Math.min(1, progress) * SIZE_MM);
+        printMaterial.setCut(Math.min(1, progress) * HEIGHT_MM);
         printMaterial.uniforms.uHot.value = progress < 1 ? 1 : 0;
       }
       pivot.rotation.y = animate ? elapsed * spin * ((2 * Math.PI) / 10) : 0;
