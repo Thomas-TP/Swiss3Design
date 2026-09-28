@@ -17,19 +17,20 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Every `.md` in this repo, what it's for, and who reads it:
 
-| File                                                                 | Audience       | Read it for                                                                           |
-| -------------------------------------------------------------------- | -------------- | ------------------------------------------------------------------------------------- |
-| [`docs/codemap.md`](docs/codemap.md)                                 | Agents         | **Start here for any code task** — "I need to do X" → exact file(s)                   |
-| [`docs/architecture.md`](docs/architecture.md)                       | Agents / dev   | Data model, request flows (checkout, quotes, auth), runtime model                     |
-| [`docs/conventions.md`](docs/conventions.md)                         | Agents / dev   | Code patterns, CSP nonce contract, i18n, Swiss specifics, style                       |
-| [`docs/playbook.md`](docs/playbook.md)                               | Human ↔ agent  | How to phrase a request well, task recipes, prompt templates                          |
-| [`docs/runbook.md`](docs/runbook.md)                                 | Ops            | Deploy/rollback steps, incident procedures, secrets rotation                          |
-| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)   | Ops            | Git ↔ Cloudflare Workers Builds wiring, preview env, PR-stack pitfall                 |
-| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md) | Product        | Forward-looking redesign proposal — **not implemented**, don't treat as current state |
-| [`README.md`](README.md)                                             | Human (public) | Project overview, stack, setup, for anyone landing on the repo                        |
-| [`ROADMAP.md`](ROADMAP.md)                                           | Product        | What's shipped vs. what's next, budget                                                |
-| [`SECURITY.md`](SECURITY.md)                                         | Security       | Vulnerability disclosure process                                                      |
-| [`LICENSE.md`](LICENSE.md)                                           | Legal          | All-rights-reserved terms                                                             |
+| File                                                                     | Audience       | Read it for                                                                                                           |
+| ------------------------------------------------------------------------ | -------------- | --------------------------------------------------------------------------------------------------------------------- |
+| [`docs/codemap.md`](docs/codemap.md)                                     | Agents         | **Start here for any code task** — "I need to do X" → exact file(s)                                                   |
+| [`docs/architecture.md`](docs/architecture.md)                           | Agents / dev   | Data model, request flows (checkout, quotes, auth), runtime model                                                     |
+| [`docs/conventions.md`](docs/conventions.md)                             | Agents / dev   | Code patterns, CSP nonce contract, i18n, Swiss specifics, style                                                       |
+| [`docs/playbook.md`](docs/playbook.md)                                   | Human ↔ agent  | How to phrase a request well, task recipes, prompt templates                                                          |
+| [`docs/runbook.md`](docs/runbook.md)                                     | Ops            | Deploy/rollback steps, incident procedures, secrets rotation                                                          |
+| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)       | Ops            | Git ↔ Cloudflare Workers Builds wiring, preview env, PR-stack pitfall                                                 |
+| [`docs/audit-remediation-2026-09.md`](docs/audit-remediation-2026-09.md) | Ops            | September 2026 audit report (dated snapshot): fixes shipped, incident 1102 cause, post-deploy checks — not a rulebook |
+| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md)     | Product        | Forward-looking redesign proposal — **not implemented**, don't treat as current state                                 |
+| [`README.md`](README.md)                                                 | Human (public) | Project overview, stack, setup, for anyone landing on the repo                                                        |
+| [`ROADMAP.md`](ROADMAP.md)                                               | Product        | What's shipped vs. what's next, budget                                                                                |
+| [`SECURITY.md`](SECURITY.md)                                             | Security       | Vulnerability disclosure process                                                                                      |
+| [`LICENSE.md`](LICENSE.md)                                               | Legal          | All-rights-reserved terms                                                                                             |
 
 `CLAUDE.md` at the repo root is a one-line `@AGENTS.md` import — this file
 _is_ the actual source of truth Claude Code loads every session.
@@ -44,68 +45,40 @@ Runs entirely on **Cloudflare Workers** (Next.js 16 via OpenNext) with
 (cache/rate-limit). Payments via **Stripe in LIVE mode** — treat
 checkout/webhook code as production-critical.
 
-**Stack pivot (2026-07-09):** the project moved off Medusa/Railway (never
-viable on Cloudflare Workers — no persistent Node process — and Railway isn't
-free) and off D1/SQLite onto Postgres/Hyperdrive, with **Bun** as the
-package manager/dev runtime (deploy target is still `workerd`, unchanged).
-**ESLint has been fully removed and replaced by Biome** as the sole
-linter+formatter (same date) — Biome's `react` domain already covers
-react-hooks (`useHookAtTopLevel`/`useExhaustiveDependencies`) and its `a11y`
-domain covers what `jsx-a11y` did; the one confirmed, accepted gap is
-`eslint-plugin-react-hooks`'s `react-hooks/purity` rule (flags non-deterministic
-calls like `Date.now()` during render) and `@next/next`'s rules (e.g.
-`no-img-element`), neither of which Biome replicates — low-severity, not
-worth keeping a second linter for. **TypeScript 7 was attempted the same day
-and reverted**: TS 7.0.2's `package.json` maps its root import to a
-version-only stub (`./lib/version.cjs`, no compiler API), which breaks not
-just `typescript-eslint` but `next build` itself (Next's internal
-dependency-verification step `require()`s `typescript` and expects the classic
-API) — confirmed by direct inspection of the installed package, not just
-upstream reports. No config flag bypasses it. Stays on **TypeScript 6**
-until TS 7.1 reintroduces a JS API. D1 stays wired in `wrangler.jsonc` for
-now as a rollback safety net, not the active database.
+**Runtime and toolchain:** Cloudflare Workers has no persistent Node process,
+so nothing that needs one can run here. Bun is the package manager and dev
+runtime; the deploy target is `workerd`. The active database is
+Postgres/Hyperdrive; the D1 binding stays wired in `wrangler.jsonc` only as a
+rollback safety net. **Stay on TypeScript 6** until a TypeScript 7 release
+ships a JS API again (expected in 7.1): TS 7.0's root import is a version-only
+stub with no compiler API, and `next build` `require()`s `typescript`
+expecting the classic API — no config flag bypasses it.
 
-**Driver + tooling refresh (2026-09-09):** the Postgres runtime driver moved
-from `postgres.js` to **node-postgres (`pg`)** — Cloudflare's Hyperdrive docs
-name `pg` as _the_ recommended driver (better prepared-statement caching,
-fewer round-trips to Neon); `postgres.js` is still supported, just no longer
-recommended. `getPgDb()` ([`src/db/index.pg.ts`](src/db/index.pg.ts)) uses a
-request-scoped `pg.Pool` (`max: 5`), **not** a bare `Client`: this app
-parallelizes independent reads with `Promise.all` (e.g. the product page), and
-a `Client` only handles one query at a time — confirmed in real testing
-against the preview DB (a silent `DeprecationWarning` under concurrent
-queries; becomes a hard error in pg@9). The pool has an `.on("error", ...)`
-handler — without it, Neon closing an idle connection (Postgres error
-`57P01`) surfaces as an uncaught exception (also hit live in testing, not
-hypothetical). Old code comment claimed `better-auth-cloudflare` required
-`postgres.js`: false — that package was never used here and is no longer
-installed; `src/lib/auth.ts` wires plain `betterAuth()` + the driver-agnostic
-`better-auth/adapters/drizzle`, confirmed by reading its source (no reference
-to either Postgres driver) and by a real sign-up/login/2FA round-trip against
-`pg`.
-**Biome replaced by Oxlint + Oxfmt** (same date): `oxlint` (`.oxlintrc.json`)
-covers everything Biome did, including both of Biome's own accepted gaps
-above — `react/purity` (Date.now-during-render) and the `nextjs` plugin
-rules — plus noticeably deeper `jsx-a11y` coverage. `nextjs/no-img-element`
-is kept **off**, same reasoning as Biome's old override: Cloudflare Images
-already handles optimization (`images.unoptimized` in `next.config.ts`), so
-converting `<img>` to `next/image` is a real UI change, not a lint fix.
-`oxfmt` (`.oxfmtrc.json`) is Prettier-compatible, configured to match Biome's
-prior formatting (LF line endings on every platform, double quotes, printWidth 80,
-etc.) —
-`sortPackageJson`/`sortImports`/`sortTailwindcss` left off on purpose to avoid
-a repo-wide reorder diff unrelated to any real change. Caveat: **oxfmt is
-still beta (0.x)**, no stable 1.0 as of this date. `biome-ignore` comments
-don't port automatically — the ones that mattered (exhaustive-deps
-exemptions, one deliberate a11y-role exemption) were translated to
-`// oxlint-disable`/`oxlint-enable <bare-rule-name> -- reason` pairs bracketing
-the block (bare rule name, no plugin prefix — e.g. `exhaustive-deps`, not
-`react-hooks/exhaustive-deps`; `oxlint-disable-line`/`-next-line` only reaches
-the _exact_ reported line, which for a multi-line hook body is rarely the
-line the old single comment sat above). Two gaps vs. Biome: oxfmt doesn't
-format CSS (`src/app/globals.css` needs another tool if it drifts), and
-doesn't organize imports (no active equivalent of Biome's
-`assist.organizeImports` here).
+**Database driver:** node-postgres (`pg`), the driver Cloudflare's Hyperdrive
+docs recommend (better prepared-statement caching, fewer round-trips to Neon).
+`getPgDb()` ([`src/db/index.pg.ts`](src/db/index.pg.ts)) uses a
+request-scoped `pg.Pool` (`max: 5`), **not** a bare `Client`: pages
+parallelize independent reads with `Promise.all` (e.g. the product page), and a
+`Client` runs one query at a time (a `DeprecationWarning` today, a hard error
+in pg@9). Keep the pool's `.on("error", ...)` handler: Neon closes idle
+connections (Postgres error `57P01`), which otherwise surface as an uncaught
+exception. `src/lib/auth.ts` wires plain `betterAuth()` + the driver-agnostic
+`better-auth/adapters/drizzle`, which works with any Postgres driver.
+**Lint/format: Oxlint + Oxfmt.** `oxlint` (`.oxlintrc.json`) covers React
+hooks, `react/purity` (Date.now-during-render), the `nextjs` plugin rules and
+`jsx-a11y`. `nextjs/no-img-element` is kept **off**: Cloudflare Images already
+handles optimization (`images.unoptimized` in `next.config.ts`), so converting
+`<img>` to `next/image` is a real UI change, not a lint fix. `oxfmt`
+(`.oxfmtrc.json`, still beta 0.x) is Prettier-compatible (LF line endings on
+every platform, double quotes, printWidth 80, etc.);
+`sortPackageJson`/`sortImports`/`sortTailwindcss` stay off on purpose to avoid
+a repo-wide reorder diff unrelated to any real change. It formats neither CSS
+(`src/app/globals.css` needs another tool if it drifts) nor imports. Suppress a
+rule with `// oxlint-disable`/`oxlint-enable <bare-rule-name> -- reason` pairs
+bracketing the block (bare rule name, no plugin prefix — e.g.
+`exhaustive-deps`, not `react-hooks/exhaustive-deps`);
+`oxlint-disable-line`/`-next-line` only reaches the _exact_ reported line,
+which for a multi-line hook body is rarely the line you'd expect.
 
 ## Golden rules (these break production — read first)
 
@@ -193,7 +166,7 @@ put` on an environment with real users without `--env <name>` explicitly
 | Styling                   | Tailwind CSS 4 (`src/app/globals.css`), `motion`, `lucide-react`                                                                                                                                                  |
 | DB                        | Postgres (Neon) via Cloudflare Hyperdrive + Drizzle ORM (pg dialect, `node-postgres`/`pg` driver)                                                                                                                 |
 | Auth                      | `better-auth` (+`@better-auth/passkey`) via the driver-agnostic `better-auth/adapters/drizzle` (email + Google OAuth, TOTP 2FA, passkeys) — Postgres-backed                                                       |
-| Lint/format               | Oxlint + Oxfmt (Biome removed 2026-09-09, see driver + tooling refresh note; oxfmt is still beta)                                                                                                                 |
+| Lint/format               | Oxlint + Oxfmt (see the lint/format note under "What this is"; oxfmt is still beta)                                                                                                                               |
 | Payments                  | Stripe Payment Element + webhooks (LIVE in prod)                                                                                                                                                                  |
 | Email                     | Resend (REST) — no-op if `RESEND_API_KEY` unset                                                                                                                                                                   |
 | i18n                      | `next-intl` (fr/de/it/en, auto-detect, fr fallback)                                                                                                                                                               |
@@ -277,7 +250,7 @@ src/
 drizzle/          D1/SQLite migrations + snapshots (legacy, inactive DB) — NEVER hand-edit
 drizzle-pg/       Postgres migrations + snapshots (active DB, drizzle.config.pg.ts) — NEVER hand-edit
 messages/         next-intl translations (fr/de/it/en)
-scripts/          push.bat (one-click publish), seed*.sql, migrate-d1-to-pg.ts (Bun,
+scripts/          seed*.sql, migrate-d1-to-pg.ts (Bun,
                   one-off D1→Postgres data migration tool, reusable if D1 ever
                   needs resyncing before the rollback safety net is retired)
 workers/cron/     standalone Cloudflare Cron Worker → POST /api/cron/maintenance
@@ -291,61 +264,62 @@ Server-side data access patterns to reuse: `getDb()` ([src/db/index.ts](src/db/i
 
 ## Deployment
 
-`git push` to `main` is _supposed_ to trigger **Cloudflare Workers Builds**
+A merge into `main` is _supposed_ to trigger **Cloudflare Workers Builds**
 (Git-native): build + deploy, with Cloudflare's own credentials — but this has
-proven unreliable in practice (see golden rule 9), and from Phase 2 of the
-stack pivot until 2026-07-09 it was **outright broken** for a real reason, not
-flakiness: `next build` needs `CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE`
-at build time and that variable only existed in local `.env*` files, never
-uploaded to Cloudflare — fixed by adding it as a **Build variable** (Worker →
-Settings → **Build tab** → "Build variables and secrets" — **not** the
-"Variables & Secrets" tab, that's runtime-only and has zero effect on the
-build; dashboard-only, no `wrangler.jsonc`/CLI/API equivalent) on both
-`swiss3design` and `swiss3design-preview`. **Always verify the push actually
-deployed**; fall
+proven unreliable in practice (see golden rule 9). `next build` needs
+`CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE` at build time; on
+Cloudflare it is a **Build variable** (Worker → Settings → **Build tab** →
+"Build variables and secrets" — **not** the "Variables & Secrets" tab, which is
+runtime-only and has no effect on the build; dashboard-only, no
+`wrangler.jsonc`/CLI/API equivalent) on both `swiss3design` and
+`swiss3design-preview`; a build failing on it means that variable is gone.
+**Always verify the merge actually deployed**; fall
 back to a manual deploy (`bunx opennextjs-cloudflare build && bunx
 opennextjs-cloudflare deploy`, i.e. `bun run deploy`) if it didn't. GitHub
 Actions runs [`quality.yml`](.github/workflows/quality.yml) (lint,
 format:check, typecheck, migrations against a throwaway Postgres, tests,
 `bun audit`) and CodeQL on every PR and every push to `main`, but deploys
-nothing: only the Cloudflare checks (« Workers Builds: … ») deploy. One-click
-publish: run [`scripts/push.bat`](scripts/push.bat).
+nothing: only the Cloudflare checks (« Workers Builds: … ») deploy.
 Full details, the two-separate-Worker preview setup, the stacked-PR merge
 pitfall, and the secrets-rotation incident:
 [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
 
-**Postgres schema changes are NOT part of this pipeline.** Unlike the old D1
-setup (migrations auto-applied by Cloudflare Workers Builds on every deploy),
-a `bun run deploy`/git-push deploy does **not** touch the Postgres schema at
-all. After editing `src/db/schema.pg.ts`, run `bun run db:generate:pg` then
-apply it against the real Neon database (`bun run db:push:pg`, or run the
+**Postgres schema changes are NOT part of this pipeline.** A deploy
+(`bun run deploy` or a merge into `main`) does **not** touch the Postgres
+schema. After editing `src/db/schema.pg.ts`, run `bun run db:generate:pg`
+then apply it against the real Neon database (`bun run db:push:pg`, or run the
 generated SQL in `drizzle-pg/` by hand) **before** deploying code that depends
-on the new columns/tables — deploy order matters here in a way it didn't
-under D1.
+on the new columns/tables: code that ships first queries columns that don't
+exist yet.
 
 ## Workflow & etiquette
 
-- **End of task:** auto-push to `main` and start the dev server (`bun run dev`).
-  Verify in a browser preview whenever it helps confirm the change — you're free
-  to use the preview/verification tools as you see fit. **Then confirm it's
-  actually live** (golden rule 9) — don't report done on faith that the push
-  triggered a deploy.
-- Branch `main` is the deploy branch; a push goes live. Be deliberate.
-- **Multi-phase features on stacked branches**: merge the top-of-stack branch
-  directly into `main` (`git merge <branch> --no-ff`) once every phase is
-  approved, rather than merging each PR one by one — see the PR-stack pitfall
-  in [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md). Verify
-  with `git log --oneline main -- <file only the last phase adds>` afterwards.
+- **End of task:** push your branch, open a PR to `main` and merge it once
+  `quality` and « Workers Builds: swiss3design-preview » are green. `main` is
+  protected: a PR is required and its branch must be up to date
+  (`gh pr update-branch <n>`, never `--admin`). Start the dev server
+  (`bun run dev`) and verify in a browser preview whenever it helps confirm the
+  change. **Then confirm it's actually live** (golden rule 9) — don't report
+  done on faith that the merge triggered a deploy.
+- Branch `main` is the deploy branch; a merge into it goes live. Be deliberate.
+- **Multi-phase features on stacked branches**: once every phase is approved,
+  merge the top-of-stack branch through a PR whose base is `main` (open one
+  from that branch, or `gh pr edit <n> --base main`), rather than merging each
+  PR one by one — see the PR-stack pitfall in
+  [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md). A local
+  `git merge` pushed to `main` would skip the required PR and `quality` check.
+  Verify with `git log --oneline main -- <file only the last phase adds>`
+  afterwards.
 - Match the surrounding style: **comments and user-facing copy are in French**;
   code identifiers in English. Keep the dense, explanatory comment style already
   in the codebase (the _why_, not the _what_).
 - Run `bun run lint` before declaring work done. When a change touches CSP, inline
   scripts, or anything runtime-specific, also run `bun run preview`.
 - **Dependabot PRs (bun):** Dependabot's lockfile update can leave a stale
-  hoisted copy of a peer dependency. In PR #36 (2026-09-26), `@better-auth/core`
-  1.7.4 stayed at the root while every 1.7.5 package nested its own 1.7.5 copy.
-  The duplicate, incompatible types broke `typecheck` and the Cloudflare
-  build. To fix it on the branch: merge `main` in, run
+  hoisted copy of a peer dependency (e.g. an older `@better-auth/core` at the
+  root while each updated `@better-auth/*` package nests its own newer copy);
+  the duplicate, incompatible types break `typecheck` and the Cloudflare build.
+  To fix it on the branch: merge `main` in, run
   `bun update <direct deps involved>`, then check that `node_modules` holds a
   single copy. Merge only when both `quality` and « Workers Builds:
   swiss3design-preview » are green.

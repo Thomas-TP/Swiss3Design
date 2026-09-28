@@ -228,7 +228,6 @@ Swiss3Design/
 │  ├─ about/                      # Photos page « À propos »
 │  └─ .well-known/security.txt    # Contact sécurité
 ├─ scripts/                       # Outils hors-app
-│  ├─ push.bat                    # Publier : commit + push (= déploiement auto)
 │  ├─ seed.sql / seed-categories.sql  # Jeux de données D1 legacy (rollback)
 │  └─ migrate-d1-to-pg.ts         # Outil de migration D1 → Postgres (Bun)
 ├─ src/
@@ -380,7 +379,7 @@ bun run db:push:pg       # applique sur la vraie base Neon
 ```
 
 **Contrairement à l'ancien D1** (migrations auto-appliquées par Cloudflare
-Workers Builds à chaque déploiement), **un `git push`/`bun run deploy` ne
+Workers Builds à chaque déploiement), **un merge sur `main`/`bun run deploy` ne
 touche jamais le schéma Postgres.** Toujours exécuter `db:push:pg` _avant_ de
 déployer du code qui dépend de nouvelles colonnes/tables — l'ordre compte.
 
@@ -398,7 +397,8 @@ OpenNext).
 ### Automatique (recommandé)
 
 Le dépôt est connecté à **Cloudflare Workers Builds** (intégration Git native).
-Tout push sur `main` déclenche, côté Cloudflare et avec ses propres identifiants :
+Tout merge sur `main` (par PR : la branche est protégée, check `quality`
+obligatoire) déclenche, côté Cloudflare et avec ses propres identifiants :
 
 1. build OpenNext (`opennextjs-cloudflare build`) ;
 2. **déploiement** sur Cloudflare Workers.
@@ -406,12 +406,9 @@ Tout push sur `main` déclenche, côté Cloudflare et avec ses propres identifia
 > Il n'y a **plus de workflow GitHub Actions** : le statut de déploiement est porté
 > par le _check_ « Cloudflare Workers Builds » sur le commit (vert = build **et**
 > deploy réussis ; rouge = l'ancienne version reste en ligne, rien n'est cassé).
-> **Toujours vérifier qu'un push a réellement déployé** — l'auto-trigger
+> **Toujours vérifier qu'un merge a réellement déployé** — l'auto-trigger
 > Cloudflare s'est déjà avéré peu fiable. Détails, filet de secours manuel et
 > configuration de preview : [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md).
-
-Pour publier en un clic : double-cliquer sur [`scripts/push.bat`](scripts/push.bat)
-(commit + push), et la mise en production démarre automatiquement.
 
 ### Manuel
 

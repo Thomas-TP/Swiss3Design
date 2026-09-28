@@ -305,11 +305,12 @@ après le merge, puis confirmé via `git log --oneline main -- <fichier connu>`.
 
 **Comment merger une pile correctement** — deux options :
 
-1. **Le plus sûr** : une fois toutes les PR de la pile approuvées, merger
-   directement en local la branche la **plus haute de la pile** (celle qui
-   contient tout, cumulée) dans `main` : `git checkout main && git merge
-<branche-la-plus-haute> --no-ff`, puis push. Ferme les PR intermédiaires
-   manuellement sur GitHub une fois `main` à jour (elles n'ont plus de diff).
+1. **Le plus sûr** : une fois toutes les PR de la pile approuvées, ouvrir une
+   PR de la branche la **plus haute de la pile** (celle qui contient tout,
+   cumulée) vers `main` et la merger quand `quality` est vert. `main` est
+   protégée (PR obligatoire, branche à jour) : un `git merge` local poussé
+   directement contournerait ce contrôle. Fermer ensuite les PR intermédiaires
+   manuellement sur GitHub (elles n'ont plus de diff).
 2. Ou re-cibler chaque PR sur `main` avant de merger (`gh pr edit N --base
 main`) — fonctionne mais casse la lecture en pile sur GitHub (chaque PR
    affichera alors _tout_ le diff cumulé, pas juste sa propre phase).

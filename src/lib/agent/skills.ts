@@ -44,7 +44,7 @@ Use the MCP server at \`${MCP}\` (Streamable HTTP, no authentication) or the RES
       "Check the status and Swiss Post tracking link of a Swiss3Design order from its order number and the email address used to place it.",
     body: `# Track a Swiss3Design order
 
-Ask the customer for their **order number** (in the confirmation email, e.g. \`S3D-1042\`) and the **email address** used for the order.
+Ask the customer for their **order number** (in the confirmation email: \`S3D-\` followed by letters and digits, e.g. \`S3D-MFZ3K2Q1A7BX\`) and the **email address** used for the order.
 
 - MCP: call \`track_order\` on \`${MCP}\` with \`{"order_number":"…","email":"…"}\`.
 - REST: \`POST ${API}/orders/track\` with the same JSON body.

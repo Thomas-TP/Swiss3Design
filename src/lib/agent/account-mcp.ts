@@ -59,8 +59,7 @@ export function unauthorized(
         ? { error: error.code, error_description: error.description }
         : {
             error: "unauthorized",
-            error_description:
-              "Bearer token required: see the WWW-Authenticate header and https://swiss3design.ch/auth.md",
+            error_description: `Bearer token required: see the WWW-Authenticate header and ${issuer}/auth.md`,
           },
     ),
     {
@@ -157,7 +156,8 @@ export async function authenticateAccountRequest(
       ok: false,
       response: unauthorized(issuer, {
         code: "invalid_token",
-        description: "Access to this account was revoked by its owner.",
+        description:
+          "This token no longer grants access: the customer removed this agent or application, or the auth.md registration it came from has since been claimed, declined or expired. See /auth.md (Revocation).",
       }),
     };
 
@@ -199,7 +199,7 @@ export function missingScope(
 }
 
 export const ACCOUNT_MCP_INSTRUCTIONS =
-  "Swiss3Design customer-account tools, acting for the signed-in customer who authorized you: list_my_orders and get_my_order (status, items, totals, Swiss Post tracking), list_my_quotes (custom 3D print quotes), get_my_profile. The public catalogue tools (search_products, get_product, get_store_info, build_cart_link…) are also available. Never ask the customer for their password: access is granted through OAuth.";
+  "Swiss3Design customer account (read-only), acting for the customer who authorized you: their orders with Swiss Post tracking, their custom 3D print quote requests and their profile, alongside the public catalogue and store tools. tools/list returns only the account tools your token's scopes allow; a token from an auth.md registration the customer has not claimed yet gets the public tools only (see /auth.md). Never ask the customer for their password: access is granted through OAuth.";
 
 function negotiate(requested: unknown): string {
   return typeof requested === "string" &&

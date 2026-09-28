@@ -465,7 +465,7 @@ export function agentAuthExtension(options: AgentAuthOptions) {
         )
           throw tokenError(
             "invalid_grant",
-            "identity assertion revoked or superseded; restart at registration",
+            "identity assertion revoked or superseded; if a claim was under way, poll the claim grant with your claim_token (it returns the post-claim tokens once the customer has confirmed), otherwise restart at registration",
           );
         const client = await provider.getClient(reg.clientId);
         if (!client || client.disabled)

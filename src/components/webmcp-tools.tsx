@@ -168,7 +168,13 @@ export function WebMcpTools() {
           type: "object",
           properties: {
             slug: { type: "string", description: "Product slug" },
-            quantity: { type: "integer", minimum: 1, maximum: 99 },
+            quantity: {
+              type: "integer",
+              minimum: 1,
+              maximum: 99,
+              description:
+                "Quantity to add (default 1); added to any quantity already in the cart, up to 99",
+            },
             color: {
               type: "string",
               description: "Colour name from colorOptions",
@@ -210,13 +216,19 @@ export function WebMcpTools() {
         name: "remove_from_cart",
         title: "Remove from cart",
         description:
-          "Remove a product (optionally a given colour or variant) from the cart.",
+          "Remove a product from the cart: every line of it, or only the line with the given colour or variant. Returns how many lines were removed (0 when nothing matched).",
         inputSchema: {
           type: "object",
           properties: {
-            slug: { type: "string" },
-            color: { type: "string" },
-            variant: { type: "string" },
+            slug: { type: "string", description: "Product slug" },
+            color: {
+              type: "string",
+              description: "Only the line with this colour name",
+            },
+            variant: {
+              type: "string",
+              description: "Only the line with this variant (id or name)",
+            },
           },
           required: ["slug"],
         },
@@ -262,12 +274,19 @@ export function WebMcpTools() {
         name: "track_order",
         title: "Track an order",
         description:
-          "Order status and Swiss Post tracking link, from the order number and email.",
+          "Order status, items, totals and Swiss Post tracking link, from the order number and the email address used for the order. A wrong number or email returns not found; lookups are rate-limited.",
         inputSchema: {
           type: "object",
           properties: {
-            order_number: { type: "string" },
-            email: { type: "string", format: "email" },
+            order_number: {
+              type: "string",
+              description: "Order number from the confirmation email (S3D-…)",
+            },
+            email: {
+              type: "string",
+              format: "email",
+              description: "Email address used for the order",
+            },
           },
           required: ["order_number", "email"],
         },

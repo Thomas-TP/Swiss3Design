@@ -14,10 +14,10 @@ import {
 
 // Agent A2A (Agent2Agent) de la boutique : un autre agent lui écrit en texte
 // libre (« un vase multicolore à moins de 50 CHF », « où en est la commande
-// S3D-1042, jean@exemple.ch ») ou appelle directement une compétence via une
-// partie `data` ({ "skill": "search_products", … }). Réponses déterministes,
-// construites sur les mêmes outils que le serveur MCP — aucun LLM côté
-// serveur, donc rien d'inventé.
+// S3D-MFZ3K2Q1A7BX, jean@exemple.ch ») ou appelle directement une
+// compétence via une partie `data` ({ "skill": "search_products", … }).
+// Réponses déterministes, construites sur les mêmes outils que le serveur
+// MCP — aucun LLM côté serveur, donc rien d'inventé.
 
 const A2A_ERRORS = {
   taskNotFound: -32001,
@@ -49,9 +49,11 @@ const SKILL_EXAMPLES: Record<ToolName, string[]> = {
     "How much is shipping to Zurich?",
     "What is your return policy?",
   ],
-  track_order: ["Where is my order S3D-1042? My email is jean@example.ch"],
+  track_order: [
+    "Where is my order S3D-MFZ3K2Q1A7BX? My email is jean@example.ch",
+  ],
   build_cart_link: [
-    '{"skill":"build_cart_link","items":[{"slug":"vase-spirale","quantity":1,"color":"Rouge"}]}',
+    '{"skill":"build_cart_link","items":[{"slug":"vase-spirale","quantity":1,"color":"Blanc"}]}',
   ],
 };
 
@@ -134,7 +136,9 @@ export function keywords(text: string): string[] {
   );
 }
 
-const ORDER_NUMBER = /\b[A-Z0-9]{2,6}-\d{3,}\b/i;
+// Format réel (lib/order-number.ts) : « S3D- » + horodatage base 36 + 4
+// caractères aléatoires, donc des lettres ET des chiffres après le tiret.
+const ORDER_NUMBER = /\bS3D-[A-Z0-9]{8,16}\b/i;
 const EMAIL = /[\w.+-]+@[\w-]+(\.[\w-]+)+/;
 const STORE_INFO =
   /\b(ship|shipping|deliver|delivery|livraison|livrer|versand|lieferung|spedizione|consegna|return|retour|rueckgabe|reso|payment|paiement|zahlung|pagamento|twint|contact|kontakt|contatto|warranty|garantie|custom|sur mesure|devis|quote|angebot|preventivo|stl|3mf)\b/i;

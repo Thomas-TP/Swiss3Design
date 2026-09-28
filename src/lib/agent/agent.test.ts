@@ -141,10 +141,20 @@ describe("serveur MCP", () => {
 
 describe("agent A2A", () => {
   it("comprend les demandes en texte libre", () => {
-    expect(routeText("Where is order S3D-1042? jean@example.ch")).toEqual({
+    expect(
+      routeText("Where is order S3D-MFZ3K2Q1A7BX? jean@example.ch"),
+    ).toEqual({
       skill: "track_order",
-      args: { order_number: "S3D-1042", email: "jean@example.ch" },
+      args: { order_number: "S3D-MFZ3K2Q1A7BX", email: "jean@example.ch" },
     });
+    // Numéro saisi en minuscules : le handler le remet en majuscules.
+    expect(
+      routeText("où en est s3d-mfz3k2q1a7bx ? jean@example.ch").skill,
+    ).toBe("track_order");
+    // Un mot composé n'est pas pris pour un numéro de commande.
+    expect(
+      routeText("Where is my multi-colour order? jean@example.ch").skill,
+    ).not.toBe("track_order");
     expect(routeText("Combien coûte la livraison ?").skill).toBe(
       "get_store_info",
     );
