@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -17,12 +16,8 @@ import { ThemeManager } from "@/components/theme-manager";
 import { JsonLd } from "@/components/json-ld";
 import { SITE_URL, siteJsonLd } from "@/lib/seo";
 import { PATHS } from "@/lib/agent/paths";
+import { archivo, geist, geistMono } from "../fonts";
 import "../globals.css";
-
-const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist-sans",
-});
 
 // Métadonnées PAR DÉFAUT : chaque page indexable pose les siennes via
 // pageMetadata() (lib/seo.ts), avec canonical, hreflang et og:url. Ce socle ne
@@ -109,7 +104,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${geist.variable} antialiased`}
+      className={`${geist.variable} ${geistMono.variable} ${archivo.variable} antialiased`}
       suppressHydrationWarning
       // Localisation approximative du visiteur (pays, canton, ville), déduite
       // de son IP par Cloudflare, lue par la mesure d'audience : en mode sans
