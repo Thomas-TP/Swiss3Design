@@ -1,1 +1,53 @@
-{}
+{
+  "nav": {
+    "primary": "Navigazione principale",
+    "mobile": "Navigazione mobile",
+    "shop": "Negozio",
+    "studio": "Studio",
+    "custom": "Su misura",
+    "atelier": "Atelier",
+    "cartCount": "Carrello, {count, plural, =0 {vuoto} one {# articolo} other {# articoli}}",
+    "favoritesCount": "Preferiti, {count, plural, =0 {nessuno} one {# oggetto} other {# oggetti}}"
+  },
+  "skip": {
+    "footer": "Vai al piè di pagina"
+  },
+  "pending": "Caricamento della pagina…",
+  "footer": {
+    "motto": "Lei regola. Noi stampiamo.",
+    "legend": "Equidistanza 0.2 mm · Scala 1:1",
+    "gland": "46°25′N 6°16′E · Gland",
+    "pully": "46°31′N 6°40′E · Pully",
+    "preferences": "Preferenze"
+  },
+  "motion": {
+    "toggle": "Riduci le animazioni",
+    "hint": "Disattiva lo scorrimento fluido, le transizioni di pagina e il 3D animato in questo browser."
+  },
+  "stage": {
+    "unavailable": "Vista 3D non disponibile su questo dispositivo: l'anteprima 2D è precisa al decimo di millimetro.",
+    "loading": "Preparazione della vista 3D…",
+    "poster": "Anteprima 2D",
+    "interactive": "Anteprima 3D: frecce per ruotare",
+    "rotateLeft": "Ruota a sinistra",
+    "rotateRight": "Ruota a destra",
+    "front": "Vista frontale",
+    "reset": "Reimposta",
+    "zoomIn": "Ingrandisci",
+    "zoomOut": "Riduci"
+  },
+  "cta": {
+    "studio": "Regola un oggetto",
+    "shop": "Vai al negozio",
+    "file": "Invia un file"
+  },
+  "ui": {
+    "close": "Chiudi",
+    "cancel": "Annulla",
+    "dismiss": "Nascondi il messaggio"
+  },
+  "media": {
+    "illustration": "Illustrazione",
+    "render": "Rendering"
+  }
+}

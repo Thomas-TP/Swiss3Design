@@ -1,1 +1,53 @@
-{}
+{
+  "nav": {
+    "primary": "Navigation principale",
+    "mobile": "Navigation mobile",
+    "shop": "Boutique",
+    "studio": "Studio",
+    "custom": "Sur mesure",
+    "atelier": "Atelier",
+    "cartCount": "Panier, {count, plural, =0 {vide} one {# article} other {# articles}}",
+    "favoritesCount": "Favoris, {count, plural, =0 {aucun} one {# objet} other {# objets}}"
+  },
+  "skip": {
+    "footer": "Aller au pied de page"
+  },
+  "pending": "Chargement de la page…",
+  "footer": {
+    "motto": "Réglez-le. On l'imprime.",
+    "legend": "Équidistance 0,2 mm · Échelle 1:1",
+    "gland": "46°25′N 6°16′E · Gland",
+    "pully": "46°31′N 6°40′E · Pully",
+    "preferences": "Préférences"
+  },
+  "motion": {
+    "toggle": "Réduire les animations",
+    "hint": "Coupe le défilement doux, les transitions de page et la 3D animée dans ce navigateur."
+  },
+  "stage": {
+    "unavailable": "Vue 3D indisponible sur cet appareil : l'aperçu 2D est exact au dixième de millimètre.",
+    "loading": "Préparation de la vue 3D…",
+    "poster": "Aperçu 2D",
+    "interactive": "Aperçu 3D : flèches pour tourner",
+    "rotateLeft": "Tourner à gauche",
+    "rotateRight": "Tourner à droite",
+    "front": "Vue de face",
+    "reset": "Réinitialiser",
+    "zoomIn": "Zoom avant",
+    "zoomOut": "Zoom arrière"
+  },
+  "cta": {
+    "studio": "Régler un objet",
+    "shop": "Voir la boutique",
+    "file": "Envoyer un fichier"
+  },
+  "ui": {
+    "close": "Fermer",
+    "cancel": "Annuler",
+    "dismiss": "Masquer le message"
+  },
+  "media": {
+    "illustration": "Illustration",
+    "render": "Rendu"
+  }
+}
