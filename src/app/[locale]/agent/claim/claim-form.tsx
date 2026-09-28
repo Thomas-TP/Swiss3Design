@@ -37,7 +37,7 @@ export function ClaimForm({ token }: { token: string }) {
         </p>
         <Link
           href="/account/agents"
-          className="text-sm font-medium text-accent hover:underline"
+          className="text-sm font-medium text-accent-text hover:underline"
         >
           {t("manage")}
         </Link>
@@ -69,7 +69,7 @@ export function ClaimForm({ token }: { token: string }) {
           className={field}
         />
         {error && (
-          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
             {t(`errors.${error}`, { remaining: confirmState.remaining ?? 0 })}
           </p>
         )}

@@ -60,7 +60,7 @@ export default async function LoginPage({
         {t("noAccount")}{" "}
         <Link
           href="/account/register"
-          className="font-semibold text-accent hover:underline"
+          className="font-semibold text-accent-text hover:underline"
         >
           {t("signUpTitle")}
         </Link>

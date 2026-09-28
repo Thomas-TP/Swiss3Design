@@ -174,7 +174,7 @@ export function QuoteForm({ materials }: { materials: string[] }) {
               type="button"
               onClick={() => setFile(null)}
               aria-label="×"
-              className="rounded-full p-1 text-soft transition-colors hover:bg-line/60 hover:text-accent"
+              className="rounded-full p-1 text-soft transition-colors hover:bg-line/60 hover:text-accent-text"
             >
               <X size={15} />
             </button>
@@ -193,7 +193,7 @@ export function QuoteForm({ materials }: { materials: string[] }) {
           </label>
         )}
         {fileError && (
-          <p className="mt-1.5 text-xs font-medium text-accent">
+          <p className="mt-1.5 text-xs font-medium text-accent-text">
             {t("fileError")}
           </p>
         )}
@@ -202,7 +202,7 @@ export function QuoteForm({ materials }: { materials: string[] }) {
       </div>
 
       {state.status === "error" && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
           {t("error")}
         </p>
       )}

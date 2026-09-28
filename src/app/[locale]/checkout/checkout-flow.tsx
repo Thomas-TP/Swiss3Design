@@ -417,7 +417,7 @@ function SummaryCard({
                   setCode("");
                   setPromoError(null);
                 }}
-                className="text-xs font-semibold text-soft transition-colors hover:text-accent"
+                className="text-xs font-semibold text-soft transition-colors hover:text-accent-text"
               >
                 {t("promoRemove")}
               </button>
@@ -447,7 +447,7 @@ function SummaryCard({
                 </button>
               </div>
               {promoError && (
-                <p className="mt-2 text-xs font-medium text-accent">
+                <p className="mt-2 text-xs font-medium text-accent-text">
                   {promoError}
                 </p>
               )}
@@ -544,7 +544,7 @@ export function CheckoutFlow({
         <p className="mt-4 text-soft">{t("emptyCart")}</p>
         <Link
           href="/shop"
-          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-accent hover:underline"
+          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-accent-text hover:underline"
         >
           {t("back")}
           <ArrowRight size={15} />
@@ -814,7 +814,7 @@ export function CheckoutFlow({
               </div>
 
               {error && (
-                <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+                <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
                   {error}
                 </p>
               )}
@@ -947,7 +947,7 @@ function PaymentStep({
       </div>
 
       {error && (
-        <p className="mt-5 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+        <p className="mt-5 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
           {error}
         </p>
       )}

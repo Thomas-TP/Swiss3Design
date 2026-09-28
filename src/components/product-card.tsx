@@ -60,7 +60,7 @@ export function ProductCard({ product }: { product: ProductListItem }) {
         <p
           className={`text-xs ${
             product.saleType === "stock" && product.stock === 0
-              ? "font-semibold text-accent"
+              ? "font-semibold text-accent-text"
               : "text-soft"
           }`}
         >

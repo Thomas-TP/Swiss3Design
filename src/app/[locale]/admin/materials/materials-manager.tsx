@@ -57,7 +57,7 @@ export function MaterialsManager({ materials }: { materials: MaterialItem[] }) {
             className={FIELD}
           />
           {state.error && (
-            <p className="mt-1.5 text-xs font-medium text-accent">
+            <p className="mt-1.5 text-xs font-medium text-accent-text">
               {state.error}
             </p>
           )}
@@ -142,7 +142,7 @@ function ColorChip({ color }: { color: ColorItem }) {
           }
         }}
         aria-label={`Supprimer la couleur ${color.name}`}
-        className="rounded-full p-0.5 text-soft transition-colors hover:bg-line/60 hover:text-accent"
+        className="rounded-full p-0.5 text-soft transition-colors hover:bg-line/60 hover:text-accent-text"
       >
         <X size={13} />
       </button>
@@ -196,7 +196,9 @@ function AddColorForm({ materialId }: { materialId: string }) {
         {pending ? "Ajout…" : "Couleur"}
       </button>
       {state.error && (
-        <p className="w-full text-xs font-medium text-accent">{state.error}</p>
+        <p className="w-full text-xs font-medium text-accent-text">
+          {state.error}
+        </p>
       )}
     </form>
   );
@@ -226,7 +228,7 @@ function DeleteMaterialButton({ material }: { material: MaterialItem }) {
         }
       }}
       aria-label={`Supprimer ${material.name}`}
-      className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-accent transition-colors hover:bg-red-500/20"
+      className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-3 py-1.5 text-xs font-semibold text-accent-text transition-colors hover:bg-red-500/20"
     >
       <Trash2 size={14} />
       Supprimer

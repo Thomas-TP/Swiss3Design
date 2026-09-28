@@ -131,7 +131,7 @@ export default async function HomePage({
             className="flex items-start gap-3.5 rounded-2xl border border-line bg-surface p-4 transition-colors hover:border-soft/40"
           >
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-paper ring-1 ring-line">
-              <Icon size={19} strokeWidth={1.8} className="text-accent" />
+              <Icon size={19} strokeWidth={1.8} className="text-accent-text" />
             </span>
             <div>
               <p className="text-sm font-semibold">{title}</p>
@@ -186,7 +186,7 @@ export default async function HomePage({
                 key={n}
                 className="relative rounded-card border border-line bg-surface p-6"
               >
-                <span className="grid h-9 w-9 place-items-center rounded-xl bg-accent/10 text-base font-bold tabular-nums text-accent">
+                <span className="grid h-9 w-9 place-items-center rounded-xl bg-accent/10 text-base font-bold tabular-nums text-accent-text">
                   {n}
                 </span>
                 <p className="mt-4 font-semibold">

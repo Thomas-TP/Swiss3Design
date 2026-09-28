@@ -190,7 +190,7 @@ export function ComposeForm({ products }: { products: Product[] }) {
           style={{ height: 560 }}
         />
         {error && (
-          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
             {error}
           </p>
         )}
@@ -281,7 +281,7 @@ export function ComposeForm({ products }: { products: Product[] }) {
           className="hidden"
         />
         {bannerError && (
-          <p className="mt-1.5 text-xs text-accent">{bannerError}</p>
+          <p className="mt-1.5 text-xs text-accent-text">{bannerError}</p>
         )}
       </div>
 
@@ -408,7 +408,7 @@ export function ComposeForm({ products }: { products: Product[] }) {
       </div>
 
       {error && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
           {error}
         </p>
       )}

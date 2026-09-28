@@ -192,7 +192,9 @@ function TwoFactor() {
               </button>
             </div>
           </div>
-          {error && <p className="text-sm font-medium text-accent">{error}</p>}
+          {error && (
+            <p className="text-sm font-medium text-accent-text">{error}</p>
+          )}
         </div>
       ) : enabled ? (
         <div className="mt-4 space-y-3">
@@ -238,7 +240,7 @@ function TwoFactor() {
                 className={field}
               />
               {error && (
-                <p className="text-sm font-medium text-accent">{error}</p>
+                <p className="text-sm font-medium text-accent-text">{error}</p>
               )}
               <div className="flex flex-wrap gap-2.5">
                 <button
@@ -276,7 +278,9 @@ function TwoFactor() {
             className={field}
           />
           <p className="text-xs text-soft">{t("security.passwordHint")}</p>
-          {error && <p className="text-sm font-medium text-accent">{error}</p>}
+          {error && (
+            <p className="text-sm font-medium text-accent-text">{error}</p>
+          )}
           <button
             type="button"
             onClick={onEnable}

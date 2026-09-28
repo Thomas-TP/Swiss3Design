@@ -34,7 +34,7 @@ export function FavoriteButton({
         size={size}
         strokeWidth={1.8}
         className={`transition-colors ${
-          active ? "fill-accent text-accent" : "text-soft hover:text-ink"
+          active ? "fill-accent text-accent-text" : "text-soft hover:text-ink"
         }`}
       />
     </button>

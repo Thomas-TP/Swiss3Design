@@ -119,7 +119,7 @@ function AddressForm({
           </option>
         ))}
       </select>
-      {error && <p className="text-sm font-medium text-accent">{error}</p>}
+      {error && <p className="text-sm font-medium text-accent-text">{error}</p>}
       <div className="flex gap-2">
         <button type="submit" disabled={pending} className={btnPrimary}>
           {pending ? t("security.processing") : t("addresses.save")}
@@ -222,7 +222,7 @@ export function AddressBook({ addresses }: { addresses: Address[] }) {
                 type="button"
                 onClick={() => onDelete(a.id)}
                 disabled={pending !== null}
-                className="text-soft transition-colors hover:text-accent disabled:opacity-40"
+                className="text-soft transition-colors hover:text-accent-text disabled:opacity-40"
                 aria-label={t("addresses.delete")}
               >
                 <Trash2 size={15} />

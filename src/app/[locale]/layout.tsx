@@ -1,6 +1,5 @@
 import { getTranslations } from "next-intl/server";
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
 import { cookies, headers } from "next/headers";
 import { notFound } from "next/navigation";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
@@ -17,12 +16,8 @@ import { ThemeManager } from "@/components/theme-manager";
 import { JsonLd } from "@/components/json-ld";
 import { SITE_URL, siteJsonLd } from "@/lib/seo";
 import { PATHS } from "@/lib/agent/paths";
+import { archivo, geist, geistMono } from "../fonts";
 import "../globals.css";
-
-const geist = Geist({
-  subsets: ["latin"],
-  variable: "--font-geist-sans",
-});
 
 // Métadonnées PAR DÉFAUT : chaque page indexable pose les siennes via
 // pageMetadata() (lib/seo.ts), avec canonical, hreflang et og:url. Ce socle ne
@@ -109,7 +104,7 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
-      className={`${geist.variable} antialiased`}
+      className={`${geist.variable} ${geistMono.variable} ${archivo.variable} antialiased`}
       suppressHydrationWarning
       // Localisation approximative du visiteur (pays, canton, ville), déduite
       // de son IP par Cloudflare, lue par la mesure d'audience : en mode sans
@@ -122,13 +117,19 @@ export default async function LocaleLayout({
       data-geo-tz={cf?.timezone}
     >
       <body className="flex min-h-screen flex-col">
-        {/* Applique le thème avant le 1er rendu : évite le flash clair→sombre.
-            Sur les navigations sans rechargement (langue, retour arrière), le
-            relais est pris par <ThemeManager>. */}
+        {/* Applique le thème et la préférence de mouvement avant le 1er rendu :
+            ni flash clair→sombre, ni animation lancée puis coupée. data-motion
+            vaut « reduce » ou « full » : choix explicite de l'interrupteur du
+            footer (localStorage « s3d-motion »), sinon prefers-reduced-motion.
+            Si le stockage est bloqué, <html> reste sans data-motion : le CSS
+            retombe sur la préférence OS et les révélations restent dans leur
+            état final. Sur les navigations sans rechargement (langue, retour
+            arrière), le relais du thème est pris par <ThemeManager>.
+            L'attribut suppressHydrationWarning de <html> couvre ces écritures. */}
         <script
           nonce={nonce}
           dangerouslySetInnerHTML={{
-            __html: `(function(){try{var t=localStorage.getItem('theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;var r=document.documentElement;r.classList.toggle('dark',d);r.style.colorScheme=d?'dark':'light';}catch(e){}})();`,
+            __html: `(function(){try{var r=document.documentElement;var t=localStorage.getItem('theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.classList.toggle('dark',d);r.style.colorScheme=d?'dark':'light';var m=null;try{m=localStorage.getItem('s3d-motion')}catch(e){}var rm=m?m==='reduce':matchMedia('(prefers-reduced-motion: reduce)').matches;r.dataset.motion=rm?'reduce':'full';}catch(e){}})();`,
           }}
         />
         {/* Données structurées de l'entreprise + du site (OnlineStore +

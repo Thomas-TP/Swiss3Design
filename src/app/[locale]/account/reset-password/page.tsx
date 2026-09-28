@@ -20,12 +20,12 @@ export default async function ResetPasswordPage({
       <div className="mt-8 rounded-card border border-line bg-surface p-6 sm:p-8">
         {!token || error ? (
           <div className="text-center">
-            <p className="text-sm font-medium leading-relaxed text-accent">
+            <p className="text-sm font-medium leading-relaxed text-accent-text">
               {t("resetInvalid")}
             </p>
             <Link
               href="/account/forgot-password"
-              className="mt-4 inline-block text-sm font-semibold text-accent hover:underline"
+              className="mt-4 inline-block text-sm font-semibold text-accent-text hover:underline"
             >
               {t("forgotTitle")}
             </Link>

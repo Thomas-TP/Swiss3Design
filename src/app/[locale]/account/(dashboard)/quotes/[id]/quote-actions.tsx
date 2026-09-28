@@ -66,7 +66,7 @@ export function QuoteActions({
           <button
             type="button"
             onClick={() => setPanel(panel === "decline" ? "none" : "decline")}
-            className="flex items-center justify-center gap-2 rounded-full border border-line bg-surface px-5 py-3.5 text-sm font-semibold text-soft transition-colors hover:border-accent hover:text-accent"
+            className="flex items-center justify-center gap-2 rounded-full border border-line bg-surface px-5 py-3.5 text-sm font-semibold text-soft transition-colors hover:border-accent hover:text-accent-text"
           >
             <Ban size={15} />
             {t("decline")}
@@ -174,7 +174,7 @@ function RevisePanel({
             type="button"
             onClick={() => setFile(null)}
             aria-label="×"
-            className="rounded-full p-1 text-soft transition-colors hover:bg-line/60 hover:text-accent"
+            className="rounded-full p-1 text-soft transition-colors hover:bg-line/60 hover:text-accent-text"
           >
             <X size={15} />
           </button>
@@ -193,13 +193,13 @@ function RevisePanel({
         </label>
       )}
       {fileError && (
-        <p className="text-xs font-medium text-accent">{t("fileError")}</p>
+        <p className="text-xs font-medium text-accent-text">{t("fileError")}</p>
       )}
       {file && <input type="hidden" name="fileKey" value={file.key} />}
       {file && <input type="hidden" name="fileName" value={file.name} />}
 
       {state.status === "error" && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
           {t("error")}
         </p>
       )}
@@ -261,7 +261,7 @@ function DeclinePanel({
       />
 
       {state.status === "error" && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
           {t("error")}
         </p>
       )}

@@ -65,7 +65,7 @@ export function Footer() {
               {t("tagline")}
             </p>
             <p className="mt-4 flex items-start gap-2 text-sm leading-snug text-soft">
-              <MapPin size={15} className="mt-0.5 shrink-0 text-accent" />
+              <MapPin size={15} className="mt-0.5 shrink-0 text-accent-text" />
               {t("madeIn")}
             </p>
           </div>
@@ -113,7 +113,7 @@ export function Footer() {
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <span className="mr-1 flex items-center gap-1.5 font-medium">
-              <ShieldCheck size={14} className="text-accent" />
+              <ShieldCheck size={14} className="text-accent-text" />
               {t("securePayment")}
             </span>
             {PAYMENT_METHODS.map((m) => (

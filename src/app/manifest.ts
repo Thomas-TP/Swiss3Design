@@ -12,8 +12,9 @@ export default function manifest(): MetadataRoute.Manifest {
     scope: "/",
     display: "standalone",
     categories: ["shopping", "design"],
-    background_color: "#fafaf9",
-    theme_color: "#1c1917",
+    // Jetons « Strates » : papier carte (fond du thème clair) et encre.
+    background_color: "#f4f0e8",
+    theme_color: "#1a1614",
     icons: [
       {
         src: "/brand/app/icon-192.png",

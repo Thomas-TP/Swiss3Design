@@ -15,7 +15,7 @@ export interface ShippingSection {
 }
 
 const link =
-  "font-medium text-accent underline-offset-2 transition-colors hover:underline";
+  "font-medium text-accent-text underline-offset-2 transition-colors hover:underline";
 
 export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
   fr: [

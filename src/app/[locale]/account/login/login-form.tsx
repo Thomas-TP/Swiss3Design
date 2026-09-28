@@ -231,7 +231,7 @@ export function LoginForm({
           className={`${field} ${isBackup ? "" : "tracking-[0.3em]"}`}
         />
         {error && (
-          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
             {error}
           </p>
         )}
@@ -291,7 +291,7 @@ export function LoginForm({
           className={`${field} tracking-[0.3em]`}
         />
         {error && (
-          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
             {error}
           </p>
         )}
@@ -349,7 +349,7 @@ export function LoginForm({
           className={field}
         />
         {error && (
-          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
             {error}
           </p>
         )}
@@ -424,14 +424,14 @@ export function LoginForm({
         <p className="mt-1.5 text-right">
           <Link
             href="/account/forgot-password"
-            className="text-xs font-medium text-soft transition-colors hover:text-accent"
+            className="text-xs font-medium text-soft transition-colors hover:text-accent-text"
           >
             {t("forgotLink")}
           </Link>
         </p>
       </div>
       {error && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
           {error}
         </p>
       )}

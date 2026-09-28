@@ -134,7 +134,7 @@ export function LocaleSwitcher() {
             >
               {NAMES[nextLocale]}
               {nextLocale === locale && (
-                <Check size={15} className="shrink-0 text-accent" />
+                <Check size={15} className="shrink-0 text-accent-text" />
               )}
             </button>
           ))}

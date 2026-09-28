@@ -400,7 +400,7 @@ export function ProductForm({
       </section>
 
       {state.error && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
           {state.error}
         </p>
       )}
@@ -474,7 +474,7 @@ function ModelManager({ initial }: { initial: string | null }) {
           <button
             type="button"
             onClick={() => setUrl(null)}
-            className="shrink-0 text-xs font-semibold text-accent hover:underline"
+            className="shrink-0 text-xs font-semibold text-accent-text hover:underline"
           >
             Retirer
           </button>
@@ -494,7 +494,7 @@ function ModelManager({ initial }: { initial: string | null }) {
         </label>
       )}
       {error && (
-        <p className="mt-2 text-xs text-accent">{`Échec : ${error}`}</p>
+        <p className="mt-2 text-xs text-accent-text">{`Échec : ${error}`}</p>
       )}
       <p className="mt-2 text-xs text-soft">STL ou GLB, 25 Mo max.</p>
     </div>
@@ -521,7 +521,7 @@ function DeleteButton({ id }: { id: string }) {
           alert("Échec de la suppression, réessayez.");
         }
       }}
-      className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-semibold text-accent transition-colors hover:bg-red-500/20"
+      className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-semibold text-accent-text transition-colors hover:bg-red-500/20"
     >
       <Trash2 size={14} />
       Supprimer
@@ -613,7 +613,7 @@ function VariantManager({ initial }: { initial: VariantInitial[] }) {
                   setRows((prev) => prev.filter((_, j) => j !== i))
                 }
                 aria-label="Retirer la variante"
-                className="grid place-items-center rounded-xl border border-line text-soft transition-colors hover:border-accent hover:text-accent"
+                className="grid place-items-center rounded-xl border border-line text-soft transition-colors hover:border-accent hover:text-accent-text"
               >
                 <X size={15} />
               </button>
@@ -757,7 +757,9 @@ function ImageManager({ initial }: { initial: Img[] }) {
           />
         </label>
       </div>
-      {error && <p className="mt-2 text-xs font-medium text-accent">{error}</p>}
+      {error && (
+        <p className="mt-2 text-xs font-medium text-accent-text">{error}</p>
+      )}
       <p className="mt-2 text-xs text-soft">
         JPG, PNG ou WebP, 8 Mo max. La première photo est l&apos;image
         principale.

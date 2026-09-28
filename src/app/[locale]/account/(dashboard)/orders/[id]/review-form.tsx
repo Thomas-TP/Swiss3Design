@@ -56,7 +56,9 @@ export function ReviewForm({
             <Star
               size={22}
               className={
-                (hover || rating) >= n ? "fill-accent text-accent" : "text-line"
+                (hover || rating) >= n
+                  ? "fill-accent text-accent-text"
+                  : "text-line"
               }
             />
           </button>
@@ -70,7 +72,7 @@ export function ReviewForm({
         placeholder={t("placeholder")}
         className="w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm outline-none transition-colors focus:border-soft/50"
       />
-      {state.error && <p className="text-xs text-accent">{t("error")}</p>}
+      {state.error && <p className="text-xs text-accent-text">{t("error")}</p>}
       <button
         type="submit"
         disabled={pending || rating === 0}

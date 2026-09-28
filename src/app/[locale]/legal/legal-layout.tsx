@@ -83,7 +83,7 @@ export function Section({
   return (
     <section>
       <h2 className="mb-3 flex items-center gap-2.5 text-lg font-bold">
-        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-accent/10 text-sm font-bold tabular-nums text-accent">
+        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-accent/10 text-sm font-bold tabular-nums text-accent-text">
           {n}
         </span>
         {title}

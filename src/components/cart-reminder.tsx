@@ -91,7 +91,7 @@ export function CartReminder() {
         {status === "sending" ? "…" : t("cta")}
       </button>
       {status === "error" && (
-        <p role="alert" className="mt-2 text-xs text-accent">
+        <p role="alert" className="mt-2 text-xs text-accent-text">
           {t("error")}
         </p>
       )}
