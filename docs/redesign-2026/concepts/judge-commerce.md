@@ -2,6 +2,7 @@
 
 > Lecture : les 3 concepts, `research/critique.md`, `research/codemap.md`, puis des vérifications
 > dans le dépôt :
+>
 > - `src/app/api/quote-upload/route.ts` : 30 Mo, 10 envois par heure et par IP, contrôle de signature ;
 > - `src/lib/file-signature.ts` : un STL binaire passe si `84 + n×50 = taille`, donc la sortie de
 >   `STLExporter` est acceptée, et un 3MF passe s'il est un zip ;
@@ -13,19 +14,19 @@
 
 ## Grille
 
-| # | Critère | Strates | G1 Atelier | Studio |
-|---|---|---|---|---|
-| 1 | Clarté du prix et des CTA | **8** | 5 | 7 |
-| 2 | Chemin vers le produit achetable (N = 1) | 6 | 6 | **7** |
-| 3 | Chemin vers une commande perso (Studio → devis) | 8 | 8 | **9** |
-| 4 | Confiance et crédibilité suisse | **9** | 7 | 6 |
-| 5 | Honnêteté (LCD art. 3, étiquettes, multicolore) | 7 | 6 | **8** |
-| 6 | Respect de la licence CC BY-ND | 7 | **9** | **9** |
-| 7 | Adéquation à la marque | **9** | 5 | 8 |
-| 8 | Passage de N = 1 à N = 50 | 8 | 8 | 8 |
-| 9 | Robustesse i18n (fr/de/it/en, de-CH) | **8** | 6 | 7 |
-| 10 | Accessibilité | **9** | 8 | 8 |
-| | **Total** | **79** | **68** | **77** |
+| #   | Critère                                         | Strates | G1 Atelier | Studio |
+| --- | ----------------------------------------------- | ------- | ---------- | ------ |
+| 1   | Clarté du prix et des CTA                       | **8**   | 5          | 7      |
+| 2   | Chemin vers le produit achetable (N = 1)        | 6       | 6          | **7**  |
+| 3   | Chemin vers une commande perso (Studio → devis) | 8       | 8          | **9**  |
+| 4   | Confiance et crédibilité suisse                 | **9**   | 7          | 6      |
+| 5   | Honnêteté (LCD art. 3, étiquettes, multicolore) | 7       | 6          | **8**  |
+| 6   | Respect de la licence CC BY-ND                  | 7       | **9**      | **9**  |
+| 7   | Adéquation à la marque                          | **9**   | 5          | 8      |
+| 8   | Passage de N = 1 à N = 50                       | 8       | 8          | 8      |
+| 9   | Robustesse i18n (fr/de/it/en, de-CH)            | **8**   | 6          | 7      |
+| 10  | Accessibilité                                   | **9**   | 8          | 8      |
+|     | **Total**                                       | **79**  | **68**     | **77** |
 
 ---
 
@@ -183,7 +184,7 @@
 
 **Idées fortes**
 
-- Le héros « vase → filament → carte portant *votre* nom », avec un vrai `<input>` SSR hors pin sur
+- Le héros « vase → filament → carte portant _votre_ nom », avec un vrai `<input>` SSR hors pin sur
   mobile : un hameçon de personnalisation dès l'accueil.
 - La garde anti-silhouette pour le Vase spirale.
 - La zone d'achat collante dès le chapitre 01 de la fiche produit.
@@ -224,8 +225,8 @@ corrigeables sans changer de thèse.
 **Depuis Studio**
 
 1. **Garde anti-silhouette** : aucun préréglage ni défaut du vase Lavaux ne doit approcher « bouteille
-   + ~40 nervures torsadées ». Nouveau défaut du héros : profil galet ou amphore, motif gradins de
-   Lavaux ou voronoï, 3 bandes. C'est aussi plus signature.
+   - ~40 nervures torsadées ». Nouveau défaut du héros : profil galet ou amphore, motif gradins de
+     Lavaux ou voronoï, 3 bandes. C'est aussi plus signature.
 2. **Surtitre et h1 explicites** : garder « Tout relief commence par une couche. » comme accroche,
    mais mettre au-dessus un surtitre SSR du type « Objets imprimés en 3D, multicolores, réglables ·
    Gland & Pully ». Ajouter la promesse « Réglez-le. On l'imprime. » comme sous-titre ou comme titre

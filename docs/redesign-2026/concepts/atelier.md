@@ -49,18 +49,18 @@ connaissons**, et dont nous garantissons qu'elle s'imprime.
 On garde les noms de jetons (un contrat avec 116 fichiers, dont l'admin). Seules les
 valeurs changent, et on en ajoute trois.
 
-| Jeton | Clair « Plateau » | Sombre « Chambre » | Usage |
-|---|---|---|---|
-| `paper` | `#F3F0EA` | `#0E0D0B` | fond |
-| `surface` / `elevated` | `#FBFAF7` / `#FFFFFF` | `#171512` / `#1F1C18` | panneaux, tableaux |
-| `ink` | `#16130F` (16,3:1) | `#EFEBE4` (16,4:1) | texte |
-| `soft` | `#625B53` (5,9:1) | `#A39B90` (7,1:1) | secondaire, étiquettes |
-| `line` | `#D9D3CA` | `#2E2A25` | filets 1 px décoratifs |
-| `accent` | `#E5231C` | `#E5231C` | remplissages, traits, buse (4,0:1 et 4,2:1 : jamais de texte < 24 px) |
-| **`accent-text`** (nouveau) | `#B8170F` (5,8:1 paper, 6,4:1 surface) | `#FF6B5E` (7,0:1 et 6,5:1) | liens et chiffres rouges |
-| **`on-accent`** (nouveau) | `#FFFFFF` sur `#E5231C` (4,6:1) | idem | boutons rouges, ≥ 16 px semi-bold |
-| **`toolpath`** (nouveau) | `#8A8176` | `#5E574F` | tracés fantômes du trancheur (non textuels, 3,4:1) |
-| `night` | `#0E0D0B` | `#0E0D0B` | chapitres « dans la machine » |
+| Jeton                       | Clair « Plateau »                      | Sombre « Chambre »         | Usage                                                                 |
+| --------------------------- | -------------------------------------- | -------------------------- | --------------------------------------------------------------------- |
+| `paper`                     | `#F3F0EA`                              | `#0E0D0B`                  | fond                                                                  |
+| `surface` / `elevated`      | `#FBFAF7` / `#FFFFFF`                  | `#171512` / `#1F1C18`      | panneaux, tableaux                                                    |
+| `ink`                       | `#16130F` (16,3:1)                     | `#EFEBE4` (16,4:1)         | texte                                                                 |
+| `soft`                      | `#625B53` (5,9:1)                      | `#A39B90` (7,1:1)          | secondaire, étiquettes                                                |
+| `line`                      | `#D9D3CA`                              | `#2E2A25`                  | filets 1 px décoratifs                                                |
+| `accent`                    | `#E5231C`                              | `#E5231C`                  | remplissages, traits, buse (4,0:1 et 4,2:1 : jamais de texte < 24 px) |
+| **`accent-text`** (nouveau) | `#B8170F` (5,8:1 paper, 6,4:1 surface) | `#FF6B5E` (7,0:1 et 6,5:1) | liens et chiffres rouges                                              |
+| **`on-accent`** (nouveau)   | `#FFFFFF` sur `#E5231C` (4,6:1)        | idem                       | boutons rouges, ≥ 16 px semi-bold                                     |
+| **`toolpath`** (nouveau)    | `#8A8176`                              | `#5E574F`                  | tracés fantômes du trancheur (non textuels, 3,4:1)                    |
+| `night`                     | `#0E0D0B`                              | `#0E0D0B`                  | chapitres « dans la machine »                                         |
 
 **Règles d'usage**
 
@@ -71,14 +71,14 @@ valeurs changent, et on en ajoute trois.
 **Filaments de démonstration** du Studio, étiquetés « teintes indicatives » tant que
 l'inventaire réel manque :
 
-| Teinte | Hex |
-|---|---|
-| Rouge S3D | `#E5231C` |
-| Encre | `#1C1917` |
-| Blanc | `#F5F5F4` |
+| Teinte     | Hex       |
+| ---------- | --------- |
+| Rouge S3D  | `#E5231C` |
+| Encre      | `#1C1917` |
+| Blanc      | `#F5F5F4` |
 | Bleu Léman | `#1D4ED8` |
-| Ambre | `#F59E0B` |
-| Béton | `#8C8A85` |
+| Ambre      | `#F59E0B` |
+| Béton      | `#8C8A85` |
 
 ### 2.2 Typographie
 
@@ -102,15 +102,15 @@ Suisse Int'l Mono.
 
 **Échelle fluide** (375 → 1440 px) :
 
-| Niveau | Valeur |
-|---|---|
-| `--t-mega` | `clamp(3.25rem, 1.6rem + 7vw, 8.5rem)` |
-| `--t-h1` | `clamp(2.4rem, 1.5rem + 3.8vw, 5rem)` |
-| `--t-h2` | `clamp(1.75rem, 1.3rem + 1.9vw, 3rem)` |
-| `--t-h3` | `clamp(1.25rem, 1.1rem + .6vw, 1.6rem)` |
-| `--t-body` | `1rem` |
-| `--t-label` | `.75rem` |
-| `--t-micro` | `.6875rem` (HUD) |
+| Niveau      | Valeur                                  |
+| ----------- | --------------------------------------- |
+| `--t-mega`  | `clamp(3.25rem, 1.6rem + 7vw, 8.5rem)`  |
+| `--t-h1`    | `clamp(2.4rem, 1.5rem + 3.8vw, 5rem)`   |
+| `--t-h2`    | `clamp(1.75rem, 1.3rem + 1.9vw, 3rem)`  |
+| `--t-h3`    | `clamp(1.25rem, 1.1rem + .6vw, 1.6rem)` |
+| `--t-body`  | `1rem`                                  |
+| `--t-label` | `.75rem`                                |
+| `--t-micro` | `.6875rem` (HUD)                        |
 
 - Interligne : 1,02 pour la display, 1,55 pour le texte.
 - On teste la mise en page avec les mots allemands longs (« Filamentwechsel »). Pas de ß
@@ -162,13 +162,13 @@ trait de 1,5 px, extrémités carrées). Lucide sert de repli.
 
 **Courbes** (`CustomEase`, dans `src/motion/gsap.ts`)
 
-| Nom | Définition | Usage |
-|---|---|---|
-| `g0` (rapide) | `M0,0 C0.7,0 0.2,1 1,1` | déplacements, panneaux, transitions |
-| `g1` (extrusion) | `M0,0 C0.12,0 0.2,1 1,1` | tracés, DrawSVG |
-| `retract` | `M0,0 C0.3,0 0.4,1.12 0.7,1.04 0.85,0.98 1,1` | fin de geste (boutons, compteurs) |
-| `purge` | `M0,0 C0.2,1.6 0.45,0.9 1,1` | apparition d'une couleur |
-| `layer` | `steps(n)` | couches, compteurs, lignes SplitText |
+| Nom              | Définition                                    | Usage                                |
+| ---------------- | --------------------------------------------- | ------------------------------------ |
+| `g0` (rapide)    | `M0,0 C0.7,0 0.2,1 1,1`                       | déplacements, panneaux, transitions  |
+| `g1` (extrusion) | `M0,0 C0.12,0 0.2,1 1,1`                      | tracés, DrawSVG                      |
+| `retract`        | `M0,0 C0.3,0 0.4,1.12 0.7,1.04 0.85,0.98 1,1` | fin de geste (boutons, compteurs)    |
+| `purge`          | `M0,0 C0.2,1.6 0.45,0.9 1,1`                  | apparition d'une couleur             |
+| `layer`          | `steps(n)`                                    | couches, compteurs, lignes SplitText |
 
 **Rythme**
 
@@ -189,11 +189,11 @@ trait de 1,5 px, extrémités carrées). Lucide sert de repli.
 
 **Équivalents tactiles**
 
-| Interaction | Souris / clavier | Tactile |
-|---|---|---|
-| Rayon X | suit le curseur | appui long puis glissé, ou bouton « Rayon X » |
-| Soulignement des liens | se trace au survol, déjà tracé au focus clavier | idem au focus |
-| Coloris | la couleur remonte les couches au survol | idem au tap |
+| Interaction            | Souris / clavier                                | Tactile                                       |
+| ---------------------- | ----------------------------------------------- | --------------------------------------------- |
+| Rayon X                | suit le curseur                                 | appui long puis glissé, ou bouton « Rayon X » |
+| Soulignement des liens | se trace au survol, déjà tracé au focus clavier | idem au focus                                 |
+| Coloris                | la couleur remonte les couches au survol        | idem au tap                                   |
 
 Pas de bouton magnétique : il n'a pas de cause physique.
 
@@ -241,13 +241,13 @@ Le LCP est le H1 ou le SVG. Il n'y a ni overlay ni opacité à 0.
 
 **Storyboard par battement**
 
-| Battement | Desktop | Mobile 375 px | Mouvement réduit |
-|---|---|---|---|
-| **B0** idle à +1,2 s | Le canvas se superpose au SVG au même cadrage (240 ms). Loader : le mark se remplit par hachures dans le header. | Identique, DPR 1,5 | SVG seul |
+| Battement                         | Desktop                                                                                                                                                                                                            | Mobile 375 px                                                                                                      | Mouvement réduit                  |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------ | --------------------------------- |
+| **B0** idle à +1,2 s              | Le canvas se superpose au SVG au même cadrage (240 ms). Loader : le mark se remplit par hachures dans le header.                                                                                                   | Identique, DPR 1,5                                                                                                 | SVG seul                          |
 | **B1** scroll 0–60 % (pin 250 vh) | `uPrintHeight` scrubbé de 0 à 180 mm. PBR plein sous la coupe, **aperçu fantôme** au-dessus (un anneau sur 6, en LineSegments). Une buse suit la spirale, avec un liseré émissif rouge. Le HUD avance par paliers. | Pin de 120 vh, puis lecture automatique. Une **réglette Z** verticale (`input range`) permet de scrubber au pouce. | Sélecteur de couche 1 / 450 / 900 |
-| **B2** changements de bobine | Pause de 120 ms, flash `purge`, la **tour de purge** gagne un palier. Libellé : « Changement 2/2 · purge 3,1 g ». | Identique | Tableau |
-| **B3** 60–85 % | L'objet se décolle du plateau, pivote de ¾ et s'**éclate par filament** : les bandes s'écartent de 12 mm, chacune étiquetée (« PLA Encre · couches 1–300 · 14 g »). | Lecture automatique, étiquettes en liste | Image fixe + liste |
-| **B4** 85–100 % | L'objet se réassemble. « Régler le mien » ouvre `/studio/vase` avec la même configuration. | CTA collant | Idem |
+| **B2** changements de bobine      | Pause de 120 ms, flash `purge`, la **tour de purge** gagne un palier. Libellé : « Changement 2/2 · purge 3,1 g ».                                                                                                  | Identique                                                                                                          | Tableau                           |
+| **B3** 60–85 %                    | L'objet se décolle du plateau, pivote de ¾ et s'**éclate par filament** : les bandes s'écartent de 12 mm, chacune étiquetée (« PLA Encre · couches 1–300 · 14 g »).                                                | Lecture automatique, étiquettes en liste                                                                           | Image fixe + liste                |
+| **B4** 85–100 %                   | L'objet se réassemble. « Régler le mien » ouvre `/studio/vase` avec la même configuration.                                                                                                                         | CTA collant                                                                                                        | Idem                              |
 
 **Technique**
 
@@ -264,13 +264,13 @@ Le LCP est le H1 ou le SVG. Il n'y a ni overlay ni opacité à 0.
 
 **Budgets**
 
-| Poste | Budget |
-|---|---|
-| Stage | ≤ 190 KiB gzip |
-| Chunk motion (GSAP + plugins + Lenis) | ≤ 65 KiB |
-| Worker | **+0 KiB** |
-| Cadence | 60 fps sur M1 et iPhone 12, déclassement automatique après 60 frames lentes |
-| Rendu | à la demande, pause hors écran et onglet caché |
+| Poste                                 | Budget                                                                      |
+| ------------------------------------- | --------------------------------------------------------------------------- |
+| Stage                                 | ≤ 190 KiB gzip                                                              |
+| Chunk motion (GSAP + plugins + Lenis) | ≤ 65 KiB                                                                    |
+| Worker                                | **+0 KiB**                                                                  |
+| Cadence                               | 60 fps sur M1 et iPhone 12, déclassement automatique après 60 frames lentes |
+| Rendu                                 | à la demande, pause hors écran et onglet caché                              |
 
 ---
 
@@ -282,16 +282,16 @@ Le LCP est le H1 ou le SVG. Il n'y a ni overlay ni opacité à 0.
 
 - Paramètres :
 
-  | Paramètre | Plage | Défaut |
-  |---|---|---|
-  | Hauteur | 80–240 mm | 180 |
-  | Diamètre | 50–140 mm | 90 |
-  | Profil | droit, bouteille, amphore, cône | — |
-  | Motif | nervures, torsade, vagues, voronoï, lisse | — |
-  | Nombre de motifs | 6–60 | 24 |
-  | Amplitude | 0–4 mm | 2 |
-  | Torsion | −180° à 180° | 35° |
-  | Bandes | 1–4 | — |
+  | Paramètre        | Plage                                     | Défaut |
+  | ---------------- | ----------------------------------------- | ------ |
+  | Hauteur          | 80–240 mm                                 | 180    |
+  | Diamètre         | 50–140 mm                                 | 90     |
+  | Profil           | droit, bouteille, amphore, cône           | —      |
+  | Motif            | nervures, torsade, vagues, voronoï, lisse | —      |
+  | Nombre de motifs | 6–60                                      | 24     |
+  | Amplitude        | 0–4 mm                                    | 2      |
+  | Torsion          | −180° à 180°                              | 35°    |
+  | Bandes           | 1–4                                       | —      |
 
 - Géométrie : surface paramétrique `r(θ,z) = profil(z)·(1 + motif(θ + torsion·z/h, z))`.
   Le voronoï est un relief cellulaire, sans trou. Le fond est plein (1,2 mm). La pente
@@ -340,12 +340,12 @@ liste `[{ filament, zDébut }]`, avec 4 filaments au maximum.
 
 ### 5.3 Rapport de tranchage (calculé dans un Web Worker)
 
-| Donnée | Calcul |
-|---|---|
-| Couches | `ceil(h / 0,2)` |
+| Donnée  | Calcul                                                                                                                                   |
+| ------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| Couches | `ceil(h / 0,2)`                                                                                                                          |
 | Grammes | volume extrudé × 1,24 g/cm³. Mode vase : aire × ligne de 0,45 mm. Objets pleins : 2 périmètres + 4 couches pleines + 15 % de remplissage |
-| Temps | longueur du trajet / vitesse par type + 1,5 s par couche + 75 s par permutation |
-| Purge | permutations × grammes par purge, avec la tour dessinée |
+| Temps   | longueur du trajet / vitesse par type + 1,5 s par couche + 75 s par permutation                                                          |
+| Purge   | permutations × grammes par purge, avec la tour dessinée                                                                                  |
 
 - Mention affichée : « estimation ±20 % ». On calibre sur 3 exports Bambu Studio.
 - Les coefficients vivent dans `src/lib/studio/estimate.ts`, partagé entre client et
@@ -478,7 +478,7 @@ couches, prix) avec une bascule vers une grille.
 **Éléments globaux**
 
 - **Header** : 64 px, wordmark et mark raster. Nav : `Boutique · Studio · Sur mesure ·
-  Atelier`. La barre Z sert d'indicateur de progression.
+Atelier`. La barre Z sert d'indicateur de progression.
 - **BottomNav** : Accueil, Boutique, **Studio** (à la place de Sur mesure, accessible
   depuis le Studio et le footer), Panier, Compte. On corrige le trou `md`/`lg`.
 - **Footer** : wordmark géant **en texte**, tracé en contour puis rempli de hachures. On y
@@ -493,16 +493,16 @@ couches, prix) avec une bascule vers une grille.
 
 **Composants**
 
-| Famille | Composants |
-|---|---|
-| Structure et navigation | `ChapterRail`, `ZBar`, `DrawLink`, `LayerReveal` (paliers de clip-path) |
-| Données | `SpecTable`, `SliceReport`, `HudReadout` |
-| Tracé | `ToolpathSvg` (SSR), `HatchReveal` |
-| Studio | `FilamentSwatch`, `BandSlider`, `StudioPanel`, `StudioSheet`, `SendToWorkshop` |
-| Catalogue | `AttributionBlock`, `RegistryTable`, `ProductGrid` |
-| Commande et suivi | `PrintQueueLine`, `LayerTimeline` |
-| Préférences | `SoundToggle`, `MotionToggle` |
-| Moteur | `StageMount` (`dynamic` avec `ssr: false`), `MotionRuntime` |
+| Famille                 | Composants                                                                     |
+| ----------------------- | ------------------------------------------------------------------------------ |
+| Structure et navigation | `ChapterRail`, `ZBar`, `DrawLink`, `LayerReveal` (paliers de clip-path)        |
+| Données                 | `SpecTable`, `SliceReport`, `HudReadout`                                       |
+| Tracé                   | `ToolpathSvg` (SSR), `HatchReveal`                                             |
+| Studio                  | `FilamentSwatch`, `BandSlider`, `StudioPanel`, `StudioSheet`, `SendToWorkshop` |
+| Catalogue               | `AttributionBlock`, `RegistryTable`, `ProductGrid`                             |
+| Commande et suivi       | `PrintQueueLine`, `LayerTimeline`                                              |
+| Préférences             | `SoundToggle`, `MotionToggle`                                                  |
+| Moteur                  | `StageMount` (`dynamic` avec `ssr: false`), `MotionRuntime`                    |
 
 Tout le code motion vit sous `src/motion/**`, protégé par une règle oxlint
 `no-restricted-imports`. Le groupe `(site)` exclut du Stage et de Lenis le checkout, le
@@ -510,14 +510,14 @@ compte, l'admin, `oauth` et `agent`.
 
 **Scènes du Stage** (un seul renderer, avec des vues en scissor)
 
-| Scène | Contenu |
-|---|---|
-| `hero-print` | coupe, fantôme, buse, tour de purge, éclatement |
-| `xray-relief` | coque et gyroïde, masque sous le pointeur à basse résolution |
-| `studio-bed` | 4 générateurs, simulation par `drawRange` |
-| `product-turntable` | STL réel du vase, orbite seulement |
-| `machines-exploded` | optionnelle, repli en SVG |
-| footer | SVG pur |
+| Scène               | Contenu                                                      |
+| ------------------- | ------------------------------------------------------------ |
+| `hero-print`        | coupe, fantôme, buse, tour de purge, éclatement              |
+| `xray-relief`       | coque et gyroïde, masque sous le pointeur à basse résolution |
+| `studio-bed`        | 4 générateurs, simulation par `drawRange`                    |
+| `product-turntable` | STL réel du vase, orbite seulement                           |
+| `machines-exploded` | optionnelle, repli en SVG                                    |
+| footer              | SVG pur                                                      |
 
 **Vrais toolpaths.** Ces objets sortent de notre code, donc nous calculons leur trajet
 réel dans le Worker :
@@ -583,30 +583,30 @@ Des verbes d'atelier, des chiffres exacts, un humour qui tient dans la précisio
 
 ## 10. Risques et phasage
 
-| Risque | Parade |
-|---|---|
-| Géométrie lente au réglage | Basse résolution par frame, Worker, budget de 8 ms |
-| Objet non imprimable | Bornes, validateur en direct, relecture par l'atelier |
-| Chiffres trompeurs | Mention « estimation », étalonnage, pas de CHF sans coefficients |
-| Licence du Vase spirale | Viewer seul, attribution, aucun traitement de la géométrie, test e2e du bloc |
-| Texte offensant | Le devis impose une modération humaine |
-| Données personnelles dans l'URL | Textes exclus |
-| Taille de l'upload | Vérifier `/api/quote-upload`, plafonner à 300 000 triangles |
-| Stripe | Groupe `(site)` |
-| LCP | H1 et SVG en SSR, canvas superposé |
-| Contextes WebGL | Un seul renderer |
-| Replays PostHog | Exclure `[data-stage]` |
-| Longueur des textes en DE | Tests dédiés, `wdth` réductible |
-| Firefox | Fondu simple, repli en JS |
+| Risque                          | Parade                                                                       |
+| ------------------------------- | ---------------------------------------------------------------------------- |
+| Géométrie lente au réglage      | Basse résolution par frame, Worker, budget de 8 ms                           |
+| Objet non imprimable            | Bornes, validateur en direct, relecture par l'atelier                        |
+| Chiffres trompeurs              | Mention « estimation », étalonnage, pas de CHF sans coefficients             |
+| Licence du Vase spirale         | Viewer seul, attribution, aucun traitement de la géométrie, test e2e du bloc |
+| Texte offensant                 | Le devis impose une modération humaine                                       |
+| Données personnelles dans l'URL | Textes exclus                                                                |
+| Taille de l'upload              | Vérifier `/api/quote-upload`, plafonner à 300 000 triangles                  |
+| Stripe                          | Groupe `(site)`                                                              |
+| LCP                             | H1 et SVG en SSR, canvas superposé                                           |
+| Contextes WebGL                 | Un seul renderer                                                             |
+| Replays PostHog                 | Exclure `[data-stage]`                                                       |
+| Longueur des textes en DE       | Tests dédiés, `wdth` réductible                                              |
+| Firefox                         | Fondu simple, repli en JS                                                    |
 
 **Phases** (preview dédiée, validation du propriétaire à chaque jalon)
 
-| Phase | Contenu |
-|---|---|
+| Phase  | Contenu                                                                                             |
+| ------ | --------------------------------------------------------------------------------------------------- |
 | **P0** | Jetons, polices, `accent-text`, groupe `(site)`, `MotionRuntime`, garde-fou oxlint, Worker à +0 KiB |
-| **P1** | Générateur Onde, posters au build, `hero-print`, accueil |
-| **P2** | Studio Onde : rapport, simulation, URL, envoi à l'atelier |
-| **P3** | Carte, Étiquette et Relief, polices JSON, rayon X |
-| **P4** | Registre (N = 1 et N = 50), fiche NODAL, attribution |
-| **P5** | Pages secondaires, transitions, footer, 404, son |
-| **P6** | Tier B : `studio_config`, prix serveur, panier direct, rendus et photos |
+| **P1** | Générateur Onde, posters au build, `hero-print`, accueil                                            |
+| **P2** | Studio Onde : rapport, simulation, URL, envoi à l'atelier                                           |
+| **P3** | Carte, Étiquette et Relief, polices JSON, rayon X                                                   |
+| **P4** | Registre (N = 1 et N = 50), fiche NODAL, attribution                                                |
+| **P5** | Pages secondaires, transitions, footer, 404, son                                                    |
+| **P6** | Tier B : `studio_config`, prix serveur, panier direct, rendus et photos                             |

@@ -6,43 +6,43 @@
 
 ## 1. Nom et thèse
 
-**Studio.** Le site ne *montre* pas des objets. Il les **règle devant vous**, puis les envoie à l'atelier.
+**Studio.** Le site ne _montre_ pas des objets. Il les **règle devant vous**, puis les envoie à l'atelier.
 La scène d'accueil est un vrai configurateur en direct. Le vase qu'on y voit est le nôtre, il est
 paramétrique et on le modifie au scroll. Chaque état naît du précédent : un motif devient un autre motif,
 la couleur monte le long des couches, le vase se défait en filament qui se redépose en carte de visite
-portant *votre* nom.
+portant _votre_ nom.
 
 Pourquoi c'est juste pour cette marque, et pas du « motion slop » :
 
 - **La vérité du sujet.** Une impression FDM empile des couches de 0,2 mm et change de couleur à une
-  hauteur donnée. Notre mouvement *est* ce procédé : quantification par couche, bandes de couleur,
+  hauteur donnée. Notre mouvement _est_ ce procédé : quantification par couche, bandes de couleur,
   dépôt par strates. Le mark (pic alpin, 6 strates) dit déjà la même chose.
 - **N = 1 n'est plus un problème.** Le catalogue vivant, ce sont 4 objets procéduraux infinis. Le Vase
   spirale de Ian reste une vitrine honnête : montré, tourné, jamais modifié.
 - **Personne ne le fait.** Gantri, Nagami et Zellerfeld n'ont aucun WebGL ; les configurateurs primés
   (Qudrix, Scout, iyO) vendent des voitures et des cabanes.
 - **Ce qu'on garde de « La Forge »** : le sur-mesure comme outil plutôt que formulaire, l'attente
-  narrée, *prix ferme ou indicatif*, le coût de purge affiché, « le serveur ne croit jamais le prix
+  narrée, _prix ferme ou indicatif_, le coût de purge affiché, « le serveur ne croit jamais le prix
   client », un seul CTA rouge par écran, les interdits (compte à rebours, faux « 3 personnes
   regardent », carrousels auto). **Reporté** : l'analyse de fichiers (`/forge`), `/matieres`, `/pro`.
-  Le Studio est la Forge *de nos objets* ; le fichier du client passe toujours par `/custom`. La double
+  Le Studio est la Forge _de nos objets_ ; le fichier du client passe toujours par `/custom`. La double
   intention devient trois temps : **Régler**, **Acheter**, **Envoyer un fichier**.
 
 ## 2. Direction artistique
 
 ### 2.1 Palette (noms des jetons conservés : c'est un contrat avec 116 fichiers, dont l'admin)
 
-| Jeton | Clair | Sombre | Contraste (texte sur `paper`) |
-|---|---|---|---|
-| `paper` | `#F7F4EF` papier chaud | `#0E0C0B` encre | — |
-| `surface` | `#FFFFFF` | `#191614` | — |
-| `elevated` | `#FFFFFF` | `#221E1B` | — |
-| `ink` | `#1A1614` | `#F4EFE8` | 16,4:1 / 16,8:1 |
-| `soft` | `#6B645C` | `#A39C92` | 5,3:1 / 7,2:1 |
-| `line` | `#E6E0D8` | `#2A2622` | décoratif |
-| `accent` (fonds, traits, ≥ 24 px) | `#E5231C` | `#E5231C` | 4,2:1 / 4,3:1 : **jamais en texte courant** |
-| **`accent-text`** (nouveau) | `#C01D14` (= `accent-dark`) | `#FF5A4E` | 5,6:1 / 6,3:1 |
-| `on-accent` | `#FFFFFF` | `#FFFFFF` | 4,6:1 sur `#E5231C` (texte ≥ 16 px en 600) |
+| Jeton                             | Clair                       | Sombre          | Contraste (texte sur `paper`)               |
+| --------------------------------- | --------------------------- | --------------- | ------------------------------------------- |
+| `paper`                           | `#F7F4EF` papier chaud      | `#0E0C0B` encre | —                                           |
+| `surface`                         | `#FFFFFF`                   | `#191614`       | —                                           |
+| `elevated`                        | `#FFFFFF`                   | `#221E1B`       | —                                           |
+| `ink`                             | `#1A1614`                   | `#F4EFE8`       | 16,4:1 / 16,8:1                             |
+| `soft`                            | `#6B645C`                   | `#A39C92`       | 5,3:1 / 7,2:1                               |
+| `line`                            | `#E6E0D8`                   | `#2A2622`       | décoratif                                   |
+| `accent` (fonds, traits, ≥ 24 px) | `#E5231C`                   | `#E5231C`       | 4,2:1 / 4,3:1 : **jamais en texte courant** |
+| **`accent-text`** (nouveau)       | `#C01D14` (= `accent-dark`) | `#FF5A4E`       | 5,6:1 / 6,3:1                               |
+| `on-accent`                       | `#FFFFFF`                   | `#FFFFFF`       | 4,6:1 sur `#E5231C` (texte ≥ 16 px en 600)  |
 
 Migration : les 107 `text-accent` passent en `text-accent-text` par codemod. Le rouge plein reste pour
 les pastilles, les boutons, la buse et les ronds de ponctuation. `night` reste le panneau sombre constant.
@@ -95,19 +95,19 @@ dépôt). (2) **Couche par couche** : les révélations sont quantifiées (`step
 
 **Courbes (CustomEase, `src/motion/gsap.ts`)** :
 
-| Nom | Chemin | Usage |
-|---|---|---|
-| `s3d.extrude` | `M0,0 C0.12,0.72 0.24,1 1,1` | entrées, morphs de paramètres |
-| `s3d.nozzle` | `M0,0 C0.65,0 0.35,1 1,1` | caméra, transitions longues |
-| `s3d.pop` | `M0,0 C0.3,1.32 0.55,1 1,1` | pastille choisie, ajout panier |
-| `s3d.purge` | `M0,0 C0.5,0 0.1,1 1,1` | front de changement de couleur |
-| `s3d.layer` | `steps(12)` | révélations quantifiées, transition de page |
+| Nom           | Chemin                       | Usage                                       |
+| ------------- | ---------------------------- | ------------------------------------------- |
+| `s3d.extrude` | `M0,0 C0.12,0.72 0.24,1 1,1` | entrées, morphs de paramètres               |
+| `s3d.nozzle`  | `M0,0 C0.65,0 0.35,1 1,1`    | caméra, transitions longues                 |
+| `s3d.pop`     | `M0,0 C0.3,1.32 0.55,1 1,1`  | pastille choisie, ajout panier              |
+| `s3d.purge`   | `M0,0 C0.5,0 0.1,1 1,1`      | front de changement de couleur              |
+| `s3d.layer`   | `steps(12)`                  | révélations quantifiées, transition de page |
 
 **Durées** : micro 160 ms · UI 320 ms · section 700 ms · morph héros 1 200 ms. **Stagger** : bande de
 couches 18 ms, caractères 24 ms, cartes 60 ms.
 
 **Scroll** : Lenis (`lerp 0.1`, `autoRaf:false` sur `gsap.ticker`) uniquement dans le groupe `(site)`
-(accueil, boutique, produit, studio *hors panneau de réglage*, à propos, contact). **Pas de Lenis** sur
+(accueil, boutique, produit, studio _hors panneau de réglage_, à propos, contact). **Pas de Lenis** sur
 cart, checkout, account, auth, oauth, agent, track, favorites, legal et admin. Une seule section pinnée
 par page, `scrub: 0.8`, `ScrollTrigger.config({ ignoreMobileResize: true })`, unités `svh`.
 
@@ -140,14 +140,14 @@ Aucun overlay, aucun `opacity:0` sur le h1.
 
 **Desktop** (section pinnée 320 vh, Stage chargé en idle quand le héros est visible) :
 
-| Scroll | Beat | Technique |
-|---|---|---|
-| Arrivée | Le canvas remplace le poster **au pixel près** (même caméra, mêmes paramètres : aucun fondu), puis une **vague de couleur** monte les couches. | Ripple le long de Y (iyO) : `mix(colA, colB, smoothstep(front-0.02, front, yNorm))`, liseré émissif rouge au front |
-| 0–25 % | **Motif** : Nervures → Torsade → Voronoï → Vagues → Relief ; légende et grammes suivent. | Vertex shader : `r = profile(z) + Σ wᵢ·patternᵢ(θ,z)`, poids interpolés, normales par différences finies |
-| 25–45 % | **Taille** : 120 → 240 mm. Une règle graduée pousse, l'odomètre recompte les couches. | Uniform `uHeight` + rescale du profil ; DOM mis à jour à 10 Hz au plus |
-| 45–65 % | **Couleur** : 4 bandes de filament montent en vague, avec un flash de purge à chaque limite. Les pastilles s'allument. | Bandes = uniform `vec4 uBandTop` + `vec3 uBandCol[4]` ; `floor(y/0.2)` pour que la limite tombe sur une couche |
-| 65–85 % | **Filament** : le vase se défait en particules du haut vers le bas, qui retombent et se **déposent en strates** pour former une carte de visite. | `Points` échantillonnés sur la surface (40 k), deux attributs `aFrom` (vase) et `aTo` (carte), progression par particule décalée selon Y, `aTo.y` quantifié par couches |
-| 85–100 % | **Votre nom** : la carte pivote vers la caméra. Un vrai `<input>` SSR « Votre nom » apparaît sous le Stage. Chaque frappe réextrude le texte en direct. CTA « Continuer dans le Studio → » (le nom passe dans l'URL). | `TextGeometry` régénérée en debounce de 120 ms (≤ 5 ms), matériau texte ≠ matériau base (2 filaments) |
+| Scroll   | Beat                                                                                                                                                                                                                  | Technique                                                                                                                                                               |
+| -------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Arrivée  | Le canvas remplace le poster **au pixel près** (même caméra, mêmes paramètres : aucun fondu), puis une **vague de couleur** monte les couches.                                                                        | Ripple le long de Y (iyO) : `mix(colA, colB, smoothstep(front-0.02, front, yNorm))`, liseré émissif rouge au front                                                      |
+| 0–25 %   | **Motif** : Nervures → Torsade → Voronoï → Vagues → Relief ; légende et grammes suivent.                                                                                                                              | Vertex shader : `r = profile(z) + Σ wᵢ·patternᵢ(θ,z)`, poids interpolés, normales par différences finies                                                                |
+| 25–45 %  | **Taille** : 120 → 240 mm. Une règle graduée pousse, l'odomètre recompte les couches.                                                                                                                                 | Uniform `uHeight` + rescale du profil ; DOM mis à jour à 10 Hz au plus                                                                                                  |
+| 45–65 %  | **Couleur** : 4 bandes de filament montent en vague, avec un flash de purge à chaque limite. Les pastilles s'allument.                                                                                                | Bandes = uniform `vec4 uBandTop` + `vec3 uBandCol[4]` ; `floor(y/0.2)` pour que la limite tombe sur une couche                                                          |
+| 65–85 %  | **Filament** : le vase se défait en particules du haut vers le bas, qui retombent et se **déposent en strates** pour former une carte de visite.                                                                      | `Points` échantillonnés sur la surface (40 k), deux attributs `aFrom` (vase) et `aTo` (carte), progression par particule décalée selon Y, `aTo.y` quantifié par couches |
+| 85–100 % | **Votre nom** : la carte pivote vers la caméra. Un vrai `<input>` SSR « Votre nom » apparaît sous le Stage. Chaque frappe réextrude le texte en direct. CTA « Continuer dans le Studio → » (le nom passe dans l'URL). | `TextGeometry` régénérée en debounce de 120 ms (≤ 5 ms), matériau texte ≠ matériau base (2 filaments)                                                                   |
 
 **Mobile 375 px** : pin de 200 svh, 3 beats seulement (motif → couleur → carte), 8 k particules, DPR
 1,5, pas de post-traitement. L'input du nom est **hors pin**, juste sous la section (le clavier iOS ne
@@ -168,13 +168,13 @@ triangles. Un seul contexte WebGL, rendu à la demande au repos, pause hors écr
 
 ### 5.1 Catalogue d'objets procéduraux (originaux Swiss3Design)
 
-| Objet | Paramètres (plage, défaut) | Géométrie |
-|---|---|---|
-| **Vase Strata** | hauteur 100–240 (180) mm ; Ø max 60–140 (96) ; profil : Cylindre, Tulipe, Amphore, Galet, Colonne ; galbe 0–1 (0,45), col 0,3–1 (0,6), évasement 0–1 (0,2) ; motif : Lisse, Nervures (12–64, prof. 0–3 mm), Torsade (0–360°), Voronoï (8–40 cellules, graine), Vagues (fréq. 2–24, amp. 0–3 mm), Relief (terrasses topographiques, graine nommée d'après un sommet vaudois, ex. « Dent de Jaman ») ; 1–4 filaments, 1–8 bandes | `BufferGeometry` paramétrique maison (anneaux × segments). Profil Catmull-Rom sur 5 rayons, déplacement `d(θ,z)` calculé sur CPU (pour l'export) **et** en GLSL (pour le morph), avec un test unitaire qui compare les deux. Fond fermé, maillage étanche. Aucun préréglage ne reproduit la silhouette du Vase spirale (bouteille à 40 nervures torsadées). |
-| **Carte Relief** (carte de visite) | 85 × 55 mm ; base 0,8–2,0 (1,2) mm ; relief 0,4–1,2 (0,6) mm, **en relief ou gravé** ; mises en page : Classique, Centrée, Monogramme, Grille suisse, QR (vCard) ; 3 polices ; rayon 0–6 mm ; nom ≤ 28 car., 3 lignes ≤ 40 car. ; 2–3 filaments | `Shape` rectangle arrondi → `ExtrudeGeometry`. Texte : `FontLoader` + `TextGeometry` (`curveSegments 4`). **Gravé sans CSG** : la dalle du dessus prend les contours des glyphes comme `holes`, et les contrepoinçons (o, a, e…) sont rajoutés en îlots. QR : modules extrudés d'au moins 1,2 mm (version bornée, sinon avertissement). |
-| **Étiquette Nom** (porte-clés) | texte 1–14 car. ; forme : Pilule, Fanion, Étiquette ; anneau Ø 4–6 mm ; épaisseur 2–4 mm ; 2 filaments par hauteur | `Shape` avec trou + texte extrudé fusionné |
-| **Sous-verre Topo** | Ø 90–110 (100) ; niveaux 4–12 (8) ; 2–4 filaments **teintés par altitude** (comme une carte nationale) ; terrain : graine procédurale (Tier A) ou relief réel swisstopo (Tier B, attribution) | Heightmap 128², marching squares maison (~150 lignes), chaque niveau extrudé sur 0,6 mm (3 couches) : la démonstration idéale du multicolore par bandes |
-| *Plus tard* | Chevalet de bureau (texte sur socle incliné) ; abat-jour Lumen (LED seulement : le PLA ramollit vers 55–60 °C) | — |
+| Objet                              | Paramètres (plage, défaut)                                                                                                                                                                                                                                                                                                                                                                                                     | Géométrie                                                                                                                                                                                                                                                                                                                                                   |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Vase Strata**                    | hauteur 100–240 (180) mm ; Ø max 60–140 (96) ; profil : Cylindre, Tulipe, Amphore, Galet, Colonne ; galbe 0–1 (0,45), col 0,3–1 (0,6), évasement 0–1 (0,2) ; motif : Lisse, Nervures (12–64, prof. 0–3 mm), Torsade (0–360°), Voronoï (8–40 cellules, graine), Vagues (fréq. 2–24, amp. 0–3 mm), Relief (terrasses topographiques, graine nommée d'après un sommet vaudois, ex. « Dent de Jaman ») ; 1–4 filaments, 1–8 bandes | `BufferGeometry` paramétrique maison (anneaux × segments). Profil Catmull-Rom sur 5 rayons, déplacement `d(θ,z)` calculé sur CPU (pour l'export) **et** en GLSL (pour le morph), avec un test unitaire qui compare les deux. Fond fermé, maillage étanche. Aucun préréglage ne reproduit la silhouette du Vase spirale (bouteille à 40 nervures torsadées). |
+| **Carte Relief** (carte de visite) | 85 × 55 mm ; base 0,8–2,0 (1,2) mm ; relief 0,4–1,2 (0,6) mm, **en relief ou gravé** ; mises en page : Classique, Centrée, Monogramme, Grille suisse, QR (vCard) ; 3 polices ; rayon 0–6 mm ; nom ≤ 28 car., 3 lignes ≤ 40 car. ; 2–3 filaments                                                                                                                                                                                | `Shape` rectangle arrondi → `ExtrudeGeometry`. Texte : `FontLoader` + `TextGeometry` (`curveSegments 4`). **Gravé sans CSG** : la dalle du dessus prend les contours des glyphes comme `holes`, et les contrepoinçons (o, a, e…) sont rajoutés en îlots. QR : modules extrudés d'au moins 1,2 mm (version bornée, sinon avertissement).                     |
+| **Étiquette Nom** (porte-clés)     | texte 1–14 car. ; forme : Pilule, Fanion, Étiquette ; anneau Ø 4–6 mm ; épaisseur 2–4 mm ; 2 filaments par hauteur                                                                                                                                                                                                                                                                                                             | `Shape` avec trou + texte extrudé fusionné                                                                                                                                                                                                                                                                                                                  |
+| **Sous-verre Topo**                | Ø 90–110 (100) ; niveaux 4–12 (8) ; 2–4 filaments **teintés par altitude** (comme une carte nationale) ; terrain : graine procédurale (Tier A) ou relief réel swisstopo (Tier B, attribution)                                                                                                                                                                                                                                  | Heightmap 128², marching squares maison (~150 lignes), chaque niveau extrudé sur 0,6 mm (3 couches) : la démonstration idéale du multicolore par bandes                                                                                                                                                                                                     |
+| _Plus tard_                        | Chevalet de bureau (texte sur socle incliné) ; abat-jour Lumen (LED seulement : le PLA ramollit vers 55–60 °C)                                                                                                                                                                                                                                                                                                                 | —                                                                                                                                                                                                                                                                                                                                                           |
 
 ### 5.2 Modèle multicolore par bandes de couches
 
@@ -316,17 +316,17 @@ CSP** (pas de WASM, polices JSON et worker same-origin). Le Vase spirale garde s
 
 ## 10. Risques et plan de construction
 
-| Risque | Parade |
-|---|---|
-| Three ou GSAP qui fuient dans le Worker | `src/motion/**` seul importeur, règle lint, `wrangler deploy --dry-run` à chaque phase |
-| INP et replays PostHog (mutations du DOM) | DOM télémétrie ≤ 10 Hz, canvas sans mutation DOM, replay testé sur le prototype |
-| Objet configuré non imprimable (fausse promesse) | badge Imprimable, bornes des paramètres, validation atelier systématique, « estimation » |
-| Dérive CC BY-ND | aucun effet ni remix sur le Vase spirale, bloc d'attribution SSR, préréglages distincts |
-| Texte libre abusif (nom, marque) | longueurs bornées, rendu en géométrie (pas de HTML injecté), revue atelier avant impression |
-| Allemand trop long | `hyphens`, `balance`, tests DE sur chaque mise en page |
-| Stripe perturbé | groupe `(site)` : aucun effet global sur le tunnel |
-| Mémoire iOS, perte de contexte | tiers, repli poster, un seul contexte |
-| Scope | phases courtes, validation propriétaire en fin de phase |
+| Risque                                           | Parade                                                                                      |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------- |
+| Three ou GSAP qui fuient dans le Worker          | `src/motion/**` seul importeur, règle lint, `wrangler deploy --dry-run` à chaque phase      |
+| INP et replays PostHog (mutations du DOM)        | DOM télémétrie ≤ 10 Hz, canvas sans mutation DOM, replay testé sur le prototype             |
+| Objet configuré non imprimable (fausse promesse) | badge Imprimable, bornes des paramètres, validation atelier systématique, « estimation »    |
+| Dérive CC BY-ND                                  | aucun effet ni remix sur le Vase spirale, bloc d'attribution SSR, préréglages distincts     |
+| Texte libre abusif (nom, marque)                 | longueurs bornées, rendu en géométrie (pas de HTML injecté), revue atelier avant impression |
+| Allemand trop long                               | `hyphens`, `balance`, tests DE sur chaque mise en page                                      |
+| Stripe perturbé                                  | groupe `(site)` : aucun effet global sur le tunnel                                          |
+| Mémoire iOS, perte de contexte                   | tiers, repli poster, un seul contexte                                                       |
+| Scope                                            | phases courtes, validation propriétaire en fin de phase                                     |
 
 **Phases** (chacune validée sur `bun run preview` puis par le propriétaire) : **P0** fondations (jetons,
 polices, groupe `(site)`, MotionRuntime, Stage, garde lint, mesures) → **P1** Studio v1 (Vase + Carte,

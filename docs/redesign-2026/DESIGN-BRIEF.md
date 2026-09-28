@@ -57,20 +57,20 @@
 
 ### 0.2 Faits vérifiés pendant la rédaction (ne pas les re-vérifier, mais ne pas les contredire)
 
-| Fait | Conséquence dans ce brief |
-|---|---|
-| `oxlint` (version du dépôt) : `no-restricted-imports` signale **aussi les `import()` dynamiques** ; `import type` passe avec `allowTypeImports: true` ; `overrides` par `files` fonctionne (testé dans le scratchpad). | Les `import("@/motion/…")` ne sont permis que dans `src/gates/**` (§4.6). |
-| schema.org : `isBasedOn` n'a pour domaine que `CreativeWork` (pas `Product`). | L'attribution de Ian passe par un nœud `3DModel` séparé, relié au `Product` par `subjectOf` (§7.9). |
-| woff2 latin servis par Google Fonts : Archivo axes complets **88 Ko**, Archivo `wdth` figé à 112,5 + `wght` 500–900 **35 Ko**, Geist **28,7 Ko**, Geist Mono **22,6 Ko**. | Archivo auto-hébergé par `next/font/local`, largeur figée (§2.2). |
-| Contrastes WCAG calculés par script (luminance relative). | Valeurs du §2.1, à ne pas « arrondir ». |
-| Versions npm au 28.09.2026 : `gsap@3.15.0`, `@gsap/react@2.1.2`, `lenis@1.3.26`, `three@0.186.1`, `@types/three@0.186.0`, `d3-contour@4.0.2`, `@types/d3-contour@3.0.6`, `earcut@3.2.3` (types inclus), `fflate@0.8.3`, `postprocessing@6.39.5`, `opentype.js@1.3.4`. | Versions exactes au §4.7. |
-| `POST /api/quote-upload` : 30 Mo max, **10 envois/h/IP**, extensions `stl 3mf obj step stp`, signature STL binaire `84 + 50 × n = taille`, stockage privé `quotes/<uuid>-<nom>`, cookie propriétaire `s3d-upload-owner` (httpOnly, 24 h). | Export STL binaire strict, réutilisation du `fileKey` par configuration (§6.9). |
-| `submitQuoteRequest` (`custom/actions.ts`) : 5 envois/10 min, zod `email`, `description` 10–4000, `material ≤ 100`, `colors ≤ 200`, `dimensions ≤ 200`, `fileKey` préfixé `quotes/` **et** appartenant au même cookie, `locale`. Aucun `redirect()`. | Le Studio réutilise cette Server Action telle quelle (§6.9). |
-| PostHog (`src/lib/analytics.ts`) : `defaults: "2026-08-30"` retire déjà les ancres `#…` des URL capturées ; `maskAllInputs: true` ; `.ph-mask` masque le texte ; seuls les paramètres de `KEPT_PARAMS` survivent. | L'état du Studio vit dans le fragment, jamais de texte personnel dedans (§6.8). |
-| `src/app/[locale]/layout.tsx` est le layout racine (pas de `src/app/layout.tsx`) ; il enveloppe aussi `/admin`, `/checkout`, `/account`. Seul `contact/page.tsx` importe `../a-propos/contact-form` ; seul `sitemap.xml/route.ts` importe `../[locale]/legal/legal-layout`. | Déplacement sûr des pages vitrine dans `(site)` (§4.2). |
-| La fiche produit charge le STL du Vase spirale (46 756 triangles, ~2,23 Mio, servi sans `Content-Length`). Le catalogue live compte **1** produit. | N = 1 → 50 prévu partout ; chargement du STL différé (§7.9). |
-| `custom.intro` promet aujourd'hui « un devis personnalisé sous 48 h ». | Le Studio reprend « sous 48 h », rien de plus ambitieux sans accord (§6.9). |
-| `messages/de.json` contient « Schließen » (ß). | Corrigé par WP-00 ; test anti-ß (§4.9). |
+| Fait                                                                                                                                                                                                                                                                        | Conséquence dans ce brief                                                                           |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `oxlint` (version du dépôt) : `no-restricted-imports` signale **aussi les `import()` dynamiques** ; `import type` passe avec `allowTypeImports: true` ; `overrides` par `files` fonctionne (testé dans le scratchpad).                                                      | Les `import("@/motion/…")` ne sont permis que dans `src/gates/**` (§4.6).                           |
+| schema.org : `isBasedOn` n'a pour domaine que `CreativeWork` (pas `Product`).                                                                                                                                                                                               | L'attribution de Ian passe par un nœud `3DModel` séparé, relié au `Product` par `subjectOf` (§7.9). |
+| woff2 latin servis par Google Fonts : Archivo axes complets **88 Ko**, Archivo `wdth` figé à 112,5 + `wght` 500–900 **35 Ko**, Geist **28,7 Ko**, Geist Mono **22,6 Ko**.                                                                                                   | Archivo auto-hébergé par `next/font/local`, largeur figée (§2.2).                                   |
+| Contrastes WCAG calculés par script (luminance relative).                                                                                                                                                                                                                   | Valeurs du §2.1, à ne pas « arrondir ».                                                             |
+| Versions npm au 28.09.2026 : `gsap@3.15.0`, `@gsap/react@2.1.2`, `lenis@1.3.26`, `three@0.186.1`, `@types/three@0.186.0`, `d3-contour@4.0.2`, `@types/d3-contour@3.0.6`, `earcut@3.2.3` (types inclus), `fflate@0.8.3`, `postprocessing@6.39.5`, `opentype.js@1.3.4`.       | Versions exactes au §4.7.                                                                           |
+| `POST /api/quote-upload` : 30 Mo max, **10 envois/h/IP**, extensions `stl 3mf obj step stp`, signature STL binaire `84 + 50 × n = taille`, stockage privé `quotes/<uuid>-<nom>`, cookie propriétaire `s3d-upload-owner` (httpOnly, 24 h).                                   | Export STL binaire strict, réutilisation du `fileKey` par configuration (§6.9).                     |
+| `submitQuoteRequest` (`custom/actions.ts`) : 5 envois/10 min, zod `email`, `description` 10–4000, `material ≤ 100`, `colors ≤ 200`, `dimensions ≤ 200`, `fileKey` préfixé `quotes/` **et** appartenant au même cookie, `locale`. Aucun `redirect()`.                        | Le Studio réutilise cette Server Action telle quelle (§6.9).                                        |
+| PostHog (`src/lib/analytics.ts`) : `defaults: "2026-08-30"` retire déjà les ancres `#…` des URL capturées ; `maskAllInputs: true` ; `.ph-mask` masque le texte ; seuls les paramètres de `KEPT_PARAMS` survivent.                                                           | L'état du Studio vit dans le fragment, jamais de texte personnel dedans (§6.8).                     |
+| `src/app/[locale]/layout.tsx` est le layout racine (pas de `src/app/layout.tsx`) ; il enveloppe aussi `/admin`, `/checkout`, `/account`. Seul `contact/page.tsx` importe `../a-propos/contact-form` ; seul `sitemap.xml/route.ts` importe `../[locale]/legal/legal-layout`. | Déplacement sûr des pages vitrine dans `(site)` (§4.2).                                             |
+| La fiche produit charge le STL du Vase spirale (46 756 triangles, ~2,23 Mio, servi sans `Content-Length`). Le catalogue live compte **1** produit.                                                                                                                          | N = 1 → 50 prévu partout ; chargement du STL différé (§7.9).                                        |
+| `custom.intro` promet aujourd'hui « un devis personnalisé sous 48 h ».                                                                                                                                                                                                      | Le Studio reprend « sous 48 h », rien de plus ambitieux sans accord (§6.9).                         |
+| `messages/de.json` contient « Schließen » (ß).                                                                                                                                                                                                                              | Corrigé par WP-00 ; test anti-ß (§4.9).                                                             |
 
 ---
 
@@ -81,13 +81,13 @@
 La direction est **« Strates »** (82, 79 et 79 points chez les trois juges, premier partout),
 avec les greffes exigées par les juges. Le tableau dit d'où vient chaque pièce.
 
-| Pièce | Provenance |
-|---|---|
-| Thèse « une couche = une courbe de niveau ; le multicolore = une teinte hypsométrique » ; bascule élévation → plan ; poster d'isolignes calé sous le canvas (« le dessin devient matière ») ; ease quantifiée `s3d.pas` ; transition de page « Coupe » ; cadre de carte, coordonnées, cartouche, point rouge ; voix (« Point non coté ») ; physique juste (multicolore en mode standard, spirale seulement en monochrome) ; générateur pur TS partagé ; test de variété (manifold) | Strates |
-| Personnalisation **dans** le héros (gestes Palette et Motif) ; « Votre nom » hors pin ; vague de couleur le long des couches ; outils du configurateur (Annuler/Rétablir, « Surprenez-moi », badge Imprimable avec correction, Copier le lien, Garder) ; Studio en disque rouge au centre de la BottomNav ; silhouette du Vase spirale interdite par test ; STL écrit dans un Web Worker ; outil WebMCP `studio_configure` ; Studio livré avant le héros | Studio |
-| Aucun texte personnel dans l'URL ; tiroir « Envoyer à l'atelier » sur la même Server Action ; tour de purge et commande « Éclater » ; formulaire Studio SSR fonctionnel sans JS (GET) ; simulation ×1/×10/×100 et réglette Z verticale ; LOD de régénération en Worker ; aucun pin sous 768 px de haut ; groupe de routes `(site)` ; vue « Registre » de la boutique ; attribution en données structurées ; aucun CHF avant validation des coefficients | G1 (Atelier) |
-| Correctifs d'ingénierie : jamais d'axe `wdth` lié au scroll ; 4 scènes + un service au lieu de 8 scènes ; champ de courbes WebGL réservé à l'accueil (SVG ailleurs) ; relief du champ précalculé en texture ; polices 3D en instances statiques sans chevauchement ; pas vertical adaptatif (STL de 1 à 3 Mo) ; budget INP mesuré | Juge ingénierie |
-| Correctifs commerce : surtitre SSR explicite ; zone d'achat collante au chapitre 01 de la fiche ; métaphore bornée (l'unité réelle d'abord) ; modération humaine des textes ; gestion du 429 ; fourchette ±15 % avant calibration | Juge commerce |
+| Pièce                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Provenance      |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| Thèse « une couche = une courbe de niveau ; le multicolore = une teinte hypsométrique » ; bascule élévation → plan ; poster d'isolignes calé sous le canvas (« le dessin devient matière ») ; ease quantifiée `s3d.pas` ; transition de page « Coupe » ; cadre de carte, coordonnées, cartouche, point rouge ; voix (« Point non coté ») ; physique juste (multicolore en mode standard, spirale seulement en monochrome) ; générateur pur TS partagé ; test de variété (manifold) | Strates         |
+| Personnalisation **dans** le héros (gestes Palette et Motif) ; « Votre nom » hors pin ; vague de couleur le long des couches ; outils du configurateur (Annuler/Rétablir, « Surprenez-moi », badge Imprimable avec correction, Copier le lien, Garder) ; Studio en disque rouge au centre de la BottomNav ; silhouette du Vase spirale interdite par test ; STL écrit dans un Web Worker ; outil WebMCP `studio_configure` ; Studio livré avant le héros                           | Studio          |
+| Aucun texte personnel dans l'URL ; tiroir « Envoyer à l'atelier » sur la même Server Action ; tour de purge et commande « Éclater » ; formulaire Studio SSR fonctionnel sans JS (GET) ; simulation ×1/×10/×100 et réglette Z verticale ; LOD de régénération en Worker ; aucun pin sous 768 px de haut ; groupe de routes `(site)` ; vue « Registre » de la boutique ; attribution en données structurées ; aucun CHF avant validation des coefficients                            | G1 (Atelier)    |
+| Correctifs d'ingénierie : jamais d'axe `wdth` lié au scroll ; 4 scènes + un service au lieu de 8 scènes ; champ de courbes WebGL réservé à l'accueil (SVG ailleurs) ; relief du champ précalculé en texture ; polices 3D en instances statiques sans chevauchement ; pas vertical adaptatif (STL de 1 à 3 Mo) ; budget INP mesuré                                                                                                                                                  | Juge ingénierie |
+| Correctifs commerce : surtitre SSR explicite ; zone d'achat collante au chapitre 01 de la fiche ; métaphore bornée (l'unité réelle d'abord) ; modération humaine des textes ; gestion du 429 ; fourchette ±15 % avant calibration                                                                                                                                                                                                                                                  | Juge commerce   |
 
 ### 1.2 Thèse
 
@@ -125,11 +125,11 @@ réimpression, réglette Z) sert ensuite **telle quelle** dans le Studio.
 
 **Motifs de soutien (et rien d'autre) :**
 
-| Motif | Où il vit | Règle |
-|---|---|---|
-| **M1 · Isolignes et coupe** | Poster SSR du héros, bascule en plan, champ de courbes (accueil seulement, WebGL), isolignes SVG statiques (footer, 404, contact), transition de page « Coupe » (8 paliers), révélations `s3d-print` | Trois moments de champ plein écran au plus (fin du héros, footer, 404). Jamais en papier peint sur les pages transactionnelles. |
-| **M2 · La buse et le point rouge** | Liseré chaud à la ligne de coupe, point rouge final des titres, filet de progression sous le header, buse d'attente pendant le TTFB, soulignement actif de la nav, disque Studio de la BottomNav, bouton principal | Un seul bouton rouge par écran. Le rouge ne remplit jamais une grande surface décorative. |
-| **M3 · La bande de mesure** | Télémétrie mono du héros et du Studio (« 150,0 mm · 750 couches · ≈ 80 g · ≈ 2 h 45 · 2 changements »), réglettes graduées, fiches techniques `<dl>`, étiquettes de l'éclaté | Toujours `Intl.NumberFormat` ; unité réelle d'abord, clin d'œil ensuite. |
+| Motif                              | Où il vit                                                                                                                                                                                                          | Règle                                                                                                                           |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| **M1 · Isolignes et coupe**        | Poster SSR du héros, bascule en plan, champ de courbes (accueil seulement, WebGL), isolignes SVG statiques (footer, 404, contact), transition de page « Coupe » (8 paliers), révélations `s3d-print`               | Trois moments de champ plein écran au plus (fin du héros, footer, 404). Jamais en papier peint sur les pages transactionnelles. |
+| **M2 · La buse et le point rouge** | Liseré chaud à la ligne de coupe, point rouge final des titres, filet de progression sous le header, buse d'attente pendant le TTFB, soulignement actif de la nav, disque Studio de la BottomNav, bouton principal | Un seul bouton rouge par écran. Le rouge ne remplit jamais une grande surface décorative.                                       |
+| **M3 · La bande de mesure**        | Télémétrie mono du héros et du Studio (« 150,0 mm · 750 couches · ≈ 80 g · ≈ 2 h 45 · 2 changements »), réglettes graduées, fiches techniques `<dl>`, étiquettes de l'éclaté                                       | Toujours `Intl.NumberFormat` ; unité réelle d'abord, clin d'œil ensuite.                                                        |
 
 **Plus tard (hors v1, ne pas construire)** : son génératif ; plaque de bureau « Signal » ;
 abat-jour « Lumen » ; export 3MF multi-objets (fflate) ; QR code sur la carte ; relief suisse
@@ -197,16 +197,16 @@ chaîne en 4 langues (de-CH sans ß).
 
 **Noms publics.**
 
-| Élément | FR | DE | IT | EN | URL |
-|---|---|---|---|---|---|
-| Boutique | Boutique | Shop | Negozio | Shop | `/shop` (inchangée) |
-| Configurateur | Studio | Studio | Studio | Studio | `/studio` (nouvelle) |
-| Sur mesure | Sur mesure | Nach Mass | Su misura | Custom | `/custom` (inchangée) |
-| À propos | **Atelier** (libellé de nav) | Atelier | Atelier | Workshop | `/a-propos` (inchangée, SEO) |
-| Vase | Vase « Lavaux » | Vase «Lavaux» | Vaso «Lavaux» | "Lavaux" vase | `/studio/lavaux` |
-| Carte de visite | Carte « Cartouche » | Visitenkarte «Cartouche» | Biglietto «Cartouche» | "Cartouche" business card | `/studio/cartouche` |
-| Sous-verre | Sous-verre « Relief » | Untersetzer «Relief» | Sottobicchiere «Relief» | "Relief" coaster | `/studio/relief` |
-| Porte-nom | Porte-nom « Borne » | Namensschild «Borne» | Portanome «Borne» | "Borne" name tag | `/studio/borne` |
+| Élément         | FR                           | DE                       | IT                      | EN                        | URL                          |
+| --------------- | ---------------------------- | ------------------------ | ----------------------- | ------------------------- | ---------------------------- |
+| Boutique        | Boutique                     | Shop                     | Negozio                 | Shop                      | `/shop` (inchangée)          |
+| Configurateur   | Studio                       | Studio                   | Studio                  | Studio                    | `/studio` (nouvelle)         |
+| Sur mesure      | Sur mesure                   | Nach Mass                | Su misura               | Custom                    | `/custom` (inchangée)        |
+| À propos        | **Atelier** (libellé de nav) | Atelier                  | Atelier                 | Workshop                  | `/a-propos` (inchangée, SEO) |
+| Vase            | Vase « Lavaux »              | Vase «Lavaux»            | Vaso «Lavaux»           | "Lavaux" vase             | `/studio/lavaux`             |
+| Carte de visite | Carte « Cartouche »          | Visitenkarte «Cartouche» | Biglietto «Cartouche»   | "Cartouche" business card | `/studio/cartouche`          |
+| Sous-verre      | Sous-verre « Relief »        | Untersetzer «Relief»     | Sottobicchiere «Relief» | "Relief" coaster          | `/studio/relief`             |
+| Porte-nom       | Porte-nom « Borne »          | Namensschild «Borne»     | Portanome «Borne»       | "Borne" name tag          | `/studio/borne`              |
 
 Les slugs d'objet sont des noms propres, identiques dans les 4 langues. Palettes : **Léman**,
 **Molasse**, **Signal**, **Uni**. Motifs : **Gradins**, **Vagues**, **Voronoï**, **Nervures**,
@@ -227,21 +227,21 @@ porte « Illustration » ou « Rendu ».
 
 **Lexique imposé** (à utiliser tel quel dans les 4 langues) :
 
-| FR | DE (CH) | IT | EN |
-|---|---|---|---|
-| couche | Schicht | strato | layer |
-| hauteur de couche | Schichthöhe | altezza dello strato | layer height |
-| changement de filament | Filamentwechsel | cambio di filamento | filament change |
-| bande (de couleur) | Farbzone | fascia (di colore) | color band |
-| bobine | Spule | bobina | spool |
-| purge | Spülmenge | spurgo | purge |
-| buse | Düse | ugello | nozzle |
-| plateau | Druckplatte | piatto | build plate |
-| estimation | Schätzung | stima | estimate |
-| sur devis | auf Offerte | su preventivo | on quote |
-| imprimable | druckbar | stampabile | printable |
-| en relief / gravé | erhaben / graviert | in rilievo / inciso | embossed / engraved |
-| Envoyer à l'atelier | Ans Atelier senden | Invia all'atelier | Send to the workshop |
+| FR                       | DE (CH)                       | IT                         | EN                       |
+| ------------------------ | ----------------------------- | -------------------------- | ------------------------ |
+| couche                   | Schicht                       | strato                     | layer                    |
+| hauteur de couche        | Schichthöhe                   | altezza dello strato       | layer height             |
+| changement de filament   | Filamentwechsel               | cambio di filamento        | filament change          |
+| bande (de couleur)       | Farbzone                      | fascia (di colore)         | color band               |
+| bobine                   | Spule                         | bobina                     | spool                    |
+| purge                    | Spülmenge                     | spurgo                     | purge                    |
+| buse                     | Düse                          | ugello                     | nozzle                   |
+| plateau                  | Druckplatte                   | piatto                     | build plate              |
+| estimation               | Schätzung                     | stima                      | estimate                 |
+| sur devis                | auf Offerte                   | su preventivo              | on quote                 |
+| imprimable               | druckbar                      | stampabile                 | printable                |
+| en relief / gravé        | erhaben / graviert            | in rilievo / inciso        | embossed / engraved      |
+| Envoyer à l'atelier      | Ans Atelier senden            | Invia all'atelier          | Send to the workshop     |
 | Réglez-le. On l'imprime. | Sie stellen ein. Wir drucken. | Lei regola. Noi stampiamo. | You set it. We print it. |
 
 La banque de textes des titres principaux, dans les 4 langues, est en annexe C. Les agents
@@ -256,23 +256,23 @@ rédigent le reste en respectant ce lexique ; le propriétaire valide les accroc
 Les **noms** des jetons existants sont un contrat avec ~116 fichiers (dont 27 de l'admin) : on
 les garde et on change leurs valeurs. On ajoute cinq jetons. Contrastes calculés (WCAG 2.x).
 
-| Jeton | Clair | Sombre | Chapitre « encre » (clair / sombre) | Usage | Contrastes vérifiés |
-|---|---|---|---|---|---|
-| `paper` | `#F4F0E8` papier carte | `#0E0D0B` | `#1A1614` / `#211E1A` | fond de page | — |
-| `surface` | `#FBF9F4` | `#1A1815` | `#221E1B` / `#2A2622` | cartes, panneaux, footer | — |
-| `elevated` | `#FFFFFF` | `#211E1A` | `#2A2521` / `#322D28` | menus, tiroir, champs | — |
-| `ink` | `#1A1614` | `#F2EDE4` | `#F2EDE4` | texte | 15,81 (paper clair) · 16,66 (paper sombre) · 15,41 / 14,19 (encre) |
-| `soft` | `#6A635A` | `#A39B8F` | `#B0A89C` | texte secondaire | 5,21 · 5,63 (surface) · 7,07 (sombre) · 7,64 / 7,03 (encre) |
-| `line` | `#D8D1C4` | `#2E2A25` | `#3A342E` / `#3D3731` | filets 1 px décoratifs | 1,34 (non textuel, décor) |
-| `accent` | `#E5231C` | `#E5231C` | idem | **graphique seulement** : boutons, points, liseré chaud, pastilles, texte ≥ 24 px (ou ≥ 19 px gras) | 4,03 (paper clair) · 4,24 (paper sombre) · 3,63 (elevated sombre) |
-| `accent-dark` | `#C01D14` | `#C01D14` | idem | survol des boutons rouges | blanc dessus 6,13 |
-| **`accent-text`** (nouveau) | `#B3170F` | `#FF5B4E` | `#FF5B4E` | **tout texte rouge < 24 px** (liens, erreurs, prix rouges) | 6,07 (paper) · 6,55 (surface) · 6,89 (blanc) · 6,34 (paper sombre) · 5,79 (surface sombre) · 5,87 / 5,40 (encre) |
-| **`on-accent`** (nouveau) | `#FFFFFF` | `#FFFFFF` | idem | texte sur `accent` (≥ 15 px, 600) | 4,58 (AA texte normal) |
-| **`iso`** (nouveau) | `#C9C1B2` | `#3A352F` | `#3A342E` | isolignes ordinaires, lignes fantômes (décor) | 1,57 (décor) |
-| **`iso-index`** (nouveau) | `#9C7650` sépia carte | `#8A6C4E` | `#9C7650` | courbe maîtresse, graduations majeures | 3,61 (≥ 3:1 non textuel) · 4,01 (sombre) · 4,38 (encre) |
-| **`glacier`** (nouveau) | `#3E7CB1` | `#5B95C8` | — | 2ᵉ teinte cartographique (eau), jamais pour du texte courant | 3,91 · 6,08 (sombre) |
-| `swatch-ring` | `#767676` | `#767676` | idem | contour des pastilles et des champs | 4,00 (paper) · 3,90 (surface sombre) |
-| `night`, `night-soft`, `night-line` | `#121110`, `#A8A29B`, `#2C2825` | idem | — | conservés pour l'existant (panneaux constants) | — |
+| Jeton                               | Clair                           | Sombre    | Chapitre « encre » (clair / sombre) | Usage                                                                                               | Contrastes vérifiés                                                                                              |
+| ----------------------------------- | ------------------------------- | --------- | ----------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `paper`                             | `#F4F0E8` papier carte          | `#0E0D0B` | `#1A1614` / `#211E1A`               | fond de page                                                                                        | —                                                                                                                |
+| `surface`                           | `#FBF9F4`                       | `#1A1815` | `#221E1B` / `#2A2622`               | cartes, panneaux, footer                                                                            | —                                                                                                                |
+| `elevated`                          | `#FFFFFF`                       | `#211E1A` | `#2A2521` / `#322D28`               | menus, tiroir, champs                                                                               | —                                                                                                                |
+| `ink`                               | `#1A1614`                       | `#F2EDE4` | `#F2EDE4`                           | texte                                                                                               | 15,81 (paper clair) · 16,66 (paper sombre) · 15,41 / 14,19 (encre)                                               |
+| `soft`                              | `#6A635A`                       | `#A39B8F` | `#B0A89C`                           | texte secondaire                                                                                    | 5,21 · 5,63 (surface) · 7,07 (sombre) · 7,64 / 7,03 (encre)                                                      |
+| `line`                              | `#D8D1C4`                       | `#2E2A25` | `#3A342E` / `#3D3731`               | filets 1 px décoratifs                                                                              | 1,34 (non textuel, décor)                                                                                        |
+| `accent`                            | `#E5231C`                       | `#E5231C` | idem                                | **graphique seulement** : boutons, points, liseré chaud, pastilles, texte ≥ 24 px (ou ≥ 19 px gras) | 4,03 (paper clair) · 4,24 (paper sombre) · 3,63 (elevated sombre)                                                |
+| `accent-dark`                       | `#C01D14`                       | `#C01D14` | idem                                | survol des boutons rouges                                                                           | blanc dessus 6,13                                                                                                |
+| **`accent-text`** (nouveau)         | `#B3170F`                       | `#FF5B4E` | `#FF5B4E`                           | **tout texte rouge < 24 px** (liens, erreurs, prix rouges)                                          | 6,07 (paper) · 6,55 (surface) · 6,89 (blanc) · 6,34 (paper sombre) · 5,79 (surface sombre) · 5,87 / 5,40 (encre) |
+| **`on-accent`** (nouveau)           | `#FFFFFF`                       | `#FFFFFF` | idem                                | texte sur `accent` (≥ 15 px, 600)                                                                   | 4,58 (AA texte normal)                                                                                           |
+| **`iso`** (nouveau)                 | `#C9C1B2`                       | `#3A352F` | `#3A342E`                           | isolignes ordinaires, lignes fantômes (décor)                                                       | 1,57 (décor)                                                                                                     |
+| **`iso-index`** (nouveau)           | `#9C7650` sépia carte           | `#8A6C4E` | `#9C7650`                           | courbe maîtresse, graduations majeures                                                              | 3,61 (≥ 3:1 non textuel) · 4,01 (sombre) · 4,38 (encre)                                                          |
+| **`glacier`** (nouveau)             | `#3E7CB1`                       | `#5B95C8` | —                                   | 2ᵉ teinte cartographique (eau), jamais pour du texte courant                                        | 3,91 · 6,08 (sombre)                                                                                             |
+| `swatch-ring`                       | `#767676`                       | `#767676` | idem                                | contour des pastilles et des champs                                                                 | 4,00 (paper) · 3,90 (surface sombre)                                                                             |
+| `night`, `night-soft`, `night-line` | `#121110`, `#A8A29B`, `#2C2825` | idem      | —                                   | conservés pour l'existant (panneaux constants)                                                      | —                                                                                                                |
 
 **Règles d'usage.**
 
@@ -291,16 +291,16 @@ les garde et on change leurs valeurs. On ajoute cinq jetons. Contrastes calculé
 marquée `indicative: true` tant que le propriétaire n'a pas fourni l'inventaire réel (§11.2).
 L'UI affiche alors « Teintes indicatives, couleur finale selon les bobines en stock ».
 
-| id | Nom FR | Hex (indicatif) | Réalité aujourd'hui |
-|---|---|---|---|
-| `blanc-neve` | Blanc névé | `#F5F5F4` | vendu (« Blanc ») |
-| `encre` | Encre | `#1C1917` | vendu (« Noir ») |
-| `rouge-signal` | Rouge Signal | `#E5231C` | à confirmer |
-| `bleu-leman` | Bleu Léman | `#2E6A9E` | à confirmer |
-| `vert-lavaux` | Vert Lavaux | `#5E7F3A` | à confirmer |
-| `gris-molasse` | Gris molasse | `#8C8A85` | à confirmer |
-| `ambre` | Ambre | `#D98E1F` | à confirmer |
-| `glacier` | Glacier | `#9CC3DA` | à confirmer |
+| id             | Nom FR       | Hex (indicatif) | Réalité aujourd'hui |
+| -------------- | ------------ | --------------- | ------------------- |
+| `blanc-neve`   | Blanc névé   | `#F5F5F4`       | vendu (« Blanc »)   |
+| `encre`        | Encre        | `#1C1917`       | vendu (« Noir »)    |
+| `rouge-signal` | Rouge Signal | `#E5231C`       | à confirmer         |
+| `bleu-leman`   | Bleu Léman   | `#2E6A9E`       | à confirmer         |
+| `vert-lavaux`  | Vert Lavaux  | `#5E7F3A`       | à confirmer         |
+| `gris-molasse` | Gris molasse | `#8C8A85`       | à confirmer         |
+| `ambre`        | Ambre        | `#D98E1F`       | à confirmer         |
+| `glacier`      | Glacier      | `#9CC3DA`       | à confirmer         |
 
 Palettes prêtes (du bas vers le haut) : **Léman** = bleu-leman / vert-lavaux / blanc-neve ;
 **Molasse** = encre / gris-molasse / blanc-neve ; **Signal** = encre / blanc-neve / rouge-signal ;
@@ -309,12 +309,12 @@ namespace `studioCore` (§4.9).
 
 ### 2.2 Typographie
 
-| Rôle | Famille | Chargement | Poids | Notes |
-|---|---|---|---|---|
-| Titres (h1, titres de chapitre, grands chiffres) | **Archivo SemiExpanded** (largeur figée 112,5, graisse variable 500–900) | `next/font/local`, fichier `src/fonts/archivo-sx-latin.woff2` (35 Ko), `preload: true` | 800 (titres), 700 (titres de carte) | OFL. Le fichier est le woff2 latin servi par Google Fonts pour `Archivo:wdth,wght@112.5,500..900`, recopié dans le dépôt (auto-hébergé, `font-src 'self'`). |
-| Texte et interface | **Geist** (inchangée) | `next/font/google`, `--font-geist-sans` | 400, 500, 600, 700 | **Conservée pour Stripe** : `checkout-flow.tsx` et `stripe-appearance.ts` chargent Geist dans les iframes. Aucun changement au tunnel. Le wordmark « **Swiss**3Design » reste en Geist partout (c'est la marque). |
-| Télémétrie, étiquettes, cotes | **Geist Mono** | `next/font/google`, `--font-geist-mono`, `preload: false` | 500 | Majuscules, `letter-spacing: 0.06em`, `tabular-nums slashed-zero`, 12 px minimum (jamais de HUD en 11 px). |
-| Texte en relief (objets 3D) | **Archivo SemiExpanded Black** (instance statique 900, contours fusionnés) | JSON de glyphes maison `public/studio/glyphs/s3d-relief-v1.json`, chargé seulement par le Studio et le chapitre 02 | 900 | §6.3.3 : pourquoi Black (trait ≥ 0,8 mm). |
+| Rôle                                             | Famille                                                                    | Chargement                                                                                                         | Poids                               | Notes                                                                                                                                                                                                             |
+| ------------------------------------------------ | -------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Titres (h1, titres de chapitre, grands chiffres) | **Archivo SemiExpanded** (largeur figée 112,5, graisse variable 500–900)   | `next/font/local`, fichier `src/fonts/archivo-sx-latin.woff2` (35 Ko), `preload: true`                             | 800 (titres), 700 (titres de carte) | OFL. Le fichier est le woff2 latin servi par Google Fonts pour `Archivo:wdth,wght@112.5,500..900`, recopié dans le dépôt (auto-hébergé, `font-src 'self'`).                                                       |
+| Texte et interface                               | **Geist** (inchangée)                                                      | `next/font/google`, `--font-geist-sans`                                                                            | 400, 500, 600, 700                  | **Conservée pour Stripe** : `checkout-flow.tsx` et `stripe-appearance.ts` chargent Geist dans les iframes. Aucun changement au tunnel. Le wordmark « **Swiss**3Design » reste en Geist partout (c'est la marque). |
+| Télémétrie, étiquettes, cotes                    | **Geist Mono**                                                             | `next/font/google`, `--font-geist-mono`, `preload: false`                                                          | 500                                 | Majuscules, `letter-spacing: 0.06em`, `tabular-nums slashed-zero`, 12 px minimum (jamais de HUD en 11 px).                                                                                                        |
+| Texte en relief (objets 3D)                      | **Archivo SemiExpanded Black** (instance statique 900, contours fusionnés) | JSON de glyphes maison `public/studio/glyphs/s3d-relief-v1.json`, chargé seulement par le Studio et le chapitre 02 | 900                                 | §6.3.3 : pourquoi Black (trait ≥ 0,8 mm).                                                                                                                                                                         |
 
 **Mise en place exacte** (WP-00, nouveau fichier `src/app/fonts.ts`, importé par
 `src/app/[locale]/layout.tsx`) :
@@ -361,16 +361,16 @@ Ajouter `src/fonts/OFL-Archivo.txt` (licence) à côté du woff2.
 **Échelle fluide** (base 16 px, de 375 à 1440 px ; utilitaires Tailwind générés par `@theme`,
 §2.5) :
 
-| Utilitaire | Valeur | Interligne | Chasse | Graisse | Usage |
-|---|---|---|---|---|---|
-| `text-hero` | `clamp(3.25rem, 1.2rem + 9vw, 11rem)` | 0,88 | −0,035em | 800 | h1 de l'accueil seulement |
-| `text-display` | `clamp(2.5rem, 1.35rem + 4.9vw, 6rem)` | 0,94 | −0,03em | 800 | h1 des autres pages, titres de chapitre (h2) |
-| `text-title` | `clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem)` | 1,08 | −0,02em | 700 | h2 de contenu, titres de carte |
-| `text-subtitle` | `clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem)` | 1,2 | — | 600 (Geist) | h3 |
-| `text-lead` | `clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem)` | 1,45 | — | 400 (Geist) | chapeaux |
-| `text-base` | `1rem` | 1,55 | — | 400 | texte courant |
-| `text-sm` | `0.875rem` | 1,5 | — | 400/500 | UI |
-| `text-label` / `.s3d-label` | `0.75rem` | 1,3 | +0,06em | 500 (mono) | étiquettes, télémétrie |
+| Utilitaire                  | Valeur                                        | Interligne | Chasse   | Graisse     | Usage                                        |
+| --------------------------- | --------------------------------------------- | ---------- | -------- | ----------- | -------------------------------------------- |
+| `text-hero`                 | `clamp(3.25rem, 1.2rem + 9vw, 11rem)`         | 0,88       | −0,035em | 800         | h1 de l'accueil seulement                    |
+| `text-display`              | `clamp(2.5rem, 1.35rem + 4.9vw, 6rem)`        | 0,94       | −0,03em  | 800         | h1 des autres pages, titres de chapitre (h2) |
+| `text-title`                | `clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem)`      | 1,08       | −0,02em  | 700         | h2 de contenu, titres de carte               |
+| `text-subtitle`             | `clamp(1.25rem, 1.1rem + 0.7vw, 1.625rem)`    | 1,2        | —        | 600 (Geist) | h3                                           |
+| `text-lead`                 | `clamp(1.125rem, 1.05rem + 0.35vw, 1.375rem)` | 1,45       | —        | 400 (Geist) | chapeaux                                     |
+| `text-base`                 | `1rem`                                        | 1,55       | —        | 400         | texte courant                                |
+| `text-sm`                   | `0.875rem`                                    | 1,5        | —        | 400/500     | UI                                           |
+| `text-label` / `.s3d-label` | `0.75rem`                                     | 1,3        | +0,06em  | 500 (mono)  | étiquettes, télémétrie                       |
 
 - Titres : `font-display` (Archivo) + `text-wrap: balance`. Texte : `text-wrap: pretty`,
   65 caractères de large au plus.
@@ -411,7 +411,7 @@ Ajouter `src/fonts/OFL-Archivo.txt` (licence) à côté du woff2.
 - **Calques (z-index)** : canvas du Stage `-1` (porté dans `document.body`, §4.4) ; contenu
   `auto` ; favori sur carte `10` ; menus `20` ; AboutNav/ChapterRail `30` ; header `40` ;
   bandeau de consentement `40` ; barre d'action Studio mobile `45` ; BottomNav et skip link
-  `50` ; tiroirs et dialogues dans le *top layer* (`<dialog>.showModal()`). Header à 64 px
+  `50` ; tiroirs et dialogues dans le _top layer_ (`<dialog>.showModal()`). Header à 64 px
   (inchangé : `top-16`, `top-24`, `scroll-mt-32` restent justes).
 
 ### 2.4 Texture, iconographie, rendu 3D, mark
@@ -532,8 +532,10 @@ dynamique.
   --color-night-line: #2c2825;
 
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
-  --font-display: var(--font-archivo), var(--font-geist-sans), ui-sans-serif, sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-display:
+    var(--font-archivo), var(--font-geist-sans), ui-sans-serif, sans-serif;
+  --font-mono:
+    var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
 }
 
 @theme {
@@ -877,13 +879,13 @@ utilisé aujourd'hui). Les styles propres à un package vont dans des **CSS Modu
 
 ### 3.2 Courbes, durées, décalages
 
-| Nom | CustomEase (GSAP) | CSS | Usage | Durée |
-|---|---|---|---|---|
-| `s3d.strate` | `M0,0 C0.16,0.84 0.3,1 1,1` | `var(--ease-strate)` = `cubic-bezier(0.16, 0.84, 0.3, 1)` | révélations de lignes et de blocs, soulignements, tiroirs | 0,7–0,9 s (UI : 280 ms) |
-| `s3d.buse` | `M0,0 C0.45,0 0.55,1 1,1` | `var(--ease-buse)` | déplacements de caméra et de buse, éclaté | 1,2–1,6 s |
-| `s3d.purge` | `M0,0 C0.3,1.35 0.6,1 1,1` (léger dépassement) | `var(--ease-purge)` | pastille choisie, flash de changement de filament, ajout au panier | 320 ms |
-| `s3d.carte` | `M0,0 C0.7,0 0.2,1 1,1` | `var(--ease-carte)` | bascule élévation → plan, grands changements d'état | 1,4 s |
-| `s3d.pas` | fonction `pas(n, k)` (ci-dessous) | `steps(8, end)` | compteurs, scrubs quantifiés, « Coupe », `.s3d-print` | selon contexte |
+| Nom          | CustomEase (GSAP)                              | CSS                                                       | Usage                                                              | Durée                   |
+| ------------ | ---------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------ | ----------------------- |
+| `s3d.strate` | `M0,0 C0.16,0.84 0.3,1 1,1`                    | `var(--ease-strate)` = `cubic-bezier(0.16, 0.84, 0.3, 1)` | révélations de lignes et de blocs, soulignements, tiroirs          | 0,7–0,9 s (UI : 280 ms) |
+| `s3d.buse`   | `M0,0 C0.45,0 0.55,1 1,1`                      | `var(--ease-buse)`                                        | déplacements de caméra et de buse, éclaté                          | 1,2–1,6 s               |
+| `s3d.purge`  | `M0,0 C0.3,1.35 0.6,1 1,1` (léger dépassement) | `var(--ease-purge)`                                       | pastille choisie, flash de changement de filament, ajout au panier | 320 ms                  |
+| `s3d.carte`  | `M0,0 C0.7,0 0.2,1 1,1`                        | `var(--ease-carte)`                                       | bascule élévation → plan, grands changements d'état                | 1,4 s                   |
+| `s3d.pas`    | fonction `pas(n, k)` (ci-dessous)              | `steps(8, end)`                                           | compteurs, scrubs quantifiés, « Coupe », `.s3d-print`              | selon contexte          |
 
 **Durées** : micro 120–180 ms (`--dur-micro` 150), UI 240–320 ms (`--dur-ui` 280), révélations
 700–900 ms (`--dur-reveal` 800), chapitres 1,2–1,6 s (`--dur-chapter` 1400), page 480 ms
@@ -979,15 +981,15 @@ dans la chorégraphie qui les utilise (`src/motion/choreo/about.tsx`), jamais ai
 
 ### 3.5 Micro-interactions et équivalents tactiles
 
-| Interaction | Souris | Tactile | Clavier |
-|---|---|---|---|
-| Soulignement d'un lien | se trace de gauche à droite (280 ms) | déjà tracé à l'état actif | déjà tracé au focus |
-| Pastille de filament | aperçu de la vague au survol (desktop Studio) | vague au tap | flèches dans le groupe radio |
-| Carte produit | la 2ᵉ image « s'imprime » en `steps(8)` | balayage unique à l'entrée dans la vue | rien (focus visible) |
-| Rotation 3D (Studio, fiche) | glisser | glisser à un doigt dans la vue (`touch-action: none` sur la vue seulement) | flèches quand la vue a le focus + boutons « Tourner » |
-| Zoom 3D | boutons +/− (la molette fait défiler la page) | pincer | boutons |
-| Réglages Studio | curseurs natifs, Maj + flèche = ×10 | curseurs de 44 px, réglette Z verticale au pouce | idem |
-| Ajout au panier | pastille `s3d.purge` sur le compteur du header | idem + `navigator.vibrate(5)` si disponible | annonce `aria-live` existante |
+| Interaction                 | Souris                                         | Tactile                                                                    | Clavier                                               |
+| --------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Soulignement d'un lien      | se trace de gauche à droite (280 ms)           | déjà tracé à l'état actif                                                  | déjà tracé au focus                                   |
+| Pastille de filament        | aperçu de la vague au survol (desktop Studio)  | vague au tap                                                               | flèches dans le groupe radio                          |
+| Carte produit               | la 2ᵉ image « s'imprime » en `steps(8)`        | balayage unique à l'entrée dans la vue                                     | rien (focus visible)                                  |
+| Rotation 3D (Studio, fiche) | glisser                                        | glisser à un doigt dans la vue (`touch-action: none` sur la vue seulement) | flèches quand la vue a le focus + boutons « Tourner » |
+| Zoom 3D                     | boutons +/− (la molette fait défiler la page)  | pincer                                                                     | boutons                                               |
+| Réglages Studio             | curseurs natifs, Maj + flèche = ×10            | curseurs de 44 px, réglette Z verticale au pouce                           | idem                                                  |
+| Ajout au panier             | pastille `s3d.purge` sur le compteur du header | idem + `navigator.vibrate(5)` si disponible                                | annonce `aria-live` existante                         |
 
 ### 3.6 Mouvement réduit et paliers d'appareil
 
@@ -1002,18 +1004,18 @@ dans la chorégraphie qui les utilise (`src/motion/choreo/about.tsx`), jamais ai
 - La détection vit dans `src/lib/motion-bridge/tier.ts` (léger, sans import lourd), après
   l'hydratation. Côté serveur, tout le monde reçoit les posters (état C0).
 
-| Élément | C2 · complet | C1 · complet | C0 (tout mouvement) | Mouvement réduit (toute capacité) |
-|---|---|---|---|---|
-| Lenis | oui | oui (molette seulement ; tactile natif) | non | non |
-| Chorégraphies GSAP, SplitText | oui | oui, allégées | CSS seulement | non (états finaux) |
-| Pin du héros | oui (≥ 1024 × 768) | non | non | non |
-| Héros | impression animée, contrôles, bascule en plan | impression autojouée 0 → 100 % en 4,2 s, réglette Z | poster SVG final, contrôles qui recolorent le SVG | poster SVG final, contrôles instantanés |
-| Champ de courbes (accueil) | WebGL | SVG statique | SVG statique | SVG statique |
-| Studio 3D | oui | oui (scène collante : son rectangle ne bouge pas au scroll, pas de décalage) | vue Élévation SVG, export et devis complets | 3D **rendue à la demande** (sans vague, sans autorotation, sans simulation animée) |
-| Viewer produit (Vase spirale) | oui | oui, figé au repos | photos seulement | oui, sans autorotation |
-| Transition « Coupe » | oui | oui | oui (CSS) | non |
-| Révélations CSS | oui | oui | oui | non |
-| Compteurs | animés | animés | valeur finale | valeur finale |
+| Élément                       | C2 · complet                                  | C1 · complet                                                                 | C0 (tout mouvement)                               | Mouvement réduit (toute capacité)                                                  |
+| ----------------------------- | --------------------------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Lenis                         | oui                                           | oui (molette seulement ; tactile natif)                                      | non                                               | non                                                                                |
+| Chorégraphies GSAP, SplitText | oui                                           | oui, allégées                                                                | CSS seulement                                     | non (états finaux)                                                                 |
+| Pin du héros                  | oui (≥ 1024 × 768)                            | non                                                                          | non                                               | non                                                                                |
+| Héros                         | impression animée, contrôles, bascule en plan | impression autojouée 0 → 100 % en 4,2 s, réglette Z                          | poster SVG final, contrôles qui recolorent le SVG | poster SVG final, contrôles instantanés                                            |
+| Champ de courbes (accueil)    | WebGL                                         | SVG statique                                                                 | SVG statique                                      | SVG statique                                                                       |
+| Studio 3D                     | oui                                           | oui (scène collante : son rectangle ne bouge pas au scroll, pas de décalage) | vue Élévation SVG, export et devis complets       | 3D **rendue à la demande** (sans vague, sans autorotation, sans simulation animée) |
+| Viewer produit (Vase spirale) | oui                                           | oui, figé au repos                                                           | photos seulement                                  | oui, sans autorotation                                                             |
+| Transition « Coupe »          | oui                                           | oui                                                                          | oui (CSS)                                         | non                                                                                |
+| Révélations CSS               | oui                                           | oui                                                                          | oui                                               | non                                                                                |
+| Compteurs                     | animés                                        | animés                                                                       | valeur finale                                     | valeur finale                                                                      |
 
 **Interrupteur « Réduire les animations »** (footer, `MotionToggle`) : écrit
 `localStorage["s3d-motion"] = "reduce" | "full"` (try/catch), pose `data-motion` sur `<html>` et
@@ -1049,7 +1051,7 @@ Interdits : import de gsap / lenis / three / postprocessing hors src/motion/** ;
 
 - **`src/motion/**`** : seul endroit qui importe `gsap`, `gsap/*`, `@gsap/react`, `lenis`,
   `three`, `three/*`, `postprocessing`. Atteint **uniquement** par `next/dynamic(() => import(...),
-  { ssr: false })` déclaré dans un fichier de `src/gates/**`. Avec `ssr: false`, le transform de
+{ ssr: false })` déclaré dans un fichier de `src/gates/**`. Avec `ssr: false`, le transform de
   Next retire l'import du build serveur : le Worker ne voit jamais ces paquets. (Un simple
   `await import("three")` dans un effet d'un composant rendu côté serveur **reste** dans le
   Worker, voir `research/critique.md` §2.2 : c'est interdit.)
@@ -1062,7 +1064,7 @@ Interdits : import de gsap / lenis / three / postprocessing hors src/motion/** ;
 - **`src/lib/studio/**`** : géométrie, statistiques, estimation, codecs d'URL, posters SVG, écriture
   STL. **Pur TypeScript, sans three**, utilisable par le SSR, le client, le Worker du Studio et le
   Stage (qui ne fait qu'envelopper les `Float32Array` dans des `BufferGeometry`).
-- **Communication** : le DOM passe des *props* (snapshots immuables) aux vues ; le côté lourd
+- **Communication** : le DOM passe des _props_ (snapshots immuables) aux vues ; le côté lourd
   renvoie des états (couche courante, prêt, statistiques d'export) par le bridge ou par des
   callbacks. Les chorégraphies pilotent les scènes par des **contrôleurs** (objets JS à propriétés
   animables) exposés par le Stage.
@@ -1118,7 +1120,25 @@ Responsabilités :
 contenu par la version ci-dessous (thème inchangé + mouvement) :
 
 ```js
-(function(){try{var r=document.documentElement;var t=localStorage.getItem('theme');var d=t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches;r.classList.toggle('dark',d);r.style.colorScheme=d?'dark':'light';var m=null;try{m=localStorage.getItem('s3d-motion')}catch(e){}var rm=m?m==='reduce':matchMedia('(prefers-reduced-motion: reduce)').matches;r.dataset.motion=rm?'reduce':'full';}catch(e){}})();
+(function () {
+  try {
+    var r = document.documentElement;
+    var t = localStorage.getItem("theme");
+    var d = t
+      ? t === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    r.classList.toggle("dark", d);
+    r.style.colorScheme = d ? "dark" : "light";
+    var m = null;
+    try {
+      m = localStorage.getItem("s3d-motion");
+    } catch (e) {}
+    var rm = m
+      ? m === "reduce"
+      : matchMedia("(prefers-reduced-motion: reduce)").matches;
+    r.dataset.motion = rm ? "reduce" : "full";
+  } catch (e) {}
+})();
 ```
 
 ### 4.4 Stage : un seul renderer WebGL persistant (WP-00 pour le cœur)
@@ -1179,30 +1199,43 @@ contenu par la version ci-dessous (thème inchangé + mouvement) :
 ```ts
 // src/lib/motion-bridge/types.ts (WP-00)
 export type Capability = 0 | 1 | 2;
-export type SceneId = "print-hero" | "contour-field" | "studio-object" | "product-viewer";
+export type SceneId =
+  "print-hero" | "contour-field" | "studio-object" | "product-viewer";
 
 export interface StageViewDescriptor<P = unknown> {
-  id: string;                        // useId()
+  id: string; // useId()
   scene: SceneId;
-  element: HTMLElement;              // conteneur transparent qui couvre sa section
-  props: P;                          // snapshot immuable : on remplace, on ne mute pas
+  element: HTMLElement; // conteneur transparent qui couvre sa section
+  props: P; // snapshot immuable : on remplace, on ne mute pas
   clear: "transparent" | "tone";
-  liveRect?: boolean;                // true si dans une section pinnée ou transformée
-  bakeWhenIdle?: boolean;            // C1 seulement : figer en image au repos (vues qui défilent avec la page)
-  interactive?: boolean;             // orbite, pointeur
-  priority?: number;                 // ordre de rendu (croissant)
+  liveRect?: boolean; // true si dans une section pinnée ou transformée
+  bakeWhenIdle?: boolean; // C1 seulement : figer en image au repos (vues qui défilent avec la page)
+  interactive?: boolean; // orbite, pointeur
+  priority?: number; // ordre de rendu (croissant)
 }
 
 export interface MotionBridgeState {
-  capability: Capability;            // 0 côté serveur
+  capability: Capability; // 0 côté serveur
   reduced: boolean;
   runtimeReady: boolean;
   stageReady: boolean;
   contextLost: boolean;
   navPending: boolean;
-  velocity: number;                  // px/frame lissée, écrite par le runtime
-  scroll: { to(target: number | string | HTMLElement, o?: { offset?: number; immediate?: boolean }): void; lock(on: boolean): void } | null;
-  stage: { bake(scene: SceneId, props: unknown, size: { width: number; height: number }): Promise<Blob> } | null;
+  velocity: number; // px/frame lissée, écrite par le runtime
+  scroll: {
+    to(
+      target: number | string | HTMLElement,
+      o?: { offset?: number; immediate?: boolean },
+    ): void;
+    lock(on: boolean): void;
+  } | null;
+  stage: {
+    bake(
+      scene: SceneId,
+      props: unknown,
+      size: { width: number; height: number },
+    ): Promise<Blob>;
+  } | null;
 }
 ```
 
@@ -1217,7 +1250,7 @@ export const motionBridge: {
     update(id: string, props: unknown): void;
     unregister(id: string): void;
     list(): StageViewDescriptor[];
-    subscribe(listener: () => void): () => void;   // n'émet que sur ajout / retrait / props
+    subscribe(listener: () => void): () => void; // n'émet que sur ajout / retrait / props
   };
 };
 export function useMotionBridge<T>(select: (s: MotionBridgeState) => T): T;
@@ -1227,7 +1260,10 @@ export function useStageView<P>(
   ref: React.RefObject<HTMLElement | null>,
   scene: SceneId,
   props: P,
-  opts?: Pick<StageViewDescriptor, "clear" | "liveRect" | "bakeWhenIdle" | "interactive" | "priority">,
+  opts?: Pick<
+    StageViewDescriptor,
+    "clear" | "liveRect" | "bakeWhenIdle" | "interactive" | "priority"
+  >,
 ): { id: string; ready: boolean };
 ```
 
@@ -1238,17 +1274,32 @@ export interface StageContext {
   envMap: import("three").Texture;
   capability: Capability;
   reduced: boolean;
-  theme: { dark: boolean; paper: string; ink: string; iso: string; isoIndex: string };
+  theme: {
+    dark: boolean;
+    paper: string;
+    ink: string;
+    iso: string;
+    isoIndex: string;
+  };
 }
-export interface ViewFrame { rect: DOMRectReadOnly; dpr: number; time: number; dt: number; scrollY: number; velocity: number }
+export interface ViewFrame {
+  rect: DOMRectReadOnly;
+  dpr: number;
+  time: number;
+  dt: number;
+  scrollY: number;
+  velocity: number;
+}
 export interface StageScene<P, C = unknown> {
   mount(ctx: StageContext, view: StageViewDescriptor<P>): Promise<void> | void;
   update(props: P): void;
-  render(ctx: StageContext, frame: ViewFrame): boolean;   // true = « rends-moi encore »
-  controller?: C;                                          // propriétés animables par GSAP
+  render(ctx: StageContext, frame: ViewFrame): boolean; // true = « rends-moi encore »
+  controller?: C; // propriétés animables par GSAP
   dispose(): void;
 }
-export type SceneModule<P, C = unknown> = { default: (ctx: StageContext) => StageScene<P, C> };
+export type SceneModule<P, C = unknown> = {
+  default: (ctx: StageContext) => StageScene<P, C>;
+};
 
 // src/motion/stage/controllers.ts (WP-00) — les chorégraphies retrouvent le contrôleur d'une vue
 export function getController<C>(viewId: string): C | undefined;
@@ -1261,31 +1312,70 @@ utilisés par plusieurs packages) :
 ```ts
 // src/lib/studio/types.ts (WP-00 crée le contrat ; WP-01 et WP-02 l'étendent sans rupture)
 export type StudioObjectId = "lavaux" | "cartouche" | "relief" | "borne";
-export type FilamentId = "blanc-neve" | "encre" | "rouge-signal" | "bleu-leman" | "vert-lavaux" | "gris-molasse" | "ambre" | "glacier";
-export interface Band { filament: FilamentId; toMm: number }            // bandes contiguës depuis z = 0 ; la dernière finit à la hauteur totale
-export interface StudioTexts { name?: string; role?: string; line1?: string; line2?: string; peak?: string; text?: string } // JAMAIS dans l'URL
+export type FilamentId =
+  | "blanc-neve"
+  | "encre"
+  | "rouge-signal"
+  | "bleu-leman"
+  | "vert-lavaux"
+  | "gris-molasse"
+  | "ambre"
+  | "glacier";
+export interface Band {
+  filament: FilamentId;
+  toMm: number;
+} // bandes contiguës depuis z = 0 ; la dernière finit à la hauteur totale
+export interface StudioTexts {
+  name?: string;
+  role?: string;
+  line1?: string;
+  line2?: string;
+  peak?: string;
+  text?: string;
+} // JAMAIS dans l'URL
 export interface MeshData {
-  positions: Float32Array; normals: Float32Array; indices: Uint32Array;
-  side?: Float32Array;                                                  // 0 = paroi extérieure, 1 = intérieure (lignes fantômes)
+  positions: Float32Array;
+  normals: Float32Array;
+  indices: Uint32Array;
+  side?: Float32Array; // 0 = paroi extérieure, 1 = intérieure (lignes fantômes)
   groups: { start: number; count: number; band: number }[];
-  bbox: [number, number, number, number, number, number];              // mm, Z vers le haut
+  bbox: [number, number, number, number, number, number]; // mm, Z vers le haut
   triangles: number;
 }
 // Les unions LavauxConfig | CartoucheConfig | ReliefConfig | BorneConfig (§6.2.1), StudioStats et Printability (§6.5) complètent ce fichier.
 
 // src/lib/studio/creations.ts (WP-00) — « Mes créations », localStorage, try/catch partout
-export interface Creation { id: string; object: StudioObjectId; fragment: string; texts?: StudioTexts; thumbnail?: string; label: string; savedAt: number }
+export interface Creation {
+  id: string;
+  object: StudioObjectId;
+  fragment: string;
+  texts?: StudioTexts;
+  thumbnail?: string;
+  label: string;
+  savedAt: number;
+}
 export function listCreations(): Creation[];
-export function saveCreation(c: Omit<Creation, "id" | "savedAt">): Creation | null;   // 12 max (FIFO), vignette ≤ 60 Ko sinon omise
+export function saveCreation(
+  c: Omit<Creation, "id" | "savedAt">,
+): Creation | null; // 12 max (FIFO), vignette ≤ 60 Ko sinon omise
 export function removeCreation(id: string): void;
-export function subscribeCreations(cb: () => void): () => void;                    // événement storage + événement local
+export function subscribeCreations(cb: () => void): () => void; // événement storage + événement local
 
 // src/lib/quote-handoff.ts (WP-00) — passage Studio → /custom, sessionStorage["s3d-quote-handoff-v1"]
 export interface QuoteHandoff {
-  v: 1; source: "studio"; object: StudioObjectId; link: string;        // lien de configuration SANS texte personnel
-  prefill: { description: string; material: "PLA"; colors: string; dimensions: string };
+  v: 1;
+  source: "studio";
+  object: StudioObjectId;
+  link: string; // lien de configuration SANS texte personnel
+  prefill: {
+    description: string;
+    material: "PLA";
+    colors: string;
+    dimensions: string;
+  };
   attachment?: { key: string; name: string; bytes: number; triangles: number };
-  thumbnail?: string; createdAt: number;                                // expire après 24 h (durée du cookie propriétaire)
+  thumbnail?: string;
+  createdAt: number; // expire après 24 h (durée du cookie propriétaire)
 }
 export function writeQuoteHandoff(h: QuoteHandoff): boolean;
 export function readQuoteHandoff(): QuoteHandoff | null;
@@ -1294,7 +1384,10 @@ export function clearQuoteHandoff(): void;
 // src/lib/studio/texts-store.ts (WP-00) — textes saisis, sessionStorage["s3d-studio-texts-v1"]
 // Écrit par l'accueil (chapitre 02) et par le Studio, lu par le Studio. Jamais dans l'URL.
 export function readStudioTexts(object: StudioObjectId): StudioTexts;
-export function writeStudioTexts(object: StudioObjectId, texts: StudioTexts): void;
+export function writeStudioTexts(
+  object: StudioObjectId,
+  texts: StudioTexts,
+): void;
 export function clearStudioTexts(object?: StudioObjectId): void;
 ```
 
@@ -1308,45 +1401,121 @@ définis au §9.2 : ils permettent à l'accueil d'afficher un objet Studio sans 
 ```jsonc
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["eslint", "typescript", "unicorn", "oxc", "react", "jsx-a11y", "nextjs", "vitest"],
+  "plugins": [
+    "eslint",
+    "typescript",
+    "unicorn",
+    "oxc",
+    "react",
+    "jsx-a11y",
+    "nextjs",
+    "vitest",
+  ],
   "rules": {
     "react/rules-of-hooks": "error",
     "nextjs/no-img-element": "off",
     // Bundle du Worker (règle d'or 10) : moteurs motion et 3D seulement sous src/motion/**.
-    "no-restricted-imports": ["error", {
-      "paths": [
-        { "name": "three", "message": "three : uniquement sous src/motion/**. Types : import type.", "allowTypeImports": true },
-        { "name": "gsap", "message": "gsap : uniquement sous src/motion/** (via @/motion/gsap)." },
-        { "name": "@gsap/react", "message": "@gsap/react : uniquement sous src/motion/**." },
-        { "name": "lenis", "message": "lenis : uniquement sous src/motion/**." },
-        { "name": "postprocessing", "message": "postprocessing : uniquement sous src/motion/** (non installé en v1)." }
-      ],
-      "patterns": [
-        { "group": ["three/*", "gsap/*", "lenis/*", "@gsap/*"], "message": "Moteur motion : uniquement sous src/motion/**.", "allowTypeImports": true },
-        { "group": ["@/motion", "@/motion/*"], "message": "src/motion n'est atteint que depuis src/gates/** par next/dynamic({ ssr: false }).", "allowTypeImports": true }
-      ]
-    }]
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "three",
+            "message": "three : uniquement sous src/motion/**. Types : import type.",
+            "allowTypeImports": true,
+          },
+          {
+            "name": "gsap",
+            "message": "gsap : uniquement sous src/motion/** (via @/motion/gsap).",
+          },
+          {
+            "name": "@gsap/react",
+            "message": "@gsap/react : uniquement sous src/motion/**.",
+          },
+          {
+            "name": "lenis",
+            "message": "lenis : uniquement sous src/motion/**.",
+          },
+          {
+            "name": "postprocessing",
+            "message": "postprocessing : uniquement sous src/motion/** (non installé en v1).",
+          },
+        ],
+        "patterns": [
+          {
+            "group": ["three/*", "gsap/*", "lenis/*", "@gsap/*"],
+            "message": "Moteur motion : uniquement sous src/motion/**.",
+            "allowTypeImports": true,
+          },
+          {
+            "group": ["@/motion", "@/motion/*"],
+            "message": "src/motion n'est atteint que depuis src/gates/** par next/dynamic({ ssr: false }).",
+            "allowTypeImports": true,
+          },
+        ],
+      },
+    ],
   },
   "overrides": [
     { "files": ["src/motion/**"], "rules": { "no-restricted-imports": "off" } },
     {
       "files": ["src/gates/**"],
       "rules": {
-        "no-restricted-imports": ["error", {
-          "paths": [
-            { "name": "three", "message": "Les gates n'importent que @/motion/** par next/dynamic.", "allowTypeImports": true },
-            { "name": "gsap", "message": "Les gates n'importent que @/motion/** par next/dynamic." },
-            { "name": "@gsap/react", "message": "Les gates n'importent que @/motion/** par next/dynamic." },
-            { "name": "lenis", "message": "Les gates n'importent que @/motion/** par next/dynamic." }
-          ],
-          "patterns": [{ "group": ["three/*", "gsap/*", "lenis/*", "@gsap/*"], "message": "Les gates n'importent que @/motion/**.", "allowTypeImports": true }]
-        }]
-      }
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "three",
+                "message": "Les gates n'importent que @/motion/** par next/dynamic.",
+                "allowTypeImports": true,
+              },
+              {
+                "name": "gsap",
+                "message": "Les gates n'importent que @/motion/** par next/dynamic.",
+              },
+              {
+                "name": "@gsap/react",
+                "message": "Les gates n'importent que @/motion/** par next/dynamic.",
+              },
+              {
+                "name": "lenis",
+                "message": "Les gates n'importent que @/motion/** par next/dynamic.",
+              },
+            ],
+            "patterns": [
+              {
+                "group": ["three/*", "gsap/*", "lenis/*", "@gsap/*"],
+                "message": "Les gates n'importent que @/motion/**.",
+                "allowTypeImports": true,
+              },
+            ],
+          },
+        ],
+      },
     },
     // Temporaire : ancien viewer, supprimé par WP-SHOP ; entrée retirée par WP-99.
-    { "files": ["src/components/product-viewer-3d.tsx", "src/components/showroom-scene.ts"], "rules": { "no-restricted-imports": "off" } }
+    {
+      "files": [
+        "src/components/product-viewer-3d.tsx",
+        "src/components/showroom-scene.ts",
+      ],
+      "rules": { "no-restricted-imports": "off" },
+    },
   ],
-  "ignorePatterns": [".claude/**", "drizzle/**", "drizzle-pg/**", ".next/**", ".open-next/**", ".wrangler/**", "public/**", "workers/**", "cloudflare-env.d.ts", "next-env.d.ts", "src/app/icon.svg"]
+  "ignorePatterns": [
+    ".claude/**",
+    "drizzle/**",
+    "drizzle-pg/**",
+    ".next/**",
+    ".open-next/**",
+    ".wrangler/**",
+    "public/**",
+    "workers/**",
+    "cloudflare-env.d.ts",
+    "next-env.d.ts",
+    "src/app/icon.svg",
+  ],
 }
 ```
 
@@ -1381,15 +1550,15 @@ bun add -d @types/three@0.186.0 @types/d3-contour@3.0.6 opentype.js@1.3.4 @types
 
 ### 4.8 CSP : aucun changement en v1
 
-| Besoin | Couvert par la CSP actuelle | Changement |
-|---|---|---|
-| Scripts gsap, lenis, three, Worker du Studio | `script-src 'self' 'nonce-…'`, `worker-src 'self' blob: data:` (chunks bundlés, Worker servi depuis `/_next/static`) | aucun |
-| Styles inline de GSAP, SplitText, View Transitions | `style-src 'unsafe-inline'` | aucun |
-| Glyphes JSON, STL produit, posters SVG | `connect-src 'self'` (fetch same-origin) | aucun |
-| Upload STL du Studio | `POST /api/quote-upload` same-origin | aucun |
-| Vignettes et « bake » (`blob:`, `data:`) | `img-src 'self' data: blob: https:` | aucun |
-| Polices | `next/font` auto-hébergées (`font-src 'self'`) | aucun |
-| WASM, `eval` | non utilisés (earcut, d3-contour, opentype.js sont du JS pur ; pas de Draco, KTX2, Rive) | aucun |
+| Besoin                                             | Couvert par la CSP actuelle                                                                                          | Changement |
+| -------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- | ---------- |
+| Scripts gsap, lenis, three, Worker du Studio       | `script-src 'self' 'nonce-…'`, `worker-src 'self' blob: data:` (chunks bundlés, Worker servi depuis `/_next/static`) | aucun      |
+| Styles inline de GSAP, SplitText, View Transitions | `style-src 'unsafe-inline'`                                                                                          | aucun      |
+| Glyphes JSON, STL produit, posters SVG             | `connect-src 'self'` (fetch same-origin)                                                                             | aucun      |
+| Upload STL du Studio                               | `POST /api/quote-upload` same-origin                                                                                 | aucun      |
+| Vignettes et « bake » (`blob:`, `data:`)           | `img-src 'self' data: blob: https:`                                                                                  | aucun      |
+| Polices                                            | `next/font` auto-hébergées (`font-src 'self'`)                                                                       | aucun      |
+| WASM, `eval`                                       | non utilisés (earcut, d3-contour, opentype.js sont du JS pur ; pas de Draco, KTX2, Rive)                             | aucun      |
 
 **Ajouts futurs possibles, chacun à valider par le propriétaire** : `connect-src blob:` le jour où
 l'on charge un GLB texturé (bug connu `GLTFLoader`/`ImageBitmapLoader`) ; `media-src` si une
@@ -1407,7 +1576,15 @@ retire les clés devenues inutiles). Chaque package écrit ses textes dans **ses
 // src/i18n/namespaces.ts (WP-00)
 // Un namespace = un fichier messages/<locale>/<ns>.json = un package propriétaire (§9.2).
 export const NAMESPACES = [
-  "shell", "studioCore", "landing", "studio", "quote", "catalog", "atelier", "system", "accountUi",
+  "shell",
+  "studioCore",
+  "landing",
+  "studio",
+  "quote",
+  "catalog",
+  "atelier",
+  "system",
+  "accountUi",
 ] as const;
 export type Namespace = (typeof NAMESPACES)[number];
 ```
@@ -1423,33 +1600,40 @@ type Messages = Record<string, unknown>;
 
 export default getRequestConfig(async ({ requestLocale }) => {
   const requested = await requestLocale;
-  const locale = hasLocale(routing.locales, requested) ? requested : routing.defaultLocale;
+  const locale = hasLocale(routing.locales, requested)
+    ? requested
+    : routing.defaultLocale;
   const [base, ...parts] = await Promise.all([
     import(`../../messages/${locale}.json`).then((m) => m.default as Messages),
     ...NAMESPACES.map((ns) =>
-      import(`../../messages/${locale}/${ns}.json`).then((m) => m.default as Messages),
+      import(`../../messages/${locale}/${ns}.json`).then(
+        (m) => m.default as Messages,
+      ),
     ),
   ]);
   const messages: Messages = { ...base };
   NAMESPACES.forEach((ns, i) => {
-    if (ns in base) throw new Error(`[i18n] « ${ns} » existe déjà dans messages/${locale}.json`);
+    if (ns in base)
+      throw new Error(
+        `[i18n] « ${ns} » existe déjà dans messages/${locale}.json`,
+      );
     messages[ns] = parts[i];
   });
   return { locale, messages };
 });
 ```
 
-| Namespace | Package | Contenu |
-|---|---|---|
-| `shell` | WP-00 | libellés de nav ajoutés (`studio`, `atelier`), BottomNav, footer (cartouche, préférences), `MotionToggle`, attente de navigation, textes des vues 3D (« Vue 3D indisponible sur cet appareil »), bouton principal générique |
-| `studioCore` | WP-01 (+ WP-02) | noms des objets, profils, motifs, palettes, filaments, unités et formats de durée, gabarit du sommet (« Pointe {name} »), messages d'imprimabilité |
-| `landing` | WP-HOME | accueil : héros, chapitres, SEO de l'accueil |
-| `studio` | WP-STUDIO | pages Studio, contrôles, outils, tiroir d'envoi, erreurs d'export, FAQ, SEO |
-| `quote` | WP-QUOTE | `/custom` : nouveaux textes, carte « Configuration Studio jointe », erreurs 429/413/415 |
-| `catalog` | WP-SHOP | boutique (planche N = 1, vue Registre, rangée Studio), fiche (chapitres, attribution, viewer), réassurance (copie de `home.trust*` pour découpler) |
-| `atelier` | WP-ABOUT | nouveaux textes d'À propos et de contact |
-| `system` | WP-UTILITY | panier, succès, suivi, favoris (« Mes créations »), 404, erreur |
-| `accountUi` | WP-ACCOUNT | seulement si un texte nouveau est nécessaire (sinon `{}`) |
+| Namespace    | Package         | Contenu                                                                                                                                                                                                                     |
+| ------------ | --------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `shell`      | WP-00           | libellés de nav ajoutés (`studio`, `atelier`), BottomNav, footer (cartouche, préférences), `MotionToggle`, attente de navigation, textes des vues 3D (« Vue 3D indisponible sur cet appareil »), bouton principal générique |
+| `studioCore` | WP-01 (+ WP-02) | noms des objets, profils, motifs, palettes, filaments, unités et formats de durée, gabarit du sommet (« Pointe {name} »), messages d'imprimabilité                                                                          |
+| `landing`    | WP-HOME         | accueil : héros, chapitres, SEO de l'accueil                                                                                                                                                                                |
+| `studio`     | WP-STUDIO       | pages Studio, contrôles, outils, tiroir d'envoi, erreurs d'export, FAQ, SEO                                                                                                                                                 |
+| `quote`      | WP-QUOTE        | `/custom` : nouveaux textes, carte « Configuration Studio jointe », erreurs 429/413/415                                                                                                                                     |
+| `catalog`    | WP-SHOP         | boutique (planche N = 1, vue Registre, rangée Studio), fiche (chapitres, attribution, viewer), réassurance (copie de `home.trust*` pour découpler)                                                                          |
+| `atelier`    | WP-ABOUT        | nouveaux textes d'À propos et de contact                                                                                                                                                                                    |
+| `system`     | WP-UTILITY      | panier, succès, suivi, favoris (« Mes créations »), 404, erreur                                                                                                                                                             |
+| `accountUi`  | WP-ACCOUNT      | seulement si un texte nouveau est nécessaire (sinon `{}`)                                                                                                                                                                   |
 
 - WP-00 crée les 36 fichiers (`{}` sauf `shell`), le test de parité et la correction du ß.
 - **Test `src/i18n/messages.test.ts`** (WP-00) : pour chaque namespace et pour les fichiers
@@ -1473,14 +1657,14 @@ export default getRequestConfig(async ({ requestLocale }) => {
 
 **Nouveaux événements** (jamais de texte saisi dans une propriété) :
 
-| Événement | Propriétés | Quand |
-|---|---|---|
-| `Hero Customized` | `palette`, `pattern` | premier geste dans le héros (une fois par session) |
-| `Studio Viewed` | `object` | `<TrackEvent>` sur `/studio/[objet]` |
-| `Studio Configured` | `object`, `control` | premier réglage par objet et par session |
-| `Studio Sent` | `object`, `bands`, `triangles`, `bytes`, `estimate_low`, `estimate_high` (CHF décimaux, si affichés) | upload réussi, avant la Server Action |
-| `Studio Link Copied` | `object` | « Copier le lien » |
-| `Studio Saved` | `object` | « Garder » |
+| Événement            | Propriétés                                                                                           | Quand                                              |
+| -------------------- | ---------------------------------------------------------------------------------------------------- | -------------------------------------------------- |
+| `Hero Customized`    | `palette`, `pattern`                                                                                 | premier geste dans le héros (une fois par session) |
+| `Studio Viewed`      | `object`                                                                                             | `<TrackEvent>` sur `/studio/[objet]`               |
+| `Studio Configured`  | `object`, `control`                                                                                  | premier réglage par objet et par session           |
+| `Studio Sent`        | `object`, `bands`, `triangles`, `bytes`, `estimate_low`, `estimate_high` (CHF décimaux, si affichés) | upload réussi, avant la Server Action              |
+| `Studio Link Copied` | `object`                                                                                             | « Copier le lien »                                 |
+| `Studio Saved`       | `object`                                                                                             | « Garder »                                         |
 
 **Règles** : aucun texte personnel (nom, fonction, contact, sommet) dans l'URL, le fragment, un
 événement ou un attribut non masqué. Le texte vit en mémoire et dans
@@ -1494,19 +1678,19 @@ retire déjà). **Stockage local ajouté** : `s3d-motion`, `s3d-creations-v1` (l
 
 ### 4.11 Budgets et mesures
 
-| Poste | Budget | Mesure |
-|---|---|---|
-| Worker (gzip) | base mesurée par WP-00 (≈ 2 946 KiB au 27.09) ; **+20 KiB** pour WP-00, **+10 KiB** par package ensuite, **+60 KiB** au total ; **0** signature three/gsap/lenis | `bunx opennextjs-cloudflare build` puis `bunx wrangler deploy --dry-run` (ligne `Total Upload … gzip`) et `bun scripts/check-worker-bundle.ts` |
-| JS initial de l'accueil (hors chunks motion et Stage) | ≤ actuel + 15 KiB gzip | `bun scripts/chunk-report.ts` |
-| Chunk runtime (gsap + ScrollTrigger + SplitText + Flip + CustomEase + Lenis + runtime) | ≤ 65 KiB gzip, après l'hydratation | idem |
-| Chunk Stage (three + cœur + matériau d'impression) | ≤ 200 KiB gzip ; scènes ≤ 15 KiB chacune | idem |
-| Moteur Studio + Worker | ≤ 40 KiB (moteur) + ≤ 60 KiB (Worker, avec générateurs, d3-contour, earcut) | idem |
-| Glyphes 3D | ≤ 45 KiB gzip, chargés seulement par le Studio et le chapitre 02 | onglet Réseau |
-| LCP (p75 mobile 4G) | ≤ 2,0 s ; élément LCP = h1 ou poster SSR, visible au premier paint | Lighthouse mobile sur `bun run preview`, puis PostHog web vitals sur la preview |
-| INP | ≤ 150 ms : glissé d'un curseur, frappe dans un texte, clic « Envoyer à l'atelier », changement de palette | DevTools Performance, CPU ×4 + profil mobile (et un Android moyen 2023 si disponible) |
-| CLS | ≤ 0,05 (ratios réservés, polices avec métriques de repli) | Lighthouse |
-| GPU | 1 contexte WebGL par page ; DPR ≤ 2 (C2), ≤ 1,5 (C1) ; < 20 draw calls ; ≤ 120 k triangles (C2), ≤ 40 k (C1) visibles ; ≤ 8 ms de GPU par frame sur un iGPU 2020 | Spector ou `renderer.info` en dev |
-| Mémoire | géométries du Stage ≤ 20 Mo | `renderer.info.memory` |
+| Poste                                                                                  | Budget                                                                                                                                                           | Mesure                                                                                                                                         |
+| -------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| Worker (gzip)                                                                          | base mesurée par WP-00 (≈ 2 946 KiB au 27.09) ; **+20 KiB** pour WP-00, **+10 KiB** par package ensuite, **+60 KiB** au total ; **0** signature three/gsap/lenis | `bunx opennextjs-cloudflare build` puis `bunx wrangler deploy --dry-run` (ligne `Total Upload … gzip`) et `bun scripts/check-worker-bundle.ts` |
+| JS initial de l'accueil (hors chunks motion et Stage)                                  | ≤ actuel + 15 KiB gzip                                                                                                                                           | `bun scripts/chunk-report.ts`                                                                                                                  |
+| Chunk runtime (gsap + ScrollTrigger + SplitText + Flip + CustomEase + Lenis + runtime) | ≤ 65 KiB gzip, après l'hydratation                                                                                                                               | idem                                                                                                                                           |
+| Chunk Stage (three + cœur + matériau d'impression)                                     | ≤ 200 KiB gzip ; scènes ≤ 15 KiB chacune                                                                                                                         | idem                                                                                                                                           |
+| Moteur Studio + Worker                                                                 | ≤ 40 KiB (moteur) + ≤ 60 KiB (Worker, avec générateurs, d3-contour, earcut)                                                                                      | idem                                                                                                                                           |
+| Glyphes 3D                                                                             | ≤ 45 KiB gzip, chargés seulement par le Studio et le chapitre 02                                                                                                 | onglet Réseau                                                                                                                                  |
+| LCP (p75 mobile 4G)                                                                    | ≤ 2,0 s ; élément LCP = h1 ou poster SSR, visible au premier paint                                                                                               | Lighthouse mobile sur `bun run preview`, puis PostHog web vitals sur la preview                                                                |
+| INP                                                                                    | ≤ 150 ms : glissé d'un curseur, frappe dans un texte, clic « Envoyer à l'atelier », changement de palette                                                        | DevTools Performance, CPU ×4 + profil mobile (et un Android moyen 2023 si disponible)                                                          |
+| CLS                                                                                    | ≤ 0,05 (ratios réservés, polices avec métriques de repli)                                                                                                        | Lighthouse                                                                                                                                     |
+| GPU                                                                                    | 1 contexte WebGL par page ; DPR ≤ 2 (C2), ≤ 1,5 (C1) ; < 20 draw calls ; ≤ 120 k triangles (C2), ≤ 40 k (C1) visibles ; ≤ 8 ms de GPU par frame sur un iGPU 2020 | Spector ou `renderer.info` en dev                                                                                                              |
+| Mémoire                                                                                | géométries du Stage ≤ 20 Mo                                                                                                                                      | `renderer.info.memory`                                                                                                                         |
 
 ---
 
@@ -1522,7 +1706,7 @@ retire déjà). **Stockage local ajouté** : `s3d-motion`, `s3d-creations-v1` (l
   **« Régler un objet »** (seul bouton rouge, vers `/studio/lavaux#c=…` avec la configuration
   courante), « Boutique » (contour, `/shop`), « J'ai un fichier » (lien texte, `/custom`).
 - Colonnes 7–12 : boîte visuelle `aspect-[4/5]`, hauteur `min(78svh, 820px)` = `<StageView
-  scene="print-hero">` avec, en enfants, les deux posters SVG inline (§5.7), l'étiquette
+scene="print-hero">` avec, en enfants, les deux posters SVG inline (§5.7), l'étiquette
   d'honnêteté en bas à gauche (« Objet Studio · configuration d'exemple · rendu temps réel ») et la
   **bande de mesure** en bas (§5.5).
 - Cadre de carte (`MapFrame`) sur les bords gauche et bas de la section ; coordonnées en haut à
@@ -1542,26 +1726,30 @@ inline, donc non candidats au LCP. Aucun overlay, aucun préloader, aucun `opaci
 ```ts
 export const HERO_CONFIG: LavauxConfig = {
   object: "lavaux",
-  h: 150, d: 96,                          // mm (d = diamètre de l'enveloppe, motif compris)
-  profile: "galet", belly: 0.5, neck: 0.72, lip: 0.08,
+  h: 150,
+  d: 96, // mm (d = diamètre de l'enveloppe, motif compris)
+  profile: "galet",
+  belly: 0.5,
+  neck: 0.72,
+  lip: 0.08,
   pattern: { kind: "gradins", step: 5, depth: 1.4 },
   wall: 1.6,
   bands: [
-    { filament: "bleu-leman", toMm: 42 },  // couches 1–210
+    { filament: "bleu-leman", toMm: 42 }, // couches 1–210
     { filament: "vert-lavaux", toMm: 108 }, // couches 211–540
-    { filament: "blanc-neve", toMm: 150 },  // couches 541–750
+    { filament: "blanc-neve", toMm: 150 }, // couches 541–750
   ],
 };
 export const HERO_PATTERNS = {
   gradins: { kind: "gradins", step: 5, depth: 1.4 },
   vagues: { kind: "vagues", wavelength: 14, amplitude: 1.2, lobes: 5 },
   voronoi: { kind: "voronoi", cells: 48, relief: 1.2, seed: 4812 },
-} as const;                                // jamais « nervures » dans le héros
+} as const; // jamais « nervures » dans le héros
 export const HERO_PALETTES = {
   leman: ["bleu-leman", "vert-lavaux", "blanc-neve"],
   molasse: ["encre", "gris-molasse", "blanc-neve"],
   signal: ["encre", "blanc-neve", "rouge-signal"],
-  uni: ["blanc-neve"],                     // 1 bande, 0 changement
+  uni: ["blanc-neve"], // 1 bande, 0 changement
 } as const;
 ```
 
@@ -1593,13 +1781,13 @@ silhouette du Vase spirale (vérifié par `nearVaseSpirale`, §6.6). Géométrie
 
 ```ts
 export interface PrintHeroController {
-  progress: number;            // 0–1 → uCutZ = quantize(progress × h, 0.2)
-  tilt: number;                // 0 = élévation 22°, 1 = vue de plan (90°, fov 12°), uIsoMode = tilt
-  explode: number;             // 0–1 → écartement des bandes (12 mm au maximum), mode « éclaté » du chapitre 01
-  ghost: 0 | 1;                // lignes fantômes au-dessus de la coupe
-  ripple(palette: FilamentId[]): void;     // vague de couleur, 0,9 s
-  reprint(pattern: LavauxPattern): void;   // réimpression depuis le plateau, 1,2 s
-  onLayer?: (layer: number, zMm: number, band: number) => void;       // ≤ 10 Hz
+  progress: number; // 0–1 → uCutZ = quantize(progress × h, 0.2)
+  tilt: number; // 0 = élévation 22°, 1 = vue de plan (90°, fov 12°), uIsoMode = tilt
+  explode: number; // 0–1 → écartement des bandes (12 mm au maximum), mode « éclaté » du chapitre 01
+  ghost: 0 | 1; // lignes fantômes au-dessus de la coupe
+  ripple(palette: FilamentId[]): void; // vague de couleur, 0,9 s
+  reprint(pattern: LavauxPattern): void; // réimpression depuis le plateau, 1,2 s
+  onLayer?: (layer: number, zMm: number, band: number) => void; // ≤ 10 Hz
   onBandCross?: (band: number, layer: number, filament: FilamentId) => void;
 }
 ```
@@ -1613,29 +1801,29 @@ export interface PrintHeroController {
 `customProgramCacheKey = () => "s3d-print-v1"`. Partagé par `print-hero` et `studio-object`.
 Code GLSL en annexe A. Uniforms :
 
-| Uniform | Type | Rôle |
-|---|---|---|
-| `uCutZ` | float (mm) | hauteur imprimée ; au-dessus : `discard` ou ligne fantôme |
-| `uHeight` | float (mm) | hauteur totale de l'objet |
-| `uLayerH` | float | 0,2 mm |
-| `uBandTop[3]`, `uBandCount` | float[3], int | frontières des bandes (mm) |
-| `uBandColor[4]`, `uBandColorFrom[4]` | vec3[4] | teintes actuelles et précédentes (vague) |
-| `uRippleZ`, `uRippleActive` | float | front de la vague de couleur, liseré rouge |
-| `uReprintZ`, `uReprintSide`, `uReprintActive` | float | front de réimpression (ancien maillage garde le dessus, nouveau le dessous) |
-| `uHot`, `uFlash`, `uHotColor` | float, float, vec3 | liseré chaud à la coupe (0,3 mm, au moins 1,5 px) et flash de changement de bobine |
-| `uGhost`, `uGhostStep`, `uGhostColor` | float, float (2 mm), vec3 (`iso`) | lignes fantômes : anneaux de la paroi extérieure tous les 2 mm |
-| `uIsoMode`, `uIsoIndexColor` | float, vec3 (`iso-index`) | mode carte : courbe maîtresse toutes les 10 couches, teintes à plat |
-| `uLayerRelief`, `uUpView` | float, vec3 | lignes de couche en normales, atténuées quand elles passent sous le pixel (anti-moiré) |
+| Uniform                                       | Type                              | Rôle                                                                                   |
+| --------------------------------------------- | --------------------------------- | -------------------------------------------------------------------------------------- |
+| `uCutZ`                                       | float (mm)                        | hauteur imprimée ; au-dessus : `discard` ou ligne fantôme                              |
+| `uHeight`                                     | float (mm)                        | hauteur totale de l'objet                                                              |
+| `uLayerH`                                     | float                             | 0,2 mm                                                                                 |
+| `uBandTop[3]`, `uBandCount`                   | float[3], int                     | frontières des bandes (mm)                                                             |
+| `uBandColor[4]`, `uBandColorFrom[4]`          | vec3[4]                           | teintes actuelles et précédentes (vague)                                               |
+| `uRippleZ`, `uRippleActive`                   | float                             | front de la vague de couleur, liseré rouge                                             |
+| `uReprintZ`, `uReprintSide`, `uReprintActive` | float                             | front de réimpression (ancien maillage garde le dessus, nouveau le dessous)            |
+| `uHot`, `uFlash`, `uHotColor`                 | float, float, vec3                | liseré chaud à la coupe (0,3 mm, au moins 1,5 px) et flash de changement de bobine     |
+| `uGhost`, `uGhostStep`, `uGhostColor`         | float, float (2 mm), vec3 (`iso`) | lignes fantômes : anneaux de la paroi extérieure tous les 2 mm                         |
+| `uIsoMode`, `uIsoIndexColor`                  | float, vec3 (`iso-index`)         | mode carte : courbe maîtresse toutes les 10 couches, teintes à plat                    |
+| `uLayerRelief`, `uUpView`                     | float, vec3                       | lignes de couche en normales, atténuées quand elles passent sous le pixel (anti-moiré) |
 
 ### 5.5 Storyboard
 
-| Temps | Desktop C2 (≥ 1024 × 768) | Mobile / C1 | C0 | Mouvement réduit |
-|---|---|---|---|---|
-| **B0**, 0 ms (SSR) | Papier, cadre de carte, h1, **poster « dessin »** : anneaux fantômes du vase tous les 2 mm en `iso`. Bande de mesure SSR : « 150,0 mm · 750 couches · 3 filaments · ≈ 80 g · ≈ 2 h 45 ». | Idem, empilé | Idem | **Poster « final »** (strates colorées), même bande de mesure |
-| **B1**, idle (≈ 0,3 à 1,2 s) | Le Stage rend une première frame **identique au poster** (coupe à 0, fantômes partout, buse sur le plateau) ; le poster s'efface en 240 ms. Intro : `progress` 0 → 0,38 en 3,2 s (linéaire, quantifié à la couche). À la couche 211 (≈ 2,4 s) : flash 320 ms, étiquette « Changement de filament → Vert Lavaux · couche 0211 » (1,6 s), la tour de purge gagne sa première bande. Compteur « Couche 0284 / 0750 · z 56,8 mm · Vert Lavaux ». | Même raccord ; autoplay 0 → 100 % en 4,2 s quand le héros est visible à 50 % ; deux changements visibles ; la vue est ensuite figée en image (bake). Réglette Z : scrub au pouce de la couche 0 à 750. | Après détection, le poster « dessin » laisse place au poster « final » (fondu de 240 ms : le dessin devient matière, en 2D) | Rien ne bouge |
-| **B2**, pin 0 → 110 % | `progress` 0,38 → 1 (scrub). Couche 541 : second changement (flash, étiquette). La tour s'arrête à 109 mm. À 100 %, la buse se lève et se range. | — | — | — |
-| **B3**, pin 110 → 180 % | `tilt` 0 → 1 (`s3d.carte`) : la caméra passe en vue de plan, fov 20° → 12°, les couches deviennent des cercles concentriques, les teintes deviennent des aplats hypsométriques ; le **champ de courbes** (`contour-field`) s'ouvre autour et remplit la section. Le titre du chapitre 01 entre (SplitText). | Pas de B3 : le chapitre 01 montre le champ en SVG statique | SVG statique | SVG statique |
-| **B4**, sortie | Le pin se relâche ; le champ continue sous le chapitre 01 (les deux vues partagent des coordonnées « page », sans couture). | — | — | — |
+| Temps                        | Desktop C2 (≥ 1024 × 768)                                                                                                                                                                                                                                                                                                                                                                                                                    | Mobile / C1                                                                                                                                                                                            | C0                                                                                                                          | Mouvement réduit                                              |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **B0**, 0 ms (SSR)           | Papier, cadre de carte, h1, **poster « dessin »** : anneaux fantômes du vase tous les 2 mm en `iso`. Bande de mesure SSR : « 150,0 mm · 750 couches · 3 filaments · ≈ 80 g · ≈ 2 h 45 ».                                                                                                                                                                                                                                                     | Idem, empilé                                                                                                                                                                                           | Idem                                                                                                                        | **Poster « final »** (strates colorées), même bande de mesure |
+| **B1**, idle (≈ 0,3 à 1,2 s) | Le Stage rend une première frame **identique au poster** (coupe à 0, fantômes partout, buse sur le plateau) ; le poster s'efface en 240 ms. Intro : `progress` 0 → 0,38 en 3,2 s (linéaire, quantifié à la couche). À la couche 211 (≈ 2,4 s) : flash 320 ms, étiquette « Changement de filament → Vert Lavaux · couche 0211 » (1,6 s), la tour de purge gagne sa première bande. Compteur « Couche 0284 / 0750 · z 56,8 mm · Vert Lavaux ». | Même raccord ; autoplay 0 → 100 % en 4,2 s quand le héros est visible à 50 % ; deux changements visibles ; la vue est ensuite figée en image (bake). Réglette Z : scrub au pouce de la couche 0 à 750. | Après détection, le poster « dessin » laisse place au poster « final » (fondu de 240 ms : le dessin devient matière, en 2D) | Rien ne bouge                                                 |
+| **B2**, pin 0 → 110 %        | `progress` 0,38 → 1 (scrub). Couche 541 : second changement (flash, étiquette). La tour s'arrête à 109 mm. À 100 %, la buse se lève et se range.                                                                                                                                                                                                                                                                                             | —                                                                                                                                                                                                      | —                                                                                                                           | —                                                             |
+| **B3**, pin 110 → 180 %      | `tilt` 0 → 1 (`s3d.carte`) : la caméra passe en vue de plan, fov 20° → 12°, les couches deviennent des cercles concentriques, les teintes deviennent des aplats hypsométriques ; le **champ de courbes** (`contour-field`) s'ouvre autour et remplit la section. Le titre du chapitre 01 entre (SplitText).                                                                                                                                  | Pas de B3 : le chapitre 01 montre le champ en SVG statique                                                                                                                                             | SVG statique                                                                                                                | SVG statique                                                  |
+| **B4**, sortie               | Le pin se relâche ; le champ continue sous le chapitre 01 (les deux vues partagent des coordonnées « page », sans couture).                                                                                                                                                                                                                                                                                                                  | —                                                                                                                                                                                                      | —                                                                                                                           | —                                                             |
 
 Clavier : Espace et Page suivante font défiler normalement ; le lien d'évitement « Passer
 l'animation » mène au chapitre 01. Aucune animation automatique ne dépasse 5 s.
@@ -1701,61 +1889,61 @@ Les contrôles sont natifs : `range` couplé à un `number` avec unité, `radio`
 
 **Vase « Lavaux »** (`lavaux`)
 
-| Paramètre | Clé | Plage | Défaut | Pas | Contrôle |
-|---|---|---|---|---|---|
-| Hauteur | `h` | 80–240 mm | 150 | 1 | curseur + nombre |
-| Diamètre (enveloppe) | `d` | 50–140 mm | 96 | 1 | curseur + nombre |
-| Profil | `p` | cylindre, galet, amphore, cone, tulipe | galet | — | radios (pictos) |
-| Galbe | `b` | 0–1 | 0,5 | 0,01 | curseur |
-| Col (rayon du haut / rayon max) | `n` | **0,5**–1 | 0,72 | 0,01 | curseur |
-| Lèvre | `l` | 0–0,3 | 0,08 | 0,01 | curseur |
-| Motif | `m` | lisse, gradins, vagues, voronoi, nervures | gradins | — | radios |
-| Gradins : pas / profondeur | `gs` / `gd` | 2–12 mm / 0,4–3 mm (≤ 0,5 × pas) | 5 / 1,4 | 0,2 / 0,1 | curseurs couplés |
-| Vagues : longueur d'onde / amplitude / lobes | `wl` / `wa` / `wk` | 6–40 mm (≥ 4 × amp.) / 0,4–3 mm / 0–12 | 14 / 1,2 / 5 | 0,5 / 0,1 / 1 | curseurs |
-| Voronoï : cellules / relief / graine | `vc` / `va` / `vs` | 12–120 / 0,4–2,5 mm / 0–9999 | 48 / 1,2 / 4812 | 1 / 0,1 / 1 | curseurs + « Surprenez-moi » |
-| Nervures : nombre / profondeur / torsion | `rn` / `ra` / `rt` | 8–48 / 0,4–3 mm / −180–180° | 16 / 1,2 / 0 | 1 / 0,1 / 5 | curseurs (garde §6.6) |
-| Paroi | `w` | 1,2 · 1,6 · 2,0 · 2,4 mm | 1,6 | — | radios (multiples de la largeur de ligne) |
-| Bandes | `bd` | 1–4, frontières quantifiées à 0,2 mm, épaisseur ≥ 2 mm | Léman, 3 bandes | — | barre altimétrique |
+| Paramètre                                    | Clé                | Plage                                                  | Défaut          | Pas           | Contrôle                                  |
+| -------------------------------------------- | ------------------ | ------------------------------------------------------ | --------------- | ------------- | ----------------------------------------- |
+| Hauteur                                      | `h`                | 80–240 mm                                              | 150             | 1             | curseur + nombre                          |
+| Diamètre (enveloppe)                         | `d`                | 50–140 mm                                              | 96              | 1             | curseur + nombre                          |
+| Profil                                       | `p`                | cylindre, galet, amphore, cone, tulipe                 | galet           | —             | radios (pictos)                           |
+| Galbe                                        | `b`                | 0–1                                                    | 0,5             | 0,01          | curseur                                   |
+| Col (rayon du haut / rayon max)              | `n`                | **0,5**–1                                              | 0,72            | 0,01          | curseur                                   |
+| Lèvre                                        | `l`                | 0–0,3                                                  | 0,08            | 0,01          | curseur                                   |
+| Motif                                        | `m`                | lisse, gradins, vagues, voronoi, nervures              | gradins         | —             | radios                                    |
+| Gradins : pas / profondeur                   | `gs` / `gd`        | 2–12 mm / 0,4–3 mm (≤ 0,5 × pas)                       | 5 / 1,4         | 0,2 / 0,1     | curseurs couplés                          |
+| Vagues : longueur d'onde / amplitude / lobes | `wl` / `wa` / `wk` | 6–40 mm (≥ 4 × amp.) / 0,4–3 mm / 0–12                 | 14 / 1,2 / 5    | 0,5 / 0,1 / 1 | curseurs                                  |
+| Voronoï : cellules / relief / graine         | `vc` / `va` / `vs` | 12–120 / 0,4–2,5 mm / 0–9999                           | 48 / 1,2 / 4812 | 1 / 0,1 / 1   | curseurs + « Surprenez-moi »              |
+| Nervures : nombre / profondeur / torsion     | `rn` / `ra` / `rt` | 8–48 / 0,4–3 mm / −180–180°                            | 16 / 1,2 / 0    | 1 / 0,1 / 5   | curseurs (garde §6.6)                     |
+| Paroi                                        | `w`                | 1,2 · 1,6 · 2,0 · 2,4 mm                               | 1,6             | —             | radios (multiples de la largeur de ligne) |
+| Bandes                                       | `bd`               | 1–4, frontières quantifiées à 0,2 mm, épaisseur ≥ 2 mm | Léman, 3 bandes | —             | barre altimétrique                        |
 
 **Carte « Cartouche »** (`cartouche`), 85 × 55 mm (format suisse)
 
-| Paramètre | Clé | Plage | Défaut | Contrôle |
-|---|---|---|---|---|
-| Épaisseur de plaque | `t` | 1,2–2,4 mm (pas 0,2) | 1,6 | curseur |
-| Coins | `r` | 0–6 mm (pas 0,5) | 3 | curseur |
-| Mode | `mo` | relief, gravure | relief | radios |
-| Hauteur du relief ou profondeur de gravure | `e` | 0,4–1,2 mm (pas 0,2) | 0,6 | curseur |
-| Mise en page | `ly` | classique (grille suisse), centree, cartouche (cadre et filet), monogramme | classique | radios (vignettes) |
-| Couleur de plaque / du texte | `fp` / `ft` | filaments | blanc-neve / encre | pastilles |
-| Nom | texte | ≤ 24 caractères | exemple « Léa Dubois » | champ (jamais dans l'URL) |
-| Fonction | texte | ≤ 30 | exemple « Architecte » | champ |
-| Ligne 1, ligne 2 | texte | ≤ 30 chacune | exemples « lea@exemple.ch », « +41 21 000 00 00 » | champs |
+| Paramètre                                  | Clé         | Plage                                                                      | Défaut                                            | Contrôle                  |
+| ------------------------------------------ | ----------- | -------------------------------------------------------------------------- | ------------------------------------------------- | ------------------------- |
+| Épaisseur de plaque                        | `t`         | 1,2–2,4 mm (pas 0,2)                                                       | 1,6                                               | curseur                   |
+| Coins                                      | `r`         | 0–6 mm (pas 0,5)                                                           | 3                                                 | curseur                   |
+| Mode                                       | `mo`        | relief, gravure                                                            | relief                                            | radios                    |
+| Hauteur du relief ou profondeur de gravure | `e`         | 0,4–1,2 mm (pas 0,2)                                                       | 0,6                                               | curseur                   |
+| Mise en page                               | `ly`        | classique (grille suisse), centree, cartouche (cadre et filet), monogramme | classique                                         | radios (vignettes)        |
+| Couleur de plaque / du texte               | `fp` / `ft` | filaments                                                                  | blanc-neve / encre                                | pastilles                 |
+| Nom                                        | texte       | ≤ 24 caractères                                                            | exemple « Léa Dubois »                            | champ (jamais dans l'URL) |
+| Fonction                                   | texte       | ≤ 30                                                                       | exemple « Architecte »                            | champ                     |
+| Ligne 1, ligne 2                           | texte       | ≤ 30 chacune                                                               | exemples « lea@exemple.ch », « +41 21 000 00 00 » | champs                    |
 
 **Sous-verre « Relief »** (`relief`)
 
-| Paramètre | Clé | Plage | Défaut | Contrôle |
-|---|---|---|---|---|
-| Forme | `sh` | rond, carre | rond | radios |
-| Diamètre ou côté | `s` | 90–110 mm | 100 | curseur |
-| Socle | `ba` | 2,4–4 mm (pas 0,2) | 3 | curseur |
-| Relief | `re` | 1,2–4 mm (pas 0,2) | 3,2 | curseur |
-| Strates | `lv` | 4–12 | 8 | curseur |
-| Massif (graine) | `sd` | 0–9999 | 1291 | curseur + « Surprenez-moi » |
-| Niveau du lac | `lk` | 0–40 % | 18 | curseur |
-| Teintes par altitude | `bd` | 2–4 bandes (lac, prairie, roche, neige) | bleu-leman / vert-lavaux / gris-molasse / blanc-neve | barre altimétrique |
-| Étiquette du sommet | `lb` + texte | oui/non ; nom ≤ 12 caractères | oui, exemple « Léa » | interrupteur + champ |
+| Paramètre            | Clé          | Plage                                   | Défaut                                               | Contrôle                    |
+| -------------------- | ------------ | --------------------------------------- | ---------------------------------------------------- | --------------------------- |
+| Forme                | `sh`         | rond, carre                             | rond                                                 | radios                      |
+| Diamètre ou côté     | `s`          | 90–110 mm                               | 100                                                  | curseur                     |
+| Socle                | `ba`         | 2,4–4 mm (pas 0,2)                      | 3                                                    | curseur                     |
+| Relief               | `re`         | 1,2–4 mm (pas 0,2)                      | 3,2                                                  | curseur                     |
+| Strates              | `lv`         | 4–12                                    | 8                                                    | curseur                     |
+| Massif (graine)      | `sd`         | 0–9999                                  | 1291                                                 | curseur + « Surprenez-moi » |
+| Niveau du lac        | `lk`         | 0–40 %                                  | 18                                                   | curseur                     |
+| Teintes par altitude | `bd`         | 2–4 bandes (lac, prairie, roche, neige) | bleu-leman / vert-lavaux / gris-molasse / blanc-neve | barre altimétrique          |
+| Étiquette du sommet  | `lb` + texte | oui/non ; nom ≤ 12 caractères           | oui, exemple « Léa »                                 | interrupteur + champ        |
 
 **Porte-nom « Borne »** (`borne`)
 
-| Paramètre | Clé | Plage | Défaut | Contrôle |
-|---|---|---|---|---|
-| Forme | `sh` | pilule, etiquette, goutte, pic (triangle générique, ni le mark ni une croix) | pilule | radios |
-| Texte | texte | 1–14 caractères | exemple « Léa » | champ |
-| Hauteur des lettres | `c` | 5–10 mm | 7 | curseur |
-| Épaisseur | `t` | 3–5 mm (pas 0,2) | 4 | curseur |
-| Anneau | `rg` / `rd` | gauche, droite, aucun / Ø 4–6 mm | gauche / 5 | radios + curseur |
-| Mode | `mo` | relief (0,8 mm), gravure (0,8 mm) | relief | radios |
-| Couleur de base / du texte | `fb` / `ft` | filaments | encre / blanc-neve | pastilles |
+| Paramètre                  | Clé         | Plage                                                                        | Défaut             | Contrôle         |
+| -------------------------- | ----------- | ---------------------------------------------------------------------------- | ------------------ | ---------------- |
+| Forme                      | `sh`        | pilule, etiquette, goutte, pic (triangle générique, ni le mark ni une croix) | pilule             | radios           |
+| Texte                      | texte       | 1–14 caractères                                                              | exemple « Léa »    | champ            |
+| Hauteur des lettres        | `c`         | 5–10 mm                                                                      | 7                  | curseur          |
+| Épaisseur                  | `t`         | 3–5 mm (pas 0,2)                                                             | 4                  | curseur          |
+| Anneau                     | `rg` / `rd` | gauche, droite, aucun / Ø 4–6 mm                                             | gauche / 5         | radios + curseur |
+| Mode                       | `mo`        | relief (0,8 mm), gravure (0,8 mm)                                            | relief             | radios           |
+| Couleur de base / du texte | `fb` / `ft` | filaments                                                                    | encre / blanc-neve | pastilles        |
 
 La longueur du porte-nom suit le texte (40–80 mm) ; au-delà, les lettres rétrécissent jusqu'à
 5 mm, puis erreur « Texte trop long ».
@@ -1775,40 +1963,62 @@ export type LavauxPattern =
 
 export interface LavauxConfig {
   object: "lavaux";
-  h: number; d: number;
+  h: number;
+  d: number;
   profile: "cylindre" | "galet" | "amphore" | "cone" | "tulipe";
-  belly: number; neck: number; lip: number;
+  belly: number;
+  neck: number;
+  lip: number;
   pattern: LavauxPattern;
   wall: 1.2 | 1.6 | 2 | 2.4;
   bands: Band[];
 }
 export interface CartoucheConfig {
   object: "cartouche";
-  thickness: number; corner: number;
-  mode: "relief" | "gravure"; depth: number;
+  thickness: number;
+  corner: number;
+  mode: "relief" | "gravure";
+  depth: number;
   layout: "classique" | "centree" | "cartouche" | "monogramme";
-  plate: FilamentId; ink: FilamentId;                 // texte : StudioTexts.name, role, line1, line2
+  plate: FilamentId;
+  ink: FilamentId; // texte : StudioTexts.name, role, line1, line2
 }
 export interface ReliefConfig {
   object: "relief";
-  shape: "rond" | "carre"; size: number;
-  base: number; relief: number; levels: number; seed: number; lake: number;
-  bands: Band[];                                       // 2 à 4, calées sur les sommets de strates
-  label: boolean;                                      // texte : StudioTexts.peak
+  shape: "rond" | "carre";
+  size: number;
+  base: number;
+  relief: number;
+  levels: number;
+  seed: number;
+  lake: number;
+  bands: Band[]; // 2 à 4, calées sur les sommets de strates
+  label: boolean; // texte : StudioTexts.peak
 }
 export interface BorneConfig {
   object: "borne";
   shape: "pilule" | "etiquette" | "goutte" | "pic";
-  cap: number; thickness: number;
-  ring: "gauche" | "droite" | "aucun"; ringD: number;
+  cap: number;
+  thickness: number;
+  ring: "gauche" | "droite" | "aucun";
+  ringD: number;
   mode: "relief" | "gravure";
-  base: FilamentId; ink: FilamentId;                   // texte : StudioTexts.text
+  base: FilamentId;
+  ink: FilamentId; // texte : StudioTexts.text
 }
-export type StudioConfig = LavauxConfig | CartoucheConfig | ReliefConfig | BorneConfig;
+export type StudioConfig =
+  LavauxConfig | CartoucheConfig | ReliefConfig | BorneConfig;
 
 export type IssueCode =
-  | "overhang" | "base-narrow" | "plate" | "band-thin" | "pattern-coupling"
-  | "text-stroke" | "text-fit" | "text-char" | "near-vase-spirale";
+  | "overhang"
+  | "base-narrow"
+  | "plate"
+  | "band-thin"
+  | "pattern-coupling"
+  | "text-stroke"
+  | "text-fit"
+  | "text-char"
+  | "near-vase-spirale";
 ```
 
 ### 6.3 Algorithmes géométriques (pur TS, `src/lib/studio/**`, mm, Z vers le haut, PRNG `mulberry32`)
@@ -1874,7 +2084,7 @@ exactement deux triangles d'orientations opposées, par composante connexe), `ke
   3,6 mm de capitale, une Bold (~15 %) seulement vers 5,5 mm.
 - **Format maison** `public/studio/glyphs/s3d-relief-v1.json` (script `scripts/fonts/build-glyphs.ts`,
   opentype.js) : `{ v: 1, family: "S3D Relief", unitsPerEm, ascender, descender, capHeight, stem,
-  glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0–00FF, U+0100–017F, plus
+glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0–00FF, U+0100–017F, plus
   ’ – — ; famille renommée (clause RFN de l'OFL), `OFL.txt` à côté. ≤ 45 Ko gzip.
 - **Chaîne** : chemins → polylignes (quadratiques 6 segments, cubiques 8, adaptatifs à la
   longueur) → classement extérieur/trou par inclusion → mise en page (hauteur de capitale en mm,
@@ -1936,15 +2146,29 @@ pour les objets plats), identique en SSR et côté client :
 
 ```ts
 export interface StudioStats {
-  heightMm: number; widthMm: number; depthMm: number; layers: number;          // layers = ceil(h / 0.2)
-  volumeCm3: number; grams: number; minutes: number;
-  changes: number; purgeGrams: number;
+  heightMm: number;
+  widthMm: number;
+  depthMm: number;
+  layers: number; // layers = ceil(h / 0.2)
+  volumeCm3: number;
+  grams: number;
+  minutes: number;
+  changes: number;
+  purgeGrams: number;
   printable: Printability;
-  estimate?: { lowCents: number; highCents: number } | null;                   // null tant que PRICING.validated = false
+  estimate?: { lowCents: number; highCents: number } | null; // null tant que PRICING.validated = false
 }
 export type Printability =
   | { status: "ok" }
-  | { status: "warn" | "error"; issues: { code: IssueCode; atMm?: number; value?: number; fix?: Partial<StudioConfig> }[] };
+  | {
+      status: "warn" | "error";
+      issues: {
+        code: IssueCode;
+        atMm?: number;
+        value?: number;
+        fix?: Partial<StudioConfig>;
+      }[];
+    };
 ```
 
 - **Volume** : Lavaux = ∫∫ (r_o² − r_i²) / 2 dθ dz + fond ; plats = somme des aires × épaisseurs ;
@@ -1961,7 +2185,7 @@ export type Printability =
 ```ts
 // src/lib/studio/pricing-params.ts — valeurs à valider par le propriétaire (§11.2)
 export const PRICING = {
-  validated: false,           // false : aucun CHF affiché, seulement grammes, durée, changements
+  validated: false, // false : aucun CHF affiché, seulement grammes, durée, changements
   floorCents: 900,
   setupCents: 400,
   centsPerGram: 8,
@@ -1986,17 +2210,17 @@ plancher (CHF 9–10.50). Le serveur ne recalcule rien en v1 (aucun paiement) ; 
 
 ### 6.6 Garde-fous (`guards.ts`)
 
-| Code | Règle | Correction proposée (bouton « Corriger ») |
-|---|---|---|
-| `overhang` | pente vers l'extérieur ≤ 45° partout (`∂r_o/∂z ≤ 1`) | galbe réduit, profondeur de motif réduite, ou hauteur augmentée (valeur calculée) |
-| `base-narrow` | rayon du pied ≥ 20 mm et ≥ 35 % du rayon max | profil « cylindre » ou galbe ≤ 0,4 |
-| `plate` | boîte ≤ 250 × 250 × 250 mm | réduire la dimension en cause |
-| `band-thin` | bande < 2 mm | fusion avec la voisine |
-| `pattern-coupling` | gradins `gd ≤ 0,5 gs` ; vagues `wl ≥ 4 wa` ; voronoï `w ≥ 1,2 va` (bornes couplées dans l'UI) | valeur bornée |
-| `text-stroke` | trait ≥ 0,8 mm (avertissement), ≥ 0,6 mm (erreur) | agrandir les lettres à la taille calculée |
-| `text-fit` | le texte tient à la taille minimale | raccourcir le texte |
-| `text-char` | caractère hors du jeu de glyphes | retirer le caractère |
-| `near-vase-spirale` | **bloquant** : `m = nervures` et `28 ≤ rn ≤ 56` et `|rt| ≥ 45°` et `n ≤ 0,6` | « Cette combinaison rappelle le Vase spirale de Ian (licence sans modification). Réduisez la torsion ou le nombre de nervures. » |
+| Code                | Règle                                                                                         | Correction proposée (bouton « Corriger »)                                         |
+| ------------------- | --------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| `overhang`          | pente vers l'extérieur ≤ 45° partout (`∂r_o/∂z ≤ 1`)                                          | galbe réduit, profondeur de motif réduite, ou hauteur augmentée (valeur calculée) |
+| `base-narrow`       | rayon du pied ≥ 20 mm et ≥ 35 % du rayon max                                                  | profil « cylindre » ou galbe ≤ 0,4                                                |
+| `plate`             | boîte ≤ 250 × 250 × 250 mm                                                                    | réduire la dimension en cause                                                     |
+| `band-thin`         | bande < 2 mm                                                                                  | fusion avec la voisine                                                            |
+| `pattern-coupling`  | gradins `gd ≤ 0,5 gs` ; vagues `wl ≥ 4 wa` ; voronoï `w ≥ 1,2 va` (bornes couplées dans l'UI) | valeur bornée                                                                     |
+| `text-stroke`       | trait ≥ 0,8 mm (avertissement), ≥ 0,6 mm (erreur)                                             | agrandir les lettres à la taille calculée                                         |
+| `text-fit`          | le texte tient à la taille minimale                                                           | raccourcir le texte                                                               |
+| `text-char`         | caractère hors du jeu de glyphes                                                              | retirer le caractère                                                              |
+| `near-vase-spirale` | **bloquant** : `m = nervures` et `28 ≤ rn ≤ 56` et `                                          | rt                                                                                | ≥ 45°`et`n ≤ 0,6` | « Cette combinaison rappelle le Vase spirale de Ian (licence sans modification). Réduisez la torsion ou le nombre de nervures. » |
 
 - **Pas de profil « bouteille »**, col ≥ 0,5 : la silhouette d'Ian est exclue par construction ;
   `nearVaseSpirale()` est **testée** : `false` pour `HERO_CONFIG`, les 12 variantes du héros, tous
@@ -2107,9 +2331,9 @@ S3D-STUDIO v1 lavaux h=150 d=96 p=galet b=0.5 n=0.72 l=0.08 m=gradins gs=5 gd=1.
 ```
 
 5. **Succès** : « Reçu. L'atelier vérifie votre pièce et vous répond sous 48 h avec un prix ferme. »
-   + « Continuer dans le Studio » / « Voir la boutique » ; événements `Studio Sent` puis
-   `Quote Requested { source: "studio", object, has_file: true, signed_in }`. Le client suit sa
-   demande dans `account/quotes` et paie par le Payment Element existant (`quotes/[id]/pay`).
+   - « Continuer dans le Studio » / « Voir la boutique » ; événements `Studio Sent` puis
+     `Quote Requested { source: "studio", object, has_file: true, signed_in }`. Le client suit sa
+     demande dans `account/quotes` et paie par le Payment Element existant (`quotes/[id]/pay`).
 6. **Erreurs** : 429 à l'upload → « Trop d'envois depuis cette connexion (10 par heure). Réessayez
    plus tard ou écrivez à contact@swiss3design.ch. » ; 413/415 → message dédié ; erreur de la
    Server Action → « Réessayer » (le fichier déjà envoyé est réutilisé, pas de second upload).
@@ -2140,12 +2364,36 @@ S3D-STUDIO v1 lavaux h=150 d=96 p=galet b=0.5 n=0.72 l=0.08 m=gradins gs=5 gd=1.
 ```ts
 type ToWorker =
   | { t: "glyphs"; url: string }
-  | { t: "build"; id: number; config: StudioConfig; texts: StudioTexts; lod: "drag" | "display" }
-  | { t: "export"; id: number; config: StudioConfig; texts: StudioTexts; name: string };
+  | {
+      t: "build";
+      id: number;
+      config: StudioConfig;
+      texts: StudioTexts;
+      lod: "drag" | "display";
+    }
+  | {
+      t: "export";
+      id: number;
+      config: StudioConfig;
+      texts: StudioTexts;
+      name: string;
+    };
 type FromWorker =
   | { t: "mesh"; id: number; mesh: MeshData; ms: number }
-  | { t: "stl"; id: number; buffer: ArrayBuffer; triangles: number; bytes: number; ms: number }
-  | { t: "error"; id: number; code: "glyphs" | "build" | "export"; message: string };
+  | {
+      t: "stl";
+      id: number;
+      buffer: ArrayBuffer;
+      triangles: number;
+      bytes: number;
+      ms: number;
+    }
+  | {
+      t: "error";
+      id: number;
+      code: "glyphs" | "build" | "export";
+      message: string;
+    };
 ```
 
 - Pendant un glissé : au plus une construction `drag` par frame (les réponses périmées sont
@@ -2210,7 +2458,7 @@ l'habillage change. Toute page de `(site)` enveloppe son contenu dans `<PageCut>
   `style={{ viewTransitionName: "site-header" }}`. À gauche : mark 28 px + wordmark
   « **Swiss**3Design » en Geist (inchangé). Au centre (≥ lg) : **Boutique · Studio · Sur mesure ·
   Atelier** en texte 14 px ; actif = encre + soulignement rouge 2 px (`view-transition-name:
-  nav-mark`) ; survol = soulignement qui se trace. À droite : thème, langue, favoris (cœur +
+nav-mark`) ; survol = soulignement qui se trace. À droite : thème, langue, favoris (cœur +
   compteur), compte (≥ md), panier (≥ md) « Panier » + compteur.
 - **Bord inférieur** : filet de progression `.s3d-progress` (pages de `(site)`), buse d'attente
   `.s3d-pending` pendant `navPending`.
@@ -2261,15 +2509,15 @@ l'habillage change. Toute page de `(site)` enveloppe son contenu dans `<PageCut>
   Acheter / J'ai un fichier).
 - **Chapitres** (desktop : `ChapterRail` ≥ 1280 px) :
 
-| # | Titre (FR) | Contenu | Mouvement (complet) | Réduit / C0 |
-|---|---|---|---|---|
-| 00 | Tout relief commence par une couche. | Héros (§5), puis bande de réassurance | §5.5 | poster final |
-| 01 | Une couleur par altitude. | Le même vase **éclaté** (`print-hero` en mode `exploded`), une étiquette par bande calculée par `bandStats(config)` (« Bleu Léman · couches 1–210 · 0–42,0 mm · ≈ 21 g »), ligne de purge (« 2 changements · purge ≈ 1,6 g · + ≈ 4 min : c'est tout ce que coûte la couleur, et on vous le montre »), texte sur la teinte hypsométrique. Fond : champ de courbes. Suit la palette et le motif choisis dans le héros (contexte client `HomeConfig`). | éclatement de 1,2 s à l'entrée (`s3d.buse`), étiquettes en `.s3d-rise` ; champ WebGL en C2, SVG sinon | poster « éclaté » SVG |
-| 02 | Votre nom, en relief. Littéralement. | Ton **encre**. Sous-verre « Relief » (`studio-object`) ; champ SSR « Nommez votre sommet » (12 caractères, **hors de toute section pinnée**), note « Le texte reste dans votre navigateur jusqu'à l'envoi à l'atelier. » ; l'étiquette « POINTE LÉA · 3 107 M » se réimprime à chaque frappe (debounce 120 ms) ; bande de mesure ; CTA rouge « Continuer dans le Studio » (`/studio/relief#c=…`, texte via `sessionStorage`). Glyphes chargés quand la section approche (marge 150 %). | réimpression de l'étiquette | SVG statique du relief + étiquette en DOM mise à jour en direct |
-| 03 | Réglez-le. On l'imprime. | Quatre cartes d'objet (poster SSR, h3, une ligne, stats du défaut, « Sur devis » ou fourchette), puis « Comment ça marche » en `<ol>` : Réglez · Envoyez · L'atelier vérifie (48 h) · Imprimé et livré | `.s3d-print` sur les cartes | statique |
-| 04 | Des objets choisis, imprimés à la commande. | N = 1 : grande `ProductCard` du Vase spirale + légende d'attribution courte (« Design : Ian · CC BY-ND 4.0 ») ; N = 2–3 : rangée ; N ≥ 4 : grille + « Tout voir » | `.s3d-print` | statique |
-| 05 | Imprimé à Gland et à Pully. Livré de Genève à Romanshorn. | Deux colonnes (Gland : Bambu Lab P1S + AMS 2 Pro ; Pully : Creality K2 + CFS), coordonnées, livraison offerte dès `formatChf(freeOverCents)`, moyens de paiement, lien « Visiter l'atelier » ; illustration ChatGPT facultative (étiquetée « Illustration ») | `.s3d-rise` | statique |
-| 06 | Vous avez déjà un fichier ? | « STL, 3MF, OBJ ou STEP : envoyez-le, l'atelier vous répond sous 48 h avec un devis. » CTA rouge « Envoyer un fichier » (`/custom`) | — | — |
+| #   | Titre (FR)                                                | Contenu                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Mouvement (complet)                                                                                   | Réduit / C0                                                     |
+| --- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| 00  | Tout relief commence par une couche.                      | Héros (§5), puis bande de réassurance                                                                                                                                                                                                                                                                                                                                                                                                                                                  | §5.5                                                                                                  | poster final                                                    |
+| 01  | Une couleur par altitude.                                 | Le même vase **éclaté** (`print-hero` en mode `exploded`), une étiquette par bande calculée par `bandStats(config)` (« Bleu Léman · couches 1–210 · 0–42,0 mm · ≈ 21 g »), ligne de purge (« 2 changements · purge ≈ 1,6 g · + ≈ 4 min : c'est tout ce que coûte la couleur, et on vous le montre »), texte sur la teinte hypsométrique. Fond : champ de courbes. Suit la palette et le motif choisis dans le héros (contexte client `HomeConfig`).                                    | éclatement de 1,2 s à l'entrée (`s3d.buse`), étiquettes en `.s3d-rise` ; champ WebGL en C2, SVG sinon | poster « éclaté » SVG                                           |
+| 02  | Votre nom, en relief. Littéralement.                      | Ton **encre**. Sous-verre « Relief » (`studio-object`) ; champ SSR « Nommez votre sommet » (12 caractères, **hors de toute section pinnée**), note « Le texte reste dans votre navigateur jusqu'à l'envoi à l'atelier. » ; l'étiquette « POINTE LÉA · 3 107 M » se réimprime à chaque frappe (debounce 120 ms) ; bande de mesure ; CTA rouge « Continuer dans le Studio » (`/studio/relief#c=…`, texte via `sessionStorage`). Glyphes chargés quand la section approche (marge 150 %). | réimpression de l'étiquette                                                                           | SVG statique du relief + étiquette en DOM mise à jour en direct |
+| 03  | Réglez-le. On l'imprime.                                  | Quatre cartes d'objet (poster SSR, h3, une ligne, stats du défaut, « Sur devis » ou fourchette), puis « Comment ça marche » en `<ol>` : Réglez · Envoyez · L'atelier vérifie (48 h) · Imprimé et livré                                                                                                                                                                                                                                                                                 | `.s3d-print` sur les cartes                                                                           | statique                                                        |
+| 04  | Des objets choisis, imprimés à la commande.               | N = 1 : grande `ProductCard` du Vase spirale + légende d'attribution courte (« Design : Ian · CC BY-ND 4.0 ») ; N = 2–3 : rangée ; N ≥ 4 : grille + « Tout voir »                                                                                                                                                                                                                                                                                                                      | `.s3d-print`                                                                                          | statique                                                        |
+| 05  | Imprimé à Gland et à Pully. Livré de Genève à Romanshorn. | Deux colonnes (Gland : Bambu Lab P1S + AMS 2 Pro ; Pully : Creality K2 + CFS), coordonnées, livraison offerte dès `formatChf(freeOverCents)`, moyens de paiement, lien « Visiter l'atelier » ; illustration ChatGPT facultative (étiquetée « Illustration »)                                                                                                                                                                                                                           | `.s3d-rise`                                                                                           | statique                                                        |
+| 06  | Vous avez déjà un fichier ?                               | « STL, 3MF, OBJ ou STEP : envoyez-le, l'atelier vous répond sous 48 h avec un devis. » CTA rouge « Envoyer un fichier » (`/custom`)                                                                                                                                                                                                                                                                                                                                                    | —                                                                                                     | —                                                               |
 
 - **À préserver** : `export const dynamic = "force-dynamic"` ; `generateMetadata` via
   `pageMetadata({ path: "", absoluteTitle: true })` (titre et description déplacés dans
@@ -2314,7 +2562,7 @@ mobile. i18n : `studio`, `studioCore`.
   `sort=new|price_asc|price_desc`, `q`), `getUsedFilters(locale)`, `getProducts(locale, {…})`,
   canonical `/shop`, `collectionJsonLd` **seulement** sans filtre, `TrackEvent`
   `Products Searched {query, results}` et `Product List Filtered {category, material, color,
-  multicolor, sort, results}`, état vide utile, aucun nouveau paramètre d'URL (sinon robots et
+multicolor, sort, results}`, état vide utile, aucun nouveau paramètre d'URL (sinon robots et
   `KEPT_PARAMS`).
 - **i18n** : `shop.*` + `catalog`.
 
@@ -2343,16 +2591,16 @@ mobile. i18n : `studio`, `studioCore`.
   - **07 Produits liés** (s'il y en a).
 - **`AttributionBlock`** (SSR, 4 langues, `src/components/catalog/attribution-block.tsx`), données
   `src/lib/attribution.ts` (`attributionFor(slug)` ; `vase-spirale` → `{ title: "Vase", author: "Ian",
-  platform: "MakerWorld", url: "https://makerworld.com/fr/models/1262112-vase", license: "CC BY-ND 4.0",
-  licenseUrl: "https://creativecommons.org/licenses/by-nd/4.0/", modified: false }`, deed localisé
+platform: "MakerWorld", url: "https://makerworld.com/fr/models/1262112-vase", license: "CC BY-ND 4.0",
+licenseUrl: "https://creativecommons.org/licenses/by-nd/4.0/", modified: false }`, deed localisé
   `…/by-nd/4.0/deed.fr|de|it|en`). Texte FR : « Design : **Ian**, « Vase », publié sur MakerWorld
   (lien). Licence **Creative Commons BY-ND 4.0** (lien vers le deed). Swiss3Design imprime ce modèle
   **sans aucune modification**. Cette mention n'implique aucune approbation de Swiss3Design par
   l'auteur. » (DE/IT/EN en annexe C). Jamais de formulation laissant croire à un partenariat.
 - **JSON-LD** : `productJsonLd` gagne une entrée facultative `design` qui ajoute au `Product`
   `subjectOf: { "@type": "3DModel", name: "Vase", creator: { "@type": "Person", name: "Ian" }, url:
-  "https://makerworld.com/fr/models/1262112-vase", license: "https://creativecommons.org/licenses/by-nd/4.0/",
-  isAccessibleForFree: true }` (**pas** `isBasedOn` sur `Product`, invalide).
+"https://makerworld.com/fr/models/1262112-vase", license: "https://creativecommons.org/licenses/by-nd/4.0/",
+isAccessibleForFree: true }` (**pas** `isBasedOn` sur `Product`, invalide).
 - **À préserver** : `cache(getProductBySlug)` partagé metadata/page ; `notFound()` avant tout ;
   `generateMetadata` (titre `seo.productTitle` si nom ≤ 20 car., `productMetaDescription`, OG
   jusqu'à 4 photos `cfOgImage`, SVG exclus) ; `productJsonLd` + `breadcrumbJsonLd` ;
@@ -2375,30 +2623,44 @@ mobile. i18n : `studio`, `studioCore`.
   `quote-form.tsx`, qui devient un simple wrapper) :
 
 ```ts
-export interface QuotePrefill { description?: string; material?: string; colors?: string; dimensions?: string }
-export interface QuoteUploadProgress { phase: "prepare" | "upload" | "submit"; loaded?: number; total?: number; triangles?: number }
+export interface QuotePrefill {
+  description?: string;
+  material?: string;
+  colors?: string;
+  dimensions?: string;
+}
+export interface QuoteUploadProgress {
+  phase: "prepare" | "upload" | "submit";
+  loaded?: number;
+  total?: number;
+  triangles?: number;
+}
 export interface QuoteAttachment {
-  key?: string; name?: string;                                       // déjà envoyé
-  prepare?: (onProgress: (p: QuoteUploadProgress) => void) => Promise<{ key: string; name: string }>; // envoi paresseux
+  key?: string;
+  name?: string; // déjà envoyé
+  prepare?: (
+    onProgress: (p: QuoteUploadProgress) => void,
+  ) => Promise<{ key: string; name: string }>; // envoi paresseux
   summary?: { title: string; lines: string[]; thumbnail?: string };
 }
 export function QuoteRequestForm(props: {
-  materials?: string[];              // absent → sélecteur masqué si prefill.material est fourni
+  materials?: string[]; // absent → sélecteur masqué si prefill.material est fourni
   source: "form" | "studio";
   object?: StudioObjectId;
   prefill?: QuotePrefill;
   attachment?: QuoteAttachment | null;
   variant?: "page" | "drawer";
-  extraFields?: React.ReactNode;     // ex. quantité (Studio)
+  extraFields?: React.ReactNode; // ex. quantité (Studio)
   onSuccess?: () => void;
 }): React.JSX.Element;
 ```
 
-  Soumission : `onSubmit` → si `attachment.prepare`, l'appeler (progression narrée) → ajouter
-  `fileKey`/`fileName` au `FormData` → `startTransition(() => formAction(formData))`. Sans JS, le
-  formulaire reste un `<form action={formAction}>` (Server Action, amélioration progressive).
-  `src/lib/quote-upload-client.ts` : `uploadQuoteFile(file, onProgress)` (XHR, erreurs typées
-  `429 | 413 | 415 | 400 | "network"`).
+Soumission : `onSubmit` → si `attachment.prepare`, l'appeler (progression narrée) → ajouter
+`fileKey`/`fileName` au `FormData` → `startTransition(() => formAction(formData))`. Sans JS, le
+formulaire reste un `<form action={formAction}>` (Server Action, amélioration progressive).
+`src/lib/quote-upload-client.ts` : `uploadQuoteFile(file, onProgress)` (XHR, erreurs typées
+`429 | 413 | 415 | 400 | "network"`).
+
 - **À préserver** : `submitQuoteRequest` **inchangée** (rate limit, zod, transaction
   `quote_requests` + `status_events`, e-mail admin via outbox, `{ status }` sans `redirect()`) ;
   upload avant envoi par `POST /api/quote-upload` (FormData, `.stl,.3mf,.obj,.step,.stp`) ;
@@ -2418,7 +2680,7 @@ export function QuoteRequestForm(props: {
 - **À préserver** : contenu `ABOUT_CONTENT` (JSX par langue) intact ; `pageMetadata` tiré du
   contenu ; `webPageJsonLd({ type: "AboutPage" })` + `faqJsonLd(c.faq)` avec la FAQ **visible en
   SSR** (`<details class="faq-item">`, sans JS) ; ancres `equipment, process, materials, trust,
-  faq, contact` + `scroll-mt-32` ; `AboutNav` **enfant direct** du conteneur racine (sinon le sticky
+faq, contact` + `scroll-mt-32` ; `AboutNav` **enfant direct** du conteneur racine (sinon le sticky
   se décolle) ; `DETECTION_LINE` alignée sur le header de 64 px ; `ContactForm` ; interactions du
   schéma (survol ↔ légende, focus, épinglage). `scrollIntoView` remplacé par `bridge.scroll.to`
   quand Lenis est là. La photo `about/p1s-ams2-pro.jpg` reste inutilisée (droits non vérifiés).
@@ -2481,7 +2743,7 @@ export function QuoteRequestForm(props: {
   confirmation « s'imprime » une fois (`.s3d-print`, en CSS) ; ticket mono (n°, montant).
 - **À préserver** : `stripe.checkout.sessions.retrieve` + `settleSession()` idempotent, statuts
   `succeeded | processing | failed`, `ClearCart`, `TrackEvent "Order Completed"` (`onceKey =
-  order_id`, `revenue` port compris), `AttributionQuestion`, conversion invité → compte
+order_id`, `revenue` port compris), `AttributionQuestion`, conversion invité → compte
   (`/account/register?email=`), lien `/track?order=`.
 - **i18n** : `orderSuccess.*`, `attribution.*` + `system`.
 
@@ -2572,57 +2834,57 @@ L'admin hérite des jetons, du header et du footer : WP-99 vérifie l'admin dans
 Nature : **SSR** = rendu serveur (Server Component ou Client Component SSR sans import lourd) ;
 **client** = îlot `"use client"` léger ; **lourd** = sous `src/motion/**`, atteint par une gate.
 
-| Composant / module | Fichier | Nature | Package | Utilisé par |
-|---|---|---|---|---|
-| Polices | `src/app/fonts.ts`, `src/fonts/archivo-sx-latin.woff2` | SSR | WP-00 | layout |
-| Jetons et CSS global | `src/app/globals.css` | — | WP-00 | tout |
-| `SiteShell` | `src/components/site-shell.tsx` | client | WP-00 | `(site)/layout.tsx` |
-| Gates runtime | `src/gates/runtime.tsx` (`MotionRuntime`, `StageRoot`) | client | WP-00 | `SiteShell` |
-| Bridge | `src/lib/motion-bridge/{types,store,use-stage-view,motion-pref,tier}.ts` | léger | WP-00 | tout le DOM animé |
-| `StageView` | `src/components/ui/stage-view.tsx` | client | WP-00 | héros, chapitre 02, Studio, fiche |
-| `PageCut` | `src/components/ui/page-cut.tsx` (`<ViewTransition>`) | SSR | WP-00 | chaque page `(site)` |
-| `SiteLink` | `src/components/ui/site-link.tsx` (`transitionTypes`, `useLinkStatus`) | client | WP-00 | header, footer, CTA, cartes |
-| `NavPending` | `src/components/ui/nav-pending.tsx` | client | WP-00 | header |
-| `Button`, `ButtonLink` | `src/components/ui/button.tsx` (primary, secondary, ghost, ink, text ; sm/md/lg) | SSR | WP-00 | tout |
-| `Chip`, `ChipRadio` | `src/components/ui/chip.tsx` | SSR | WP-00 | filtres, héros, Studio |
-| `Field`, `fieldClass` | `src/components/ui/field.tsx` | SSR | WP-00 | formulaires |
-| `Chapter`, `ChapterRail` | `src/components/ui/chapter.tsx`, `chapter-rail.tsx` | SSR / client | WP-00 | accueil, Atelier, fiche |
-| `DotTitle` | `src/components/ui/dot-title.tsx` | SSR | WP-00 | titres d'affichage |
-| `MonoLabel`, `Num` | `src/components/ui/mono.tsx` | SSR | WP-00 | télémétrie |
-| `MeasureStrip` | `src/components/ui/measure-strip.tsx` | SSR (props) | WP-00 | héros, Studio, chapitre 02 |
-| `Ruler` | `src/components/ui/ruler.tsx` (SVG gradué) | SSR | WP-00 | Studio, héros mobile |
-| `MapFrame` | `src/components/ui/map-frame.tsx` | SSR | WP-00 | héros, footer |
-| `SpecTable` | `src/components/ui/spec-table.tsx` (`<dl>` à filets) | SSR | WP-00 | fiche, Studio, Atelier |
-| `Drawer` | `src/components/ui/drawer.tsx` (`<dialog>`, verrou Lenis) | client | WP-00 | Studio, plus tard ailleurs |
-| `Toast` | `src/components/ui/toast.tsx` (`aria-live`) | client | WP-00 | Studio, favoris |
-| Icônes maison | `src/components/ui/icons.tsx` (`StrataIcon`, `NozzleIcon`, `LayerIcon`, `SummitIcon`) | SSR | WP-00 | nav, Studio |
-| `MotionToggle` | `src/components/motion-toggle.tsx` | client | WP-00 | footer |
-| Header, Footer, BottomNav, Consent, PageHeader, BrandMark, ThemeToggle, LocaleSwitcher, Select | `src/components/*.tsx` | SSR / client | WP-00 | shell |
-| Contrats de données | `src/lib/studio/types.ts`, `src/lib/studio/creations.ts`, `src/lib/quote-handoff.ts` | léger | WP-00 | Studio, favoris, sur mesure |
-| Scripts de contrôle | `scripts/check-worker-bundle.ts`, `scripts/chunk-report.ts` | outil | WP-00 | tous |
-| Cœur du Stage | `src/motion/stage/{stage-root.tsx,view-tracker.ts,loop.ts,bake.ts,controllers.ts,types.ts,geometry.ts}` | lourd | WP-00 | scènes |
-| Matériau d'impression | `src/motion/stage/materials/print-material.ts`, `src/motion/stage/glsl/*.ts` | lourd | WP-00 | `print-hero`, `studio-object` |
-| Registre des scènes + stubs | `src/motion/stage/scenes/index.ts` | lourd | WP-00 | Stage |
-| GSAP, runtime | `src/motion/gsap.ts`, `src/motion/runtime.tsx` | lourd | WP-00 | chorégraphies |
-| Géométrie Lavaux, noyau, stats, estimation, codecs, posters, STL | `src/lib/studio/{kernel/*,objects/lavaux.ts,profile.ts,patterns.ts,stats.ts,estimate.ts,pricing-params.ts,guards.ts,schemas.ts,url-state.ts,presets.ts,filaments.ts,camera.ts,format.ts,poster.ts,stl.ts,band-stats.ts}` | pur TS | WP-01 | tous les consommateurs 3D et SSR |
-| Posters de champ | `scripts/gen-field-posters.ts` → `public/posters/field-*-{light,dark}.svg` | outil | WP-01 | footer, 404, contact, accueil |
-| Texte 3D, objets plats | `src/lib/studio/{text/*,objects/cartouche.ts,objects/relief.ts,objects/borne.ts}`, `scripts/fonts/*`, `public/studio/glyphs/*` | pur TS | WP-02 | Studio, chapitre 02 |
-| `QuoteRequestForm`, `StudioAttachmentCard` | `src/components/quote/*.tsx` | client | WP-QUOTE | `/custom`, tiroir du Studio |
-| Upload client | `src/lib/quote-upload-client.ts` | léger | WP-QUOTE | formulaires de devis |
-| `StudioApp` et contrôles | `src/components/studio/{studio-app,param-slider,band-editor,pattern-radio,swatch-radio,view-switch,measure-bar,printable-badge,studio-tools,studio-actionbar,send-drawer,elevation-view,object-card,studio-form-ssr}.tsx` | SSR / client | WP-STUDIO | pages Studio, chapitre 02 |
-| Gates Studio | `src/gates/studio.tsx` (`StudioEngine`, `StudioChoreo`) | client | WP-STUDIO | `StudioApp` |
-| Moteur et Worker | `src/motion/studio/{engine.tsx,geometry.worker.ts,channel.ts}` | lourd | WP-STUDIO | Studio, chapitre 02 |
-| Scène Studio | `src/motion/stage/scenes/studio-object.ts` | lourd | WP-STUDIO | Studio, chapitre 02 |
-| Composants de l'accueil | `src/components/home/*` (`hero`, `hero-poster`, `hero-controls`, `hero-telemetry`, `chapter-map`, `chapter-summit`, `chapter-studio`, `chapter-shop`, `chapter-atelier`, `chapter-file`, `home-config-context`, `home.module.css`) | SSR / client | WP-HOME | accueil |
-| Gates et chorégraphie de l'accueil | `src/gates/home.tsx`, `src/motion/choreo/home.tsx` | client / lourd | WP-HOME | accueil |
-| Scènes de l'accueil | `src/motion/stage/scenes/{print-hero,contour-field}.ts`, `src/motion/stage/materials/field-material.ts` | lourd | WP-HOME | accueil |
-| Catalogue | `src/components/{product-card,product-gallery,product-purchase,add-to-cart,favorite-button,multicolor-dots,star-rating}.tsx`, `src/components/catalog/{attribution-block,product-plate,registry-table,studio-row}.tsx` | SSR / client | WP-SHOP | boutique, fiche, accueil, admin (star-rating) |
-| Attribution, JSON-LD | `src/lib/attribution.ts`, `src/lib/seo.ts` (`productJsonLd`) | léger | WP-SHOP | fiche |
-| Viewer produit | `src/motion/stage/scenes/product-viewer.ts`, `src/gates/product.tsx`, `src/motion/choreo/{product,shop}.tsx` | lourd | WP-SHOP | fiche, boutique |
-| Atelier, contact | `src/app/[locale]/(site)/{a-propos,contact}/**`, `src/gates/about.tsx`, `src/motion/choreo/about.tsx` | SSR / lourd | WP-ABOUT | Atelier, contact |
-| Utilitaires | `src/app/[locale]/{cart,checkout,track,favorites}/**`, `not-found.tsx`, `error.tsx`, `src/components/{cart-reminder,cart-recovery,cart-link-import,guest-email-verification}.tsx`, `src/lib/{stripe-appearance.ts,favorites.tsx}` | SSR / client | WP-UTILITY | tunnel, suivi |
-| Compte, auth, légal | `src/app/[locale]/{account,oauth,agent,legal}/**` | SSR / client | WP-ACCOUNT | compte |
-| WebMCP | `src/components/webmcp-tools.tsx` (+ `studio_configure`) | client | WP-STUDIO | layout |
+| Composant / module                                                                             | Fichier                                                                                                                                                                                                                            | Nature         | Package    | Utilisé par                                   |
+| ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------- | ---------- | --------------------------------------------- |
+| Polices                                                                                        | `src/app/fonts.ts`, `src/fonts/archivo-sx-latin.woff2`                                                                                                                                                                             | SSR            | WP-00      | layout                                        |
+| Jetons et CSS global                                                                           | `src/app/globals.css`                                                                                                                                                                                                              | —              | WP-00      | tout                                          |
+| `SiteShell`                                                                                    | `src/components/site-shell.tsx`                                                                                                                                                                                                    | client         | WP-00      | `(site)/layout.tsx`                           |
+| Gates runtime                                                                                  | `src/gates/runtime.tsx` (`MotionRuntime`, `StageRoot`)                                                                                                                                                                             | client         | WP-00      | `SiteShell`                                   |
+| Bridge                                                                                         | `src/lib/motion-bridge/{types,store,use-stage-view,motion-pref,tier}.ts`                                                                                                                                                           | léger          | WP-00      | tout le DOM animé                             |
+| `StageView`                                                                                    | `src/components/ui/stage-view.tsx`                                                                                                                                                                                                 | client         | WP-00      | héros, chapitre 02, Studio, fiche             |
+| `PageCut`                                                                                      | `src/components/ui/page-cut.tsx` (`<ViewTransition>`)                                                                                                                                                                              | SSR            | WP-00      | chaque page `(site)`                          |
+| `SiteLink`                                                                                     | `src/components/ui/site-link.tsx` (`transitionTypes`, `useLinkStatus`)                                                                                                                                                             | client         | WP-00      | header, footer, CTA, cartes                   |
+| `NavPending`                                                                                   | `src/components/ui/nav-pending.tsx`                                                                                                                                                                                                | client         | WP-00      | header                                        |
+| `Button`, `ButtonLink`                                                                         | `src/components/ui/button.tsx` (primary, secondary, ghost, ink, text ; sm/md/lg)                                                                                                                                                   | SSR            | WP-00      | tout                                          |
+| `Chip`, `ChipRadio`                                                                            | `src/components/ui/chip.tsx`                                                                                                                                                                                                       | SSR            | WP-00      | filtres, héros, Studio                        |
+| `Field`, `fieldClass`                                                                          | `src/components/ui/field.tsx`                                                                                                                                                                                                      | SSR            | WP-00      | formulaires                                   |
+| `Chapter`, `ChapterRail`                                                                       | `src/components/ui/chapter.tsx`, `chapter-rail.tsx`                                                                                                                                                                                | SSR / client   | WP-00      | accueil, Atelier, fiche                       |
+| `DotTitle`                                                                                     | `src/components/ui/dot-title.tsx`                                                                                                                                                                                                  | SSR            | WP-00      | titres d'affichage                            |
+| `MonoLabel`, `Num`                                                                             | `src/components/ui/mono.tsx`                                                                                                                                                                                                       | SSR            | WP-00      | télémétrie                                    |
+| `MeasureStrip`                                                                                 | `src/components/ui/measure-strip.tsx`                                                                                                                                                                                              | SSR (props)    | WP-00      | héros, Studio, chapitre 02                    |
+| `Ruler`                                                                                        | `src/components/ui/ruler.tsx` (SVG gradué)                                                                                                                                                                                         | SSR            | WP-00      | Studio, héros mobile                          |
+| `MapFrame`                                                                                     | `src/components/ui/map-frame.tsx`                                                                                                                                                                                                  | SSR            | WP-00      | héros, footer                                 |
+| `SpecTable`                                                                                    | `src/components/ui/spec-table.tsx` (`<dl>` à filets)                                                                                                                                                                               | SSR            | WP-00      | fiche, Studio, Atelier                        |
+| `Drawer`                                                                                       | `src/components/ui/drawer.tsx` (`<dialog>`, verrou Lenis)                                                                                                                                                                          | client         | WP-00      | Studio, plus tard ailleurs                    |
+| `Toast`                                                                                        | `src/components/ui/toast.tsx` (`aria-live`)                                                                                                                                                                                        | client         | WP-00      | Studio, favoris                               |
+| Icônes maison                                                                                  | `src/components/ui/icons.tsx` (`StrataIcon`, `NozzleIcon`, `LayerIcon`, `SummitIcon`)                                                                                                                                              | SSR            | WP-00      | nav, Studio                                   |
+| `MotionToggle`                                                                                 | `src/components/motion-toggle.tsx`                                                                                                                                                                                                 | client         | WP-00      | footer                                        |
+| Header, Footer, BottomNav, Consent, PageHeader, BrandMark, ThemeToggle, LocaleSwitcher, Select | `src/components/*.tsx`                                                                                                                                                                                                             | SSR / client   | WP-00      | shell                                         |
+| Contrats de données                                                                            | `src/lib/studio/types.ts`, `src/lib/studio/creations.ts`, `src/lib/quote-handoff.ts`                                                                                                                                               | léger          | WP-00      | Studio, favoris, sur mesure                   |
+| Scripts de contrôle                                                                            | `scripts/check-worker-bundle.ts`, `scripts/chunk-report.ts`                                                                                                                                                                        | outil          | WP-00      | tous                                          |
+| Cœur du Stage                                                                                  | `src/motion/stage/{stage-root.tsx,view-tracker.ts,loop.ts,bake.ts,controllers.ts,types.ts,geometry.ts}`                                                                                                                            | lourd          | WP-00      | scènes                                        |
+| Matériau d'impression                                                                          | `src/motion/stage/materials/print-material.ts`, `src/motion/stage/glsl/*.ts`                                                                                                                                                       | lourd          | WP-00      | `print-hero`, `studio-object`                 |
+| Registre des scènes + stubs                                                                    | `src/motion/stage/scenes/index.ts`                                                                                                                                                                                                 | lourd          | WP-00      | Stage                                         |
+| GSAP, runtime                                                                                  | `src/motion/gsap.ts`, `src/motion/runtime.tsx`                                                                                                                                                                                     | lourd          | WP-00      | chorégraphies                                 |
+| Géométrie Lavaux, noyau, stats, estimation, codecs, posters, STL                               | `src/lib/studio/{kernel/*,objects/lavaux.ts,profile.ts,patterns.ts,stats.ts,estimate.ts,pricing-params.ts,guards.ts,schemas.ts,url-state.ts,presets.ts,filaments.ts,camera.ts,format.ts,poster.ts,stl.ts,band-stats.ts}`           | pur TS         | WP-01      | tous les consommateurs 3D et SSR              |
+| Posters de champ                                                                               | `scripts/gen-field-posters.ts` → `public/posters/field-*-{light,dark}.svg`                                                                                                                                                         | outil          | WP-01      | footer, 404, contact, accueil                 |
+| Texte 3D, objets plats                                                                         | `src/lib/studio/{text/*,objects/cartouche.ts,objects/relief.ts,objects/borne.ts}`, `scripts/fonts/*`, `public/studio/glyphs/*`                                                                                                     | pur TS         | WP-02      | Studio, chapitre 02                           |
+| `QuoteRequestForm`, `StudioAttachmentCard`                                                     | `src/components/quote/*.tsx`                                                                                                                                                                                                       | client         | WP-QUOTE   | `/custom`, tiroir du Studio                   |
+| Upload client                                                                                  | `src/lib/quote-upload-client.ts`                                                                                                                                                                                                   | léger          | WP-QUOTE   | formulaires de devis                          |
+| `StudioApp` et contrôles                                                                       | `src/components/studio/{studio-app,param-slider,band-editor,pattern-radio,swatch-radio,view-switch,measure-bar,printable-badge,studio-tools,studio-actionbar,send-drawer,elevation-view,object-card,studio-form-ssr}.tsx`          | SSR / client   | WP-STUDIO  | pages Studio, chapitre 02                     |
+| Gates Studio                                                                                   | `src/gates/studio.tsx` (`StudioEngine`, `StudioChoreo`)                                                                                                                                                                            | client         | WP-STUDIO  | `StudioApp`                                   |
+| Moteur et Worker                                                                               | `src/motion/studio/{engine.tsx,geometry.worker.ts,channel.ts}`                                                                                                                                                                     | lourd          | WP-STUDIO  | Studio, chapitre 02                           |
+| Scène Studio                                                                                   | `src/motion/stage/scenes/studio-object.ts`                                                                                                                                                                                         | lourd          | WP-STUDIO  | Studio, chapitre 02                           |
+| Composants de l'accueil                                                                        | `src/components/home/*` (`hero`, `hero-poster`, `hero-controls`, `hero-telemetry`, `chapter-map`, `chapter-summit`, `chapter-studio`, `chapter-shop`, `chapter-atelier`, `chapter-file`, `home-config-context`, `home.module.css`) | SSR / client   | WP-HOME    | accueil                                       |
+| Gates et chorégraphie de l'accueil                                                             | `src/gates/home.tsx`, `src/motion/choreo/home.tsx`                                                                                                                                                                                 | client / lourd | WP-HOME    | accueil                                       |
+| Scènes de l'accueil                                                                            | `src/motion/stage/scenes/{print-hero,contour-field}.ts`, `src/motion/stage/materials/field-material.ts`                                                                                                                            | lourd          | WP-HOME    | accueil                                       |
+| Catalogue                                                                                      | `src/components/{product-card,product-gallery,product-purchase,add-to-cart,favorite-button,multicolor-dots,star-rating}.tsx`, `src/components/catalog/{attribution-block,product-plate,registry-table,studio-row}.tsx`             | SSR / client   | WP-SHOP    | boutique, fiche, accueil, admin (star-rating) |
+| Attribution, JSON-LD                                                                           | `src/lib/attribution.ts`, `src/lib/seo.ts` (`productJsonLd`)                                                                                                                                                                       | léger          | WP-SHOP    | fiche                                         |
+| Viewer produit                                                                                 | `src/motion/stage/scenes/product-viewer.ts`, `src/gates/product.tsx`, `src/motion/choreo/{product,shop}.tsx`                                                                                                                       | lourd          | WP-SHOP    | fiche, boutique                               |
+| Atelier, contact                                                                               | `src/app/[locale]/(site)/{a-propos,contact}/**`, `src/gates/about.tsx`, `src/motion/choreo/about.tsx`                                                                                                                              | SSR / lourd    | WP-ABOUT   | Atelier, contact                              |
+| Utilitaires                                                                                    | `src/app/[locale]/{cart,checkout,track,favorites}/**`, `not-found.tsx`, `error.tsx`, `src/components/{cart-reminder,cart-recovery,cart-link-import,guest-email-verification}.tsx`, `src/lib/{stripe-appearance.ts,favorites.tsx}`  | SSR / client   | WP-UTILITY | tunnel, suivi                                 |
+| Compte, auth, légal                                                                            | `src/app/[locale]/{account,oauth,agent,legal}/**`                                                                                                                                                                                  | SSR / client   | WP-ACCOUNT | compte                                        |
+| WebMCP                                                                                         | `src/components/webmcp-tools.tsx` (+ `studio_configure`)                                                                                                                                                                           | client         | WP-STUDIO  | layout                                        |
 
 ---
 
@@ -2656,19 +2918,19 @@ WP-00 Fondation
 
 ### 9.2 Propriété des fichiers (seul le propriétaire édite ; tout le monde peut importer)
 
-| Package | Possède (édite, crée ou supprime) |
-|---|---|
-| **WP-00** | `package.json`, `bun.lock` ; `.oxlintrc.json` ; `src/app/globals.css`, `src/app/fonts.ts`, `src/fonts/**`, `src/app/manifest.ts` ; `src/app/[locale]/layout.tsx`, `src/app/[locale]/(site)/layout.tsx` et **le déplacement** (`git mv`, sans modification) de `page.tsx`, `shop/`, `products/`, `custom/`, `a-propos/`, `contact/` dans `(site)/` ; `src/i18n/request.ts`, `src/i18n/namespaces.ts`, `src/i18n/messages.test.ts` ; `messages/{fr,de,it,en}.json` (correction du ß seulement) ; création des 36 fichiers `messages/<locale>/<ns>.json` (vides) et contenu de `messages/*/shell.json` ; `src/lib/motion-bridge/**` ; `src/lib/studio/types.ts`, `src/lib/studio/creations.ts`, `src/lib/studio/texts-store.ts`, `src/lib/quote-handoff.ts` (+ tests) ; `src/lib/analytics.ts` (+ test) ; `src/gates/runtime.tsx`, `src/gates/boundary.test.ts` ; `src/motion/gsap.ts`, `src/motion/runtime.tsx`, `src/motion/stage/*` (cœur), `src/motion/stage/materials/print-material.ts`, `src/motion/stage/glsl/**`, `src/motion/stage/scenes/index.ts` et les **stubs** des 4 scènes (transférés ensuite) ; `src/components/{header,footer,bottom-nav,consent-banner,brand-mark,page-header,theme-toggle,locale-switcher,select,site-shell,motion-toggle}.tsx`, `src/components/ui/**` ; le **codemod `text-accent` → `text-accent-text`** sur tout `src/**` (une fois) ; `public/_headers` ; placeholders `public/posters/field-{footer,404,leman,home}-{light,dark}.svg` (transférés à WP-01) ; `scripts/check-worker-bundle.ts`, `scripts/chunk-report.ts` ; `AGENTS.md` (nouvelle règle d'or « frontière motion ») et `docs/conventions.md` (motion, i18n, jetons) |
-| **WP-01** | `src/lib/studio/**` sauf `types.ts` (ajouts seulement), `creations.ts`, `texts-store.ts` : `kernel/**`, `objects/lavaux.ts`, `profile.ts`, `patterns.ts`, `stats.ts`, `estimate.ts`, `pricing-params.ts`, `guards.ts`, `schemas.ts`, `url-state.ts`, `presets.ts`, `filaments.ts`, `camera.ts`, `format.ts`, `poster.ts`, `stl.ts`, `band-stats.ts` et leurs tests ; `scripts/gen-field-posters.ts` ; `public/posters/**` ; `messages/*/studioCore.json` |
-| **WP-02** | reprend la propriété de `src/lib/studio/**` (mêmes exclusions) **après la fusion de WP-01** : `text/**`, `objects/{cartouche,relief,borne}.ts`, extensions de `stats.ts`, `guards.ts`, `schemas.ts`, `presets.ts`, `poster.ts`, `manifold.test.ts` ; `scripts/fonts/**` ; `public/studio/glyphs/**` ; `public/posters/relief-*` ; `messages/*/studioCore.json` (ajouts) |
-| **WP-QUOTE** | `src/app/[locale]/(site)/custom/**` (**`actions.ts` : logique inchangée**) ; `src/components/quote/**` ; `src/lib/quote-upload-client.ts` (+ test) ; `messages/*/quote.json` |
-| **WP-SHOP** | `src/app/[locale]/(site)/shop/**`, `src/app/[locale]/(site)/products/**` ; `src/components/{product-card,product-gallery,product-purchase,add-to-cart,favorite-button,multicolor-dots,star-rating,product-color-context}.tsx`, `src/components/catalog/**` ; suppression de `src/components/product-viewer-3d.tsx` et `src/components/showroom-scene.ts` ; `src/lib/attribution.ts` (+ test) ; `src/lib/seo.ts` (**`productJsonLd` seulement**) et `src/lib/seo.test.ts` ; `src/motion/stage/scenes/product-viewer.ts` ; `src/gates/product.tsx` ; `src/motion/choreo/{product,shop}.tsx` ; `messages/*/catalog.json` |
-| **WP-ABOUT** | `src/app/[locale]/(site)/a-propos/**`, `src/app/[locale]/(site)/contact/**` ; `src/gates/about.tsx` ; `src/motion/choreo/about.tsx` ; `messages/*/atelier.json` |
-| **WP-UTILITY** | `src/app/[locale]/{cart,checkout,track,favorites}/**` ; `src/app/[locale]/not-found.tsx`, `src/app/[locale]/error.tsx` ; `src/components/{cart-reminder,cart-recovery,cart-link-import,guest-email-verification}.tsx` ; `src/lib/stripe-appearance.ts`, `src/lib/favorites.tsx` ; `messages/*/system.json` |
-| **WP-ACCOUNT** | `src/app/[locale]/{account,oauth,agent,legal}/**` (**`legal/*/content.tsx` et `LEGAL_UPDATED` intouchés**) ; `messages/*/accountUi.json` |
-| **WP-STUDIO** | `src/app/[locale]/(site)/studio/**` ; `src/components/studio/**` ; `src/gates/studio.tsx` ; `src/motion/studio/**` ; `src/motion/stage/scenes/studio-object.ts` ; `src/motion/choreo/studio.tsx` ; `src/components/webmcp-tools.tsx` ; `src/app/sitemap.xml/route.ts`, `src/app/robots.txt/route.ts`, `src/app/llms.txt/route.ts` ; `messages/*/studio.json` |
-| **WP-HOME** | `src/app/[locale]/(site)/page.tsx` ; `src/components/home/**` ; suppression de `src/components/hero-scene.tsx` ; `src/gates/home.tsx` ; `src/motion/choreo/home.tsx` ; `src/motion/stage/scenes/{print-hero,contour-field}.ts` ; `src/motion/stage/materials/field-material.ts` ; `messages/*/landing.json` |
-| **WP-99** | nettoyage transversal après fusion de tous : suppression de `src/components/reveal.tsx` et des composants devenus inutiles, clés mortes de `messages/*.json`, entrée temporaire d'oxlint ; `docs/codemap.md`, `docs/architecture.md`, `README.md`, `ROADMAP.md`, `LICENSE.md` (crédits GSAP, OFL) ; corrections de jetons pour l'admin ; aucune autre refonte |
+| Package        | Possède (édite, crée ou supprime)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| -------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **WP-00**      | `package.json`, `bun.lock` ; `.oxlintrc.json` ; `src/app/globals.css`, `src/app/fonts.ts`, `src/fonts/**`, `src/app/manifest.ts` ; `src/app/[locale]/layout.tsx`, `src/app/[locale]/(site)/layout.tsx` et **le déplacement** (`git mv`, sans modification) de `page.tsx`, `shop/`, `products/`, `custom/`, `a-propos/`, `contact/` dans `(site)/` ; `src/i18n/request.ts`, `src/i18n/namespaces.ts`, `src/i18n/messages.test.ts` ; `messages/{fr,de,it,en}.json` (correction du ß seulement) ; création des 36 fichiers `messages/<locale>/<ns>.json` (vides) et contenu de `messages/*/shell.json` ; `src/lib/motion-bridge/**` ; `src/lib/studio/types.ts`, `src/lib/studio/creations.ts`, `src/lib/studio/texts-store.ts`, `src/lib/quote-handoff.ts` (+ tests) ; `src/lib/analytics.ts` (+ test) ; `src/gates/runtime.tsx`, `src/gates/boundary.test.ts` ; `src/motion/gsap.ts`, `src/motion/runtime.tsx`, `src/motion/stage/*` (cœur), `src/motion/stage/materials/print-material.ts`, `src/motion/stage/glsl/**`, `src/motion/stage/scenes/index.ts` et les **stubs** des 4 scènes (transférés ensuite) ; `src/components/{header,footer,bottom-nav,consent-banner,brand-mark,page-header,theme-toggle,locale-switcher,select,site-shell,motion-toggle}.tsx`, `src/components/ui/**` ; le **codemod `text-accent` → `text-accent-text`** sur tout `src/**` (une fois) ; `public/_headers` ; placeholders `public/posters/field-{footer,404,leman,home}-{light,dark}.svg` (transférés à WP-01) ; `scripts/check-worker-bundle.ts`, `scripts/chunk-report.ts` ; `AGENTS.md` (nouvelle règle d'or « frontière motion ») et `docs/conventions.md` (motion, i18n, jetons) |
+| **WP-01**      | `src/lib/studio/**` sauf `types.ts` (ajouts seulement), `creations.ts`, `texts-store.ts` : `kernel/**`, `objects/lavaux.ts`, `profile.ts`, `patterns.ts`, `stats.ts`, `estimate.ts`, `pricing-params.ts`, `guards.ts`, `schemas.ts`, `url-state.ts`, `presets.ts`, `filaments.ts`, `camera.ts`, `format.ts`, `poster.ts`, `stl.ts`, `band-stats.ts` et leurs tests ; `scripts/gen-field-posters.ts` ; `public/posters/**` ; `messages/*/studioCore.json`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **WP-02**      | reprend la propriété de `src/lib/studio/**` (mêmes exclusions) **après la fusion de WP-01** : `text/**`, `objects/{cartouche,relief,borne}.ts`, extensions de `stats.ts`, `guards.ts`, `schemas.ts`, `presets.ts`, `poster.ts`, `manifold.test.ts` ; `scripts/fonts/**` ; `public/studio/glyphs/**` ; `public/posters/relief-*` ; `messages/*/studioCore.json` (ajouts)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| **WP-QUOTE**   | `src/app/[locale]/(site)/custom/**` (**`actions.ts` : logique inchangée**) ; `src/components/quote/**` ; `src/lib/quote-upload-client.ts` (+ test) ; `messages/*/quote.json`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **WP-SHOP**    | `src/app/[locale]/(site)/shop/**`, `src/app/[locale]/(site)/products/**` ; `src/components/{product-card,product-gallery,product-purchase,add-to-cart,favorite-button,multicolor-dots,star-rating,product-color-context}.tsx`, `src/components/catalog/**` ; suppression de `src/components/product-viewer-3d.tsx` et `src/components/showroom-scene.ts` ; `src/lib/attribution.ts` (+ test) ; `src/lib/seo.ts` (**`productJsonLd` seulement**) et `src/lib/seo.test.ts` ; `src/motion/stage/scenes/product-viewer.ts` ; `src/gates/product.tsx` ; `src/motion/choreo/{product,shop}.tsx` ; `messages/*/catalog.json`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| **WP-ABOUT**   | `src/app/[locale]/(site)/a-propos/**`, `src/app/[locale]/(site)/contact/**` ; `src/gates/about.tsx` ; `src/motion/choreo/about.tsx` ; `messages/*/atelier.json`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            |
+| **WP-UTILITY** | `src/app/[locale]/{cart,checkout,track,favorites}/**` ; `src/app/[locale]/not-found.tsx`, `src/app/[locale]/error.tsx` ; `src/components/{cart-reminder,cart-recovery,cart-link-import,guest-email-verification}.tsx` ; `src/lib/stripe-appearance.ts`, `src/lib/favorites.tsx` ; `messages/*/system.json`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| **WP-ACCOUNT** | `src/app/[locale]/{account,oauth,agent,legal}/**` (**`legal/*/content.tsx` et `LEGAL_UPDATED` intouchés**) ; `messages/*/accountUi.json`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| **WP-STUDIO**  | `src/app/[locale]/(site)/studio/**` ; `src/components/studio/**` ; `src/gates/studio.tsx` ; `src/motion/studio/**` ; `src/motion/stage/scenes/studio-object.ts` ; `src/motion/choreo/studio.tsx` ; `src/components/webmcp-tools.tsx` ; `src/app/sitemap.xml/route.ts`, `src/app/robots.txt/route.ts`, `src/app/llms.txt/route.ts` ; `messages/*/studio.json`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| **WP-HOME**    | `src/app/[locale]/(site)/page.tsx` ; `src/components/home/**` ; suppression de `src/components/hero-scene.tsx` ; `src/gates/home.tsx` ; `src/motion/choreo/home.tsx` ; `src/motion/stage/scenes/{print-hero,contour-field}.ts` ; `src/motion/stage/materials/field-material.ts` ; `messages/*/landing.json`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
+| **WP-99**      | nettoyage transversal après fusion de tous : suppression de `src/components/reveal.tsx` et des composants devenus inutiles, clés mortes de `messages/*.json`, entrée temporaire d'oxlint ; `docs/codemap.md`, `docs/architecture.md`, `README.md`, `ROADMAP.md`, `LICENSE.md` (crédits GSAP, OFL) ; corrections de jetons pour l'admin ; aucune autre refonte                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 
 **Non attribués (personne n'y touche)** : `src/app/[locale]/admin/**` (hors codemod), `src/app/api/**`,
 `src/db/**`, `src/middleware.ts`, `src/lib/{auth,orders,cart,shipping,…}.ts` (logique),
@@ -2707,7 +2969,7 @@ jamais dessus.
 
 1. **Mesures de référence** sur `claude/redesign-2026` avant tout changement :
    `bunx opennextjs-cloudflare build` puis `bunx wrangler deploy --dry-run` (noter `Total Upload …
-   gzip`) ; `bun scripts/chunk-report.ts` ; Lighthouse mobile de `/fr`, `/fr/shop`,
+gzip`) ; `bun scripts/chunk-report.ts` ; Lighthouse mobile de `/fr`, `/fr/shop`,
    `/fr/products/vase-spirale` sur `bun run preview`. Consigner dans le compte rendu.
 2. **Paquets** (§4.7), puis `bun run typecheck`.
 3. **Garde-fous** : `.oxlintrc.json` (§4.6), `src/gates/boundary.test.ts`, les deux scripts.
@@ -2724,6 +2986,7 @@ jamais dessus.
    ```
 
    Enfin, suppression du halo rouge du `body`.
+
 6. **i18n** : `namespaces.ts`, `request.ts` (§4.9), 36 fichiers, `shell.json` dans les 4 langues,
    correction « Schließen » → « Schliessen », `messages.test.ts`.
 7. **Bridge et contrats** (§4.5, §9.2) avec tests (store, `creations`, `quote-handoff`,
@@ -2958,16 +3221,16 @@ aucun changement de schéma de base de données**, aucun service tiers nouveau.
 
 ### 11.2 Décisions minimales (avec la valeur par défaut si vous ne répondez pas)
 
-| # | Décision | Défaut appliqué sans réponse | Quand |
-|---|---|---|---|
-| 1 | Valider la direction : palette du §2.1, Archivo SemiExpanded pour les titres, noms « Studio », « Lavaux », « Cartouche », « Relief », « Borne », libellé « Atelier » pour `/a-propos` | on construit avec ces choix | J0 |
-| 2 | **Inventaire réel des bobines** (marque, nom, hex, matière) | palette indicative + mention « Teintes indicatives » | avant J1 |
-| 3 | **Coefficients de prix** (table `PRICING`, §6.5) | aucun CHF affiché (grammes, durée, changements) | quand vous voulez ; active la fourchette |
-| 4 | Politique de modération des textes (phrase proposée au §6.6) et mention du stockage local du Studio dans la politique de confidentialité (4 langues) | phrase de modération affichée ; politique inchangée | avant J1 |
-| 5 | **Preview dédiée** à la refonte (3ᵉ Worker `swiss3design-redesign` ou URL de version) et, sur la branche Neon preview, réinjection du Vase spirale avec `model_3d_url`, photos et STL copiés dans le bucket R2 preview | revues sur la preview partagée, autres branches gelées pendant les revues | avant J0 |
-| 6 | Valider les accroches (annexe C), dont « Pointe {nom} » (DE « Piz », IT « Pizzo », EN « Mount ») | textes de l'annexe C | J2 |
-| 7 | Mise en ligne en une fois après J3 (recommandé, les jetons changent partout) ou progressive | en une fois | J3 |
-| 8 | Options : police suisse premium (licence web) ; redessin vectoriel du mark (changement de marque) ; session Blender (§11.4) ; une image ChatGPT (§11.3) ; imprimer et peser 3 pièces Studio (Lavaux du héros, une Cartouche, un Relief) pour calibrer l'estimation à ±8 % et obtenir les premières photos multicolores réelles | rien de tout cela ; le site est complet sans | après J1 |
+| #   | Décision                                                                                                                                                                                                                                                                                                                       | Défaut appliqué sans réponse                                              | Quand                                    |
+| --- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- | ---------------------------------------- |
+| 1   | Valider la direction : palette du §2.1, Archivo SemiExpanded pour les titres, noms « Studio », « Lavaux », « Cartouche », « Relief », « Borne », libellé « Atelier » pour `/a-propos`                                                                                                                                          | on construit avec ces choix                                               | J0                                       |
+| 2   | **Inventaire réel des bobines** (marque, nom, hex, matière)                                                                                                                                                                                                                                                                    | palette indicative + mention « Teintes indicatives »                      | avant J1                                 |
+| 3   | **Coefficients de prix** (table `PRICING`, §6.5)                                                                                                                                                                                                                                                                               | aucun CHF affiché (grammes, durée, changements)                           | quand vous voulez ; active la fourchette |
+| 4   | Politique de modération des textes (phrase proposée au §6.6) et mention du stockage local du Studio dans la politique de confidentialité (4 langues)                                                                                                                                                                           | phrase de modération affichée ; politique inchangée                       | avant J1                                 |
+| 5   | **Preview dédiée** à la refonte (3ᵉ Worker `swiss3design-redesign` ou URL de version) et, sur la branche Neon preview, réinjection du Vase spirale avec `model_3d_url`, photos et STL copiés dans le bucket R2 preview                                                                                                         | revues sur la preview partagée, autres branches gelées pendant les revues | avant J0                                 |
+| 6   | Valider les accroches (annexe C), dont « Pointe {nom} » (DE « Piz », IT « Pizzo », EN « Mount »)                                                                                                                                                                                                                               | textes de l'annexe C                                                      | J2                                       |
+| 7   | Mise en ligne en une fois après J3 (recommandé, les jetons changent partout) ou progressive                                                                                                                                                                                                                                    | en une fois                                                               | J3                                       |
+| 8   | Options : police suisse premium (licence web) ; redessin vectoriel du mark (changement de marque) ; session Blender (§11.4) ; une image ChatGPT (§11.3) ; imprimer et peser 3 pièces Studio (Lavaux du héros, une Cartouche, un Relief) pour calibrer l'estimation à ±8 % et obtenir les premières photos multicolores réelles | rien de tout cela ; le site est complet sans                              | après J1                                 |
 
 ### 11.3 Image ChatGPT (une seule, facultative, étiquetée « Illustration »)
 
@@ -3015,27 +3278,27 @@ ou FLUX, pas de photogrammétrie, pas de domaine média, pas de `'wasm-unsafe-ev
 
 ## 12. Risques et parades
 
-| Risque | Parade |
-|---|---|
-| three, gsap ou lenis fuient dans le Worker | `src/motion/**` + `src/gates/**`, lint (imports statiques **et** dynamiques), test de frontière, `check-worker-bundle` à chaque package |
-| LCP retardé par le mouvement | h1 SSR sans animation, posters inline, Stage chargé en idle, aucun préloader |
-| Un de nos objets ressemble au Vase spirale | pas de profil bouteille, col ≥ 0,5, pas de nervures dans le héros, `nearVaseSpirale` bloquant et testé |
-| Attribution absente ou trompeuse | `AttributionBlock` SSR en 4 langues, test `curl`, JSON-LD `3DModel`, aucune formulation d'approbation |
-| Configuration non imprimable vendue | bornes couplées, garde-fous, test de variété, relecture humaine de chaque demande |
-| Estimation perçue comme un prix | fourchette, libellé « Estimation », aucun CHF avant validation, prix ferme par devis sous 48 h |
-| Texte personnel qui fuit | jamais dans l'URL ni les événements, `sessionStorage`, `.ph-mask`, inspection réseau en acceptation |
-| INP du Studio | Worker + LOD `drag`/`display`, stats analytiques, télémétrie ≤ 10 Hz, mesure CPU ×4 |
-| Upload lent sur mobile, 429 | STL adaptatif 1–3 Mo, progression narrée, cache du `fileKey`, message 429 |
-| Lenis ou transforms autour de Stripe | groupe `(site)` : le tunnel n'est pas dedans |
-| iOS : barre d'adresse, clavier, contextes | pas de pin mobile, `ignoreMobileResize`, `svh`, saisies hors pin, un seul contexte, bake au repos, repli sur perte de contexte |
-| Décalage DOM / canvas au scroll natif mobile | bake des vues au repos en C1 ; Lenis synchronise le desktop |
-| Allemand trop long | échelle `:lang(de)`, `hyphens`, tests avec les mots du lexique |
-| Replays PostHog lourds | `ph-no-capture` sur les compteurs et conteneurs décoratifs, mesure en WP-99 |
-| Actions PostHog cassées par le nouveau DOM | audit et liste de recréation en WP-99 |
-| Preview partagée écrasée par d'autres branches | preview dédiée ou gel pendant les revues (décision 5) |
-| Branche longue qui dérive de `main` | noms de jetons conservés, packages courts, rebase avant chaque fusion |
-| Admin abîmé par les jetons | revue de l'admin en WP-00 et WP-99, corrections par les jetons seulement |
-| Dépendances : three 0.187 casse le Stage | three figé en `0.186.1`, Dependabot relu |
+| Risque                                         | Parade                                                                                                                                  |
+| ---------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| three, gsap ou lenis fuient dans le Worker     | `src/motion/**` + `src/gates/**`, lint (imports statiques **et** dynamiques), test de frontière, `check-worker-bundle` à chaque package |
+| LCP retardé par le mouvement                   | h1 SSR sans animation, posters inline, Stage chargé en idle, aucun préloader                                                            |
+| Un de nos objets ressemble au Vase spirale     | pas de profil bouteille, col ≥ 0,5, pas de nervures dans le héros, `nearVaseSpirale` bloquant et testé                                  |
+| Attribution absente ou trompeuse               | `AttributionBlock` SSR en 4 langues, test `curl`, JSON-LD `3DModel`, aucune formulation d'approbation                                   |
+| Configuration non imprimable vendue            | bornes couplées, garde-fous, test de variété, relecture humaine de chaque demande                                                       |
+| Estimation perçue comme un prix                | fourchette, libellé « Estimation », aucun CHF avant validation, prix ferme par devis sous 48 h                                          |
+| Texte personnel qui fuit                       | jamais dans l'URL ni les événements, `sessionStorage`, `.ph-mask`, inspection réseau en acceptation                                     |
+| INP du Studio                                  | Worker + LOD `drag`/`display`, stats analytiques, télémétrie ≤ 10 Hz, mesure CPU ×4                                                     |
+| Upload lent sur mobile, 429                    | STL adaptatif 1–3 Mo, progression narrée, cache du `fileKey`, message 429                                                               |
+| Lenis ou transforms autour de Stripe           | groupe `(site)` : le tunnel n'est pas dedans                                                                                            |
+| iOS : barre d'adresse, clavier, contextes      | pas de pin mobile, `ignoreMobileResize`, `svh`, saisies hors pin, un seul contexte, bake au repos, repli sur perte de contexte          |
+| Décalage DOM / canvas au scroll natif mobile   | bake des vues au repos en C1 ; Lenis synchronise le desktop                                                                             |
+| Allemand trop long                             | échelle `:lang(de)`, `hyphens`, tests avec les mots du lexique                                                                          |
+| Replays PostHog lourds                         | `ph-no-capture` sur les compteurs et conteneurs décoratifs, mesure en WP-99                                                             |
+| Actions PostHog cassées par le nouveau DOM     | audit et liste de recréation en WP-99                                                                                                   |
+| Preview partagée écrasée par d'autres branches | preview dédiée ou gel pendant les revues (décision 5)                                                                                   |
+| Branche longue qui dérive de `main`            | noms de jetons conservés, packages courts, rebase avant chaque fusion                                                                   |
+| Admin abîmé par les jetons                     | revue de l'admin en WP-00 et WP-99, corrections par les jetons seulement                                                                |
+| Dépendances : three 0.187 casse le Stage       | three figé en `0.186.1`, Dependabot relu                                                                                                |
 
 ---
 
@@ -3051,13 +3314,28 @@ WebGL2 (three r186) : indexation dynamique des tableaux d'uniforms permise. Coul
 material.onBeforeCompile = (shader) => {
   Object.assign(shader.uniforms, uniforms);
   shader.vertexShader = shader.vertexShader
-    .replace("#include <common>", "#include <common>\nattribute float side;\nvarying float vZ;\nvarying float vSide;")
-    .replace("#include <begin_vertex>", "#include <begin_vertex>\nvZ = position.z;\nvSide = side;");
+    .replace(
+      "#include <common>",
+      "#include <common>\nattribute float side;\nvarying float vZ;\nvarying float vSide;",
+    )
+    .replace(
+      "#include <begin_vertex>",
+      "#include <begin_vertex>\nvZ = position.z;\nvSide = side;",
+    );
   shader.fragmentShader = shader.fragmentShader
     .replace("#include <common>", `#include <common>\n${PRINT_HEAD}`)
-    .replace("#include <color_fragment>", `#include <color_fragment>\n${PRINT_COLOR}`)
-    .replace("#include <normal_fragment_maps>", `#include <normal_fragment_maps>\n${PRINT_NORMAL}`)
-    .replace("#include <emissivemap_fragment>", `#include <emissivemap_fragment>\n${PRINT_EMISSIVE}`);
+    .replace(
+      "#include <color_fragment>",
+      `#include <color_fragment>\n${PRINT_COLOR}`,
+    )
+    .replace(
+      "#include <normal_fragment_maps>",
+      `#include <normal_fragment_maps>\n${PRINT_NORMAL}`,
+    )
+    .replace(
+      "#include <emissivemap_fragment>",
+      `#include <emissivemap_fragment>\n${PRINT_EMISSIVE}`,
+    );
 };
 material.customProgramCacheKey = () => "s3d-print-v1";
 ```
@@ -3125,7 +3403,7 @@ héros. Rendu seulement quand le scroll bouge ou que `uReveal` change.
 
 - Couches : `ceil(h / 0,2)` ; une frontière de bande `z` tombe à la couche `round(z / 0,2) + 1`.
 - Masse : `V(cm³) × 1,24 + changements × 0,8 g`. Durée : `V(mm³) / 8 + couches × 1,5 s +
-  changements × 110 s + 360 s`.
+changements × 110 s + 360 s`.
 - Prix : `max(900, 400 + 8 × g + 300 × h + 60 × changements) × marge` centimes, fourchette ±15 %,
   arrondi à 50 centimes, jamais sous le plancher (valeurs à valider, `PRICING.validated`).
 - STL binaire : `84 + 50 × triangles` octets. Pour viser 1–3 Mo : 20 000 à 60 000 triangles.
@@ -3134,47 +3412,47 @@ héros. Rendu seulement quand le scroll bouge ou que `uReveal` change.
 
 ### Annexe C · Banque de textes (FR · DE · IT · EN)
 
-| Clé (namespace) | FR | DE (CH, sans ß) | IT | EN |
-|---|---|---|---|---|
-| `landing.hero.kicker` | Impression 3D multicolore · Gland & Pully (VD) | Mehrfarbiger 3D-Druck · Gland & Pully (VD) | Stampa 3D multicolore · Gland & Pully (VD) | Multicolor 3D printing · Gland & Pully (VD) |
-| `landing.hero.title` | Tout relief commence par une couche. | Jedes Relief beginnt mit einer Schicht. | Ogni rilievo nasce da uno strato. | Every relief starts with a layer. |
-| `landing.hero.lead` | Des objets dessinés par notre atelier, que vous réglez en direct : forme, motif, jusqu'à quatre couleurs. Vous réglez, on imprime, à Gland et à Pully. | Objekte aus unserem Atelier, die Sie live einstellen: Form, Muster, bis zu vier Farben. Sie stellen ein, wir drucken, in Gland und Pully. | Oggetti disegnati nel nostro atelier, che Lei regola dal vivo: forma, motivo, fino a quattro colori. Lei regola, noi stampiamo, a Gland e Pully. | Objects designed in our workshop that you adjust live: shape, pattern, up to four colors. You set it, we print it, in Gland and Pully. |
-| `landing.hero.ctaStudio` | Régler un objet | Objekt einstellen | Regola un oggetto | Adjust an object |
-| `landing.hero.ctaShop` | Boutique | Shop | Negozio | Shop |
-| `landing.hero.ctaFile` | J'ai un fichier | Ich habe eine Datei | Ho un file | I have a file |
-| `landing.hero.label` | Objet Studio · configuration d'exemple · rendu temps réel | Studio-Objekt · Beispielkonfiguration · Echtzeit-Rendering | Oggetto Studio · configurazione di esempio · rendering in tempo reale | Studio object · sample configuration · real-time render |
-| `landing.hero.skip` | Passer l'animation | Animation überspringen | Salta l'animazione | Skip the animation |
-| `landing.hero.palette` / `.pattern` | Palette / Motif | Palette / Muster | Tavolozza / Motivo | Palette / Pattern |
-| `landing.hero.telemetry` | Couche {layer} / {total} · z {z} mm · {filament} | Schicht {layer} / {total} · z {z} mm · {filament} | Strato {layer} / {total} · z {z} mm · {filament} | Layer {layer} / {total} · z {z} mm · {filament} |
-| `landing.hero.change` | Changement de filament → {filament} · couche {layer} | Filamentwechsel → {filament} · Schicht {layer} | Cambio di filamento → {filament} · strato {layer} | Filament change → {filament} · layer {layer} |
-| `landing.map.title` | Une couleur par altitude. | Eine Farbe pro Höhenstufe. | Un colore per ogni quota. | One color per altitude. |
-| `landing.summit.title` | Votre nom, en relief. Littéralement. | Ihr Name, im Relief. Wörtlich. | Il Suo nome, in rilievo. Letteralmente. | Your name, in relief. Literally. |
-| `landing.summit.input` | Nommez votre sommet | Benennen Sie Ihren Gipfel | Dia un nome alla Sua vetta | Name your peak |
-| `landing.summit.note` | Le texte reste dans votre navigateur jusqu'à l'envoi à l'atelier. | Der Text bleibt in Ihrem Browser, bis Sie ihn ans Atelier senden. | Il testo resta nel Suo browser fino all'invio all'atelier. | The text stays in your browser until you send it to the workshop. |
-| `studioCore.relief.peak` | Pointe {name} | Piz {name} | Pizzo {name} | Mount {name} |
-| `studioCore.relief.fictional` | altitude fictive | fiktive Höhe | quota immaginaria | fictional altitude |
-| `landing.summit.cta` | Continuer dans le Studio | Im Studio weitermachen | Continua nello Studio | Continue in the Studio |
-| `landing.studio.title` | Réglez-le. On l'imprime. | Sie stellen ein. Wir drucken. | Lei regola. Noi stampiamo. | You set it. We print it. |
-| `landing.shop.title` | Des objets choisis, imprimés à la commande. | Ausgewählte Objekte, auf Bestellung gedruckt. | Oggetti scelti, stampati su ordinazione. | Selected objects, printed to order. |
-| `landing.atelier.title` | Imprimé à Gland et à Pully. Livré de Genève à Romanshorn. | Gedruckt in Gland und Pully. Geliefert von Genf bis Romanshorn. | Stampato a Gland e Pully. Consegnato da Ginevra a Romanshorn. | Printed in Gland and Pully. Delivered from Geneva to Romanshorn. |
-| `landing.file.title` | Vous avez déjà un fichier ? | Sie haben schon eine Datei? | Ha già un file? | Already have a file? |
-| `landing.file.cta` | Envoyer un fichier | Datei senden | Invia un file | Send a file |
-| `studio.send` | Envoyer à l'atelier | Ans Atelier senden | Invia all'atelier | Send to the workshop |
-| `studio.moderation` | Un humain de l'atelier relit chaque texte avant l'impression. Nous refusons les marques de tiers, les injures et les contenus illicites. | Ein Mensch im Atelier prüft jeden Text vor dem Druck. Marken Dritter, Beleidigungen und rechtswidrige Inhalte lehnen wir ab. | Una persona dell'atelier rilegge ogni testo prima della stampa. Rifiutiamo marchi di terzi, insulti e contenuti illeciti. | A person in our workshop reviews every text before printing. We refuse third-party trademarks, insults and unlawful content. |
-| `studio.estimate` | Estimation · prix ferme confirmé par l'atelier sous 48 h | Schätzung · verbindlicher Preis vom Atelier innert 48 Stunden | Stima · prezzo definitivo confermato dall'atelier entro 48 ore | Estimate · firm price confirmed by the workshop within 48 hours |
-| `studio.indicative` | Teintes indicatives, couleur finale selon les bobines en stock. | Farbtöne unverbindlich, die endgültige Farbe hängt von den vorrätigen Spulen ab. | Tinte indicative, colore finale secondo le bobine disponibili. | Indicative shades; the final color depends on the spools in stock. |
-| `studio.success` | Reçu. L'atelier vérifie votre pièce et vous répond sous 48 h avec un prix ferme. | Erhalten. Das Atelier prüft Ihr Stück und antwortet Ihnen innert 48 Stunden mit einem verbindlichen Preis. | Ricevuto. L'atelier verifica il Suo pezzo e Le risponde entro 48 ore con un prezzo definitivo. | Received. The workshop checks your piece and replies within 48 hours with a firm price. |
-| `studio.error429` | Trop d'envois depuis cette connexion (10 par heure). Réessayez plus tard ou écrivez à contact@swiss3design.ch. | Zu viele Uploads von dieser Verbindung (10 pro Stunde). Versuchen Sie es später erneut oder schreiben Sie an contact@swiss3design.ch. | Troppi invii da questa connessione (10 all'ora). Riprovi più tardi o scriva a contact@swiss3design.ch. | Too many uploads from this connection (10 per hour). Try again later or write to contact@swiss3design.ch. |
-| `studioCore.guard.nearVase` | Cette combinaison rappelle le Vase spirale de Ian (licence sans modification). Réduisez la torsion ou le nombre de nervures. | Diese Kombination erinnert an Ians Vase spirale (Lizenz ohne Bearbeitungen). Verringern Sie die Drehung oder die Anzahl Rippen. | Questa combinazione ricorda il Vase spirale di Ian (licenza senza modifiche). Riduca la torsione o il numero di nervature. | This combination resembles Ian's Vase spirale (no-derivatives license). Reduce the twist or the number of ribs. |
-| `shell.stage.unavailable` | Vue 3D indisponible sur cet appareil : l'aperçu 2D est exact au dixième de millimètre. | 3D-Ansicht auf diesem Gerät nicht verfügbar: Die 2D-Vorschau ist auf den Zehntelmillimeter genau. | Vista 3D non disponibile su questo dispositivo: l'anteprima 2D è precisa al decimo di millimetro. | 3D view unavailable on this device: the 2D preview is accurate to a tenth of a millimeter. |
-| `shell.motion.toggle` | Réduire les animations | Animationen reduzieren | Riduci le animazioni | Reduce motion |
-| `catalog.attribution.body` | Design : Ian, « Vase », publié sur MakerWorld. Licence Creative Commons BY-ND 4.0. Swiss3Design imprime ce modèle sans aucune modification. Cette mention n'implique aucune approbation de Swiss3Design par l'auteur. | Design: Ian, «Vase», veröffentlicht auf MakerWorld. Lizenz Creative Commons BY-ND 4.0. Swiss3Design druckt dieses Modell ohne jede Änderung. Dieser Hinweis bedeutet keine Billigung von Swiss3Design durch den Urheber. | Design: Ian, «Vase», pubblicato su MakerWorld. Licenza Creative Commons BY-ND 4.0. Swiss3Design stampa questo modello senza alcuna modifica. Questa menzione non implica alcuna approvazione di Swiss3Design da parte dell'autore. | Design: Ian, "Vase", published on MakerWorld. License Creative Commons BY-ND 4.0. Swiss3Design prints this model without any modification. This credit does not imply any endorsement of Swiss3Design by the author. |
-| `catalog.cross.title` | Un vase à vos couleurs ? | Eine Vase in Ihren Farben? | Un vaso nei Suoi colori? | A vase in your colors? |
-| `system.notFound.title` | Page introuvable. | Seite nicht gefunden. | Pagina non trovata. | Page not found. |
-| `system.notFound.kicker` | Point non coté | Kein vermessener Punkt | Punto non quotato | Unsurveyed point |
-| `system.notFound.line` | Altitude 404 m, soit 32 m au-dessus du Léman. Rien n'a été imprimé ici. | Höhe 404 m, also 32 m über dem Genfersee. Hier wurde nichts gedruckt. | Quota 404 m, cioè 32 m sopra il Lemano. Qui non è stato stampato nulla. | Altitude 404 m, 32 m above Lake Geneva. Nothing was printed here. |
-| `system.cart.emptyTitle` / `.emptyKicker` | Votre panier est vide. / Terrain vierge | Ihr Warenkorb ist leer. / Unberührtes Gelände | Il carrello è vuoto. / Terreno vergine | Your cart is empty. / Blank terrain |
-| `system.success.kicker` | La buse chauffe. | Die Düse heizt auf. | L'ugello si scalda. | The nozzle is heating up. |
-| `system.error.title` | Une couche a raté. On réessaie ? | Eine Schicht ist missglückt. Nochmals versuchen? | Uno strato non è riuscito. Riproviamo? | A layer failed. Shall we retry? |
+| Clé (namespace)                           | FR                                                                                                                                                                                                                    | DE (CH, sans ß)                                                                                                                                                                                                          | IT                                                                                                                                                                                                                                 | EN                                                                                                                                                                                                                   |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `landing.hero.kicker`                     | Impression 3D multicolore · Gland & Pully (VD)                                                                                                                                                                        | Mehrfarbiger 3D-Druck · Gland & Pully (VD)                                                                                                                                                                               | Stampa 3D multicolore · Gland & Pully (VD)                                                                                                                                                                                         | Multicolor 3D printing · Gland & Pully (VD)                                                                                                                                                                          |
+| `landing.hero.title`                      | Tout relief commence par une couche.                                                                                                                                                                                  | Jedes Relief beginnt mit einer Schicht.                                                                                                                                                                                  | Ogni rilievo nasce da uno strato.                                                                                                                                                                                                  | Every relief starts with a layer.                                                                                                                                                                                    |
+| `landing.hero.lead`                       | Des objets dessinés par notre atelier, que vous réglez en direct : forme, motif, jusqu'à quatre couleurs. Vous réglez, on imprime, à Gland et à Pully.                                                                | Objekte aus unserem Atelier, die Sie live einstellen: Form, Muster, bis zu vier Farben. Sie stellen ein, wir drucken, in Gland und Pully.                                                                                | Oggetti disegnati nel nostro atelier, che Lei regola dal vivo: forma, motivo, fino a quattro colori. Lei regola, noi stampiamo, a Gland e Pully.                                                                                   | Objects designed in our workshop that you adjust live: shape, pattern, up to four colors. You set it, we print it, in Gland and Pully.                                                                               |
+| `landing.hero.ctaStudio`                  | Régler un objet                                                                                                                                                                                                       | Objekt einstellen                                                                                                                                                                                                        | Regola un oggetto                                                                                                                                                                                                                  | Adjust an object                                                                                                                                                                                                     |
+| `landing.hero.ctaShop`                    | Boutique                                                                                                                                                                                                              | Shop                                                                                                                                                                                                                     | Negozio                                                                                                                                                                                                                            | Shop                                                                                                                                                                                                                 |
+| `landing.hero.ctaFile`                    | J'ai un fichier                                                                                                                                                                                                       | Ich habe eine Datei                                                                                                                                                                                                      | Ho un file                                                                                                                                                                                                                         | I have a file                                                                                                                                                                                                        |
+| `landing.hero.label`                      | Objet Studio · configuration d'exemple · rendu temps réel                                                                                                                                                             | Studio-Objekt · Beispielkonfiguration · Echtzeit-Rendering                                                                                                                                                               | Oggetto Studio · configurazione di esempio · rendering in tempo reale                                                                                                                                                              | Studio object · sample configuration · real-time render                                                                                                                                                              |
+| `landing.hero.skip`                       | Passer l'animation                                                                                                                                                                                                    | Animation überspringen                                                                                                                                                                                                   | Salta l'animazione                                                                                                                                                                                                                 | Skip the animation                                                                                                                                                                                                   |
+| `landing.hero.palette` / `.pattern`       | Palette / Motif                                                                                                                                                                                                       | Palette / Muster                                                                                                                                                                                                         | Tavolozza / Motivo                                                                                                                                                                                                                 | Palette / Pattern                                                                                                                                                                                                    |
+| `landing.hero.telemetry`                  | Couche {layer} / {total} · z {z} mm · {filament}                                                                                                                                                                      | Schicht {layer} / {total} · z {z} mm · {filament}                                                                                                                                                                        | Strato {layer} / {total} · z {z} mm · {filament}                                                                                                                                                                                   | Layer {layer} / {total} · z {z} mm · {filament}                                                                                                                                                                      |
+| `landing.hero.change`                     | Changement de filament → {filament} · couche {layer}                                                                                                                                                                  | Filamentwechsel → {filament} · Schicht {layer}                                                                                                                                                                           | Cambio di filamento → {filament} · strato {layer}                                                                                                                                                                                  | Filament change → {filament} · layer {layer}                                                                                                                                                                         |
+| `landing.map.title`                       | Une couleur par altitude.                                                                                                                                                                                             | Eine Farbe pro Höhenstufe.                                                                                                                                                                                               | Un colore per ogni quota.                                                                                                                                                                                                          | One color per altitude.                                                                                                                                                                                              |
+| `landing.summit.title`                    | Votre nom, en relief. Littéralement.                                                                                                                                                                                  | Ihr Name, im Relief. Wörtlich.                                                                                                                                                                                           | Il Suo nome, in rilievo. Letteralmente.                                                                                                                                                                                            | Your name, in relief. Literally.                                                                                                                                                                                     |
+| `landing.summit.input`                    | Nommez votre sommet                                                                                                                                                                                                   | Benennen Sie Ihren Gipfel                                                                                                                                                                                                | Dia un nome alla Sua vetta                                                                                                                                                                                                         | Name your peak                                                                                                                                                                                                       |
+| `landing.summit.note`                     | Le texte reste dans votre navigateur jusqu'à l'envoi à l'atelier.                                                                                                                                                     | Der Text bleibt in Ihrem Browser, bis Sie ihn ans Atelier senden.                                                                                                                                                        | Il testo resta nel Suo browser fino all'invio all'atelier.                                                                                                                                                                         | The text stays in your browser until you send it to the workshop.                                                                                                                                                    |
+| `studioCore.relief.peak`                  | Pointe {name}                                                                                                                                                                                                         | Piz {name}                                                                                                                                                                                                               | Pizzo {name}                                                                                                                                                                                                                       | Mount {name}                                                                                                                                                                                                         |
+| `studioCore.relief.fictional`             | altitude fictive                                                                                                                                                                                                      | fiktive Höhe                                                                                                                                                                                                             | quota immaginaria                                                                                                                                                                                                                  | fictional altitude                                                                                                                                                                                                   |
+| `landing.summit.cta`                      | Continuer dans le Studio                                                                                                                                                                                              | Im Studio weitermachen                                                                                                                                                                                                   | Continua nello Studio                                                                                                                                                                                                              | Continue in the Studio                                                                                                                                                                                               |
+| `landing.studio.title`                    | Réglez-le. On l'imprime.                                                                                                                                                                                              | Sie stellen ein. Wir drucken.                                                                                                                                                                                            | Lei regola. Noi stampiamo.                                                                                                                                                                                                         | You set it. We print it.                                                                                                                                                                                             |
+| `landing.shop.title`                      | Des objets choisis, imprimés à la commande.                                                                                                                                                                           | Ausgewählte Objekte, auf Bestellung gedruckt.                                                                                                                                                                            | Oggetti scelti, stampati su ordinazione.                                                                                                                                                                                           | Selected objects, printed to order.                                                                                                                                                                                  |
+| `landing.atelier.title`                   | Imprimé à Gland et à Pully. Livré de Genève à Romanshorn.                                                                                                                                                             | Gedruckt in Gland und Pully. Geliefert von Genf bis Romanshorn.                                                                                                                                                          | Stampato a Gland e Pully. Consegnato da Ginevra a Romanshorn.                                                                                                                                                                      | Printed in Gland and Pully. Delivered from Geneva to Romanshorn.                                                                                                                                                     |
+| `landing.file.title`                      | Vous avez déjà un fichier ?                                                                                                                                                                                           | Sie haben schon eine Datei?                                                                                                                                                                                              | Ha già un file?                                                                                                                                                                                                                    | Already have a file?                                                                                                                                                                                                 |
+| `landing.file.cta`                        | Envoyer un fichier                                                                                                                                                                                                    | Datei senden                                                                                                                                                                                                             | Invia un file                                                                                                                                                                                                                      | Send a file                                                                                                                                                                                                          |
+| `studio.send`                             | Envoyer à l'atelier                                                                                                                                                                                                   | Ans Atelier senden                                                                                                                                                                                                       | Invia all'atelier                                                                                                                                                                                                                  | Send to the workshop                                                                                                                                                                                                 |
+| `studio.moderation`                       | Un humain de l'atelier relit chaque texte avant l'impression. Nous refusons les marques de tiers, les injures et les contenus illicites.                                                                              | Ein Mensch im Atelier prüft jeden Text vor dem Druck. Marken Dritter, Beleidigungen und rechtswidrige Inhalte lehnen wir ab.                                                                                             | Una persona dell'atelier rilegge ogni testo prima della stampa. Rifiutiamo marchi di terzi, insulti e contenuti illeciti.                                                                                                          | A person in our workshop reviews every text before printing. We refuse third-party trademarks, insults and unlawful content.                                                                                         |
+| `studio.estimate`                         | Estimation · prix ferme confirmé par l'atelier sous 48 h                                                                                                                                                              | Schätzung · verbindlicher Preis vom Atelier innert 48 Stunden                                                                                                                                                            | Stima · prezzo definitivo confermato dall'atelier entro 48 ore                                                                                                                                                                     | Estimate · firm price confirmed by the workshop within 48 hours                                                                                                                                                      |
+| `studio.indicative`                       | Teintes indicatives, couleur finale selon les bobines en stock.                                                                                                                                                       | Farbtöne unverbindlich, die endgültige Farbe hängt von den vorrätigen Spulen ab.                                                                                                                                         | Tinte indicative, colore finale secondo le bobine disponibili.                                                                                                                                                                     | Indicative shades; the final color depends on the spools in stock.                                                                                                                                                   |
+| `studio.success`                          | Reçu. L'atelier vérifie votre pièce et vous répond sous 48 h avec un prix ferme.                                                                                                                                      | Erhalten. Das Atelier prüft Ihr Stück und antwortet Ihnen innert 48 Stunden mit einem verbindlichen Preis.                                                                                                               | Ricevuto. L'atelier verifica il Suo pezzo e Le risponde entro 48 ore con un prezzo definitivo.                                                                                                                                     | Received. The workshop checks your piece and replies within 48 hours with a firm price.                                                                                                                              |
+| `studio.error429`                         | Trop d'envois depuis cette connexion (10 par heure). Réessayez plus tard ou écrivez à contact@swiss3design.ch.                                                                                                        | Zu viele Uploads von dieser Verbindung (10 pro Stunde). Versuchen Sie es später erneut oder schreiben Sie an contact@swiss3design.ch.                                                                                    | Troppi invii da questa connessione (10 all'ora). Riprovi più tardi o scriva a contact@swiss3design.ch.                                                                                                                             | Too many uploads from this connection (10 per hour). Try again later or write to contact@swiss3design.ch.                                                                                                            |
+| `studioCore.guard.nearVase`               | Cette combinaison rappelle le Vase spirale de Ian (licence sans modification). Réduisez la torsion ou le nombre de nervures.                                                                                          | Diese Kombination erinnert an Ians Vase spirale (Lizenz ohne Bearbeitungen). Verringern Sie die Drehung oder die Anzahl Rippen.                                                                                          | Questa combinazione ricorda il Vase spirale di Ian (licenza senza modifiche). Riduca la torsione o il numero di nervature.                                                                                                         | This combination resembles Ian's Vase spirale (no-derivatives license). Reduce the twist or the number of ribs.                                                                                                      |
+| `shell.stage.unavailable`                 | Vue 3D indisponible sur cet appareil : l'aperçu 2D est exact au dixième de millimètre.                                                                                                                                | 3D-Ansicht auf diesem Gerät nicht verfügbar: Die 2D-Vorschau ist auf den Zehntelmillimeter genau.                                                                                                                        | Vista 3D non disponibile su questo dispositivo: l'anteprima 2D è precisa al decimo di millimetro.                                                                                                                                  | 3D view unavailable on this device: the 2D preview is accurate to a tenth of a millimeter.                                                                                                                           |
+| `shell.motion.toggle`                     | Réduire les animations                                                                                                                                                                                                | Animationen reduzieren                                                                                                                                                                                                   | Riduci le animazioni                                                                                                                                                                                                               | Reduce motion                                                                                                                                                                                                        |
+| `catalog.attribution.body`                | Design : Ian, « Vase », publié sur MakerWorld. Licence Creative Commons BY-ND 4.0. Swiss3Design imprime ce modèle sans aucune modification. Cette mention n'implique aucune approbation de Swiss3Design par l'auteur. | Design: Ian, «Vase», veröffentlicht auf MakerWorld. Lizenz Creative Commons BY-ND 4.0. Swiss3Design druckt dieses Modell ohne jede Änderung. Dieser Hinweis bedeutet keine Billigung von Swiss3Design durch den Urheber. | Design: Ian, «Vase», pubblicato su MakerWorld. Licenza Creative Commons BY-ND 4.0. Swiss3Design stampa questo modello senza alcuna modifica. Questa menzione non implica alcuna approvazione di Swiss3Design da parte dell'autore. | Design: Ian, "Vase", published on MakerWorld. License Creative Commons BY-ND 4.0. Swiss3Design prints this model without any modification. This credit does not imply any endorsement of Swiss3Design by the author. |
+| `catalog.cross.title`                     | Un vase à vos couleurs ?                                                                                                                                                                                              | Eine Vase in Ihren Farben?                                                                                                                                                                                               | Un vaso nei Suoi colori?                                                                                                                                                                                                           | A vase in your colors?                                                                                                                                                                                               |
+| `system.notFound.title`                   | Page introuvable.                                                                                                                                                                                                     | Seite nicht gefunden.                                                                                                                                                                                                    | Pagina non trovata.                                                                                                                                                                                                                | Page not found.                                                                                                                                                                                                      |
+| `system.notFound.kicker`                  | Point non coté                                                                                                                                                                                                        | Kein vermessener Punkt                                                                                                                                                                                                   | Punto non quotato                                                                                                                                                                                                                  | Unsurveyed point                                                                                                                                                                                                     |
+| `system.notFound.line`                    | Altitude 404 m, soit 32 m au-dessus du Léman. Rien n'a été imprimé ici.                                                                                                                                               | Höhe 404 m, also 32 m über dem Genfersee. Hier wurde nichts gedruckt.                                                                                                                                                    | Quota 404 m, cioè 32 m sopra il Lemano. Qui non è stato stampato nulla.                                                                                                                                                            | Altitude 404 m, 32 m above Lake Geneva. Nothing was printed here.                                                                                                                                                    |
+| `system.cart.emptyTitle` / `.emptyKicker` | Votre panier est vide. / Terrain vierge                                                                                                                                                                               | Ihr Warenkorb ist leer. / Unberührtes Gelände                                                                                                                                                                            | Il carrello è vuoto. / Terreno vergine                                                                                                                                                                                             | Your cart is empty. / Blank terrain                                                                                                                                                                                  |
+| `system.success.kicker`                   | La buse chauffe.                                                                                                                                                                                                      | Die Düse heizt auf.                                                                                                                                                                                                      | L'ugello si scalda.                                                                                                                                                                                                                | The nozzle is heating up.                                                                                                                                                                                            |
+| `system.error.title`                      | Une couche a raté. On réessaie ?                                                                                                                                                                                      | Eine Schicht ist missglückt. Nochmals versuchen?                                                                                                                                                                         | Uno strato non è riuscito. Riproviamo?                                                                                                                                                                                             | A layer failed. Shall we retry?                                                                                                                                                                                      |
 
-*Fin du brief.*
+_Fin du brief._

@@ -26,6 +26,7 @@ Legend: **Stack** = what I confirmed or what is documented. **Idea for us** = ho
 ### A. Physical products + WebGL (highest relevance)
 
 #### 1. iyO One — audio computer (pre-order e-commerce)
+
 - URL: https://iyo.com — case study: https://www.awwwards.com/iyo-case-study-selling-the-worlds-first-audio-computer.html
 - Awards: Awwwards SOTD + Developer, FWA of the Day, CSSDA.
 - Why notable: it sells a physical object nobody has touched, through experience rather than specs.
@@ -38,6 +39,7 @@ Legend: **Stack** = what I confirmed or what is documented. **Idea for us** = ho
 - **Idea for us:** the filament-colour picker. When a colour is picked, it flows along the layer lines from the nozzle outward. We could also offer an exploded view of multi-part or multicolour prints (each colour region separates on scroll) and a "render ↔ live 3D" toggle on the PDP.
 
 #### 2. Aether 1 — earbuds (fictional product, OFF+BRAND)
+
 - URL: https://aether1.ai — Codrops: https://tympanus.net/codrops/2025/08/06/building-aether-1-sound-without-boundaries/
 - Awards: Awwwards SOTD + E-commerce Honors + Developer (Jul 2025), FWA, CSSDA.
 - Techniques:
@@ -53,6 +55,7 @@ Legend: **Stack** = what I confirmed or what is documented. **Idea for us** = ho
 - **Idea for us:** reveal the internal infill (gyroid/honeycomb) under the cursor with a fluid mask. Use the cheap-effect recipes (fake DoF and bloom, matcap PLA-silk) to stay inside our bundle and CPU budget. Ship a real reduced-motion route.
 
 #### 3. Oryzo AI — a cork coaster launched as an "AI product" (Lusion)
+
 - URL: https://oryzo.ai — BTS: https://blog.lusion.co/oryzo-bts-part-1-7-concept-and-creative-direction (parts 2 and 3 cover 3D/motion and UX/UI)
 - Awards: Awwwards **Site of the Month, April 2026** + Developer.
 - Stack I confirmed live: **Astro + Three.js r178 "modified by Lusion"**, 6 canvases, a scroll height of about 42,000 px, font Halyard Display variable, WebGPU available.
@@ -68,24 +71,28 @@ Legend: **Stack** = what I confirmed or what is documented. **Idea for us** = ho
 - **Idea for us:** our loader draws the product as a slicer toolpath on the print bed, then it "solidifies" into the real render. Scan a real Swiss3Design print (RealityScan or Polycam, both free) for a true layer-line texture. Keep the product-page skeleton simple and put the craft into it.
 
 #### 4. Scout Motors — EV brand (Locomotive)
+
 - URL: https://www.scoutmotors.com — https://locomotive.ca/en/work/scout-motors
 - Awards: **Awwwards E-commerce of the Year 2025**, SOTD, Developer.
-- Techniques: a cinematic, full-screen, scroll-driven heritage story *before* any pre-order CTA, then 3D exploration and configurator paths.
+- Techniques: a cinematic, full-screen, scroll-driven heritage story _before_ any pre-order CTA, then 3D exploration and configurator paths.
 - **Idea for us:** the homepage tells the story (Swiss atelier, multicolour, made to order) and only then opens the shop. Configurator paths run from the story into the product and into a custom quote.
 
 #### 5. Opal Tadpole — webcam (Claudio Guglieri / Opal)
+
 - Awards: **Awwwards E-commerce of the Year 2024**.
 - Status: opalcamera.com now redirects to **op.al** ("Opal Electronics", a new Next.js + Turbopack site with Die Grotesk C type). The Tadpole page is archived.
 - Techniques: many playful scroll-choreographed feature demos, studio and lifestyle photography mixed with 3D, and a box concept. Frontend.fyi rebuilt its text reveals in **pure CSS scroll-driven animations** (`view-timeline`, `animation-range`, a `@property` percentage, and `background-clip: text` on sticky elements).
 - **Idea for us:** for cheap, CSP-safe reveals, use CSS `animation-timeline: view()`, which needs no JS and no nonce. Keep the JS budget for the WebGL hero.
 
 #### 6. Qudrix — modular living cubes (O0 / ozero.design)
+
 - URL: https://qudrix.com — https://www.ozero.design/works/qudrix
 - Awards: Awwwards SOTD + **E-commerce Honors** + Developer (Jan 2025).
 - Techniques: a **3D wizard / configurator** where you "sculpt your own space", big titles and lots of space, cubes placed in natural landscapes, Webflow + JS + **Stripe**. The founder: "our site became a powerful sales tool".
 - **Idea for us:** rethink our custom-quote flow (`/custom`) as a 3D wizard. Upload an STL → preview it on a virtual print bed → pick colours per region → live estimate. We already have Stripe and R2.
 
 #### 7. Telepathic Instruments — Orchid synth (Love + Money)
+
 - URL: https://telepathicinstruments.com
 - Awards: Awwwards SOTD (2025). The first 1,000 units sold out in 3 minutes.
 - Stack I confirmed live: **Shopify, no canvas, 6 videos**. Type: Suisse Intl + Suisse Intl Mono + Editorial Old Ultralight.
@@ -93,12 +100,14 @@ Legend: **Stack** = what I confirmed or what is documented. **Idea for us** = ho
 - **Idea for us:** proof that a strong art direction + video + a grotesk/mono/serif trio can win without WebGL. This is our **fallback tier and our category pages**. Their paper tone is close to ours.
 
 #### 8. Oura Ring (Instrument)
+
 - URL: https://ouraring.com — https://www.instrument.com/work/oura-smart-ring
 - Awards: Awwwards E-commerce Honors (Apr 2025), Webby honoree 2025.
 - Techniques: **progressive disclosure** as the core of the design system (layers of information, animation and micro-interactions), CGI + lifestyle photography + in-app UI + data-viz. **Finish storytelling** (black PVD, brushed silver, rose, stealth DLC).
 - **Idea for us:** finish storytelling for filaments (matte, silk, marble, translucent, glow). Use progressive disclosure on the PDP: layer height, material, print time and care, one tap at a time.
 
 #### 9. Cartier Watches & Wonders 2025 / 2026 (Immersive Garden) + Cartier "Le Chœur des Pierres" (makemepulse)
+
 - URLs: https://www.cartier.com/en-us/watchesandwonders — https://www.cartier.com/en-fr/lechoeurdespierres
 - Awards: W&W 2025 SOTD (2026 edition also SOTD). Le Chœur des Pierres is an FWA of the Day and Awwwards nominee (Sep 2026).
 - Techniques:
@@ -107,6 +116,7 @@ Legend: **Stack** = what I confirmed or what is documented. **Idea for us** = ho
 - **Idea for us:** "one room per collection", for example an alcove per product family, each with its own light and colour mood. The gouache-to-jewel reveal becomes CAD-sketch-to-print.
 
 #### 10. KAI Design Dept. — 117-year-old Japanese blade maker (mount inc.)
+
 - URL: https://www.kai-group.com/global/design — Codrops: https://tympanus.net/codrops/2025/11/20/behind-the-kai-design-dept-experience-webgl-line-blur-video-scrubbing-and-3d-animation/
 - Techniques:
   - Craftsmanship told as gesture: "touchable video".
@@ -116,82 +126,95 @@ Legend: **Stack** = what I confirmed or what is documented. **Idea for us** = ho
 - **Idea for us:** the **ffmpeg recipe for scrubbable video** of real prints (timelapse of the nozzle at work) is directly reusable. The Blender-animated lines as JSON cues map to animated toolpaths.
 
 #### 11. Aardvark Book Club (FUTURE THREE®)
+
 - URL: https://aardvarkbookclub.com
 - Awards: Awwwards SOTD (30 Aug 2026) + E-commerce Honors (Jul 2026).
 - Techniques: a **scroll-driven 3D book reveal**, hover genre discovery, **buttons with audio feedback**, Barba page transitions, Webflow + GSAP. The brief: "interactions that make every page feel like an unboxing".
 - **Idea for us:** the "unboxing" feeling for every product page, with the object coming out of Swiss3Design packaging. Subtle, opt-in click sounds.
 
 #### 12. Pixel Vault (Karan Chouhan)
+
 - URL: https://www.pixelvault.fit
 - Awards: Awwwards E-commerce Honors / HM (Mar 2026).
 - Techniques: "a marketplace from earth 2047". Three.js + Vue, **360° product viewing**, shop grid + collections gallery with WebGL transitions, a "Playground" section, black-only palette.
 - **Idea for us:** a "Playground" or "Atelier" page where visitors toy with materials, colours and physics on prints without buying pressure. It is a good shareable asset.
 
 #### 13. Lando Norris (OFF+BRAND)
+
 - URL: https://landonorris.com — https://www.itsoffbrand.com/our-work/lando-norris
 - Awards: **Awwwards Site of the Year 2025** + Users' Choice, SOTM, FWA.
 - Techniques: a **rotating 3D helmet that tracks your reading** position, cinematic scroll sequences, **Rive** state-machine motion graphics, custom PBR + HDRI, Webflow, and heavy lazy-loading.
 - **Idea for us:** one persistent 3D object that follows the reader through the whole homepage and changes pose and colour per section. Rive (free tier) could drive the UI micro-animations (cart, filters).
 
 #### 14. Messenger / Igloo Inc (abeto)
+
 - URLs: https://messenger.abeto.co — https://www.igloo.inc — Awwwards case study: https://www.awwwards.com/igloo-inc-case-study.html
 - Awards: Messenger won **Developer Site of the Year 2025**. Igloo was a 2024 SOTY finalist.
 - Techniques (Igloo):
   - **Procedurally grown ice crystals** and a UI rendered fully in WebGL: text glitch via SDF texture-offset swaps, with no DOM relayout.
   - A custom **VDB → browser volume exporter** drives the particle footer, smaller than a typical image.
   - Three.js + Svelte + GSAP + Houdini + Blender.
-- **Idea for us:** a procedural "growth" effect, where a product *grows* layer by layer the way a crystal grows. Do not render the UI in WebGL: it hurts accessibility and conflicts with next-intl.
+- **Idea for us:** a procedural "growth" effect, where a product _grows_ layer by layer the way a crystal grows. Do not render the UI in WebGL: it hurts accessibility and conflicts with next-intl.
 
 ### B. Physical-product e-commerce: motion without heavy 3D (benchmarks for the shop UI)
 
 #### 15. Outfit — ++hellohello merch store
+
 - URL: https://outfit.hellohello.is
 - Awards: Awwwards SOTD + Developer (May 2026), E-commerce Honors (Apr 2026). **Animations/Transitions 8.2 and WPO 8.2**, so it is fast and animated.
 - Stack: React + Shopify + GSAP. Standout elements: an **empty-bag visualisation**, product hover animations, the home animation.
 - **Idea for us:** reference for the cart drawer, empty-cart state and card hovers, animated while staying fast.
 
 #### 16. Drop Edition (Square43 Studio)
+
 - URL: https://dropedition.com
 - Awards: E-commerce Honors (Mar 2026), community score 8.27.
 - Stack: **Next.js + GSAP + Shopify**, the closest to our stack. Minimal, parallax, hero animation, PDP with video demos, palette #B9C7CC + white.
 - **Idea for us:** proof that Next.js + GSAP e-commerce scores well. Use video demos on the PDP for articulated or flexible prints.
 
 #### 17. Serotoninn (BL/S®)
+
 - URL: https://serotoninn.com
 - Awards: SOTD + E-commerce Honors + Developer (Jul 2026).
 - Techniques: **red #ED3833 + black** only, an animated preloader, a best-seller card slider, category filtering, campaign video, custom 404. WordPress + GSAP + Swiper.
 - **Idea for us:** a direct palette precedent for red on ink. Use it to show the owner how far a disciplined two-colour system goes.
 
 #### 18. Decathlon Yestalgia (index)
+
 - URL: https://decathlonyestalgia.com
 - Awards: SOTD + Developer (28 Aug 2026).
 - Techniques: a 90s capsule collection, an animated lookbook with video gallery, illustrated characters, scroll effects, black + pink #F3AFCC, GSAP.
 - **Idea for us:** capsule "drops" as mini-sites for seasonal collections (Noël, Alpine edition).
 
 #### 19. Zellerfeld — 3D-printed shoes (direct peer)
+
 - URL: https://www.zellerfeld.com
 - Stack I confirmed live: Nuxt, no canvas, 4 videos. Fonts: Exposure, Phonic mono, Lateral.
 - Techniques: dark UI, an **orange-red CTA accent**, a mono font for data, **raffle drops with a live countdown** (for example AIRMAX 1000.3 with Nike), "Create" for designers.
 - **Idea for us:** **limited print runs with a countdown** ("Édition 03 — 50 pièces"). Use mono type for fabrication data. It also shows that the peer category has no WebGL at all.
 
 #### 20. Gantri — 3D-printed designer lamps (direct peer)
+
 - URL: https://www.gantri.com
 - Stack I confirmed live: Next.js, Söhne. Headlines: "Digitally made in California", "Made to order", "Plant-based", "Every step with intention".
 - Techniques: **manufacturing-process storytelling in words and photos** (made to order, plant-based material, packaging), designer/creator features and a "Create" program.
 - **Idea for us:** the story beats are right (made to order, material origin, packaging). Their execution is static, and our WebGL process story would be the upgrade.
 
 #### 21. Nagami — 3D-printed furniture from recycled plastic (direct peer)
+
 - URL: https://nagami.design
 - Stack I confirmed live: a Shopify theme, video hero, Inter. Collaborations with Zaha Hadid Architects, Dior, Cartier and Patricia Urquiola.
 - **Idea for us:** "Del residuo a una nueva vida" (from waste to a new life), i.e. material-origin storytelling. The site shows how collaboration credits can build credibility.
 
 #### 22. Weekend Max Mara — "The Tuscan Journey Begins" (MONOGRID)
+
 - URL: https://weekend-mm-2026-pasticcino-bag-master.monogrid.io/en/
 - Awards: Awwwards SOTD (13 Sep 2026).
 - Techniques: Italian bag craftsmanship turned into a gesture-based WebGL journey, a single-colour palette (#465016), sound, Vue + GSAP + WebGL.
 - **Idea for us:** "Swiss journey": a regional or craft narrative (atelier → Alps → your home) with gesture interactions.
 
 ### Honourable mentions (worth a look)
+
 - **Shopify Editions Spring '26** (https://www.shopify.com/editions/spring2026). Point clouds extracted from video (VGGT) in a custom quantised `.mdpc` format decoded in Web Workers. Volumetric light raymarched from KTX2 array textures. Scroll drives shader uniforms, not React renders. Device tiers 0-3 plus a shared `FluidField`. Codrops write-up: https://tympanus.net/codrops/2026/06/26/engineering-the-web-experience-behind-shopifys-spring-26-edition-everywhere/
 - **Forged.build** (Michael Modena, ex-Active Theory). Custom WebGPU, "fake tracing" (baked diffuse + a real-time microfacet specular), movement on one axis per scene, film cuts, a 3-tier quality fallback. https://tympanus.net/codrops/2025/10/20/from-garage-to-browser-forged-build-and-the-webgpu-revolution/
 - **INK Games (ToyFight)**. **One canvas for the whole Next.js site**: drei `<View>` scissor rendering, and the frame loop runs only when 3D is visible, scrolling or resizing (ScrollTrigger `onToggle`). https://tympanus.net/codrops/2025/11/21/one-canvas-to-rule-them-all-how-ink-games-new-site-handles-complex-3d/
@@ -210,44 +233,48 @@ Legend: **Stack** = what I confirmed or what is documented. **Idea for us** = ho
 Grouped by the Swiss3Design use case. All use Three.js/GSAP unless noted.
 
 ### Hero: the object prints or forms itself
-| Tutorial | Demo / code | How we adapt it |
-|---|---|---|
-| **Sliced Model Shader**, Three.js Journey (fragment `discard` with `three-custom-shader-material` on `MeshStandardMaterial`; the Citrix x Red Bull site used it) | https://threejs-journey.com/lessons/sliced-model-shader | Core of the "print-on-scroll" hero. Discard fragments above `uPrintHeight` and add a glowing rim at the cut (the "nozzle line"). Quantise the height into 0.2 mm steps so it advances layer by layer. |
-| **Houdini VAT → Three.js** (crumpled paper, Sep 2026). Vertex animation baked into an EXR (1024×200 float RGBA, 1.7 MB) plus FBX; playback is scrubbable by fractional frame | https://tympanus.net/codrops/2026/09/19/crumbled-paper-houdini-vat-threejs/ | Bake a real deposition sim (the extruded bead flowing) or an articulated print unfolding. Scroll scrubs the frame. **Watch the size:** host the EXR/KTX2 files in R2 or `public/`, never in the bundle. |
-| **Crafting a Dreamy Particle Effect (GPGPU)**. Particles sampled on the mesh surface, mouse repulsion via three-mesh-bvh, MotionBloom | https://tympanus.net/Tutorials/DreamyParticles — https://github.com/DGFX/codrops-dreamy-particles | "Filament dust" condenses into the product, and the cursor scatters it. |
-| **Particles Morphing Shader**, Three.js Journey | https://threejs-journey.com/lessons/particles-morphing-shader | Morph between products (vase → lamp → figurine) in the homepage product rail. |
-| **Animating 160,000 cubes (InstancedMesh + per-instance attributes, GPU-only animation)** | https://tympanus.net/Tutorials/VisualizingDitheringThreejs/ — https://github.com/damarberlari/visualizing-dithering-codrops | Voxel or layer build-up of the brand peak (logo = stacked layers). Colour regions switch per instance for the multicolour story. |
-| **WebGPU Scanning Effect with Depth Maps** (TSL, R3F, scan line + cell-noise dot grid) | https://tympanus.net/Development/ScanEffect — https://github.com/d3adrabbit/ScanningEffectWithDepthMap | Treat photos as "scanning" plus a depth pass over product photography for category heroes, with no 3D model needed. |
+
+| Tutorial                                                                                                                                                                     | Demo / code                                                                                                                 | How we adapt it                                                                                                                                                                                         |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Sliced Model Shader**, Three.js Journey (fragment `discard` with `three-custom-shader-material` on `MeshStandardMaterial`; the Citrix x Red Bull site used it)             | https://threejs-journey.com/lessons/sliced-model-shader                                                                     | Core of the "print-on-scroll" hero. Discard fragments above `uPrintHeight` and add a glowing rim at the cut (the "nozzle line"). Quantise the height into 0.2 mm steps so it advances layer by layer.   |
+| **Houdini VAT → Three.js** (crumpled paper, Sep 2026). Vertex animation baked into an EXR (1024×200 float RGBA, 1.7 MB) plus FBX; playback is scrubbable by fractional frame | https://tympanus.net/codrops/2026/09/19/crumbled-paper-houdini-vat-threejs/                                                 | Bake a real deposition sim (the extruded bead flowing) or an articulated print unfolding. Scroll scrubs the frame. **Watch the size:** host the EXR/KTX2 files in R2 or `public/`, never in the bundle. |
+| **Crafting a Dreamy Particle Effect (GPGPU)**. Particles sampled on the mesh surface, mouse repulsion via three-mesh-bvh, MotionBloom                                        | https://tympanus.net/Tutorials/DreamyParticles — https://github.com/DGFX/codrops-dreamy-particles                           | "Filament dust" condenses into the product, and the cursor scatters it.                                                                                                                                 |
+| **Particles Morphing Shader**, Three.js Journey                                                                                                                              | https://threejs-journey.com/lessons/particles-morphing-shader                                                               | Morph between products (vase → lamp → figurine) in the homepage product rail.                                                                                                                           |
+| **Animating 160,000 cubes (InstancedMesh + per-instance attributes, GPU-only animation)**                                                                                    | https://tympanus.net/Tutorials/VisualizingDitheringThreejs/ — https://github.com/damarberlari/visualizing-dithering-codrops | Voxel or layer build-up of the brand peak (logo = stacked layers). Colour regions switch per instance for the multicolour story.                                                                        |
+| **WebGPU Scanning Effect with Depth Maps** (TSL, R3F, scan line + cell-noise dot grid)                                                                                       | https://tympanus.net/Development/ScanEffect — https://github.com/d3adrabbit/ScanningEffectWithDepthMap                      | Treat photos as "scanning" plus a depth pass over product photography for category heroes, with no 3D model needed.                                                                                     |
 
 ### Material, colour and inside structure
-| Tutorial | Demo / code | How we adapt it |
-|---|---|---|
-| **Dual-Scene Fluid X-Ray Reveal** (two scenes, ping-pong fluid mask with FBM, TSL/WebGPU, Draco) | https://tympanus.net/Tutorials/SkeletonFluidReveal/ — https://github.com/cullenwebber/three-skull | Scene A = finished print, scene B = the same print with visible **gyroid infill** or a wireframe toolpath. The cursor wipes away the shell. |
-| **Mouse-Following Square Lens** (CC-Lens distortion, radial RGB shift, fragment only) | https://tympanus.net/Tutorials/PointerSquareLensDistortion — https://github.com/tomoyukinakata/mouse-following-square-lens-effect | A "layer-line loupe" over macro photos on the PDP, with the RGB shift turned off for honest detail. |
-| **Volatile Nexus: glass, caustics, cubes and sound** (Aug 2026) | https://tympanus.net/codrops/2026/08/31/volatile-nexus-tinkering-with-glass-caustics-cubes-and-sound-in-three-js/ | Translucent PETG and "glass-like" filament material studies with caustics on the table. |
-| **Building an Infinite Loom / "Unwoven"**: images split into 26 ribbons that unravel with smoothstep edge "tear" (single HTML file, no build) | https://tympanus.net/Development/Unwoven/ — https://github.com/clementgrellier/unwoven | **The filament transition.** Product cards unravel into filament strands as they leave the viewport and re-weave into the next product. |
-| **Interactive WebGL Backgrounds: Bayer dithering** | https://tympanus.net/codrops/2025/07/30/interactive-webgl-backgrounds-a-quick-guide-to-bayer-dithering/ | A lightweight brand background (warm paper + red dithering) for non-3D pages. |
+
+| Tutorial                                                                                                                                      | Demo / code                                                                                                                       | How we adapt it                                                                                                                             |
+| --------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Dual-Scene Fluid X-Ray Reveal** (two scenes, ping-pong fluid mask with FBM, TSL/WebGPU, Draco)                                              | https://tympanus.net/Tutorials/SkeletonFluidReveal/ — https://github.com/cullenwebber/three-skull                                 | Scene A = finished print, scene B = the same print with visible **gyroid infill** or a wireframe toolpath. The cursor wipes away the shell. |
+| **Mouse-Following Square Lens** (CC-Lens distortion, radial RGB shift, fragment only)                                                         | https://tympanus.net/Tutorials/PointerSquareLensDistortion — https://github.com/tomoyukinakata/mouse-following-square-lens-effect | A "layer-line loupe" over macro photos on the PDP, with the RGB shift turned off for honest detail.                                         |
+| **Volatile Nexus: glass, caustics, cubes and sound** (Aug 2026)                                                                               | https://tympanus.net/codrops/2026/08/31/volatile-nexus-tinkering-with-glass-caustics-cubes-and-sound-in-three-js/                 | Translucent PETG and "glass-like" filament material studies with caustics on the table.                                                     |
+| **Building an Infinite Loom / "Unwoven"**: images split into 26 ribbons that unravel with smoothstep edge "tear" (single HTML file, no build) | https://tympanus.net/Development/Unwoven/ — https://github.com/clementgrellier/unwoven                                            | **The filament transition.** Product cards unravel into filament strands as they leave the viewport and re-weave into the next product.     |
+| **Interactive WebGL Backgrounds: Bayer dithering**                                                                                            | https://tympanus.net/codrops/2025/07/30/interactive-webgl-backgrounds-a-quick-guide-to-bayer-dithering/                           | A lightweight brand background (warm paper + red dithering) for non-3D pages.                                                               |
 
 ### Scroll camera, chapters and process story
-| Tutorial | Demo / code | How we adapt it |
-|---|---|---|
-| **Scroll-driven 3D gallery using a Blender camera path** (Python export to JSON, Z-up → Y-up, `CatmullRomCurve3`, `gsap.quickTo` on a proxy `t`, GSAP Observer) | https://tympanus.net/Tutorials/CurveGallery/ — https://github.com/gaspoorf/curve-gallery | An author-directed camera flight through the "atelier" scene (CAD → slicer → printer → post-process → packaging) straight from Blender. |
-| **How to Build Cinematic 3D Scroll Experiences with GSAP** (Nov 2025; OGL cylinder + particles; R3F waypoint camera + SplitText chapters + progress bar) | https://tympanus.net/codrops/2025/11/19/how-to-build-cinematic-3d-scroll-experiences-with-gsap/ — https://github.com/JosephASG/codrops-cinematic-scroll-animations | Chaptered process storytelling with a progress indicator of "layers printed". |
-| **Shader.se scroll-driven WebGPU pipeline** (one FBO per section, skip inactive passes, reverse-order texture passing, a Lenis → cumulative progress config array, a pre-render window) | https://tympanus.net/codrops/2026/05/19/80s-business-tech-seamless-scene-transitions-inside-shader-ses-scroll-driven-webgpu-pipeline/ | The architecture for our homepage chapters, so we don't pay for scenes that aren't on screen. |
-| **KAI: video scrubbing + line DoF** (ffmpeg `-g 12`, baseline 3.1, faststart; mediabunny fallback) | https://tympanus.net/codrops/2025/11/20/behind-the-kai-design-dept-experience-webgl-line-blur-video-scrubbing-and-3d-animation/ | Scroll-scrub real timelapses of our printers. This is the cheap, truthful manufacturing-story tier. |
-| **Building a Layered Zoom Scroll Effect (ScrollSmoother + ScrollTrigger)** | https://tympanus.net/codrops/2025/10/29/building-a-layered-zoom-scroll-effect-with-gsap-scrollsmoother-and-scrolltrigger/ | A zoom from the Alps into the atelier and then onto the nozzle, a "zoom into the layer" intro. |
-| **Creating 3D scroll-driven text animations with CSS and GSAP** | https://tympanus.net/codrops/2025/11/04/creating-3d-scroll-driven-text-animations-with-css-and-gsap/ | Kinetic FR/DE/IT/EN headlines. Take care with translation lengths. |
+
+| Tutorial                                                                                                                                                                                | Demo / code                                                                                                                                                        | How we adapt it                                                                                                                         |
+| --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| **Scroll-driven 3D gallery using a Blender camera path** (Python export to JSON, Z-up → Y-up, `CatmullRomCurve3`, `gsap.quickTo` on a proxy `t`, GSAP Observer)                         | https://tympanus.net/Tutorials/CurveGallery/ — https://github.com/gaspoorf/curve-gallery                                                                           | An author-directed camera flight through the "atelier" scene (CAD → slicer → printer → post-process → packaging) straight from Blender. |
+| **How to Build Cinematic 3D Scroll Experiences with GSAP** (Nov 2025; OGL cylinder + particles; R3F waypoint camera + SplitText chapters + progress bar)                                | https://tympanus.net/codrops/2025/11/19/how-to-build-cinematic-3d-scroll-experiences-with-gsap/ — https://github.com/JosephASG/codrops-cinematic-scroll-animations | Chaptered process storytelling with a progress indicator of "layers printed".                                                           |
+| **Shader.se scroll-driven WebGPU pipeline** (one FBO per section, skip inactive passes, reverse-order texture passing, a Lenis → cumulative progress config array, a pre-render window) | https://tympanus.net/codrops/2026/05/19/80s-business-tech-seamless-scene-transitions-inside-shader-ses-scroll-driven-webgpu-pipeline/                              | The architecture for our homepage chapters, so we don't pay for scenes that aren't on screen.                                           |
+| **KAI: video scrubbing + line DoF** (ffmpeg `-g 12`, baseline 3.1, faststart; mediabunny fallback)                                                                                      | https://tympanus.net/codrops/2025/11/20/behind-the-kai-design-dept-experience-webgl-line-blur-video-scrubbing-and-3d-animation/                                    | Scroll-scrub real timelapses of our printers. This is the cheap, truthful manufacturing-story tier.                                     |
+| **Building a Layered Zoom Scroll Effect (ScrollSmoother + ScrollTrigger)**                                                                                                              | https://tympanus.net/codrops/2025/10/29/building-a-layered-zoom-scroll-effect-with-gsap-scrollsmoother-and-scrolltrigger/                                          | A zoom from the Alps into the atelier and then onto the nozzle, a "zoom into the layer" intro.                                          |
+| **Creating 3D scroll-driven text animations with CSS and GSAP**                                                                                                                         | https://tympanus.net/codrops/2025/11/04/creating-3d-scroll-driven-text-animations-with-css-and-gsap/                                                               | Kinetic FR/DE/IT/EN headlines. Take care with translation lengths.                                                                      |
 
 ### Shop UI (grid, PDP, transitions)
-| Tutorial | Demo / code | How we adapt it |
-|---|---|---|
-| **Recreating Palmer's draggable product grid** (GSAP Draggable + Inertia, Flip into detail, SplitText) | https://tympanus.net/Tutorials/PalmerDraggableGrid/ — https://github.com/joffreysp/draggable-grid | A "table of objects" shop view you can pan like a print bed covered in parts, with Flip into the PDP. |
-| **Animated product grid preview with GSAP & clip-path** | https://tympanus.net/codrops/2025/05/27/animated-product-grid-preview-with-gsap-clip-path/ | Quick-view overlay on `/shop`. |
-| **Scroll-revealed WebGL gallery (Astro + Three + GSAP ScrollSmoother + Barba + Flip)** (`uProgress` reveal shader, DOM ↔ plane sync via `getBoundingClientRect` on `gsap.ticker`) | https://pixelimageeffect.pages.dev/ — https://github.com/J0SUKE/gsap-threejs-codrops | Product photo reveals on scroll. In Next 16, replace Barba with the **View Transitions API** / React `<ViewTransition>` plus a persistent canvas in the root layout. |
-| **Seamless 3D transitions (Webflow + GSAP + Three + Barba)**: a persistent canvas outside the swapped container, and per-page namespaces mapped to camera X ("pen", "cup" objects) | https://page-transitions-webflow-gsap-threejs.webflow.io/ | Exactly our pattern: one canvas in `app/[locale]/layout.tsx`, and each product page is a camera "station" beside the object. |
-| **Progressively enhanced WebGL lens refraction, 14islands r3f-scroll-rig** (`GlobalCanvas` + `UseCanvas` tunnel, meshes track DOM elements, semantic HTML first) | https://tympanus.net/codrops/2023/10/10/progressively-enhanced-webgl-lens-refraction/ — https://github.com/14islands/r3f-scroll-rig | The **best-fitting architecture for Next.js + i18n + SEO**: the HTML is the source of truth and WebGL enhances it. |
-| **Magnetic commerce (Dash Creative)**: a video-texture hero distortion that keeps going in the drag direction (radius 0.41, amplitude 0.082, momentum decay 0.86) | https://tympanus.net/codrops/2026/07/21/magnetic-commerce-building-the-dash-creative-website/ | A tactile hero behind the headline: the cursor "pulls" a molten-filament video texture. |
-| **Exploring the HTML-in-Canvas proposal** (`layoutsubtree`, `drawElementImage()`, Chrome flag only) | https://html-in-canvas.vercel.app/ — https://github.com/motiontx/html-in-canvas | Watch list only. Not production-ready in 2026 and behind a flag. |
+
+| Tutorial                                                                                                                                                                           | Demo / code                                                                                                                         | How we adapt it                                                                                                                                                      |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Recreating Palmer's draggable product grid** (GSAP Draggable + Inertia, Flip into detail, SplitText)                                                                             | https://tympanus.net/Tutorials/PalmerDraggableGrid/ — https://github.com/joffreysp/draggable-grid                                   | A "table of objects" shop view you can pan like a print bed covered in parts, with Flip into the PDP.                                                                |
+| **Animated product grid preview with GSAP & clip-path**                                                                                                                            | https://tympanus.net/codrops/2025/05/27/animated-product-grid-preview-with-gsap-clip-path/                                          | Quick-view overlay on `/shop`.                                                                                                                                       |
+| **Scroll-revealed WebGL gallery (Astro + Three + GSAP ScrollSmoother + Barba + Flip)** (`uProgress` reveal shader, DOM ↔ plane sync via `getBoundingClientRect` on `gsap.ticker`)  | https://pixelimageeffect.pages.dev/ — https://github.com/J0SUKE/gsap-threejs-codrops                                                | Product photo reveals on scroll. In Next 16, replace Barba with the **View Transitions API** / React `<ViewTransition>` plus a persistent canvas in the root layout. |
+| **Seamless 3D transitions (Webflow + GSAP + Three + Barba)**: a persistent canvas outside the swapped container, and per-page namespaces mapped to camera X ("pen", "cup" objects) | https://page-transitions-webflow-gsap-threejs.webflow.io/                                                                           | Exactly our pattern: one canvas in `app/[locale]/layout.tsx`, and each product page is a camera "station" beside the object.                                         |
+| **Progressively enhanced WebGL lens refraction, 14islands r3f-scroll-rig** (`GlobalCanvas` + `UseCanvas` tunnel, meshes track DOM elements, semantic HTML first)                   | https://tympanus.net/codrops/2023/10/10/progressively-enhanced-webgl-lens-refraction/ — https://github.com/14islands/r3f-scroll-rig | The **best-fitting architecture for Next.js + i18n + SEO**: the HTML is the source of truth and WebGL enhances it.                                                   |
+| **Magnetic commerce (Dash Creative)**: a video-texture hero distortion that keeps going in the drag direction (radius 0.41, amplitude 0.082, momentum decay 0.86)                  | https://tympanus.net/codrops/2026/07/21/magnetic-commerce-building-the-dash-creative-website/                                       | A tactile hero behind the headline: the cursor "pulls" a molten-filament video texture.                                                                              |
+| **Exploring the HTML-in-Canvas proposal** (`layoutsubtree`, `drawElementImage()`, Chrome flag only)                                                                                | https://html-in-canvas.vercel.app/ — https://github.com/motiontx/html-in-canvas                                                     | Watch list only. Not production-ready in 2026 and behind a flag.                                                                                                     |
 
 ---
 
@@ -288,10 +315,11 @@ Grouped by the Swiss3Design use case. All use Three.js/GSAP unless noted.
    - At 100% the slicer-preview colours cross-fade into the real PBR material.
 
    Budget: a single glTF (Draco) + KTX2, lazy-loaded via the existing `next/dynamic({ ssr:false })` pattern.
+
 2. **Loader = toolpath.** Like Oryzo's CAD sketch, the brand peak (our layered logo) is drawn as a **G-code toolpath** (perimeter lines, then infill hatching) on a warm-paper print bed, then solidifies into the red raster mark.
 3. **Couches = courbes de niveau (layers = contour lines).** Our logo is a layered alpine peak, and every print is literally a topography. Use a Swiss-topo **isoline shader** (contours from world-Y) on products and backgrounds, tying "stacked print layers" to the Alps. It gives the brand a unique visual signature.
 4. **Filament-colour ripple configurator.** When a filament colour is chosen on the PDP, the new colour **propagates up the layer lines from the bed like a wave** (iyO's ripple, but along Y). Multicolour products expose each colour region as its own swatch with an exploded view on scroll (iyO).
-5. **Real fabrication data as motion.** Each PDP shows *truthful* counters that animate on reveal: "14 h 32 min d'impression", "412 couches", "38 m de filament", "4 couleurs", "0,2 mm". Parse them from the slicer/G-code metadata we already have for the products. It is honest, unique and fits Swiss precision.
+5. **Real fabrication data as motion.** Each PDP shows _truthful_ counters that animate on reveal: "14 h 32 min d'impression", "412 couches", "38 m de filament", "4 couleurs", "0,2 mm". Parse them from the slicer/G-code metadata we already have for the products. It is honest, unique and fits Swiss precision.
 6. **X-ray infill lens.** A cursor or finger fluid mask (dual-scene reveal) wipes the shell away to show the **gyroid infill** and inner toolpaths. It explains why a print is strong and light.
 7. **"L'atelier" process chapter.** A Blender-authored camera path flies through our real atelier, captured as **Gaussian splats** (Postshot, or Polycam/Luma for capture) or as a scrubbed timelapse (KAI's ffmpeg recipe). Six stops: design → slicing → printing → post-processing → quality check → packaging, then La Poste to your door in Switzerland.
 8. **Unravel-to-filament transitions.** Page transitions between products use the "Unwoven" ribbon shader: the current product's image **unspools into filament threads** that re-weave into the next product (View Transitions + persistent canvas).
@@ -326,6 +354,7 @@ Grouped by the Swiss3Design use case. All use Three.js/GSAP unless noted.
 ## 6. Sources
 
 Awards and galleries
+
 - Awwwards annual winners 2025: https://www.awwwards.com/annual-awards/winners
 - Awwwards Sites of the Year: https://www.awwwards.com/websites/sites_of_the_year/
 - Awwwards e-commerce winners: https://www.awwwards.com/websites/winner_category_ecommerce/
@@ -360,6 +389,7 @@ Awards and galleries
   - https://metabole.studio/en/blog/immersive-website-examples
 
 Studio case studies
+
 - Lusion Oryzo BTS:
   - https://blog.lusion.co/oryzo-bts-part-1-7-concept-and-creative-direction
   - https://blog.lusion.co/oryzo-bts-part-2-7-3d-design-and-motion-graphics
@@ -374,14 +404,17 @@ Studio case studies
 - Cartier W&W (webgpu.com): https://www.webgpu.com/showcase/cartier-watches-and-wonders-immersive-garden/
 
 Codrops
+
 - WebGL tag, pages 1-2: https://tympanus.net/codrops/tag/webgl/
 - 2025 year in review: https://tympanus.net/codrops/2025/12/29/2025-a-very-special-year-in-review/
 - The tutorial URLs are in the section 2 tables.
 
 AI video pipeline
+
 - https://www.mindstudio.ai/blog/animated-3d-websites-claude-code-ai-video-generation
 - https://higgsfield.ai/
 - https://www.builder.io/blog/3d-gsap
 
 Live-site inspection (in my own browser tab; I clicked nothing and accepted no cookies)
+
 - oryzo.ai, telepathicinstruments.com, op.al (formerly opalcamera.com), nagami.design, gantri.com, zellerfeld.com

@@ -34,20 +34,20 @@ réaliste de la Forge.
 
 Ratios WCAG calculés (formule de luminance relative).
 
-| Token | Clair | Sombre | Usage et contraste |
-|---|---|---|---|
-| `paper` | `#F4F0E8` (papier carte) | `#0E0D0B` | fond |
-| `surface` | `#FBF9F4` | `#1A1815` | cartes, panneaux |
-| `elevated` | `#FFFFFF` | `#211E1A` | menus, sheets |
-| `ink` | `#1A1614` | `#F2EDE4` | texte : 15,81 et 16,66:1 |
-| `soft` | `#6A635A` | `#A39B8F` | texte secondaire : 5,21 et 7,07:1 |
-| `line` | `#D8D1C4` | `#2E2A25` | hairlines de grille (décor, 1,34:1) |
-| `accent` | `#E5231C` | `#E5231C` | **graphique seulement** : 4,03:1 sur papier, 4,24:1 sur nuit. Fond de bouton : blanc dessus 4,58:1 (AA) |
-| **`accent-ink`** (nouveau) | `#B3170F` | `#FF5B4E` | **texte rouge** : 6,07:1 sur papier, 6,34:1 sur nuit |
-| **`iso`** (nouveau) | `#C9C1B2` | `#3A352F` | courbes de niveau normales (décor) |
-| **`iso-index`** (nouveau) | `#9C7650` (sépia carte) | `#8A6C4E` | courbe maîtresse toutes les 5 couches : 3,61 et 4,01:1 (≥ 3:1 non-texte) |
-| **`glacier`** (nouveau) | `#3E7CB1` | `#3E7CB1` | 2ᵉ teinte cartographique (eau, glacier), 3,91:1 |
-| `swatch-ring` | `#767676` | idem | bordures de champs et pastilles : 4,0:1 |
+| Token                      | Clair                    | Sombre    | Usage et contraste                                                                                      |
+| -------------------------- | ------------------------ | --------- | ------------------------------------------------------------------------------------------------------- |
+| `paper`                    | `#F4F0E8` (papier carte) | `#0E0D0B` | fond                                                                                                    |
+| `surface`                  | `#FBF9F4`                | `#1A1815` | cartes, panneaux                                                                                        |
+| `elevated`                 | `#FFFFFF`                | `#211E1A` | menus, sheets                                                                                           |
+| `ink`                      | `#1A1614`                | `#F2EDE4` | texte : 15,81 et 16,66:1                                                                                |
+| `soft`                     | `#6A635A`                | `#A39B8F` | texte secondaire : 5,21 et 7,07:1                                                                       |
+| `line`                     | `#D8D1C4`                | `#2E2A25` | hairlines de grille (décor, 1,34:1)                                                                     |
+| `accent`                   | `#E5231C`                | `#E5231C` | **graphique seulement** : 4,03:1 sur papier, 4,24:1 sur nuit. Fond de bouton : blanc dessus 4,58:1 (AA) |
+| **`accent-ink`** (nouveau) | `#B3170F`                | `#FF5B4E` | **texte rouge** : 6,07:1 sur papier, 6,34:1 sur nuit                                                    |
+| **`iso`** (nouveau)        | `#C9C1B2`                | `#3A352F` | courbes de niveau normales (décor)                                                                      |
+| **`iso-index`** (nouveau)  | `#9C7650` (sépia carte)  | `#8A6C4E` | courbe maîtresse toutes les 5 couches : 3,61 et 4,01:1 (≥ 3:1 non-texte)                                |
+| **`glacier`** (nouveau)    | `#3E7CB1`                | `#3E7CB1` | 2ᵉ teinte cartographique (eau, glacier), 3,91:1                                                         |
+| `swatch-ring`              | `#767676`                | idem      | bordures de champs et pastilles : 4,0:1                                                                 |
 
 `text-accent` (107 usages) migre vers `accent-ink`. **Le sombre ne flashe jamais en blanc** : un
 chapitre « inverse » vaut `ink` en clair, `elevated` + filet rouge en sombre. WebGL suit
@@ -98,13 +98,13 @@ mouvements avancent par paliers de couche. (3) **Unités vraies** : tout scrub s
 couches. (4) **Le trait avant la matière**. (5) **Le rouge, c'est la chaleur** (buse, état courant,
 curseur), jamais un décor.
 
-| CustomEase | Courbe | Usage, durée |
-|---|---|---|
-| `s3d.strate` | `M0,0 C0.16,0.84 0.3,1 1,1` | révélations de lignes, 0,7 à 0,9 s |
-| `s3d.buse` | `M0,0 C0.45,0 0.55,1 1,1` | déplacements de caméra et de tête, 1,2 à 1,6 s |
-| `s3d.pas` | ease maison `x ⇒ mix(x, round(x·n)/n, 0.85)` | compteurs, scrubs quantifiés |
-| `s3d.purge` | `M0,0 C0.3,1.35 0.6,1 1,1` | pastilles et changement de filament, 320 ms |
-| `s3d.carte` | `M0,0 C0.7,0 0.2,1 1,1` | bascule élévation ↔ plan, 1,4 s |
+| CustomEase   | Courbe                                       | Usage, durée                                   |
+| ------------ | -------------------------------------------- | ---------------------------------------------- |
+| `s3d.strate` | `M0,0 C0.16,0.84 0.3,1 1,1`                  | révélations de lignes, 0,7 à 0,9 s             |
+| `s3d.buse`   | `M0,0 C0.45,0 0.55,1 1,1`                    | déplacements de caméra et de tête, 1,2 à 1,6 s |
+| `s3d.pas`    | ease maison `x ⇒ mix(x, round(x·n)/n, 0.85)` | compteurs, scrubs quantifiés                   |
+| `s3d.purge`  | `M0,0 C0.3,1.35 0.6,1 1,1`                   | pastilles et changement de filament, 320 ms    |
+| `s3d.carte`  | `M0,0 C0.7,0 0.2,1 1,1`                      | bascule élévation ↔ plan, 1,4 s                |
 
 Durées : micro 120 à 180 ms, UI 240 à 320 ms, révélations 700 à 900 ms, chapitres 1,2 à 1,6 s.
 Décalages : 40 ms par ligne (« une couche »), 12 ms par caractère, grilles `from: "end"` (de bas en
@@ -144,13 +144,13 @@ commence par une couche. » (**élément LCP**, visible sans JS), sous-titre, 2 
 en élévation** : les isolignes du même vase, générées par le même code au build
 (`public/hero/lavaux-iso.svg`, ~15 Ko, ratio réservé, donc CLS 0). Aucun overlay, aucun préloader.
 
-| Beat | Desktop | Mobile 375 px | Reduced motion |
-|---|---|---|---|
-| B0, idle après hydratation | Chargement du Stage (`next/dynamic`, `requestIdleCallback`). Canvas en fondu, **calé au pixel sur le poster SVG** (même projection) : le dessin devient matière. | Tier bas : DPR 1,5, 96 segments, sans post-traitement. | Stage non chargé, le poster reste. |
-| B1, intro 2,4 s (une fois par session) | Plateau en filets, buse (point rouge), impression de 0 à 18 %. Compteur mono « Couche 0144 / 0800 · z 28,8 mm ». | Impression complète autojouée en 3,2 s, puis arrêt. Bouton « Rejouer ». | — |
-| B2, pin de 250 vh, scrub | 18 → 100 %. À chaque frontière de bande : flash rouge de 320 ms et étiquette « Changement de filament → Glacier · couche 312 ». Au-dessus de la coupe, isolignes fantômes : la carte avant le terrain. | Pas de pin (pas de conflit avec la barre iOS). Le compteur se termine au scroll via IntersectionObserver. | Valeurs finales affichées. |
-| B3, bascule `s3d.carte` | Caméra en vue de dessus orthographique : les couches deviennent des cercles concentriques, qui s'étendent en **champ de courbes plein écran** (chapitre 02). | Fondu vers le champ statique. | SVG statique. |
-| B4, CTA | « Composer le mien → » (rouge) · « Boutique » · « J'ai un fichier ». | Idem, empilés. | Idem. |
+| Beat                                   | Desktop                                                                                                                                                                                                | Mobile 375 px                                                                                             | Reduced motion                     |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- | ---------------------------------- |
+| B0, idle après hydratation             | Chargement du Stage (`next/dynamic`, `requestIdleCallback`). Canvas en fondu, **calé au pixel sur le poster SVG** (même projection) : le dessin devient matière.                                       | Tier bas : DPR 1,5, 96 segments, sans post-traitement.                                                    | Stage non chargé, le poster reste. |
+| B1, intro 2,4 s (une fois par session) | Plateau en filets, buse (point rouge), impression de 0 à 18 %. Compteur mono « Couche 0144 / 0800 · z 28,8 mm ».                                                                                       | Impression complète autojouée en 3,2 s, puis arrêt. Bouton « Rejouer ».                                   | —                                  |
+| B2, pin de 250 vh, scrub               | 18 → 100 %. À chaque frontière de bande : flash rouge de 320 ms et étiquette « Changement de filament → Glacier · couche 312 ». Au-dessus de la coupe, isolignes fantômes : la carte avant le terrain. | Pas de pin (pas de conflit avec la barre iOS). Le compteur se termine au scroll via IntersectionObserver. | Valeurs finales affichées.         |
+| B3, bascule `s3d.carte`                | Caméra en vue de dessus orthographique : les couches deviennent des cercles concentriques, qui s'étendent en **champ de courbes plein écran** (chapitre 02).                                           | Fondu vers le champ statique.                                                                             | SVG statique.                      |
+| B4, CTA                                | « Composer le mien → » (rouge) · « Boutique » · « J'ai un fichier ».                                                                                                                                   | Idem, empilés.                                                                                            | Idem.                              |
 
 **Technique.** `MeshPhysicalMaterial` + `onBeforeCompile` : `discard` si `z > uCutZ` ; bande
 émissive rouge de 0,3 mm à la coupe ; normale perturbée `sin(2π·z/uLayerH)` ; lignes maîtresses toutes
@@ -186,13 +186,13 @@ contexte WebGL**. LCP ≤ 2,0 s (texte). INP ≤ 150 ms. Boucle en pause hors é
 
 ### 5.2 Catalogue d'objets (originaux Swiss3Design)
 
-| Objet | Paramètres (plage · défaut) | Géométrie |
-|---|---|---|
-| **Vase « Lavaux »** (P2) | hauteur 80–240 · 160 mm ; Ø max 50–140 · 90 ; profil cylindre / bouteille / amphore / cône / galet ; col 30–100 % · 55 ; paroi 1,2–2,0 · 1,2 mm ; motif lisse / côtes (8–96 · 40, profondeur 0,5–4 mm) / torsion (0–360° · 120) / vagues (amplitude 0–4, fréquence 1–12) / voronoï (12–120 cellules, relief 0,5–3) / gradins façon terrasses de Lavaux (pas 1–10 mm) / facettes (3–12) ; 1–4 bandes | Grille paramétrique `r(θ,z) = profil(z) + motif(θ,z)` en `BufferGeometry`, bruit cellulaire périodique en θ (sans couture), fond fermé. Pente de profil bornée à 45° (imprimable sans support). Multicolore imprimé en mode standard (3 périmètres). Spirale seulement en monochrome, à valider par l'atelier. |
-| **Carte de visite « Cartouche »** (P2) | 85×55 mm ; épaisseur 1,0–2,4 · 1,6 ; coins 0–6 · 3 ; nom ≤ 28 caractères, fonction ≤ 36, 2 lignes de contact ≤ 40 ; relief 0,4–1,2 · 0,6 ; mises en page Classique (grille suisse), Centrée, Cartouche (cadre et filet), Topo (courbes gravées en fond), QR (29 modules, 30 mm) ; 2–3 couleurs (plaque / relief / cadre) | `ExtrudeGeometry` (plaque arrondie) + `TextGeometry` avec police typeface JSON auto-hébergée (Archivo SemiExpanded Bold et Geist Mono, sous-ensemble latin étendu, ~70 Ko gzip chacune, chargées seulement dans le Studio). QR via le codeur de `qrcode.react` (déjà installé), modules extrudés. Garde-fous : hauteur de capitale ≥ 3 mm, trait ≥ 0,8 mm, sinon avertissement. |
-| **Sous-verre « Relief »** (P4) | Ø 80–110 · 95 mm (ou carré) ; épaisseur 4–9 · 6 ; massif (seed) ; relief 0,8–3 mm ; strates 4–15 · 10 ; niveau du lac 0–40 % ; teintes lac / prairie / roche / neige ; gravure « Pointe [Nom] 2 431 m » (altitude fictive calculée) | FBM → marching squares (`d3-contour`, ISC, ~10 Ko) → un `Shape` extrudé par strate. **C'est littéralement une carte en courbes empilées.** |
-| **Porte-nom « Borne »** (P4) | forme pilule / rectangle / pic générique / goutte ; longueur 40–80 · 60 ; épaisseur 3–5 · 4 ; texte 1–14 caractères ; anneau Ø 4–6 · 5 ; relief ou gravure ; 2–3 bandes | `ExtrudeGeometry` + texte + perçage (`Shape.holes`). **Pas de croix suisse ni d'armoiries** (loi sur la protection des armoiries). |
-| **Plaque de bureau « Signal »** (P5) | prisme 120–220 × 30–50 mm, texte recto ou recto-verso, 2 couleurs | Prisme extrudé + texte. Clin d'œil aux panneaux de randonnée, sans copier leur norme. |
+| Objet                                  | Paramètres (plage · défaut)                                                                                                                                                                                                                                                                                                                                                                         | Géométrie                                                                                                                                                                                                                                                                                                                                                                       |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Vase « Lavaux »** (P2)               | hauteur 80–240 · 160 mm ; Ø max 50–140 · 90 ; profil cylindre / bouteille / amphore / cône / galet ; col 30–100 % · 55 ; paroi 1,2–2,0 · 1,2 mm ; motif lisse / côtes (8–96 · 40, profondeur 0,5–4 mm) / torsion (0–360° · 120) / vagues (amplitude 0–4, fréquence 1–12) / voronoï (12–120 cellules, relief 0,5–3) / gradins façon terrasses de Lavaux (pas 1–10 mm) / facettes (3–12) ; 1–4 bandes | Grille paramétrique `r(θ,z) = profil(z) + motif(θ,z)` en `BufferGeometry`, bruit cellulaire périodique en θ (sans couture), fond fermé. Pente de profil bornée à 45° (imprimable sans support). Multicolore imprimé en mode standard (3 périmètres). Spirale seulement en monochrome, à valider par l'atelier.                                                                  |
+| **Carte de visite « Cartouche »** (P2) | 85×55 mm ; épaisseur 1,0–2,4 · 1,6 ; coins 0–6 · 3 ; nom ≤ 28 caractères, fonction ≤ 36, 2 lignes de contact ≤ 40 ; relief 0,4–1,2 · 0,6 ; mises en page Classique (grille suisse), Centrée, Cartouche (cadre et filet), Topo (courbes gravées en fond), QR (29 modules, 30 mm) ; 2–3 couleurs (plaque / relief / cadre)                                                                            | `ExtrudeGeometry` (plaque arrondie) + `TextGeometry` avec police typeface JSON auto-hébergée (Archivo SemiExpanded Bold et Geist Mono, sous-ensemble latin étendu, ~70 Ko gzip chacune, chargées seulement dans le Studio). QR via le codeur de `qrcode.react` (déjà installé), modules extrudés. Garde-fous : hauteur de capitale ≥ 3 mm, trait ≥ 0,8 mm, sinon avertissement. |
+| **Sous-verre « Relief »** (P4)         | Ø 80–110 · 95 mm (ou carré) ; épaisseur 4–9 · 6 ; massif (seed) ; relief 0,8–3 mm ; strates 4–15 · 10 ; niveau du lac 0–40 % ; teintes lac / prairie / roche / neige ; gravure « Pointe [Nom] 2 431 m » (altitude fictive calculée)                                                                                                                                                                 | FBM → marching squares (`d3-contour`, ISC, ~10 Ko) → un `Shape` extrudé par strate. **C'est littéralement une carte en courbes empilées.**                                                                                                                                                                                                                                      |
+| **Porte-nom « Borne »** (P4)           | forme pilule / rectangle / pic générique / goutte ; longueur 40–80 · 60 ; épaisseur 3–5 · 4 ; texte 1–14 caractères ; anneau Ø 4–6 · 5 ; relief ou gravure ; 2–3 bandes                                                                                                                                                                                                                             | `ExtrudeGeometry` + texte + perçage (`Shape.holes`). **Pas de croix suisse ni d'armoiries** (loi sur la protection des armoiries).                                                                                                                                                                                                                                              |
+| **Plaque de bureau « Signal »** (P5)   | prisme 120–220 × 30–50 mm, texte recto ou recto-verso, 2 couleurs                                                                                                                                                                                                                                                                                                                                   | Prisme extrudé + texte. Clin d'œil aux panneaux de randonnée, sans copier leur norme.                                                                                                                                                                                                                                                                                           |
 
 Le **« Vase spirale » d'Ian n'entre jamais dans le Studio**, qui ne contient que nos objets.
 
@@ -320,28 +320,28 @@ vectoriel du mark, police suisse premium.
 OG 1200×630 (accueil, studio, chaque objet, vase spirale non modifié) ; turntable de 72 images du vase
 spirale blanc et noir (tier bas) ; macro de lignes de couche.
 
-**Un seul prompt ChatGPT** (ambiance du chapitre Atelier, étiqueté « Illustration ») : *« Vue
+**Un seul prompt ChatGPT** (ambiance du chapitre Atelier, étiqueté « Illustration ») : _« Vue
 aérienne à l'aube des terrasses viticoles de Lavaux au-dessus du lac Léman, brume basse, lumière
 rasante du nord-ouest, rendue comme une gravure cartographique monochrome sépia sur papier crème,
 courbes de niveau fines visibles, aucune personne, aucun bâtiment reconnaissable, aucun texte,
-format 3:2 »*. Les cartes imaginaires (404, auth) sont générées en code.
+format 3:2 »_. Les cartes imaginaires (404, auth) sont générées en code.
 
 ---
 
 ## 10. Risques et plan de livraison
 
-| Risque | Mitigation |
-|---|---|
-| three ou GSAP qui fuient dans le Worker | `src/motion/**` + garde oxlint + `wrangler deploy --dry-run` à chaque phase |
-| LCP retardé par la motion | h1 et poster SSR, aucun SplitText sur l'élément LCP |
-| Configurations non imprimables | Bornes de pente, épaisseurs minimales, test manifold, validation par l'atelier |
-| Estimation perçue comme un prix | Fourchette, libellé « estimation », prix ferme par devis |
-| Licence CC BY-ND | Vase d'Ian exclu du Studio, attribution visible, aucune coupe ni remix |
-| Armoiries et Swissness | Aucune croix, aucun « Swiss made » |
-| iOS, pins, perte de contexte | Pas de pin mobile, `ignoreMobileResize`, repli poster sur `webglcontextlost` |
-| Taille des replays PostHog et INP | Masquer ou échantillonner le replay sur `/studio`, auditer les actions à sélecteurs |
-| Longueurs en allemand | Tests de mise en page DE, `autoSplit` |
-| Dérive de la branche | Noms de tokens conservés, livraison par route |
+| Risque                                  | Mitigation                                                                          |
+| --------------------------------------- | ----------------------------------------------------------------------------------- |
+| three ou GSAP qui fuient dans le Worker | `src/motion/**` + garde oxlint + `wrangler deploy --dry-run` à chaque phase         |
+| LCP retardé par la motion               | h1 et poster SSR, aucun SplitText sur l'élément LCP                                 |
+| Configurations non imprimables          | Bornes de pente, épaisseurs minimales, test manifold, validation par l'atelier      |
+| Estimation perçue comme un prix         | Fourchette, libellé « estimation », prix ferme par devis                            |
+| Licence CC BY-ND                        | Vase d'Ian exclu du Studio, attribution visible, aucune coupe ni remix              |
+| Armoiries et Swissness                  | Aucune croix, aucun « Swiss made »                                                  |
+| iOS, pins, perte de contexte            | Pas de pin mobile, `ignoreMobileResize`, repli poster sur `webglcontextlost`        |
+| Taille des replays PostHog et INP       | Masquer ou échantillonner le replay sur `/studio`, auditer les actions à sélecteurs |
+| Longueurs en allemand                   | Tests de mise en page DE, `autoSplit`                                               |
+| Dérive de la branche                    | Noms de tokens conservés, livraison par route                                       |
 
 **Phases** (chacune validée sur une preview dédiée) : **P0** tokens, polices, `src/motion`, garde de
 lint, exclusions par route · **P1** héros, champ de courbes, « Coupe », header et footer · **P2**

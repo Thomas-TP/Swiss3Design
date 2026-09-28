@@ -21,12 +21,12 @@
    l'intérieur des modules 3D : `import type * as THREE` + `await import("three")`
    dans les effets.
 3. **CSP nonce en prod** (`src/middleware.ts`) : `script-src 'self' 'nonce-…'`
-   + js.stripe.com + static.cloudflareinsights.com + *.posthog.com. **Aucun
-   script CDN** (GSAP/Lenis/etc. doivent être installés via `bun add` et
-   bundlés). Tout `<script>` inline serveur doit porter
-   `(await headers()).get("x-nonce")`. Pas de `'unsafe-eval'` ni
-   `'wasm-unsafe-eval'` en prod (voir § 14). `bun run dev` NE révèle PAS ces
-   blocages → vérifier avec `bun run preview`.
+   - js.stripe.com + static.cloudflareinsights.com + *.posthog.com. **Aucun
+     script CDN** (GSAP/Lenis/etc. doivent être installés via `bun add` et
+     bundlés). Tout `<script>` inline serveur doit porter
+     `(await headers()).get("x-nonce")`. Pas de `'unsafe-eval'` ni
+     `'wasm-unsafe-eval'` en prod (voir § 14). `bun run dev` NE révèle PAS ces
+     blocages → vérifier avec `bun run preview`.
 4. **Jamais `redirect()` dans une Server Action** (gèle l'UI sur Workers) :
    renvoyer `{ status }`/`{ error }` et naviguer côté client (`router.push`).
    Les `redirect()` de `@/i18n/navigation` dans des Server Components/layouts
@@ -55,7 +55,7 @@
     touche aussi l'admin, le checkout et le compte → prévoir un groupe de
     routes `(site)` ou des exclusions par pathname.
 12. **Les jetons de thème sont un contrat** : `paper surface elevated ink soft
-    line accent accent-dark night night-soft night-line swatch-ring` +
+line accent accent-dark night night-soft night-line swatch-ring` +
     `rounded-card`. Utilisés par **116 fichiers** dont **27 fichiers admin** sur
     48 (`rounded-card` : 110 occurrences). Renommer = casser l'admin (hors
     scope) → garder les noms (on peut changer leurs valeurs) ou migrer l'admin.
@@ -129,6 +129,7 @@ Ordre exact (à reproduire ou reconstruire en connaissance de cause) :
 - `globals.css` importé ici (`import "../globals.css"`).
 
 Autres layouts :
+
 - `checkout/layout.tsx` : metadata `title` + `NOINDEX`, passe-plat.
 - `account/layout.tsx` : `metadata = { robots: NOINDEX }`.
 - `account/(dashboard)/layout.tsx` : garde de session (`redirect` →
@@ -209,17 +210,17 @@ body { background paper + halo radial rouge 5 % en haut ; font-sans ; antialiase
 
 ## 6. Motion existant (à remplacer / réutiliser)
 
-| Fichier | Rôle | Technique |
-| --- | --- | --- |
-| `src/components/reveal.tsx` | Fade + translateY(18px) d'entrée (`animate` au montage ou `whileInView` once, margin -60px), easing `[0.21,0.65,0.36,1]`, 0.55 s, `delay` prop | motion/react, `useReducedMotion` |
-| `src/components/hero-scene.tsx` (230 l.) | Hero « imprimante qui dépose un vase couche par couche » en boucle 5,6 s : clip-path + portique dérivés d'une seule motion value `reveal`, balayage X de la tête, flottement, filament pulsé | 100 % DOM/CSS + motion, `aria-hidden`, reduced-motion → état figé |
-| `src/components/header.tsx` | Pastille active de la nav desktop qui glisse (`layoutId="nav-pill"`, spring 400/34) | motion `layoutId` |
-| `src/components/product-viewer-3d.tsx` (191 l.) | `ModelViewer` (OrbitControls, damping, pan, clavier, pause si hors écran/onglet caché, recolor live via contexte couleur) + `ModelThumbnail3D` (rendu hors-écran 384² → dataURL PNG, `forceContextLoss`) | three dynamique, `import type` only |
-| `src/components/showroom-scene.ts` (341 l.) | Scène partagée : pièce fermée (murs texture canvas procédurale, parquet canvas), tapis rouge, socle + plinthe, `RoomEnvironment` PMREM, spot ombré 2048², rim/fill/2 point lights, ACES, cadrage ¾ ; STL ou GLB (matériau teinté unique) | 100 % procédural, aucun asset externe |
-| `src/components/product-gallery.tsx` | Galerie : grande image + vignettes, le 3D est le **dernier slot** ; `ModelViewer`/`ModelThumbnail3D` en `next/dynamic({ ssr:false })` | pattern de référence anti-bundle |
-| `a-propos/printer-showcase.tsx` + `printer-schematic.tsx` (794 l. de SVG) | Schéma annoté interactif (survol ↔ légende, boutons focusables, épinglage) | SVG + CSS transitions |
-| `a-propos/about-nav.tsx` | Sommaire sticky `top-16` avec section active (scroll listener déterministe, `scrollIntoView({behavior:"smooth"})`, `history.replaceState`) | JS natif |
-| Divers | `hover:-translate-y-1` + zoom image sur cartes, `active:scale-[0.98]` sur boutons, barre de progression livraison offerte (`transition-[width]`), spinner paiement | Tailwind |
+| Fichier                                                                   | Rôle                                                                                                                                                                                                                                     | Technique                                                         |
+| ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| `src/components/reveal.tsx`                                               | Fade + translateY(18px) d'entrée (`animate` au montage ou `whileInView` once, margin -60px), easing `[0.21,0.65,0.36,1]`, 0.55 s, `delay` prop                                                                                           | motion/react, `useReducedMotion`                                  |
+| `src/components/hero-scene.tsx` (230 l.)                                  | Hero « imprimante qui dépose un vase couche par couche » en boucle 5,6 s : clip-path + portique dérivés d'une seule motion value `reveal`, balayage X de la tête, flottement, filament pulsé                                             | 100 % DOM/CSS + motion, `aria-hidden`, reduced-motion → état figé |
+| `src/components/header.tsx`                                               | Pastille active de la nav desktop qui glisse (`layoutId="nav-pill"`, spring 400/34)                                                                                                                                                      | motion `layoutId`                                                 |
+| `src/components/product-viewer-3d.tsx` (191 l.)                           | `ModelViewer` (OrbitControls, damping, pan, clavier, pause si hors écran/onglet caché, recolor live via contexte couleur) + `ModelThumbnail3D` (rendu hors-écran 384² → dataURL PNG, `forceContextLoss`)                                 | three dynamique, `import type` only                               |
+| `src/components/showroom-scene.ts` (341 l.)                               | Scène partagée : pièce fermée (murs texture canvas procédurale, parquet canvas), tapis rouge, socle + plinthe, `RoomEnvironment` PMREM, spot ombré 2048², rim/fill/2 point lights, ACES, cadrage ¾ ; STL ou GLB (matériau teinté unique) | 100 % procédural, aucun asset externe                             |
+| `src/components/product-gallery.tsx`                                      | Galerie : grande image + vignettes, le 3D est le **dernier slot** ; `ModelViewer`/`ModelThumbnail3D` en `next/dynamic({ ssr:false })`                                                                                                    | pattern de référence anti-bundle                                  |
+| `a-propos/printer-showcase.tsx` + `printer-schematic.tsx` (794 l. de SVG) | Schéma annoté interactif (survol ↔ légende, boutons focusables, épinglage)                                                                                                                                                               | SVG + CSS transitions                                             |
+| `a-propos/about-nav.tsx`                                                  | Sommaire sticky `top-16` avec section active (scroll listener déterministe, `scrollIntoView({behavior:"smooth"})`, `history.replaceState`)                                                                                               | JS natif                                                          |
+| Divers                                                                    | `hover:-translate-y-1` + zoom image sur cartes, `active:scale-[0.98]` sur boutons, barre de progression livraison offerte (`transition-[width]`), spinner paiement                                                                       | Tailwind                                                          |
 
 Aucune animation liée au scroll (scrub/pin), aucun smooth scroll, aucune
 transition de page, aucun shader aujourd'hui.
@@ -242,10 +243,10 @@ transition de page, aucun shader aujourd'hui.
    contextes WebGL par page : **un renderer partagé** est préférable à un
    renderer par vignette/carte).
 6. DPR plafonné à 2 (`Math.min(devicePixelRatio, 2)`).
-Même logique pour GSAP/ScrollTrigger/SplitText/Lenis : pas besoin de SSR →
-`await import("gsap")` dans un effet, ou module client chargé via
-`dynamic({ ssr:false })`, pour ne pas alourdir le Worker (gsap+ScrollTrigger
-≈ 45 KiB gzip, Lenis ≈ 5 KiB).
+   Même logique pour GSAP/ScrollTrigger/SplitText/Lenis : pas besoin de SSR →
+   `await import("gsap")` dans un effet, ou module client chargé via
+   `dynamic({ ssr:false })`, pour ne pas alourdir le Worker (gsap+ScrollTrigger
+   ≈ 45 KiB gzip, Lenis ≈ 5 KiB).
 
 ## 8. Patterns mobile & couches
 
@@ -262,7 +263,7 @@ Même logique pour GSAP/ScrollTrigger/SplitText/Lenis : pas besoin de SSR →
   wordmark caché `< 360px`. « À propos » n'est pas dans la BottomNav → bouton
   dédié `md:hidden` dans le hero de l'accueil.
 - **ConsentBanner** : `fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))]
-  z-40` (au-dessus de la BottomNav), `lg:bottom-6 lg:left-6`, masquée sur
+z-40` (au-dessus de la BottomNav), `lg:bottom-6 lg:left-6`, masquée sur
   `/checkout*` et `/admin*`.
 - Offsets dépendants de la hauteur du header (64 px) : `AboutNav` `top-16` +
   `DETECTION_LINE = 150`, sections `scroll-mt-32`, colonnes sticky `top-24`
@@ -320,6 +321,7 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
 **utility** (restyle léger, logique intouchable), **skip**.
 
 ### `/[locale]` — Accueil (`page.tsx`, 241 l.) — core
+
 - Données : `getProducts(locale, { featuredOnly: true })` (produits
   `featured` triés `featuredOrder`), `getShippingSettings()` (seuil port
   offert → `formatChf` dans les textes), traductions `home`, `nav`.
@@ -334,6 +336,7 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   `Product Added` source `catalog`).
 
 ### `/[locale]/shop` — Catalogue (`shop/page.tsx`, 303 l.) — core
+
 - `searchParams` : `category`, `material`, `color`, `multicolor=1`, `sort`
   (`new|price_asc|price_desc`), `q`. `getUsedFilters(locale)` (catégories,
   matières, couleurs réellement utilisées) + `getProducts(locale, {...})`.
@@ -342,13 +345,14 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   couleur : `<span class="sr-only">{nom}</span>` (a11y + SEO).
 - JSON-LD `collectionJsonLd` **seulement** si catalogue non filtré.
 - Events : `Products Searched {query, results}`, `Product List Filtered
-  {category, material, color, multicolor, sort, results}` (via `TrackEvent`).
+{category, material, color, multicolor, sort, results}` (via `TrackEvent`).
 - Canonical toujours `/shop` ; facettes `sort/material/color/q` en `Disallow`
   dans `robots.txt` → ne pas inventer de nouveau paramètre sans l'ajouter
   (robots + `KEPT_PARAMS` analytics).
 - Grille : 1 col < 480 px, 2 cols, 3 cols `lg`.
 
 ### `/[locale]/products/[slug]` — Fiche produit (360 l.) — core
+
 - `cache(getProductBySlug)` partagé metadata/page ; puis en parallèle
   `getRelatedProducts`, `getPublishedReviews`, `getRatingSummary`,
   `getShippingSettings`, traductions `product/reviews/home/seo/shop`.
@@ -375,6 +379,7 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
 - Opportunité : morph `ViewTransition` carte → galerie (même `name` par slug).
 
 ### `/[locale]/custom` — Sur mesure / devis (`custom/`) — core
+
 - Serveur : `getMaterials()` ; JSON-LD `customServiceJsonLd`.
 - `QuoteForm` (client) : `useActionState(submitQuoteRequest)` (Server Action
   `custom/actions.ts` : rate limit 5/10 min, zod, insert `quote_requests` +
@@ -384,11 +389,12 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   cachés `fileKey`/`fileName`. E-mail prérempli via `useSession()`.
 - Event `Quote Requested {material, has_file, signed_in}` au succès.
 - À préserver : champs `email, description (min 10), material, colors,
-  dimensions, locale`, états succès/erreur, labels `htmlFor`.
+dimensions, locale`, états succès/erreur, labels `htmlFor`.
 - Le doc `docs/refonte-plateforme-2026.md` (non implémenté) décrit une
   « Forge » (devis instantané, analyse de fichier, viewer 3D sur upload).
 
 ### `/[locale]/a-propos` — À propos (322 l. + contenu 1 307 l.) — core
+
 - Contenu `ABOUT_CONTENT[locale]` ; metadata depuis ce contenu.
 - JSON-LD `webPageJsonLd({type:"AboutPage"})` + **`faqJsonLd(c.faq)`** (la
   FAQ visible DOIT rester dans le HTML SSR).
@@ -400,6 +406,7 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
 - Photo : `public/about/p1s-ams2-pro.jpg`.
 
 ### `/[locale]/contact` — secondary
+
 - JSON-LD `webPageJsonLd({type:"ContactPage"})`, `pageMetadata`.
 - `ContactForm` (partagé avec À propos) : `useActionState(submitContactMessage)`
   (`a-propos/actions.ts` : rate limit, zod, **honeypot `company`** caché
@@ -407,6 +414,7 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   `mailto:contact@swiss3design.ch` + lien `/custom`.
 
 ### `/[locale]/cart` — Panier (NOINDEX) — utility
+
 - Serveur : `getShippingSettings()`. Monte `CartRecovery` (jeton
   `#restore=` dans le fragment → `POST /api/cart-reminder/restore`) et
   `CartLinkImport` (`?item=slug|qty||Couleur` générés par les agents →
@@ -418,6 +426,7 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
 - Events `Cart Viewed` (une fois, après hydratation), `Product Removed`.
 
 ### `/[locale]/checkout` — Tunnel (NOINDEX) — utility (logique intouchable)
+
 - Serveur : `getCloudflareContext()` → `env.STRIPE_PUBLISHABLE_KEY` (clé TEST
   en preview), session + adresse par défaut (`customer_addresses`).
 - `CheckoutFlow` (955 l.) : étape 1 = contact (e-mail de compte ou
@@ -431,8 +440,8 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   `checkout.confirm()` puis `router.push('/checkout/success?session_id=…')`.
   Stripe.js préchargé en idle (`@stripe/stripe-js/pure`).
 - Events : `Checkout Started`, `Coupon Applied/Denied`, `Checkout Step
-  Viewed {step:2,…}`, `Payment Info Entered`, `Payment Failed {error_code,
-  decline_code}`.
+Viewed {step:2,…}`, `Payment Info Entered`, `Payment Failed {error_code,
+decline_code}`.
 - **Légal** : mention `checkout.termsPrefix` + lien CGV `/legal/terms` sous
   le bouton payer, « Sécurisé par Stripe ». `ph-mask` sur l'e-mail affiché.
 - ⚠ `window.scrollTo({ top: 0, behavior: "smooth" })` au passage à l'étape 2
@@ -440,6 +449,7 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   ici. Recommandation : **pas de smooth scroll / effets lourds sur le tunnel**.
 
 ### `/[locale]/checkout/success` — Confirmation — utility
+
 - `stripe.checkout.sessions.retrieve` + `settleSession()` (finalisation
   idempotente, en double du webhook), statut `succeeded|processing|failed`.
 - `ClearCart`, `TrackEvent "Order Completed"` (`onceKey = order_id`,
@@ -448,16 +458,19 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   compte (`/account/register?email=`) et lien `/track?order=`.
 
 ### `/[locale]/track` — Suivi invité (NOINDEX) — utility
+
 - `TrackFlow` : n° + e-mail → `POST /api/track-order` ; résultat : statut
   (palette `statusStyle`), lien Poste suisse, lignes, totaux, adresse.
   `?order=` prérempli. Exclu des replays PostHog.
 
 ### `/[locale]/favorites` — Favoris (NOINDEX) — secondary
+
 - 100 % client (`localStorage s3d-favorites-v1`), « tout ajouter au panier ».
   Events `Product Added to Wishlist` / `Product Removed from Wishlist`
   (émis par `FavoritesProvider.toggle/remove`).
 
 ### `/[locale]/legal/{terms,privacy,shipping}` — utility (texte intouchable)
+
 - `pageMetadata` + `LegalPage` (h1, « Swiss3Design — Gland (VD), Suisse ·
   Dernière mise à jour : … » via `LEGAL_UPDATED`, avis « la version française
   fait foi » en de/it/en) + `Section` numérotées.
@@ -468,6 +481,7 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   hébergée ailleurs) ⇒ mise à jour de la politique dans les 4 langues.**
 
 ### Compte (NOINDEX) — utility
+
 - `/account/login` (`LoginForm` 455 l. : mot de passe, **passkey + WebAuthn
   conditional UI** `autoComplete="username webauthn"`, 2FA TOTP/backup,
   e-mail OTP, ne pas `router.push` quand better-auth répond `{redirect,url}`
@@ -487,11 +501,13 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   suppression de compte nLPD). Classes partagées dans `(dashboard)/_ui.ts`.
 
 ### Agents OAuth — utility
+
 - `/oauth/consent` (requête signée better-auth, `ScopeList`, `ConsentForm`
   POST `/oauth2/consent`, avertissement non vérifié) ;
   `/agent/claim` (code 6 chiffres, `confirmAgentClaim/denyAgentClaim`).
 
 ### Système
+
 - `not-found.tsx` (event `Page Not Found`), `error.tsx` (`trackException`,
   bouton `reset`), `[...rest]/page.tsx` → `notFound()` (404 dans le shell).
 - `/admin/*` : **skip** (hors scope) — mais hérite du shell et des jetons.
@@ -509,9 +525,9 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
 - Liste des événements à conserver (noms = spec e-commerce PostHog) :
   `Product Viewed`, `Products Searched`, `Product List Filtered`,
   `Product Added` (source `product_page|catalog|buy_now`), `Product Added to
-  Wishlist`, `Product Removed from Wishlist`, `Cart Viewed`, `Product Removed`,
+Wishlist`, `Product Removed from Wishlist`, `Cart Viewed`, `Product Removed`,
   `Checkout Started`, `Checkout Step Viewed`, `Coupon Applied`, `Coupon
-  Denied`, `Payment Info Entered`, `Payment Failed`, `Order Completed`
+Denied`, `Payment Info Entered`, `Payment Failed`, `Order Completed`
   (onceKey), `Attribution Survey Answered`, `Quote Requested`, `Signed Up`,
   `Page Not Found`, + `trackException` (error boundary).
 - `ph-mask` sur toute donnée perso affichée ; inputs masqués d'office.
@@ -548,23 +564,23 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
 
 ## 13. SEO
 
-| Route | Metadata | JSON-LD |
-| --- | --- | --- |
-| layout (toutes) | socle + icônes + OG défaut | `siteJsonLd` (OnlineStore + WebSite, référencés par `@id`) |
-| `/` | `pageMetadata(path:"", absoluteTitle)` | — |
-| `/shop` | `pageMetadata("/shop")` | `collectionJsonLd` (non filtré) |
-| `/products/[slug]` | `pageMetadata` + OG photos | `productJsonLd`, `breadcrumbJsonLd` |
-| `/custom` | `pageMetadata` | `customServiceJsonLd` |
-| `/a-propos` | `pageMetadata` (contenu) | `webPageJsonLd(AboutPage)`, `faqJsonLd` |
-| `/contact` | `pageMetadata` | `webPageJsonLd(ContactPage)` |
-| `/legal/*` | `pageMetadata` | — |
-| cart, checkout(+success), track, favorites, account/*, oauth, agent/claim, admin | `NOINDEX` / `index:false` | — |
+| Route                                                                            | Metadata                               | JSON-LD                                                    |
+| -------------------------------------------------------------------------------- | -------------------------------------- | ---------------------------------------------------------- |
+| layout (toutes)                                                                  | socle + icônes + OG défaut             | `siteJsonLd` (OnlineStore + WebSite, référencés par `@id`) |
+| `/`                                                                              | `pageMetadata(path:"", absoluteTitle)` | —                                                          |
+| `/shop`                                                                          | `pageMetadata("/shop")`                | `collectionJsonLd` (non filtré)                            |
+| `/products/[slug]`                                                               | `pageMetadata` + OG photos             | `productJsonLd`, `breadcrumbJsonLd`                        |
+| `/custom`                                                                        | `pageMetadata`                         | `customServiceJsonLd`                                      |
+| `/a-propos`                                                                      | `pageMetadata` (contenu)               | `webPageJsonLd(AboutPage)`, `faqJsonLd`                    |
+| `/contact`                                                                       | `pageMetadata`                         | `webPageJsonLd(ContactPage)`                               |
+| `/legal/*`                                                                       | `pageMetadata`                         | —                                                          |
+| cart, checkout(+success), track, favorites, account/*, oauth, agent/claim, admin | `NOINDEX` / `index:false`              | —                                                          |
 
 - `pageMetadata()` (`src/lib/seo.ts`) = title, description, canonical,
   hreflang 4 langues + `x-default` → FR, OG complet (fusion superficielle de
   Next !), Twitter. `JsonLd` lit lui-même le nonce et échappe `<`.
 - `sitemap.xml/route.ts` `STATIC_PAGES` : `"" /shop /custom /a-propos /contact
-  /legal/terms /legal/privacy /legal/shipping` (+ produits). Nouvelle page
+/legal/terms /legal/privacy /legal/shipping` (+ produits). Nouvelle page
   publique ⇒ l'y ajouter (+ `llms.txt` si utile).
 - `robots.txt` (route écrite à la main) : Disallow account/admin/checkout/
   cart/track/favorites + facettes ; `Allow /api/files/products/` (images
@@ -592,9 +608,11 @@ frame-src 'self' https://js.stripe.com https://hooks.stripe.com https://m.stripe
 worker-src 'self' blob: data:;  manifest-src 'self';  report-uri/report-to /api/csp-report;  upgrade-insecure-requests
 (media-src absent → retombe sur default-src 'self')
 ```
-+ `X-Frame-Options: DENY`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`.
+
+- `X-Frame-Options: DENY`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`.
 
 Conséquences :
+
 - Scripts : uniquement bundlés (`'self'`) → `bun add gsap lenis …` ; aucun
   `<script src=cdn>`. Scripts inline serveur = nonce obligatoire. Next pose
   lui-même le nonce sur ses scripts (runtime, hydratation, **scripts de
@@ -644,7 +662,7 @@ Conséquences :
   `cartReminder.consent` (nLPD).
 - Checkout : lien CGV avant paiement, « Suisse uniquement », mentions de
   sécurité ; moyens de paiement du footer (`TWINT, Visa, Mastercard, Google
-  Pay`), copyright `footer.copyright`, crédit « Site créé par » + logo
+Pay`), copyright `footer.copyright`, crédit « Site créé par » + logo
   Calyroc (`public/credits/calyroc-logo.png`, lien externe).
 - Footer : colonnes Boutique (shop, custom, favoris, suivi), Compte & aide
   (compte, à propos, contact), Informations (CGV, confidentialité, livraison
@@ -723,16 +741,16 @@ Conséquences :
 - Désactiver Lenis/effets lourds sur `/checkout*`, `/account*`, `/admin*`,
   `/oauth*`, `/agent*` et sous `prefers-reduced-motion`.
 - Chaque navigation client démonte la page : `useGSAP()`/`gsap.context()`
-  + `ScrollTrigger.refresh()` après chargement des images/polices ; les
-  pages étant dynamiques, les hauteurs changent après hydratation (panier/
-  favoris lus du localStorage).
+  - `ScrollTrigger.refresh()` après chargement des images/polices ; les
+    pages étant dynamiques, les hauteurs changent après hydratation (panier/
+    favoris lus du localStorage).
 - `AboutNav` calcule la section active sur `window.scroll` — compatible
   Lenis (scroll natif), mais sa `DETECTION_LINE` dépend de la hauteur du
   header.
 - WebGL : plafond ~16 contextes ; la galerie crée déjà 1 renderer par
   vignette 3D (snapshot puis `forceContextLoss`) ; un fond/hero WebGL global
-  + viewer produit = 2 contextes minimum → mutualiser si plusieurs canvases.
-  Couper le rendu hors écran/onglet caché (pattern existant).
+  - viewer produit = 2 contextes minimum → mutualiser si plusieurs canvases.
+    Couper le rendu hors écran/onglet caché (pattern existant).
 - Texte animé (SplitText) : garder le texte dans le HTML SSR (SEO, Markdown
   agents, lecteurs d'écran) et découper côté client après hydratation ;
   `aria-label` sur le conteneur.

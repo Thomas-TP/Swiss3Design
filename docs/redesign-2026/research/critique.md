@@ -20,13 +20,13 @@ de dessiner le héros.
 
 ## 1. Bloquants (à régler avant de figer le concept du héros)
 
-| # | Problème | Pourquoi ça bloque | Action |
-|---|---|---|---|
-| B1 | **La licence du seul modèle 3D réel n'est pas vérifiée.** L'en-tête du STL du vase est « MW 1.0 1262112 US », ce qui évoque MakerWorld ou un export tiers (assets §1.4). | Le concept dominant (« l'objet s'imprime sous vos yeux », présent dans les 3 notes d'inspiration) repose sur ce fichier. S'il vient d'une plateforme, la vente et l'usage marketing (rendus, vidéos IA, simulations) peuvent être interdits. | Demander au propriétaire l'origine et la licence. Plan B : un objet conçu en interne, par exemple le mark en 3D. |
-| B2 | **La promesse multicolore n'a aucune preuve.** L'unique produit live est monochrome (blanc ou noir), et aucune pièce multicolore réelle n'existe en photo ni en 3D (assets §0, G4). | Un héros qui change de couleur « aux vrais indices de couche » sur ce vase montrerait un produit qui n'existe pas. C'est un risque LCD art. 3 (indications inexactes). | Soit une pièce-signature 4 couleurs imprimée par le propriétaire, soit une scène étiquetée « illustration », séparée de la fiche produit. À décider avant le storyboard. |
-| B3 | **Préloader narratif ou LCP : il faut choisir.** Les 3 notes d'inspiration recommandent un préloader « slicer/CAD » façon Oryzo. `tech.md` règle 2 impose un LCP visible au premier paint, sans jamais `opacity:0` en attendant le JS, avec LCP ≤ 2,0 s. | Les deux sont incompatibles tels qu'ils sont décrits. | Définir le « loader » comme une animation **dans** le héros, non bloquante, jouée par-dessus un h1 et un poster déjà peints. Pas d'overlay plein écran. Éventuellement une seule fois par session. |
-| B4 | **L'espace de preview est partagé.** Un seul Worker `swiss3design-preview` reçoit **tous** les push hors `main`, et le dernier push l'emporte (`docs/deploiement-cloudflare.md` l.219-224). | Les branches Dependabot et les correctifs écraseront la preview que le propriétaire doit valider. | Prévoir une preview dédiée à la refonte (un 3e Worker ou une URL de version), ou geler les autres branches pendant les revues. |
-| B5 | **La preview ne contient pas les vrais assets.** Elle a son propre bucket R2 (`swiss3design-preview-files`, `wrangler.jsonc` l.137-141) et un catalogue démo de 6 produits avec des SVG hors charte et sans `model_3d_url` (assets §1.5). | Le héros construit sur le STL du vase ne s'affichera pas sur la preview, qui montrera en plus des produits factices hors marque. | Copier le STL et les photos dans le bucket preview. Réinjecter le vase avec `model_3d_url` dans la branche Neon preview. Vérifier avant la première revue. |
+| #   | Problème                                                                                                                                                                                                                                                 | Pourquoi ça bloque                                                                                                                                                                                                                           | Action                                                                                                                                                                                             |
+| --- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| B1  | **La licence du seul modèle 3D réel n'est pas vérifiée.** L'en-tête du STL du vase est « MW 1.0 1262112 US », ce qui évoque MakerWorld ou un export tiers (assets §1.4).                                                                                 | Le concept dominant (« l'objet s'imprime sous vos yeux », présent dans les 3 notes d'inspiration) repose sur ce fichier. S'il vient d'une plateforme, la vente et l'usage marketing (rendus, vidéos IA, simulations) peuvent être interdits. | Demander au propriétaire l'origine et la licence. Plan B : un objet conçu en interne, par exemple le mark en 3D.                                                                                   |
+| B2  | **La promesse multicolore n'a aucune preuve.** L'unique produit live est monochrome (blanc ou noir), et aucune pièce multicolore réelle n'existe en photo ni en 3D (assets §0, G4).                                                                      | Un héros qui change de couleur « aux vrais indices de couche » sur ce vase montrerait un produit qui n'existe pas. C'est un risque LCD art. 3 (indications inexactes).                                                                       | Soit une pièce-signature 4 couleurs imprimée par le propriétaire, soit une scène étiquetée « illustration », séparée de la fiche produit. À décider avant le storyboard.                           |
+| B3  | **Préloader narratif ou LCP : il faut choisir.** Les 3 notes d'inspiration recommandent un préloader « slicer/CAD » façon Oryzo. `tech.md` règle 2 impose un LCP visible au premier paint, sans jamais `opacity:0` en attendant le JS, avec LCP ≤ 2,0 s. | Les deux sont incompatibles tels qu'ils sont décrits.                                                                                                                                                                                        | Définir le « loader » comme une animation **dans** le héros, non bloquante, jouée par-dessus un h1 et un poster déjà peints. Pas d'overlay plein écran. Éventuellement une seule fois par session. |
+| B4  | **L'espace de preview est partagé.** Un seul Worker `swiss3design-preview` reçoit **tous** les push hors `main`, et le dernier push l'emporte (`docs/deploiement-cloudflare.md` l.219-224).                                                              | Les branches Dependabot et les correctifs écraseront la preview que le propriétaire doit valider.                                                                                                                                            | Prévoir une preview dédiée à la refonte (un 3e Worker ou une URL de version), ou geler les autres branches pendant les revues.                                                                     |
+| B5  | **La preview ne contient pas les vrais assets.** Elle a son propre bucket R2 (`swiss3design-preview-files`, `wrangler.jsonc` l.137-141) et un catalogue démo de 6 produits avec des SVG hors charte et sans `model_3d_url` (assets §1.5).                | Le héros construit sur le STL du vase ne s'affichera pas sur la preview, qui montrera en plus des produits factices hors marque.                                                                                                             | Copier le STL et les photos dans le bucket preview. Réinjecter le vase avec `model_3d_url` dans la branche Neon preview. Vérifier avant la première revue.                                         |
 
 ## 2. Contradictions entre notes à trancher
 
@@ -71,6 +71,7 @@ de dessiner le héros.
 ## 3. Manques et points non vérifiés
 
 ### 3.1 Données de référence (aucune n'a été mesurée)
+
 - **Audience** : la répartition mobile/desktop, la part d'iOS Safari (vidéo sans `Range` = cassée), de
   Firefox (pas de `animation-timeline`, pas de types de View Transition), et les pages d'entrée
   (accueil ou fiche produit depuis Google). Le connecteur PostHog (projet 285063) n'a pas servi. Sans
@@ -86,6 +87,7 @@ de dessiner le héros.
   Il faut au minimum figer les URL, les h1 et le JSON-LD, puis comparer avant et après.
 
 ### 3.2 Contenu réel (N = 1)
+
 - Un seul produit live et 2 catégories sur 3 vides (`bureau`, `accessoires`). Les produits liés de la
   fiche sont vides, la « sélection » de l'accueil n'a qu'une carte, et les idées « une salle par
   collection », « footer de particules par catégorie » ou « table d'impression » présupposent un
@@ -98,6 +100,7 @@ de dessiner le héros.
   Aujourd'hui, tout le design dépend implicitement du Tier B.
 
 ### 3.3 Mobile (stratégie de perf seulement, aucun concept de design)
+
 - Il n'existe aucune chorégraphie mobile : ce que devient le héros « impression au scroll » sur 375 px,
   ni la durée des sections pinnées au pouce.
 - Le redimensionnement de la barre d'adresse iOS casse les pins ScrollTrigger : il faut
@@ -109,6 +112,7 @@ de dessiner le héros.
   bannière de consentement à 4,5 rem, et le trou `md`/`lg` du footer (codemap §8).
 
 ### 3.4 Accessibilité
+
 - **Contraste de l'accent** (calcul manuel, à confirmer avec un outil) : `#E5231C` fait environ
   **4,4:1 sur `#fafaf9`** et environ **4,3:1 sur `#0b0a09`**, donc moins que l'AA de 4,5:1 pour le
   texte courant. C'est acceptable pour le texte ≥ 24 px (ou ≥ 19 px en gras) et les éléments non
@@ -125,6 +129,7 @@ de dessiner le héros.
   Le plus simple est d'étendre le script anti-FOUC du thème (déjà nonce) plutôt que d'en ajouter un.
 
 ### 3.5 i18n (spécificités suisses non traitées)
+
 - **Pas de ß en allemand suisse.** `messages/de.json` l.96 contient déjà « Schließen »
   (« Schliessen » en de-CH). Il faut en faire une règle pour toute la nouvelle copie.
 - **Formats numériques par locale** pour la télémétrie animée (« Couche 142/300 · 0,2 mm »,
@@ -136,6 +141,7 @@ de dessiner le héros.
   mise en page cinétique.
 
 ### 3.6 Licences et sécurité
+
 - GSAP : vérifié (licence standard gratuite, pas MIT). Lenis, three, postprocessing et le bruit
   Ashima sont OK. LYGIA est déjà écarté.
 - **Non vérifiés** :
@@ -149,6 +155,7 @@ de dessiner le héros.
   non audité qui s'exécuterait dans la session.
 
 ### 3.7 Juridique suisse
+
 - **Swissness** (LPM art. 47-49, loi sur la protection des armoiries) : aucune vérification. Si le
   design utilise la croix suisse, le drapeau ou une mention « Swiss made / Imprimé en Suisse »
   (diorama des cantons, topo swisstopo, badges), les règles d'usage s'appliquent, y compris le seuil
@@ -157,6 +164,7 @@ de dessiner le héros.
   l'UI** n'est définie (« rendu », « illustration »).
 
 ### 3.8 Analytics
+
 - **Session replay et motion** : rrweb (PostHog) enregistre chaque mutation d'attribut `style`. Les
   tweens GSAP ou Motion par frame et SplitText peuvent faire exploser la taille des replays et le coût
   sur le fil principal, donc l'INP. Il faut le tester sur le prototype et, si nécessaire, désactiver
@@ -165,6 +173,7 @@ de dessiner le héros.
   dans codemap §11, mais pas fait.
 
 ### 3.9 Surfaces non cartographiées
+
 - Les **e-mails transactionnels** (`src/lib/email-templates.ts`) et les **pages HTML de
   désinscription** (`src/app/api/newsletter/unsubscribe`, `src/app/api/cart-reminder/unsubscribe`)
   restent-ils dans l'ancien style ou passent-ils à la nouvelle identité ?
@@ -174,6 +183,7 @@ de dessiner le héros.
   périmètre ? Si oui, il faut mettre à jour `STATIC_PAGES`, `llms.txt` et robots.
 
 ### 3.10 Marque
+
 - Le mark n'existe qu'en raster (480 px). La vectorisation (G6) est un **changement de marque soumis à
   validation**, et elle conditionne le loader toolpath, les particules vers le mark, le mark 3D et le
   wordmark 3D. Il faut la faire valider **avant** de concevoir ces pièces.
@@ -181,6 +191,7 @@ de dessiner le héros.
   C'est aussi une décision de marque, pas seulement de design.
 
 ### 3.11 Méthode
+
 - Il n'y a **aucune planche visuelle** : les captures des sites de référence n'ont pas été enregistrées
   dans `research/`, et le propriétaire ne peut valider une direction que sur du texte. Il faut
   produire un moodboard (8 à 12 captures et 2 à 3 « style tiles ») avant le design détaillé.
@@ -197,6 +208,7 @@ de dessiner le héros.
 
   Il faut en retenir **une mécanique héros et 2 à 3 motifs de soutien**. Le reste va dans une liste
   « plus tard ».
+
 - **Découpage et validation** : pas de phases, pas de jalons de validation par le propriétaire
   (règle de marque : « tout nouveau visuel validé »), pas de stratégie de déploiement (big bang ou
   progressif par route ou par flag), pas de plan contre la dérive d'une branche longue face à `main`
@@ -225,6 +237,7 @@ de dessiner le héros.
 10. L'installation locale de ffmpeg et gltfpack, et le lancement de Blender avec l'add-on MCP.
 
 ## 5. Vérifié par cette critique (reproductible)
+
 - `showroom-scene.ts` : seulement `import type` et `await import("three")`. Combiné à la mesure
   d'AGENTS.md (import statique = environ 243 KiB gzip dans le Worker), cela confirme qu'un import
   dynamique dans un module rendu côté serveur reste dans le bundle.

@@ -36,15 +36,15 @@
 
 ### 1.1 Kit de marque (`public/brand/`)
 
-| Fichier | Format / taille | Notes |
-|---|---|---|
-| `brand/webp/mark.webp` | WebP VP8X, 480×480, alpha, 23,8 Ko | **Le mark officiel**, rendu par `src/components/brand-mark.tsx` (`<img>`). Pic central et deux pics latéraux avec « neige » plus claire, sur **6 strates** (couches d'impression). Dégradés internes rouges (du clair ~#F07A6E au foncé ~#C9302A). Rouge uniquement. |
-| `brand/logo.png` | PNG 512×512, 120 Ko | **Identique octet pour octet** à `brand/app/icon-512.png` (même hash). |
-| `brand/app/icon.webp` | 512×512 alpha, 24 Ko | Favicon moderne. |
-| `brand/app/icon-192.png`, `apple-icon.png` (180), `png/icon-64.png` | PNG | Jeu d'icônes. |
-| `favicon.ico` | 48×48 | |
-| `brand/social/og-image.png` | 1200×630, 94 Ko | Fond noir, mark + « Swiss**3Design** » (police de type Helvetica/Arial, **pas Geist**), bande rouge en bas. **Une seule OG pour tout le site.** |
-| `brand/old-logo/**` | ~60 fichiers (SVG, PNG, WebP, JPG) | Ancien logo (cube isométrique encre et rouge), archivé et **jamais référencé**. Ne pas réutiliser. |
+| Fichier                                                             | Format / taille                    | Notes                                                                                                                                                                                                                                                                |
+| ------------------------------------------------------------------- | ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `brand/webp/mark.webp`                                              | WebP VP8X, 480×480, alpha, 23,8 Ko | **Le mark officiel**, rendu par `src/components/brand-mark.tsx` (`<img>`). Pic central et deux pics latéraux avec « neige » plus claire, sur **6 strates** (couches d'impression). Dégradés internes rouges (du clair ~#F07A6E au foncé ~#C9302A). Rouge uniquement. |
+| `brand/logo.png`                                                    | PNG 512×512, 120 Ko                | **Identique octet pour octet** à `brand/app/icon-512.png` (même hash).                                                                                                                                                                                               |
+| `brand/app/icon.webp`                                               | 512×512 alpha, 24 Ko               | Favicon moderne.                                                                                                                                                                                                                                                     |
+| `brand/app/icon-192.png`, `apple-icon.png` (180), `png/icon-64.png` | PNG                                | Jeu d'icônes.                                                                                                                                                                                                                                                        |
+| `favicon.ico`                                                       | 48×48                              |                                                                                                                                                                                                                                                                      |
+| `brand/social/og-image.png`                                         | 1200×630, 94 Ko                    | Fond noir, mark + « Swiss**3Design** » (police de type Helvetica/Arial, **pas Geist**), bande rouge en bas. **Une seule OG pour tout le site.**                                                                                                                      |
+| `brand/old-logo/**`                                                 | ~60 fichiers (SVG, PNG, WebP, JPG) | Ancien logo (cube isométrique encre et rouge), archivé et **jamais référencé**. Ne pas réutiliser.                                                                                                                                                                   |
 
 **Le mark n'existe en aucun format vectoriel.** `svg/logo.svg` (387 Ko) est l'**ancien** logo.
 Le mark actuel plafonne donc à 512 px, ce qui est insuffisant pour un héros plein écran, un
@@ -63,14 +63,14 @@ morphing ou une extrusion 3D.
 
 Tokens (`src/app/globals.css`) :
 
-| Token | Clair | Sombre |
-|---|---|---|
-| `--paper` | `#fafaf9` | `#0b0a09` |
-| `--surface` | `#ffffff` | `#1a1714` |
+| Token        | Clair     | Sombre    |
+| ------------ | --------- | --------- |
+| `--paper`    | `#fafaf9` | `#0b0a09` |
+| `--surface`  | `#ffffff` | `#1a1714` |
 | `--elevated` | `#ffffff` | `#221e1b` |
-| `--ink` | `#1a1614` | `#f4f1ed` |
-| `--soft` | `#6f6962` | `#a39c92` |
-| `--line` | `#e8e5e1` | `#2a2622` |
+| `--ink`      | `#1a1614` | `#f4f1ed` |
+| `--soft`     | `#6f6962` | `#a39c92` |
+| `--line`     | `#e8e5e1` | `#2a2622` |
 
 Constantes : `accent #e5231c`, `accent-dark #c01d14`, `night #121110`, `night-soft #a8a29b`,
 `night-line #2c2825`, `swatch-ring #767676` (contraste de pastille WCAG réfléchi).
@@ -89,6 +89,7 @@ et que le motif « 4 couleurs » corresponde à de vraies bobines.
 `GET /api/v1/products?limit=50` renvoie `count: 1`.
 
 **vase-spirale** (`GET /api/v1/products/vase-spirale`)
+
 - Prix CHF 24.00 (2400 centimes), `on_demand`, 3 jours de production, PLA, 79×79×209 mm, 120 g, aucune variante.
 - Description : silhouette de bouteille, **40 nervures fines torsadées en spirale**, base galbée, col
   fin (~3,5 cm) évasé à l'ouverture. Imprimé à la pièce dans les ateliers de l'arc lémanique (Gland et Pully).
@@ -116,14 +117,14 @@ Le fichier est en syntaxe SQLite/D1 (`INSERT OR REPLACE`, `unixepoch()`, boolée
 Il contient 6 produits, **aucun `model_3d_url`, aucune couleur liée**, et des images **SVG
 placeholder 600×600** (fond `#f5f5f4`, formes orange et brun `#c2410c`/`#9a3412`, **hors charte**) :
 
-| slug | prix | vente | matériau | dim. | multicolore |
-|---|---|---|---|---|---|
-| vase-spirale | 29.90 | stock | PLA | 120×120×220 | non |
-| lampe-voronoi | 49.90 | sur demande, 5 j | PLA | 180×180×260 | non |
-| organiseur-bureau | 24.90 | stock | PETG | 220×100×110 | **oui (3 couleurs)** |
-| jardiniere-geometrique | 19.90 | stock | PETG | 150×150×130 | non |
-| porte-cles-relief | 9.90 | stock | PLA | 60×30×4 | **oui (4 couleurs)** |
-| support-casque | 34.90 | sur demande, 3 j | PETG | 120×100×280 | **oui (bicolore)** |
+| slug                   | prix  | vente            | matériau | dim.        | multicolore          |
+| ---------------------- | ----- | ---------------- | -------- | ----------- | -------------------- |
+| vase-spirale           | 29.90 | stock            | PLA      | 120×120×220 | non                  |
+| lampe-voronoi          | 49.90 | sur demande, 5 j | PLA      | 180×180×260 | non                  |
+| organiseur-bureau      | 24.90 | stock            | PETG     | 220×100×110 | **oui (3 couleurs)** |
+| jardiniere-geometrique | 19.90 | stock            | PETG     | 150×150×130 | non                  |
+| porte-cles-relief      | 9.90  | stock            | PLA      | 60×30×4     | **oui (4 couleurs)** |
+| support-casque         | 34.90 | sur demande, 3 j | PETG     | 120×100×280 | **oui (bicolore)**   |
 
 Ces produits **n'existent pas en prod**. Ne jamais les présenter comme réels sur le site live.
 Ils peuvent servir de « contenu de test » pour éprouver les layouts de grille.
@@ -219,27 +220,27 @@ Ils peuvent servir de « contenu de test » pour éprouver les layouts de grille
 
 ## 3. Manques et comment les combler
 
-| # | Manque | Priorité | Comblement principal | Alternatives |
-|---|---|---|---|---|
-| G1 | **Séquence héros** « l'objet naît couche par couche » | P0 | **WebGL temps réel sur le vrai STL** : plan de coupe en Y piloté par le scroll, liseré émissif rouge à la ligne de coupe, buse qui suit, normales « lignes de couche » procédurales (§6). Aucun asset nouveau. | Boucle vidéo Blender (poster et fallback mobile ou reduced-motion) ; vrai timelapse filmé (§7) |
-| G2 | **Vrai parcours d'outil** (G-code) | P0 | Le propriétaire tranche le vase dans Bambu Studio et exporte le G-code. Un script (Blender ou Bun) parse `G1 X Y Z E`, obtient une polyligne, décime et quantifie (Int16), produit un buffer binaire d'environ 0,5 à 1 Mo. En WebGL, `drawRange` suit le scroll : **la spirale continue du mode vase se dessine**. | Toolpath synthétique généré depuis le STL (tranches et contours) |
-| G3 | **Macros des lignes de couche** | P0 | Photos macro réelles, lumière rasante (§7), sur le vase blanc **et** noir | Rendu macro Blender 4K (displacement 0,2 mm, profondeur de champ) ; shader procédural |
-| G4 | **Preuve multicolore** (0 pièce multicolore réelle en photo) | P0 | Imprimer une **pièce-signature 4 couleurs** avec les vraies bobines (idéalement le **mark en 3D**, strates en tons rouges et encre) puis la filmer et la photographier | Rendus Blender d'une pièce multi-matériaux (3MF, puis GLB à 4 matériaux) ; animation « purge » et changement de filament en shader |
-| G5 | **Photos produit haute définition** (≥ 3000 px, fonds maîtrisés, **version noire absente**) | P0 | Nouvelle séance : fond papier sans couture (papier, encre, rouge), charte gris, RAW | Rendus Blender fidèles au STL (étiquetés « rendu ») ; upscale IA des photos existantes en solution temporaire uniquement |
-| G6 | **Mark vectoriel et 3D** | P0 | Retracer `mark.webp` en SVG (6 strates et 3 pics, formes simples), puis l'extruder dans Blender (strates = dalles) et exporter un GLB de quelques Ko. Sert au loader, au morphing, au footer 3D, à l'OG. **Validation propriétaire obligatoire** (règle de marque). | Vectorisation automatique puis nettoyage manuel |
-| G7 | **GLB web optimisé** (le STL fait 2,23 Mio, sans `Content-Length`) | P1 | Import Blender, nettoyage, 2 à 3 LOD, export GLB, puis `gltfpack` (quantification, et meshopt si CSP wasm). Cible **200 à 450 Ko** (estimation). | `KHR_mesh_quantization` seul, sans WASM (~600 à 800 Ko) |
-| G8 | **Turntables** (vues 360° par produit, par couleur) | P1 | Blender Cycles : 72 à 120 images en séquence WebP ou vidéo intra. Ou mieux : un viewer WebGL temps réel avec un meilleur éclairage studio que la pièce actuelle. | Photogrammétrie inutile (le STL existe) |
-| G9 | **Ambiance atelier et Suisse** (Gland au bord du Léman, Pully, gens, mains, emballage) | P1 | Photos et vidéo du propriétaire (§7) | IA pour de l'atmosphère **non trompeuse** (lac à l'aube, crêtes dans le brouillard). Ne jamais générer un « faux atelier ». |
-| G10 | **Imprimantes en image** (P1S : rendu constructeur orphelin ; K2 : rien) | P1 | Animer les schémas SVG existants (exploded view au scroll) et ajouter des vraies photos des machines | Modèles Blender stylisés (pas de modèle Sketchfab sous licence floue) |
-| G11 | **Textures et matériaux** (PLA mat, sheen, grain papier, bois, lin) | P1 | Poly Haven (CC0, sans compte) : HDRI studio pour Blender, textures de mise en scène ; grain et bruit procéduraux en shader | Textures peintes au canvas (déjà pratiqué dans `showroom-scene.ts`) |
-| G12 | **Topographie suisse** (clin d'œil alpin : courbes de niveau = couches d'impression) | P2 | **swisstopo swissALTI3D** (données OGD gratuites, attribution © swisstopo), puis `gdal_contour`, puis SVG ou heightmap statique. Le MNT d'une vue Léman-Alpes vaudoises se morphe en strates, puis en vase. | Copernicus DEM (30 m) si Mont-Blanc ou France |
-| G13 | **Son** (optionnel, coupé par défaut) | P2 | Enregistrements réels : ronronnement des moteurs pas-à-pas, clac du changement AMS, purge, porte. Boucles Opus et AAC de moins de 200 Ko. | ElevenLabs Sound Effects (plan payant, usage commercial) ; Freesound filtré CC0 |
-| G14 | **Typographie display et mono** | P1 | Garder Geist (UI), ajouter **Geist Mono** (télémétrie façon HUD : couche 412/1045, 0,20 mm, 220 °C) et une display variable (axe de graisse animable au scroll). Auto-hébergée. | Gratuites : Instrument Serif (contraste éditorial), Fontshare (General Sans, Satoshi, Clash Display, licence gratuite commerciale). Payantes suisses : Suisse Int'l (Swiss Typefaces), ABC Diatype ou Favorit (Dinamo), Neue Haas (Monotype). |
-| G15 | **OG par page et par produit** | P2 | Pré-rendues (Blender ou Figma) et posées dans R2 ou `public/`. **Pas** de convention `opengraph-image` (règle 10). | Cloudflare Images (overlay) |
-| G16 | **Avatars au style de l'ancien logo** | P3 | 10 variations du pic en strates (angles, nombre de strates) en SVG | — |
-| G17 | **Placeholders du seed hors charte** (preview) | P3 | Rendus Blender procéduraux en charte, **preview uniquement** | — |
-| G18 | **Métadonnées média** (pas de vidéo, poster, dimensions ni type dans `product_images`) | P1 | Étendre le schéma : `media_type`, `poster_url`, `width`, `height`, `turntable_url`. Ou une table `product_media`. | Convention d'URL |
-| G19 | **Inventaire réel des filaments** (hex exacts) | P0 | Liste fournie par le propriétaire (marque, nom de couleur, hex). Photo des bobines comme référence colorimétrique. | — |
+| #   | Manque                                                                                      | Priorité | Comblement principal                                                                                                                                                                                                                                                                                               | Alternatives                                                                                                                                                                                                                                  |
+| --- | ------------------------------------------------------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| G1  | **Séquence héros** « l'objet naît couche par couche »                                       | P0       | **WebGL temps réel sur le vrai STL** : plan de coupe en Y piloté par le scroll, liseré émissif rouge à la ligne de coupe, buse qui suit, normales « lignes de couche » procédurales (§6). Aucun asset nouveau.                                                                                                     | Boucle vidéo Blender (poster et fallback mobile ou reduced-motion) ; vrai timelapse filmé (§7)                                                                                                                                                |
+| G2  | **Vrai parcours d'outil** (G-code)                                                          | P0       | Le propriétaire tranche le vase dans Bambu Studio et exporte le G-code. Un script (Blender ou Bun) parse `G1 X Y Z E`, obtient une polyligne, décime et quantifie (Int16), produit un buffer binaire d'environ 0,5 à 1 Mo. En WebGL, `drawRange` suit le scroll : **la spirale continue du mode vase se dessine**. | Toolpath synthétique généré depuis le STL (tranches et contours)                                                                                                                                                                              |
+| G3  | **Macros des lignes de couche**                                                             | P0       | Photos macro réelles, lumière rasante (§7), sur le vase blanc **et** noir                                                                                                                                                                                                                                          | Rendu macro Blender 4K (displacement 0,2 mm, profondeur de champ) ; shader procédural                                                                                                                                                         |
+| G4  | **Preuve multicolore** (0 pièce multicolore réelle en photo)                                | P0       | Imprimer une **pièce-signature 4 couleurs** avec les vraies bobines (idéalement le **mark en 3D**, strates en tons rouges et encre) puis la filmer et la photographier                                                                                                                                             | Rendus Blender d'une pièce multi-matériaux (3MF, puis GLB à 4 matériaux) ; animation « purge » et changement de filament en shader                                                                                                            |
+| G5  | **Photos produit haute définition** (≥ 3000 px, fonds maîtrisés, **version noire absente**) | P0       | Nouvelle séance : fond papier sans couture (papier, encre, rouge), charte gris, RAW                                                                                                                                                                                                                                | Rendus Blender fidèles au STL (étiquetés « rendu ») ; upscale IA des photos existantes en solution temporaire uniquement                                                                                                                      |
+| G6  | **Mark vectoriel et 3D**                                                                    | P0       | Retracer `mark.webp` en SVG (6 strates et 3 pics, formes simples), puis l'extruder dans Blender (strates = dalles) et exporter un GLB de quelques Ko. Sert au loader, au morphing, au footer 3D, à l'OG. **Validation propriétaire obligatoire** (règle de marque).                                                | Vectorisation automatique puis nettoyage manuel                                                                                                                                                                                               |
+| G7  | **GLB web optimisé** (le STL fait 2,23 Mio, sans `Content-Length`)                          | P1       | Import Blender, nettoyage, 2 à 3 LOD, export GLB, puis `gltfpack` (quantification, et meshopt si CSP wasm). Cible **200 à 450 Ko** (estimation).                                                                                                                                                                   | `KHR_mesh_quantization` seul, sans WASM (~600 à 800 Ko)                                                                                                                                                                                       |
+| G8  | **Turntables** (vues 360° par produit, par couleur)                                         | P1       | Blender Cycles : 72 à 120 images en séquence WebP ou vidéo intra. Ou mieux : un viewer WebGL temps réel avec un meilleur éclairage studio que la pièce actuelle.                                                                                                                                                   | Photogrammétrie inutile (le STL existe)                                                                                                                                                                                                       |
+| G9  | **Ambiance atelier et Suisse** (Gland au bord du Léman, Pully, gens, mains, emballage)      | P1       | Photos et vidéo du propriétaire (§7)                                                                                                                                                                                                                                                                               | IA pour de l'atmosphère **non trompeuse** (lac à l'aube, crêtes dans le brouillard). Ne jamais générer un « faux atelier ».                                                                                                                   |
+| G10 | **Imprimantes en image** (P1S : rendu constructeur orphelin ; K2 : rien)                    | P1       | Animer les schémas SVG existants (exploded view au scroll) et ajouter des vraies photos des machines                                                                                                                                                                                                               | Modèles Blender stylisés (pas de modèle Sketchfab sous licence floue)                                                                                                                                                                         |
+| G11 | **Textures et matériaux** (PLA mat, sheen, grain papier, bois, lin)                         | P1       | Poly Haven (CC0, sans compte) : HDRI studio pour Blender, textures de mise en scène ; grain et bruit procéduraux en shader                                                                                                                                                                                         | Textures peintes au canvas (déjà pratiqué dans `showroom-scene.ts`)                                                                                                                                                                           |
+| G12 | **Topographie suisse** (clin d'œil alpin : courbes de niveau = couches d'impression)        | P2       | **swisstopo swissALTI3D** (données OGD gratuites, attribution © swisstopo), puis `gdal_contour`, puis SVG ou heightmap statique. Le MNT d'une vue Léman-Alpes vaudoises se morphe en strates, puis en vase.                                                                                                        | Copernicus DEM (30 m) si Mont-Blanc ou France                                                                                                                                                                                                 |
+| G13 | **Son** (optionnel, coupé par défaut)                                                       | P2       | Enregistrements réels : ronronnement des moteurs pas-à-pas, clac du changement AMS, purge, porte. Boucles Opus et AAC de moins de 200 Ko.                                                                                                                                                                          | ElevenLabs Sound Effects (plan payant, usage commercial) ; Freesound filtré CC0                                                                                                                                                               |
+| G14 | **Typographie display et mono**                                                             | P1       | Garder Geist (UI), ajouter **Geist Mono** (télémétrie façon HUD : couche 412/1045, 0,20 mm, 220 °C) et une display variable (axe de graisse animable au scroll). Auto-hébergée.                                                                                                                                    | Gratuites : Instrument Serif (contraste éditorial), Fontshare (General Sans, Satoshi, Clash Display, licence gratuite commerciale). Payantes suisses : Suisse Int'l (Swiss Typefaces), ABC Diatype ou Favorit (Dinamo), Neue Haas (Monotype). |
+| G15 | **OG par page et par produit**                                                              | P2       | Pré-rendues (Blender ou Figma) et posées dans R2 ou `public/`. **Pas** de convention `opengraph-image` (règle 10).                                                                                                                                                                                                 | Cloudflare Images (overlay)                                                                                                                                                                                                                   |
+| G16 | **Avatars au style de l'ancien logo**                                                       | P3       | 10 variations du pic en strates (angles, nombre de strates) en SVG                                                                                                                                                                                                                                                 | —                                                                                                                                                                                                                                             |
+| G17 | **Placeholders du seed hors charte** (preview)                                              | P3       | Rendus Blender procéduraux en charte, **preview uniquement**                                                                                                                                                                                                                                                       | —                                                                                                                                                                                                                                             |
+| G18 | **Métadonnées média** (pas de vidéo, poster, dimensions ni type dans `product_images`)      | P1       | Étendre le schéma : `media_type`, `poster_url`, `width`, `height`, `turntable_url`. Ou une table `product_media`.                                                                                                                                                                                                  | Convention d'URL                                                                                                                                                                                                                              |
+| G19 | **Inventaire réel des filaments** (hex exacts)                                              | P0       | Liste fournie par le propriétaire (marque, nom de couleur, hex). Photo des bobines comme référence colorimétrique.                                                                                                                                                                                                 | —                                                                                                                                                                                                                                             |
 
 ---
 
@@ -289,6 +290,7 @@ still macro 4K, entre 30 et 90 s.
 ## 5. Pipeline IA (vidéo et image) et garde-fous
 
 **Usages recommandés** :
+
 - **Higgsfield** en image vers vidéo, avec ses presets de mouvements de caméra (dolly, orbit,
   crash zoom…). Première image : **une vraie photo ou un rendu Blender fidèle** du vase, pour
   obtenir des plans héros cinématiques (lente orbite, lumière qui glisse sur les nervures).
@@ -304,6 +306,7 @@ still macro 4K, entre 30 et 90 s.
 - **Upscale** des trois photos existantes : solution **temporaire** uniquement, en attendant la séance photo.
 
 **Garde-fous** :
+
 - **Fidélité produit** : sur la fiche produit, seules de vraies photos ou des rendus fidèles au STL,
   étiquetés « rendu » (c'est déjà le cas dans l'alt). Aucune image IA ne doit montrer une forme,
   une couleur ou une finition qui n'existe pas. C'est un risque LCD (indications inexactes) et un
@@ -343,6 +346,7 @@ still macro 4K, entre 30 et 90 s.
 Photos en RAW si possible.
 
 **Photos** :
+
 1. Vase blanc et vase noir sur fond papier, face, 3/4, plongée, ≥ 3000 px, en séries identiques pour les deux couleurs.
 2. **Macros des nervures et des lignes de couche** en lumière rasante (latérale), blanc et noir, 5 à 10 plans.
 3. Col et ouverture, base, détail de la torsion.
@@ -352,6 +356,7 @@ Photos en RAW si possible.
 7. Ateliers de Gland et de Pully (ambiance, lumière du lac), sans visages sauf accord explicite.
 
 **Vidéo** :
+
 1. **Timelapse d'impression du vase** : caméra intégrée en mode « smooth » (tête garée à chaque
    couche, faible résolution, bien pour un encart) **et** smartphone 4K sur trépied devant la porte.
 2. Plans macro de la buse qui dépose le filament (4K 60p, pour le ralenti), et du changement de filament AMS.
@@ -364,18 +369,18 @@ l'impression, changement AMS, porte, pose de la pièce sur la table.
 
 ## 8. Comptes et services (création par le propriétaire)
 
-| Service | Pourquoi | Coût / remarque (à vérifier au moment voulu) |
-|---|---|---|
-| Higgsfield | Image vers vidéo et mouvements de caméra pour les plans héros et le B-roll | Crédits payants ; usage commercial selon le plan |
-| Un 2e générateur vidéo (Kling, Veo via Google Flow, ou Runway) | Comparer la fidélité géométrique | Payant |
-| Générateur ou éditeur d'image (Flux Kontext via Krea ou Freepik, Midjourney, Gemini) | Mises en situation depuis de vraies photos, moodboards | Payant pour l'usage commercial |
-| ElevenLabs (Sound Effects) | SFX si l'on n'enregistre pas | Plan payant pour l'usage commercial |
-| Poly Haven | HDRI et textures | Gratuit, CC0, sans compte |
-| swisstopo (swissALTI3D) | Topographie réelle | Gratuit (OGD), attribution |
-| Bucket R2 public sur `media.swiss3design.ch` | Vidéo avec Range, GLB, séquences | Compte Cloudflare existant ; sortie de données R2 gratuite |
-| Cloudflare Stream (optionnel) | Seulement si film long | Facturé à la minute stockée et livrée |
-| Licence de police (optionnel) | Display suisse premium | De quelques centaines à ~1000 CHF (licence web) |
-| MCP for Blender Premium (optionnel) | Générateurs 3D Hunyuan, Tripo, Rodin | Inutile tant qu'on a de vrais STL et 3MF |
+| Service                                                                              | Pourquoi                                                                   | Coût / remarque (à vérifier au moment voulu)               |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Higgsfield                                                                           | Image vers vidéo et mouvements de caméra pour les plans héros et le B-roll | Crédits payants ; usage commercial selon le plan           |
+| Un 2e générateur vidéo (Kling, Veo via Google Flow, ou Runway)                       | Comparer la fidélité géométrique                                           | Payant                                                     |
+| Générateur ou éditeur d'image (Flux Kontext via Krea ou Freepik, Midjourney, Gemini) | Mises en situation depuis de vraies photos, moodboards                     | Payant pour l'usage commercial                             |
+| ElevenLabs (Sound Effects)                                                           | SFX si l'on n'enregistre pas                                               | Plan payant pour l'usage commercial                        |
+| Poly Haven                                                                           | HDRI et textures                                                           | Gratuit, CC0, sans compte                                  |
+| swisstopo (swissALTI3D)                                                              | Topographie réelle                                                         | Gratuit (OGD), attribution                                 |
+| Bucket R2 public sur `media.swiss3design.ch`                                         | Vidéo avec Range, GLB, séquences                                           | Compte Cloudflare existant ; sortie de données R2 gratuite |
+| Cloudflare Stream (optionnel)                                                        | Seulement si film long                                                     | Facturé à la minute stockée et livrée                      |
+| Licence de police (optionnel)                                                        | Display suisse premium                                                     | De quelques centaines à ~1000 CHF (licence web)            |
+| MCP for Blender Premium (optionnel)                                                  | Générateurs 3D Hunyuan, Tripo, Rodin                                       | Inutile tant qu'on a de vrais STL et 3MF                   |
 
 GSAP (ScrollTrigger, SplitText, MorphSVG…) est entièrement gratuit depuis 2025 ; Lenis est gratuit.
 Aucun compte n'est nécessaire.
@@ -384,17 +389,17 @@ Aucun compte n'est nécessaire.
 
 ## 9. Formats et budgets cibles (estimations, à mesurer)
 
-| Asset | Format | Budget |
-|---|---|---|
-| Boucle héros 6 à 10 s | AV1 (WebM ou MP4) avec repli H.264 ; 1920×1080 et 1080×1350 | 1,5 à 3 Mo (AV1), 3 à 5 Mo (H.264) |
-| Vidéo pilotée au scroll | GOP court (keyint 1 à 10) pour un seek précis | ×3 à ×5 par rapport à une boucle, donc limiter à 4 à 6 s |
-| Séquence d'images (scrub) | WebP ou AVIF 1280 px, 90 à 150 images, chargement progressif (1 image sur 4 d'abord) | 3 à 9 Mo au total : lourd, à réserver au desktop |
-| Poster et stills | AVIF et WebP via CF Images, depuis un original ≥ 3000 px | 60 à 150 Ko affichés |
-| GLB vase | gltfpack (quantification ± meshopt) | 200 à 450 Ko (contre 2,23 Mio en STL) |
-| GLB mark | Géométrie simple | < 20 Ko |
-| Toolpath | Buffer binaire Int16 quantifié | 0,5 à 1 Mo |
-| HDRI web | Éviter : `RoomEnvironment` (procédural) ou HDR 1k | 0 à 1,5 Mo |
-| Sons | Opus et AAC | < 200 Ko chacun ; coupés par défaut, geste utilisateur requis (iOS) |
+| Asset                     | Format                                                                               | Budget                                                              |
+| ------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------------------------- |
+| Boucle héros 6 à 10 s     | AV1 (WebM ou MP4) avec repli H.264 ; 1920×1080 et 1080×1350                          | 1,5 à 3 Mo (AV1), 3 à 5 Mo (H.264)                                  |
+| Vidéo pilotée au scroll   | GOP court (keyint 1 à 10) pour un seek précis                                        | ×3 à ×5 par rapport à une boucle, donc limiter à 4 à 6 s            |
+| Séquence d'images (scrub) | WebP ou AVIF 1280 px, 90 à 150 images, chargement progressif (1 image sur 4 d'abord) | 3 à 9 Mo au total : lourd, à réserver au desktop                    |
+| Poster et stills          | AVIF et WebP via CF Images, depuis un original ≥ 3000 px                             | 60 à 150 Ko affichés                                                |
+| GLB vase                  | gltfpack (quantification ± meshopt)                                                  | 200 à 450 Ko (contre 2,23 Mio en STL)                               |
+| GLB mark                  | Géométrie simple                                                                     | < 20 Ko                                                             |
+| Toolpath                  | Buffer binaire Int16 quantifié                                                       | 0,5 à 1 Mo                                                          |
+| HDRI web                  | Éviter : `RoomEnvironment` (procédural) ou HDR 1k                                    | 0 à 1,5 Mo                                                          |
+| Sons                      | Opus et AAC                                                                          | < 200 Ko chacun ; coupés par défaut, geste utilisateur requis (iOS) |
 
 Règles communes : tout va dans `public/` (avec des règles `_headers` immutables pour `/media/*`
 et des noms hashés) ou dans R2, **jamais** dans le bundle Worker. Fallbacks

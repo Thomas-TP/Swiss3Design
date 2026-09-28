@@ -32,9 +32,9 @@ génère une landing page. Le site propose aussi :
 
 1. Une boucle vidéo IA plein écran derrière le hero (planète, portail doré, île flottante, mannequin qui
    tend la main vers la caméra).
-2. Un **objet héros unique** qui flotte dans un espace neutre (le cube de sucre vitreux de *KnowSugar*,
-   le cube de *3D Story*).
-3. Une grosse typo d'affichage : un serif éditorial en capitales (*OYLA* : « MEASURED PURITY ») ou une
+2. Un **objet héros unique** qui flotte dans un espace neutre (le cube de sucre vitreux de _KnowSugar_,
+   le cube de _3D Story_).
+3. Une grosse typo d'affichage : un serif éditorial en capitales (_OYLA_ : « MEASURED PURITY ») ou une
    grotesque très grasse, souvent avec un dégradé dans le texte.
 4. Un header en verre dépoli, des pilules ou badges (« FRESH DROPS EVERYDAY »), du grain et un fond
    sombre.
@@ -42,13 +42,13 @@ génère une landing page. Le site propose aussi :
 
 **Templates à retenir pour nous :**
 
-| Template (URL `motionsites.ai/?prompt=…`) | Pourquoi                                                                                                                  |
-| ----------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| **OYLA** (`oyla`, Ecommerce, 614 likes, le plus aimé) | Bijouterie : vidéo IA d'un geste vers la caméra, serif éditorial géant, nav `ABOUT / ≡ / [BAG]`. L'e-commerce traité comme une campagne de mode. |
-| **KnowSugar** (Healthcare)                | Un seul objet translucide (un cube de sucre) en lévitation sur fond gris, avec un titre italique. C'est exactement la mise en scène d'un objet imprimé. |
-| **Nebula Hero** / **Space planet**        | Planète à anneaux, flammes stylisées, violet et vert menthe : un diorama illustré plus qu'une photo.                     |
-| **3D Portfolio** / **3D Character Studio** | Personnage 3D façon Pixar comme mascotte. À éviter pour nous (hors marque), mais c'est la preuve que le ton « jouet » plaît. |
-| Fond **« île flottante »** (`/backgrounds`) | Une île miniature dans les nuages : l'esthétique diorama et tilt-shift qui correspond parfaitement à un objet imprimé posé sur un plateau. |
+| Template (URL `motionsites.ai/?prompt=…`)             | Pourquoi                                                                                                                                                |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **OYLA** (`oyla`, Ecommerce, 614 likes, le plus aimé) | Bijouterie : vidéo IA d'un geste vers la caméra, serif éditorial géant, nav `ABOUT / ≡ / [BAG]`. L'e-commerce traité comme une campagne de mode.        |
+| **KnowSugar** (Healthcare)                            | Un seul objet translucide (un cube de sucre) en lévitation sur fond gris, avec un titre italique. C'est exactement la mise en scène d'un objet imprimé. |
+| **Nebula Hero** / **Space planet**                    | Planète à anneaux, flammes stylisées, violet et vert menthe : un diorama illustré plus qu'une photo.                                                    |
+| **3D Portfolio** / **3D Character Studio**            | Personnage 3D façon Pixar comme mascotte. À éviter pour nous (hors marque), mais c'est la preuve que le ton « jouet » plaît.                            |
+| Fond **« île flottante »** (`/backgrounds`)           | Une île miniature dans les nuages : l'esthétique diorama et tilt-shift qui correspond parfaitement à un objet imprimé posé sur un plateau.              |
 
 **Leçon de mise en œuvre, tirée d'un PR public qui a intégré une vidéo Higgsfield de motionsites
 ([crimznexus/multiagency-redesign#5](https://github.com/crimznexus/multiagency-redesign/pull/5)) :**
@@ -323,17 +323,17 @@ plateau), en plans de 3 à 5 s scrubbés au scroll dans une section « L'atelier
 
 ## 4. Outils et services utiles (le propriétaire peut créer des comptes)
 
-| Outil | Usage pour nous | Note |
-| --- | --- | --- |
+| Outil                                                      | Usage pour nous                                                                                                                                                                      | Note                                                                                                                             |
+| ---------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------- |
 | **Higgsfield** (MCP hébergé à `https://mcp.higgsfield.ai`) | Boucles vidéo image-to-video **à partir de vraies photos produits**. Donne accès à Veo 3.1, Kling 3.0, Sora 2 et Seedance, avec plus de 70 presets de caméra (orbite, dolly, macro). | Compte à créer par le propriétaire. Il faut **héberger les vidéos nous-mêmes** (R2 ou `public/`), en 720p WebM d'environ 300 Ko. |
-| **GSAP 3.13+** | ScrollTrigger, SplitText (révélations de titres en 4 langues), Flip (transitions de la grille vers la fiche), DrawSVG (toolpath), CustomEase. | Gratuit. Installé via npm, donc aucun problème de CSP. |
-| **Lenis** (lenis.dev) | Scroll inertiel, `lenis/snap`, synchronisé avec le ticker GSAP. | Moins de 5 Ko. |
-| **Three.js 0.186 / R3F + drei** (déjà installé) | Objet héros, configurateur, curseur rayon X, topographie. | Déjà chargé derrière `next/dynamic({ssr:false})` (voir `product-viewer-3d.tsx`). |
-| **Rive** | Micro-animations interactives (mark, icônes, états du panier). | Le runtime WASM exige `'wasm-unsafe-eval'` dans le CSP. |
-| **Unicorn Studio** | Fonds shader no-code (bruit, fluide, lumière volumétrique), environ 29 Ko de runtime, export en vidéo WebM/MP4 possible. | L'embed charge un CDN tiers, donc à ajouter au CSP. **L'export vidéo évite ce problème.** |
-| **Blender / Houdini** | Précuisson de la lumière, de l'AO et des normal maps de lignes de couche. Export GLB Draco/Meshopt, textures KTX2. | |
-| **swisstopo** (données d'altitude libres) | Courbes de niveau des Alpes pour l'idée topographique. | Données ouvertes. Vérifier la mention d'attribution. |
-| **Codrops, madewithgsap.com, demos.gsap.com** | Recettes d'effets (voxel drop, galeries WebGL révélées au scroll, masques SVG). | madewithgsap coûte 20 à 25 €/mois. |
+| **GSAP 3.13+**                                             | ScrollTrigger, SplitText (révélations de titres en 4 langues), Flip (transitions de la grille vers la fiche), DrawSVG (toolpath), CustomEase.                                        | Gratuit. Installé via npm, donc aucun problème de CSP.                                                                           |
+| **Lenis** (lenis.dev)                                      | Scroll inertiel, `lenis/snap`, synchronisé avec le ticker GSAP.                                                                                                                      | Moins de 5 Ko.                                                                                                                   |
+| **Three.js 0.186 / R3F + drei** (déjà installé)            | Objet héros, configurateur, curseur rayon X, topographie.                                                                                                                            | Déjà chargé derrière `next/dynamic({ssr:false})` (voir `product-viewer-3d.tsx`).                                                 |
+| **Rive**                                                   | Micro-animations interactives (mark, icônes, états du panier).                                                                                                                       | Le runtime WASM exige `'wasm-unsafe-eval'` dans le CSP.                                                                          |
+| **Unicorn Studio**                                         | Fonds shader no-code (bruit, fluide, lumière volumétrique), environ 29 Ko de runtime, export en vidéo WebM/MP4 possible.                                                             | L'embed charge un CDN tiers, donc à ajouter au CSP. **L'export vidéo évite ce problème.**                                        |
+| **Blender / Houdini**                                      | Précuisson de la lumière, de l'AO et des normal maps de lignes de couche. Export GLB Draco/Meshopt, textures KTX2.                                                                   |                                                                                                                                  |
+| **swisstopo** (données d'altitude libres)                  | Courbes de niveau des Alpes pour l'idée topographique.                                                                                                                               | Données ouvertes. Vérifier la mention d'attribution.                                                                             |
+| **Codrops, madewithgsap.com, demos.gsap.com**              | Recettes d'effets (voxel drop, galeries WebGL révélées au scroll, masques SVG).                                                                                                      | madewithgsap coûte 20 à 25 €/mois.                                                                                               |
 
 ---
 
