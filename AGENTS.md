@@ -2,7 +2,10 @@
 
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
 <!-- END:nextjs-agent-rules -->
 
 ---
@@ -17,20 +20,21 @@ This version has breaking changes — APIs, conventions, and file structure may 
 
 Every `.md` in this repo, what it's for, and who reads it:
 
-| File                                                                     | Audience       | Read it for                                                                                                           |
-| ------------------------------------------------------------------------ | -------------- | --------------------------------------------------------------------------------------------------------------------- |
-| [`docs/codemap.md`](docs/codemap.md)                                     | Agents         | **Start here for any code task** — "I need to do X" → exact file(s)                                                   |
-| [`docs/architecture.md`](docs/architecture.md)                           | Agents / dev   | Data model, request flows (checkout, quotes, auth), runtime model                                                     |
-| [`docs/conventions.md`](docs/conventions.md)                             | Agents / dev   | Code patterns, CSP nonce contract, i18n, Swiss specifics, style                                                       |
-| [`docs/playbook.md`](docs/playbook.md)                                   | Human ↔ agent  | How to phrase a request well, task recipes, prompt templates                                                          |
-| [`docs/runbook.md`](docs/runbook.md)                                     | Ops            | Deploy/rollback steps, incident procedures, secrets rotation                                                          |
-| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)       | Ops            | Git ↔ Cloudflare Workers Builds wiring, preview env, PR-stack pitfall                                                 |
-| [`docs/audit-remediation-2026-09.md`](docs/audit-remediation-2026-09.md) | Ops            | September 2026 audit report (dated snapshot): fixes shipped, incident 1102 cause, post-deploy checks — not a rulebook |
-| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md)     | Product        | Forward-looking redesign proposal — **not implemented**, don't treat as current state                                 |
-| [`README.md`](README.md)                                                 | Human (public) | Project overview, stack, setup, for anyone landing on the repo                                                        |
-| [`ROADMAP.md`](ROADMAP.md)                                               | Product        | What's shipped vs. what's next, budget                                                                                |
-| [`SECURITY.md`](SECURITY.md)                                             | Security       | Vulnerability disclosure process                                                                                      |
-| [`LICENSE.md`](LICENSE.md)                                               | Legal          | All-rights-reserved terms                                                                                             |
+| File                                                                       | Audience          | Read it for                                                                                                               |
+| -------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| [`docs/codemap.md`](docs/codemap.md)                                       | Agents            | **Start here for any code task** — "I need to do X" → exact file(s)                                                       |
+| [`docs/architecture.md`](docs/architecture.md)                             | Agents / dev      | Data model, request flows (checkout, quotes, auth), runtime model                                                         |
+| [`docs/conventions.md`](docs/conventions.md)                               | Agents / dev      | Code patterns, CSP nonce contract, i18n, Swiss specifics, style                                                           |
+| [`docs/playbook.md`](docs/playbook.md)                                     | Human ↔ agent     | How to phrase a request well, task recipes, prompt templates                                                              |
+| [`docs/runbook.md`](docs/runbook.md)                                       | Ops               | Deploy/rollback steps, incident procedures, secrets rotation                                                              |
+| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)         | Ops               | Git ↔ Cloudflare Workers Builds wiring, preview env, PR-stack pitfall                                                     |
+| [`docs/audit-remediation-2026-09.md`](docs/audit-remediation-2026-09.md)   | Ops               | September 2026 audit report (dated snapshot): fixes shipped, incident 1102 cause, post-deploy checks — not a rulebook     |
+| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md)       | Product           | Forward-looking redesign proposal — **not implemented**, don't treat as current state                                     |
+| [`docs/redesign-2026/DESIGN-BRIEF.md`](docs/redesign-2026/DESIGN-BRIEF.md) | Agents (redesign) | Binding spec of the « Strates » redesign (branch `claude/redesign-2026`): tokens, motion, Stage, packages, file ownership |
+| [`README.md`](README.md)                                                   | Human (public)    | Project overview, stack, setup, for anyone landing on the repo                                                            |
+| [`ROADMAP.md`](ROADMAP.md)                                                 | Product           | What's shipped vs. what's next, budget                                                                                    |
+| [`SECURITY.md`](SECURITY.md)                                               | Security          | Vulnerability disclosure process                                                                                          |
+| [`LICENSE.md`](LICENSE.md)                                                 | Legal             | All-rights-reserved terms                                                                                                 |
 
 `CLAUDE.md` at the repo root is a one-line `@AGENTS.md` import — this file
 _is_ the actual source of truth Claude Code loads every session.
@@ -155,6 +159,37 @@ put` on an environment with real users without `--env <name>` explicitly
     `product-viewer-3d.tsx` behind `next/dynamic({ ssr: false })`; importing
     `showroom-scene.ts` directly from `product-gallery.tsx` puts Three.js back
     into the server Worker and costs about 243 KiB gzip.
+11. **Motion boundary (redesign « Strates »): `gsap`, `lenis` and `three`
+    live only under `src/motion/**`, and `src/motion` is reached only from
+    `src/gates/**`.** A gate is a `"use client"` file holding nothing but
+    module-level `dynamic(() => import("@/motion/…"), { ssr: false })`
+    declarations: with `ssr: false` Next strips the import from the server
+    build, so the Worker never sees those packages. Anything else — a static import,
+    or an `await import("three")` in an effect of a server-rendered component
+    — stays in the Worker (rule 10). Three guards enforce it: `.oxlintrc.json`
+    (`no-restricted-imports`, which also flags dynamic `import()`; types pass
+    with `import type`), [`src/gates/boundary.test.ts`](src/gates/boundary.test.ts)
+    (no `@/motion` string anywhere else in `src/**`, not even in a mock) and
+    `bun scripts/check-worker-bundle.ts` after an OpenNext build (0 engine
+    signature allowed in `.open-next/server-functions`). The DOM talks to the
+    heavy side only through the light, SSR-safe bridge
+    [`src/lib/motion-bridge/**`](src/lib/motion-bridge/) (store,
+    `useStageView`, motion preference, capability tier): the heavy side
+    imports the bridge, never the reverse. **Lenis and the WebGL Stage exist
+    only inside the `src/app/[locale]/(site)/` route group**, mounted by
+    [`SiteShell`](src/components/site-shell.tsx) from its layout: cart,
+    checkout, account, admin, OAuth, track and legal stay outside the group
+    and never get either (no Lenis, no transform, no canvas around Stripe
+    iframes). A page that joins or leaves the group also updates
+    `isSitePath()` in [`src/components/ui/site-link.tsx`](src/components/ui/site-link.tsx)
+    (the « Coupe » page transition only plays between two pages of the
+    group). **i18n by namespace:** during the redesign the historical
+    `messages/{fr,de,it,en}.json` are frozen; each package writes its new text
+    in its own `messages/<locale>/<namespace>.json` (declared in
+    [`src/i18n/namespaces.ts`](src/i18n/namespaces.ts), merged by
+    `src/i18n/request.ts`), and `src/i18n/messages.test.ts` enforces the same
+    keys and ICU arguments in the 4 locales and zero `ß` in German. Details:
+    [`docs/conventions.md`](docs/conventions.md) → Motion, i18n, Design tokens.
 
 ## Tech stack
 
@@ -230,10 +265,18 @@ has a populated shop without ever holding real customer data.
 src/
   app/[locale]/   localized pages: shop, products, cart, checkout, custom (quotes),
                   account, admin, legal, track. error.tsx / not-found.tsx
+  app/[locale]/(site)/  route group (not in the URL) of the public showcase
+                  pages: home, shop, products, custom, a-propos, contact (and
+                  the Studio). Its layout mounts SiteShell (Lenis + WebGL
+                  Stage); everything else under [locale] never gets them
   app/api/        route handlers: stripe/webhook, checkout, quote-*, discount,
                   files & admin/files (R2), cron/maintenance, auth/[...all],
                   csp-report, track-order
   components/     shared UI (product-card, add-to-cart, theme-toggle, …)
+  components/ui/  « Strates » primitives: SiteLink, PageCut, Button, Field,
+                  Chip, Chapter, Drawer, Toast, StageView, MeasureStrip, icons…
+  gates/          the ONLY door to src/motion: next/dynamic({ ssr: false }) (rule 11)
+  motion/         client-only engines: gsap, Lenis runtime, three Stage + scenes
   db/             Drizzle (Postgres/pg-core): schema.pg.ts + index.pg.ts are the
                   real source; schema.ts/index.ts are thin re-export shims
                   (so every call site still says `getDb()`/`@/db/schema`).
@@ -242,6 +285,8 @@ src/
   i18n/           next-intl routing / request / navigation
   lib/            domain logic: auth, session, orders, cart, stripe, discounts,
                   shipping, email(+templates), rate-limit, maintenance, format, theme
+  lib/motion-bridge/  light SSR-safe bridge between the DOM and src/motion
+                  (store, useStageView, motion preference, capability tier)
   lib/agent/      AI-agent surfaces: MCP (public + /mcp/account), A2A, REST,
                   discovery, OAuth 2.1 resource server, auth.md agent registration
   lib/commerce/   agentic commerce: Stripe catalogue feed, ACS hooks, agent
@@ -249,7 +294,8 @@ src/
   middleware.ts   Edge middleware: i18n + security headers + CSP nonce + www→apex
 drizzle/          D1/SQLite migrations + snapshots (legacy, inactive DB) — NEVER hand-edit
 drizzle-pg/       Postgres migrations + snapshots (active DB, drizzle.config.pg.ts) — NEVER hand-edit
-messages/         next-intl translations (fr/de/it/en)
+messages/         next-intl translations (fr/de/it/en); <locale>/<namespace>.json
+                  = one file per redesign package (rule 11), merged at load
 scripts/          seed*.sql, migrate-d1-to-pg.ts (Bun,
                   one-off D1→Postgres data migration tool, reusable if D1 ever
                   needs resyncing before the rollback safety net is retired)
