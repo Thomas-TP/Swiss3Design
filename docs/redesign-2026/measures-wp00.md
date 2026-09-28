@@ -40,7 +40,8 @@ rapport direct avec le chiffre de wrangler) : `handler.mjs` 2 589,0 KiB,
 164 chunks dans `.next/static/chunks` : 1 011,2 KiB gzip au total.
 
 JS initial par page (rootMainFiles + chunks des modules client de la route, hors
-chunks `next/dynamic`) :
+chunks `next/dynamic`), mesuré avec la première version du script, qui comptait aussi
+les chunks d'entrée hors de la chaîne de la route (voir la note de la section 2) :
 
 | Route                                       | gzip          | brut      | chunks |
 | ------------------------------------------- | ------------- | --------- | ------ |
@@ -91,4 +92,57 @@ Lighthouse dans la session). À faire sur `bun run preview` avant le jalon J0 : 
 Relevé des 6 pages vitrine × 4 langues, plus `/fr/cart`, `/fr/legal/terms` et deux 404
 (statut, `<title>`, canonical, nombre de h1 et de blocs JSON-LD) et copie de
 `/sitemap.xml` : tous en 200 (404 pour les deux URL inexistantes), un seul h1 par
-page. Ce relevé sert de témoin à l'étape 4 (voir plus bas).
+page (les deux 404 n'ont aucun h1 dans le HTML du serveur de dev, avant comme après
+le déplacement : point à revoir par WP-UTILITY). Ce relevé sert de témoin à l'étape 4.
+
+## 2. Après les étapes 2 à 4 de WP-00 (paquets, garde-fous, groupe `(site)`)
+
+Build `bunx opennextjs-cloudflare build` sur `claude/redesign-2026--wp00-base`, après
+l'ajout des paquets du §4.7 (aucun n'est encore importé), des garde-fous et du
+`git mv` des six routes vitrine dans `src/app/[locale]/(site)/` avec son
+`layout.tsx` et une `SiteShell` minimale.
+
+### Worker
+
+| Mesure                                              | Référence     | Après l'étape 4  | Écart     |
+| --------------------------------------------------- | ------------- | ---------------- | --------- |
+| `Total Upload` (dry-run)                            | 15 853,89 KiB | 15 882,26 KiB    | +28,4 KiB |
+| `gzip` (dry-run)                                    | 3 064,86 KiB  | **3 057,96 KiB** | −6,9 KiB  |
+| Signatures three/gsap/lenis (`check-worker-bundle`) | 0             | **0**            | —         |
+
+Dans le budget de WP-00 (≤ base + 20 KiB gzip). L'écart négatif relève de la variation
+d'un build à l'autre : aucun code servi n'a changé hormis la `SiteShell`.
+
+### JS initial
+
+À méthode égale (première version du script), chaque page gagne 0,3 KiB gzip et un
+chunk : celui du layout `(site)`, que Next fusionne dans le manifeste de toutes les
+pages de `/[locale]`. Accueil : 218,7 → **219,0 KiB** (budget ≤ 233,7 KiB).
+
+Le script a ensuite été corrigé : Next fusionne dans le manifeste d'une page ceux de
+ses segments parents, si bien que `/shop` comptait aussi la page d'accueil. Les chunks
+d'entrée `app/…` hors de la chaîne de la route sont désormais retirés (les chunks
+partagés restent comptés : c'est une borne haute). L'accueil n'est pas concerné.
+
+| Route                                | gzip          | brut      | chunks |
+| ------------------------------------ | ------------- | --------- | ------ |
+| `/[locale]` (accueil)                | **219,0 KiB** | 692,1 KiB | 14     |
+| `/[locale]/shop`                     | 218,9 KiB     | 692,3 KiB | 13     |
+| `/[locale]/products/[slug]`          | 222,0 KiB     | 701,1 KiB | 14     |
+| `/[locale]/custom`                   | 237,5 KiB     | 745,1 KiB | 15     |
+| `/[locale]/a-propos`                 | 240,0 KiB     | 755,3 KiB | 15     |
+| `/[locale]/contact`                  | 236,1 KiB     | 740,4 KiB | 15     |
+| `/[locale]/cart` (hors `(site)`)     | 242,3 KiB     | 758,2 KiB | 15     |
+| `/[locale]/checkout` (hors `(site)`) | 252,1 KiB     | 786,6 KiB | 16     |
+
+Ce tableau est la référence pour les packages suivants.
+
+### Routes, sitemap, 404
+
+- Table des routes de `next build` : **identique** (121 lignes, aucune URL changée).
+- `/sitemap.xml` (serveur de dev, catalogue de la branche Neon `preview`) :
+  **identique à l'octet** (même SHA-256 avant et après).
+- Relevé des 28 URL (6 pages × 4 langues, `/fr/cart`, `/fr/legal/terms`, deux 404) :
+  statut, `<title>`, canonical, nombre de h1 et de JSON-LD **identiques**.
+- Navigation client dans le navigateur : `/fr/shop` → `/fr/a-propos` → `/fr/cart` (hors
+  `(site)`) → `/fr`, sans erreur de console.
