@@ -194,7 +194,7 @@ export default async function AdminOrderDetailPage({
           </p>
           {order.status === "cancelled" &&
             order.refundedCents < order.totalCents && (
-              <p className="mt-2 font-medium text-accent">
+              <p className="mt-2 font-medium text-accent-text">
                 {paymentText("refundPending")}
               </p>
             )}

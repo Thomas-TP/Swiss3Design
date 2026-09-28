@@ -95,7 +95,7 @@ export function PasskeysSection({
                 type="button"
                 onClick={() => onDelete(p.id)}
                 disabled={pending !== null}
-                className="shrink-0 text-soft transition-colors hover:text-accent disabled:opacity-40"
+                className="shrink-0 text-soft transition-colors hover:text-accent-text disabled:opacity-40"
                 aria-label={t("security.passkeys.delete")}
               >
                 <Trash2 size={15} />
@@ -105,7 +105,7 @@ export function PasskeysSection({
         </ul>
       )}
 
-      {error && <p className="mt-3 text-sm font-medium text-accent">{error}</p>}
+      {error && <p className="mt-3 text-sm font-medium text-accent-text">{error}</p>}
 
       <button
         type="button"

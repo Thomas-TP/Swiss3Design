@@ -137,7 +137,7 @@ export default async function CheckoutSuccessPage({
               ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
               : status === "processing"
                 ? "bg-amber-500/15 text-amber-600 dark:text-amber-300"
-                : "bg-accent/10 text-accent"
+                : "bg-accent/10 text-accent-text"
           }`}
         >
           <Icon size={30} strokeWidth={1.8} />

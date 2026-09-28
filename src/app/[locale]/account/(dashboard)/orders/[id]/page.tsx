@@ -121,7 +121,7 @@ export default async function OrderDetailPage({
               </span>
             </span>
           </span>
-          <span className="shrink-0 text-sm font-semibold text-accent">
+          <span className="shrink-0 text-sm font-semibold text-accent-text">
             {t("orderDetail.trackOrder")} →
           </span>
         </a>

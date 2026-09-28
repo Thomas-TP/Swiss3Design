@@ -141,7 +141,7 @@ export function TrackFlow({
                 </span>
               </span>
             </span>
-            <span className="shrink-0 text-sm font-semibold text-accent">
+            <span className="shrink-0 text-sm font-semibold text-accent-text">
               {t("trackOrder")} →
             </span>
           </a>
@@ -302,7 +302,7 @@ export function TrackFlow({
       </div>
 
       {error && (
-        <p className="mt-4 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+        <p className="mt-4 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
           {error}
         </p>
       )}
@@ -328,7 +328,7 @@ export function TrackFlow({
         {t("haveAccountPrompt")}{" "}
         <Link
           href="/account/login"
-          className="inline-flex items-center gap-1 font-semibold text-accent hover:underline"
+          className="inline-flex items-center gap-1 font-semibold text-accent-text hover:underline"
         >
           {t("loginLink")}
           <ArrowRight size={14} />

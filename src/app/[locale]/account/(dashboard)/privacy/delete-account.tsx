@@ -23,7 +23,7 @@ export function DeleteAccount() {
 
   return (
     <div className="rounded-card border border-red-500/30 bg-red-500/5 p-5 sm:p-6">
-      <p className="flex items-center gap-2 text-sm font-semibold text-accent">
+      <p className="flex items-center gap-2 text-sm font-semibold text-accent-text">
         <Trash2 size={16} />
         {t("security.dangerTitle")}
       </p>
@@ -38,7 +38,7 @@ export function DeleteAccount() {
           type="button"
           onClick={onDelete}
           disabled={pending}
-          className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-accent transition-colors hover:bg-red-500/20 disabled:opacity-60"
+          className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-accent-text transition-colors hover:bg-red-500/20 disabled:opacity-60"
         >
           <Trash2 size={15} />
           {pending ? t("security.processing") : t("security.deleteButton")}

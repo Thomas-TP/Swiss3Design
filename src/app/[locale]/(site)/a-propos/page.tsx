@@ -44,7 +44,7 @@ function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
   return (
     <div className="mb-8">
       <span className="flex h-1 w-10 rounded-full bg-accent" />
-      <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-accent">
+      <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-accent-text">
         {kicker}
       </p>
       <h2 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">
@@ -167,7 +167,7 @@ export default async function AboutPage({
           {c.steps.map((step, i) => (
             <Reveal key={step.title} inView delay={i * 0.06}>
               <div className="flex h-full flex-col rounded-2xl border border-line bg-surface p-5">
-                <span className="grid h-9 w-9 place-items-center rounded-full bg-accent/10 text-sm font-bold text-accent">
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-accent/10 text-sm font-bold text-accent-text">
                   {i + 1}
                 </span>
                 <p className="mt-4 text-sm font-semibold">{step.title}</p>
@@ -199,7 +199,7 @@ export default async function AboutPage({
               <p className="text-5xl font-bold tracking-tight md:text-6xl">
                 {c.plaName}
               </p>
-              <p className="mt-2 text-sm font-medium text-accent">
+              <p className="mt-2 text-sm font-medium text-accent-text">
                 {c.plaTagline}
               </p>
             </div>
@@ -210,7 +210,7 @@ export default async function AboutPage({
                     <Check
                       size={13}
                       strokeWidth={2.5}
-                      className="text-accent"
+                      className="text-accent-text"
                     />
                   </span>
                   <span className="text-sm leading-snug text-ink">{point}</span>
@@ -241,7 +241,7 @@ export default async function AboutPage({
               <Reveal key={item.title} inView delay={i * 0.06}>
                 <div className="flex h-full flex-col rounded-2xl border border-line bg-surface p-5 transition-colors hover:border-soft/40">
                   <span className="grid h-10 w-10 place-items-center rounded-xl bg-paper ring-1 ring-line">
-                    <Icon size={19} strokeWidth={1.8} className="text-accent" />
+                    <Icon size={19} strokeWidth={1.8} className="text-accent-text" />
                   </span>
                   <p className="mt-4 text-sm font-semibold">{item.title}</p>
                   <p className="mt-1 text-sm leading-snug text-soft">
@@ -294,7 +294,7 @@ export default async function AboutPage({
           <Reveal inView>
             <div className="text-center">
               <span className="mx-auto flex h-1 w-10 rounded-full bg-accent" />
-              <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-accent">
+              <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-accent-text">
                 {c.contactKicker}
               </p>
               <h2 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">
@@ -323,7 +323,7 @@ export default async function AboutPage({
               </a>
               <Link
                 href="/custom"
-                className="inline-flex items-center gap-1.5 font-medium text-ink transition-colors hover:text-accent"
+                className="inline-flex items-center gap-1.5 font-medium text-ink transition-colors hover:text-accent-text"
               >
                 {t("quoteCta")}
                 <ArrowRight size={15} />

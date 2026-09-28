@@ -75,7 +75,7 @@ export default async function ContactPage({
           </a>
           <Link
             href="/custom"
-            className="inline-flex items-center gap-1.5 font-medium text-ink transition-colors hover:text-accent"
+            className="inline-flex items-center gap-1.5 font-medium text-ink transition-colors hover:text-accent-text"
           >
             {t("quoteCta")}
             <ArrowRight size={15} />

@@ -71,7 +71,7 @@ export function ResetForm({ token }: { token: string }) {
         <p className="mt-1 text-xs text-soft">{t("passwordHint")}</p>
       </div>
       {error && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
           {error}
         </p>
       )}

@@ -110,7 +110,7 @@ export default function CartContent({
                       track("Product Removed", productProperties(item));
                     }}
                     aria-label={t("remove")}
-                    className="rounded-full p-1.5 text-soft transition-colors hover:bg-line/60 hover:text-accent"
+                    className="rounded-full p-1.5 text-soft transition-colors hover:bg-line/60 hover:text-accent-text"
                   >
                     <Trash2 size={16} />
                   </button>

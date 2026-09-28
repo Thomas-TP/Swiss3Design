@@ -128,7 +128,7 @@ export function EmailForm({
           </div>
         </form>
       )}
-      {error && <p className="mt-2 text-sm font-medium text-accent">{error}</p>}
+      {error && <p className="mt-2 text-sm font-medium text-accent-text">{error}</p>}
     </div>
   );
 }

@@ -99,7 +99,7 @@ export function PasswordSection() {
           required
           className={field}
         />
-        {error && <p className="text-sm font-medium text-accent">{error}</p>}
+        {error && <p className="text-sm font-medium text-accent-text">{error}</p>}
         {done && (
           <p className="text-sm font-medium text-emerald-600">
             {t("security.passwordSection.saved")}

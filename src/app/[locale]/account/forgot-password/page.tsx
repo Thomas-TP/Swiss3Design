@@ -19,7 +19,7 @@ export default async function ForgotPasswordPage() {
       <p className="mt-5 text-center text-sm text-soft">
         <Link
           href="/account/login"
-          className="font-semibold text-accent hover:underline"
+          className="font-semibold text-accent-text hover:underline"
         >
           {t("signInTitle")}
         </Link>

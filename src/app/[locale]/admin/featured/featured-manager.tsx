@@ -105,7 +105,7 @@ export function FeaturedManager({
         <section className="rounded-card border border-line bg-surface p-4 sm:p-5">
           <div className="mb-3 flex items-center justify-between gap-2">
             <h3 className="flex items-center gap-2 font-semibold">
-              <Sparkles size={16} className="text-accent" />
+              <Sparkles size={16} className="text-accent-text" />
               Dans la sélection
             </h3>
             <span className="rounded-full bg-line/60 px-2 py-0.5 text-xs font-bold tabular-nums text-soft">
@@ -148,7 +148,7 @@ export function FeaturedManager({
                       onPointerDown={(e) => e.stopPropagation()}
                       onClick={() => remove(p.id)}
                       aria-label={`Retirer ${p.name} de la sélection`}
-                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-soft transition-colors hover:bg-accent/10 hover:text-accent"
+                      className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-soft transition-colors hover:bg-accent/10 hover:text-accent-text"
                     >
                       <X size={16} />
                     </button>

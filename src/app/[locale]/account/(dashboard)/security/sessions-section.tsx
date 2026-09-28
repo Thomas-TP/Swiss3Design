@@ -138,7 +138,7 @@ export function SessionsSection() {
                   type="button"
                   onClick={() => onRevokeGroup(revocableTokens)}
                   disabled={revoking !== null}
-                  className="shrink-0 text-xs font-semibold text-accent transition-opacity hover:opacity-70 disabled:opacity-40"
+                  className="shrink-0 text-xs font-semibold text-accent-text transition-opacity hover:opacity-70 disabled:opacity-40"
                 >
                   {revoking === revocableTokens[0]
                     ? t("security.processing")

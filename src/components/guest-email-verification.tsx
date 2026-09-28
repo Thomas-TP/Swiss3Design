@@ -187,7 +187,7 @@ export function GuestEmailVerification({
       {error && (
         <p
           role="alert"
-          className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent"
+          className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text"
         >
           {error}
         </p>
@@ -196,7 +196,7 @@ export function GuestEmailVerification({
         {t("haveAccount")}{" "}
         <Link
           href={{ pathname: "/account/login", query: { next } }}
-          className="font-semibold text-accent hover:underline"
+          className="font-semibold text-accent-text hover:underline"
         >
           {t("loginCta")}
         </Link>

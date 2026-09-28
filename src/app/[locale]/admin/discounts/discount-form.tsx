@@ -140,7 +140,7 @@ export function DiscountForm({ initial }: { initial?: DiscountFormInitial }) {
       </section>
 
       {state.error && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent">
+        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
           {state.error}
         </p>
       )}
@@ -179,7 +179,7 @@ function DeleteButton({ id }: { id: string }) {
           alert("Échec de la suppression, réessayez.");
         }
       }}
-      className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-semibold text-accent transition-colors hover:bg-red-500/20"
+      className="ml-auto inline-flex items-center gap-1.5 rounded-full border border-red-500/30 bg-red-500/10 px-4 py-2 text-xs font-semibold text-accent-text transition-colors hover:bg-red-500/20"
     >
       <Trash2 size={14} />
       Supprimer

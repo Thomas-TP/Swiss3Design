@@ -90,7 +90,7 @@ export default async function AdminQuoteDetailPage({
           Devis valable jusqu&apos;au{" "}
           {quote.validUntil.toLocaleDateString("fr-CH")}
           {quoteExpired && (
-            <span className="font-semibold text-accent"> · expiré</span>
+            <span className="font-semibold text-accent-text"> · expiré</span>
           )}
         </p>
       )}

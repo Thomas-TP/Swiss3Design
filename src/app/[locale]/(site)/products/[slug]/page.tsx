@@ -283,7 +283,7 @@ export default async function ProductPage({
                   <Icon
                     size={16}
                     strokeWidth={1.8}
-                    className="shrink-0 text-accent"
+                    className="shrink-0 text-accent-text"
                   />
                   <span className="text-xs font-semibold leading-tight">
                     {label}

@@ -149,7 +149,7 @@ export default async function QuoteDetailPage({
           </p>
           {quote.validUntil && (
             <p
-              className={`mt-2 inline-flex items-center gap-1.5 text-xs font-medium ${expired ? "text-accent" : "text-soft"}`}
+              className={`mt-2 inline-flex items-center gap-1.5 text-xs font-medium ${expired ? "text-accent-text" : "text-soft"}`}
             >
               <Clock size={13} />
               {expired
