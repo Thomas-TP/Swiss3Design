@@ -8,12 +8,20 @@ import {
   setAnalyticsOptOut,
   subscribeAnalyticsOptOut,
 } from "@/lib/analytics";
+import { buttonClass } from "./ui/button";
 
 // Information sur la mesure d'audience, au régime suisse (art. 45c LTC :
 // informer et permettre de refuser) : la mesure tourne déjà, le bandeau ne
 // bloque rien. « OK » le referme, « Refuser » coupe toute mesure et tout
 // enregistrement. Masqué au paiement (il couvrirait le bouton de commande
 // sur mobile) et dans l'admin.
+//
+// Habillage « Strates » (brief §7.4) : un encart de légende de carte, filet
+// sous un titre mono. Mêmes textes, mêmes positions (au-dessus de la
+// BottomNav, en bas à gauche dès lg), même logique. « OK » est en encre, pas
+// en rouge : le bouton rouge de l'écran reste celui de la page. Ancré pendant
+// la « Coupe » (site-consent, page-cut.css) : la page qui s'imprime ne passe
+// pas par-dessus.
 export function ConsentBanner() {
   const t = useTranslations("consent");
   const pathname = usePathname();
@@ -32,14 +40,17 @@ export function ConsentBanner() {
   return (
     <section
       aria-label={t("title")}
-      className="fixed inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 rounded-card border border-line bg-surface p-4 shadow-xl shadow-ink/10 sm:inset-x-auto sm:left-4 sm:max-w-sm lg:bottom-6 lg:left-6"
+      style={{ viewTransitionName: "site-consent" }}
+      className="fixed inset-x-3 bottom-[calc(4.5rem+env(safe-area-inset-bottom))] z-40 rounded-card border border-line bg-elevated p-4 shadow-lg shadow-ink/10 sm:inset-x-auto sm:left-4 sm:max-w-sm lg:bottom-6 lg:left-6"
     >
-      <p className="text-sm font-semibold">{t("title")}</p>
-      <p className="mt-1.5 text-[13px] leading-relaxed text-soft">
+      <p className="s3d-label border-b border-line pb-2.5 text-ink">
+        {t("title")}
+      </p>
+      <p className="mt-2.5 text-[13px] leading-relaxed text-soft">
         {t("text")}{" "}
         <Link
           href="/legal/privacy"
-          className="underline transition-colors hover:text-ink"
+          className="text-ink underline decoration-line underline-offset-2 transition-colors hover:decoration-ink"
         >
           {t("learnMore")}
         </Link>
@@ -48,14 +59,22 @@ export function ConsentBanner() {
         <button
           type="button"
           onClick={() => setAnalyticsOptOut(true)}
-          className="flex-1 rounded-full border border-line px-4 py-2 text-sm font-semibold transition-colors hover:border-ink"
+          className={buttonClass({
+            variant: "secondary",
+            size: "sm",
+            className: "flex-1",
+          })}
         >
           {t("decline")}
         </button>
         <button
           type="button"
           onClick={() => setAnalyticsOptOut(false)}
-          className="flex-1 rounded-full bg-ink px-4 py-2 text-sm font-semibold text-paper transition-opacity hover:opacity-90"
+          className={buttonClass({
+            variant: "ink",
+            size: "sm",
+            className: "flex-1",
+          })}
         >
           {t("accept")}
         </button>

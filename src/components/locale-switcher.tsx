@@ -76,12 +76,13 @@ export function LocaleSwitcher() {
             openAt(routing.locales.length - 1);
           }
         }}
-        className="flex cursor-pointer items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1.5 text-xs font-semibold uppercase tracking-wide text-soft transition-colors hover:text-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        className="s3d-label inline-flex h-9 cursor-pointer items-center gap-1 rounded-field border border-line px-2.5 text-soft transition-colors duration-150 hover:border-iso hover:text-ink aria-expanded:border-ink aria-expanded:text-ink"
       >
         {locale}
         <ChevronDown
           size={13}
-          className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          strokeWidth={1.5}
+          className={`transition-transform duration-150 ${open ? "rotate-180" : ""}`}
         />
       </button>
       {/* oxlint-disable prefer-tag-over-role -- liste deroulante maison necessaire au style de marque */}
@@ -90,7 +91,7 @@ export function LocaleSwitcher() {
           id={listId}
           role="listbox"
           aria-label={t("language")}
-          className="absolute right-0 z-50 mt-2 w-40 overflow-hidden rounded-xl border border-line bg-surface py-1.5 shadow-lg shadow-ink/5"
+          className="absolute right-0 z-20 mt-2 w-44 overflow-hidden rounded-card border border-line bg-elevated py-1 shadow-lg shadow-ink/10"
         >
           {routing.locales.map((nextLocale, index) => (
             <button
@@ -128,13 +129,20 @@ export function LocaleSwitcher() {
                   close();
                 }
               }}
-              className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper focus:bg-paper focus:outline-none ${
-                nextLocale === locale ? "font-semibold" : ""
+              className={`flex w-full items-center gap-3 px-3.5 py-2.5 text-left text-sm transition-colors hover:bg-paper focus:bg-paper focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink ${
+                nextLocale === locale ? "font-semibold text-ink" : "text-soft"
               }`}
             >
-              {NAMES[nextLocale]}
+              <span aria-hidden="true" className="s3d-label w-5 text-soft">
+                {nextLocale}
+              </span>
+              <span className="flex-1">{NAMES[nextLocale]}</span>
               {nextLocale === locale && (
-                <Check size={15} className="shrink-0 text-accent-text" />
+                <Check
+                  size={15}
+                  strokeWidth={1.5}
+                  className="shrink-0 text-accent-text"
+                />
               )}
             </button>
           ))}

@@ -130,14 +130,171 @@ KV-backed fixed window, per IP + route; a no-op locally (no `cf-connecting-ip`).
 
 ## i18n
 
-- All UI strings live in `messages/{fr,de,it,en}.json`; read with `next-intl`
+- All UI strings live in message files read with `next-intl`
   (`useTranslations` / `getTranslations`). **Never hardcode** user-facing text;
-  add the key to **all four** files (fr is the fallback).
+  add the key to **all four** locales (fr is the fallback).
+- **Namespaces (redesign « Strates »).** The historical
+  `messages/{fr,de,it,en}.json` are **frozen** during the redesign (only the
+  final clean-up package removes dead keys). New text goes into the owning
+  package's own file `messages/<locale>/<namespace>.json`: `shell` (chrome),
+  `studioCore`, `landing`, `studio`, `quote`, `catalog`, `atelier`, `system`,
+  `accountUi`. [`src/i18n/request.ts`](../src/i18n/request.ts) grafts each
+  file at the root of the messages, so `useTranslations("shell")` reads
+  `messages/<locale>/shell.json` exactly like `useTranslations("nav")` reads
+  the `nav` key of the historical file. One namespace = one file per locale =
+  one owner, so parallel packages never edit the same JSON.
+- **Adding a namespace** = add it to `NAMESPACES` in
+  [`src/i18n/namespaces.ts`](../src/i18n/namespaces.ts) **and** create the 4
+  files (even `{}`): the import fails on a missing file, and a namespace whose
+  name already exists as a root key of the historical file throws instead of
+  silently replacing it.
+- [`src/i18n/messages.test.ts`](../src/i18n/messages.test.ts) enforces, for
+  every namespace and the historical files: the same key paths in the 4
+  locales, the same ICU arguments (`{count, plural, …}`, `{name}`), no empty
+  value, and **no `ß` in German** (de-CH writes « ss »: « Grösse »,
+  « Schliessen », « Mass »).
+- Budget: everything reaches the client (`NextIntlClientProvider` inherits
+  the merged messages), so keep new text ≤ 25 KB per locale in total.
 - Navigate with the locale-aware helpers from
   [`src/i18n/navigation.ts`](../src/i18n/navigation.ts) (`Link`, `redirect`,
   `useRouter`), not bare `next/link` / `next/navigation`, so the `/fr` `/de` …
-  prefix is preserved.
+  prefix is preserved. The one exception is `useLinkStatus`, imported from
+  `next/link`. Chrome links and CTAs use
+  [`SiteLink`](../src/components/ui/site-link.tsx) (below, Motion).
 - DB content is localized via `*_translations` tables, not message files.
+
+## Motion (redesign « Strates »)
+
+Layers: the server renders a **complete** DOM (text, SVG posters, forms);
+after hydration, the light bridge
+[`src/lib/motion-bridge/**`](../src/lib/motion-bridge/) (store, hooks,
+motion preference, capability tier) decides what to load; the heavy engines
+live in `src/motion/**` and are reached only through `src/gates/**`
+(AGENTS.md, golden rule 11).
+
+- **Boundary.** Never import `gsap`, `@gsap/react`, `lenis`, `three` (or any
+  sub-path) outside `src/motion/**`; `import type` from `three` is fine. A
+  gate (`src/gates/<package>.tsx`) starts with `"use client"` and only holds
+  module-level `dynamic(() => import("@/motion/…"), { ssr: false })`. Outside
+  gates and `src/motion`, the string `@/motion` must not appear at all (the
+  boundary test parses every file). The heavy side imports the bridge, never
+  the reverse. After an OpenNext build, `bun scripts/check-worker-bundle.ts`
+  must report 0 engine signature in the Worker.
+- **`(site)` only.** `SiteShell` (from `src/app/[locale]/(site)/layout.tsx`)
+  loads `MotionRuntime` (GSAP + Lenis) in full motion at capability ≥ C1, and
+  `StageRoot` (three) only once a `StageView` registers, at ≥ C1, without a
+  lost WebGL context. Pages outside the group (cart, checkout, account, admin,
+  OAuth, track, legal) never get Lenis or the canvas; never put Lenis, a
+  transform or an animated overflow around a Stripe iframe.
+- **Motion preference** = `data-motion="reduce" | "full"` on `<html>`, set
+  **before paint** by the anti-FOUC script of the `[locale]` layout (choice
+  stored in `localStorage["s3d-motion"]` by the footer's `MotionToggle`, else
+  `prefers-reduced-motion`). Style with the Tailwind variants `motion-on:` /
+  `motion-off:`; in JS read `readReducedMotion()` /
+  `subscribeMotionPreference()` or `useMotionBridge((s) => s.reduced)`.
+  `globals.css` already cuts animations, transitions and View Transitions in
+  reduced motion; a JS animation (WAAPI, GSAP) must check it itself.
+- **Capability** C0–C2 (`src/lib/motion-bridge/tier.ts`) is detected after
+  hydration; the server and hydration always render C0 (posters). Never make
+  SSR output depend on it: `useMotionBridge` serves the server state during
+  hydration.
+- **Motion never holds content back.** No `opacity: 0` on SSR content
+  waiting for JS, nothing on the `h1`/LCP element, no preloader, no
+  `loading.tsx` inside `(site)` (it breaks View Transition pairs). Simple
+  reveals are CSS: `.s3d-rise` (text blocks), `.s3d-print` (images, cards,
+  8 steps); they only run with `data-motion="full"`.
+- **One engine per property.** GSAP (via `@/motion/gsap`, the only module
+  that imports the gsap packages) for scroll-linked work, timelines and
+  WebGL uniforms; CSS (`transition`, `@starting-style` / `starting:`,
+  `animation-timeline: view()`) for UI. Framer Motion (`motion`) gets **no new
+  use** on showcase pages; it stays for the admin (`Reorder`).
+- **Stage views.** Render
+  [`<StageView scene props poster>`](../src/components/ui/stage-view.tsx):
+  a transparent container that covers its whole section, with the SSR poster
+  as `.s3d-poster` child; the Stage sets `data-stage-ready="true"` on its first
+  frame (the poster fades out) and removes it on context loss. `props` is an
+  immutable snapshot (replace it, never mutate). The canvas is `aria-hidden`:
+  anything that matters must exist in the DOM too.
+- **Page transition « Coupe ».** Every page of `(site)` wraps its content in
+  [`<PageCut>`](../src/components/ui/page-cut.tsx) **in its `page.tsx`**, not in
+  a layout (a layout persists, enter/exit would never fire). `SiteLink` adds
+  the `s3d-coupe` transition type only between two **different** `(site)`
+  pages (`isSitePath()`, keep it in sync with the route group) and never in
+  reduced motion; the back button carries no type, so nothing animates. The
+  fixed chrome is anchored with a `view-transition-name`: `site-header`
+  (`globals.css`), `site-bottom-nav`, `site-consent` and the active nav
+  underline `nav-mark` (`src/components/ui/page-cut.css`). Names must be
+  unique in the document: don't name another element without adding its CSS
+  (or it gets covered by the page that prints over it).
+- **Server wait.** Links use `prefetch={false}` by default; `SiteLink`
+  reports `useLinkStatus()` to the bridge (`navPending`) and the header runs
+  its red nozzle (`NavPending`).
+- **Scrolling.** When Lenis runs, scroll programmatically through
+  `motionBridge.get().scroll?.to(target)` (offset −80 for the 64 px header);
+  otherwise jump natively with `behavior: "auto"` in reduced motion. A nested
+  scroll container gets `data-lenis-prevent`; drawers and dialogs use
+  [`<Drawer>`](../src/components/ui/drawer.tsx) (native `<dialog>` +
+  `showModal()`, top layer), which stops Lenis while open.
+- **Stacking** (z-index): Stage canvas −1 (portaled into `<body>`), content
+  `auto`, favorite on a card 10, menus 20, chapter rail 30, header 40, consent
+  banner 40, mobile Studio bar 45, BottomNav and skip links 50, toasts 55,
+  drawers and dialogs in the top layer. The header stays 64 px tall
+  (`top-16`, `top-24`, `scroll-mt-32` offsets rely on it); the BottomNav is
+  64 px + safe area under `lg`.
+
+## Design tokens (redesign « Strates »)
+
+- **Token names are a contract** used by ~116 files (admin included):
+  `paper`, `surface`, `elevated`, `ink`, `soft`, `line`, `accent`,
+  `accent-dark`, `accent-text`, `on-accent`, `iso`, `iso-index`, `glacier`,
+  `swatch-ring`, `night*`. Values live in
+  [`src/app/globals.css`](../src/app/globals.css) (light, `.dark`,
+  `[data-tone="ink"]`); never hardcode a hex in a component.
+- **Red is heat, not decoration.** `accent` (`#E5231C`) is for graphics only
+  (buttons, dots, pills, progress, text ≥ 24 px); any red text under 24 px is
+  `text-accent-text` (≥ 5.4:1 on every background). **One `primary` (red)
+  button per screen**; other actions are `secondary` (ink outline), `ink`,
+  `ghost` or `text` ([`Button`](../src/components/ui/button.tsx)). White on
+  red is 4.58:1: keep it ≥ 15 px, weight 600.
+- **Ink chapter**: `data-tone="ink"` on a section redefines the tokens
+  locally; in dark theme it becomes `elevated` with a red rule, never a white
+  flash.
+- **Type**: `font-display` (Archivo SemiExpanded, headings; never animate its
+  width or variation axes), `font-sans` (Geist: UI, the wordmark, and the
+  Stripe iframes — unchanged), `font-mono` (Geist Mono: telemetry, labels,
+  12 px minimum). Scale utilities `text-hero` (home h1 only), `text-display`
+  (other h1, chapter h2), `text-title`, `text-subtitle`, `text-lead`,
+  `text-label`; German gets smaller `hero`/`display` and hyphenation from
+  `globals.css`. `.s3d-label` = mono, uppercase, +0.06em, tabular figures;
+  add `normal-case` where it carries a unit (« 0,2 mm », never « MM »). A
+  display title ending with « . » gets the red dot via
+  [`DotTitle` / `withDot()`](../src/components/ui/dot-title.tsx) (the period
+  stays in the text).
+- **Numbers** are always formatted with ``Intl.NumberFormat(`${locale}-CH`)``
+  (`formatChf`, [`Num`](../src/components/ui/mono.tsx), the Studio helpers):
+  a displayed figure is computed, never decorative, real unit first.
+- **Layout**: `.s3d-page` (max 90rem, fluid margins), `.s3d-grid` (4/8/12
+  columns), spacing tokens `gutter`, `margin`, `section` (`py-section`).
+  Radii: `rounded-hair` 2 px (tags), `rounded-field` 4 px (fields, buttons),
+  `rounded-card` 6 px, `rounded-sheet` 14 px (mobile drawer top);
+  `rounded-full` only for pills, dots, avatars and the Studio disc. Hairlines
+  (`line`) on editorial chapters, spec tables and the footer, never as a grid
+  around forms, cart, checkout or account.
+- **Motion tokens**: easings `ease-strate` (UI, reveals), `ease-buse`
+  (camera, nozzle), `ease-purge` (slight overshoot: pills, add to cart),
+  `ease-carte` (big state changes); durations `--dur-micro` 150 ms,
+  `--dur-ui` 280 ms, `--dur-reveal` 800 ms, `--dur-chapter` 1400 ms,
+  `--dur-page` 480 ms.
+- **`globals.css` is frozen after WP-00.** Package styles go in colocated
+  CSS Modules (`*.module.css`). Beware: the few rules written outside
+  `@layer` there (`.s3d-pending`, `.s3d-progress`, `.s3d-stage`) beat every
+  Tailwind utility; render a different element instead of trying to override
+  them.
+- Reuse the primitives of [`src/components/ui/`](../src/components/ui/)
+  (`Button`/`ButtonLink`, `Chip`/`ChipRadio` on native radios,
+  `Field`/`fieldClass`, `SpecTable`, `MeasureStrip`, `Ruler`, `MapFrame`,
+  `Chapter`/`ChapterRail`, `Drawer`, `Toast`, `StageView`, icons) before
+  writing a new one.
 
 ## SEO & GEO (every public page)
 
