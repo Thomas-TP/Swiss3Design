@@ -14,7 +14,7 @@
     "test:watch": "vitest",
     "format": "oxfmt .",
     "format:check": "oxfmt --check .",
-    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview",
+    "preview": "opennextjs-cloudflare build && opennextjs-cloudflare preview -- --upstream-protocol https",
     "deploy": "opennextjs-cloudflare build && opennextjs-cloudflare deploy",
     "cf-typegen": "wrangler types --env-interface CloudflareEnv ./cloudflare-env.d.ts",
     "db:generate": "drizzle-kit generate",

@@ -99,6 +99,14 @@ which for a multi-line hook body is rarely the line you'd expect.
    per-request nonce via the `x-nonce` request header
    (`(await headers()).get("x-nonce")`), or it's blocked **in prod only**.
    `bun run dev` will NOT reveal this — verify with `bun run preview`.
+   `bun run preview` passes `--upstream-protocol https` to `wrangler dev` on
+   purpose: wrangler gives `request.url` the host of the first route
+   (`swiss3design.ch`) with the local protocol, so over plain http the
+   middleware's http→https 308 fired on every page, and wrangler rewrote its
+   `Location` back to `localhost` — an endless 308 loop. With the flag the
+   Worker sees `https://swiss3design.ch/…` exactly as in production (the
+   middleware is untouched). Running `opennextjs-cloudflare preview` by hand
+   needs the same `-- --upstream-protocol https`.
 5. **Money is always integer centimes CHF** (`*_cents`). Never floats, never a
    plain `price`. Format for display via [`src/lib/format.ts`](src/lib/format.ts).
 6. **Cloudflare bindings only exist inside a request.** Always obtain DB/auth via
