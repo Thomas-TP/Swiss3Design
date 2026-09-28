@@ -1,16 +1,23 @@
-// src/motion/gsap.ts — seul module qui importe les paquets gsap (brief
-// « Strates », §3.2). Tout src/motion importe d'ici : les plugins sont
-// enregistrés une fois, les courbes de la marque existent partout sous le même
-// nom, et un plugin rare (DrawSVGPlugin des schémas de l'Atelier) s'enregistre
-// dans la chorégraphie qui l'utilise, jamais ici.
+// src/motion/gsap.ts — socle GSAP de src/motion (brief « Strates », §3.2).
+// Tout src/motion importe gsap, ScrollTrigger et useGSAP d'ici : le cœur est
+// enregistré une fois, les courbes de la marque existent partout sous le même
+// nom. N'y entre que ce que le runtime de WP-00 utilise : ce module fait
+// partie du chunk runtime (≤ 65 KiB gzip avec Lenis, §4.11).
+//
+// Un plugin d'une chorégraphie s'importe et s'enregistre dans la chorégraphie
+// qui s'en sert, jamais ici : SplitText (titres de chapitre), Flip (boutique,
+// Studio), DrawSVGPlugin (schémas de l'Atelier). Il part alors dans le chunk
+// de cette chorégraphie, chargé par son propre gate :
+//
+//   import { SplitText } from "gsap/SplitText";
+//   import { gsap } from "@/motion/gsap";
+//   gsap.registerPlugin(SplitText); // idempotent
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { SplitText } from "gsap/SplitText";
-import { Flip } from "gsap/Flip";
 import { CustomEase } from "gsap/CustomEase";
 import { useGSAP } from "@gsap/react";
 
-gsap.registerPlugin(useGSAP, ScrollTrigger, SplitText, Flip, CustomEase);
+gsap.registerPlugin(useGSAP, ScrollTrigger, CustomEase);
 
 // Mêmes courbes que les jetons CSS --ease-* de globals.css (§2.5, §3.2).
 CustomEase.create("s3d.strate", "M0,0 C0.16,0.84 0.3,1 1,1");
@@ -29,4 +36,4 @@ gsap.defaults({ ease: "s3d.strate", duration: 0.8 });
 // les calculs de ScrollTrigger (hauteurs mobiles en svh, §3.3).
 ScrollTrigger.config({ ignoreMobileResize: true });
 
-export { gsap, ScrollTrigger, SplitText, Flip, CustomEase, useGSAP };
+export { gsap, ScrollTrigger, CustomEase, useGSAP };

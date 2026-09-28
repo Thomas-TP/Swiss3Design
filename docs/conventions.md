@@ -191,7 +191,13 @@ live in `src/motion/**` and are reached only through `src/gates/**`
   stored in `localStorage["s3d-motion"]` by the footer's `MotionToggle`, else
   `prefers-reduced-motion`). Style with the Tailwind variants `motion-on:` /
   `motion-off:`; in JS read `readReducedMotion()` /
-  `subscribeMotionPreference()` or `useMotionBridge((s) => s.reduced)`.
+  `subscribeMotionPreference()` or `useMotionBridge((s) => s.reduced)`; in a
+  React component, `useReducedMotionPreference()`
+  (`src/lib/motion-bridge/use-reduced-motion.ts`: `false` on the server and
+  during hydration, then the real value), never `useReducedMotion()` from
+  `motion/react`, which only reads the OS setting. The `[locale]` layout
+  drives `<MotionConfig reducedMotion>` from the same preference
+  (`ReducedMotionConfig`).
   `globals.css` already cuts animations, transitions and View Transitions in
   reduced motion; a JS animation (WAAPI, GSAP) must check it itself.
 - **Capability** C0–C2 (`src/lib/motion-bridge/tier.ts`) is detected after
@@ -203,9 +209,12 @@ live in `src/motion/**` and are reached only through `src/gates/**`
   `loading.tsx` inside `(site)` (it breaks View Transition pairs). Simple
   reveals are CSS: `.s3d-rise` (text blocks), `.s3d-print` (images, cards,
   8 steps); they only run with `data-motion="full"`.
-- **One engine per property.** GSAP (via `@/motion/gsap`, the only module
-  that imports the gsap packages) for scroll-linked work, timelines and
-  WebGL uniforms; CSS (`transition`, `@starting-style` / `starting:`,
+- **One engine per property.** GSAP (core, ScrollTrigger, `useGSAP` and the
+  brand eases via `@/motion/gsap`) for scroll-linked work, timelines and
+  WebGL uniforms. `@/motion/gsap` sits in the runtime chunk (≤ 65 KiB gzip):
+  a plugin only one choreography needs (SplitText, Flip, DrawSVGPlugin) is
+  imported and `gsap.registerPlugin()`-ed **in that choreography**, never
+  added there; CSS (`transition`, `@starting-style` / `starting:`,
   `animation-timeline: view()`) for UI. Framer Motion (`motion`) gets **no new
   use** on showcase pages; it stays for the admin (`Reorder`).
 - **Stage views.** Render
