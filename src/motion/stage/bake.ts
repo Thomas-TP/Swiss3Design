@@ -18,15 +18,19 @@ import {
   PlaneGeometry,
   RawShaderMaterial,
   UnsignedByteType,
+  Vector4,
   WebGLRenderTarget,
   type WebGLRenderer,
 } from "three";
 
 const WEBP_QUALITY = 0.86;
 
-// Même passe que OutputShader de three (tone mapping puis sRGB), avec en plus
-// le retour à l'alpha non prémultiplié : la résolution du MSAA laisse des
-// bords prémultipliés, qu'ImageData lirait trop sombres.
+// Même passe que OutputShader de three (tone mapping puis sRGB), avec deux
+// ajouts : le retour à l'alpha non prémultiplié (la résolution du MSAA laisse
+// des bords prémultipliés, qu'ImageData lirait trop sombres) et le fond de ton
+// posé APRÈS le tone mapping, comme gl.clear sur le canvas : sans cela, une
+// vue « tone » figée serait un peu plus sombre que la vue vivante (le Neutral
+// abaisse les tons foncés) et le réveil se verrait.
 const OUTPUT_VERTEX = /* glsl */ `
 precision highp float;
 attribute vec3 position;
@@ -40,6 +44,7 @@ void main() {
 const OUTPUT_FRAGMENT = /* glsl */ `
 precision highp float;
 uniform sampler2D tDiffuse;
+uniform vec4 uBackground;
 varying vec2 vUv;
 #include <tonemapping_pars_fragment>
 #include <colorspace_pars_fragment>
@@ -47,14 +52,19 @@ void main() {
   vec4 color = texture2D(tDiffuse, vUv);
   if (color.a > 0.0) color.rgb /= color.a;
   color.rgb = NeutralToneMapping(color.rgb);
-  gl_FragColor = sRGBTransferOETF(color);
+  color = sRGBTransferOETF(color);
+  // Fond déjà en sRGB : mélangé comme le fait le canvas (valeurs encodées).
+  gl_FragColor = vec4(
+    mix(uBackground.rgb, color.rgb, color.a),
+    color.a + uBackground.a * (1.0 - color.a)
+  );
 }`;
 
 export interface CaptureOptions {
   /** Pixels de l'image produite. */
   width: number;
   height: number;
-  /** Fond opaque (couleur three, déjà convertie) ou null pour un fond transparent. */
+  /** Fond opaque (couleur three, espace de travail linéaire) ou null : transparent. */
   background: Color | null;
 }
 
@@ -71,6 +81,7 @@ export class Baker {
       name: "S3DBakeOutput",
       uniforms: {
         tDiffuse: { value: null },
+        uBackground: { value: new Vector4(0, 0, 0, 0) },
         toneMappingExposure: { value: renderer.toneMappingExposure },
       },
       vertexShader: OUTPUT_VERTEX,
@@ -134,14 +145,18 @@ export class Baker {
     const pixels = new Uint8Array(width * height * 4);
     try {
       renderer.setRenderTarget(scene);
-      if (options.background) renderer.setClearColor(options.background, 1);
-      else renderer.setClearColor(0x000000, 0);
+      renderer.setClearColor(0x000000, 0);
       renderer.clear(true, true, false);
       draw();
 
-      this.quad.material.uniforms.tDiffuse.value = scene.texture;
-      this.quad.material.uniforms.toneMappingExposure.value =
-        renderer.toneMappingExposure;
+      const uniforms = this.quad.material.uniforms;
+      uniforms.tDiffuse.value = scene.texture;
+      const background = uniforms.uBackground.value as Vector4;
+      if (options.background) {
+        const srgb = options.background.clone().convertLinearToSRGB();
+        background.set(srgb.r, srgb.g, srgb.b, 1);
+      } else background.set(0, 0, 0, 0);
+      uniforms.toneMappingExposure.value = renderer.toneMappingExposure;
       renderer.setRenderTarget(output);
       renderer.setClearColor(0x000000, 0);
       renderer.clear(true, false, false);
