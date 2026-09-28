@@ -146,3 +146,100 @@ Ce tableau est la référence pour les packages suivants.
   statut, `<title>`, canonical, nombre de h1 et de JSON-LD **identiques**.
 - Navigation client dans le navigateur : `/fr/shop` → `/fr/a-propos` → `/fr/cart` (hors
   `(site)`) → `/fr`, sans erreur de console.
+
+## 3. Vérification de fin de WP-00
+
+Checkout principal, branche `claude/redesign-2026` au commit `4d29a15` (fusion de
+`claude/redesign-2026--wp00-chrome`), 28.09.2026. Mêmes outils qu'en section 1.
+
+### Contrôles du §10
+
+| Contrôle               | Résultat                                                                                                                                                                   |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun run lint`         | vert                                                                                                                                                                       |
+| `bun run typecheck`    | vert après le build (avant : 18 erreurs dans les `.next/types` périmés d'un build d'avant le `git mv`)                                                                     |
+| `bun run test`         | vert : 22 fichiers, 374 tests (15 ignorés sans URL) ; `messages.test.ts` et `boundary.test.ts` : 174 tests verts                                                           |
+| `bun run format:check` | **rouge** : les 14 fichiers de `docs/redesign-2026/{DESIGN-BRIEF,concepts,research}` (commit `fd61dee`, antérieur à WP-00) ne sont pas formatés ; `measures-wp00.md` l'est |
+
+### Worker
+
+| Mesure                                              | Référence     | Fin de WP-00     | Écart      |
+| --------------------------------------------------- | ------------- | ---------------- | ---------- |
+| `Total Upload` (dry-run)                            | 15 853,89 KiB | 15 743,98 KiB    | −109,9 KiB |
+| `gzip` (dry-run)                                    | 3 064,86 KiB  | **3 062,66 KiB** | −2,2 KiB   |
+| Signatures three/gsap/lenis (`check-worker-bundle`) | 0             | **0**            | —          |
+
+Dans le budget de WP-00 (≤ 3 084,86 KiB). Ventilation `check-worker-bundle` : 1 565
+fichiers, `node_modules/` 5 011,8 KiB, `handler.mjs` 2 586,0 KiB, `.next/` 2 309,0 KiB,
+middleware 102,0 KiB (gzip fichier par fichier).
+
+### Chunks client
+
+173 chunks, 1 100,6 KiB gzip (3 400,0 KiB brut).
+
+| Route (JS initial, borne haute)      | gzip          | brut      | chunks | Écart / section 2 |
+| ------------------------------------ | ------------- | --------- | ------ | ----------------- |
+| `/[locale]` (accueil)                | **224,8 KiB** | 709,0 KiB | 14     | +5,8 KiB          |
+| `/[locale]/shop`                     | 224,8 KiB     | 709,3 KiB | 13     | +5,9 KiB          |
+| `/[locale]/products/[slug]`          | 227,9 KiB     | 718,0 KiB | 14     | +5,9 KiB          |
+| `/[locale]/custom`                   | 243,5 KiB     | 762,6 KiB | 15     | +6,0 KiB          |
+| `/[locale]/a-propos`                 | 245,8 KiB     | 772,2 KiB | 15     | +5,8 KiB          |
+| `/[locale]/contact`                  | 242,0 KiB     | 757,3 KiB | 15     | +5,9 KiB          |
+| `/[locale]/cart` (hors `(site)`)     | 245,3 KiB     | 767,5 KiB | 15     | +3,0 KiB          |
+| `/[locale]/checkout` (hors `(site)`) | 255,3 KiB     | 796,4 KiB | 16     | +3,2 KiB          |
+
+Accueil dans le budget (≤ 233,7 KiB). Chunks des gates, d'après
+`.next/react-loadable-manifest.json` (gzip zlib par défaut, comme `chunk-report`) :
+
+| Gate                                | Chunks                                               | gzip           | Budget    |
+| ----------------------------------- | ---------------------------------------------------- | -------------- | --------- |
+| `@/motion/runtime` (gsap + Lenis)   | `4745…` 44,00 · `c15bf2b0…` 19,50 · `7783…` 1,86     | **65,36 KiB**  | ≤ 65 KiB  |
+| `@/motion/stage/stage-root` (three) | `bd904a5c…` 99,44 · `b536a0f1…` 87,26 · `5445…` 6,90 | **193,60 KiB** | ≤ 200 KiB |
+| scène `product-viewer`              | `3753…` 2,58                                         | 2,58 KiB       | ≤ 15 KiB  |
+
+Le chunk runtime dépasse son budget de 0,36 KiB. Le Stage n'est demandé par aucune
+page (aucun `StageView` monté à ce stade) : taille statique seulement.
+
+### Navigateur (`opennextjs-cloudflare preview`, CSP de production)
+
+`bun run preview` boucle en 308 sur toutes les pages en HTTP : wrangler donne à
+`request.url` l'hôte de la première route (`swiss3design.ch`), et le middleware
+redirige alors `http:` vers `https:` (`src/middleware.ts`, lignes 156 à 163, antérieur
+à la refonte). Relevés faits sur le même build servi par
+`bunx opennextjs-cloudflare preview --port 8792 --local-upstream localhost:8792`
+(les sondes `curl` aussi en `--local-protocol https`).
+
+- **SSR** (`curl`, HTTPS) : 200 et un seul h1 sur `/fr`, `/fr/shop`,
+  `/fr/products/vase-spirale`, `/fr/contact`, `/fr/custom`, `/fr/a-propos`, `/fr/cart`,
+  `/fr/checkout`, `/fr/legal/terms` ; `/fr/account` → 307 vers la connexion. CSP à nonce
+  partout, 100 % des scripts inline portent le nonce.
+- **CSP et hydratation**, mouvement complet, 1440 × 900, clair et sombre : aucune
+  violation CSP, aucune erreur d'hydratation sur `/fr`, `/fr/shop`,
+  `/fr/products/vase-spirale`, `/fr/contact`. Seule erreur : 404 sur
+  `/posters/field-footer-{light,dark}.svg` (fond du cartouche du footer, fichiers absents
+  de `public/`), sur toutes les pages.
+- **`html.lenis`** : présent sur `/fr`, `/fr/shop`, `/fr/products/vase-spirale`,
+  `/fr/contact` ; absent sur `/fr/cart`, `/fr/checkout`, `/fr/account`,
+  `/fr/legal/terms`, `/fr/track`, `/fr/favorites`. En navigation client, `/fr/shop` →
+  `/fr/cart` retire la classe et `/fr/cart` → `/fr/shop` la remet.
+- **three** : aucun chunk three demandé sur `/fr/contact` (ni sur `/fr`, `/fr/shop`, ni
+  sur la fiche avant d'ouvrir la vue 3D).
+- **Interrupteur du footer** : bascule sans rechargement (Lenis détruit,
+  `data-motion="reduce"`, `localStorage["s3d-motion"]`), le rechargement suivant ne
+  télécharge plus le runtime ; le script anti-FOUC (nonce, deuxième enfant de
+  `<body>`, avant tout contenu visible) pose `data-motion` avant le paint.
+- **Mouvement réduit** (Chromium headless, `prefers-reduced-motion` émulé par CDP) :
+  ni Lenis ni runtime, contenu dans son état final. Mais, sur `/fr` seulement, erreur
+  React #418 (hydratation) et `data-motion` perdu sur `<html>` après la reprise de
+  React. Avec l'interrupteur sur « reduce » et l'OS sans préférence, le héros de
+  l'accueil boucle toujours et les `Reveal` s'animent encore au défilement :
+  `motion/react` ne lit que la préférence du système.
+- **Mobile** 375 × 812 (émulation tactile) : aucun défilement horizontal sur `/fr`,
+  `/fr/shop`, `/fr/products/vase-spirale`, `/fr/contact`, `/fr/cart` ; BottomNav collée
+  en bas ; bandeau de consentement au-dessus d'elle (bas du bandeau à 740 px, haut de la
+  nav à 747 px).
+- **Contrastes** (texte réel, couleur composée sur le fond effectif) : header, clair
+  ≥ 5,21, sombre ≥ 7,07 ; footer, clair ≥ 5,21, sombre ≥ 6,45, hors le point rouge
+  décoratif (`.s3d-dot`, texte transparent) ; bandeau de consentement (servi seulement
+  en dev, hôte non mesuré en preview), clair ≥ 5,92, sombre ≥ 6,04. Aucun texte sous
+  4,5:1.
