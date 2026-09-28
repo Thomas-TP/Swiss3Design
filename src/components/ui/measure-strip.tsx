@@ -9,7 +9,8 @@ import { cx } from "./cx";
 // d'écran entend une virgule à la place. `ph-no-capture` : une bande qui
 // change en continu gonflerait les replays (§4.10). `live` n'est à poser que
 // sur une bande mise à jour par un geste (debounce côté appelant), jamais
-// pendant une animation.
+// pendant une animation. Mono et chiffres tabulaires de .s3d-label, mais sans
+// les majuscules : « 150,0 MM » ou « 80 G » fausseraient les unités SI.
 
 export function MeasureStrip({
   items,
@@ -28,7 +29,7 @@ export function MeasureStrip({
     <p
       aria-live={live ? "polite" : undefined}
       className={cx(
-        "s3d-label ph-no-capture flex flex-wrap items-baseline gap-x-2 gap-y-1 text-ink",
+        "s3d-label ph-no-capture flex flex-wrap items-baseline gap-x-2 gap-y-1 normal-case text-ink",
         className,
       )}
     >

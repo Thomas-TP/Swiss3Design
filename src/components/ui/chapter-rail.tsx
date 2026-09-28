@@ -11,7 +11,9 @@ import { cx } from "./cx";
 // (#id, utilisable sans JS et au clavier) ; quand Lenis tourne, le défilement
 // passe par le pont (bridge.scroll.to) pour rester doux et décalé du header,
 // sinon le navigateur saute à l'ancre (instantané, scroll-mt du chapitre).
-// Calque 30 (sous le header, au-dessus du contenu).
+// Calque 30 (sous le header, au-dessus du contenu), sur un fond papier voilé :
+// le rail survole aussi les chapitres « encre », où le texte `soft` du thème
+// de la page tomberait sous 4,5:1.
 
 export interface RailChapter {
   id: string;
@@ -50,7 +52,7 @@ export function ChapterRail({
   return (
     <nav
       aria-label={label}
-      className="fixed right-6 top-1/2 z-30 hidden -translate-y-1/2 min-[80rem]:block"
+      className="fixed right-6 top-1/2 z-30 hidden -translate-y-1/2 rounded-card bg-paper/80 px-2.5 py-2 backdrop-blur min-[80rem]:block"
     >
       <ol className="flex flex-col gap-3">
         {chapters.map((chapter) => {
@@ -69,11 +71,11 @@ export function ChapterRail({
                   history.replaceState(null, "", `#${chapter.id}`);
                 }}
                 className={cx(
-                  "group flex items-center justify-end gap-2.5 py-0.5 transition-colors duration-150",
+                  "group relative flex items-center justify-end gap-2.5 py-0.5 transition-colors duration-150",
                   active ? "text-ink" : "text-soft hover:text-ink",
                 )}
               >
-                <span className="s3d-label pointer-events-none opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
+                <span className="s3d-label pointer-events-none absolute right-full mr-3 whitespace-nowrap rounded-hair bg-paper/90 px-1.5 py-0.5 opacity-0 transition-opacity duration-150 group-hover:opacity-100 group-focus-visible:opacity-100">
                   {chapter.label}
                 </span>
                 <span className="s3d-label">{chapter.number}</span>

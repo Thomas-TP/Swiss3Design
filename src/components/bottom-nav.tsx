@@ -17,8 +17,9 @@ import { SiteLink } from "./ui/site-link";
 // footer). Masquée sur /studio/<objet> : la barre d'action du Studio la
 // remplace (WP-STUDIO), à la même hauteur.
 //
-// Hauteur fixe de 64 px + safe-area : le bandeau de consentement (bottom
-// 4.5rem) et les toasts se posent juste au-dessus ; <main> garde pb-24 et le
+// Hauteur fixe de 64 px + safe-area, libellés alignés sur une même ligne de
+// base en bas de la barre : le disque dépasse de quelques pixels vers le haut,
+// le bandeau de consentement (bottom 4.5rem) et les toasts restent au-dessus ; <main> garde pb-24 et le
 // footer pb-24 lg:pb-0. Filet actif rouge de 2 px en haut, nommé `nav-mark`
 // comme celui du header (un seul des deux est rendu à une largeur donnée) ;
 // la barre est ancrée pendant la « Coupe » (site-bottom-nav, page-cut.css).
@@ -102,7 +103,7 @@ export function BottomNav({ hasSession = false }: { hasSession?: boolean }) {
                     ? shell("nav.cartCount", { count })
                     : undefined
                 }
-                className="relative flex h-full flex-col items-center justify-center gap-1 text-[11px] font-medium leading-tight"
+                className="relative flex h-full flex-col items-center justify-end gap-1 pb-2 text-[11px] font-medium leading-tight"
               >
                 {studio ? (
                   <span
@@ -123,7 +124,7 @@ export function BottomNav({ hasSession = false }: { hasSession?: boolean }) {
                   </span>
                 )}
                 <span
-                  className={`whitespace-nowrap ${active ? "text-ink" : "text-soft"} ${studio ? "-mt-0.5" : ""}`}
+                  className={`whitespace-nowrap ${active ? "text-ink" : "text-soft"}`}
                 >
                   {label}
                 </span>

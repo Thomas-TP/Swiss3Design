@@ -2,6 +2,7 @@ import { useTranslations } from "next-intl";
 import { MapPin, ShieldCheck } from "lucide-react";
 import { BrandMark } from "./brand-mark";
 import { MotionToggle } from "./motion-toggle";
+import { withDot } from "./ui/dot-title";
 import { MapFrame } from "./ui/map-frame";
 import { SiteLink } from "./ui/site-link";
 
@@ -14,7 +15,8 @@ import { SiteLink } from "./ui/site-link";
  *   pas de nouveau wordmark), accroche, légende mono « Équidistance 0,2 mm ·
  *   Échelle 1:1 », coordonnées de Gland et de Pully, isolignes SVG statiques
  *   en fond (public/posters/field-footer-{light,dark}.svg, une par thème),
- *   graduations de carte en marge dès lg (MapFrame).
+ *   graduations de carte en marge dès lg (MapFrame). Légende en mono sans
+ *   majuscules : « 0,2 MM » fausserait l'unité.
  * - Trois colonnes : Boutique (boutique, Studio, sur mesure, favoris, suivi),
  *   Compte et aide (compte, Atelier, contact), Informations (légal).
  * - Préférences : « Réduire les animations ».
@@ -88,7 +90,7 @@ export function Footer() {
               {t("tagline")}
             </p>
             <p className="mt-6 font-display text-title text-ink">
-              {shell("footer.motto")}
+              {withDot(shell("footer.motto"))}
             </p>
             <p className="mt-5 flex items-start gap-2 text-sm leading-snug text-soft">
               <MapPin
@@ -99,9 +101,11 @@ export function Footer() {
               {t("madeIn")}
             </p>
             <div className="mt-6 grid gap-1.5 border-t border-line pt-4 text-soft">
-              <p className="s3d-label text-ink">{shell("footer.legend")}</p>
-              <p className="s3d-label">{shell("footer.gland")}</p>
-              <p className="s3d-label">{shell("footer.pully")}</p>
+              <p className="s3d-label normal-case text-ink">
+                {shell("footer.legend")}
+              </p>
+              <p className="s3d-label normal-case">{shell("footer.gland")}</p>
+              <p className="s3d-label normal-case">{shell("footer.pully")}</p>
             </div>
           </div>
 
