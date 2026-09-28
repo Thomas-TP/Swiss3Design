@@ -16,8 +16,107 @@
     // (images.unoptimized: true) -- convertir les <img> en next/image est un
     // vrai changement UI a part, pas un correctif de lint (meme override que
     // sous Biome, voir AGENTS.md).
-    "nextjs/no-img-element": "off"
+    "nextjs/no-img-element": "off",
+    // Bundle du Worker (regle d'or 10) : moteurs motion et 3D seulement sous
+    // src/motion/**, atteint uniquement depuis src/gates/** par
+    // next/dynamic({ ssr: false }). La regle signale aussi les import()
+    // dynamiques : un `await import("three")` dans un effet d'un composant
+    // rendu cote serveur reste dans le Worker (brief de refonte, 4.1 et 4.6).
+    // Motifs en `/**` et non `/*` (ecart volontaire au brief) : avec oxlint,
+    // `three/*` ne couvre qu'un niveau et laisse passer
+    // `three/addons/controls/OrbitControls.js` ou
+    // `@/motion/stage/scenes/print-hero` (verifie le 28.09.2026).
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "three",
+            "message": "three : uniquement sous src/motion/**. Types : import type.",
+            "allowTypeImports": true
+          },
+          {
+            "name": "gsap",
+            "message": "gsap : uniquement sous src/motion/** (via @/motion/gsap)."
+          },
+          {
+            "name": "@gsap/react",
+            "message": "@gsap/react : uniquement sous src/motion/**."
+          },
+          {
+            "name": "lenis",
+            "message": "lenis : uniquement sous src/motion/**."
+          },
+          {
+            "name": "postprocessing",
+            "message": "postprocessing : uniquement sous src/motion/** (non installé en v1)."
+          }
+        ],
+        "patterns": [
+          {
+            "group": ["three/**", "gsap/**", "lenis/**", "@gsap/**"],
+            "message": "Moteur motion : uniquement sous src/motion/**.",
+            "allowTypeImports": true
+          },
+          {
+            "group": ["@/motion", "@/motion/**"],
+            "message": "src/motion n'est atteint que depuis src/gates/** par next/dynamic({ ssr: false }).",
+            "allowTypeImports": true
+          }
+        ]
+      }
+    ]
   },
+  "overrides": [
+    {
+      "files": ["src/motion/**"],
+      "rules": { "no-restricted-imports": "off" }
+    },
+    {
+      "files": ["src/gates/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "three",
+                "message": "Les gates n'importent que @/motion/** par next/dynamic.",
+                "allowTypeImports": true
+              },
+              {
+                "name": "gsap",
+                "message": "Les gates n'importent que @/motion/** par next/dynamic."
+              },
+              {
+                "name": "@gsap/react",
+                "message": "Les gates n'importent que @/motion/** par next/dynamic."
+              },
+              {
+                "name": "lenis",
+                "message": "Les gates n'importent que @/motion/** par next/dynamic."
+              }
+            ],
+            "patterns": [
+              {
+                "group": ["three/**", "gsap/**", "lenis/**", "@gsap/**"],
+                "message": "Les gates n'importent que @/motion/**.",
+                "allowTypeImports": true
+              }
+            ]
+          }
+        ]
+      }
+    },
+    // Temporaire : ancien viewer, supprime par WP-SHOP ; entree retiree par WP-99.
+    {
+      "files": [
+        "src/components/product-viewer-3d.tsx",
+        "src/components/showroom-scene.ts"
+      ],
+      "rules": { "no-restricted-imports": "off" }
+    }
+  ],
   "ignorePatterns": [
     ".claude/**",
     "drizzle/**",
