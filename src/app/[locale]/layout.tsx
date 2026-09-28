@@ -13,6 +13,7 @@ import { ConsentBanner } from "@/components/consent-banner";
 import { WebMcpTools } from "@/components/webmcp-tools";
 import { Footer } from "@/components/footer";
 import { ThemeManager } from "@/components/theme-manager";
+import { ReducedMotionConfig } from "@/components/reduced-motion-config";
 import { JsonLd } from "@/components/json-ld";
 import { SITE_URL, siteJsonLd } from "@/lib/seo";
 import { PATHS } from "@/lib/agent/paths";
@@ -142,24 +143,28 @@ export default async function LocaleLayout({
         <NextIntlClientProvider>
           <CartProvider>
             <FavoritesProvider>
-              <a
-                href="#main-content"
-                className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-surface focus:p-4"
-              >
-                {nav("skipContent")}
-              </a>
-              <Header hasSession={hasSession} />
-              <main
-                id="main-content"
-                tabIndex={-1}
-                className="flex-1 pb-24 lg:pb-0"
-              >
-                {children}
-              </main>
-              <Footer />
-              <BottomNav hasSession={hasSession} />
-              <ConsentBanner />
-              <WebMcpTools />
+              {/* motion/react suit la préférence du site (interrupteur du
+                  footer compris), pas seulement le réglage du système. */}
+              <ReducedMotionConfig>
+                <a
+                  href="#main-content"
+                  className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-xl focus:bg-surface focus:p-4"
+                >
+                  {nav("skipContent")}
+                </a>
+                <Header hasSession={hasSession} />
+                <main
+                  id="main-content"
+                  tabIndex={-1}
+                  className="flex-1 pb-24 lg:pb-0"
+                >
+                  {children}
+                </main>
+                <Footer />
+                <BottomNav hasSession={hasSession} />
+                <ConsentBanner />
+                <WebMcpTools />
+              </ReducedMotionConfig>
             </FavoritesProvider>
           </CartProvider>
         </NextIntlClientProvider>

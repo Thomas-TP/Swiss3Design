@@ -109,6 +109,24 @@ describe("état du pont", () => {
     expect(motionBridge.get().reduced).toBe(false);
     off();
   });
+
+  it("data-motion retiré par React (hydratation rattrapée) : reposé à l'abonnement", () => {
+    const { dataset } = installBrowser({ osReduced: true });
+    expect(dataset.motion).toBeUndefined();
+    const off = motionBridge.subscribe(() => {});
+    expect(dataset.motion).toBe("reduce");
+    expect(motionBridge.get().reduced).toBe(true);
+    off();
+  });
+
+  it("à l'abonnement, le choix mémorisé l'emporte sur le système", () => {
+    const { dataset, store } = installBrowser({ osReduced: true });
+    store.set(MOTION_STORAGE_KEY, "full");
+    const off = motionBridge.subscribe(() => {});
+    expect(dataset.motion).toBe("full");
+    expect(motionBridge.get().reduced).toBe(false);
+    off();
+  });
 });
 
 describe("registre des vues", () => {

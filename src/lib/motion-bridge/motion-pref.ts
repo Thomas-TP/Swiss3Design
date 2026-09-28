@@ -73,6 +73,11 @@ export function setMotionPreference(pref: MotionPreference | null) {
  * S'abonne aux changements de préférence. Le réglage du système et le choix
  * fait dans un autre onglet sont réappliqués sur <html> ici même : sans cela,
  * data-motion resterait figé à la valeur du chargement de la page.
+ *
+ * data-motion est aussi reposé à chaque abonnement : quand React reprend
+ * <html> par un rendu client (erreur d'hydratation rattrapée), il retire les
+ * attributs qu'il n'a pas rendus lui-même, dont celui du script anti-FOUC.
+ * Les abonnés (effets) arrivent après ce rendu : le premier le répare.
  */
 export function subscribeMotionPreference(onChange: () => void): () => void {
   if (typeof window === "undefined") return () => {};
@@ -92,6 +97,7 @@ export function subscribeMotionPreference(onChange: () => void): () => void {
   window.addEventListener(MOTION_CHANGE_EVENT, onChange);
   window.addEventListener("storage", onStorage);
   media?.addEventListener("change", resync);
+  resync();
   return () => {
     window.removeEventListener(MOTION_CHANGE_EVENT, onChange);
     window.removeEventListener("storage", onStorage);

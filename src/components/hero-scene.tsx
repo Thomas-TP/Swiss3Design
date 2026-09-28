@@ -6,16 +6,15 @@
 // verticale de la buse sont dérivés d'UNE SEULE valeur (`reveal`) → la pointe
 // suit exactement le sommet imprimé, image par image, sans dérive possible. La
 // tête balaie de gauche à droite pendant le dépôt. Couleurs de marque (rouge +
-// neutres thémés), respecte prefers-reduced-motion.
+// neutres thémés). Mouvement réduit : préférence du site (interrupteur du
+// footer compris), lue sans écart d'hydratation (useReducedMotionPreference :
+// serveur et premier rendu client identiques, puis état final). Remplacé par
+// WP-HOME.
 
 import { useEffect } from "react";
-import {
-  motion,
-  useReducedMotion,
-  useMotionValue,
-  useTransform,
-  animate,
-} from "motion/react";
+import { motion, useMotionValue, useTransform, animate } from "motion/react";
+import { readReducedMotion } from "@/lib/motion-bridge/motion-pref";
+import { useReducedMotionPreference } from "@/lib/motion-bridge/use-reduced-motion";
 
 // Profil du vase : largeur relative (0–1) de chaque couche, base → col → lèvre.
 const PROFILE = [
@@ -43,7 +42,7 @@ const HEAD_SWING = 22; // amplitude du balayage gauche-droite de la tête (px)
 const CYCLE = 5.6; // durée d'un cycle d'impression (s)
 
 export function HeroScene({ className }: { className?: string }) {
-  const reduce = useReducedMotion();
+  const reduce = useReducedMotionPreference();
 
   // Une seule valeur pilote la géométrie : reveal ∈ [0,1] = fraction imprimée.
   // clip (sommet du masque) et translateY de la buse en dérivent ⇒ toujours
@@ -57,7 +56,9 @@ export function HeroScene({ className }: { className?: string }) {
   const gantryY = useTransform(reveal, (v) => (1 - v) * stackH);
 
   useEffect(() => {
-    if (reduce) {
+    // Relue aussi en direct : le rendu d'hydratation voit toujours false, et
+    // la boucle ne doit pas démarrer pour autant en mouvement réduit.
+    if (reduce || readReducedMotion()) {
       reveal.set(1);
       objOpacity.set(1);
       headX.set(0);
@@ -105,7 +106,7 @@ export function HeroScene({ className }: { className?: string }) {
 
         {/* Scène (léger flottement vertical) */}
         <motion.div
-          className="absolute inset-0 text-ink"
+          className="absolute inset-0 text-ink motion-off:transform-none!"
           animate={reduce ? undefined : { y: [0, -6, 0] }}
           transition={
             reduce
