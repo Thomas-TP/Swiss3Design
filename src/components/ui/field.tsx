@@ -8,13 +8,16 @@ import { cx } from "./cx";
 // (`aria-invalid`, bordure `accent-text`, 6:1 et plus sur tous les fonds).
 // Taille de texte 16 px en mobile : en dessous, iOS zoome sur le champ.
 
-export const fieldClass = cx(
-  "block w-full rounded-field border border-line bg-elevated px-3.5 py-2.5 text-base text-ink sm:text-[0.9375rem]",
+/** Habillage seul (sans display ni largeur), pour un déclencheur en flex. */
+export const fieldSkin = cx(
+  "rounded-field border border-line bg-elevated px-3.5 py-2.5 text-base text-ink sm:text-[0.9375rem]",
   "placeholder:text-soft/70 transition-colors duration-150 hover:border-iso",
   "focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/15",
   "disabled:cursor-not-allowed disabled:opacity-60",
   "aria-invalid:border-accent-text",
 );
+
+export const fieldClass = cx("block w-full", fieldSkin);
 
 /** Identifiants d'aide et d'erreur d'un champ, pour aria-describedby. */
 export function fieldIds(id: string) {

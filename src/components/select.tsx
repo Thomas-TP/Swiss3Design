@@ -2,14 +2,20 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { Check, ChevronDown } from "lucide-react";
+import { fieldSkin } from "./ui/field";
 
 export interface SelectOption {
   value: string;
   label: string;
 }
 
-// Liste déroulante visuellement identique à la version de production, avec
-// déplacement du focus et commandes clavier explicites.
+// Liste déroulante maison, avec déplacement du focus et commandes clavier
+// explicites (listbox). Habillage « Strates » : le déclencheur reprend le
+// dessin des champs (fieldSkin : rayon `field`, fond `elevated`, focus encre)
+// pour qu'un Select et un <input> voisins aient la même hauteur et le même
+// anneau ; la liste est une carte `elevated` (rayon `card`, calque « menus »).
+// Comportement inchangé (checkout, sur mesure) : mêmes props, même champ
+// caché `name`, mêmes touches.
 export function Select({
   value,
   onChange,
@@ -83,14 +89,15 @@ export function Select({
             openAt(selectedIndex >= 0 ? selectedIndex : options.length - 1);
           }
         }}
-        className="flex w-full items-center justify-between gap-2 rounded-xl border border-line bg-surface px-4 py-3 text-left text-sm transition-colors focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-accent/40"
+        className={`${fieldSkin} flex w-full items-center justify-between gap-2 text-left aria-expanded:border-ink`}
       >
-        <span className={`truncate ${selected ? "" : "text-soft/60"}`}>
+        <span className={`truncate ${selected ? "" : "text-soft/70"}`}>
           {selected?.label ?? placeholder}
         </span>
         <ChevronDown
           size={16}
-          className={`shrink-0 text-soft transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          strokeWidth={1.5}
+          className={`shrink-0 text-soft transition-transform duration-150 ${open ? "rotate-180" : ""}`}
         />
       </button>
       {/* oxlint-disable prefer-tag-over-role -- liste deroulante maison necessaire au style de marque */}
@@ -99,7 +106,8 @@ export function Select({
           id={listId}
           role="listbox"
           aria-label={ariaLabel ?? placeholder}
-          className="absolute z-30 mt-1.5 max-h-64 w-full overflow-auto rounded-xl border border-line bg-surface py-1.5 shadow-lg shadow-ink/5"
+          data-lenis-prevent=""
+          className="absolute z-20 mt-1.5 max-h-64 w-full overflow-auto overscroll-contain rounded-card border border-line bg-elevated py-1 shadow-lg shadow-ink/10"
         >
           {options.map((option, index) => (
             <button
@@ -133,13 +141,17 @@ export function Select({
                   close();
                 }
               }}
-              className={`flex w-full items-center justify-between gap-3 px-4 py-2.5 text-left text-sm transition-colors hover:bg-paper focus:bg-paper focus:outline-none ${
+              className={`flex w-full items-center justify-between gap-3 px-3.5 py-2.5 text-left text-sm transition-colors hover:bg-paper focus:bg-paper focus:outline-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink ${
                 option.value === value ? "font-semibold" : ""
               }`}
             >
               <span className="truncate">{option.label}</span>
               {option.value === value && (
-                <Check size={15} className="shrink-0 text-accent-text" />
+                <Check
+                  size={15}
+                  strokeWidth={1.5}
+                  className="shrink-0 text-accent-text"
+                />
               )}
             </button>
           ))}
