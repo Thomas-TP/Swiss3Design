@@ -30,6 +30,7 @@ import { ProductColorProvider } from "@/components/product-color-context";
 import { ProductPurchase } from "@/components/product-purchase";
 import { ProductCard } from "@/components/product-card";
 import { StarRating } from "@/components/star-rating";
+import { PageCut } from "@/components/ui/page-cut";
 
 export const dynamic = "force-dynamic";
 
@@ -188,192 +189,199 @@ export default async function ProductPage({
     .filter(Boolean);
 
   return (
-    <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-16">
-      <JsonLd data={jsonLd} />
-      <JsonLd data={breadcrumb} />
-      <TrackEvent
-        event="Product Viewed"
-        properties={{
-          ...productProperties({
-            productId: product.id,
-            slug: product.slug,
-            name: product.name,
-            priceCents: product.priceCents,
-            saleType: product.saleType,
-          }),
-          in_stock: product.stock == null || product.stock > 0,
-          rating: ratingSummary.count > 0 ? ratingSummary.average : null,
-          reviews: ratingSummary.count,
-        }}
-      />
-      <Link
-        href="/shop"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"
-      >
-        <ArrowLeft size={15} />
-        {t("backToShop")}
-      </Link>
+    <PageCut>
+      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-16">
+        <JsonLd data={jsonLd} />
+        <JsonLd data={breadcrumb} />
+        <TrackEvent
+          event="Product Viewed"
+          properties={{
+            ...productProperties({
+              productId: product.id,
+              slug: product.slug,
+              name: product.name,
+              priceCents: product.priceCents,
+              saleType: product.saleType,
+            }),
+            in_stock: product.stock == null || product.stock > 0,
+            rating: ratingSummary.count > 0 ? ratingSummary.average : null,
+            reviews: ratingSummary.count,
+          }}
+        />
+        <Link
+          href="/shop"
+          className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"
+        >
+          <ArrowLeft size={15} />
+          {t("backToShop")}
+        </Link>
 
-      <ProductColorProvider colors={product.colors}>
-        <div className="grid gap-8 md:grid-cols-2 md:gap-14">
-          <div>
-            <ProductGallery
-              images={product.images}
-              name={product.name}
-              model3dUrl={product.model3dUrl}
-            />
-          </div>
+        <ProductColorProvider colors={product.colors}>
+          <div className="grid gap-8 md:grid-cols-2 md:gap-14">
+            <div>
+              <ProductGallery
+                images={product.images}
+                name={product.name}
+                model3dUrl={product.model3dUrl}
+              />
+            </div>
 
-          <div className="flex flex-col md:sticky md:top-24 md:self-start">
-            {product.multicolor && (
-              <span className="flex w-fit items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold">
-                <MulticolorDots size={6} />
-                {t("multicolorBadge")}
-              </span>
-            )}
-
-            <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
-              {product.name}
-            </h1>
-            {/* Premier paragraphe = résumé (et meta description) : juste sous
-                le titre ; la suite vient après l'achat, qui reste visible. */}
-            {paragraphs[0] && (
-              <p className="mt-4 leading-relaxed text-soft">{paragraphs[0]}</p>
-            )}
-
-            {ratingSummary.count > 0 && (
-              <div className="mt-3 flex items-center gap-2">
-                <StarRating value={ratingSummary.average} size={15} />
-                <span className="text-sm text-soft">
-                  {tReviews("count", { count: ratingSummary.count })}
+            <div className="flex flex-col md:sticky md:top-24 md:self-start">
+              {product.multicolor && (
+                <span className="flex w-fit items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold">
+                  <MulticolorDots size={6} />
+                  {t("multicolorBadge")}
                 </span>
-              </div>
-            )}
+              )}
 
-            <ProductPurchase
-              productId={product.id}
-              slug={product.slug}
-              name={product.name}
-              basePriceCents={product.priceCents}
-              saleType={product.saleType}
-              productionDays={product.productionDays}
-              productStock={product.stock}
-              imageUrl={image?.url ?? null}
-              variants={product.variants.map((v) => ({
-                id: v.id,
-                name: v.name,
-                priceCents: v.priceCents,
-                stock: v.stock,
-              }))}
-            />
+              <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
+                {product.name}
+              </h1>
+              {/* Premier paragraphe = résumé (et meta description) : juste sous
+                le titre ; la suite vient après l'achat, qui reste visible. */}
+              {paragraphs[0] && (
+                <p className="mt-4 leading-relaxed text-soft">
+                  {paragraphs[0]}
+                </p>
+              )}
 
-            {/* Réassurance au plus près du bouton d'achat : lève les trois
+              {ratingSummary.count > 0 && (
+                <div className="mt-3 flex items-center gap-2">
+                  <StarRating value={ratingSummary.average} size={15} />
+                  <span className="text-sm text-soft">
+                    {tReviews("count", { count: ratingSummary.count })}
+                  </span>
+                </div>
+              )}
+
+              <ProductPurchase
+                productId={product.id}
+                slug={product.slug}
+                name={product.name}
+                basePriceCents={product.priceCents}
+                saleType={product.saleType}
+                productionDays={product.productionDays}
+                productStock={product.stock}
+                imageUrl={image?.url ?? null}
+                variants={product.variants.map((v) => ({
+                  id: v.id,
+                  name: v.name,
+                  priceCents: v.priceCents,
+                  stock: v.stock,
+                }))}
+              />
+
+              {/* Réassurance au plus près du bouton d'achat : lève les trois
               objections classiques (délai, provenance, paiement) sans quitter
               la page. Libellés partagés avec la homepage. */}
-            <ul className="mt-6 grid gap-2 text-sm sm:grid-cols-3">
-              {[
-                { Icon: Truck, label: tHome("trustShippingTitle") },
-                { Icon: Factory, label: tHome("trustMadeTitle") },
-                { Icon: ShieldCheck, label: tHome("trustPaymentTitle") },
-              ].map(({ Icon, label }) => (
+              <ul className="mt-6 grid gap-2 text-sm sm:grid-cols-3">
+                {[
+                  { Icon: Truck, label: tHome("trustShippingTitle") },
+                  { Icon: Factory, label: tHome("trustMadeTitle") },
+                  { Icon: ShieldCheck, label: tHome("trustPaymentTitle") },
+                ].map(({ Icon, label }) => (
+                  <li
+                    key={label}
+                    className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5"
+                  >
+                    <Icon
+                      size={16}
+                      strokeWidth={1.8}
+                      className="shrink-0 text-accent-text"
+                    />
+                    <span className="text-xs font-semibold leading-tight">
+                      {label}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+
+              {paragraphs.length > 1 && (
+                <div className="mt-8 space-y-3 text-[15px] leading-relaxed text-soft">
+                  {paragraphs.slice(1).map((p) => (
+                    <p key={p}>{p}</p>
+                  ))}
+                </div>
+              )}
+
+              {specs.length > 0 && (
+                <div className="mt-8 border-t border-line text-sm">
+                  <p className="border-b border-line pt-4 font-semibold">
+                    {t("details")}
+                  </p>
+                  <dl
+                    aria-label={t("details")}
+                    className="divide-y divide-line"
+                  >
+                    {specs.map((s) => (
+                      <div
+                        key={s.label}
+                        className="flex justify-between gap-4 py-3"
+                      >
+                        <dt className="shrink-0 text-soft">{s.label}</dt>
+                        <dd className="text-right font-medium">{s.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              )}
+            </div>
+          </div>
+        </ProductColorProvider>
+
+        {productReviews.length > 0 && (
+          <section className="mt-16 md:mt-24">
+            <span className="flex h-1 w-10 rounded-full bg-accent" />
+            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+              <h2 className="text-2xl font-bold tracking-tight">
+                {tReviews("title")}
+              </h2>
+              <span className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1">
+                <StarRating value={ratingSummary.average} size={14} />
+                <span className="text-sm font-semibold tabular-nums">
+                  {ratingSummary.average.toFixed(1)}
+                </span>
+                <span className="text-xs text-soft">
+                  {tReviews("count", { count: ratingSummary.count })}
+                </span>
+              </span>
+            </div>
+            <ul className="mt-6 space-y-4">
+              {productReviews.map((r) => (
                 <li
-                  key={label}
-                  className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5"
+                  key={r.id}
+                  className="rounded-card border border-line bg-surface p-5"
                 >
-                  <Icon
-                    size={16}
-                    strokeWidth={1.8}
-                    className="shrink-0 text-accent-text"
-                  />
-                  <span className="text-xs font-semibold leading-tight">
-                    {label}
-                  </span>
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-semibold">{r.authorName}</span>
+                    <StarRating value={r.rating} size={14} />
+                  </div>
+                  <p className="mt-1 text-xs text-soft">
+                    {r.createdAt.toLocaleDateString(`${locale}-CH`)}
+                  </p>
+                  {r.body && (
+                    <p className="mt-3 leading-relaxed text-soft">{r.body}</p>
+                  )}
                 </li>
               ))}
             </ul>
+          </section>
+        )}
 
-            {paragraphs.length > 1 && (
-              <div className="mt-8 space-y-3 text-[15px] leading-relaxed text-soft">
-                {paragraphs.slice(1).map((p) => (
-                  <p key={p}>{p}</p>
-                ))}
-              </div>
-            )}
-
-            {specs.length > 0 && (
-              <div className="mt-8 border-t border-line text-sm">
-                <p className="border-b border-line pt-4 font-semibold">
-                  {t("details")}
-                </p>
-                <dl aria-label={t("details")} className="divide-y divide-line">
-                  {specs.map((s) => (
-                    <div
-                      key={s.label}
-                      className="flex justify-between gap-4 py-3"
-                    >
-                      <dt className="shrink-0 text-soft">{s.label}</dt>
-                      <dd className="text-right font-medium">{s.value}</dd>
-                    </div>
-                  ))}
-                </dl>
-              </div>
-            )}
-          </div>
-        </div>
-      </ProductColorProvider>
-
-      {productReviews.length > 0 && (
-        <section className="mt-16 md:mt-24">
-          <span className="flex h-1 w-10 rounded-full bg-accent" />
-          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-            <h2 className="text-2xl font-bold tracking-tight">
-              {tReviews("title")}
+        {related.length > 0 && (
+          <section className="mt-16 md:mt-24">
+            <span className="flex h-1 w-10 rounded-full bg-accent" />
+            <h2 className="mt-3 text-2xl font-bold tracking-tight">
+              {t("relatedTitle")}
             </h2>
-            <span className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1">
-              <StarRating value={ratingSummary.average} size={14} />
-              <span className="text-sm font-semibold tabular-nums">
-                {ratingSummary.average.toFixed(1)}
-              </span>
-              <span className="text-xs text-soft">
-                {tReviews("count", { count: ratingSummary.count })}
-              </span>
-            </span>
-          </div>
-          <ul className="mt-6 space-y-4">
-            {productReviews.map((r) => (
-              <li
-                key={r.id}
-                className="rounded-card border border-line bg-surface p-5"
-              >
-                <div className="flex items-center justify-between gap-3">
-                  <span className="font-semibold">{r.authorName}</span>
-                  <StarRating value={r.rating} size={14} />
-                </div>
-                <p className="mt-1 text-xs text-soft">
-                  {r.createdAt.toLocaleDateString(`${locale}-CH`)}
-                </p>
-                {r.body && (
-                  <p className="mt-3 leading-relaxed text-soft">{r.body}</p>
-                )}
-              </li>
-            ))}
-          </ul>
-        </section>
-      )}
-
-      {related.length > 0 && (
-        <section className="mt-16 md:mt-24">
-          <span className="flex h-1 w-10 rounded-full bg-accent" />
-          <h2 className="mt-3 text-2xl font-bold tracking-tight">
-            {t("relatedTitle")}
-          </h2>
-          <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-            {related.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
+            <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+              {related.map((p) => (
+                <ProductCard key={p.id} product={p} />
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+    </PageCut>
   );
 }
