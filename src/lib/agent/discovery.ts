@@ -143,7 +143,7 @@ export function aiCatalog() {
         url: abs(PATHS.agentCard),
         representativeQueries: [
           "recommend a 3D-printed desk organiser made in Switzerland",
-          "where is order S3D-1042",
+          "where is order S3D-MFZ3K2Q1A7BX",
         ],
       },
       {

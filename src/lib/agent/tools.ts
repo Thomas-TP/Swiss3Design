@@ -38,7 +38,13 @@ const schemas = {
       .max(60)
       .optional()
       .describe("Category slug, as returned by list_categories"),
-    material: z.string().max(40).optional().describe("Material, e.g. PLA"),
+    material: z
+      .string()
+      .max(40)
+      .optional()
+      .describe(
+        "Exact material name as shown in product results (case-sensitive), e.g. PLA",
+      ),
     multicolor: z
       .boolean()
       .optional()
@@ -48,7 +54,7 @@ const schemas = {
       .positive()
       .max(100000)
       .optional()
-      .describe("Maximum unit price in CHF"),
+      .describe("Maximum base price in CHF (a variant can cost more)"),
     sort: z
       .enum(["new", "price_asc", "price_desc"])
       .optional()
@@ -77,7 +83,9 @@ const schemas = {
       .string()
       .min(3)
       .max(40)
-      .describe("Order number from the confirmation email, e.g. S3D-1042"),
+      .describe(
+        "Order number from the confirmation email: S3D- followed by letters and digits, e.g. S3D-MFZ3K2Q1A7BX (case-insensitive)",
+      ),
     email: z.email().describe("Email address used for the order"),
   }),
   build_cart_link: z.object({
@@ -85,7 +93,13 @@ const schemas = {
       .array(
         z.object({
           slug: z.string().min(1).max(120).describe("Product slug"),
-          quantity: z.number().int().min(1).max(99).optional(),
+          quantity: z
+            .number()
+            .int()
+            .min(1)
+            .max(99)
+            .optional()
+            .describe("Quantity (default 1)"),
           variant: z
             .string()
             .max(120)
@@ -256,7 +270,7 @@ const meta: Record<ToolName, ToolMeta> = {
   search_products: {
     title: "Search products",
     description:
-      "Search the Swiss3Design catalogue of 3D-printed design objects (vases, lamps, desk items…). Returns names, CHF prices, availability, colours and product URLs.",
+      "Search the Swiss3Design catalogue of 3D-printed design objects. The query matches product names and descriptions (case-insensitive) in the requested language, falling back to French. Returns active products, out-of-stock ones included, each with name, description (up to 240 characters), CHF price, availability (in_stock, made_to_order with productionDays, or out_of_stock), material, colours, image and product URL. Use get_product for variants, colour options and dimensions.",
   },
   get_product: {
     title: "Get product details",
@@ -275,12 +289,12 @@ const meta: Record<ToolName, ToolMeta> = {
   track_order: {
     title: "Track an order",
     description:
-      "Status, items, totals and Swiss Post tracking link of an order, from its order number and the email address used to place it.",
+      "Status (pending, paid, in_production, shipped, delivered or cancelled), items, totals in CHF and Swiss Post tracking link of an order, from its order number and the email address used to place it (both case-insensitive). A wrong number and a wrong email return the same not_found error, so ask the customer to check both. Lookups are rate-limited per IP (30 per 10 minutes). Postal addresses and payment details are never returned.",
   },
   build_cart_link: {
     title: "Build a cart link",
     description:
-      "Validate items and return a swiss3design.ch link that fills the shopping cart, with prices and a shipping estimate. The customer completes payment on the website.",
+      "Validate up to 20 items and return a swiss3design.ch link that fills the customer's cart, with line prices, subtotal, estimated shipping and estimated total in CHF. Nothing is reserved or charged: the customer opens the link and pays on the website, where prices are re-checked. Returns invalid_arguments when a product is out of stock or a required variant or colour is missing (the message lists the valid choices), and not_found for an unknown slug.",
   },
 };
 

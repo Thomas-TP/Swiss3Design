@@ -21,14 +21,16 @@ works) and [`conventions.md`](conventions.md) (how to write code here).
 2. Implements, matching existing style (French comments, English identifiers).
 3. Runs `bun run lint`; runs `bun run preview` when the change touches CSP, inline
    scripts, runtime, or anything prod-only.
-4. **Pushes to `main`** (this _should_ trigger the Cloudflare deploy, but that
-   auto-trigger has proven unreliable — see `AGENTS.md` golden rule 9) and
-   starts `bun run dev` so Thomas can test. **Verifies the deploy actually
-   happened** (Worker `modified_on` moved) and deploys manually if not. Browser
-   verification with the preview tools is allowed whenever it helps confirm
-   the change.
+4. **Opens a PR to `main` and merges it once `quality` and the preview build
+   are green** (`main` requires a PR with an up-to-date branch). The merge
+   _should_ trigger the Cloudflare deploy, but that auto-trigger has proven
+   unreliable — see `AGENTS.md` golden rule 9. Starts `bun run dev` so Thomas
+   can test. **Verifies the deploy actually happened** (Worker `modified_on`
+   moved) and deploys manually if not. Browser verification with the preview
+   tools is allowed whenever it helps confirm the change.
 
-If you do **not** want an auto-push (e.g. risky change), say so up front.
+If you want to review the PR before it is merged (e.g. risky change), say so
+up front.
 
 ## Golden rules (full list in [`AGENTS.md`](../AGENTS.md))
 
@@ -95,9 +97,9 @@ Almost always the **CSP nonce** (inline script without `x-nonce`) — invisible 
   encrypts existing 2FA data; getting the target wrong locks users out with no
   self-service recovery (real incident, see `deploiement-cloudflare.md`).
 
-Note: `bun run deploy` / `bun run db:push:pg` by hand are no longer "don't ask
-for" — the auto-deploy-on-push is unreliable enough that a manual deploy is
-often the right call; see `AGENTS.md` golden rule 9.
+Running `bun run deploy` or `bun run db:push:pg` by hand is part of the normal
+workflow: the auto-deploy on merge is unreliable enough that a manual deploy is
+often the right call (see `AGENTS.md` golden rule 9).
 
 ## Prompt templates
 

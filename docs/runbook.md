@@ -6,7 +6,7 @@ Operational reference for the **live** store (swiss3design.ch). Architecture is 
 
 ## Deploy
 
-- **Trigger:** `git push` to `main` (or `scripts/push.bat`). **Cloudflare Workers
+- **Trigger:** a merge into `main` (through a PR: `main` is protected). **Cloudflare Workers
   Builds** runs `opennextjs-cloudflare build`, then `wrangler deploy` (which also
   deploys the Worker; Postgres migrations remain a separate operation). GitHub
   Actions Quality checks the code and isolated Postgres tests; it does not deploy.

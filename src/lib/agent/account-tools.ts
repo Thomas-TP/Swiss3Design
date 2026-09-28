@@ -47,7 +47,9 @@ const schemas = {
       .string()
       .min(3)
       .max(40)
-      .describe("Order number, e.g. S3D-1042, as returned by list_my_orders"),
+      .describe(
+        "Order number as returned by list_my_orders or shown in the confirmation email: S3D- followed by letters and digits, e.g. S3D-MFZ3K2Q1A7BX (case-insensitive)",
+      ),
   }),
   list_my_quotes: z.object({
     limit: z
@@ -69,25 +71,25 @@ const meta: Record<
   get_my_profile: {
     title: "My profile",
     description:
-      "Name, email (with the email scope) and account creation date of the signed-in Swiss3Design customer.",
+      "Profile of the signed-in Swiss3Design customer: name, account creation date (memberSince) and a link to their account page. With the email scope, also their email address and whether it is verified. Takes no arguments; postal addresses and payment details are never returned.",
     scope: "profile",
   },
   list_my_orders: {
     title: "My orders",
     description:
-      "The customer's orders, newest first: number, status, date, total in CHF, item count and Swiss Post tracking link.",
+      "The customer's orders, newest first: those linked to the account and those placed as a guest with the account's email address. Each order has its number, status (pending = not paid yet), creation date, total in CHF, Swiss Post tracking number and link (null until there is one) and a link to the order page on swiss3design.ch. Items are not included: call get_my_order with the order number for items, colours and the price breakdown.",
     scope: "orders.read",
   },
   get_my_order: {
     title: "Order details",
     description:
-      "Items, colours, totals, status and Swiss Post tracking of one of the customer's orders.",
+      "Full details of one of the customer's orders, by order number (case-insensitive): status, creation and payment dates, items (name, colour, quantity, unit price), subtotal, shipping, discount, total and refunded amount in CHF, Swiss Post tracking number and link, and a link to the order page on swiss3design.ch. Only orders linked to the account or placed with the account's email address are found; any other number returns not_found. For an order placed with a different email address, use track_order with that address. Postal addresses and payment details are never returned.",
     scope: "orders.read",
   },
   list_my_quotes: {
     title: "My custom print quotes",
     description:
-      "The customer's custom 3D printing quote requests: status, quoted price in CHF, validity and payment state.",
+      "The customer's custom 3D printing quote requests, newest first: those linked to the account and those sent with the account's email address. Each quote has its id, status (received, quoted, revision_requested, accepted, declined, paid, in_production, done or rejected), request date, the customer's description (cut at 300 characters), material, quoted price in CHF (null until the store has quoted), offer expiry (validUntil), whether it was paid and the amount paid, and a link to the quote page on swiss3design.ch.",
     scope: "quotes.read",
   },
 };

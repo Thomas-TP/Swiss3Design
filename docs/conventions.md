@@ -156,7 +156,7 @@ on _every_ page at once.
   appends ` · Swiss3Design`), description 110–160 chars.
 - **Private / transactional page** (account, admin, cart, checkout, track,
   favorites) → `robots: NOINDEX` (layout or page) **and** a `Disallow` in
-  `app/robots.ts`.
+  `app/robots.txt/route.ts`.
 - **hreflang comes only from `alternatesFor()`**. next-intl's HTTP `Link`
   header is disabled (`alternateLinks: false` in `i18n/routing.ts`); turning it
   back on duplicates every hreflang and points `x-default` at an unprefixed
@@ -170,7 +170,7 @@ on _every_ page at once.
   locale gets its own `<loc>`) and, if useful to AI assistants, to
   `app/llms.txt/route.ts`.
 - **Shop facets** (`sort`, `material`, `color`, `q`) are closed to crawlers in
-  `robots.ts` and canonicalised to `/shop`; don't add a new filter parameter
+  `robots.txt/route.ts` and canonicalised to `/shop`; don't add a new filter parameter
   without adding its `Disallow`.
 - **Product availability** in JSON-LD is `InStock` / `OutOfStock` only:
   `MadeToOrder` is valid schema.org but rejected by Google merchant listings —
@@ -282,13 +282,11 @@ Workers runtime + prod CSP).
 - **Comments and user-facing copy in French**; code identifiers in English.
 - Keep the existing dense, explanatory comment style: explain the _why_ (the Workers
   constraint, the idempotency reason, the nLPD rule), not the obvious _what_.
-- TypeScript **6** strict (7 was attempted and reverted 2026-07-09 — its
-  package no longer exports the classic compiler API, which breaks `next
-build` itself, not just tooling; revisit once 7.1 ships a JS API again).
-  Prefer the `@/…` import alias over deep relative paths.
-- Lint + format = **Oxlint** (`.oxlintrc.json`) + **Oxfmt** (`.oxfmtrc.json`),
-  replacing Biome 2026-09-09 (ESLint had already been fully removed
-  2026-07-09; see AGENTS.md for why). Run `bun run lint` before finishing;
+- TypeScript **6** strict: TypeScript 7.0 doesn't export the classic
+  compiler API, which `next build` itself needs — revisit once a 7.x release
+  ships a JS API again. Prefer the `@/…` import alias over deep relative paths.
+- Lint + format = **Oxlint** (`.oxlintrc.json`) + **Oxfmt** (`.oxfmtrc.json`).
+  Run `bun run lint` before finishing;
   `bun run format` to auto-fix style. Suppress a rule with
   `// oxlint-disable`/`oxlint-enable <bare-rule-name> -- reason` bracketing
   the block — bare rule name, no plugin prefix.

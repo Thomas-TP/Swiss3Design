@@ -113,7 +113,7 @@ This service follows the auth.md profile with two identity types: \`anonymous\` 
 ### Step 2 — Pick a method
 
 1. You know the customer's email address → **service_auth** (claim ceremony right away).
-2. You don't → **anonymous**: you immediately get a catalogue-only token (\`${PRE_CLAIM_SCOPES.join(" ")}\`); ask for the email later to claim the account scopes.
+2. You don't → **anonymous**: you immediately get an identity assertion for a catalogue-only token (\`${PRE_CLAIM_SCOPES.join(" ")}\`); ask for the email later to claim the account scopes.
 
 ### Step 3 — Register
 
@@ -147,7 +147,7 @@ No email is sent by the service: you show the code to the customer yourself.
 
 ### Step 4 — Claim ceremony
 
-**4a. Anonymous only — start a ceremony** (also use it to get a fresh code when one expired):
+**4a. Start a ceremony** — anonymous registrations start here; any registration also uses it to get a fresh code when one expired (\`service_auth\`: send the \`login_hint\` email):
 
 \`\`\`http
 POST ${AUTH_BASE_PATH}/agent/identity/claim
@@ -185,7 +185,7 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=${JWT_BEARER_GRANT}&assertion=<identity_assertion>&resource=${resource}
 \`\`\`
 
-The same \`identity_assertion\` mints new access tokens until it expires: there is no refresh token in Path B. \`invalid_grant\` means it expired or was revoked: restart at Step 3.
+The same \`identity_assertion\` mints new access tokens until it expires: there is no refresh token in Path B. \`invalid_grant\` means it expired, was revoked or was superseded by a claim: if a claim was under way, poll Step 4c (it returns the post-claim assertion once the customer has confirmed), otherwise restart at Step 3.
 
 ## Step 6 — Call the API
 
@@ -223,7 +223,7 @@ Path B scopes: anonymous before claim = \`${PRE_CLAIM_SCOPES.join(" ")}\`; after
 
 ## Revocation
 
-The customer can remove any agent or application at any time on swiss3design.ch (My account → AI agents). It takes effect immediately: the API rejects the tokens with \`401 invalid_token\`, and Path B assertions stop being exchangeable. On a \`401\` from a token that used to work: Path A → refresh once; Path B → retry Step 5 once; if that fails too, start over at Step 1. Refresh tokens can also be revoked with RFC 7009 at ${base}/oauth2/revoke.
+The customer can remove any agent or application at any time on swiss3design.ch (My account → AI agents). It takes effect immediately: the API rejects the tokens with \`401 invalid_token\`, and Path B assertions stop being exchangeable. On a \`401\` from a token that used to work: Path A → refresh once; Path B → if a claim was under way, poll Step 4c first (pre-claim tokens stop working as soon as the customer confirms the code), otherwise retry Step 5 once; if that fails too, start over at Step 1. Refresh tokens can also be revoked with RFC 7009 at ${base}/oauth2/revoke.
 
 ## Errors
 
@@ -237,6 +237,8 @@ The customer can remove any agent or application at any time on swiss3design.ch 
 | \`authorization_pending\`, \`slow_down\`, \`expired_token\`, \`access_denied\` | claim grant | See Step 4c. |
 | \`invalid_grant\` | \`/oauth2/token\` | Assertion, code or refresh token expired, revoked or reused. |
 | \`invalid_target\` | \`/oauth2/token\` | Unknown \`resource\`: use ${resource}. |
+| \`invalid_scope\` | \`/oauth2/token\` (Path B) | Requested \`scope\` exceeds what this registration has: omit \`scope\`, or stay within the pre-claim or post-claim scopes. |
+| \`invalid_request\` | \`/agent/identity\`, \`/agent/identity/claim\` | Missing or malformed \`type\` or \`email\`, or an \`email\` different from the registration's \`login_hint\`. |
 
 ## Privacy
 
