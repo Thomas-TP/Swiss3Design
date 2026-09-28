@@ -15,6 +15,12 @@
 //    client de la page). Les chunks chargés plus tard par next/dynamic (gates,
 //    runtime, Stage) n'y figurent pas, et c'est voulu : le budget « JS initial
 //    de l'accueil ≤ actuel + 15 KiB » les exclut.
+//    Borne haute : Next fusionne dans le manifeste d'une page ceux des segments
+//    parents (celui de /shop contient aussi les modules de l'accueil). Les
+//    chunks d'entrée `app/…` hors de la chaîne de la route (la page d'accueil
+//    vue depuis /shop) sont retirés ; les chunks partagés numérotés qu'ils
+//    tirent restent comptés. L'accueil, dont aucun segment parent ne porte de
+//    page, ne compte que ses propres chunks.
 //
 // Le gzip est calculé ici fichier par fichier (niveau par défaut de zlib) :
 // c'est un ordre de grandeur comparable d'un build à l'autre, pas l'octet près
@@ -110,13 +116,32 @@ function parseClientManifest(source: string): {
   const manifest = JSON.parse(json) as {
     clientModules: Record<string, { chunks: string[] }>;
   };
+  const route = match[1];
   const chunks = new Set<string>();
   for (const mod of Object.values(manifest.clientModules)) {
     // Liste plate [id, fichier, id, fichier…] : on ne garde que les fichiers.
-    for (const entry of mod.chunks)
-      if (entry.endsWith(".js")) chunks.add(decodeURIComponent(entry));
+    for (const entry of mod.chunks) {
+      if (!entry.endsWith(".js")) continue;
+      const file = decodeURIComponent(entry);
+      if (onRouteChain(route, file)) chunks.add(file);
+    }
   }
-  return { route: match[1], chunks: [...chunks] };
+  return { route, chunks: [...chunks] };
+}
+
+// Chunk d'entrée `static/chunks/app/<dossier>/<fichier>-<hash>.js` : gardé si
+// <dossier> est un segment de la route (layout, error, not-found… des
+// parents), et, pour une page, seulement si c'est la page de la route.
+// Les autres chunks (partagés, numérotés) sont toujours gardés.
+function onRouteChain(route: string, file: string): boolean {
+  const entry = file.match(
+    /^static\/chunks\/app\/(.+)\/([^/]+?)-[0-9a-f]+\.js$/,
+  );
+  if (!entry) return true;
+  const [, dir, name] = entry;
+  const routeDir = route.replace(/^\//, "").replace(/\/page$/, "");
+  const onChain = routeDir === dir || routeDir.startsWith(`${dir}/`);
+  return onChain && (name !== "page" || dir === routeDir);
 }
 
 async function main() {
@@ -174,7 +199,7 @@ async function main() {
   }
 
   console.log(
-    "\nJS initial par page (rootMainFiles + chunks des modules client, hors next/dynamic) :",
+    "\nJS initial par page (rootMainFiles + chunks des modules client, hors next/dynamic ; borne haute) :",
   );
   console.log(
     `${pad("gzip", 11)}  ${pad("brut", 11)}  chunks  moteurs   route`,
