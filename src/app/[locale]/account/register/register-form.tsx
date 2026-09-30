@@ -6,9 +6,8 @@ import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { signUp, signIn } from "@/lib/auth-client";
 import { track } from "@/lib/analytics";
-
-const field =
-  "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
+import { Field, fieldClass } from "@/components/ui/field";
+import { alertError, btnAccentLg } from "../(dashboard)/_ui";
 
 export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
   const t = useTranslations("auth");
@@ -104,13 +103,17 @@ export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
 
   if (waiting) {
     return (
-      <div className="rounded-xl border border-emerald-500/30 bg-emerald-500/10 p-6 text-center">
-        <MailCheck size={28} className="mx-auto text-emerald-600" />
+      <div className="rounded-field border border-emerald-500/30 bg-emerald-500/10 p-6 text-center">
+        <MailCheck
+          size={28}
+          strokeWidth={1.5}
+          className="mx-auto text-emerald-600"
+        />
         <p className="mt-3 text-sm font-medium leading-relaxed text-emerald-800 dark:text-emerald-200">
           {t("verifyNotice")}
         </p>
-        <p className="mt-3 flex items-center justify-center gap-2 text-xs text-emerald-700 dark:text-emerald-300">
-          <LoaderCircle size={14} className="animate-spin" />
+        <p className="mt-3 flex items-center justify-center gap-2 text-xs text-emerald-800 dark:text-emerald-200">
+          <LoaderCircle size={14} strokeWidth={1.5} className="animate-spin" />
           {signingIn ? t("verifySigningIn") : t("verifyWaiting")}
         </p>
       </div>
@@ -120,23 +123,17 @@ export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
   return (
     // method="post" : repli natif sans JS qui n'expose pas le mot de passe en URL
     <form method="post" onSubmit={onSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="name" className="mb-1.5 block text-sm font-semibold">
-          {t("name")}
-        </label>
+      <Field label={t("name")} htmlFor="name">
         <input
           id="name"
           name="name"
           required
           minLength={2}
           autoComplete="name"
-          className={field}
+          className={fieldClass}
         />
-      </div>
-      <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
-          {t("email")}
-        </label>
+      </Field>
+      <Field label={t("email")} htmlFor="email">
         <input
           id="email"
           name="email"
@@ -144,16 +141,10 @@ export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
           required
           autoComplete="email"
           defaultValue={defaultEmail}
-          className={field}
+          className={fieldClass}
         />
-      </div>
-      <div>
-        <label
-          htmlFor="password"
-          className="mb-1.5 block text-sm font-semibold"
-        >
-          {t("password")}
-        </label>
+      </Field>
+      <Field label={t("password")} htmlFor="password" hint={t("passwordHint")}>
         <input
           id="password"
           name="password"
@@ -161,21 +152,13 @@ export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
           required
           minLength={8}
           autoComplete="new-password"
-          className={field}
+          aria-describedby="password-hint"
+          className={fieldClass}
         />
-        <p className="mt-1 text-xs text-soft">{t("passwordHint")}</p>
-      </div>
-      {error && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
-          {error}
-        </p>
-      )}
-      <button
-        type="submit"
-        disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
-      >
-        <UserPlus size={16} />
+      </Field>
+      {error && <p className={alertError}>{error}</p>}
+      <button type="submit" disabled={pending} className={btnAccentLg}>
+        <UserPlus size={16} strokeWidth={1.5} />
         {t("signUpCta")}
       </button>
     </form>

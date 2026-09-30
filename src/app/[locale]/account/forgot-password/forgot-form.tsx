@@ -4,9 +4,8 @@ import { useState } from "react";
 import { MailCheck, Send } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
-
-const field =
-  "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
+import { Field, fieldClass } from "@/components/ui/field";
+import { btnAccentLg } from "../(dashboard)/_ui";
 
 export function ForgotForm() {
   const t = useTranslations("auth");
@@ -29,7 +28,11 @@ export function ForgotForm() {
   if (sent) {
     return (
       <div className="text-center">
-        <MailCheck size={28} className="mx-auto text-emerald-600" />
+        <MailCheck
+          size={28}
+          strokeWidth={1.5}
+          className="mx-auto text-emerald-600"
+        />
         <p className="mt-3 text-sm font-medium leading-relaxed text-soft">
           {t("resetSent")}
         </p>
@@ -40,25 +43,18 @@ export function ForgotForm() {
   return (
     // method="post" : repli natif sans JS (cohérence avec les autres formulaires)
     <form method="post" onSubmit={onSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
-          {t("email")}
-        </label>
+      <Field label={t("email")} htmlFor="email">
         <input
           id="email"
           name="email"
           type="email"
           required
           autoComplete="email"
-          className={field}
+          className={fieldClass}
         />
-      </div>
-      <button
-        type="submit"
-        disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
-      >
-        <Send size={16} />
+      </Field>
+      <button type="submit" disabled={pending} className={btnAccentLg}>
+        <Send size={16} strokeWidth={1.5} />
         {pending ? t("processing") : t("sendReset")}
       </button>
     </form>

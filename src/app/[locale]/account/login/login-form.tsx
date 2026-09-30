@@ -5,11 +5,20 @@ import { LogIn, ShieldCheck, Mail, MailCheck, Fingerprint } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link, useRouter } from "@/i18n/navigation";
 import { signIn, twoFactor, emailOtp } from "@/lib/auth-client";
+import { Field, fieldClass } from "@/components/ui/field";
+import {
+  alertError,
+  alertSuccess,
+  btnAccentLg,
+  btnGhost,
+  linkSoft,
+} from "../(dashboard)/_ui";
 
-const field =
-  "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
-const btnGhost =
-  "flex w-full items-center justify-center gap-2 rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-ink disabled:opacity-60";
+// Champ de code (TOTP, code de secours, code reçu par e-mail) : chiffres à
+// chasse fixe, interlettrage large pour lire les six chiffres d'un coup d'œil.
+const codeField = `${fieldClass} tracking-[0.3em]`;
+const btnGhostFull = `${btnGhost} w-full`;
+const linkBack = `${linkSoft} block w-full text-center`;
 
 // Connexion demandée par le serveur OAuth (un agent ou une application veut
 // accéder au compte) : l'URL porte la requête d'autorisation signée (?sig=…).
@@ -202,7 +211,11 @@ export function LoginForm({
     return (
       <div className="space-y-4">
         <p className="flex items-center gap-2 text-sm font-semibold">
-          <ShieldCheck size={18} className="text-emerald-600" />
+          <ShieldCheck
+            size={18}
+            strokeWidth={1.5}
+            className="text-emerald-600"
+          />
           {t("twoFactor.title")}
         </p>
         <p className="text-sm text-soft">
@@ -225,23 +238,22 @@ export function LoginForm({
           }}
           inputMode={isBackup ? "text" : "numeric"}
           autoComplete="one-time-code"
+          aria-label={
+            isBackup ? t("twoFactor.backupCode") : t("twoFactor.code")
+          }
           placeholder={
             isBackup ? t("twoFactor.backupCode") : t("twoFactor.code")
           }
-          className={`${field} ${isBackup ? "" : "tracking-[0.3em]"}`}
+          className={isBackup ? fieldClass : codeField}
         />
-        {error && (
-          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
-            {error}
-          </p>
-        )}
+        {error && <p className={alertError}>{error}</p>}
         <button
           type="button"
           onClick={verify}
           disabled={pending || code.length < 6}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+          className={btnAccentLg}
         >
-          <ShieldCheck size={16} />
+          <ShieldCheck size={16} strokeWidth={1.5} />
           {pending ? t("processing") : t("twoFactor.verify")}
         </button>
         <button
@@ -251,7 +263,7 @@ export function LoginForm({
             setCode("");
             setError(null);
           }}
-          className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink"
+          className={linkBack}
         >
           {isBackup ? t("twoFactor.useTotp") : t("twoFactor.useBackup")}
         </button>
@@ -261,8 +273,8 @@ export function LoginForm({
 
   if (stage === "magicSent") {
     return (
-      <p className="flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-300">
-        <MailCheck size={16} className="shrink-0" />
+      <p className={`${alertSuccess} flex items-center gap-2`}>
+        <MailCheck size={16} strokeWidth={1.5} className="shrink-0" />
         {t("passwordless.magicSent")}
       </p>
     );
@@ -287,19 +299,16 @@ export function LoginForm({
           }}
           inputMode="numeric"
           autoComplete="one-time-code"
+          aria-label={t("twoFactor.code")}
           placeholder={t("twoFactor.code")}
-          className={`${field} tracking-[0.3em]`}
+          className={codeField}
         />
-        {error && (
-          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
-            {error}
-          </p>
-        )}
+        {error && <p className={alertError}>{error}</p>}
         <button
           type="button"
           onClick={verifyOtp}
           disabled={pending || code.length < 6}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+          className={btnAccentLg}
         >
           {pending ? t("processing") : t("twoFactor.verify")}
         </button>
@@ -310,7 +319,7 @@ export function LoginForm({
             setCode("");
             setError(null);
           }}
-          className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink"
+          className={linkBack}
         >
           {t("passwordless.back")}
         </button>
@@ -327,9 +336,9 @@ export function LoginForm({
               type="button"
               onClick={onPasskeySignIn}
               disabled={pending}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+              className={btnAccentLg}
             >
-              <Fingerprint size={16} />
+              <Fingerprint size={16} strokeWidth={1.5} />
               {t("passwordless.usePasskey")}
             </button>
             <div className="flex items-center gap-3 text-xs text-soft">
@@ -343,34 +352,29 @@ export function LoginForm({
           type="email"
           value={plEmail}
           onChange={(e) => setPlEmail(e.target.value)}
+          aria-label={t("email")}
           placeholder={t("email")}
           autoComplete="email"
           required
-          className={field}
+          className={fieldClass}
         />
-        {error && (
-          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
-            {error}
-          </p>
-        )}
+        {error && <p className={alertError}>{error}</p>}
         <button
           type="button"
           onClick={sendMagicLink}
           disabled={pending || !plEmail.trim()}
-          className={
-            passkeySupported
-              ? btnGhost
-              : "flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
-          }
+          // Un seul bouton rouge par écran : la clé d'accès le prend quand
+          // elle est proposée, sinon l'envoi du lien.
+          className={passkeySupported ? btnGhostFull : btnAccentLg}
         >
-          <Mail size={16} />
+          <Mail size={16} strokeWidth={1.5} />
           {pending ? t("processing") : t("passwordless.sendLink")}
         </button>
         <button
           type="button"
           onClick={sendOtp}
           disabled={pending || !plEmail.trim()}
-          className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink disabled:opacity-60"
+          className={`${linkBack} disabled:opacity-60`}
         >
           {t("passwordless.sendCode")}
         </button>
@@ -380,7 +384,7 @@ export function LoginForm({
             setStage("login");
             setError(null);
           }}
-          className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink"
+          className={linkBack}
         >
           {t("passwordless.back")}
         </button>
@@ -392,10 +396,7 @@ export function LoginForm({
     // method="post" : si JS est indisponible, le repli natif n'envoie jamais le
     // mot de passe dans l'URL (sinon GET par défaut → fuite via Referer/logs).
     <form method="post" onSubmit={onSubmit} className="space-y-4">
-      <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
-          {t("email")}
-        </label>
+      <Field label={t("email")} htmlFor="email">
         <input
           id="email"
           name="email"
@@ -403,44 +404,27 @@ export function LoginForm({
           required
           // oxlint-disable-next-line autocomplete-valid -- "username webauthn" est la valeur standard pour l'autofill de cle d'acces (conditional UI WebAuthn) ; faux positif connu de la regle, portee de eslint-plugin-jsx-a11y (cf. sveltejs/svelte#8568), qui ne reconnait pas le token "webauthn" du spec
           autoComplete="username webauthn"
-          className={field}
+          className={fieldClass}
         />
-      </div>
-      <div>
-        <label
-          htmlFor="password"
-          className="mb-1.5 block text-sm font-semibold"
-        >
-          {t("password")}
-        </label>
+      </Field>
+      <Field label={t("password")} htmlFor="password">
         <input
           id="password"
           name="password"
           type="password"
           required
           autoComplete="current-password"
-          className={field}
+          className={fieldClass}
         />
-        <p className="mt-1.5 text-right">
-          <Link
-            href="/account/forgot-password"
-            className="text-xs font-medium text-soft transition-colors hover:text-accent-text"
-          >
+        <p className="text-right">
+          <Link href="/account/forgot-password" className={linkSoft}>
             {t("forgotLink")}
           </Link>
         </p>
-      </div>
-      {error && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
-          {error}
-        </p>
-      )}
-      <button
-        type="submit"
-        disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
-      >
-        <LogIn size={16} />
+      </Field>
+      {error && <p className={alertError}>{error}</p>}
+      <button type="submit" disabled={pending} className={btnAccentLg}>
+        <LogIn size={16} strokeWidth={1.5} />
         {t("signInCta")}
       </button>
       {/* Clé d'accès visible dès le premier écran : la cacher derrière
@@ -450,9 +434,9 @@ export function LoginForm({
           type="button"
           onClick={onPasskeySignIn}
           disabled={pending}
-          className={btnGhost}
+          className={btnGhostFull}
         >
-          <Fingerprint size={16} />
+          <Fingerprint size={16} strokeWidth={1.5} />
           {t("passwordless.usePasskey")}
         </button>
       )}
@@ -463,7 +447,7 @@ export function LoginForm({
             setStage("passwordless");
             setError(null);
           }}
-          className="block w-full text-center text-xs font-medium text-soft transition-colors hover:text-ink"
+          className={linkBack}
         >
           {t("passwordless.toggle")}
         </button>
