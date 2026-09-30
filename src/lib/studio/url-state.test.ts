@@ -30,6 +30,7 @@ import {
   type DecodeResult,
   encodeConfig,
   encodeSearchParams,
+  machineLine,
   toShortKeys,
 } from "./url-state";
 import type { LavauxConfig, StudioConfig, StudioObjectId } from "./types";
@@ -452,6 +453,23 @@ describe("schémas et bornage", () => {
       heroVariant("signal", "voronoi"),
     ]) {
       expect(clampLavaux(v)).toEqual(v);
+    }
+  });
+});
+
+describe("ligne machine du devis", () => {
+  it("le héros : exactement la ligne du brief (§6.9)", () => {
+    expect(machineLine(HERO_CONFIG)).toBe(
+      "S3D-STUDIO v1 lavaux h=150 d=96 p=galet b=0.5 n=0.72 l=0.08 m=gradins gs=5 gd=1.4 w=1.6 bd=bleu-leman:42,vert-lavaux:108,blanc-neve:150",
+    );
+  });
+
+  it("aucun texte, pas de saut de ligne, tous les objets", () => {
+    for (const object of ["lavaux", "cartouche", "relief", "borne"] as const) {
+      const line = machineLine(defaultConfig(object));
+      expect(line.startsWith(`S3D-STUDIO v1 ${object} `)).toBe(true);
+      expect(line).not.toMatch(/[\n\r]/);
+      for (const key of TEXT_KEYS) expect(line).not.toContain(`${key}=`);
     }
   });
 });

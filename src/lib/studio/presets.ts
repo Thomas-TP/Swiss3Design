@@ -7,7 +7,7 @@
 // `RELIEF_DEFAULT` définitif).
 import { between, intBetween, mulberry32, pick, type Rng } from "./kernel/rng";
 import { checkLavaux, nearVaseSpirale } from "./guards";
-import { gradinsDepthMax } from "./schemas";
+import { gradinsDepthMax, quantizeMm } from "./schemas";
 import type {
   Band,
   BorneConfig,
@@ -63,7 +63,7 @@ const BAND_FRACTIONS = [0.28, 0.72, 1] as const;
 
 /** Arrondit à la couche (0,2 mm) sans traîne de virgule flottante. */
 export function toLayer(mm: number): number {
-  return Math.round(Math.round(mm / 0.2) * 0.2 * 10) / 10;
+  return quantizeMm(mm);
 }
 
 /**

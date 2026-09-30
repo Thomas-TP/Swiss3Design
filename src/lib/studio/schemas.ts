@@ -116,8 +116,16 @@ export function clampRange(value: number, range: Range): number {
   );
 }
 
-const toLayer = (mm: number) =>
-  Math.round(Math.round(mm / 0.2) * 0.2 * 10) / 10;
+/**
+ * Ramène une hauteur à la couche (0,2 mm) la plus proche, sans traîne de
+ * virgule flottante ; un demi-pas exact (0,3) monte (0,4) au lieu de dépendre
+ * de l'arrondi binaire (0,3 / 0,2 = 1,4999999999999998).
+ */
+export function quantizeMm(mm: number): number {
+  return Math.round(Math.round(mm / 0.2 + 1e-9) * 0.2 * 10) / 10;
+}
+
+const toLayer = quantizeMm;
 
 /**
  * Bandes valides pour une hauteur : frontières à la couche, épaisseur ≥ 2 mm,
@@ -170,6 +178,11 @@ export function gradinsDepthMax(step: number, wall: number): number {
   );
 }
 
+/** Longueur d'onde minimale des vagues (mm), au demi-millimètre : wl ≥ 4 × amplitude (brief §6.6). */
+export function vaguesWavelengthMin(amplitude: number): number {
+  return Math.ceil((4 * amplitude) / 0.5 - 1e-9) * 0.5;
+}
+
 function clampPattern(p: LavauxPattern, wall: number): LavauxPattern {
   const R = LAVAUX_RANGES;
   switch (p.kind) {
@@ -188,7 +201,7 @@ function clampPattern(p: LavauxPattern, wall: number): LavauxPattern {
       // Couplage : longueur d'onde ≥ 4 × amplitude.
       const wavelength = Math.max(
         clampRange(p.wavelength, R.vagues.wavelength),
-        Math.ceil((4 * amplitude) / 0.5 - 1e-9) * 0.5,
+        vaguesWavelengthMin(amplitude),
       );
       return {
         kind: "vagues",

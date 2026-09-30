@@ -51,6 +51,14 @@
     "ambre": "Bernstein",
     "glacier": "Gletscherblau"
   },
+  "presets": {
+    "lavaux": "Lavaux",
+    "terrasses": "Terrassen",
+    "houle": "Dünung",
+    "pave": "Pflaster",
+    "colonne": "Säule",
+    "galet": "Kiesel"
+  },
   "options": {
     "mode": {
       "relief": "Erhaben",

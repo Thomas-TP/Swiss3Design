@@ -51,6 +51,14 @@
     "ambre": "Ambra",
     "glacier": "Ghiacciaio"
   },
+  "presets": {
+    "lavaux": "Lavaux",
+    "terrasses": "Terrazze",
+    "houle": "Onda lunga",
+    "pave": "Acciottolato",
+    "colonne": "Colonna",
+    "galet": "Ciottolo"
+  },
   "options": {
     "mode": {
       "relief": "In rilievo",

@@ -51,6 +51,14 @@
     "ambre": "Ambre",
     "glacier": "Glacier"
   },
+  "presets": {
+    "lavaux": "Lavaux",
+    "terrasses": "Terrasses",
+    "houle": "Houle",
+    "pave": "Pavé",
+    "colonne": "Colonne",
+    "galet": "Galet"
+  },
   "options": {
     "mode": {
       "relief": "En relief",

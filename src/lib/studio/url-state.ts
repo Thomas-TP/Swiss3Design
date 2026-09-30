@@ -475,6 +475,19 @@ export function encodeSearchParams(config: StudioConfig): string {
   return params.toString();
 }
 
+/**
+ * Ligne « machine » de la demande de devis (brief §6.9, point 4) : le réglage
+ * exact, lisible par l'atelier et par un script, sans aucun texte personnel :
+ * `S3D-STUDIO v1 lavaux h=150 d=96 … bd=bleu-leman:42,vert-lavaux:108,blanc-neve:150`.
+ */
+export function machineLine(config: StudioConfig): string {
+  const parts = Object.entries(toShortKeys(config)).map(([key, value]) =>
+    key === "bd" && "bands" in config
+      ? `bd=${bandsToParam(config.bands)}`
+      : `${key}=${String(value)}`,
+  );
+  return `S3D-STUDIO ${FRAGMENT_VERSION} ${config.object} ${parts.join(" ")}`;
+}
 export type SearchParamsLike =
   | URLSearchParams
   | Record<string, string | string[] | undefined>;

@@ -51,6 +51,14 @@
     "ambre": "Amber",
     "glacier": "Glacier"
   },
+  "presets": {
+    "lavaux": "Lavaux",
+    "terrasses": "Terraces",
+    "houle": "Swell",
+    "pave": "Cobblestone",
+    "colonne": "Column",
+    "galet": "Pebble"
+  },
   "options": {
     "mode": {
       "relief": "Embossed",

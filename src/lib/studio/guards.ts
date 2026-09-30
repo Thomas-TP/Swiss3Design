@@ -19,7 +19,12 @@
 // Silhouette d'Ian (Vase spirale, CC BY-ND 4.0, §1.5) : pas de profil
 // « bouteille », col ≥ 0,5 (exclus par construction) et `nearVaseSpirale`.
 import { analyzeLavaux, type LavauxAnalysis } from "./objects/lavaux-analysis";
-import { clampLavaux, gradinsDepthMax, MIN_BAND_MM } from "./schemas";
+import {
+  clampLavaux,
+  gradinsDepthMax,
+  MIN_BAND_MM,
+  vaguesWavelengthMin,
+} from "./schemas";
 import type {
   Band,
   IssueCode,
@@ -155,7 +160,7 @@ function couplingIssues(
           fix: {
             pattern: {
               ...p,
-              wavelength: Math.ceil((4 * p.amplitude) / 0.5 - 1e-9) * 0.5,
+              wavelength: vaguesWavelengthMin(p.amplitude),
             },
           } as Partial<LavauxConfig>,
         },

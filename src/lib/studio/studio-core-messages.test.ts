@@ -54,7 +54,7 @@ describe("studioCore : couverture du code", () => {
       for (const pattern of LAVAUX_PATTERN_KINDS) has(`patterns.${pattern}`);
       for (const palette of HERO_PALETTE_KEYS) has(`palettes.${palette}`);
       for (const filament of FILAMENT_IDS) has(`filaments.${filament}`);
-      // Les préréglages nomment leur palette par ses bandes, pas par un id : rien à traduire ici.
+      for (const preset of LAVAUX_PRESETS) has(`presets.${preset.id}`);
       expect(LAVAUX_PRESETS.length).toBeGreaterThan(0);
       expect(missing).toEqual([]);
     });
