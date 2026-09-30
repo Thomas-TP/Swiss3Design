@@ -130,4 +130,53 @@ describe("SEO — données structurées", () => {
     const pricey = productJsonLd({ ...base, priceCents: 9000 }, "fr", shipping);
     expect(pricey.offers.shippingDetails.shippingRate.value).toBe("0.00");
   });
+
+  // Attribution CC BY-ND de Ian (brief §7.9) : nœud 3DModel relié par
+  // `subjectOf`, jamais `isBasedOn` (domaine CreativeWork : invalide sur Product).
+  describe("crédit de conception (design)", () => {
+    const base = {
+      slug: "vase-spirale",
+      name: "Vase spirale",
+      description: "Vase",
+      priceCents: 2400,
+      saleType: "on_demand" as const,
+      productionDays: 3,
+      stock: null,
+      material: "PLA",
+      weightGrams: 120,
+      dimensionsMm: null,
+      colors: ["Blanc"],
+      imageUrls: ["/api/files/products/a.webp"],
+    };
+    const shipping = { shippingCents: 890, freeOverCents: 6000 };
+    const design = {
+      title: "Vase",
+      author: "Ian",
+      url: "https://makerworld.com/fr/models/1262112-vase",
+      licenseUrl: "https://creativecommons.org/licenses/by-nd/4.0/",
+    };
+
+    it("ajoute un nœud 3DModel (créateur, lien, licence) par subjectOf", () => {
+      const ld = productJsonLd({ ...base, design }, "fr", shipping);
+      expect(ld["@type"]).toBe("Product");
+      expect(ld.subjectOf).toEqual({
+        "@type": "3DModel",
+        name: "Vase",
+        creator: { "@type": "Person", name: "Ian" },
+        url: "https://makerworld.com/fr/models/1262112-vase",
+        license: "https://creativecommons.org/licenses/by-nd/4.0/",
+        isAccessibleForFree: true,
+      });
+    });
+
+    it("n'écrit jamais isBasedOn sur le Product", () => {
+      const ld = productJsonLd({ ...base, design }, "fr", shipping);
+      expect(ld).not.toHaveProperty("isBasedOn");
+    });
+
+    it("ne change rien pour un produit sans crédit", () => {
+      const ld = productJsonLd(base, "fr", shipping);
+      expect(ld).not.toHaveProperty("subjectOf");
+    });
+  });
 });

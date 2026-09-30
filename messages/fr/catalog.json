@@ -1,1 +1,110 @@
-{}
+{
+  "shop": {
+    "eyebrow": "Imprimé à la commande, à Gland et à Pully",
+    "title": "Boutique.",
+    "emptyCatalog": "Aucun objet en boutique pour le moment. Réglez le vôtre au Studio ou envoyez-nous un fichier.",
+    "view": {
+      "label": "Affichage",
+      "grid": "Grille",
+      "registry": "Registre"
+    },
+    "registry": {
+      "caption": "Registre des objets de la boutique",
+      "ref": "Réf.",
+      "image": "Vignette",
+      "name": "Objet",
+      "price": "Prix"
+    },
+    "studio": {
+      "title": "À régler au Studio.",
+      "intro": "Quatre objets dessinés par l'atelier, que vous réglez en 3D avant de nous les envoyer. Ce ne sont pas des articles de la boutique : le prix ferme est confirmé sur devis sous 48 h.",
+      "quote": "Sur devis",
+      "adjust": "Régler",
+      "objects": {
+        "lavaux": {
+          "name": "Vase « Lavaux »",
+          "line": "Un vase de 80 à 240 mm : forme, motif, jusqu'à quatre bandes de couleur."
+        },
+        "cartouche": {
+          "name": "Carte « Cartouche »",
+          "line": "Une carte de visite de 85 × 55 mm, votre nom en relief ou gravé."
+        },
+        "relief": {
+          "name": "Sous-verre « Relief »",
+          "line": "Un sous-verre topographique de 90 à 110 mm, avec votre sommet en relief."
+        },
+        "borne": {
+          "name": "Porte-nom « Borne »",
+          "line": "Un porte-nom à deux couleurs, en relief ou gravé, avec ou sans anneau."
+        }
+      }
+    },
+    "file": {
+      "title": "Vous avez déjà un fichier ?",
+      "text": "STL, 3MF, OBJ ou STEP : envoyez-le, l'atelier vous répond sous 48 h avec un devis.",
+      "cta": "Envoyer un fichier"
+    }
+  },
+  "card": {
+    "days": "{days} j",
+    "height": "Hauteur {height} mm"
+  },
+  "plate": {
+    "ref": "N° {n}",
+    "view": "Voir la fiche"
+  },
+  "product": {
+    "back": "Retour à la boutique",
+    "rail": "Chapitres de la fiche",
+    "chapters": {
+      "object": "Objet",
+      "turn": "Rotation",
+      "specs": "Mesures",
+      "credit": "Licence",
+      "reviews": "Clients",
+      "cross": "Studio",
+      "related": "Suite"
+    },
+    "titles": {
+      "turn": "Tournez-le.",
+      "specs": "Fiche technique.",
+      "credit": "Crédit du design.",
+      "reviews": "Avis clients.",
+      "related": "Vous aimerez aussi."
+    }
+  },
+  "trust": {
+    "shippingTitle": "Livraison suisse",
+    "madeTitle": "Fabriqué dans l'arc lémanique",
+    "paymentTitle": "Paiement sécurisé"
+  },
+  "attribution": {
+    "short": "Design : {author} · {license}",
+    "seeCredit": "voir le crédit",
+    "body": "Design : <strong>{author}</strong>, « {title} », publié sur <model>{platform}</model>. Licence <deed>Creative Commons BY-ND 4.0</deed>. Swiss3Design imprime ce modèle sans aucune modification. Cette mention n'implique aucune approbation de Swiss3Design par l'auteur.",
+    "dl": {
+      "author": "Auteur",
+      "model": "Modèle original",
+      "modelValue": "« {title} », <link>{platform}</link>",
+      "license": "Licence",
+      "modifications": "Modifications",
+      "none": "Aucune"
+    }
+  },
+  "viewer": {
+    "caption": "Rendu temps réel du fichier original de {author}, non modifié.",
+    "poster": "Photo de la pièce imprimée. L'aperçu 3D la remplace dès qu'il est prêt (WebGL requis).",
+    "loading": "Chargement du modèle 3D",
+    "loadingSize": "Chargement du modèle 3D (≈ {size} Mo)",
+    "ready": "Modèle 3D prêt. Flèches gauche et droite pour tourner.",
+    "error": "Aperçu 3D indisponible. La photo de la pièce reste affichée.",
+    "label": "Aperçu 3D de {name} : flèches pour tourner",
+    "turnLeft": "Tourner vers la gauche",
+    "turnRight": "Tourner vers la droite"
+  },
+  "cross": {
+    "title": "Un vase à vos couleurs ?",
+    "body": "Ce vase reste tel que {author} l'a dessiné. Pour un vase à vos couleurs, le Studio propose nos propres modèles paramétriques.",
+    "cta": "Régler un vase"
+  }
+}

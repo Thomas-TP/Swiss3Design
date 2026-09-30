@@ -3,7 +3,6 @@ import { cache } from "react";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Truck, Factory, ShieldCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import {
   getProductBySlug,
@@ -18,6 +17,7 @@ import {
   productJsonLd,
   type OgImage,
 } from "@/lib/seo";
+import { attributionFor } from "@/lib/attribution";
 import { cfOgImage } from "@/lib/cf-image";
 import { formatChf } from "@/lib/format";
 import { getShippingSettings } from "@/lib/shipping-settings";
@@ -28,9 +28,18 @@ import { MulticolorDots } from "@/components/multicolor-dots";
 import { ProductGallery } from "@/components/product-gallery";
 import { ProductColorProvider } from "@/components/product-color-context";
 import { ProductPurchase } from "@/components/product-purchase";
-import { ProductCard } from "@/components/product-card";
+import { ProductCard, type ProductCardItem } from "@/components/product-card";
 import { StarRating } from "@/components/star-rating";
+import { AttributionBlock } from "@/components/catalog/attribution-block";
+import { getCardExtras } from "@/components/catalog/card-extras";
+import { ProductMotion } from "@/components/catalog/product-motion";
+import { ProductViewer } from "@/components/catalog/product-viewer";
+import { Chapter } from "@/components/ui/chapter";
+import { ChapterRail, type RailChapter } from "@/components/ui/chapter-rail";
+import { ButtonLink } from "@/components/ui/button";
 import { PageCut } from "@/components/ui/page-cut";
+import { SiteLink } from "@/components/ui/site-link";
+import { SpecTable } from "@/components/ui/spec-table";
 
 export const dynamic = "force-dynamic";
 
@@ -101,6 +110,17 @@ export async function generateMetadata({
   });
 }
 
+// Modèle 3D : la photo qui le précède tant qu'il n'est pas rendu (et seule là où
+// la 3D n'est pas possible). De préférence le « rendu 3D » de la galerie s'il y
+// en a un (sa légende le dit), sinon la première photo.
+function posterOf(images: { url: string; alt: string | null }[]) {
+  return (
+    images.find((i) => /\b(3d|rendu|render|rendering)\b/i.test(i.alt ?? "")) ??
+    images[0] ??
+    null
+  );
+}
+
 export default async function ProductPage({
   params,
 }: {
@@ -118,7 +138,7 @@ export default async function ProductPage({
     productReviews,
     ratingSummary,
     tReviews,
-    tHome,
+    tCat,
     tSeo,
     tShop,
     shippingSettings,
@@ -127,11 +147,24 @@ export default async function ProductPage({
     getPublishedReviews(product.id),
     getRatingSummary(product.id),
     getTranslations("reviews"),
-    getTranslations("home"),
+    getTranslations("catalog"),
     getTranslations("seo"),
     getTranslations("shop"),
     getShippingSettings(),
   ]);
+
+  // Dimensions et 2ᵉ photo des cartes des produits liés : une lecture groupée.
+  const relatedExtras = await getCardExtras(related.map((p) => p.id));
+  const relatedCards: ProductCardItem[] = related.map((p) => ({
+    ...p,
+    dimensionsMm: relatedExtras.get(p.id)?.dimensionsMm ?? null,
+    secondImage: relatedExtras.get(p.id)?.secondImage ?? null,
+  }));
+
+  // Crédit de design (CC BY-ND 4.0 de Ian pour le Vase spirale) : null pour un
+  // modèle de notre conception. Il alimente le bloc de crédit, la ligne courte
+  // de la colonne d'achat et le nœud 3DModel des données structurées.
+  const attribution = attributionFor(product.slug);
 
   // Données structurées Product (prix/dispo CHF, livraison, retours) →
   // résultats enrichis et fiches marchandes Google, et une fiche lisible sans
@@ -150,6 +183,7 @@ export default async function ProductPage({
       dimensionsMm: product.dimensionsMm,
       colors: product.colors.map((c) => c.name),
       imageUrls: product.images.map((i) => i.url),
+      design: attribution ?? undefined,
     },
     locale,
     shippingSettings,
@@ -166,20 +200,20 @@ export default async function ProductPage({
   // taille, poids, délai, provenance) que moteurs et assistants IA reprennent
   // tels quels, sans dépendre du sélecteur d'achat (composant client).
   const specs = [
-    { label: t("material"), value: product.material },
-    { label: t("dimensions"), value: product.dimensionsMm },
+    { term: t("material"), value: product.material },
+    { term: t("dimensions"), value: product.dimensionsMm },
     {
-      label: t("weight"),
+      term: t("weight"),
       value: product.weightGrams ? `${product.weightGrams} g` : null,
     },
     {
-      label: t("productionTime"),
+      term: t("productionTime"),
       value:
         product.saleType === "on_demand"
           ? t("productionDays", { days: product.productionDays ?? 3 })
           : null,
     },
-    { label: t("origin"), value: t("originValue") },
+    { term: t("origin"), value: t("originValue") },
   ].filter((s) => s.value);
   // Paragraphes saisis à l'admin (ligne vide = nouveau paragraphe) : une
   // description structurée se lit mieux et se découpe mieux pour les moteurs.
@@ -188,59 +222,104 @@ export default async function ProductPage({
     .map((p) => p.trim())
     .filter(Boolean);
 
+  // Chapitres (brief « Strates », §7.9) : 01 Objet, 02 Tourner, 03 Fiche
+  // technique, 04 Crédit, 05 Avis, 06 « Un vase à vos couleurs ? », 07 Produits
+  // liés. Numérotés dans l'ordre de ceux qui existent pour CE produit (sans
+  // modèle 3D, ni crédit, ni avis, la suite se resserre), ce qui donne la
+  // numérotation du brief pour le Vase spirale.
+  const hasViewer = Boolean(product.model3dUrl);
+  const hasSpecs = specs.length > 0 || paragraphs.length > 1;
+  const sections = [
+    { key: "object", id: "objet", present: true },
+    { key: "turn", id: "tourner", present: hasViewer },
+    { key: "specs", id: "mesures", present: hasSpecs },
+    { key: "credit", id: "credit", present: attribution !== null },
+    { key: "reviews", id: "avis", present: productReviews.length > 0 },
+    { key: "cross", id: "studio", present: attribution !== null },
+    { key: "related", id: "suite", present: relatedCards.length > 0 },
+  ]
+    .filter((s) => s.present)
+    .map((s, index) => ({
+      ...s,
+      number: String(index + 1).padStart(2, "0"),
+      label: tCat(`product.chapters.${s.key}`),
+    }));
+  const chapter = (key: string) => sections.find((s) => s.key === key)!;
+  const rail: RailChapter[] = sections.map((s) => ({
+    id: s.id,
+    number: s.number,
+    label: s.label,
+  }));
+
   return (
     <PageCut>
-      <div className="mx-auto max-w-6xl px-4 py-8 sm:px-6 md:py-16">
-        <JsonLd data={jsonLd} />
-        <JsonLd data={breadcrumb} />
-        <TrackEvent
-          event="Product Viewed"
-          properties={{
-            ...productProperties({
-              productId: product.id,
-              slug: product.slug,
-              name: product.name,
-              priceCents: product.priceCents,
-              saleType: product.saleType,
-            }),
-            in_stock: product.stock == null || product.stock > 0,
-            rating: ratingSummary.count > 0 ? ratingSummary.average : null,
-            reviews: ratingSummary.count,
-          }}
-        />
-        <Link
-          href="/shop"
-          className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"
-        >
-          <ArrowLeft size={15} />
-          {t("backToShop")}
-        </Link>
+      <JsonLd data={jsonLd} />
+      <JsonLd data={breadcrumb} />
+      <TrackEvent
+        event="Product Viewed"
+        properties={{
+          ...productProperties({
+            productId: product.id,
+            slug: product.slug,
+            name: product.name,
+            priceCents: product.priceCents,
+            saleType: product.saleType,
+          }),
+          in_stock: product.stock == null || product.stock > 0,
+          rating: ratingSummary.count > 0 ? ratingSummary.average : null,
+          reviews: ratingSummary.count,
+        }}
+      />
+      {sections.length > 2 && (
+        <ChapterRail chapters={rail} label={tCat("product.rail")} />
+      )}
 
-        <ProductColorProvider colors={product.colors}>
-          <div className="grid gap-8 md:grid-cols-2 md:gap-14">
-            <div>
+      <ProductColorProvider colors={product.colors}>
+        {/* 01 · Objet : la galerie et, à côté, la colonne d'achat collante dès
+          le premier écran (quand l'écran est assez haut pour qu'elle tienne :
+          pas de colonne collante plus haute que la fenêtre). */}
+        <section
+          id="objet"
+          data-chapter="01"
+          aria-labelledby="product-title"
+          className="s3d-page scroll-mt-24 pb-16 pt-6 md:pb-24 md:pt-10"
+        >
+          <SiteLink
+            href="/shop"
+            className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors duration-150 hover:text-ink"
+          >
+            <ArrowLeft size={15} aria-hidden="true" />
+            {tCat("product.back")}
+          </SiteLink>
+
+          <div className="s3d-grid items-start gap-y-10">
+            <div className="col-span-full md:col-span-4 lg:col-span-7">
               <ProductGallery
                 images={product.images}
                 name={product.name}
-                model3dUrl={product.model3dUrl}
+                slug={product.slug}
               />
             </div>
 
-            <div className="flex flex-col md:sticky md:top-24 md:self-start">
+            <div className="col-span-full flex flex-col md:col-span-4 md:[@media(min-height:800px)]:sticky md:[@media(min-height:800px)]:top-24 lg:col-span-5">
               {product.multicolor && (
-                <span className="flex w-fit items-center gap-1.5 rounded-full border border-line bg-surface px-3 py-1 text-xs font-semibold">
+                <span className="s3d-label flex w-fit items-center gap-1.5 rounded-hair border border-line bg-surface px-2 py-1 normal-case text-ink">
                   <MulticolorDots size={6} />
                   {t("multicolorBadge")}
                 </span>
               )}
 
-              <h1 className="mt-4 text-3xl font-bold tracking-tight md:text-4xl">
+              <h1
+                id="product-title"
+                className={`font-display text-title text-ink ${product.multicolor ? "mt-4" : ""}`}
+              >
                 {product.name}
               </h1>
               {/* Premier paragraphe = résumé (et meta description) : juste sous
-                le titre ; la suite vient après l'achat, qui reste visible. */}
+                le titre ; la suite vient au chapitre « Fiche technique », et
+                l'achat reste visible. */}
               {paragraphs[0] && (
-                <p className="mt-4 leading-relaxed text-soft">
+                <p className="mt-4 max-w-[65ch] leading-relaxed text-soft">
                   {paragraphs[0]}
                 </p>
               )}
@@ -272,22 +351,24 @@ export default async function ProductPage({
               />
 
               {/* Réassurance au plus près du bouton d'achat : lève les trois
-              objections classiques (délai, provenance, paiement) sans quitter
-              la page. Libellés partagés avec la homepage. */}
-              <ul className="mt-6 grid gap-2 text-sm sm:grid-cols-3">
+                objections classiques (délai, provenance, paiement) sans quitter
+                la page. Libellés copiés dans `catalog.trust` (découplés de
+                `home.*`, que la refonte de l'accueil réécrit). */}
+              <ul className="mt-6 grid gap-2 sm:grid-cols-3">
                 {[
-                  { Icon: Truck, label: tHome("trustShippingTitle") },
-                  { Icon: Factory, label: tHome("trustMadeTitle") },
-                  { Icon: ShieldCheck, label: tHome("trustPaymentTitle") },
+                  { Icon: Truck, label: tCat("trust.shippingTitle") },
+                  { Icon: Factory, label: tCat("trust.madeTitle") },
+                  { Icon: ShieldCheck, label: tCat("trust.paymentTitle") },
                 ].map(({ Icon, label }) => (
                   <li
                     key={label}
-                    className="flex items-center gap-2 rounded-xl border border-line bg-surface px-3 py-2.5"
+                    className="flex items-center gap-2 rounded-field border border-line px-3 py-2.5"
                   >
                     <Icon
                       size={16}
-                      strokeWidth={1.8}
-                      className="shrink-0 text-accent-text"
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                      className="shrink-0 text-iso-index"
                     />
                     <span className="text-xs font-semibold leading-tight">
                       {label}
@@ -296,67 +377,116 @@ export default async function ProductPage({
                 ))}
               </ul>
 
+              {attribution && (
+                <p className="s3d-label mt-5 normal-case text-soft">
+                  {tCat("attribution.short", {
+                    author: attribution.author,
+                    license: attribution.license,
+                  })}
+                  {" · "}
+                  <a
+                    href="#credit"
+                    className="underline decoration-iso-index decoration-1 underline-offset-4 hover:decoration-ink"
+                  >
+                    {tCat("attribution.seeCredit")} ↓
+                  </a>
+                </p>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* 02 · Tourner : le fichier original, que l'on fait tourner. */}
+        {hasViewer && product.model3dUrl && (
+          <Chapter
+            id={chapter("turn").id}
+            number={chapter("turn").number}
+            title={tCat("product.titles.turn")}
+            eyebrow={chapter("turn").label}
+            className="border-t border-line"
+          >
+            <ProductViewer
+              slug={product.slug}
+              name={product.name}
+              modelUrl={product.model3dUrl}
+              poster={posterOf(product.images)}
+              author={attribution?.author ?? "Swiss3Design"}
+            />
+          </Chapter>
+        )}
+      </ProductColorProvider>
+
+      {/* 03 · Fiche technique : <dl> rendu serveur + la suite de la description. */}
+      {hasSpecs && (
+        <Chapter
+          id={chapter("specs").id}
+          number={chapter("specs").number}
+          title={tCat("product.titles.specs")}
+          eyebrow={chapter("specs").label}
+          className="border-t border-line"
+        >
+          <div className="s3d-page mt-10">
+            <div className="s3d-grid gap-y-10">
+              {specs.length > 0 && (
+                <SpecTable
+                  className="col-span-full lg:col-span-6"
+                  rows={specs.map((s) => ({ term: s.term, value: s.value }))}
+                />
+              )}
               {paragraphs.length > 1 && (
-                <div className="mt-8 space-y-3 text-[15px] leading-relaxed text-soft">
+                <div className="col-span-full max-w-[65ch] space-y-4 leading-relaxed text-soft lg:col-span-5 lg:col-start-8">
                   {paragraphs.slice(1).map((p) => (
                     <p key={p}>{p}</p>
                   ))}
                 </div>
               )}
-
-              {specs.length > 0 && (
-                <div className="mt-8 border-t border-line text-sm">
-                  <p className="border-b border-line pt-4 font-semibold">
-                    {t("details")}
-                  </p>
-                  <dl
-                    aria-label={t("details")}
-                    className="divide-y divide-line"
-                  >
-                    {specs.map((s) => (
-                      <div
-                        key={s.label}
-                        className="flex justify-between gap-4 py-3"
-                      >
-                        <dt className="shrink-0 text-soft">{s.label}</dt>
-                        <dd className="text-right font-medium">{s.value}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              )}
             </div>
           </div>
-        </ProductColorProvider>
+        </Chapter>
+      )}
 
-        {productReviews.length > 0 && (
-          <section className="mt-16 md:mt-24">
-            <span className="flex h-1 w-10 rounded-full bg-accent" />
-            <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
-              <h2 className="text-2xl font-bold tracking-tight">
-                {tReviews("title")}
-              </h2>
-              <span className="flex items-center gap-2 rounded-full border border-line bg-surface px-3 py-1">
-                <StarRating value={ratingSummary.average} size={14} />
-                <span className="text-sm font-semibold tabular-nums">
-                  {ratingSummary.average.toFixed(1)}
-                </span>
-                <span className="text-xs text-soft">
-                  {tReviews("count", { count: ratingSummary.count })}
-                </span>
+      {/* 04 · Crédit du design : obligation de la licence, rendue côté serveur. */}
+      {attribution && (
+        <Chapter
+          id={chapter("credit").id}
+          number={chapter("credit").number}
+          title={tCat("product.titles.credit")}
+          eyebrow={chapter("credit").label}
+          className="border-t border-line"
+        >
+          <div className="s3d-page mt-10">
+            <AttributionBlock attribution={attribution} locale={locale} />
+          </div>
+        </Chapter>
+      )}
+
+      {/* 05 · Avis */}
+      {productReviews.length > 0 && (
+        <Chapter
+          id={chapter("reviews").id}
+          number={chapter("reviews").number}
+          title={tCat("product.titles.reviews")}
+          eyebrow={chapter("reviews").label}
+          className="border-t border-line"
+        >
+          <div className="s3d-page mt-10">
+            <p className="flex items-center gap-2">
+              <StarRating value={ratingSummary.average} size={16} />
+              <span className="s3d-num font-semibold">
+                {ratingSummary.average.toFixed(1)}
               </span>
-            </div>
-            <ul className="mt-6 space-y-4">
+              <span className="text-sm text-soft">
+                {tReviews("count", { count: ratingSummary.count })}
+              </span>
+            </p>
+            <ul className="mt-6 max-w-[46rem] divide-y divide-line border-y border-line">
               {productReviews.map((r) => (
-                <li
-                  key={r.id}
-                  className="rounded-card border border-line bg-surface p-5"
-                >
+                <li key={r.id} className="py-5">
                   <div className="flex items-center justify-between gap-3">
                     <span className="font-semibold">{r.authorName}</span>
                     <StarRating value={r.rating} size={14} />
                   </div>
-                  <p className="mt-1 text-xs text-soft">
+                  <p className="s3d-label mt-1 normal-case text-soft">
                     {r.createdAt.toLocaleDateString(`${locale}-CH`)}
                   </p>
                   {r.body && (
@@ -365,23 +495,49 @@ export default async function ProductPage({
                 </li>
               ))}
             </ul>
-          </section>
-        )}
+          </div>
+        </Chapter>
+      )}
 
-        {related.length > 0 && (
-          <section className="mt-16 md:mt-24">
-            <span className="flex h-1 w-10 rounded-full bg-accent" />
-            <h2 className="mt-3 text-2xl font-bold tracking-tight">
-              {t("relatedTitle")}
-            </h2>
-            <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
-              {related.map((p) => (
-                <ProductCard key={p.id} product={p} />
+      {/* 06 · « Un vase à vos couleurs ? » : le modèle de Ian reste tel qu'il l'a
+        dessiné ; pour une variante à soi, le Studio propose NOS modèles. */}
+      {attribution && (
+        <Chapter
+          id={chapter("cross").id}
+          number={chapter("cross").number}
+          title={tCat("cross.title")}
+          eyebrow={chapter("cross").label}
+          intro={tCat("cross.body", { author: attribution.author })}
+          className="border-t border-line"
+        >
+          <div className="s3d-page mt-8">
+            <ButtonLink href="/studio/lavaux" variant="secondary" size="md">
+              {tCat("cross.cta")}
+            </ButtonLink>
+          </div>
+        </Chapter>
+      )}
+
+      {/* 07 · Produits liés */}
+      {relatedCards.length > 0 && (
+        <Chapter
+          id={chapter("related").id}
+          number={chapter("related").number}
+          title={tCat("product.titles.related")}
+          eyebrow={chapter("related").label}
+          className="border-t border-line"
+        >
+          <div className="s3d-page mt-10">
+            <div className="grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-4 md:gap-x-6">
+              {relatedCards.map((p) => (
+                <ProductCard key={p.id} product={p} heading="h3" />
               ))}
             </div>
-          </section>
-        )}
-      </div>
+          </div>
+        </Chapter>
+      )}
+
+      <ProductMotion />
     </PageCut>
   );
 }

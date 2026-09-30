@@ -6,11 +6,25 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useCart, sameLine, type CartItem } from "@/lib/cart";
 import { productProperties, track } from "@/lib/analytics";
+import { Button, type ButtonVariant } from "@/components/ui/button";
 
 function trackAdded(item: Omit<CartItem, "quantity">, source: string) {
   track("Product Added", { ...productProperties(item), source });
 }
 
+// Retour tactile de l'ajout au panier (brief « Strates », §3.5) : un battement
+// de 5 ms là où le navigateur sait vibrer (Android), rien ailleurs.
+function feel() {
+  try {
+    navigator.vibrate?.(5);
+  } catch {
+    // Politique du navigateur ou appareil sans vibreur : sans conséquence.
+  }
+}
+
+// « Un seul bouton rouge par écran » (brief §2.1) : la fiche produit porte le
+// rouge (`primary`) ; partout ailleurs (cartes, planches) l'ajout rapide est en
+// contour, et la planche éditoriale de tête peut prendre le rouge (`primary`).
 export function AddToCart({
   item,
   disabled = false,
@@ -24,45 +38,45 @@ export function AddToCart({
 
   if (disabled) {
     return (
-      <button
-        type="button"
-        disabled
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-line px-6 py-3.5 text-sm font-semibold text-soft"
-      >
+      <Button variant="secondary" size="lg" full disabled>
         {t("outOfStock")}
-      </button>
+      </Button>
     );
   }
 
   return (
-    <button
-      type="button"
+    <Button
+      variant={added ? "ink" : "primary"}
+      size="lg"
+      full
       aria-live="polite"
       onClick={() => {
         add(item);
         trackAdded(item, "product_page");
+        feel();
         setAdded(true);
         setTimeout(() => setAdded(false), 1600);
       }}
-      className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3.5 text-sm font-semibold transition-all active:scale-[0.98] ${
-        added
-          ? "bg-ink text-paper"
-          : "bg-accent text-white shadow-lg shadow-accent/25 hover:bg-accent-dark"
-      }`}
     >
       {added ? <Check size={18} /> : <ShoppingBag size={18} />}
       {added ? t("added") : t("addToCart")}
-    </button>
+    </Button>
   );
 }
 
-// Variante compacte pour les cartes du catalogue (vit dans une carte-lien)
+// Variante compacte pour les cartes du catalogue (vit dans une carte-lien) et
+// pour les planches de la boutique (`variant="primary"` pour la première).
 export function AddToCartMini({
   item,
   disabled = false,
+  variant = "secondary",
+  size = "sm",
 }: {
   item: Omit<CartItem, "quantity">;
   disabled?: boolean;
+  variant?: Extract<ButtonVariant, "primary" | "secondary">;
+  /** `md` (44 px, cible tactile) pour une planche ; `sm` dans une carte dense. */
+  size?: "sm" | "md";
 }) {
   const t = useTranslations("product");
   const { add } = useCart();
@@ -70,37 +84,31 @@ export function AddToCartMini({
 
   if (disabled) {
     return (
-      <button
-        type="button"
-        disabled
-        className="flex w-full items-center justify-center gap-1.5 rounded-full bg-line px-3 py-2 text-xs font-semibold text-soft"
-      >
+      <Button variant="secondary" size={size} full disabled>
         {t("outOfStock")}
-      </button>
+      </Button>
     );
   }
 
   return (
-    <button
-      type="button"
+    <Button
+      variant={added ? "ink" : variant}
+      size={size}
+      full
       aria-live="polite"
       onClick={(e) => {
         e.preventDefault();
         e.stopPropagation();
         add(item);
         trackAdded(item, "catalog");
+        feel();
         setAdded(true);
         setTimeout(() => setAdded(false), 1600);
       }}
-      className={`flex w-full items-center justify-center gap-1.5 rounded-full px-3 py-2 text-xs font-semibold transition-all active:scale-[0.98] ${
-        added
-          ? "bg-ink text-paper"
-          : "bg-accent text-white hover:bg-accent-dark"
-      }`}
     >
       {added ? <Check size={14} /> : <ShoppingBag size={14} />}
       {added ? t("added") : t("addToCart")}
-    </button>
+    </Button>
   );
 }
 
@@ -119,8 +127,10 @@ export function BuyNow({
   if (disabled) return null;
 
   return (
-    <button
-      type="button"
+    <Button
+      variant="ink"
+      size="lg"
+      full
       aria-live="polite"
       onClick={() => {
         if (!items.some((i) => sameLine(i, item))) {
@@ -129,10 +139,9 @@ export function BuyNow({
         }
         router.push("/checkout");
       }}
-      className="flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-paper transition-all hover:bg-ink/85 active:scale-[0.98]"
     >
       <CreditCard size={18} />
       {t("buyNow")}
-    </button>
+    </Button>
   );
 }

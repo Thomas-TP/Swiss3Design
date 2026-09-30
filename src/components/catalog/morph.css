@@ -1,0 +1,15 @@
+/* Morph carte → fiche (brief « Strates », §3.4) : l'image d'une carte de la
+   boutique (ou d'une ligne du Registre) et l'image principale de la galerie de
+   la fiche portent le même `view-transition-name` (product-<slug>) et la
+   classe « morph » (`share="morph"` sur <ViewTransition>). Le navigateur fait
+   glisser et grandir le cadre de l'une à l'autre ; ici seulement la durée et
+   la courbe de la marque (la même que la bascule en plan, `ease-carte`).
+
+   Fichier global, importé par les composants qui posent le nom : des
+   pseudo-éléments de transition ne se ciblent pas depuis un CSS Module. Le
+   mouvement réduit ramène les durées à 0 (globals.css, ::view-transition-
+   group(*)), ce fichier ne le contredit pas. */
+::view-transition-group(.morph) {
+  animation-duration: var(--dur-page);
+  animation-timing-function: var(--ease-carte);
+}

@@ -1,1 +1,110 @@
-{}
+{
+  "shop": {
+    "eyebrow": "Auf Bestellung gedruckt, in Gland und Pully",
+    "title": "Shop.",
+    "emptyCatalog": "Zurzeit ist kein Objekt im Shop. Stellen Sie Ihr eigenes im Studio ein oder senden Sie uns eine Datei.",
+    "view": {
+      "label": "Ansicht",
+      "grid": "Raster",
+      "registry": "Register"
+    },
+    "registry": {
+      "caption": "Register der Objekte im Shop",
+      "ref": "Ref.",
+      "image": "Vorschau",
+      "name": "Objekt",
+      "price": "Preis"
+    },
+    "studio": {
+      "title": "Im Studio einzustellen.",
+      "intro": "Vier Objekte aus unserem Atelier, die Sie in 3D einstellen, bevor Sie sie uns senden. Es sind keine Shop-Artikel: Den verbindlichen Preis bestätigen wir auf Offerte innert 48 Stunden.",
+      "quote": "Auf Offerte",
+      "adjust": "Einstellen",
+      "objects": {
+        "lavaux": {
+          "name": "Vase «Lavaux»",
+          "line": "Eine Vase von 80 bis 240 mm: Form, Muster, bis zu vier Farbzonen."
+        },
+        "cartouche": {
+          "name": "Visitenkarte «Cartouche»",
+          "line": "Eine Visitenkarte von 85 × 55 mm, Ihr Name erhaben oder graviert."
+        },
+        "relief": {
+          "name": "Untersetzer «Relief»",
+          "line": "Ein topografischer Untersetzer von 90 bis 110 mm, mit Ihrem Gipfel im Relief."
+        },
+        "borne": {
+          "name": "Namensschild «Borne»",
+          "line": "Ein zweifarbiges Namensschild, erhaben oder graviert, mit oder ohne Ring."
+        }
+      }
+    },
+    "file": {
+      "title": "Sie haben schon eine Datei?",
+      "text": "STL, 3MF, OBJ oder STEP: Senden Sie die Datei, das Atelier antwortet Ihnen innert 48 Stunden mit einer Offerte.",
+      "cta": "Datei senden"
+    }
+  },
+  "card": {
+    "days": "{days} T",
+    "height": "Höhe {height} mm"
+  },
+  "plate": {
+    "ref": "Nr. {n}",
+    "view": "Zum Artikel"
+  },
+  "product": {
+    "back": "Zurück zum Shop",
+    "rail": "Kapitel der Produktseite",
+    "chapters": {
+      "object": "Objekt",
+      "turn": "Drehen",
+      "specs": "Masse",
+      "credit": "Lizenz",
+      "reviews": "Kunden",
+      "cross": "Studio",
+      "related": "Weiter"
+    },
+    "titles": {
+      "turn": "Drehen Sie es.",
+      "specs": "Datenblatt.",
+      "credit": "Urheber des Designs.",
+      "reviews": "Kundenbewertungen.",
+      "related": "Das könnte Ihnen gefallen."
+    }
+  },
+  "trust": {
+    "shippingTitle": "Lieferung in der Schweiz",
+    "madeTitle": "Hergestellt am Genfersee",
+    "paymentTitle": "Sichere Zahlung"
+  },
+  "attribution": {
+    "short": "Design: {author} · {license}",
+    "seeCredit": "zum Nachweis",
+    "body": "Design: <strong>{author}</strong>, «{title}», veröffentlicht auf <model>{platform}</model>. Lizenz <deed>Creative Commons BY-ND 4.0</deed>. Swiss3Design druckt dieses Modell ohne jede Änderung. Dieser Hinweis bedeutet keine Billigung von Swiss3Design durch den Urheber.",
+    "dl": {
+      "author": "Urheber",
+      "model": "Originalmodell",
+      "modelValue": "«{title}», <link>{platform}</link>",
+      "license": "Lizenz",
+      "modifications": "Änderungen",
+      "none": "Keine"
+    }
+  },
+  "viewer": {
+    "caption": "Echtzeit-Rendering der Originaldatei von {author}, unverändert.",
+    "poster": "Foto des gedruckten Stücks. Die 3D-Ansicht ersetzt es, sobald sie bereit ist (WebGL erforderlich).",
+    "loading": "3D-Modell wird geladen",
+    "loadingSize": "3D-Modell wird geladen (≈ {size} MB)",
+    "ready": "3D-Modell bereit. Mit den Pfeiltasten links und rechts drehen.",
+    "error": "3D-Ansicht nicht verfügbar. Das Foto des Stücks bleibt sichtbar.",
+    "label": "3D-Ansicht von {name}: Pfeiltasten zum Drehen",
+    "turnLeft": "Nach links drehen",
+    "turnRight": "Nach rechts drehen"
+  },
+  "cross": {
+    "title": "Eine Vase in Ihren Farben?",
+    "body": "Diese Vase bleibt, wie {author} sie gezeichnet hat. Für eine Vase in Ihren Farben bietet das Studio unsere eigenen parametrischen Modelle.",
+    "cta": "Vase einstellen"
+  }
+}
