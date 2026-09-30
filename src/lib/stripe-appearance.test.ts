@@ -27,7 +27,7 @@ describe("stripeAppearance", () => {
 
     it(`${name} : n'utilise que des sélecteurs pris en charge`, () => {
       for (const selector of Object.keys(appearance.rules ?? {}))
-        expect(SUPPORTED.has(selector), selector).toBe(true);
+        expect([...SUPPORTED]).toContain(selector);
     });
 
     it(`${name} : rayons du système (4 px, accordéon 6 px) et police Geist`, () => {

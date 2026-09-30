@@ -25,6 +25,9 @@ import {
   type EmailProof,
 } from "@/components/guest-email-verification";
 import { Select } from "@/components/select";
+import { Button, ButtonLink } from "@/components/ui/button";
+import { fieldClass } from "@/components/ui/field";
+import { readReducedMotion } from "@/lib/motion-bridge/motion-pref";
 import { useCart } from "@/lib/cart";
 import { cartProperties, chf, track } from "@/lib/analytics";
 import { useSession } from "@/lib/auth-client";
@@ -50,8 +53,25 @@ function getStripePromise(publishableKey?: string) {
   return stripePromise;
 }
 
-const field =
-  "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
+// Refresh visuel « Strates » (brief §7.14) : jetons, typographie, rayons
+// `field` et `card`, étiquettes d'étape en mono. AUCUNE logique n'a changé
+// (adresse suisse, vérification d'e-mail, remise, clé idempotente, Payment
+// Element, confirmation puis /checkout/success), et rien n'est animé autour
+// des iframes Stripe : ni Lenis (hors groupe (site)), ni canvas, ni transform,
+// ni overflow animé.
+const field = fieldClass;
+
+// Encart d'erreur : texte + bordure `accent-text` (6:1 et plus sur tous les
+// fonds), jamais la couleur seule.
+const ERROR_BOX =
+  "rounded-field border border-accent-text/30 bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text";
+
+// Étiquette (badge) mono d'un panneau.
+const TAG =
+  "s3d-label rounded-hair border border-line bg-paper px-2 py-1 text-soft";
+
+// Titre de panneau : Archivo, plus discret que les titres de page.
+const PANEL_TITLE = "font-display text-xl font-bold tracking-tight text-ink";
 
 // CANTONS/CANTON_CODES déplacés vers src/lib/cantons.ts (réutilisés par le
 // carnet d'adresses du compte).
@@ -222,7 +242,7 @@ function StreetAutocomplete({
         <ul
           id={listId}
           role="listbox"
-          className="absolute z-20 mt-1.5 w-full overflow-hidden rounded-xl border border-line bg-surface shadow-lg shadow-ink/5"
+          className="absolute z-20 mt-1.5 w-full overflow-hidden rounded-card border border-line bg-elevated shadow-lg shadow-ink/10"
         >
           {items.map((item, index) => (
             <li key={item.label}>
@@ -253,34 +273,49 @@ function StreetAutocomplete({
 
 // ── Indicateur d'étapes ──────────────────────────────────────────────────────
 
+// « 01 Contact · 02 Paiement » en mono (brief §7.14). L'étape courante porte
+// le point rouge (l'état courant, la buse) et aria-current ; une étape passée
+// montre une coche. Le trait entre les étapes est décoratif.
 function Steps({ current }: { current: 1 | 2 }) {
-  const t = useTranslations("checkout");
-  const steps = [t("stepDelivery"), t("stepPayment")];
+  const t = useTranslations("system.checkout");
+  const steps = [t("stepContact"), t("stepPayment")];
   return (
-    <ol className="flex items-center gap-3">
+    <ol aria-label={t("stepsLabel")} className="s3d-label flex items-center">
       {steps.map((label, i) => {
         const n = (i + 1) as 1 | 2;
         const active = n === current;
         const done = n < current;
         return (
-          <li key={label} className="flex items-center gap-3">
-            {i > 0 && <span className="h-px w-10 bg-line sm:w-16" />}
-            <span
-              className={`flex items-center gap-2 text-sm font-semibold ${
-                active ? "text-ink" : done ? "text-emerald-600" : "text-soft"
-              }`}
-            >
+          <li
+            key={label}
+            aria-current={active ? "step" : undefined}
+            className="flex items-center"
+          >
+            {i > 0 && (
               <span
-                className={`grid h-6 w-6 place-items-center rounded-full text-xs font-bold ${
-                  active
-                    ? "bg-ink text-paper"
-                    : done
-                      ? "bg-emerald-600 text-white"
-                      : "bg-line text-soft"
-                }`}
-              >
-                {done ? <Check size={13} strokeWidth={3} /> : n}
-              </span>
+                aria-hidden="true"
+                className="mx-3 h-px w-8 bg-iso sm:mx-4 sm:w-14"
+              />
+            )}
+            <span
+              className={`flex items-center gap-2 ${active ? "text-ink" : "text-soft"}`}
+            >
+              {done ? (
+                <Check
+                  aria-hidden="true"
+                  size={14}
+                  strokeWidth={2}
+                  className="shrink-0"
+                />
+              ) : (
+                <span
+                  aria-hidden="true"
+                  className={`h-2 w-2 shrink-0 rounded-full ${
+                    active ? "bg-accent" : "border border-iso"
+                  }`}
+                />
+              )}
+              <span className="s3d-num">{String(n).padStart(2, "0")}</span>
               {label}
             </span>
           </li>
@@ -354,11 +389,11 @@ function SummaryCard({
 
   return (
     <div className="rounded-card border border-line bg-surface p-5 sm:p-6">
-      <p className="flex items-center gap-2 text-sm font-semibold">
-        <ShoppingBag size={15} className="text-soft" />
+      <h2 className="s3d-label flex items-center gap-2 text-soft">
+        <ShoppingBag size={15} strokeWidth={1.5} aria-hidden="true" />
         {t("summary")}
-      </p>
-      <ul className="mt-3 space-y-2 text-sm">
+      </h2>
+      <ul className="mt-4 space-y-2 text-sm">
         {items.map((i) => (
           <li
             key={`${i.productId}:${i.variantId ?? ""}:${i.colorName ?? ""}`}
@@ -369,18 +404,18 @@ function SummaryCard({
               {i.variantName ? ` (${i.variantName})` : ""}
               {i.colorName ? ` — ${i.colorName}` : ""}
             </span>
-            <span className="font-medium tabular-nums">
+            <span className="s3d-num font-medium">
               {formatChf(i.priceCents * i.quantity, locale)}
             </span>
           </li>
         ))}
         {discountCents > 0 && (
-          <li className="flex justify-between gap-3 border-t border-line pt-2 text-emerald-600 dark:text-emerald-400">
+          <li className="flex justify-between gap-3 border-t border-line pt-2 text-emerald-700 dark:text-emerald-400">
             <span>
               {t("discountLine")}
               {discount?.code ? ` (${discount.code})` : ""}
             </span>
-            <span className="font-medium tabular-nums">
+            <span className="s3d-num font-medium">
               −{formatChf(discountCents, locale)}
             </span>
           </li>
@@ -391,23 +426,23 @@ function SummaryCard({
           }`}
         >
           <span className="text-soft">{t("shippingLine")}</span>
-          <span className="font-medium tabular-nums">
+          <span className="s3d-num font-medium">
             {shippingCents === 0
               ? t("shippingFree")
               : formatChf(shippingCents, locale)}
           </span>
         </li>
-        <li className="flex justify-between gap-3 font-bold">
+        <li className="flex items-baseline justify-between gap-3 border-t border-line pt-3 font-bold text-ink">
           <span>{t("totalLine")}</span>
-          <span className="tabular-nums">{formatChf(total, locale)}</span>
+          <span className="s3d-num text-xl">{formatChf(total, locale)}</span>
         </li>
       </ul>
 
       {editable && (
         <div className="mt-4 border-t border-line pt-4">
           {discount ? (
-            <div className="flex items-center justify-between gap-2 rounded-xl bg-emerald-500/10 px-3.5 py-2.5 text-sm">
-              <span className="font-semibold text-emerald-700 dark:text-emerald-300">
+            <div className="flex items-center justify-between gap-2 rounded-field bg-emerald-500/10 px-3.5 py-2.5 text-sm">
+              <span className="font-semibold text-emerald-800 dark:text-emerald-300">
                 {discount.code}
               </span>
               <button
@@ -417,7 +452,7 @@ function SummaryCard({
                   setCode("");
                   setPromoError(null);
                 }}
-                className="text-xs font-semibold text-soft transition-colors hover:text-accent-text"
+                className="min-h-9 px-1 text-sm font-semibold text-soft underline underline-offset-4 transition-colors hover:text-ink"
               >
                 {t("promoRemove")}
               </button>
@@ -434,20 +469,24 @@ function SummaryCard({
                       applyCode();
                     }
                   }}
+                  aria-label={t("promoPlaceholder")}
                   placeholder={t("promoPlaceholder")}
-                  className="w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm uppercase transition-colors placeholder:normal-case placeholder:text-soft/60 focus:border-ink focus:outline-none"
+                  className={`${field} min-w-0 uppercase placeholder:normal-case`}
                 />
-                <button
-                  type="button"
+                <Button
+                  variant="ink"
                   onClick={applyCode}
                   disabled={!code.trim() || applying}
-                  className="shrink-0 rounded-xl bg-ink px-4 text-sm font-semibold text-paper transition-opacity hover:opacity-90 disabled:opacity-50"
+                  className="h-auto! shrink-0"
                 >
                   {applying ? "…" : t("promoApply")}
-                </button>
+                </Button>
               </div>
               {promoError && (
-                <p className="mt-2 text-xs font-medium text-accent-text">
+                <p
+                  role="alert"
+                  className="mt-2 text-sm font-medium text-accent-text"
+                >
                   {promoError}
                 </p>
               )}
@@ -535,20 +574,15 @@ export function CheckoutFlow({
 
   if (items.length === 0 && !clientSecret) {
     return (
-      <div className="rounded-card border border-line bg-surface p-10 text-center">
-        <ShoppingBag
-          size={26}
-          strokeWidth={1.6}
-          className="mx-auto text-soft"
-        />
-        <p className="mt-4 text-soft">{t("emptyCart")}</p>
-        <Link
-          href="/shop"
-          className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-accent-text hover:underline"
-        >
+      <div className="rounded-card border border-line bg-surface p-8 sm:p-10">
+        <ShoppingBag size={26} strokeWidth={1.5} className="text-soft" />
+        <p className="mt-4 text-lead text-ink">{t("emptyCart")}</p>
+        {/* Le panier vide propose lui-même les sorties (Studio, boutique,
+            fichier) : le libellé « Retour au panier » y mène vraiment. */}
+        <ButtonLink href="/cart" variant="secondary" className="mt-5">
           {t("back")}
-          <ArrowRight size={15} />
-        </Link>
+          <ArrowRight size={16} strokeWidth={1.5} />
+        </ButtonLink>
       </div>
     );
   }
@@ -661,7 +695,12 @@ export function CheckoutFlow({
         currency: "CHF",
         guest: !accountEmail,
       });
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      // Retour en haut au passage à l'étape 2 : doux, sauf en mouvement réduit
+      // (préférence du système ou interrupteur du footer).
+      window.scrollTo({
+        top: 0,
+        behavior: readReducedMotion() ? "auto" : "smooth",
+      });
     } catch {
       setError(t("errorGeneric"));
     } finally {
@@ -699,19 +738,23 @@ export function CheckoutFlow({
           ) : (
             <form action={startPayment} className="space-y-6">
               {/* Contact — compte connecté ou e-mail vérifié par code */}
-              <div className="rounded-card border border-line bg-surface p-5 sm:p-6">
-                <div className="flex items-center justify-between">
-                  <p className="font-semibold">{t("contactTitle")}</p>
+              <section
+                aria-labelledby="checkout-contact"
+                className="rounded-card border border-line bg-surface p-5 sm:p-6"
+              >
+                <div className="flex items-center justify-between gap-3">
+                  <h2 id="checkout-contact" className={PANEL_TITLE}>
+                    {t("contactTitle")}
+                  </h2>
                   {accountEmail && (
-                    <span className="rounded-full bg-paper px-2.5 py-1 text-[11px] font-semibold text-soft ring-1 ring-line">
-                      {t("accountBadge")}
-                    </span>
+                    <span className={TAG}>{t("accountBadge")}</span>
                   )}
                 </div>
                 {accountEmail ? (
-                  <div className="mt-3 flex items-center gap-2.5 rounded-xl bg-paper px-4 py-3 text-sm font-medium ring-1 ring-line">
+                  <div className="mt-3 flex items-center gap-2.5 rounded-field border border-line bg-paper px-4 py-3 text-sm font-medium">
                     <CheckCircle2
                       size={17}
+                      strokeWidth={1.5}
                       className="shrink-0 text-emerald-600"
                     />
                     {/* ph-mask : masqué dans les enregistrements de visite. */}
@@ -720,15 +763,19 @@ export function CheckoutFlow({
                 ) : (
                   <GuestEmailVerification proof={proof} onProof={setProof} />
                 )}
-              </div>
+              </section>
 
-              {/* Adresse — Suisse uniquement */}
-              <div className="rounded-card border border-line bg-surface p-5 sm:p-6">
-                <div className="mb-3 flex items-center justify-between">
-                  <p className="font-semibold">{t("addressTitle")}</p>
-                  <span className="rounded-full bg-paper px-2.5 py-1 text-[11px] font-semibold text-soft ring-1 ring-line">
-                    🇨🇭 {t("swissOnly")}
-                  </span>
+              {/* Adresse — Suisse uniquement. Aucun drapeau ni croix : la
+                  croix suisse est protégée (LPM art. 47-49), on écrit le mot. */}
+              <section
+                aria-labelledby="checkout-address"
+                className="rounded-card border border-line bg-surface p-5 sm:p-6"
+              >
+                <div className="mb-4 flex items-center justify-between gap-3">
+                  <h2 id="checkout-address" className={PANEL_TITLE}>
+                    {t("addressTitle")}
+                  </h2>
+                  <span className={TAG}>{t("swissOnly")}</span>
                 </div>
                 <div className="space-y-3">
                   <input
@@ -796,52 +843,53 @@ export function CheckoutFlow({
                       value={t("countrySwiss")}
                       disabled
                       aria-label={t("country")}
-                      className={`${field} cursor-not-allowed bg-paper text-soft`}
+                      className={field}
                     />
                   </div>
                   {authSession && (
-                    <label className="flex items-center gap-2.5 text-sm font-medium">
+                    <label className="flex cursor-pointer items-center gap-2.5 text-sm font-medium">
                       <input
                         type="checkbox"
                         name="saveAddress"
                         defaultChecked
-                        className="h-4 w-4 accent-accent"
+                        className="h-4 w-4 accent-ink"
                       />
                       {t("saveAddress")}
                     </label>
                   )}
                 </div>
-              </div>
+              </section>
 
               {error && (
-                <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
+                <p role="alert" className={ERROR_BOX}>
                   {error}
                 </p>
               )}
 
               <div>
-                <button
+                <Button
                   type="submit"
+                  variant="primary"
+                  size="lg"
+                  full
                   disabled={submitting || !emailReady}
-                  className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
                 >
                   {submitting ? t("processing") : t("continueToPayment")}
-                  {!submitting && <ArrowRight size={16} />}
-                </button>
+                  {!submitting && <ArrowRight size={18} strokeWidth={1.5} />}
+                </Button>
                 {!emailReady && (
-                  <p className="mt-2.5 text-center text-xs text-soft">
+                  <p className="mt-2.5 text-center text-sm text-soft">
                     {t("verifyToContinue")}
                   </p>
                 )}
               </div>
 
-              <Link
-                href="/cart"
-                className="flex items-center justify-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"
-              >
-                <ArrowLeft size={15} />
-                {t("back")}
-              </Link>
+              <div className="text-center">
+                <ButtonLink href="/cart" variant="text">
+                  <ArrowLeft size={15} strokeWidth={1.5} />
+                  {t("back")}
+                </ButtonLink>
+              </div>
             </form>
           )}
         </div>
@@ -914,20 +962,27 @@ function PaymentStep({
   }
 
   return (
-    <div className="rounded-card border border-line bg-surface p-5 sm:p-7">
+    // Aucun transform ni overflow animé autour du Payment Element (iframes
+    // Stripe) : panneau statique, bordure et fond de jeton seulement.
+    <section
+      aria-labelledby="checkout-payment"
+      className="rounded-card border border-line bg-surface p-5 sm:p-7"
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-lg font-bold tracking-tight">{t("paymentTitle")}</p>
-        <span className="flex items-center gap-1.5 rounded-full bg-paper px-2.5 py-1 text-[11px] font-semibold text-soft ring-1 ring-line">
-          <Lock size={12} />
+        <h2 id="checkout-payment" className={PANEL_TITLE}>
+          {t("paymentTitle")}
+        </h2>
+        <span className={`${TAG} flex items-center gap-1.5`}>
+          <Lock size={12} strokeWidth={1.5} aria-hidden="true" />
           {t("securedByStripe")}
         </span>
       </div>
       <p className="mt-1 text-sm text-soft">{t("paymentSubtitle")}</p>
 
       {/* Montant à régler — hiérarchie claire, juste au-dessus des moyens de paiement */}
-      <div className="mt-5 flex items-baseline justify-between rounded-2xl bg-paper px-4 py-3.5 ring-1 ring-line">
+      <div className="mt-5 flex items-baseline justify-between rounded-field border border-line bg-paper px-4 py-3.5">
         <span className="text-sm font-medium text-soft">{t("totalToPay")}</span>
-        <span className="text-xl font-bold tabular-nums tracking-tight">
+        <span className="s3d-num text-xl font-bold text-ink">
           {formatChf(totalCents, locale)}
         </span>
       </div>
@@ -947,59 +1002,64 @@ function PaymentStep({
       </div>
 
       {error && (
-        <p className="mt-5 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
+        <p role="alert" className={`mt-5 ${ERROR_BOX}`}>
           {error}
         </p>
       )}
 
-      <button
-        type="button"
+      <Button
+        variant="primary"
+        size="lg"
+        full
         onClick={pay}
         disabled={checkoutState.type !== "success" || paying}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+        className="mt-6"
       >
         {paying ? (
           <>
             <span
               aria-hidden
-              className="h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white"
+              className="h-4 w-4 animate-spin rounded-full border-2 border-on-accent/40 border-t-on-accent"
             />
             {t("processing")}
           </>
         ) : (
           <>
-            <Lock size={15} />
+            <Lock size={16} strokeWidth={1.5} aria-hidden="true" />
             {t("payNow", { amount: formatChf(totalCents, locale) })}
           </>
         )}
-      </button>
+      </Button>
 
-      <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-soft">
-        <Lock size={12} className="shrink-0" />
+      <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-sm text-soft">
+        <Lock
+          size={13}
+          strokeWidth={1.5}
+          className="shrink-0"
+          aria-hidden="true"
+        />
         {t("paymentReassurance")}
       </p>
 
-      <p className="mt-2 text-center text-xs text-soft">
+      <p className="mt-2 text-center text-sm text-soft">
         {t("termsPrefix")}{" "}
         <Link
           href="/legal/terms"
           target="_blank"
           rel="noopener noreferrer"
-          className="underline transition-colors hover:text-ink"
+          className="underline underline-offset-4 transition-colors hover:text-ink"
         >
           {tFooter("terms")}
         </Link>
         .
       </p>
 
-      <button
-        type="button"
-        onClick={onBack}
-        className="mt-5 flex w-full items-center justify-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"
-      >
-        <ArrowLeft size={15} />
-        {t("backToAddress")}
-      </button>
-    </div>
+      <div className="mt-5 text-center">
+        <Button variant="text" onClick={onBack}>
+          <ArrowLeft size={15} strokeWidth={1.5} />
+          {t("backToAddress")}
+        </Button>
+      </div>
+    </section>
   );
 }
