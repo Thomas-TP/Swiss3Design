@@ -37,13 +37,11 @@
     "dropActive": "Loslassen, um die Datei zu senden",
     "uploading": "Datei wird hochgeladen · {percent}",
     "attached": "An die Anfrage angehängt",
-    "replace": "Ersetzen",
     "remove": "Datei {name} entfernen",
     "noscript": "Um eine Datei anzuhängen, aktivieren Sie JavaScript oder schreiben Sie an {email}."
   },
   "studioCard": {
     "kicker": "Studio-Konfiguration angehängt",
-    "thumbnailAlt": "Vorschau der Konfiguration",
     "objects": {
       "lavaux": "Vase «Lavaux»",
       "cartouche": "Visitenkarte «Cartouche»",
@@ -65,10 +63,10 @@
     "submit": "3/3 Anfrage wird gespeichert"
   },
   "errors": {
-    "429": "Zu viele Uploads von dieser Verbindung (10 pro Stunde). Versuchen Sie es später erneut oder schreiben Sie an {email}.",
+    "400": "Die Datei konnte nicht gelesen werden: Sie ist vielleicht leer oder beschädigt. Prüfen Sie sie und versuchen Sie es erneut.",
     "413": "Diese Datei ist grösser als 30 MB. Verkleinern Sie sie oder schreiben Sie an {email}.",
     "415": "Format nicht unterstützt. Senden Sie eine STL-, 3MF-, OBJ- oder STEP-Datei.",
-    "400": "Die Datei konnte nicht gelesen werden: Sie ist vielleicht leer oder beschädigt. Prüfen Sie sie und versuchen Sie es erneut.",
+    "429": "Zu viele Uploads von dieser Verbindung (10 pro Stunde). Versuchen Sie es später erneut oder schreiben Sie an {email}.",
     "network": "Der Upload ist fehlgeschlagen. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
     "unknown": "Die Datei konnte nicht vorbereitet werden. Versuchen Sie es erneut oder schreiben Sie an {email}."
   },

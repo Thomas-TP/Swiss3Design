@@ -37,13 +37,11 @@
     "dropActive": "Release to send the file",
     "uploading": "Uploading file · {percent}",
     "attached": "Attached to the request",
-    "replace": "Replace",
     "remove": "Remove file {name}",
     "noscript": "To attach a file, turn on JavaScript or write to {email}."
   },
   "studioCard": {
     "kicker": "Studio configuration attached",
-    "thumbnailAlt": "Preview of the configuration",
     "objects": {
       "lavaux": "\"Lavaux\" vase",
       "cartouche": "\"Cartouche\" business card",
@@ -65,10 +63,10 @@
     "submit": "3/3 Saving the request"
   },
   "errors": {
-    "429": "Too many uploads from this connection (10 per hour). Try again later or write to {email}.",
+    "400": "The file could not be read: it may be empty or damaged. Check it and try again.",
     "413": "This file is larger than 30 MB. Shrink it or write to {email}.",
     "415": "Unsupported format. Send an STL, 3MF, OBJ or STEP file.",
-    "400": "The file could not be read: it may be empty or damaged. Check it and try again.",
+    "429": "Too many uploads from this connection (10 per hour). Try again later or write to {email}.",
     "network": "The upload failed. Check your connection and try again.",
     "unknown": "The file could not be prepared. Try again, or write to {email}."
   },

@@ -414,7 +414,8 @@ export function QuoteRequestForm({
               />
             </Field>
 
-            <div className="grid gap-5 sm:grid-cols-2">
+            {/* Deux colonnes seulement quand le sélecteur de matière est là. */}
+            <div className={cx("grid gap-5", showMaterial && "sm:grid-cols-2")}>
               {showMaterial ? (
                 <div className="flex flex-col gap-2">
                   <span className="s3d-label text-soft">

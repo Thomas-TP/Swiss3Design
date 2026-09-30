@@ -37,13 +37,11 @@
     "dropActive": "Relâchez pour envoyer le fichier",
     "uploading": "Envoi du fichier · {percent}",
     "attached": "Joint à la demande",
-    "replace": "Remplacer",
     "remove": "Retirer le fichier {name}",
     "noscript": "Pour joindre un fichier, activez JavaScript ou écrivez à {email}."
   },
   "studioCard": {
     "kicker": "Configuration Studio jointe",
-    "thumbnailAlt": "Aperçu de la configuration",
     "objects": {
       "lavaux": "Vase « Lavaux »",
       "cartouche": "Carte « Cartouche »",
@@ -65,10 +63,10 @@
     "submit": "3/3 Enregistrement de la demande"
   },
   "errors": {
-    "429": "Trop d'envois depuis cette connexion (10 par heure). Réessayez plus tard ou écrivez à {email}.",
+    "400": "Le fichier n'a pas pu être lu : il est peut-être vide ou endommagé. Vérifiez-le et réessayez.",
     "413": "Ce fichier dépasse 30 Mo. Réduisez-le ou écrivez à {email}.",
     "415": "Format non pris en charge. Envoyez un fichier STL, 3MF, OBJ ou STEP.",
-    "400": "Le fichier n'a pas pu être lu : il est peut-être vide ou endommagé. Vérifiez-le et réessayez.",
+    "429": "Trop d'envois depuis cette connexion (10 par heure). Réessayez plus tard ou écrivez à {email}.",
     "network": "L'envoi a échoué. Vérifiez votre connexion et réessayez.",
     "unknown": "Le fichier n'a pas pu être préparé. Réessayez, ou écrivez à {email}."
   },
