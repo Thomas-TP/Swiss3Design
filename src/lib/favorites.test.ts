@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parseFavorites } from "./favorites";
+import { creationHash, parseFavorites } from "./favorites";
 
 const valid = {
   productId: "p1",
@@ -71,5 +71,25 @@ describe("parseFavorites", () => {
       productId: `p${n}`,
     }));
     expect(parseFavorites(JSON.stringify(many))).toHaveLength(200);
+  });
+});
+
+describe("creationHash", () => {
+  it("normalise le fragment gardé, avec ou sans « # » et « c= »", () => {
+    expect(creationHash("#c=v1.eyJvIjoibGF2YXV4In0")).toBe(
+      "#c=v1.eyJvIjoibGF2YXV4In0",
+    );
+    expect(creationHash("c=v1.abc_-")).toBe("#c=v1.abc_-");
+    expect(creationHash("v1.abc")).toBe("#c=v1.abc");
+  });
+
+  it("refuse tout ce qui ne ressemble pas à un jeton base64url", () => {
+    expect(creationHash("")).toBe("");
+    expect(creationHash("#c=")).toBe("");
+    expect(creationHash("v1.abc def")).toBe("");
+    expect(creationHash("v1.<script>")).toBe("");
+    expect(creationHash("v1.a#b")).toBe("");
+    expect(creationHash("v1.a&texte=Léa")).toBe("");
+    expect(creationHash(`v1.${"a".repeat(3000)}`)).toBe("");
   });
 });

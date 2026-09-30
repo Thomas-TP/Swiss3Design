@@ -95,8 +95,21 @@ export function parseFavorites(raw: string | null): FavoriteItem[] {
   }
 }
 
+/**
+ * Hash (#c=v1.…) qui rouvre une création dans le Studio. Le fragment gardé
+ * peut arriver avec ou sans son « # » et son « c= » : on normalise, et on
+ * n'en garde que les caractères d'un jeton base64url (jamais de balise, ni
+ * d'espace, ni de second fragment) pour que rien d'autre ne parte dans l'URL.
+ */
+export function creationHash(fragment: string): string {
+  const body = fragment.replace(/^#/, "").replace(/^c=/, "");
+  return /^[A-Za-z0-9._~-]{1,2048}$/.test(body) ? `#c=${body}` : "";
+}
+
 interface FavoritesContextValue {
   items: FavoriteItem[];
+  /** Faux jusqu'à la relecture du stockage : évite d'afficher « vide » un instant. */
+  ready: boolean;
   count: number;
   has: (productId: string) => boolean;
   toggle: (item: FavoriteItem) => void;
@@ -148,6 +161,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   const value: FavoritesContextValue = {
     items,
+    ready: hydrated,
     count: items.length,
     has: (productId) => items.some((i) => i.productId === productId),
     toggle: (item) => {
