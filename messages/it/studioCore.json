@@ -1,1 +1,139 @@
-{}
+{
+  "objects": {
+    "lavaux": {
+      "name": "Vaso «Lavaux»",
+      "noun": "Vaso",
+      "tagline": "Un vaso da regolare: profilo, motivo, fino a quattro colori."
+    },
+    "cartouche": {
+      "name": "Biglietto «Cartouche»",
+      "noun": "Biglietto da visita",
+      "tagline": "Il Suo biglietto da visita da 85 × 55 mm, in rilievo o inciso."
+    },
+    "relief": {
+      "name": "Sottobicchiere «Relief»",
+      "noun": "Sottobicchiere",
+      "tagline": "Un sottobicchiere da 100 mm: un massiccio a strati, il Suo nome in vetta."
+    },
+    "borne": {
+      "name": "Portanome «Borne»",
+      "noun": "Portanome",
+      "tagline": "Un portanome in due colori, con il Suo testo."
+    }
+  },
+  "profiles": {
+    "cylindre": "Cilindro",
+    "galet": "Ciottolo",
+    "amphore": "Anfora",
+    "cone": "Cono",
+    "tulipe": "Tulipano"
+  },
+  "patterns": {
+    "lisse": "Liscio",
+    "gradins": "Gradini",
+    "vagues": "Onde",
+    "voronoi": "Voronoi",
+    "nervures": "Nervature"
+  },
+  "palettes": {
+    "leman": "Lemano",
+    "molasse": "Molassa",
+    "signal": "Segnale",
+    "uni": "Tinta unita"
+  },
+  "filaments": {
+    "blanc-neve": "Bianco neve",
+    "encre": "Nero inchiostro",
+    "rouge-signal": "Rosso segnale",
+    "bleu-leman": "Blu Lemano",
+    "vert-lavaux": "Verde Lavaux",
+    "gris-molasse": "Grigio molassa",
+    "ambre": "Ambra",
+    "glacier": "Ghiacciaio"
+  },
+  "presets": {
+    "lavaux": "Lavaux",
+    "terrasses": "Terrazze",
+    "houle": "Onda lunga",
+    "pave": "Acciottolato",
+    "colonne": "Colonna",
+    "galet": "Ciottolo"
+  },
+  "options": {
+    "mode": {
+      "relief": "In rilievo",
+      "gravure": "Inciso"
+    },
+    "layout": {
+      "classique": "Classico",
+      "centree": "Centrato",
+      "cartouche": "Cartiglio",
+      "monogramme": "Monogramma"
+    },
+    "shape": {
+      "rond": "Tondo",
+      "carre": "Quadrato",
+      "pilule": "Pillola",
+      "etiquette": "Etichetta",
+      "goutte": "Goccia",
+      "pic": "Punta"
+    },
+    "ring": {
+      "gauche": "Sinistra",
+      "droite": "Destra",
+      "aucun": "Nessuno"
+    }
+  },
+  "units": {
+    "layers": "{count, plural, one {# strato} other {# strati}}",
+    "filaments": "{count, plural, one {# filamento} other {# filamenti}}",
+    "bands": "{count, plural, one {# fascia} other {# fasce}}",
+    "changes": "{count, plural, =0 {nessun cambio} one {# cambio} other {# cambi}}",
+    "triangles": "{count, plural, one {# triangolo} other {# triangoli}}",
+    "dimensions": "{width} × {depth} × {height} mm"
+  },
+  "measure": {
+    "strip": "H {height} · Ø {diameter} · {layers} · ≈ {grams} · ≈ {duration} · {changes} · spurgo ≈ {purge}",
+    "hero": "{height} · {layers} · {filaments} · ≈ {grams} · ≈ {duration}",
+    "onQuote": "Su preventivo",
+    "priceLater": "Prezzo confermato entro 48 ore"
+  },
+  "duration": {
+    "real": "Durata reale ≈ {duration}",
+    "simulated": "Durata reale ≈ {duration} · a ×{speed}: {simulated}",
+    "extra": "+ ≈ {duration}"
+  },
+  "bands": {
+    "label": "{filament} · strati {from}–{to} · {fromMm}–{toMm} · ≈ {grams}",
+    "range": "{filament} {from}–{to}",
+    "layerReadout": "Strato {layer} / {total} · z {z} · {filament}",
+    "change": "Cambio di filamento → {filament} · strato {layer}",
+    "boundary": "Cambio {index} a {z}, strato {layer}",
+    "purge": "{changes} · spurgo ≈ {grams} · + ≈ {duration}",
+    "single": "Un solo colore: nessun cambio di filamento, nessuno spurgo."
+  },
+  "guard": {
+    "status": {
+      "ok": "Stampabile",
+      "warn": "Da verificare",
+      "error": "Non stampabile"
+    },
+    "fix": "Correggi",
+    "issue": {
+      "overhang": "Sporgenza di {angle}° a {at} mm: oltre i 45° la stampa diventa incerta.",
+      "baseNarrow": "Base stretta (raggio {value} mm): il pezzo rischia di staccarsi dal piatto.",
+      "plate": "Il pezzo ({value} mm) supera il piatto di stampa da 250 mm.",
+      "bandThin": "Fascia di {value} mm: almeno 2 mm (10 strati) per un cambio di colore netto.",
+      "patternCoupling": "Questo motivo è troppo marcato per il suo passo, la lunghezza d'onda o la parete: il valore viene riportato entro i limiti.",
+      "textStroke": "Tratto delle lettere a {value} mm: almeno 0,8 mm con un ugello da 0,4 mm.",
+      "textFit": "Il testo non sta nella dimensione minima: lo accorci.",
+      "textChar": "Carattere non stampabile: {char}",
+      "nearVase": "Questa combinazione ricorda il Vase spirale di Ian (licenza senza modifiche). Riduca la torsione o il numero di nervature."
+    }
+  },
+  "relief": {
+    "peak": "Pizzo {name}",
+    "summit": "{peak} · {altitude} m",
+    "fictional": "quota immaginaria"
+  }
+}
