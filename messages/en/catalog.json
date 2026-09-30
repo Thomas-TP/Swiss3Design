@@ -1,1 +1,104 @@
-{}
+{
+  "shop": {
+    "eyebrow": "Printed to order, in Gland and Pully",
+    "title": "Shop.",
+    "emptyCatalog": "No items in the shop right now. Adjust your own in the Studio or send us a file.",
+    "view": {
+      "label": "View",
+      "grid": "Grid",
+      "registry": "Registry"
+    },
+    "registry": {
+      "caption": "Register of shop items",
+      "ref": "Ref.",
+      "image": "Thumbnail",
+      "name": "Item",
+      "price": "Price"
+    },
+    "studio": {
+      "title": "To adjust in the Studio.",
+      "intro": "Four objects designed by the workshop that you adjust in 3D before sending them to us. They are not shop items: the firm price is confirmed on quote within 48 hours.",
+      "quote": "On quote",
+      "adjust": "Adjust",
+      "objects": {
+        "lavaux": {
+          "name": "\"Lavaux\" vase",
+          "line": "A vase from 80 to 240 mm: shape, pattern, up to four color bands."
+        },
+        "cartouche": {
+          "name": "\"Cartouche\" business card",
+          "line": "An 85 × 55 mm business card, your name embossed or engraved."
+        },
+        "relief": {
+          "name": "\"Relief\" coaster",
+          "line": "A topographic coaster from 90 to 110 mm, with your peak in relief."
+        },
+        "borne": {
+          "name": "\"Borne\" name tag",
+          "line": "A two-color name tag, embossed or engraved, with or without a ring."
+        }
+      }
+    },
+    "file": {
+      "title": "Already have a file?",
+      "text": "STL, 3MF, OBJ or STEP: send it, the workshop replies within 48 hours with a quote.",
+      "cta": "Send a file"
+    }
+  },
+  "card": {
+    "days": "{days} d"
+  },
+  "plate": {
+    "view": "View details"
+  },
+  "product": {
+    "back": "Back to the shop",
+    "rail": "Product chapters",
+    "chapters": {
+      "object": "Object",
+      "turn": "Rotation",
+      "specs": "Measures",
+      "credit": "License",
+      "reviews": "Customers",
+      "cross": "Studio",
+      "related": "Next"
+    },
+    "titles": {
+      "turn": "Turn it.",
+      "specs": "Specifications.",
+      "credit": "Design credit.",
+      "reviews": "Customer reviews.",
+      "related": "You may also like."
+    }
+  },
+  "trust": {
+    "shippingTitle": "Swiss delivery",
+    "madeTitle": "Made on Lake Geneva",
+    "paymentTitle": "Secure payment"
+  },
+  "attribution": {
+    "short": "Design: {author} · {license}",
+    "seeCredit": "see the credit",
+    "body": "Design: <strong>{author}</strong>, \"{title}\", published on <model>{platform}</model>. License <deed>Creative Commons BY-ND 4.0</deed>. Swiss3Design prints this model without any modification. This credit does not imply any endorsement of Swiss3Design by the author.",
+    "dl": {
+      "author": "Author",
+      "model": "Original model",
+      "modelValue": "\"{title}\", <link>{platform}</link>",
+      "license": "License",
+      "modifications": "Modifications",
+      "none": "None"
+    }
+  },
+  "viewer": {
+    "caption": "Real-time render of {author}'s original file, unmodified.",
+    "poster": "Photo of the printed piece. The 3D preview replaces it as soon as it is ready (WebGL required).",
+    "loading": "Loading the 3D model",
+    "loadingSize": "Loading the 3D model (≈ {size} MB)",
+    "ready": "3D model ready. Left and right arrow keys rotate it."
+  },
+  "cross": {
+    "title": "A vase in your colors?",
+    "body": "This vase stays exactly as {author} drew it. For a vase in your colors, the Studio offers our own parametric models.",
+    "cta": "Adjust a vase"
+  }
+}

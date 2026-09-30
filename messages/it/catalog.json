@@ -1,1 +1,104 @@
-{}
+{
+  "shop": {
+    "eyebrow": "Stampato su ordinazione, a Gland e Pully",
+    "title": "Negozio.",
+    "emptyCatalog": "Nessun oggetto in negozio per il momento. Regoli il Suo nello Studio o ci invii un file.",
+    "view": {
+      "label": "Visualizzazione",
+      "grid": "Griglia",
+      "registry": "Registro"
+    },
+    "registry": {
+      "caption": "Registro degli oggetti del negozio",
+      "ref": "Rif.",
+      "image": "Miniatura",
+      "name": "Oggetto",
+      "price": "Prezzo"
+    },
+    "studio": {
+      "title": "Da regolare nello Studio.",
+      "intro": "Quattro oggetti disegnati dall'atelier, che Lei regola in 3D prima di inviarceli. Non sono articoli del negozio: il prezzo definitivo è confermato su preventivo entro 48 ore.",
+      "quote": "Su preventivo",
+      "adjust": "Regola",
+      "objects": {
+        "lavaux": {
+          "name": "Vaso «Lavaux»",
+          "line": "Un vaso da 80 a 240 mm: forma, motivo, fino a quattro fasce di colore."
+        },
+        "cartouche": {
+          "name": "Biglietto «Cartouche»",
+          "line": "Un biglietto da visita di 85 × 55 mm, il Suo nome in rilievo o inciso."
+        },
+        "relief": {
+          "name": "Sottobicchiere «Relief»",
+          "line": "Un sottobicchiere topografico da 90 a 110 mm, con la Sua vetta in rilievo."
+        },
+        "borne": {
+          "name": "Portanome «Borne»",
+          "line": "Un portanome bicolore, in rilievo o inciso, con o senza anello."
+        }
+      }
+    },
+    "file": {
+      "title": "Ha già un file?",
+      "text": "STL, 3MF, OBJ o STEP: lo invii, l'atelier Le risponde entro 48 ore con un preventivo.",
+      "cta": "Invia un file"
+    }
+  },
+  "card": {
+    "days": "{days} g"
+  },
+  "plate": {
+    "view": "Vedi la scheda"
+  },
+  "product": {
+    "back": "Torna al negozio",
+    "rail": "Capitoli della scheda",
+    "chapters": {
+      "object": "Oggetto",
+      "turn": "Rotazione",
+      "specs": "Misure",
+      "credit": "Licenza",
+      "reviews": "Clienti",
+      "cross": "Studio",
+      "related": "Seguito"
+    },
+    "titles": {
+      "turn": "Lo faccia ruotare.",
+      "specs": "Scheda tecnica.",
+      "credit": "Crediti del design.",
+      "reviews": "Recensioni dei clienti.",
+      "related": "Potrebbe interessarLe."
+    }
+  },
+  "trust": {
+    "shippingTitle": "Consegna in Svizzera",
+    "madeTitle": "Prodotto sull'arco lemanico",
+    "paymentTitle": "Pagamento sicuro"
+  },
+  "attribution": {
+    "short": "Design: {author} · {license}",
+    "seeCredit": "vedi i crediti",
+    "body": "Design: <strong>{author}</strong>, «{title}», pubblicato su <model>{platform}</model>. Licenza <deed>Creative Commons BY-ND 4.0</deed>. Swiss3Design stampa questo modello senza alcuna modifica. Questa menzione non implica alcuna approvazione di Swiss3Design da parte dell'autore.",
+    "dl": {
+      "author": "Autore",
+      "model": "Modello originale",
+      "modelValue": "«{title}», <link>{platform}</link>",
+      "license": "Licenza",
+      "modifications": "Modifiche",
+      "none": "Nessuna"
+    }
+  },
+  "viewer": {
+    "caption": "Rendering in tempo reale del file originale di {author}, non modificato.",
+    "poster": "Foto del pezzo stampato. L'anteprima 3D la sostituisce non appena è pronta (richiede WebGL).",
+    "loading": "Caricamento del modello 3D",
+    "loadingSize": "Caricamento del modello 3D (≈ {size} MB)",
+    "ready": "Modello 3D pronto. Frecce sinistra e destra per ruotare."
+  },
+  "cross": {
+    "title": "Un vaso nei Suoi colori?",
+    "body": "Questo vaso resta com'è stato disegnato da {author}. Per un vaso nei Suoi colori, lo Studio propone i nostri modelli parametrici.",
+    "cta": "Regola un vaso"
+  }
+}
