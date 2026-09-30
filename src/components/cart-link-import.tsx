@@ -7,7 +7,8 @@ import { fetchCartLine, parseItemParam } from "@/lib/agent/cart-line";
 // Liens panier générés pour les agents (outil build_cart_link) :
 // /fr/cart?item=vase-spirale|1||Rouge&item=… remplit le panier puis retire
 // les paramètres de l'URL. Chaque ligne est revalidée via l'API publique ;
-// une ligne invalide n'empêche pas d'ajouter les autres.
+// une ligne invalide n'empêche pas d'ajouter les autres. Le résultat
+// s'affiche dans la même note de statut que la relance de panier.
 export function CartLinkImport() {
   const { restore } = useCart();
   const restoreRef = useRef(restore);
@@ -43,8 +44,10 @@ export function CartLinkImport() {
   }, [locale]);
 
   return status === "idle" ? null : (
-    <output className="mx-auto mt-4 block max-w-6xl px-4 text-sm">
-      {t(status)}
-    </output>
+    <div className="s3d-page pt-4">
+      <output className="block rounded-field border border-line border-l-accent bg-surface px-4 py-3 text-sm text-ink border-l-3">
+        {t(status)}
+      </output>
+    </div>
   );
 }

@@ -1,1 +1,85 @@
-{}
+{
+  "cart": {
+    "title": "Votre panier.",
+    "count": "{count, plural, one {# article} other {# articles}}",
+    "unitPrice": "{price} l'unité",
+    "summary": "Récapitulatif",
+    "checkout": "Commander",
+    "freeHint": "Plus que {amount} pour la livraison offerte.",
+    "freeReached": "Livraison offerte.",
+    "emptyKicker": "Terrain vierge",
+    "emptyTitle": "Votre panier est vide.",
+    "emptyText": "Rien n'a encore été empilé ici. Réglez un objet au Studio, choisissez en boutique ou envoyez-nous votre fichier."
+  },
+  "checkout": {
+    "title": "Commande.",
+    "stepsLabel": "Étapes de la commande",
+    "stepContact": "Contact",
+    "stepPayment": "Paiement"
+  },
+  "success": {
+    "kicker": "La buse chauffe.",
+    "processingKicker": "Confirmation en attente",
+    "failedKicker": "Paiement non finalisé",
+    "title": "Merci, votre commande est reçue.",
+    "text": "Un e-mail de confirmation vous parvient sous peu. Gardez le numéro ci-dessous : il sert au suivi.",
+    "ticketNumber": "N° de commande",
+    "ticketAmount": "Montant réglé"
+  },
+  "track": {
+    "title": "Suivi de commande.",
+    "layersLabel": "Avancement de la commande",
+    "layer": {
+      "order": "Commande",
+      "print": "Impression",
+      "check": "Contrôle",
+      "shipped": "Expédiée",
+      "delivered": "Livrée"
+    },
+    "state": {
+      "done": "terminée",
+      "current": "en cours",
+      "todo": "à venir"
+    },
+    "now": {
+      "pending": "En attente du paiement.",
+      "paid": "Paiement reçu. L'impression n'a pas encore commencé.",
+      "in_production": "L'atelier imprime votre commande.",
+      "shipped": "Confiée à la Poste suisse.",
+      "delivered": "Livrée à l'adresse indiquée.",
+      "cancelled": "Aucune impression n'est prévue pour cette commande."
+    }
+  },
+  "favorites": {
+    "title": "Mes favoris.",
+    "tabsLabel": "Favoris et créations",
+    "tabObjects": "Objets",
+    "tabCreations": "Mes créations",
+    "objectsCount": "{count, plural, one {# objet} other {# objets}}",
+    "creationsCount": "{count, plural, one {# création gardée} other {# créations gardées}}",
+    "creationsEmptyTitle": "Rien de gardé pour l'instant.",
+    "creationsEmptyText": "Réglez un objet au Studio et cliquez sur Garder.",
+    "creationsNote": "Ces créations restent dans ce navigateur. Rien n'est envoyé à l'atelier avant votre demande.",
+    "savedOn": "Gardée le {date}",
+    "reopen": "Rouvrir",
+    "delete": "Supprimer",
+    "deleted": "Création supprimée.",
+    "objects": {
+      "lavaux": "Vase « Lavaux »",
+      "cartouche": "Carte « Cartouche »",
+      "relief": "Sous-verre « Relief »",
+      "borne": "Porte-nom « Borne »"
+    }
+  },
+  "notFound": {
+    "kicker": "Point non coté",
+    "title": "Page introuvable.",
+    "line": "Altitude 404 m, soit 32 m au-dessus du Léman. Rien n'a été imprimé ici.",
+    "here": "Vous êtes ici"
+  },
+  "error": {
+    "kicker": "Erreur inattendue",
+    "title": "Une couche a raté. On réessaie ?",
+    "reference": "Référence {digest}"
+  }
+}

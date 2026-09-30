@@ -1,1 +1,85 @@
-{}
+{
+  "cart": {
+    "title": "Your cart.",
+    "count": "{count, plural, one {# item} other {# items}}",
+    "unitPrice": "{price} each",
+    "summary": "Summary",
+    "checkout": "Checkout",
+    "freeHint": "{amount} away from free shipping.",
+    "freeReached": "Free shipping.",
+    "emptyKicker": "Blank terrain",
+    "emptyTitle": "Your cart is empty.",
+    "emptyText": "Nothing has been stacked here yet. Set up an object in the Studio, pick from the shop or send us your file."
+  },
+  "checkout": {
+    "title": "Checkout.",
+    "stepsLabel": "Order steps",
+    "stepContact": "Contact",
+    "stepPayment": "Payment"
+  },
+  "success": {
+    "kicker": "The nozzle is heating up.",
+    "processingKicker": "Confirmation pending",
+    "failedKicker": "Payment not completed",
+    "title": "Thank you, your order has been received.",
+    "text": "A confirmation email is on its way. Keep the number below: it is used for tracking.",
+    "ticketNumber": "Order no.",
+    "ticketAmount": "Amount paid"
+  },
+  "track": {
+    "title": "Order tracking.",
+    "layersLabel": "Order progress",
+    "layer": {
+      "order": "Order",
+      "print": "Printing",
+      "check": "Quality check",
+      "shipped": "Shipped",
+      "delivered": "Delivered"
+    },
+    "state": {
+      "done": "done",
+      "current": "in progress",
+      "todo": "upcoming"
+    },
+    "now": {
+      "pending": "Waiting for payment.",
+      "paid": "Payment received. Printing has not started yet.",
+      "in_production": "The workshop is printing your order.",
+      "shipped": "Handed to Swiss Post.",
+      "delivered": "Delivered to the address given.",
+      "cancelled": "No printing is planned for this order."
+    }
+  },
+  "favorites": {
+    "title": "My favorites.",
+    "tabsLabel": "Favorites and creations",
+    "tabObjects": "Objects",
+    "tabCreations": "My creations",
+    "objectsCount": "{count, plural, one {# object} other {# objects}}",
+    "creationsCount": "{count, plural, one {# saved creation} other {# saved creations}}",
+    "creationsEmptyTitle": "Nothing saved yet.",
+    "creationsEmptyText": "Set up an object in the Studio and click Keep.",
+    "creationsNote": "These creations stay in this browser. Nothing is sent to the workshop until you make a request.",
+    "savedOn": "Saved on {date}",
+    "reopen": "Reopen",
+    "delete": "Delete",
+    "deleted": "Creation deleted.",
+    "objects": {
+      "lavaux": "\"Lavaux\" vase",
+      "cartouche": "\"Cartouche\" business card",
+      "relief": "\"Relief\" coaster",
+      "borne": "\"Borne\" name tag"
+    }
+  },
+  "notFound": {
+    "kicker": "Unsurveyed point",
+    "title": "Page not found.",
+    "line": "Altitude 404 m, 32 m above Lake Geneva. Nothing was printed here.",
+    "here": "You are here"
+  },
+  "error": {
+    "kicker": "Unexpected error",
+    "title": "A layer failed. Shall we retry?",
+    "reference": "Reference {digest}"
+  }
+}

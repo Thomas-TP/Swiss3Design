@@ -8,11 +8,14 @@ import {
   GuestEmailVerification,
   type EmailProof,
 } from "./guest-email-verification";
+import { Button } from "@/components/ui/button";
 import { useCart } from "@/lib/cart";
 
 // Opt-in nLPD de relance de panier : case décochée par défaut, consentement
 // explicite. N'envoie l'e-mail + le panier qu'au clic du bouton (action
 // délibérée). Affiché uniquement quand le panier n'est pas vide.
+// Habillage « Strates » : encart à rayon `card`, bouton en contour (le rouge
+// reste à « Commander », un seul par écran). Logique inchangée.
 export function CartReminder() {
   const t = useTranslations("cartReminder");
   const locale = useLocale();
@@ -29,8 +32,8 @@ export function CartReminder() {
 
   if (status === "done") {
     return (
-      <p className="mt-5 flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-3 text-xs font-medium text-emerald-700 dark:text-emerald-300">
-        <Check size={15} className="shrink-0" />
+      <p className="mt-6 flex items-center gap-2 rounded-field bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-300">
+        <Check size={16} strokeWidth={1.5} className="shrink-0" />
         {t("done")}
       </p>
     );
@@ -61,11 +64,11 @@ export function CartReminder() {
   return (
     <form
       onSubmit={submit}
-      className="mt-5 rounded-xl border border-line bg-paper p-4"
+      className="mt-6 rounded-card border border-line bg-paper p-4"
     >
-      <p className="text-xs font-semibold">{t("title")}</p>
+      <p className="text-sm font-semibold text-ink">{t("title")}</p>
       {session?.user.emailVerified ? (
-        <p className="mt-2 break-all text-sm">{email}</p>
+        <p className="ph-mask mt-2 break-all text-sm">{email}</p>
       ) : (
         <GuestEmailVerification
           proof={proof}
@@ -74,24 +77,27 @@ export function CartReminder() {
           next="/cart"
         />
       )}
-      <label className="mt-2 flex items-start gap-2 text-xs text-soft">
+      <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-sm text-soft">
         <input
           type="checkbox"
           checked={consent}
           onChange={(e) => setConsent(e.target.checked)}
-          className="mt-0.5 shrink-0"
+          className="mt-0.5 h-4 w-4 shrink-0 accent-ink"
         />
         <span>{t("consent")}</span>
       </label>
-      <button
+      <Button
         type="submit"
+        variant="secondary"
+        size="sm"
+        full
         disabled={!consent || !email || status === "sending"}
-        className="mt-3 w-full rounded-full border border-line py-2 text-xs font-semibold text-soft transition-colors hover:border-ink hover:text-ink disabled:opacity-50"
+        className="mt-4"
       >
         {status === "sending" ? "…" : t("cta")}
-      </button>
+      </Button>
       {status === "error" && (
-        <p role="alert" className="mt-2 text-xs text-accent-text">
+        <p role="alert" className="mt-2 text-sm text-accent-text">
           {t("error")}
         </p>
       )}

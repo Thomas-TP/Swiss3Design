@@ -1,0 +1,15 @@
+/* Carte de confirmation : elle « s'imprime » une fois, de bas en haut en 8
+   couches (keyframes `s3d-print` de globals.css, classe .s3d-print), mais à
+   son ENTRÉE dans l'écran seulement : `.s3d-print` vaut « entry 10 % → cover
+   35 % », et une carte déjà presque à mi-hauteur de l'écran au chargement (le
+   titre de cette page tient sur trois lignes) resterait rognée en haut, sur le
+   libellé du n° de commande, tant qu'on ne défile pas. « entry 0 % → entry
+   100 % » la rend entière dès qu'elle est entièrement visible, comme le dit le
+   brief (un élément déjà visible au chargement est dans son état final).
+   Les sélecteurs doublés l'emportent sur `html[data-motion="full"] .s3d-print`
+   sans dépendre de l'ordre des feuilles. */
+@supports (animation-timeline: view()) {
+  html[data-motion="full"] .card.card {
+    animation-range: entry 0% entry 100%;
+  }
+}

@@ -1,1 +1,85 @@
-{}
+{
+  "cart": {
+    "title": "Ihr Warenkorb.",
+    "count": "{count, plural, one {# Artikel} other {# Artikel}}",
+    "unitPrice": "{price} pro Stück",
+    "summary": "Übersicht",
+    "checkout": "Zur Kasse",
+    "freeHint": "Noch {amount} bis zum Gratisversand.",
+    "freeReached": "Gratisversand.",
+    "emptyKicker": "Unberührtes Gelände",
+    "emptyTitle": "Ihr Warenkorb ist leer.",
+    "emptyText": "Hier wurde noch nichts aufgeschichtet. Stellen Sie im Studio ein Objekt ein, wählen Sie im Shop aus oder senden Sie uns Ihre Datei."
+  },
+  "checkout": {
+    "title": "Bestellung.",
+    "stepsLabel": "Schritte der Bestellung",
+    "stepContact": "Kontakt",
+    "stepPayment": "Zahlung"
+  },
+  "success": {
+    "kicker": "Die Düse heizt auf.",
+    "processingKicker": "Bestätigung ausstehend",
+    "failedKicker": "Zahlung nicht abgeschlossen",
+    "title": "Danke, Ihre Bestellung ist eingegangen.",
+    "text": "Eine Bestätigung per E-Mail folgt in Kürze. Bewahren Sie die Nummer unten auf: Sie dient der Verfolgung.",
+    "ticketNumber": "Bestellnummer",
+    "ticketAmount": "Bezahlter Betrag"
+  },
+  "track": {
+    "title": "Bestellverfolgung.",
+    "layersLabel": "Stand der Bestellung",
+    "layer": {
+      "order": "Bestellung",
+      "print": "Druck",
+      "check": "Kontrolle",
+      "shipped": "Versendet",
+      "delivered": "Geliefert"
+    },
+    "state": {
+      "done": "abgeschlossen",
+      "current": "aktuell",
+      "todo": "folgt"
+    },
+    "now": {
+      "pending": "Warten auf die Zahlung.",
+      "paid": "Zahlung eingegangen. Der Druck hat noch nicht begonnen.",
+      "in_production": "Das Atelier druckt Ihre Bestellung.",
+      "shipped": "Der Schweizerischen Post übergeben.",
+      "delivered": "An die angegebene Adresse geliefert.",
+      "cancelled": "Für diese Bestellung ist kein Druck vorgesehen."
+    }
+  },
+  "favorites": {
+    "title": "Meine Favoriten.",
+    "tabsLabel": "Favoriten und Kreationen",
+    "tabObjects": "Objekte",
+    "tabCreations": "Meine Kreationen",
+    "objectsCount": "{count, plural, one {# Objekt} other {# Objekte}}",
+    "creationsCount": "{count, plural, one {# gespeicherte Kreation} other {# gespeicherte Kreationen}}",
+    "creationsEmptyTitle": "Noch nichts gespeichert.",
+    "creationsEmptyText": "Stellen Sie im Studio ein Objekt ein und klicken Sie auf Behalten.",
+    "creationsNote": "Diese Kreationen bleiben in diesem Browser. Ans Atelier geht nichts, bevor Sie eine Anfrage senden.",
+    "savedOn": "Gespeichert am {date}",
+    "reopen": "Wieder öffnen",
+    "delete": "Löschen",
+    "deleted": "Kreation gelöscht.",
+    "objects": {
+      "lavaux": "Vase «Lavaux»",
+      "cartouche": "Visitenkarte «Cartouche»",
+      "relief": "Untersetzer «Relief»",
+      "borne": "Namensschild «Borne»"
+    }
+  },
+  "notFound": {
+    "kicker": "Kein vermessener Punkt",
+    "title": "Seite nicht gefunden.",
+    "line": "Höhe 404 m, also 32 m über dem Genfersee. Hier wurde nichts gedruckt.",
+    "here": "Sie sind hier"
+  },
+  "error": {
+    "kicker": "Unerwarteter Fehler",
+    "title": "Eine Schicht ist missglückt. Nochmals versuchen?",
+    "reference": "Referenz {digest}"
+  }
+}

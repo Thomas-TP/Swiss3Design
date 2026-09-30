@@ -5,12 +5,15 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { customerAddresses } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
+import { PageHeader } from "@/components/page-header";
 import { CheckoutFlow, type CheckoutAddress } from "./checkout-flow";
 
 export const dynamic = "force-dynamic";
 
 export default async function CheckoutPage() {
-  const t = await getTranslations("checkout");
+  // Le titre du tunnel vient du namespace « system » (point final = point
+  // rouge) ; `checkout.title` (sans point) reste celui de l'onglet.
+  const t = await getTranslations("system.checkout");
   const { env } = await getCloudflareContext({ async: true });
 
   // Adresse par défaut du client connecté, proposée en préremplissage
@@ -42,17 +45,21 @@ export default async function CheckoutPage() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 md:py-16">
-      <h1 className="text-3xl font-bold tracking-tight md:text-4xl">
-        {t("title")}
-      </h1>
-      <div className="mt-8">
-        <CheckoutFlow
-          shippingSettings={await getShippingSettings()}
-          initialAddress={initialAddress}
-          sessionEmail={session?.user.email ?? null}
-          stripePublishableKey={env.STRIPE_PUBLISHABLE_KEY ?? ""}
-        />
+    <div className="s3d-page py-10 md:py-16">
+      {/* Un seul h1. Colonne plus étroite que le panier : un formulaire se
+          lit sur une mesure courte, pas sur 1440 px. Ni Lenis ni canvas ici
+          (page hors du groupe (site)) : rien ne bouge autour des iframes
+          Stripe. */}
+      <div className="mx-auto max-w-5xl">
+        <PageHeader title={t("title")} />
+        <div className="mt-8">
+          <CheckoutFlow
+            shippingSettings={await getShippingSettings()}
+            initialAddress={initialAddress}
+            sessionEmail={session?.user.email ?? null}
+            stripePublishableKey={env.STRIPE_PUBLISHABLE_KEY ?? ""}
+          />
+        </div>
       </div>
     </div>
   );

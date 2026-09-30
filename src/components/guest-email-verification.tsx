@@ -3,8 +3,14 @@ import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { CheckCircle2, MailCheck, Pencil } from "lucide-react";
 import { Link } from "@/i18n/navigation";
-const field =
-  "min-w-0 flex-1 rounded-xl border border-line bg-surface px-4 py-3 text-sm placeholder:text-soft/60 focus:border-ink focus:outline-none";
+import { Button } from "@/components/ui/button";
+import { fieldSkin } from "@/components/ui/field";
+
+// Vérification de l'e-mail d'un invité (code à 6 chiffres). Habillage
+// « Strates » : champs `fieldSkin`, boutons d'encre (le bouton rouge de
+// l'écran reste celui du tunnel ou du panier), confirmation en vert de statut.
+// Logique inchangée : envoi et contrôle du code par /api/checkout/verify-email.
+const field = `min-w-0 flex-1 ${fieldSkin}`;
 export type EmailProof = { email: string; token: string };
 
 export function GuestEmailVerification({
@@ -87,11 +93,16 @@ export function GuestEmailVerification({
 
   if (proof) {
     return (
-      <div className="mt-3 flex items-center justify-between gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
+      <div className="mt-3 flex items-center justify-between gap-3 rounded-field border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
         <span className="flex min-w-0 items-center gap-2.5 text-sm font-medium text-emerald-800 dark:text-emerald-200">
-          <CheckCircle2 size={17} className="shrink-0 text-emerald-600" />
-          <span className="truncate">{proof.email}</span>
-          <span className="hidden shrink-0 rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 sm:inline">
+          <CheckCircle2
+            size={17}
+            strokeWidth={1.5}
+            className="shrink-0 text-emerald-600"
+          />
+          {/* ph-mask : adresse masquée dans les enregistrements de visite. */}
+          <span className="ph-mask truncate">{proof.email}</span>
+          <span className="hidden shrink-0 rounded-hair bg-emerald-500/15 px-2 py-0.5 text-xs font-semibold sm:inline">
             {t("emailVerified")}
           </span>
         </span>
@@ -103,9 +114,9 @@ export function GuestEmailVerification({
             setCode("");
           }}
           aria-label={t("email")}
-          className="shrink-0 rounded-full p-1.5 text-emerald-700 transition-colors hover:bg-emerald-100"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-field text-emerald-700 transition-colors hover:bg-emerald-500/15 dark:text-emerald-200"
         >
-          <Pencil size={14} />
+          <Pencil size={15} strokeWidth={1.5} />
         </button>
       </div>
     );
@@ -113,7 +124,7 @@ export function GuestEmailVerification({
 
   return (
     <div className="mt-3 space-y-3">
-      <p className="text-xs leading-relaxed text-soft">
+      <p className="text-sm leading-relaxed text-soft">
         {notice ?? t("guestNotice")}
       </p>
       <div className="flex flex-wrap gap-2">
@@ -132,14 +143,15 @@ export function GuestEmailVerification({
           }}
           type="email"
           autoComplete="email"
+          aria-label={t("email")}
           placeholder={t("email")}
           className={field}
         />
-        <button
-          type="button"
+        <Button
+          variant="ink"
           onClick={sendCode}
           disabled={!emailValid || pending !== null || cooldown > 0}
-          className="shrink-0 rounded-xl bg-ink px-4 py-3 text-sm font-semibold text-paper transition-all hover:bg-ink/85 active:scale-[0.98] disabled:opacity-50"
+          className="shrink-0"
         >
           {pending === "send"
             ? t("processing")
@@ -148,13 +160,19 @@ export function GuestEmailVerification({
               : codeSent
                 ? t("resendCode")
                 : t("sendCode")}
-        </button>
+        </Button>
       </div>
       {codeSent && (
-        <div className="rounded-xl bg-paper p-3.5 ring-1 ring-line">
-          <p className="flex items-center gap-2 text-xs font-medium text-soft">
-            <MailCheck size={14} className="shrink-0 text-emerald-600" />
-            {t("codeSentTo", { email: email.trim().toLowerCase() })}
+        <div className="rounded-field border border-line bg-surface p-3.5">
+          <p className="flex items-center gap-2 text-sm font-medium text-soft">
+            <MailCheck
+              size={15}
+              strokeWidth={1.5}
+              className="shrink-0 text-emerald-600"
+            />
+            <span className="ph-mask">
+              {t("codeSentTo", { email: email.trim().toLowerCase() })}
+            </span>
           </p>
           <div className="mt-2.5 flex flex-wrap gap-2">
             <input
@@ -170,33 +188,34 @@ export function GuestEmailVerification({
               }}
               inputMode="numeric"
               autoComplete="one-time-code"
+              aria-label={t("codePlaceholder")}
               placeholder={t("codePlaceholder")}
-              className={`${field} tracking-[0.3em]`}
+              className={`${field} s3d-num tracking-[0.3em]`}
             />
-            <button
-              type="button"
+            <Button
+              variant="ink"
               onClick={verifyCode}
               disabled={code.length !== 6 || pending !== null}
-              className="shrink-0 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-50"
+              className="shrink-0"
             >
               {pending === "verify" ? t("processing") : t("verifyCode")}
-            </button>
+            </Button>
           </div>
         </div>
       )}
       {error && (
         <p
           role="alert"
-          className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text"
+          className="rounded-field border border-accent-text/30 bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text"
         >
           {error}
         </p>
       )}
-      <p className="text-xs text-soft">
+      <p className="text-sm text-soft">
         {t("haveAccount")}{" "}
         <Link
           href={{ pathname: "/account/login", query: { next } }}
-          className="font-semibold text-accent-text hover:underline"
+          className="font-semibold text-accent-text underline-offset-4 hover:underline"
         >
           {t("loginCta")}
         </Link>
