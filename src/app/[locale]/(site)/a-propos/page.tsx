@@ -1,28 +1,29 @@
 import type { Metadata } from "next";
-import {
-  ArrowRight,
-  Check,
-  ChevronDown,
-  Lock,
-  Mail,
-  MapPin,
-  ShieldCheck,
-  Truck,
-} from "lucide-react";
+import { ChevronDown, Lock, MapPin, ShieldCheck, Truck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
-import { Reveal } from "@/components/reveal";
 import { JsonLd } from "@/components/json-ld";
+import { PageHeader } from "@/components/page-header";
+import { Chapter } from "@/components/ui/chapter";
+import { cx } from "@/components/ui/cx";
+import { PageCut } from "@/components/ui/page-cut";
 import { faqJsonLd, pageMetadata, webPageJsonLd } from "@/lib/seo";
-import { ContactForm } from "./contact-form";
 import { ABOUT_CONTENT } from "./about-content";
 import { AboutNav } from "./about-nav";
+import { ContactForm } from "./contact-form";
+import { ContactLinks } from "./contact-links";
 import { PrinterShowcase } from "./printer-showcase";
-import { PageCut } from "@/components/ui/page-cut";
 
-const CONTACT_EMAIL = "contact@swiss3design.ch";
 const TRUST_ICONS = [MapPin, ShieldCheck, Lock, Truck] as const;
+
+// Les chapitres se posent à 128 px du haut (header 64 + rail 48 + 16 d'air),
+// valeur que la ligne de détection de l'AboutNav suppose (about-nav.tsx).
+// `scroll-mt-32!` : la primitive Chapter pose déjà `scroll-mt-24`, l'important
+// garantit que notre valeur gagne quel que soit l'ordre des utilitaires. Le
+// `focus:outline-none` : l'AboutNav donne le focus à la section visée (comme
+// une ancre native), sans qu'un cadre d'encre entoure tout le chapitre.
+const CHAPTER = "scroll-mt-32! focus:outline-none";
+const CHAPTER_RULED = cx(CHAPTER, "border-t border-line");
 
 export async function generateMetadata({
   params,
@@ -41,20 +42,47 @@ export async function generateMetadata({
   });
 }
 
-function SectionHeading({ kicker, title }: { kicker: string; title: string }) {
+/**
+ * Typographie française à l'affichage : espace insécable devant « ? ! : ; » et
+ * à l'intérieur des guillemets, pour qu'un signe ne tombe jamais seul en début
+ * de ligne (« Une question / ? Parlons-en. »). Affichage seulement : le
+ * contenu source (ABOUT_CONTENT) et faqJsonLd gardent leurs espaces ordinaires.
+ */
+function typo(text: string): string {
+  return text.replace(/ ([?!:;»])/g, " $1").replace(/(«) /g, "$1 ");
+}
+
+/**
+ * Pile de strates décorative : `count` couches empilées de bas en haut, la
+ * dernière (celle qu'on « dépose » à cette étape) en rouge, la chaleur de la
+ * buse. Même idée que le mark : le procédé se lit comme un empilement.
+ */
+function StrataStack({ count }: { count: number }) {
   return (
-    <div className="mb-8">
-      <span className="flex h-1 w-10 rounded-full bg-accent" />
-      <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-accent-text">
-        {kicker}
-      </p>
-      <h2 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">
-        {title}
-      </h2>
-    </div>
+    <span
+      aria-hidden="true"
+      className="flex h-8 w-12 flex-col-reverse justify-start gap-[3px]"
+    >
+      {Array.from({ length: count }, (_, i) => (
+        <span
+          key={i}
+          className={cx(
+            "block h-1 w-full",
+            i === count - 1 ? "bg-accent" : "bg-iso-index",
+          )}
+        />
+      ))}
+    </span>
   );
 }
 
+// Page « Atelier » (brief « Strates », §7.11). Contenu éditorial inchangé
+// (ABOUT_CONTENT, JSX par langue) ; cette page n'en fait que la mise en forme :
+// chapitres numérotés 01 à 06, le premier en ton « encre ». Tout est rendu côté
+// serveur, FAQ comprise (<details>, lisible sans JS et dans faqJsonLd). Les
+// révélations sont des classes CSS (.s3d-rise, .s3d-print : aucune n'agit sur
+// le h1 ni sur ce qui est visible au premier paint) ; la seule animation JS,
+// le tracé des schémas, est dans PrinterShowcase (gate « about »).
 export default async function AboutPage({
   params,
 }: {
@@ -62,13 +90,18 @@ export default async function AboutPage({
 }) {
   const { locale } = await params;
   const c = ABOUT_CONTENT[locale] ?? ABOUT_CONTENT.fr;
-  const t = await getTranslations("contact");
+  const t = await getTranslations("atelier");
 
   return (
     <PageCut>
-      <div className="mx-auto max-w-5xl px-4 sm:px-6">
+      {/* Conteneur racine de la page. L'AboutNav doit en être un enfant DIRECT :
+          `position: sticky` ne « colle » que dans la hauteur de son bloc
+          englobant — un wrapper qui ne contient que la barre elle-même n'a
+          aucune marge de manœuvre pour rester à l'écran (elle se décolle dès
+          qu'on dépasse sa propre hauteur). Bug constaté en usage réel. */}
+      <div>
         {/* Page « À propos » rattachée à l'entreprise + FAQ visible plus bas :
-          deux schémas très lus par les moteurs de réponse (IA). */}
+            deux schémas très lus par les moteurs de réponse (IA). */}
         <JsonLd
           data={webPageJsonLd({
             type: "AboutPage",
@@ -79,273 +112,214 @@ export default async function AboutPage({
           })}
         />
         <JsonLd data={faqJsonLd(c.faq)} />
-        {/* Hero */}
-        <section className="py-14 md:py-20">
-          <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border border-line bg-surface px-3.5 py-1.5 text-xs font-medium text-soft">
-              <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-              {c.badge}
-            </span>
-          </Reveal>
-          <Reveal delay={0.08}>
-            <h1 className="mt-6 max-w-3xl text-[2.3rem] font-bold leading-[1.08] tracking-tight md:text-5xl">
-              {c.title}
-            </h1>
-          </Reveal>
-          <Reveal delay={0.16}>
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-soft">
-              {c.intro}
-            </p>
-          </Reveal>
-        </section>
 
-        {/* Chiffres clés */}
-        <Reveal inView>
-          <section className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-4">
+        <div className="s3d-page pb-12 pt-10 md:pb-16 md:pt-16">
+          <PageHeader eyebrow={c.badge} title={typo(c.title)} intro={c.intro} />
+        </div>
+
+        {/* Chiffres clés, en bande de mesure : valeur d'abord, étiquette mono. */}
+        <section aria-label={t("stats.label")} className="s3d-page pb-14">
+          {/* Quatre colonnes seulement dès 1280 px, et une valeur plus modeste que
+              les titres : « Jusqu'à 4 » (la plus longue, en fr) doit tenir sur
+              une ligne dans une cellule, sinon le chiffre tombe seul à la ligne. */}
+          <ul className="s3d-rise grid grid-cols-2 gap-px border-y border-line bg-line xl:grid-cols-4">
             {c.stats.map((s) => (
-              <div
+              <li
                 key={s.label}
-                className="rounded-2xl border border-line bg-surface p-5 text-center"
+                className="bg-paper py-6 pl-5 pr-2 max-xl:odd:pl-0 xl:first:pl-0"
               >
-                <p className="text-2xl font-bold tracking-tight text-ink md:text-3xl">
+                <p className="s3d-num font-display text-[clamp(1.5rem,1.1rem+1.6vw,2.5rem)] font-extrabold leading-none text-ink">
                   {s.value}
                 </p>
-                <p className="mt-1 text-xs leading-snug text-soft">{s.label}</p>
-              </div>
+                <p className="s3d-label mt-3 text-soft">{s.label}</p>
+              </li>
             ))}
-          </section>
-        </Reveal>
+          </ul>
+        </section>
 
-        {/* Navigation rapide : reste visible au défilement, met en avant la
-          section lue (voir about-nav.tsx). Page volontairement longue et
-          complète — cette barre en est le sommaire, pas un raccourci qui
-          en retire le contenu.
-          Placée en enfant DIRECT du conteneur racine (pas dans un div
-          dédié) : `position: sticky` ne "colle" que dans la hauteur de son
-          bloc englobant — un wrapper qui ne contient que la barre elle-même
-          n'a aucune marge de manœuvre pour rester à l'écran (elle se
-          décolle dès qu'on dépasse sa propre hauteur). Le conteneur racine,
-          lui, s'étend sur toute la page. Bug constaté en usage réel
-          (Thomas : "je dois revenir en haut pour l'utiliser"). */}
+        {/* Rail kilométrique : reste visible au défilement, met en avant la
+            section lue (voir about-nav.tsx). Page volontairement longue et
+            complète — ce rail en est le sommaire, pas un raccourci qui en
+            retire le contenu. */}
         <AboutNav
+          label={t("nav.label")}
           items={[
-            { id: "equipment", label: c.equipmentKicker },
-            { id: "process", label: c.processKicker },
-            { id: "materials", label: c.materialsKicker },
-            { id: "trust", label: c.trustKicker },
-            { id: "faq", label: c.faqKicker },
-            { id: "contact", label: c.contactKicker },
+            { id: "equipment", number: "01", label: c.equipmentKicker },
+            { id: "process", number: "02", label: c.processKicker },
+            { id: "materials", number: "03", label: c.materialsKicker },
+            { id: "trust", number: "04", label: c.trustKicker },
+            { id: "faq", number: "05", label: c.faqKicker },
+            { id: "contact", number: "06", label: c.contactKicker },
           ]}
         />
 
-        {/* Notre matériel */}
-        <section id="equipment" className="scroll-mt-32 py-16 md:py-20">
-          <Reveal inView>
-            <SectionHeading
-              kicker={c.equipmentKicker}
-              title={c.equipmentTitle}
-            />
-          </Reveal>
-          <Reveal inView>
-            <p className="mb-8 max-w-2xl text-[15px] leading-relaxed text-soft">
-              {c.equipmentText}
-            </p>
-          </Reveal>
-          <Reveal inView delay={0.08}>
+        {/* 01 · Notre matériel (ton encre) */}
+        <Chapter
+          id="equipment"
+          number="01"
+          eyebrow={c.equipmentKicker}
+          title={typo(c.equipmentTitle)}
+          intro={c.equipmentText}
+          tone="ink"
+          className={CHAPTER}
+        >
+          <div className="s3d-page mt-14">
             <PrinterShowcase
               printers={c.printers}
               specsTitle={c.specsTitle}
               legendHint={c.legendHint}
             />
-          </Reveal>
-        </section>
-
-        {/* Le procédé */}
-        <section
-          id="process"
-          className="scroll-mt-32 border-t border-line py-16 md:py-20"
-        >
-          <Reveal inView>
-            <SectionHeading kicker={c.processKicker} title={c.processTitle} />
-          </Reveal>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-5">
-            {c.steps.map((step, i) => (
-              <Reveal key={step.title} inView delay={i * 0.06}>
-                <div className="flex h-full flex-col rounded-2xl border border-line bg-surface p-5">
-                  <span className="grid h-9 w-9 place-items-center rounded-full bg-accent/10 text-sm font-bold text-accent-text">
-                    {i + 1}
-                  </span>
-                  <p className="mt-4 text-sm font-semibold">{step.title}</p>
-                  <p className="mt-1.5 text-sm leading-snug text-soft">
-                    {step.text}
-                  </p>
-                </div>
-              </Reveal>
-            ))}
           </div>
-        </section>
+        </Chapter>
 
-        {/* Nos matières */}
-        <section
-          id="materials"
-          className="scroll-mt-32 border-t border-line py-16 md:py-20"
+        {/* 02 · Le procédé */}
+        <Chapter
+          id="process"
+          number="02"
+          eyebrow={c.processKicker}
+          title={typo(c.processTitle)}
+          className={CHAPTER}
         >
-          <Reveal inView>
-            <SectionHeading
-              kicker={c.materialsKicker}
-              title={c.materialsTitle}
-            />
-          </Reveal>
-          <Reveal inView>
-            <p className="mb-7 max-w-2xl text-[15px] leading-relaxed text-soft">
-              {c.materialsText}
-            </p>
-          </Reveal>
-          <Reveal inView delay={0.08}>
-            <div className="grid gap-8 rounded-card border border-line bg-elevated p-7 md:grid-cols-[0.8fr_1.2fr] md:items-center md:p-9">
+          <ol className="s3d-page mt-14 grid gap-x-gutter gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
+            {c.steps.map((step, i) => (
+              <li
+                key={step.title}
+                className="s3d-print border-t border-ink pt-5"
+              >
+                <StrataStack count={i + 1} />
+                <p className="s3d-label mt-5 text-ink">
+                  {String(i + 1).padStart(2, "0")}
+                </p>
+                <h3 className="mt-2 text-subtitle font-semibold text-ink">
+                  {step.title}
+                </h3>
+                <p className="mt-2 text-sm text-soft">{step.text}</p>
+              </li>
+            ))}
+          </ol>
+        </Chapter>
+
+        {/* 03 · Nos matières */}
+        <Chapter
+          id="materials"
+          number="03"
+          eyebrow={c.materialsKicker}
+          title={typo(c.materialsTitle)}
+          intro={c.materialsText}
+          className={CHAPTER_RULED}
+        >
+          <div className="s3d-page mt-14">
+            <div className="s3d-print grid gap-10 border-y border-line py-10 md:grid-cols-[0.8fr_1.2fr] md:items-center md:py-12">
               <div>
-                <p className="text-5xl font-bold tracking-tight md:text-6xl">
+                <p className="font-display text-[clamp(4rem,2rem+8vw,9rem)] font-extrabold leading-[0.9] tracking-tight text-ink">
                   {c.plaName}
                 </p>
-                <p className="mt-2 text-sm font-medium text-accent-text">
+                <p className="s3d-label mt-4 text-accent-text">
                   {c.plaTagline}
                 </p>
               </div>
-              <ul className="space-y-3">
+              <ul className="space-y-4">
                 {c.plaPoints.map((point) => (
-                  <li key={point} className="flex items-start gap-2.5">
-                    <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-accent/10">
-                      <Check
-                        size={13}
-                        strokeWidth={2.5}
-                        className="text-accent-text"
-                      />
-                    </span>
-                    <span className="text-sm leading-snug text-ink">
-                      {point}
-                    </span>
+                  <li key={point} className="flex items-start gap-3">
+                    <span
+                      aria-hidden="true"
+                      className="mt-[0.7em] h-0.5 w-4 shrink-0 bg-iso-index"
+                    />
+                    <span className="text-base text-ink">{point}</span>
                   </li>
                 ))}
               </ul>
             </div>
-          </Reveal>
-          <Reveal inView>
-            <p className="mt-5 text-sm leading-relaxed text-soft">
+            <p className="mt-6 max-w-[65ch] text-sm text-soft">
               {c.materialsNote}
             </p>
-          </Reveal>
-        </section>
+          </div>
+        </Chapter>
 
-        {/* Qualité & engagements */}
-        <section
+        {/* 04 · Qualité & engagements */}
+        <Chapter
           id="trust"
-          className="scroll-mt-32 border-t border-line py-16 md:py-20"
+          number="04"
+          eyebrow={c.trustKicker}
+          title={typo(c.trustTitle)}
+          className={CHAPTER_RULED}
         >
-          <Reveal inView>
-            <SectionHeading kicker={c.trustKicker} title={c.trustTitle} />
-          </Reveal>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <ul className="s3d-page mt-14 grid gap-x-gutter gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
             {c.trust.map((item, i) => {
               const Icon = TRUST_ICONS[i] ?? ShieldCheck;
               return (
-                <Reveal key={item.title} inView delay={i * 0.06}>
-                  <div className="flex h-full flex-col rounded-2xl border border-line bg-surface p-5 transition-colors hover:border-soft/40">
-                    <span className="grid h-10 w-10 place-items-center rounded-xl bg-paper ring-1 ring-line">
-                      <Icon
-                        size={19}
-                        strokeWidth={1.8}
-                        className="text-accent-text"
-                      />
-                    </span>
-                    <p className="mt-4 text-sm font-semibold">{item.title}</p>
-                    <p className="mt-1 text-sm leading-snug text-soft">
-                      {item.text}
-                    </p>
-                  </div>
-                </Reveal>
+                <li
+                  key={item.title}
+                  className="s3d-print border-t border-ink pt-5"
+                >
+                  <Icon
+                    size={24}
+                    strokeWidth={1.5}
+                    aria-hidden="true"
+                    className="text-ink"
+                  />
+                  <h3 className="mt-5 text-subtitle font-semibold text-ink">
+                    {item.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-soft">{item.text}</p>
+                </li>
               );
             })}
-          </div>
-        </section>
+          </ul>
+        </Chapter>
 
-        {/* FAQ */}
-        <section
+        {/* 05 · FAQ : visible dans le HTML serveur, sans JS, et reprise telle
+            quelle dans faqJsonLd plus haut. */}
+        <Chapter
           id="faq"
-          className="scroll-mt-32 border-t border-line py-16 md:py-20"
+          number="05"
+          eyebrow={c.faqKicker}
+          title={typo(c.faqTitle)}
+          className={CHAPTER_RULED}
         >
-          <div className="mx-auto max-w-3xl">
-            <Reveal inView>
-              <SectionHeading kicker={c.faqKicker} title={c.faqTitle} />
-            </Reveal>
-            <div className="space-y-3">
+          <div className="s3d-page mt-14">
+            <div className="max-w-3xl border-t border-line">
               {c.faq.map((item) => (
-                <details
-                  key={item.q}
-                  className="faq-item rounded-2xl border border-line bg-surface px-5 transition-colors hover:border-soft/40"
-                >
-                  <summary className="flex cursor-pointer items-center justify-between gap-4 py-4 text-[15px] font-semibold">
-                    {item.q}
+                <details key={item.q} className="faq-item border-b border-line">
+                  <summary className="flex min-h-14 cursor-pointer items-center justify-between gap-4 py-4 text-lg font-semibold text-ink">
+                    {typo(item.q)}
                     <ChevronDown
-                      size={18}
-                      className="faq-chevron shrink-0 text-soft transition-transform duration-200"
+                      size={20}
+                      strokeWidth={1.5}
+                      aria-hidden="true"
+                      className="faq-chevron shrink-0 text-soft transition-transform duration-280 ease-strate"
                     />
                   </summary>
-                  <div className="pb-5 text-[15px] leading-relaxed text-soft">
+                  <div className="max-w-[65ch] pb-6 text-base text-soft">
                     {item.a}
                   </div>
                 </details>
               ))}
             </div>
           </div>
-        </section>
+        </Chapter>
 
-        {/* Contact */}
-        <section
+        {/* 06 · Contact */}
+        <Chapter
           id="contact"
-          className="scroll-mt-32 border-t border-line py-16 md:py-20"
+          number="06"
+          eyebrow={c.contactKicker}
+          title={typo(c.contactTitle)}
+          intro={c.contactText}
+          className={CHAPTER_RULED}
         >
-          <div className="mx-auto max-w-2xl">
-            <Reveal inView>
-              <div className="text-center">
-                <span className="mx-auto flex h-1 w-10 rounded-full bg-accent" />
-                <p className="mt-3 text-sm font-semibold uppercase tracking-wide text-accent-text">
-                  {c.contactKicker}
-                </p>
-                <h2 className="mt-1 text-2xl font-bold tracking-tight md:text-3xl">
-                  {c.contactTitle}
-                </h2>
-                <p className="mx-auto mt-3 max-w-md leading-relaxed text-soft">
-                  {c.contactText}
-                </p>
-              </div>
-            </Reveal>
-
-            <Reveal inView delay={0.08}>
-              <div className="mt-8 rounded-card border border-line bg-surface p-6 sm:p-8">
-                <ContactForm />
-              </div>
-            </Reveal>
-
-            <Reveal inView>
-              <div className="mt-6 flex flex-col items-center justify-center gap-3 text-sm text-soft sm:flex-row sm:gap-6">
-                <a
-                  href={`mailto:${CONTACT_EMAIL}`}
-                  className="inline-flex items-center gap-2 transition-colors hover:text-ink"
-                >
-                  <Mail size={15} />
-                  {t("directEmail")} {CONTACT_EMAIL}
-                </a>
-                <Link
-                  href="/custom"
-                  className="inline-flex items-center gap-1.5 font-medium text-ink transition-colors hover:text-accent-text"
-                >
-                  {t("quoteCta")}
-                  <ArrowRight size={15} />
-                </Link>
-              </div>
-            </Reveal>
+          {/* Fiche à gauche ; à droite (dès lg), les deux autres façons de nous
+              joindre : le formulaire reste l'action principale de l'écran. */}
+          <div className="s3d-page s3d-grid mt-14 gap-y-8">
+            <div className="col-span-full rounded-card border border-line bg-surface p-6 sm:p-8 lg:col-span-7">
+              <ContactForm />
+            </div>
+            <ContactLinks
+              stacked
+              className="col-span-full lg:col-span-4 lg:col-start-9"
+            />
           </div>
-        </section>
+        </Chapter>
       </div>
     </PageCut>
   );

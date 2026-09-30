@@ -1,1 +1,28 @@
-{}
+{
+  "nav": {
+    "label": "In questa pagina"
+  },
+  "stats": {
+    "label": "L'atelier in cifre"
+  },
+  "showcase": {
+    "tabs": "Macchine dell'atelier",
+    "legend": "Riferimenti dello schema"
+  },
+  "form": {
+    "label": "Modulo di contatto",
+    "requiredNote": "* Campo obbligatorio"
+  },
+  "contact": {
+    "eyebrow": "Contatto",
+    "workshops": "Due atelier",
+    "gland": {
+      "city": "Gland (VD)",
+      "machine": "Bambu Lab P1S + AMS 2 Pro"
+    },
+    "pully": {
+      "city": "Pully (VD)",
+      "machine": "Creality K2 + CFS"
+    }
+  }
+}

@@ -1,0 +1,29 @@
+/* « Rail kilométrique » de l'Atelier : la barre collée sous le header est une
+   règle graduée, comme le cadre de carte (MapFrame) : repère fin tous les 8 px,
+   repère majeur sépia tous les 64 px, posés sur le filet du bas. ::before et
+   non ::after : les liens (soulignement rouge de la section lue) se peignent
+   par-dessus. Couleurs lues dans les jetons, donc thème et ton « encre » suivis
+   sans règle supplémentaire. */
+.rail::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 6px;
+  pointer-events: none;
+  opacity: 0.85;
+  background-image:
+    repeating-linear-gradient(
+      to right,
+      var(--iso-index) 0 1px,
+      transparent 1px 64px
+    ),
+    repeating-linear-gradient(to right, var(--iso) 0 1px, transparent 1px 8px);
+  background-size:
+    100% 6px,
+    100% 3px;
+  background-position:
+    left bottom,
+    left bottom;
+  background-repeat: no-repeat;
+}

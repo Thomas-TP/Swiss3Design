@@ -1,35 +1,53 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { cx } from "@/components/ui/cx";
+import { readReducedMotion } from "@/lib/motion-bridge/motion-pref";
+import { motionBridge } from "@/lib/motion-bridge/store";
+import styles from "./about-nav.module.css";
 
 interface AboutNavItem {
   id: string;
   label: string;
+  /** « 01 », « 02 »… : le numéro du chapitre, en mono devant le libellé. */
+  number?: string;
 }
 
-// Ligne de détection : juste sous le header (64px) + cette barre sticky.
-const DETECTION_LINE = 150;
+// Géométrie verticale, en px. Header = 64 (h-16), cette barre = 48 (h-12) : les
+// chapitres portent `scroll-mt-32` (128 = 64 + 48 + 16 d'air), c'est là que
+// leur haut se pose après un clic ou un saut d'ancre. La ligne de détection est
+// un peu plus bas (22 px), pour que la section qu'on vient de viser soit bien
+// celle qui s'allume, malgré l'arrondi et l'inertie de Lenis.
+const SCROLL_OFFSET = 128;
+const DETECTION_LINE = SCROLL_OFFSET + 22;
 
-// Barre de navigation rapide, collée sous le header : suit le défilement et
-// met en avant la section actuellement lue, pour retrouver une info sans
-// tout relire sur une page volontairement longue et complète.
+// Barre de navigation rapide en « rail kilométrique », collée sous le header :
+// suit le défilement et met en avant la section actuellement lue, pour
+// retrouver une info sans tout relire sur une page volontairement longue et
+// complète.
 //
-// Écoute `scroll` (throttlée par requestAnimationFrame) plutôt qu'un
-// IntersectionObserver : son callback ne reçoit que les entrées dont l'état
-// vient de CHANGER, pas un instantané de toutes les sections observées — sur
-// une page à sections hautes, beaucoup de mouvements de défilement ne
-// produisent aucune entrée "actuellement visible" dans le batch reçu, et la
-// pastille active reste bloquée sur la première section. Constaté en usage
-// réel, pas juste en théorie. L'algorithme ici est déterministe : à chaque
-// scroll, on prend la dernière section (dans l'ordre du document) dont le
-// haut a déjà franchi la ligne de détection.
-export function AboutNav({ items }: { items: AboutNavItem[] }) {
+// Écoute `scroll` (sans throttle) plutôt qu'un IntersectionObserver : son
+// callback ne reçoit que les entrées dont l'état vient de CHANGER, pas un
+// instantané de toutes les sections observées — sur une page à sections
+// hautes, beaucoup de mouvements de défilement ne produisent aucune entrée
+// "actuellement visible" dans le batch reçu, et le repère actif reste bloqué
+// sur la première section (constaté en usage réel). L'algorithme ici est
+// déterministe : à chaque scroll, on prend la dernière section (dans l'ordre du
+// document) dont le haut a déjà franchi la ligne de détection. Vérifier
+// quelques éléments par événement est de toute façon négligeable.
+export function AboutNav({
+  items,
+  label,
+}: {
+  items: AboutNavItem[];
+  /** Nom accessible de la navigation (« Sur cette page »). */
+  label: string;
+}) {
   const [activeId, setActiveId] = useState(items[0]?.id);
   const listRef = useRef<HTMLDivElement>(null);
   const itemsRef = useRef(items);
-  // Écrire dans un ref pendant le rendu n'est pas garanti par React (lecture
-  // seulement dans des callbacks hors rendu ici, mais on synchronise via un
-  // effet plutôt que dans le corps du composant pour rester dans le contrat).
+  // Synchronisé par un effet plutôt que dans le corps du composant : on n'écrit
+  // pas dans un ref pendant le rendu.
   useEffect(() => {
     itemsRef.current = items;
   }, [items]);
@@ -46,17 +64,16 @@ export function AboutNav({ items }: { items: AboutNavItem[] }) {
       setActiveId((prev) => (prev === current ? prev : current));
     }
 
-    // Pas de throttle requestAnimationFrame : ne pas dépendre d'un rAF qui
-    // se déclenche de façon fiable (constaté peu fiable dans un contexte de
-    // test automatisé/headless — même famille de souci que le défilement
-    // fluide ou IntersectionObserver). Vérifier 6 éléments par événement
-    // scroll est de toute façon négligeable en coût.
     computeActive();
     window.addEventListener("scroll", computeActive, { passive: true });
-    return () => window.removeEventListener("scroll", computeActive);
+    window.addEventListener("resize", computeActive);
+    return () => {
+      window.removeEventListener("scroll", computeActive);
+      window.removeEventListener("resize", computeActive);
+    };
   }, []);
 
-  // Garde la pastille active visible dans la barre horizontale scrollable.
+  // Garde le lien actif visible dans la barre horizontale scrollable (mobile).
   // Ajuste `scrollLeft` du conteneur directement plutôt que
   // `Element.scrollIntoView()` : sur un élément sticky, scrollIntoView
   // considère aussi le défilement vertical de la page (pour re-rendre le
@@ -78,45 +95,95 @@ export function AboutNav({ items }: { items: AboutNavItem[] }) {
         elRect.left -
         containerRect.left -
         (containerRect.width - elRect.width) / 2;
-      container.scrollBy({ left: delta, behavior: "smooth" });
+      container.scrollBy({
+        left: delta,
+        behavior: readReducedMotion() ? "auto" : "smooth",
+      });
     }
   }, [activeId]);
 
-  // Défilement explicite au clic plutôt que de compter sur la navigation
-  // native par ancre (`<a href="#id">` + `scroll-behavior: smooth`) : plus
-  // fiable pour respecter systématiquement le décalage `scroll-mt` sous le
-  // header + cette barre sticky, sur tous les navigateurs.
+  // Défilement explicite au clic plutôt que la navigation native par ancre :
+  // la position visée est calculée ici (haut de section − SCROLL_OFFSET), donc
+  // identique avec Lenis (bridge.scroll.to), sans Lenis (mouvement réduit,
+  // capacité C0) et quelle que soit la façon dont Lenis lit `scroll-margin`.
+  // `stopPropagation` : Lenis écoute aussi tous les clics sur une ancre #…
+  // (option `anchors`, décalage de −80 px) et rejouerait son propre saut par
+  // dessus le nôtre. Le href reste un vrai lien d'ancre, pour le clic droit et
+  // l'absence de JS.
   function handleClick(id: string) {
     return (e: React.MouseEvent<HTMLAnchorElement>) => {
+      const target = document.getElementById(id);
+      if (!target) return;
       e.preventDefault();
-      document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+      e.stopPropagation();
+      const top = Math.max(
+        0,
+        Math.round(
+          target.getBoundingClientRect().top + window.scrollY - SCROLL_OFFSET,
+        ),
+      );
+      const scroll = motionBridge.get().scroll;
+      if (scroll) scroll.to(top);
+      else
+        window.scrollTo({
+          top,
+          behavior: readReducedMotion() ? "auto" : "smooth",
+        });
+      // Comme une ancre native : le prochain Tab part de la section visée et
+      // un lecteur d'écran commence à son titre.
+      if (!target.hasAttribute("tabindex")) target.tabIndex = -1;
+      target.focus({ preventScroll: true });
       history.replaceState(null, "", `#${id}`);
     };
   }
 
   return (
-    <div className="sticky top-16 z-30 -mx-4 mt-10 border-b border-line bg-paper/90 backdrop-blur-lg sm:-mx-6">
+    <nav
+      aria-label={label}
+      className={cx(
+        styles.rail,
+        "sticky top-16 z-30 border-b border-line bg-paper/90 backdrop-blur-lg",
+      )}
+    >
       <div
         ref={listRef}
-        className="flex gap-1.5 overflow-x-auto px-4 py-2.5 sm:px-6 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
-        {items.map((item) => (
-          <a
-            key={item.id}
-            href={`#${item.id}`}
-            onClick={handleClick(item.id)}
-            data-id={item.id}
-            aria-current={activeId === item.id ? "true" : undefined}
-            className={`shrink-0 rounded-full px-3.5 py-1.5 text-sm font-medium transition-colors ${
-              activeId === item.id
-                ? "bg-ink text-paper"
-                : "text-soft hover:bg-line/60 hover:text-ink"
-            }`}
-          >
-            {item.label}
-          </a>
-        ))}
+        <ol className="s3d-page flex w-max min-w-full gap-x-7">
+          {items.map((item) => {
+            const active = activeId === item.id;
+            return (
+              <li key={item.id} className="shrink-0">
+                <a
+                  href={`#${item.id}`}
+                  onClick={handleClick(item.id)}
+                  data-id={item.id}
+                  aria-current={active ? "location" : undefined}
+                  className={cx(
+                    "s3d-label relative flex h-12 items-center gap-2 transition-colors duration-150 ease-strate",
+                    active ? "text-ink" : "text-soft hover:text-ink",
+                  )}
+                >
+                  {item.number ? (
+                    <span className={active ? "text-accent-text" : undefined}>
+                      {item.number}
+                    </span>
+                  ) : null}
+                  <span>{item.label}</span>
+                  {/* Repère de la section lue : se trace de gauche à droite. */}
+                  <span
+                    aria-hidden="true"
+                    className={cx(
+                      "absolute inset-x-0 bottom-0 h-0.5 origin-left bg-accent transition-transform duration-280 ease-strate",
+                      active ? "scale-x-100" : "scale-x-0",
+                    )}
+                  />
+                </a>
+              </li>
+            );
+          })}
+        </ol>
       </div>
-    </div>
+    </nav>
   );
 }

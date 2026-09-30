@@ -3,14 +3,20 @@
 import { useActionState } from "react";
 import { CheckCircle2, Send } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { Button } from "@/components/ui/button";
+import { cx } from "@/components/ui/cx";
+import { Field, fieldClass } from "@/components/ui/field";
 import { useSession } from "@/lib/auth-client";
 import { submitContactMessage, type ContactFormState } from "./actions";
 
-const field =
-  "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
-
+// Formulaire de contact de l'Atelier et de /contact. Habillage « Strates » :
+// champs = primitive Field (libellé mono, bordure puis encre au focus, halo
+// `ring-ink`, 16 px en mobile contre le zoom d'iOS), un seul bouton rouge (le
+// bouton d'envoi, l'action principale de l'écran). Envoi inchangé : même
+// Server Action, mêmes noms de champs, même honeypot, même `{ status }`.
 export function ContactForm() {
   const t = useTranslations("contact");
+  const tForm = useTranslations("atelier.form");
   const locale = useLocale();
   const { data: authSession } = useSession();
   const [state, formAction, pending] = useActionState<
@@ -20,17 +26,27 @@ export function ContactForm() {
 
   if (state.status === "success") {
     return (
-      <div className="rounded-card border border-emerald-500/30 bg-emerald-500/10 p-8 text-center">
-        <CheckCircle2 size={32} className="mx-auto text-emerald-600" />
-        <p className="mt-4 font-semibold text-emerald-800 dark:text-emerald-200">
+      // <output> : rôle « status » implicite, annoncé par les lecteurs d'écran.
+      <output className="block rounded-card border border-emerald-500/30 bg-emerald-500/10 p-8 text-center">
+        <CheckCircle2
+          size={32}
+          strokeWidth={1.5}
+          aria-hidden="true"
+          className="mx-auto text-emerald-600"
+        />
+        <span className="mt-4 block font-semibold text-emerald-800 dark:text-emerald-200">
           {t("success")}
-        </p>
-      </div>
+        </span>
+      </output>
     );
   }
 
   return (
-    <form action={formAction} className="space-y-5">
+    <form
+      action={formAction}
+      aria-busy={pending}
+      className="flex flex-col gap-5"
+    >
       <input type="hidden" name="locale" value={locale} />
       {/* Honeypot anti-spam : caché des humains, ignoré des lecteurs d'écran. */}
       <div aria-hidden className="hidden">
@@ -41,10 +57,7 @@ export function ContactForm() {
       </div>
 
       <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <label htmlFor="name" className="mb-1.5 block text-sm font-semibold">
-            {t("name")}
-          </label>
+        <Field label={t("name")} htmlFor="name" required>
           <input
             key={authSession?.user.name ?? "anon-name"}
             id="name"
@@ -53,13 +66,10 @@ export function ContactForm() {
             maxLength={100}
             autoComplete="name"
             defaultValue={authSession?.user.name ?? ""}
-            className={field}
+            className={fieldClass}
           />
-        </div>
-        <div>
-          <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
-            {t("email")}
-          </label>
+        </Field>
+        <Field label={t("email")} htmlFor="email" required>
           <input
             key={authSession?.user.email ?? "anon-email"}
             id="email"
@@ -68,48 +78,55 @@ export function ContactForm() {
             required
             autoComplete="email"
             defaultValue={authSession?.user.email ?? ""}
-            className={field}
+            className={fieldClass}
           />
-        </div>
+        </Field>
       </div>
 
-      <div>
-        <label htmlFor="subject" className="mb-1.5 block text-sm font-semibold">
-          {t("subject")}{" "}
-          <span className="font-normal text-soft">({t("optional")})</span>
-        </label>
-        <input id="subject" name="subject" maxLength={150} className={field} />
-      </div>
+      <Field
+        label={
+          <>
+            {t("subject")}{" "}
+            <span className="normal-case">({t("optional")})</span>
+          </>
+        }
+        htmlFor="subject"
+      >
+        <input
+          id="subject"
+          name="subject"
+          maxLength={150}
+          className={fieldClass}
+        />
+      </Field>
 
-      <div>
-        <label htmlFor="message" className="mb-1.5 block text-sm font-semibold">
-          {t("message")}
-        </label>
+      <Field label={t("message")} htmlFor="message" required>
         <textarea
           id="message"
           name="message"
           required
           minLength={10}
-          rows={5}
+          rows={6}
           placeholder={t("messagePlaceholder")}
-          className={field}
+          className={cx(fieldClass, "resize-y")}
         />
-      </div>
+      </Field>
 
       {state.status === "error" && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
+        <p
+          role="alert"
+          className="rounded-field bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text"
+        >
           {t("error")}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
-      >
-        <Send size={16} />
+      <p className="text-sm text-soft">{tForm("requiredNote")}</p>
+
+      <Button type="submit" variant="primary" full disabled={pending}>
+        <Send size={16} strokeWidth={1.5} aria-hidden="true" />
         {pending ? t("sending") : t("send")}
-      </button>
+      </Button>
     </form>
   );
 }

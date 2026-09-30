@@ -1,1 +1,28 @@
-{}
+{
+  "nav": {
+    "label": "On this page"
+  },
+  "stats": {
+    "label": "The workshop in numbers"
+  },
+  "showcase": {
+    "tabs": "Workshop machines",
+    "legend": "Diagram markers"
+  },
+  "form": {
+    "label": "Contact form",
+    "requiredNote": "* Required field"
+  },
+  "contact": {
+    "eyebrow": "Contact",
+    "workshops": "Two workshops",
+    "gland": {
+      "city": "Gland (VD)",
+      "machine": "Bambu Lab P1S + AMS 2 Pro"
+    },
+    "pully": {
+      "city": "Pully (VD)",
+      "machine": "Creality K2 + CFS"
+    }
+  }
+}
