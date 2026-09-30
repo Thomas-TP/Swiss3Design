@@ -4,6 +4,7 @@ import { LogOut } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { signOut } from "@/lib/auth-client";
+import { btnGhostSm } from "./_ui";
 
 export function SignOutButton() {
   const t = useTranslations("auth");
@@ -17,9 +18,9 @@ export function SignOutButton() {
         router.push("/");
         router.refresh();
       }}
-      className="flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2 text-xs font-semibold text-soft transition-colors hover:border-ink hover:text-ink"
+      className={btnGhostSm}
     >
-      <LogOut size={14} />
+      <LogOut size={14} strokeWidth={1.5} />
       {t("signOut")}
     </button>
   );

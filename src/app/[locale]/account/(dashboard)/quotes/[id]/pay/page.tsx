@@ -11,6 +11,7 @@ import { getServerSession } from "@/lib/session";
 import { getStripe } from "@/lib/stripe";
 import { markQuotePaid } from "@/lib/orders";
 import { formatChf, renderTime } from "@/lib/format";
+import { backLink, card } from "../../../_ui";
 import { QuotePayFlow } from "./quote-pay-flow";
 
 export const dynamic = "force-dynamic";
@@ -91,36 +92,35 @@ export default async function QuotePayPage({
 
   return (
     <div className="max-w-xl">
-      <Link
-        href="/account"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"
-      >
-        <ArrowLeft size={15} />
+      <Link href="/account" className={backLink}>
+        <ArrowLeft size={15} strokeWidth={1.5} />
         {t("orderDetail.back")}
       </Link>
 
       {paid ? (
-        <div className="rounded-card border border-line bg-surface p-8 text-center">
+        <div className={`${card} text-center sm:p-8`}>
           <CheckCircle2
             size={30}
-            strokeWidth={1.8}
+            strokeWidth={1.5}
             className="mx-auto text-emerald-600"
           />
-          <h1 className="mt-5 text-2xl font-bold">{t("quotePay.paidTitle")}</h1>
+          <h1 className="mt-5 break-words font-display text-title text-ink">
+            {t("quotePay.paidTitle")}
+          </h1>
           <p className="mt-3 leading-relaxed text-soft">
             {t("quotePay.paidText")}
           </p>
         </div>
       ) : payable ? (
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="break-words font-display text-title text-ink">
             {t("quotePay.title")}
           </h1>
-          <p className="mt-3 text-2xl font-semibold tabular-nums">
+          <p className="s3d-num mt-3 font-display text-subtitle font-bold text-ink">
             {formatChf(quote.quotedPriceCents!, locale)}
           </p>
           {quote.adminMessage && (
-            <p className="mt-3 rounded-xl bg-paper px-4 py-3 text-sm leading-relaxed text-soft ring-1 ring-line">
+            <p className="mt-3 rounded-field bg-paper px-4 py-3 text-sm leading-relaxed text-soft ring-1 ring-line">
               {quote.adminMessage}
             </p>
           )}
@@ -132,7 +132,7 @@ export default async function QuotePayPage({
           />
         </div>
       ) : (
-        <p className="rounded-card border border-line bg-surface p-8 text-center text-soft">
+        <p className={`${card} text-center text-soft sm:p-8`}>
           {expired ? t("quotePay.expired") : t("quotePay.notPayable")}
         </p>
       )}

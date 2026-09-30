@@ -9,19 +9,11 @@ import { orders, orderItems } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { getReviewedProductIds } from "@/db/queries";
 import { formatChf } from "@/lib/format";
+import { statusBadge, backLink } from "../../_ui";
 import { ReviewForm } from "./review-form";
 import { ReorderButton } from "./reorder-button";
 
 export const dynamic = "force-dynamic";
-
-const statusStyle: Record<string, string> = {
-  pending: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-  paid: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  in_production: "bg-blue-500/15 text-blue-700 dark:text-blue-300",
-  shipped: "bg-violet-500/15 text-violet-700 dark:text-violet-300",
-  delivered: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  cancelled: "bg-red-500/15 text-red-600 dark:text-red-300",
-};
 
 function trackingUrl(n: string): string {
   return `https://service.post.ch/ekp-web/ui/entry/search/${encodeURIComponent(n)}`;
@@ -75,17 +67,14 @@ export default async function OrderDetailPage({
 
   return (
     <div className="max-w-2xl">
-      <Link
-        href="/account"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"
-      >
-        <ArrowLeft size={15} />
+      <Link href="/account" className={backLink}>
+        <ArrowLeft size={15} strokeWidth={1.5} />
         {t("orderDetail.back")}
       </Link>
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">
+          <h1 className="break-words font-display text-title text-ink">
             {t("orderDetail.title", { n: order.orderNumber })}
           </h1>
           <p className="mt-1 text-sm text-soft">
@@ -94,9 +83,7 @@ export default async function OrderDetailPage({
             })}
           </p>
         </div>
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyle[order.status] ?? "bg-line text-soft"}`}
-        >
+        <span className={statusBadge(order.status)}>
           {t(`status.${order.status}`)}
         </span>
       </div>
@@ -110,13 +97,13 @@ export default async function OrderDetailPage({
           href={trackingUrl(order.trackingNumber)}
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-5 flex items-center justify-between gap-3 rounded-card border border-line bg-surface px-5 py-4 transition-colors hover:border-ink"
+          className="mt-5 flex items-center justify-between gap-3 rounded-card border border-line bg-surface px-5 py-4 transition-colors duration-150 hover:border-ink"
         >
           <span className="flex items-center gap-2.5 text-sm">
-            <Truck size={17} className="shrink-0 text-soft" />
+            <Truck size={17} strokeWidth={1.5} className="shrink-0 text-soft" />
             <span>
               <span className="font-semibold">{t("orderDetail.tracking")}</span>{" "}
-              <span className="tabular-nums text-soft">
+              <span className="s3d-num text-soft">
                 {order.trackingNumber}
               </span>
             </span>
@@ -129,7 +116,7 @@ export default async function OrderDetailPage({
 
       <section className="mt-6">
         <h2 className="flex items-center gap-2 font-semibold">
-          <Package size={17} className="text-soft" />
+          <Package size={17} strokeWidth={1.5} className="text-soft" />
           {t("orderDetail.items")}
         </h2>
         <ul className="mt-3 divide-y divide-line rounded-card border border-line bg-surface px-5">
@@ -182,7 +169,7 @@ export default async function OrderDetailPage({
             </dd>
           </div>
           {order.discountCents > 0 && (
-            <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+            <div className="flex justify-between text-emerald-800 dark:text-emerald-300">
               <dt>
                 {t("orderDetail.discount")}
                 {order.discountCode ? ` (${order.discountCode})` : ""}
@@ -212,7 +199,7 @@ export default async function OrderDetailPage({
       {address.name && (
         <section className="mt-6">
           <h2 className="flex items-center gap-2 font-semibold">
-            <MapPin size={17} className="text-soft" />
+            <MapPin size={17} strokeWidth={1.5} className="text-soft" />
             {t("orderDetail.shippingAddress")}
           </h2>
           <p className="mt-3 rounded-card border border-line bg-surface px-5 py-4 text-sm leading-relaxed text-soft">

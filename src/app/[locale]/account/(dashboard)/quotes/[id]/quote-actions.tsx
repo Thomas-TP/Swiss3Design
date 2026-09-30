@@ -17,9 +17,15 @@ import {
   declineQuote,
   type QuoteActionState,
 } from "../actions";
-
-const field =
-  "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
+import {
+  alertError,
+  btnAccent,
+  btnDanger,
+  btnGhost,
+  btnPrimary,
+  card,
+  field,
+} from "../../_ui";
 
 const initial: QuoteActionState = { status: "idle" };
 
@@ -46,9 +52,9 @@ export function QuoteActions({
           <button
             type="button"
             onClick={() => router.push(`/account/quotes/${quoteId}/pay`)}
-            className="flex flex-1 items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98]"
+            className={`${btnAccent} flex-1`}
           >
-            <Check size={16} />
+            <Check size={16} strokeWidth={1.5} />
             {t("accept")}
           </button>
         )}
@@ -56,9 +62,9 @@ export function QuoteActions({
           <button
             type="button"
             onClick={() => setPanel(panel === "revise" ? "none" : "revise")}
-            className="flex items-center justify-center gap-2 rounded-full border border-line bg-surface px-5 py-3.5 text-sm font-semibold text-ink transition-colors hover:border-ink"
+            className={btnGhost}
           >
-            <Pencil size={15} />
+            <Pencil size={15} strokeWidth={1.5} />
             {canPay ? t("revise") : t("reviseExpired")}
           </button>
         )}
@@ -66,9 +72,9 @@ export function QuoteActions({
           <button
             type="button"
             onClick={() => setPanel(panel === "decline" ? "none" : "decline")}
-            className="flex items-center justify-center gap-2 rounded-full border border-line bg-surface px-5 py-3.5 text-sm font-semibold text-soft transition-colors hover:border-accent hover:text-accent-text"
+            className={btnGhost}
           >
-            <Ban size={15} />
+            <Ban size={15} strokeWidth={1.5} />
             {t("decline")}
           </button>
         )}
@@ -137,7 +143,7 @@ function RevisePanel({
   return (
     <form
       action={formAction}
-      className="mt-3 space-y-4 rounded-card border border-line bg-surface p-5"
+      className={`${card} mt-3 space-y-4`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -148,9 +154,9 @@ function RevisePanel({
           type="button"
           onClick={onClose}
           aria-label={t("cancel")}
-          className="rounded-full p-1 text-soft transition-colors hover:bg-line/60 hover:text-ink"
+          className="rounded-field p-1.5 text-soft transition-colors duration-150 hover:bg-line/60 hover:text-ink"
         >
-          <X size={16} />
+          <X size={16} strokeWidth={1.5} />
         </button>
       </div>
 
@@ -165,23 +171,23 @@ function RevisePanel({
       />
 
       {file ? (
-        <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-paper px-4 py-3 text-sm">
+        <div className="flex items-center justify-between gap-3 rounded-field border border-line bg-paper px-4 py-3 text-sm">
           <span className="flex min-w-0 items-center gap-2">
-            <Paperclip size={15} className="shrink-0 text-soft" />
+            <Paperclip size={15} strokeWidth={1.5} className="shrink-0 text-soft" />
             <span className="truncate font-medium">{file.name}</span>
           </span>
           <button
             type="button"
             onClick={() => setFile(null)}
             aria-label="×"
-            className="rounded-full p-1 text-soft transition-colors hover:bg-line/60 hover:text-accent-text"
+            className="rounded-field p-1.5 text-soft transition-colors duration-150 hover:bg-line/60 hover:text-accent-text"
           >
-            <X size={15} />
+            <X size={15} strokeWidth={1.5} />
           </button>
         </div>
       ) : (
-        <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line px-4 py-3.5 text-sm font-medium text-soft transition-colors hover:border-ink hover:text-ink">
-          <Paperclip size={16} />
+        <label className="flex cursor-pointer items-center justify-center gap-2 rounded-field border-2 border-dashed border-swatch-ring px-4 py-3.5 text-sm font-medium text-soft transition-colors duration-150 hover:border-ink hover:text-ink focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ink">
+          <Paperclip size={16} strokeWidth={1.5} />
           {uploading ? t("fileUploading") : t("fileHint")}
           <input
             type="file"
@@ -193,23 +199,22 @@ function RevisePanel({
         </label>
       )}
       {fileError && (
-        <p className="text-xs font-medium text-accent-text">{t("fileError")}</p>
+        <p className="text-sm font-medium text-accent-text">{t("fileError")}</p>
       )}
       {file && <input type="hidden" name="fileKey" value={file.key} />}
       {file && <input type="hidden" name="fileName" value={file.name} />}
 
       {state.status === "error" && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
-          {t("error")}
-        </p>
+        <p className={alertError}>{t("error")}</p>
+
       )}
 
       <button
         type="submit"
         disabled={pending || uploading}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-ink px-6 py-3 text-sm font-semibold text-paper transition-opacity hover:opacity-90 disabled:opacity-60"
+        className={`${btnPrimary} w-full`}
       >
-        <Send size={15} />
+        <Send size={15} strokeWidth={1.5} />
         {pending ? t("sending") : t("reviseSubmit")}
       </button>
     </form>
@@ -235,7 +240,7 @@ function DeclinePanel({
   return (
     <form
       action={formAction}
-      className="mt-3 space-y-4 rounded-card border border-line bg-surface p-5"
+      className={`${card} mt-3 space-y-4`}
     >
       <div className="flex items-start justify-between gap-3">
         <div>
@@ -246,9 +251,9 @@ function DeclinePanel({
           type="button"
           onClick={onClose}
           aria-label={t("cancel")}
-          className="rounded-full p-1 text-soft transition-colors hover:bg-line/60 hover:text-ink"
+          className="rounded-field p-1.5 text-soft transition-colors duration-150 hover:bg-line/60 hover:text-ink"
         >
-          <X size={16} />
+          <X size={16} strokeWidth={1.5} />
         </button>
       </div>
 
@@ -261,27 +266,26 @@ function DeclinePanel({
       />
 
       {state.status === "error" && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
-          {t("error")}
-        </p>
+        <p className={alertError}>{t("error")}</p>
+
       )}
 
       <div className="flex flex-col gap-2.5 sm:flex-row-reverse">
         <button
           type="submit"
           disabled={pending}
-          className="flex flex-1 items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+          className={`${btnDanger} flex-1`}
         >
-          <Ban size={15} />
+          <Ban size={15} strokeWidth={1.5} />
           {pending ? t("sending") : t("declineConfirm")}
         </button>
         <button
           type="button"
           onClick={onClose}
-          className="flex items-center justify-center gap-1.5 rounded-full border border-line bg-surface px-5 py-3 text-sm font-semibold text-soft transition-colors hover:border-ink hover:text-ink"
+          className={btnGhost}
         >
           {t("keep")}
-          <ArrowRight size={15} />
+          <ArrowRight size={15} strokeWidth={1.5} />
         </button>
       </div>
     </form>

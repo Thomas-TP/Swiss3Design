@@ -19,6 +19,7 @@ export const field = fieldClass;
 // Enregistrer, ajouter, vérifier : encre pleine (le rouge reste à l'action
 // principale de l'écran, `btnAccent`).
 export const btnPrimary = buttonClass({ variant: "ink" });
+export const btnPrimarySm = buttonClass({ variant: "ink", size: "sm" });
 
 // Annuler, autres actions : contour encre.
 export const btnGhost = buttonClass({ variant: "secondary" });
@@ -48,6 +49,10 @@ export const linkSoft =
 export const linkAccent =
   "font-semibold text-accent-text underline decoration-1 underline-offset-4 transition-colors duration-150 hover:decoration-2";
 
+// « ← Retour » en tête d'une page de détail (commande, devis, paiement).
+export const backLink =
+  "mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors duration-150 hover:text-ink";
+
 // Carte de section : conteneur standard d'un bloc de réglages.
 export const card = "rounded-card border border-line bg-surface p-5 sm:p-6";
 
@@ -57,6 +62,8 @@ export const rowList =
   "divide-y divide-line overflow-hidden rounded-card border border-line bg-surface";
 export const rowLink =
   "flex items-center justify-between gap-3 px-5 py-4 transition-colors duration-150 hover:bg-paper";
+export const rowLinkBlock =
+  "block px-5 py-4 transition-colors duration-150 hover:bg-paper";
 
 // Messages d'état : toujours un texte, jamais une couleur seule.
 export const alertError =

@@ -15,7 +15,8 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { Link, usePathname } from "@/i18n/navigation";
+import { usePathname } from "@/i18n/navigation";
+import { SiteLink } from "@/components/ui/site-link";
 
 const tabs: { href: string; key: string; icon: LucideIcon; exact?: boolean }[] =
   [
@@ -33,6 +34,7 @@ const tabs: { href: string; key: string; icon: LucideIcon; exact?: boolean }[] =
 
 export function AccountNav({ isAdmin }: { isAdmin: boolean }) {
   const t = useTranslations("account.nav");
+  const tUi = useTranslations("accountUi");
   const pathname = usePathname();
 
   // L'onglet « Vue d'ensemble » (/account) ne s'allume qu'en correspondance
@@ -42,32 +44,46 @@ export function AccountNav({ isAdmin }: { isAdmin: boolean }) {
       ? pathname === href
       : pathname === href || pathname.startsWith(`${href}/`);
 
+  // L'onglet courant est l'« état courant » : un filet rouge de 2 px (sous
+  // l'onglet en rangée mobile, à gauche en colonne), comme le soulignement de
+  // la nav du header. Les autres gardent un filet transparent pour que rien ne
+  // bouge d'un onglet à l'autre. Pas de transform, pas d'animation.
   const itemClass = (active: boolean) =>
-    `flex shrink-0 items-center gap-2.5 rounded-xl px-3.5 py-2.5 text-sm font-medium transition-colors ${
-      active ? "bg-ink text-paper" : "text-soft hover:bg-surface hover:text-ink"
+    `flex shrink-0 items-center gap-2.5 rounded-field border-b-2 px-3.5 py-2.5 text-sm font-medium transition-colors duration-150 md:border-b-0 md:border-l-2 ${
+      active
+        ? "border-accent bg-surface text-ink"
+        : "border-transparent text-soft hover:bg-surface hover:text-ink"
     }`;
 
   return (
-    // Mobile : rangée scrollable horizontale. Desktop : colonne sticky.
-    <nav className="-mx-4 flex flex-row gap-1 overflow-x-auto px-4 pb-1 md:mx-0 md:w-56 md:shrink-0 md:flex-col md:overflow-visible md:px-0 md:pb-0">
+    // Mobile : rangée scrollable horizontale. Desktop : colonne.
+    <nav
+      aria-label={tUi("nav.label")}
+      className="-mx-margin flex flex-row gap-1 overflow-x-auto px-margin pb-1 md:mx-0 md:w-56 md:shrink-0 md:flex-col md:overflow-visible md:px-0 md:pb-0"
+    >
       {tabs.map(({ href, key, icon: Icon, exact }) => {
         const active = isActive(href, exact);
         return (
-          <Link key={key} href={href} className={itemClass(active)}>
-            <Icon size={17} className="shrink-0" />
+          <SiteLink
+            key={key}
+            href={href}
+            aria-current={active ? "page" : undefined}
+            className={itemClass(active)}
+          >
+            <Icon size={17} strokeWidth={1.5} className="shrink-0" />
             {t(key)}
-          </Link>
+          </SiteLink>
         );
       })}
 
       {isAdmin && (
-        <Link
+        <SiteLink
           href="/admin"
-          className="flex shrink-0 items-center gap-2.5 rounded-xl border border-ink bg-ink px-3.5 py-2.5 text-sm font-semibold text-paper transition-opacity hover:opacity-90 md:mt-2"
+          className="flex shrink-0 items-center gap-2.5 rounded-field bg-ink px-3.5 py-2.5 text-sm font-semibold text-paper transition-colors duration-150 hover:bg-ink/85 md:mt-2"
         >
-          <Wrench size={16} className="shrink-0" />
+          <Wrench size={16} strokeWidth={1.5} className="shrink-0" />
           {t("admin")}
-        </Link>
+        </SiteLink>
       )}
     </nav>
   );
