@@ -118,12 +118,19 @@ function uniformLayout(
     minimum.push(steps.length > 0 && len >= 1 ? minGradin : 1);
   }
   const ledges = ledgeRings ? steps.length : 0;
-  const counts = allocateCounts(lengths, Math.max(stripBudget - ledges, lengths.length), minimum);
+  const counts = allocateCounts(
+    lengths,
+    Math.max(stripBudget - ledges, lengths.length),
+    minimum,
+  );
   const total = counts.reduce((s, c) => s + c, 0) + ledges;
   // Trop de retraits pour le budget : moins de segments plutôt que plus de triangles.
   let S = segments;
   if (total * S * 4 > tierTriangles * 1.05) {
-    S = Math.max(64, Math.floor((S * (tierTriangles / (total * S * 4))) / 8) * 8);
+    S = Math.max(
+      64,
+      Math.floor((S * (tierTriangles / (total * S * 4))) / 8) * 8,
+    );
   }
   const byStart = new Map<number, number>();
   for (let k = 0; k < counts.length; k++) byStart.set(key(bps[k].z), counts[k]);
@@ -187,7 +194,12 @@ function adaptiveInterior(
   const out: number[] = [];
   // Test en trois points (1/4, 1/2, 3/4) : une rampe de gradin, symétrique
   // par rapport à son milieu, passerait un test au seul milieu.
-  const refine = (za: number, zb: number, va: Float64Array, vb: Float64Array) => {
+  const refine = (
+    za: number,
+    zb: number,
+    va: Float64Array,
+    vb: Float64Array,
+  ) => {
     const len = zb - za;
     if (len < 2 * minStep) return;
     const q1 = sample(za + len * 0.25, 0);
@@ -240,7 +252,11 @@ function exportLayout(
     // Trop de triangles : d'abord moins de segments (jusqu'au plancher de
     // révolution), puis une tolérance plus large.
     const floor = revolutionSegments(model, EXPORT_LIMITS.chordTolerance);
-    if (S > floor) S = Math.max(floor, Math.floor((S * EXPORT_LIMITS.maxTriangles) / tri / 4) * 4);
+    if (S > floor)
+      S = Math.max(
+        floor,
+        Math.floor((S * EXPORT_LIMITS.maxTriangles) / tri / 4) * 4,
+      );
     else if (attempt < 3) tolerance *= 1.6;
     else S = Math.max(64, S - 16);
   }
@@ -309,7 +325,17 @@ function layoutFor(model: LavauxModel, options: LavauxBuildOptions): Layout {
   const { lod } = options;
   if (lod === "drag") {
     return memoized(
-      uniformLayout(model, [FLOOR_MM], [], DRAG.segments, DRAG.strips, 1, Infinity, false, true),
+      uniformLayout(
+        model,
+        [FLOOR_MM],
+        [],
+        DRAG.segments,
+        DRAG.strips,
+        1,
+        Infinity,
+        false,
+        true,
+      ),
     );
   }
   const marks = [FLOOR_MM, ...bandBoundaries(bands, h)];
@@ -317,7 +343,17 @@ function layoutFor(model: LavauxModel, options: LavauxBuildOptions): Layout {
   if (lod === "display") {
     const t = DISPLAY[options.tier ?? 2];
     return memoized(
-      uniformLayout(model, marks, steps, t.segments, t.strips, 3, t.triangles, true, false),
+      uniformLayout(
+        model,
+        marks,
+        steps,
+        t.segments,
+        t.strips,
+        3,
+        t.triangles,
+        true,
+        false,
+      ),
     );
   }
   return memoized(exportLayout(model, marks, steps));
@@ -476,7 +512,8 @@ function emitSolid(
     if (hasInner && ji0 < nR) {
       sample(plan.z[ji0], plan.nudge[ji0]);
       const floorR = new Float64Array(S);
-      for (let i = 0; i < S; i++) floorR[i] = innerRadius(wall, rO[i], fZ[i], fT[i]);
+      for (let i = 0; i < S; i++)
+        floorR[i] = innerRadius(wall, rO[i], fZ[i], fT[i]);
       disc(b, S, cosT, sinT, floorR, plan.z[ji0], true, bandOf(plan.z[ji0]), 1);
     }
   } else {
@@ -519,7 +556,8 @@ export function buildLavaux(
   const h = config.h;
   const bands = defaultBands(config);
   const full = layout.planFor(0, h);
-  const separate = options.separateBands && bands.length > 1 && !layout.singleBand;
+  const separate =
+    options.separateBands && bands.length > 1 && !layout.singleBand;
   // Capacité exacte à une marge près : pas de recopie des tableaux en route.
   const factor = separate ? 1.15 : 1;
   const b = new MeshBuilder(

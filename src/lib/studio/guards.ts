@@ -7,7 +7,7 @@
 // | base-narrow       | rayon du pied ≥ 20 mm et ≥ 35 % du rayon max                   |
 // | plate             | boîte ≤ 250 × 250 × 250 mm                                     |
 // | band-thin         | bande ≥ 2 mm                                                   |
-// | pattern-coupling  | gradins gd ≤ 0,5 gs ; vagues wl ≥ 4 wa ; voronoï w ≥ 1,2 va    |
+// | pattern-coupling  | gradins gd ≤ 0,5 gs ET gd ≤ paroi − 0,2 ; vagues wl ≥ 4 wa ; voronoï w ≥ 1,2 va |
 // | near-vase-spirale | BLOQUANT : nervures 28–56, |torsion| ≥ 45°, col ≤ 0,6         |
 //
 // Sévérités (le brief ne fixe que celle du trait des textes) : `error` bloque
@@ -19,7 +19,7 @@
 // Silhouette d'Ian (Vase spirale, CC BY-ND 4.0, §1.5) : pas de profil
 // « bouteille », col ≥ 0,5 (exclus par construction) et `nearVaseSpirale`.
 import { analyzeLavaux, type LavauxAnalysis } from "./objects/lavaux-analysis";
-import { clampLavaux, LAVAUX_RANGES, MIN_BAND_MM } from "./schemas";
+import { clampLavaux, gradinsDepthMax, MIN_BAND_MM } from "./schemas";
 import type {
   Band,
   IssueCode,
@@ -89,26 +89,47 @@ function bandIssues(bands: readonly Band[]): Issue[] {
   return issues;
 }
 
-function couplingIssues(config: LavauxConfig): Issue[] {
+/**
+ * Couplages de motif. Un gradin plus profond que la paroi disconnecte les
+ * étages (voir `gradinsDepthMax`) : erreur ; plus profond que `paroi − 0,2` ou
+ * que la moitié du pas : simple avertissement.
+ */
+function couplingIssues(
+  config: LavauxConfig,
+): { issue: Issue; level: "warn" | "error" }[] {
   const p = config.pattern;
-  if (p.kind === "gradins" && p.depth > 0.5 * p.step + 1e-9) {
-    const depth = Math.max(Math.floor((0.5 * p.step) / 0.1 + 1e-9) * 0.1, LAVAUX_RANGES.gradins.depth.min);
+  if (
+    p.kind === "gradins" &&
+    p.depth > gradinsDepthMax(p.step, config.wall) + 1e-9
+  ) {
+    const depth = gradinsDepthMax(p.step, config.wall);
     return [
       {
-        code: "pattern-coupling",
-        value: p.depth,
-        fix: { pattern: { ...p, depth: Number(depth.toFixed(1)) } } as Partial<LavauxConfig>,
+        level: p.depth >= config.wall - 1e-9 ? "error" : "warn",
+        issue: {
+          code: "pattern-coupling",
+          value: p.depth,
+          fix: {
+            pattern: { ...p, depth: Number(depth.toFixed(1)) },
+          } as Partial<LavauxConfig>,
+        },
       },
     ];
   }
   if (p.kind === "vagues" && p.wavelength < 4 * p.amplitude - 1e-9) {
     return [
       {
-        code: "pattern-coupling",
-        value: p.wavelength,
-        fix: {
-          pattern: { ...p, wavelength: Math.ceil((4 * p.amplitude) / 0.5 - 1e-9) * 0.5 },
-        } as Partial<LavauxConfig>,
+        level: "warn",
+        issue: {
+          code: "pattern-coupling",
+          value: p.wavelength,
+          fix: {
+            pattern: {
+              ...p,
+              wavelength: Math.ceil((4 * p.amplitude) / 0.5 - 1e-9) * 0.5,
+            },
+          } as Partial<LavauxConfig>,
+        },
       },
     ];
   }
@@ -116,7 +137,10 @@ function couplingIssues(config: LavauxConfig): Issue[] {
 }
 
 /** Motif dont la profondeur (l'amplitude) est multipliée par `k`. */
-function scalePattern(p: LavauxConfig["pattern"], k: number): LavauxConfig["pattern"] {
+function scalePattern(
+  p: LavauxConfig["pattern"],
+  k: number,
+): LavauxConfig["pattern"] {
   switch (p.kind) {
     case "lisse":
       return p;
@@ -145,7 +169,8 @@ function overhangFix(config: LavauxConfig): Partial<LavauxConfig> | undefined {
       tries.push({ ...config, pattern: scalePattern(config.pattern, k) });
     }
   }
-  for (const k of [0.75, 0.5]) tries.push({ ...config, belly: config.belly * k });
+  for (const k of [0.75, 0.5])
+    tries.push({ ...config, belly: config.belly * k });
   for (const k of [1.2, 1.5]) tries.push({ ...config, h: config.h * k });
   for (const candidate of tries) {
     const fixed = clampLavaux(candidate);
@@ -196,7 +221,10 @@ export function checkLavauxWith(
     issues.push({
       code: "plate",
       value: Math.max(config.h, config.d),
-      fix: { h: Math.min(config.h, PLATE_MM), d: Math.min(config.d, PLATE_MM) } as Partial<LavauxConfig>,
+      fix: {
+        h: Math.min(config.h, PLATE_MM),
+        d: Math.min(config.d, PLATE_MM),
+      } as Partial<LavauxConfig>,
     });
     raise("error");
   }
@@ -206,7 +234,10 @@ export function checkLavauxWith(
     const inward = analysis.maxInwardSlope > analysis.maxOutwardSlope;
     issues.push({
       code: "overhang",
-      atMm: Math.round((inward ? analysis.maxInwardSlopeZ : analysis.maxOutwardSlopeZ) * 10) / 10,
+      atMm:
+        Math.round(
+          (inward ? analysis.maxInwardSlopeZ : analysis.maxOutwardSlopeZ) * 10,
+        ) / 10,
       value: slopeToAngle(slope),
       fix: inward ? undefined : overhangFix(config),
     });
@@ -235,10 +266,9 @@ export function checkLavauxWith(
     issues.push(...thin);
     raise("warn");
   }
-  const coupling = couplingIssues(config);
-  if (coupling.length > 0) {
-    issues.push(...coupling);
-    raise("warn");
+  for (const { issue, level } of couplingIssues(config)) {
+    issues.push(issue);
+    raise(level);
   }
 
   if (worst === "ok") return { status: "ok" };
@@ -261,6 +291,7 @@ export function checkLavaux(config: LavauxConfig): Printability {
  */
 export function checkPrintability(config: StudioConfig): Printability {
   if (config.object === "lavaux") return checkLavaux(config);
-  throw new Error(`checkPrintability : « ${config.object} » est livré par WP-02`);
+  throw new Error(
+    `checkPrintability : « ${config.object} » est livré par WP-02`,
+  );
 }
-

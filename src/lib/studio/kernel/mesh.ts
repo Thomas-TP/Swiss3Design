@@ -111,7 +111,8 @@ export class MeshBuilder {
   build(withSide = true): MeshData {
     const nt = this.nt;
     let maxBand = 0;
-    for (let t = 0; t < nt; t++) if (this.band[t] > maxBand) maxBand = this.band[t];
+    for (let t = 0; t < nt; t++)
+      if (this.band[t] > maxBand) maxBand = this.band[t];
     const counts = new Uint32Array(maxBand + 1);
     for (let t = 0; t < nt; t++) counts[this.band[t]]++;
     const offsets = new Uint32Array(maxBand + 1);
@@ -119,7 +120,8 @@ export class MeshBuilder {
     let acc = 0;
     for (let b = 0; b <= maxBand; b++) {
       offsets[b] = acc;
-      if (counts[b] > 0) groups.push({ start: acc * 3, count: counts[b] * 3, band: b });
+      if (counts[b] > 0)
+        groups.push({ start: acc * 3, count: counts[b] * 3, band: b });
       acc += counts[b];
     }
     const indices = new Uint32Array(nt * 3);
@@ -145,10 +147,16 @@ export class MeshBuilder {
 
 export function bboxOf(positions: Float32Array): MeshData["bbox"] {
   if (positions.length === 0) return [0, 0, 0, 0, 0, 0];
-  let x0 = Infinity, y0 = Infinity, z0 = Infinity;
-  let x1 = -Infinity, y1 = -Infinity, z1 = -Infinity;
+  let x0 = Infinity,
+    y0 = Infinity,
+    z0 = Infinity;
+  let x1 = -Infinity,
+    y1 = -Infinity,
+    z1 = -Infinity;
   for (let i = 0; i < positions.length; i += 3) {
-    const x = positions[i], y = positions[i + 1], z = positions[i + 2];
+    const x = positions[i],
+      y = positions[i + 1],
+      z = positions[i + 2];
     if (x < x0) x0 = x;
     if (x > x1) x1 = x;
     if (y < y0) y0 = y;
@@ -165,7 +173,9 @@ export function meshVolume(mesh: MeshData): number {
   const ix = mesh.indices;
   let v = 0;
   for (let t = 0; t < ix.length; t += 3) {
-    const a = ix[t] * 3, b = ix[t + 1] * 3, c = ix[t + 2] * 3;
+    const a = ix[t] * 3,
+      b = ix[t + 1] * 3,
+      c = ix[t + 2] * 3;
     v +=
       (p[a] * (p[b + 1] * p[c + 2] - p[b + 2] * p[c + 1]) -
         p[a + 1] * (p[b] * p[c + 2] - p[b + 2] * p[c]) +
@@ -180,17 +190,29 @@ export function meshArea(mesh: MeshData): number {
   const p = mesh.positions;
   const ix = mesh.indices;
   let area = 0;
-  for (let t = 0; t < ix.length; t += 3) area += triangleArea(p, ix[t], ix[t + 1], ix[t + 2]);
+  for (let t = 0; t < ix.length; t += 3)
+    area += triangleArea(p, ix[t], ix[t + 1], ix[t + 2]);
   return area;
 }
 
-function triangleArea(p: Float32Array, a: number, b: number, c: number): number {
+function triangleArea(
+  p: Float32Array,
+  a: number,
+  b: number,
+  c: number,
+): number {
   a *= 3;
   b *= 3;
   c *= 3;
-  const ux = p[b] - p[a], uy = p[b + 1] - p[a + 1], uz = p[b + 2] - p[a + 2];
-  const vx = p[c] - p[a], vy = p[c + 1] - p[a + 1], vz = p[c + 2] - p[a + 2];
-  const cx = uy * vz - uz * vy, cy = uz * vx - ux * vz, cz = ux * vy - uy * vx;
+  const ux = p[b] - p[a],
+    uy = p[b + 1] - p[a + 1],
+    uz = p[b + 2] - p[a + 2];
+  const vx = p[c] - p[a],
+    vy = p[c + 1] - p[a + 1],
+    vz = p[c + 2] - p[a + 2];
+  const cx = uy * vz - uz * vy,
+    cy = uz * vx - ux * vz,
+    cz = ux * vy - uy * vx;
   return 0.5 * Math.sqrt(cx * cx + cy * cy + cz * cz);
 }
 
@@ -219,7 +241,8 @@ export function mergeMeshes(meshes: readonly MeshData[]): MeshData {
     positions.set(m.positions, vo * 3);
     normals.set(m.normals, vo * 3);
     if (side && m.side) side.set(m.side, vo);
-    for (let i = 0; i < m.indices.length; i++) indices[io + i] = m.indices[i] + vo;
+    for (let i = 0; i < m.indices.length; i++)
+      indices[io + i] = m.indices[i] + vo;
     for (const g of m.groups) groups.push({ ...g, start: g.start + io });
     vo += m.positions.length / 3;
     io += m.indices.length;
@@ -270,7 +293,9 @@ function weldVertices(positions: Float32Array): Int32Array {
     return VERTEX_BITS[0];
   };
   for (let i = 0; i < n; i++) {
-    const x = positions[i * 3], y = positions[i * 3 + 1], z = positions[i * 3 + 2];
+    const x = positions[i * 3],
+      y = positions[i * 3 + 1],
+      z = positions[i * 3 + 2];
     let h =
       (Math.imul(bits(x), 73856093) ^
         Math.imul(bits(y), 19349663) ^
@@ -348,9 +373,13 @@ export function checkManifold(mesh: MeshData, minArea = 1e-6): ManifoldReport {
   };
 
   for (let t = 0; t < nTri; t++) {
-    const a = ix[t * 3], b = ix[t * 3 + 1], c = ix[t * 3 + 2];
+    const a = ix[t * 3],
+      b = ix[t * 3 + 1],
+      c = ix[t * 3 + 2];
     if (triangleArea(mesh.positions, a, b, c) < minArea) degenerate++;
-    const wa = welded[a], wb = welded[b], wc = welded[c];
+    const wa = welded[a],
+      wb = welded[b],
+      wc = welded[c];
     touch(wa, wb);
     touch(wb, wc);
     touch(wc, wa);
@@ -362,7 +391,9 @@ export function checkManifold(mesh: MeshData, minArea = 1e-6): ManifoldReport {
     if (rb2 !== rc) parent[rc] = rb2;
   }
 
-  let open = 0, nonManifold = 0, orientation = 0;
+  let open = 0,
+    nonManifold = 0,
+    orientation = 0;
   for (let s = 0; s < size; s++) {
     if (keyA[s] === -1) continue;
     if (count[s] === 1) open++;
@@ -374,7 +405,9 @@ export function checkManifold(mesh: MeshData, minArea = 1e-6): ManifoldReport {
   const volumeByRoot = new Map<number, number>();
   const p = mesh.positions;
   for (let t = 0; t < nTri; t++) {
-    const a = ix[t * 3] * 3, b = ix[t * 3 + 1] * 3, c = ix[t * 3 + 2] * 3;
+    const a = ix[t * 3] * 3,
+      b = ix[t * 3 + 1] * 3,
+      c = ix[t * 3 + 2] * 3;
     const v =
       (p[a] * (p[b + 1] * p[c + 2] - p[b + 2] * p[c + 1]) -
         p[a + 1] * (p[b] * p[c + 2] - p[b + 2] * p[c]) +

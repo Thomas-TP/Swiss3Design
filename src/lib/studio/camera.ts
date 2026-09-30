@@ -110,7 +110,10 @@ export function mat4Perspective(
 }
 
 /** Applique une matrice 4×4 à un point et divise par w : renvoie [x, y, z, w] (NDC, puis w). */
-export function projectPoint(m: Mat4, p: Vec3): [number, number, number, number] {
+export function projectPoint(
+  m: Mat4,
+  p: Vec3,
+): [number, number, number, number] {
   const x = m[0] * p[0] + m[4] * p[1] + m[8] * p[2] + m[12];
   const y = m[1] * p[0] + m[5] * p[1] + m[9] * p[2] + m[13];
   const z = m[2] * p[0] + m[6] * p[1] + m[10] * p[2] + m[14];

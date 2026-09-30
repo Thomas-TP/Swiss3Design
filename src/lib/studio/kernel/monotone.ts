@@ -27,7 +27,8 @@ export function monotoneCubic(
   const d = new Float64Array(n - 1);
   for (let i = 0; i < n - 1; i++) {
     h[i] = xs[i + 1] - xs[i];
-    if (!(h[i] > 0)) throw new Error("monotoneCubic : xs strictement croissants");
+    if (!(h[i] > 0))
+      throw new Error("monotoneCubic : xs strictement croissants");
     d[i] = (ys[i + 1] - ys[i]) / h[i];
   }
   const m = new Float64Array(n);

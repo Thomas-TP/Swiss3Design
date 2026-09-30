@@ -59,7 +59,12 @@ export interface PosterLayer {
   /** Ellipses de bas en haut (l'ordre est l'ordre de dessin). */
   ellipses: PosterEllipse[];
   /** Couronne du dessus (éclaté) : extérieur clair puis ouverture sombre. */
-  cap?: { top: PosterEllipse; topFill: string; mouth: PosterEllipse; mouthFill: string };
+  cap?: {
+    top: PosterEllipse;
+    topFill: string;
+    mouth: PosterEllipse;
+    mouthFill: string;
+  };
 }
 
 export interface HeroPoster {
@@ -99,7 +104,11 @@ function project(
   for (let i = 0; i < K; i++) {
     const theta = (i * 2 * Math.PI) / K;
     const r = radiusOf(theta);
-    const [nx, ny] = projectPoint(m, [r * Math.cos(theta), r * Math.sin(theta), z + zShift]);
+    const [nx, ny] = projectPoint(m, [
+      r * Math.cos(theta),
+      r * Math.sin(theta),
+      z + zShift,
+    ]);
     const x = W / 2 + (nx * W) / 2;
     const y = H / 2 - (ny * H) / 2;
     if (x < x0) x0 = x;
@@ -131,8 +140,13 @@ function ringTools(config: LavauxConfig) {
 
 /** Caméra de l'éclaté : mêmes angles et même part de hauteur que le héros, hauteur totale écartée. */
 function explodedCamera(config: LavauxConfig): CameraSpec {
-  const gap = (z: number) => bandIndexAt(config.bands, z - 1e-6) * EXPLODE_GAP_MM;
-  return heroCameraFor(config, gap, config.h + (config.bands.length - 1) * EXPLODE_GAP_MM);
+  const gap = (z: number) =>
+    bandIndexAt(config.bands, z - 1e-6) * EXPLODE_GAP_MM;
+  return heroCameraFor(
+    config,
+    gap,
+    config.h + (config.bands.length - 1) * EXPLODE_GAP_MM,
+  );
 }
 
 /**
@@ -167,7 +181,9 @@ export function heroPoster(
   if (variant === "ghost") {
     return {
       ...base,
-      ghost: zs.map((z) => project(camera, aspect, model, z, -1, outer(z, -1), 0)),
+      ghost: zs.map((z) =>
+        project(camera, aspect, model, z, -1, outer(z, -1), 0),
+      ),
     };
   }
 
@@ -181,7 +197,15 @@ export function heroPoster(
   for (const z of zs) {
     const k = bandIndexAt(bands, z - GHOST_STEP_MM / 2);
     layers[k].ellipses.push(
-      project(camera, aspect, model, z, -1, outer(z, -1), exploded ? k * EXPLODE_GAP_MM : 0),
+      project(
+        camera,
+        aspect,
+        model,
+        z,
+        -1,
+        outer(z, -1),
+        exploded ? k * EXPLODE_GAP_MM : 0,
+      ),
     );
   }
   void shift;
@@ -205,7 +229,15 @@ export function heroPoster(
     ...base,
     layers,
     mouth: {
-      ellipse: project(camera, aspect, model, config.h, -1, mouth(config.h, -1), 0),
+      ellipse: project(
+        camera,
+        aspect,
+        model,
+        config.h,
+        -1,
+        mouth(config.h, -1),
+        0,
+      ),
       fill: shade(last.fill, 0.5),
     },
   };
@@ -225,7 +257,10 @@ const ell = (e: PosterEllipse, extra = "") =>
   `<ellipse${extra} cx="${n(e.cx)}" cy="${n(e.cy)}" rx="${n(e.rx)}" ry="${n(e.ry)}"/>`;
 
 /** Chaîne SVG d'un poster de héros (décoratif : `aria-hidden`). */
-export function posterToSvg(poster: HeroPoster, options: SvgOptions = {}): string {
+export function posterToSvg(
+  poster: HeroPoster,
+  options: SvgOptions = {},
+): string {
   const cls = options.className ?? "s3d-poster-svg";
   const head = `<svg xmlns="http://www.w3.org/2000/svg" class="${cls}" viewBox="${poster.viewBox}" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">`;
   if (poster.ghost) {
@@ -343,7 +378,10 @@ export function lavauxElevation(config: LavauxConfig): ElevationData {
 }
 
 /** Chaîne SVG de l'élévation (décorative : `aria-hidden`). */
-export function elevationToSvg(data: ElevationData, options: SvgOptions = {}): string {
+export function elevationToSvg(
+  data: ElevationData,
+  options: SvgOptions = {},
+): string {
   const cls = options.className ?? "s3d-elevation-svg";
   const id = `${options.idPrefix ?? "s3d-el"}-sil`;
   const [x, y, w, h] = data.viewBox;

@@ -36,7 +36,13 @@ const r = (min: number, max: number, step: number, def: number): Range => ({
   default: def,
 });
 
-export const LAVAUX_PROFILES = ["cylindre", "galet", "amphore", "cone", "tulipe"] as const;
+export const LAVAUX_PROFILES = [
+  "cylindre",
+  "galet",
+  "amphore",
+  "cone",
+  "tulipe",
+] as const;
 export const LAVAUX_PATTERN_KINDS = [
   "lisse",
   "gradins",
@@ -101,7 +107,8 @@ export const MAX_BANDS = 4;
 export function clampRange(value: number, range: Range): number {
   if (!Number.isFinite(value)) return range.default;
   const clamped = Math.min(Math.max(value, range.min), range.max);
-  const snapped = range.min + Math.round((clamped - range.min) / range.step) * range.step;
+  const snapped =
+    range.min + Math.round((clamped - range.min) / range.step) * range.step;
   const decimals = Math.max(0, Math.ceil(-Math.log10(range.step) - 1e-9));
   return Math.min(
     Math.max(Number(snapped.toFixed(decimals + 1)), range.min),
@@ -109,7 +116,8 @@ export function clampRange(value: number, range: Range): number {
   );
 }
 
-const toLayer = (mm: number) => Math.round(Math.round(mm / 0.2) * 0.2 * 10) / 10;
+const toLayer = (mm: number) =>
+  Math.round(Math.round(mm / 0.2) * 0.2 * 10) / 10;
 
 /**
  * Bandes valides pour une hauteur : frontières à la couche, épaisseur ≥ 2 mm,
@@ -124,7 +132,8 @@ export function normalizeBands(
 ): Band[] {
   let list = bands.slice(0, MAX_BANDS);
   if (list.length === 0) list = [{ filament: fallback, toMm: h }];
-  while (list.length > 1 && h < list.length * minThickness) list = list.slice(0, -1);
+  while (list.length > 1 && h < list.length * minThickness)
+    list = list.slice(0, -1);
   const out: Band[] = [];
   let prev = 0;
   list.forEach((band, k) => {
@@ -140,17 +149,37 @@ export function normalizeBands(
   return out;
 }
 
-function clampPattern(p: LavauxPattern): LavauxPattern {
+/** Recouvrement radial minimal (mm) de deux étages de gradins : voir `gradinsDepthMax`. */
+export const GRADINS_MIN_OVERLAP_MM = 0.2;
+
+/**
+ * Profondeur maximale d'un gradin (mm), au dixième. Deux couplages :
+ *  - gd ≤ 0,5 × pas (brief §6.6) : corniche imprimable ;
+ *  - gd ≤ paroi − 0,2 mm (écart assumé au brief) : la paroi intérieure suit la
+ *    paroi extérieure (r_i = r_o − w / cos α), donc au retrait net de chaque
+ *    palier l'étage du dessus ne recouvre celui du dessous que de `w − gd`. À
+ *    `gd = w` les deux tubes se touchent en un cercle (arête à quatre
+ *    triangles, pièce non variété) ; au-delà, ils se séparent (anneau
+ *    flottant, faces superposées). Le héros (1,4 pour 1,6) garde 0,2 mm.
+ */
+export function gradinsDepthMax(step: number, wall: number): number {
+  const limit = Math.min(0.5 * step, wall - GRADINS_MIN_OVERLAP_MM);
+  return Math.max(
+    Math.floor(limit / 0.1 + 1e-9) * 0.1,
+    LAVAUX_RANGES.gradins.depth.min,
+  );
+}
+
+function clampPattern(p: LavauxPattern, wall: number): LavauxPattern {
   const R = LAVAUX_RANGES;
   switch (p.kind) {
     case "lisse":
       return { kind: "lisse" };
     case "gradins": {
       const step = clampRange(p.step, R.gradins.step);
-      // Couplage : profondeur ≤ 0,5 × pas (corniche imprimable).
       const depth = Math.min(
         clampRange(p.depth, R.gradins.depth),
-        Math.floor((0.5 * step) / 0.1 + 1e-9) * 0.1,
+        gradinsDepthMax(step, wall),
       );
       return { kind: "gradins", step, depth: Number(depth.toFixed(1)) };
     }
@@ -201,7 +230,7 @@ export function clampLavaux(config: LavauxConfig): LavauxConfig {
     belly: clampRange(config.belly, R.belly),
     neck: clampRange(config.neck, R.neck),
     lip: clampRange(config.lip, R.lip),
-    pattern: clampPattern(config.pattern),
+    pattern: clampPattern(config.pattern, wall),
     wall,
     bands: normalizeBands(config.bands, h),
   };
@@ -247,7 +276,12 @@ export function clampRelief(config: ReliefConfig): ReliefConfig {
     lake: clampRange(config.lake, R.lake),
     // Bandes : 2 à 4, calées sur les sommets de strates par WP-02 ; ici on
     // garantit seulement la forme (frontières à la couche, ordre, dernière = sommet).
-    bands: normalizeBands(config.bands, toLayer(total), "bleu-leman", 0.2).slice(0, MAX_BANDS),
+    bands: normalizeBands(
+      config.bands,
+      toLayer(total),
+      "bleu-leman",
+      0.2,
+    ).slice(0, MAX_BANDS),
     label: Boolean(config.label),
   };
 }
@@ -256,7 +290,11 @@ export function clampBorne(config: BorneConfig): BorneConfig {
   const R = BORNE_RANGES;
   return {
     object: "borne",
-    shape: oneOf(config.shape, ["pilule", "etiquette", "goutte", "pic"], "pilule"),
+    shape: oneOf(
+      config.shape,
+      ["pilule", "etiquette", "goutte", "pic"],
+      "pilule",
+    ),
     cap: clampRange(config.cap, R.cap),
     thickness: clampRange(config.thickness, R.thickness),
     ring: oneOf(config.ring, ["gauche", "droite", "aucun"], "gauche"),
@@ -343,11 +381,17 @@ export const lavauxSchema = z
     neck: num(LAVAUX_RANGES.neck),
     lip: num(LAVAUX_RANGES.lip),
     pattern: patternSchema,
-    wall: z.union([z.literal(1.2), z.literal(1.6), z.literal(2), z.literal(2.4)]),
+    wall: z.union([
+      z.literal(1.2),
+      z.literal(1.6),
+      z.literal(2),
+      z.literal(2.4),
+    ]),
     bands: bandsSchema(1, MAX_BANDS),
   })
   .refine((c) => increasingTo(c.bands, c.h), {
-    message: "les bandes doivent être croissantes et finir à la hauteur du vase",
+    message:
+      "les bandes doivent être croissantes et finir à la hauteur du vase",
     path: ["bands"],
   });
 
@@ -404,7 +448,10 @@ export type ParseResult =
   | { ok: false; error: string };
 
 /** Valide une valeur inconnue pour l'objet donné (forme, plages, énumérations). */
-export function parseConfig(object: StudioObjectId, value: unknown): ParseResult {
+export function parseConfig(
+  object: StudioObjectId,
+  value: unknown,
+): ParseResult {
   const result = SCHEMAS[object].safeParse(value);
   if (!result.success) {
     const issue = result.error.issues[0];

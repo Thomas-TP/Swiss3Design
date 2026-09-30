@@ -30,7 +30,9 @@ export const FILAMENTS: readonly FilamentInfo[] = [
 
 export const FILAMENT_IDS: readonly FilamentId[] = FILAMENTS.map((f) => f.id);
 
-const BY_ID = new Map<FilamentId, FilamentInfo>(FILAMENTS.map((f) => [f.id, f]));
+const BY_ID = new Map<FilamentId, FilamentInfo>(
+  FILAMENTS.map((f) => [f.id, f]),
+);
 
 /** Vrai tant que toutes les teintes sont indicatives (affichage de la mention). */
 export const FILAMENTS_INDICATIVE = FILAMENTS.every((f) => f.indicative);

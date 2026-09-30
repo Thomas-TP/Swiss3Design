@@ -92,7 +92,11 @@ function gradins(step: number, depth: number): PatternField {
   };
 }
 
-function vagues(wavelength: number, amplitude: number, lobes: number): PatternField {
+function vagues(
+  wavelength: number,
+  amplitude: number,
+  lobes: number,
+): PatternField {
   const k = TWO_PI / wavelength;
   return {
     amplitude,
@@ -106,12 +110,18 @@ function vagues(wavelength: number, amplitude: number, lobes: number): PatternFi
       const cp = Math.cos(phi);
       out[0] = amplitude * (0.5 + 0.5 * sp);
       out[1] = amplitude * 0.5 * cp * k;
-      out[2] = amplitude * 0.5 * cp * TWO_PI * 0.12 * lobes * Math.cos(lobes * theta);
+      out[2] =
+        amplitude * 0.5 * cp * TWO_PI * 0.12 * lobes * Math.cos(lobes * theta);
     },
   };
 }
 
-function nervures(count: number, depth: number, twistDeg: number, h: number): PatternField {
+function nervures(
+  count: number,
+  depth: number,
+  twistDeg: number,
+  h: number,
+): PatternField {
   const twist = (twistDeg * Math.PI) / 180;
   return {
     amplitude: depth,

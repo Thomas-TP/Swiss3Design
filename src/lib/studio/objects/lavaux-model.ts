@@ -5,7 +5,11 @@
 // endroit définit la forme, donc un seul endroit à tester.
 //
 // Convention : mm, Z vers le haut, θ en radians depuis +X vers +Y.
-import { createPattern, patternAmplitude, type PatternField } from "../patterns";
+import {
+  createPattern,
+  patternAmplitude,
+  type PatternField,
+} from "../patterns";
 import { createProfile, type LavauxProfile } from "../profile";
 import type { Band, LavauxConfig } from "../types";
 
@@ -135,8 +139,10 @@ export function collectBreakpoints(
     { z: z0, step: false },
     { z: z1, step: false },
   ];
-  for (const z of marks) if (z > z0 + EPS_Z && z < z1 - EPS_Z) all.push({ z, step: false });
-  for (const z of steps) if (z > z0 + EPS_Z && z < z1 - EPS_Z) all.push({ z, step: true });
+  for (const z of marks)
+    if (z > z0 + EPS_Z && z < z1 - EPS_Z) all.push({ z, step: false });
+  for (const z of steps)
+    if (z > z0 + EPS_Z && z < z1 - EPS_Z) all.push({ z, step: true });
   all.sort((a, b) => a.z - b.z || Number(b.step) - Number(a.step));
   const out: Breakpoint[] = [];
   for (const bp of all) {
@@ -167,7 +173,12 @@ export function buildRingPlan(
   const nudges: number[] = [];
   const ledges: number[] = [];
   const strips: number[] = [];
-  const push = (z: number, nudge: number, ledge: number, stripAfterPrev: number) => {
+  const push = (
+    z: number,
+    nudge: number,
+    ledge: number,
+    stripAfterPrev: number,
+  ) => {
     if (zs.length > 0) strips.push(stripAfterPrev);
     zs.push(z);
     nudges.push(nudge);
@@ -241,7 +252,8 @@ export function allocateCounts(
   const order = want
     .map((w, i) => ({ i, frac: w - Math.floor(w) }))
     .sort((p, q) => q.frac - p.frac || p.i - q.i);
-  for (let k = 0; rest > 0; k = (k + 1) % order.length, rest--) extra[order[k].i]++;
+  for (let k = 0; rest > 0; k = (k + 1) % order.length, rest--)
+    extra[order[k].i]++;
   for (let i = 0; i < counts.length; i++) counts[i] += extra[i];
   used = counts.reduce((s, c) => s + c, 0);
   return counts;

@@ -4,7 +4,13 @@
 // Cartouche, Relief et Borne (WP-02) s'y branchent ; en attendant ils lèvent
 // plutôt que de rendre un maillage vide.
 import { buildLavaux, type LavauxBuildOptions } from "./objects/lavaux";
-import { stlFileName, stlHeader, studioHash, writeBinaryStl, type StlResult } from "./stl";
+import {
+  stlFileName,
+  stlHeader,
+  studioHash,
+  writeBinaryStl,
+  type StlResult,
+} from "./stl";
 import type { MeshData, StudioConfig, StudioTexts } from "./types";
 
 export type BuildOptions = LavauxBuildOptions;
@@ -29,7 +35,10 @@ export interface ExportedStl extends StlResult {
  * Export STL (LOD `export`, jamais de bouchons d'éclaté) : `84 + 50 × n`
  * octets, en-tête `Swiss3Design Studio v1 <objet> <hash8>`.
  */
-export function exportStl(config: StudioConfig, texts: StudioTexts = {}): ExportedStl {
+export function exportStl(
+  config: StudioConfig,
+  texts: StudioTexts = {},
+): ExportedStl {
   const mesh = buildStudioMesh(config, texts, { lod: "export" });
   const hash = studioHash(config, texts);
   const stl = writeBinaryStl(mesh, stlHeader(config.object, hash));

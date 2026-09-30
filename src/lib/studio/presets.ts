@@ -7,6 +7,7 @@
 // `RELIEF_DEFAULT` définitif).
 import { between, intBetween, mulberry32, pick, type Rng } from "./kernel/rng";
 import { checkLavaux, nearVaseSpirale } from "./guards";
+import { gradinsDepthMax } from "./schemas";
 import type {
   Band,
   BorneConfig,
@@ -73,7 +74,8 @@ export function bandsForPalette(
   filaments: readonly FilamentId[],
   h: number,
 ): Band[] {
-  if (filaments.length <= 1) return [{ filament: filaments[0] ?? "blanc-neve", toMm: h }];
+  if (filaments.length <= 1)
+    return [{ filament: filaments[0] ?? "blanc-neve", toMm: h }];
   const fractions =
     filaments.length === 2
       ? [0.6, 1]
@@ -186,7 +188,7 @@ export const LAVAUX_PRESETS: readonly LavauxPreset[] = [
       neck: 0.7,
       lip: 0.06,
       pattern: { kind: "gradins", step: 6, depth: 1.8 },
-      wall: 1.6,
+      wall: 2,
       bands: bandsForPalette(HERO_PALETTES.molasse, 180),
     },
   },
@@ -276,13 +278,16 @@ const LUMA: Record<FilamentId, number> = {
 };
 const SURPRISE_FILAMENTS = Object.keys(LUMA) as FilamentId[];
 
-function surprisePattern(rng: Rng, h: number): LavauxPattern {
+function surprisePattern(rng: Rng, wall: number): LavauxPattern {
   const kinds = ["gradins", "vagues", "voronoi", "nervures", "lisse"] as const;
   const kind = pick(rng, [...kinds, "gradins", "vagues", "voronoi"] as const);
   switch (kind) {
     case "gradins": {
       const step = Math.round(between(rng, 3, 9) * 5) / 5;
-      const depth = Math.round(between(rng, 0.6, Math.min(2, 0.5 * step)) * 10) / 10;
+      const depth =
+        Math.round(
+          between(rng, 0.6, Math.min(2, gradinsDepthMax(step, wall))) * 10,
+        ) / 10;
       return { kind, step, depth };
     }
     case "vagues": {
@@ -308,7 +313,6 @@ function surprisePattern(rng: Rng, h: number): LavauxPattern {
         twistDeg: intBetween(rng, -18, 18) * 5,
       };
     default:
-      void h;
       return { kind: "lisse" };
   }
 }
@@ -354,6 +358,7 @@ export function surpriseLavaux(seed: number): LavauxConfig {
   const rng = mulberry32(seed);
   for (let attempt = 0; attempt < 10; attempt++) {
     const h = intBetween(rng, 100, 220);
+    const wall = pick(rng, [1.6, 1.6, 2] as const);
     const config: LavauxConfig = {
       object: "lavaux",
       h,
@@ -362,8 +367,8 @@ export function surpriseLavaux(seed: number): LavauxConfig {
       belly: Math.round(between(rng, 0.3, 0.8) * 100) / 100,
       neck: Math.round(between(rng, 0.5, 0.9) * 100) / 100,
       lip: Math.round(between(rng, 0, 0.15) * 100) / 100,
-      pattern: surprisePattern(rng, h),
-      wall: pick(rng, [1.6, 1.6, 2] as const),
+      pattern: surprisePattern(rng, wall),
+      wall,
       bands: surpriseBands(rng, h),
     };
     if (nearVaseSpirale(config)) continue;

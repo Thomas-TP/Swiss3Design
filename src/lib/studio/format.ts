@@ -34,7 +34,11 @@ function numberFormat(
 const NBSP = " ";
 
 /** Nombre à `digits` décimales fixes, selon la locale suisse. */
-export function formatNumber(value: number, locale: string, digits = 0): string {
+export function formatNumber(
+  value: number,
+  locale: string,
+  digits = 0,
+): string {
   return numberFormat(locale, digits, digits).format(value);
 }
 
@@ -91,7 +95,11 @@ export function formatLayerIndex(layer: number, width = 4): string {
 }
 
 /** Fourchette de prix en centimes : « CHF 17–23 » ou « CHF 9.00–10.50 » (demi-francs). */
-export function formatChfRange(lowCents: number, highCents: number, locale: string): string {
+export function formatChfRange(
+  lowCents: number,
+  highCents: number,
+  locale: string,
+): string {
   const whole = lowCents % 100 === 0 && highCents % 100 === 0;
   const digits = whole ? 0 : 2;
   const nf = numberFormat(locale, digits, digits);

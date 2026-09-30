@@ -100,18 +100,48 @@ export function createSimplex(seed: number): Simplex {
     let i1: number, j1: number, k1: number, i2: number, j2: number, k2: number;
     if (x0 >= y0) {
       if (y0 >= z0) {
-        i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 1; k2 = 0;
+        i1 = 1;
+        j1 = 0;
+        k1 = 0;
+        i2 = 1;
+        j2 = 1;
+        k2 = 0;
       } else if (x0 >= z0) {
-        i1 = 1; j1 = 0; k1 = 0; i2 = 1; j2 = 0; k2 = 1;
+        i1 = 1;
+        j1 = 0;
+        k1 = 0;
+        i2 = 1;
+        j2 = 0;
+        k2 = 1;
       } else {
-        i1 = 0; j1 = 0; k1 = 1; i2 = 1; j2 = 0; k2 = 1;
+        i1 = 0;
+        j1 = 0;
+        k1 = 1;
+        i2 = 1;
+        j2 = 0;
+        k2 = 1;
       }
     } else if (y0 < z0) {
-      i1 = 0; j1 = 0; k1 = 1; i2 = 0; j2 = 1; k2 = 1;
+      i1 = 0;
+      j1 = 0;
+      k1 = 1;
+      i2 = 0;
+      j2 = 1;
+      k2 = 1;
     } else if (x0 < z0) {
-      i1 = 0; j1 = 1; k1 = 0; i2 = 0; j2 = 1; k2 = 1;
+      i1 = 0;
+      j1 = 1;
+      k1 = 0;
+      i2 = 0;
+      j2 = 1;
+      k2 = 1;
     } else {
-      i1 = 0; j1 = 1; k1 = 0; i2 = 1; j2 = 1; k2 = 0;
+      i1 = 0;
+      j1 = 1;
+      k1 = 0;
+      i2 = 1;
+      j2 = 1;
+      k2 = 0;
     }
     const x1 = x0 - i1 + G3;
     const y1 = y0 - j1 + G3;
@@ -246,7 +276,8 @@ export function createPeriodicNoise2(seed: number): PeriodicNoise2 {
     gx[i] = Math.cos((i * Math.PI) / 8);
     gy[i] = Math.sin((i * Math.PI) / 8);
   }
-  const hash = (ix: number, iy: number) => perm[(ix & 255) + perm[iy & 255]] & 15;
+  const hash = (ix: number, iy: number) =>
+    perm[(ix & 255) + perm[iy & 255]] & 15;
 
   return (x, y, periodX, periodY) => {
     const ix = Math.floor(x);
@@ -292,8 +323,7 @@ export function periodicFbm2(
   let amp = 1;
   let freq = 1;
   for (let o = 0; o < octaves; o++) {
-    sum +=
-      amp * noise(x * freq, y * freq, periodX * freq, periodY * freq);
+    sum += amp * noise(x * freq, y * freq, periodX * freq, periodY * freq);
     norm += amp;
     amp *= persistence;
     freq *= lacunarity;

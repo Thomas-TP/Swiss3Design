@@ -3,7 +3,13 @@
 // Douglas–Peucker, extrusion de polygones avec trous.
 import { describe, expect, it } from "vitest";
 import { canonicalJson, fnv1a32, fnv1a64, hash8 } from "./hash";
-import { MeshBuilder, checkManifold, mergeMeshes, meshArea, meshVolume } from "./mesh";
+import {
+  MeshBuilder,
+  checkManifold,
+  mergeMeshes,
+  meshArea,
+  meshVolume,
+} from "./mesh";
 import { monotoneCubic, smootherstep, smoothstep } from "./monotone";
 import {
   createPeriodicNoise2,
@@ -42,9 +48,13 @@ describe("mulberry32", () => {
 
   it("intBetween inclut les deux bornes, shuffled garde les éléments", () => {
     const rng = mulberry32(3);
-    const seen = new Set(Array.from({ length: 400 }, () => intBetween(rng, 2, 5)));
+    const seen = new Set(
+      Array.from({ length: 400 }, () => intBetween(rng, 2, 5)),
+    );
     expect([...seen].sort()).toEqual([2, 3, 4, 5]);
-    expect(shuffled(mulberry32(9), [1, 2, 3, 4, 5]).sort()).toEqual([1, 2, 3, 4, 5]);
+    expect(shuffled(mulberry32(9), [1, 2, 3, 4, 5]).sort()).toEqual([
+      1, 2, 3, 4, 5,
+    ]);
   });
 });
 
@@ -67,9 +77,9 @@ describe("empreintes FNV-1a", () => {
   });
 
   it("JSON canonique : indépendant de l'ordre des clés", () => {
-    expect(canonicalJson({ b: 1, a: { d: [1, { y: 2, x: 1 }], c: undefined } })).toBe(
-      '{"a":{"d":[1,{"x":1,"y":2}]},"b":1}',
-    );
+    expect(
+      canonicalJson({ b: 1, a: { d: [1, { y: 2, x: 1 }], c: undefined } }),
+    ).toBe('{"a":{"d":[1,{"x":1,"y":2}]},"b":1}');
     expect(hash8({ a: 1, b: 2 })).toBe(hash8({ b: 2, a: 1 }));
     expect(hash8({ a: 1 })).toMatch(/^[0-9a-f]{8}$/);
   });
@@ -108,8 +118,14 @@ describe("bruits", () => {
     for (let i = 0; i < 50; i++) {
       const x = i * 0.41 + 0.13;
       const y = i * 0.23 + 0.07;
-      expect(periodicFbm2(n, x + 6, y, 6, 4)).toBeCloseTo(periodicFbm2(n, x, y, 6, 4), 9);
-      expect(periodicFbm2(n, x, y + 4, 6, 4)).toBeCloseTo(periodicFbm2(n, x, y, 6, 4), 9);
+      expect(periodicFbm2(n, x + 6, y, 6, 4)).toBeCloseTo(
+        periodicFbm2(n, x, y, 6, 4),
+        9,
+      );
+      expect(periodicFbm2(n, x, y + 4, 6, 4)).toBeCloseTo(
+        periodicFbm2(n, x, y, 6, 4),
+        9,
+      );
     }
   });
 });
@@ -233,7 +249,10 @@ describe("maillage : constructeur et test de variété", () => {
 
 describe("Douglas–Peucker", () => {
   it("garde les extrémités et supprime les points alignés", () => {
-    const line: Vec2[] = Array.from({ length: 50 }, (_, i) => [i, 0.001 * (i % 2)]);
+    const line: Vec2[] = Array.from({ length: 50 }, (_, i) => [
+      i,
+      0.001 * (i % 2),
+    ]);
     const s = simplifyPolyline(line, 0.01);
     expect(s).toEqual([
       [0, 0],
@@ -250,8 +269,11 @@ describe("Douglas–Peucker", () => {
     const s = simplifyClosed(ring, 0.15);
     expect(s.length).toBeLessThan(120);
     expect(s.length).toBeGreaterThan(20);
-    for (const p of s) expect(Math.abs(Math.hypot(p[0], p[1]) - 50)).toBeLessThan(0.15);
-    expect(Math.abs(ringArea(s) - Math.PI * 2500) / (Math.PI * 2500)).toBeLessThan(0.01);
+    for (const p of s)
+      expect(Math.abs(Math.hypot(p[0], p[1]) - 50)).toBeLessThan(0.15);
+    expect(
+      Math.abs(ringArea(s) - Math.PI * 2500) / (Math.PI * 2500),
+    ).toBeLessThan(0.01);
   });
 });
 
@@ -279,14 +301,24 @@ describe("extrusion de polygones avec trous", () => {
 
   it("accepte les contours dans n'importe quel sens", () => {
     const b = new MeshBuilder();
-    extrudePolygon(b, { outer: square(0, 0, 10).reverse(), holes: [square(2, 2, 3)] }, 1, 3);
+    extrudePolygon(
+      b,
+      { outer: square(0, 0, 10).reverse(), holes: [square(2, 2, 3)] },
+      1,
+      3,
+    );
     const m = b.build();
     expect(checkManifold(m).closed).toBe(true);
     expect(meshVolume(m)).toBeCloseTo((100 - 9) * 2, 4);
   });
 
   it("classe les contours par inclusion : îlot dans un trou redevient un extérieur", () => {
-    const rings = [square(0, 0, 30), square(5, 5, 20), square(10, 10, 10), square(40, 0, 5)];
+    const rings = [
+      square(0, 0, 30),
+      square(5, 5, 20),
+      square(10, 10, 10),
+      square(40, 0, 5),
+    ];
     const polys = classifyRings(rings);
     expect(polys).toHaveLength(3);
     const withHole = polys.find((p) => (p.holes ?? []).length === 1);
@@ -300,6 +332,8 @@ describe("extrusion de polygones avec trous", () => {
   });
 
   it("z1 ≤ z0 est refusé", () => {
-    expect(() => extrudePolygon(new MeshBuilder(), { outer: square(0, 0, 1) }, 1, 1)).toThrow();
+    expect(() =>
+      extrudePolygon(new MeshBuilder(), { outer: square(0, 0, 1) }, 1, 1),
+    ).toThrow();
   });
 });

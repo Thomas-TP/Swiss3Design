@@ -20,7 +20,10 @@ function distSq(p: Vec2, a: Vec2, b: Vec2): number {
 }
 
 /** Polyligne ouverte : garde les extrémités et les points à plus de `tolerance`. */
-export function simplifyPolyline(points: readonly Vec2[], tolerance: number): Vec2[] {
+export function simplifyPolyline(
+  points: readonly Vec2[],
+  tolerance: number,
+): Vec2[] {
   const n = points.length;
   if (n <= 2) return points.map((p) => [p[0], p[1]]);
   const keep = new Uint8Array(n);
@@ -45,7 +48,8 @@ export function simplifyPolyline(points: readonly Vec2[], tolerance: number): Ve
     }
   }
   const out: Vec2[] = [];
-  for (let i = 0; i < n; i++) if (keep[i]) out.push([points[i][0], points[i][1]]);
+  for (let i = 0; i < n; i++)
+    if (keep[i]) out.push([points[i][0], points[i][1]]);
   return out;
 }
 
@@ -54,7 +58,10 @@ export function simplifyPolyline(points: readonly Vec2[], tolerance: number): Ve
  * aux deux points les plus éloignés l'un de l'autre, simplifiées chacune, de
  * sorte que la couture n'est jamais un point arbitraire supprimé.
  */
-export function simplifyClosed(points: readonly Vec2[], tolerance: number): Vec2[] {
+export function simplifyClosed(
+  points: readonly Vec2[],
+  tolerance: number,
+): Vec2[] {
   const n = points.length;
   if (n <= 3) return points.map((p) => [p[0], p[1]]);
   let far = 0;
@@ -69,10 +76,7 @@ export function simplifyClosed(points: readonly Vec2[], tolerance: number): Vec2
     }
   }
   const first = simplifyPolyline(points.slice(0, far + 1), tolerance);
-  const second = simplifyPolyline(
-    [...points.slice(far), points[0]],
-    tolerance,
-  );
+  const second = simplifyPolyline([...points.slice(far), points[0]], tolerance);
   // first finit sur points[far], second commence sur points[far] et finit sur points[0].
   return [...first.slice(0, -1), ...second.slice(0, -1)];
 }

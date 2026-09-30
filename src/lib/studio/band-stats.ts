@@ -44,7 +44,9 @@ export function bandStats(
     from = band.toMm;
     const fromLayer = index === 0 ? 1 : boundaryLayer(fromMm);
     const toLayer =
-      index === config.bands.length - 1 ? totalLayers : boundaryLayer(band.toMm) - 1;
+      index === config.bands.length - 1
+        ? totalLayers
+        : boundaryLayer(band.toMm) - 1;
     const volumeMm3 = analysis.bandVolumesMm3[index] ?? 0;
     return {
       index,

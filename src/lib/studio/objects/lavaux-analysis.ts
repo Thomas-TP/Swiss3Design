@@ -56,8 +56,12 @@ function analysisPlan(model: LavauxModel): RingPlan {
     // milieu de la rampe, là où la pente est maximale (1,875 × gd / gs).
     minimum.push(steps.length > 0 && len >= 1 ? 4 : 1);
   }
-  const counts = allocateCounts(lengths, Math.max(ANALYSIS_STRIPS, lengths.length), minimum).map(
-    (c, k) => (steps.length > 0 && lengths[k] >= 1 && c % 2 === 1 ? c + 1 : c),
+  const counts = allocateCounts(
+    lengths,
+    Math.max(ANALYSIS_STRIPS, lengths.length),
+    minimum,
+  ).map((c, k) =>
+    steps.length > 0 && lengths[k] >= 1 && c % 2 === 1 ? c + 1 : c,
   );
   const byStart = new Map<number, number>();
   bps.forEach((bp, k) => {
@@ -71,7 +75,8 @@ function analysisPlan(model: LavauxModel): RingPlan {
 }
 
 function bandIndex(bands: readonly Band[], z: number): number {
-  for (let k = 0; k < bands.length - 1; k++) if (z <= bands[k].toMm + 1e-9) return k;
+  for (let k = 0; k < bands.length - 1; k++)
+    if (z <= bands[k].toMm + 1e-9) return k;
   return Math.max(bands.length - 1, 0);
 }
 
@@ -115,7 +120,10 @@ function analyze(config: LavauxConfig): LavauxAnalysis {
     shell[j] = 0.5 * sShell * dTheta;
   }
 
-  const bands = config.bands.length > 0 ? config.bands : [{ filament: "blanc-neve" as const, toMm: model.height }];
+  const bands =
+    config.bands.length > 0
+      ? config.bands
+      : [{ filament: "blanc-neve" as const, toMm: model.height }];
   const bandVolumes = new Array<number>(bands.length).fill(0);
   let volume = 0;
   for (let j = 0; j < n - 1; j++) {

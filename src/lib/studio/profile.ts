@@ -19,14 +19,21 @@
 // « d = diamètre de l'enveloppe » vrai pour tous les profils (pour le héros,
 // Pmax = 1 : identique à la formule du brief).
 import type { LavauxConfig } from "./types";
-import { monotoneCubic, smootherstep, smootherstepSlope } from "./kernel/monotone";
+import {
+  monotoneCubic,
+  smootherstep,
+  smootherstepSlope,
+} from "./kernel/monotone";
 
 export const PROFILE_T = [0, 0.2, 0.5, 0.8, 1] as const;
 
 type ProfileKind = LavauxConfig["profile"];
 
 /** Rayons relatifs des quatre premiers points ; le cinquième (col) vient de `neck`. */
-const PROFILE_POINTS: Record<ProfileKind, readonly [number, number, number, number]> = {
+const PROFILE_POINTS: Record<
+  ProfileKind,
+  readonly [number, number, number, number]
+> = {
   cylindre: [0.94, 0.98, 1.0, 0.99],
   galet: [0.66, 0.92, 1.0, 0.9],
   amphore: [0.58, 0.9, 1.0, 0.78],
@@ -34,7 +41,8 @@ const PROFILE_POINTS: Record<ProfileKind, readonly [number, number, number, numb
   tulipe: [0.64, 0.74, 0.86, 0.97],
 };
 
-const clamp = (x: number, lo: number, hi: number) => Math.min(Math.max(x, lo), hi);
+const clamp = (x: number, lo: number, hi: number) =>
+  Math.min(Math.max(x, lo), hi);
 
 /** Début et largeur de la lèvre, en fraction de hauteur. */
 export const LIP_START = 0.92;
@@ -68,10 +76,7 @@ export function createProfile(
   const { h, d, profile, belly, neck, lip } = config;
   const base = PROFILE_POINTS[profile];
   const top = profile === "tulipe" ? Math.max(neck, 0.9) : neck;
-  const ys = [
-    ...base.map((r) => clamp(1 + (r - 1) * 2 * belly, 0.4, 1)),
-    top,
-  ];
+  const ys = [...base.map((r) => clamp(1 + (r - 1) * 2 * belly, 0.4, 1)), top];
   const curve = monotoneCubic(PROFILE_T, ys);
 
   const rel = (t: number) =>

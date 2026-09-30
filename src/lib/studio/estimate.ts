@@ -46,7 +46,13 @@ export function estimate(
   const price = basePriceCents(stats, params);
   const spread = rangePct / 100;
   const floor = roundTo(params.floorCents, params.roundToCents);
-  const low = Math.max(floor, roundTo(price * (1 - spread), params.roundToCents));
-  const high = Math.max(low, roundTo(price * (1 + spread), params.roundToCents));
+  const low = Math.max(
+    floor,
+    roundTo(price * (1 - spread), params.roundToCents),
+  );
+  const high = Math.max(
+    low,
+    roundTo(price * (1 + spread), params.roundToCents),
+  );
   return { lowCents: Math.round(low), highCents: Math.round(high) };
 }

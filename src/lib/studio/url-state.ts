@@ -173,7 +173,10 @@ function patternFromShort(
   pick: (key: string, fallback: unknown) => unknown,
 ): unknown {
   const R = LAVAUX_RANGES;
-  const ref = (reference.kind === kind ? reference : {}) as Record<string, unknown>;
+  const ref = (reference.kind === kind ? reference : {}) as Record<
+    string,
+    unknown
+  >;
   switch (kind) {
     case "gradins":
       return {
@@ -207,7 +210,11 @@ function patternFromShort(
   }
 }
 /** Valeur courte → valeur longue, par clé ; `undefined` si la clé est absente. */
-function longConfig(object: StudioObjectId, short: Json, defaults: StudioConfig): unknown {
+function longConfig(
+  object: StudioObjectId,
+  short: Json,
+  defaults: StudioConfig,
+): unknown {
   const pick = (key: string, fallback: unknown) =>
     Object.hasOwn(short, key) ? short[key] : fallback;
   switch (object) {
@@ -215,7 +222,9 @@ function longConfig(object: StudioObjectId, short: Json, defaults: StudioConfig)
       const d = defaults as Extract<StudioConfig, { object: "lavaux" }>;
       const kind = pick("m", d.pattern.kind) as LavauxPattern["kind"];
       const pattern = patternFromShort(kind, d.pattern, pick);
-      const bands = Object.hasOwn(short, "bd") ? bandsFromShort(short.bd) : d.bands;
+      const bands = Object.hasOwn(short, "bd")
+        ? bandsFromShort(short.bd)
+        : d.bands;
       return {
         object,
         h: pick("h", d.h),
@@ -228,7 +237,8 @@ function longConfig(object: StudioObjectId, short: Json, defaults: StudioConfig)
         wall: pick("w", d.wall),
         bands,
       };
-    }    case "cartouche": {
+    }
+    case "cartouche": {
       const d = defaults as Extract<StudioConfig, { object: "cartouche" }>;
       return {
         object,
@@ -243,7 +253,9 @@ function longConfig(object: StudioObjectId, short: Json, defaults: StudioConfig)
     }
     case "relief": {
       const d = defaults as Extract<StudioConfig, { object: "relief" }>;
-      const bands = Object.hasOwn(short, "bd") ? bandsFromShort(short.bd) : d.bands;
+      const bands = Object.hasOwn(short, "bd")
+        ? bandsFromShort(short.bd)
+        : d.bands;
       const lb = pick("lb", d.label ? 1 : 0);
       return {
         object,
@@ -255,7 +267,12 @@ function longConfig(object: StudioObjectId, short: Json, defaults: StudioConfig)
         seed: pick("sd", d.seed),
         lake: pick("lk", d.lake),
         bands,
-        label: lb === 1 || lb === true ? true : lb === 0 || lb === false ? false : lb,
+        label:
+          lb === 1 || lb === true
+            ? true
+            : lb === 0 || lb === false
+              ? false
+              : lb,
       };
     }
     case "borne": {
@@ -292,13 +309,17 @@ function configFromShort(
       ? new Set<string>([
           ...BASE_KEYS.lavaux,
           ...(PATTERN_KEYS[
-            (Object.hasOwn(short, "m") ? short.m : "") as keyof typeof PATTERN_KEYS
+            (Object.hasOwn(short, "m")
+              ? short.m
+              : "") as keyof typeof PATTERN_KEYS
           ] ?? []),
         ])
       : null;
   for (const key of Object.keys(short)) {
-    if (TEXT_KEYS.includes(key)) return { ok: false, error: "text-key", detail: key };
-    if (!allowed.includes(key)) return { ok: false, error: "unknown-key", detail: key };
+    if (TEXT_KEYS.includes(key))
+      return { ok: false, error: "text-key", detail: key };
+    if (!allowed.includes(key))
+      return { ok: false, error: "unknown-key", detail: key };
     if (strict && active && !active.has(key)) {
       return { ok: false, error: "unknown-key", detail: key };
     }
@@ -318,7 +339,10 @@ function toBase64Url(text: string): string {
   const bytes = new TextEncoder().encode(text);
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  return btoa(binary)
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_")
+    .replace(/=+$/, "");
 }
 
 function fromBase64Url(text: string): string | null {
@@ -350,10 +374,15 @@ export function decodeConfig(
   defaults: StudioConfig,
 ): DecodeResult {
   if (!value) return { ok: false, error: "empty" };
-  if (value.length > MAX_FRAGMENT_LENGTH) return { ok: false, error: "too-long" };
+  if (value.length > MAX_FRAGMENT_LENGTH)
+    return { ok: false, error: "too-long" };
   const dot = value.indexOf(".");
   if (dot < 0 || value.slice(0, dot) !== FRAGMENT_VERSION) {
-    return { ok: false, error: "version", detail: dot < 0 ? value : value.slice(0, dot) };
+    return {
+      ok: false,
+      error: "version",
+      detail: dot < 0 ? value : value.slice(0, dot),
+    };
   }
   const json = fromBase64Url(value.slice(dot + 1));
   if (json === null) return { ok: false, error: "base64" };
@@ -378,7 +407,9 @@ export function decodeFragment(
   hash: string,
   defaults: StudioConfig,
 ): DecodeResult {
-  const params = new URLSearchParams(hash.startsWith("#") ? hash.slice(1) : hash);
+  const params = new URLSearchParams(
+    hash.startsWith("#") ? hash.slice(1) : hash,
+  );
   return decodeConfig(object, params.get(FRAGMENT_PARAM) ?? "", defaults);
 }
 
@@ -393,7 +424,13 @@ function bandsFromParam(value: string): Band[] | null {
   for (const part of value.split(",")) {
     const [filament, z, ...rest] = part.split(":");
     const toMm = Number(z);
-    if (!filament || rest.length > 0 || z === undefined || z === "" || !Number.isFinite(toMm)) {
+    if (
+      !filament ||
+      rest.length > 0 ||
+      z === undefined ||
+      z === "" ||
+      !Number.isFinite(toMm)
+    ) {
       return null;
     }
     out.push({ filament: filament as FilamentId, toMm });
@@ -407,7 +444,9 @@ export function encodeSearchParams(config: StudioConfig): string {
   for (const [key, value] of Object.entries(toShortKeys(config))) {
     params.set(
       key,
-      key === "bd" && "bands" in config ? bandsToParam(config.bands) : String(value),
+      key === "bd" && "bands" in config
+        ? bandsToParam(config.bands)
+        : String(value),
     );
   }
   return params.toString();
@@ -441,7 +480,8 @@ export function decodeSearchParams(
   const short: Json = {};
   const ignored: string[] = [];
   for (const [key, raw] of entriesOf(params)) {
-    if (TEXT_KEYS.includes(key)) return { ok: false, error: "text-key", detail: key, ignored };
+    if (TEXT_KEYS.includes(key))
+      return { ok: false, error: "text-key", detail: key, ignored };
     if (!allowed.includes(key)) {
       ignored.push(key);
       continue;

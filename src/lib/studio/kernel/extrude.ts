@@ -50,8 +50,10 @@ export function cleanRing(ring: readonly Vec2[], eps = 1e-9): Vec2[] {
   }
   while (
     out.length > 1 &&
-    Math.hypot(out[0][0] - out[out.length - 1][0], out[0][1] - out[out.length - 1][1]) <=
-      eps
+    Math.hypot(
+      out[0][0] - out[out.length - 1][0],
+      out[0][1] - out[out.length - 1][1],
+    ) <= eps
   ) {
     out.pop();
   }
@@ -94,7 +96,9 @@ export function classifyRings(rings: readonly (readonly Vec2[])[]): Polygon[] {
   const containers: number[][] = clean.map((r, i) =>
     clean
       .map((_, j) => j)
-      .filter((j) => j !== i && area[j] > area[i] && pointInRing(r[0], clean[j])),
+      .filter(
+        (j) => j !== i && area[j] > area[i] && pointInRing(r[0], clean[j]),
+      ),
   );
   const polygons: Polygon[] = [];
   const polygonOf = new Map<number, Polygon>();
@@ -157,7 +161,8 @@ function addWalls(
   const n = ring.length;
   if (n < 3) return;
   const normals: Vec2[] = [];
-  for (let i = 0; i < n; i++) normals.push(edgeNormal(ring[i], ring[(i + 1) % n]));
+  for (let i = 0; i < n; i++)
+    normals.push(edgeNormal(ring[i], ring[(i + 1) % n]));
   // Normale de sommet : moyenne des deux arêtes voisines si elles sont presque
   // alignées (arrondi de coin), sinon celle de l'arête traitée (arête vive).
   const vertexNormal = (edge: number, atStart: boolean): Vec2 => {
@@ -226,11 +231,13 @@ export function extrudePolygon(
   if (!(z1 > z0)) throw new Error("extrudePolygon : z1 doit dépasser z0");
   const outer = oriented(polygon.outer, true);
   const holes = (polygon.holes ?? []).map((h) => oriented(h, false));
-  if (outer.length < 3) throw new Error("extrudePolygon : contour de moins de 3 points");
+  if (outer.length < 3)
+    throw new Error("extrudePolygon : contour de moins de 3 points");
   const before = builder.triangleCount;
   const creaseCos = Math.cos((creaseDeg * Math.PI) / 180);
   addWalls(builder, outer, z0, z1, band, side, creaseCos);
-  for (const hole of holes) addWalls(builder, hole, z0, z1, band, side, creaseCos);
+  for (const hole of holes)
+    addWalls(builder, hole, z0, z1, band, side, creaseCos);
   const { coords, holeIndices, points } = flatten(outer, holes);
   const triangles = earcut(coords, holeIndices.length ? holeIndices : null, 2);
   addCap(builder, points, triangles, z1, true, band, side);
@@ -247,7 +254,8 @@ export function extrudePolygons(
   options?: ExtrudeOptions,
 ): number {
   let total = 0;
-  for (const p of polygons) total += extrudePolygon(builder, p, z0, z1, options);
+  for (const p of polygons)
+    total += extrudePolygon(builder, p, z0, z1, options);
   return total;
 }
 

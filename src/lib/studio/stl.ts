@@ -23,7 +23,10 @@ export interface StlResult {
 }
 
 /** Empreinte courte d'une configuration et de ses textes (clé d'envoi, nom de fichier). */
-export function studioHash(config: StudioConfig, texts: StudioTexts = {}): string {
+export function studioHash(
+  config: StudioConfig,
+  texts: StudioTexts = {},
+): string {
   return hash8({ config, texts });
 }
 
@@ -41,7 +44,9 @@ export function stlHeader(object: string, hash: string): string {
 /** Écrit un maillage en STL binaire. `header` : texte ASCII (80 octets au plus, complété d'espaces). */
 export function writeBinaryStl(mesh: MeshData, header: string): StlResult {
   if (/^\s*solid/i.test(header)) {
-    throw new Error("L'en-tête d'un STL binaire ne doit pas commencer par « solid »");
+    throw new Error(
+      "L'en-tête d'un STL binaire ne doit pas commencer par « solid »",
+    );
   }
   if (mesh.triangles > STL_MAX_TRIANGLES) {
     throw new Error(
