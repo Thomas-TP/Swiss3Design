@@ -44,30 +44,49 @@ export interface FlatModel {
   issues: TextIssue[];
 }
 
-/** Hauteur totale de la pièce : plaque + relief, ou plaque seule pour une gravure. */
+/** Vrai s'il y a quelque chose à imprimer en encre : une ligne de texte, ou un disque, un cadre, un filet. */
+export function hasInk(m: Pick<FlatModel, "lines" | "decor">): boolean {
+  return m.lines.length > 0 || m.decor.length > 0;
+}
+
+/**
+ * Hauteur totale de la pièce : plaque + relief, ou plaque seule pour une
+ * gravure. Un relief sans aucune encre (pas de texte) reste à la hauteur de la
+ * plaque : le maillage n'a rien à poser dessus.
+ */
 export function flatHeight(
-  m: Pick<FlatModel, "mode" | "plateMm" | "inkMm">,
+  m: Pick<FlatModel, "mode" | "plateMm" | "inkMm" | "lines" | "decor">,
 ): number {
-  return m.mode === "relief"
+  return m.mode === "relief" && hasInk(m)
     ? Math.round((m.plateMm + m.inkMm) * 10) / 10
     : m.plateMm;
 }
 
-/** Bandes de couleur dérivées de la plaque et du texte (§6.3.4). */
+/**
+ * Bandes de couleur dérivées de la plaque et du texte (§6.3.4). Un relief
+ * sans encre n'a qu'une bande ; une gravure garde ses deux bandes (les couleurs
+ * changent à `t − e` quoi qu'on grave, comme dans le maillage).
+ */
 export function flatBands(
-  m: Pick<FlatModel, "mode" | "plateMm" | "inkMm" | "plate" | "ink">,
+  m: Pick<
+    FlatModel,
+    "mode" | "plateMm" | "inkMm" | "plate" | "ink" | "lines" | "decor"
+  >,
 ): Band[] {
   const { plateMm: t, inkMm: e } = m;
   const round = (x: number) => Math.round(x * 10) / 10;
-  return m.mode === "relief"
-    ? [
-        { filament: m.plate, toMm: round(t) },
-        { filament: m.ink, toMm: round(t + e) },
-      ]
-    : [
-        { filament: m.ink, toMm: round(t - e) },
-        { filament: m.plate, toMm: round(t) },
-      ];
+  if (m.mode === "relief") {
+    return hasInk(m)
+      ? [
+          { filament: m.plate, toMm: round(t) },
+          { filament: m.ink, toMm: round(t + e) },
+        ]
+      : [{ filament: m.plate, toMm: round(t) }];
+  }
+  return [
+    { filament: m.ink, toMm: round(t - e) },
+    { filament: m.plate, toMm: round(t) },
+  ];
 }
 
 export interface FlatAnalysis {

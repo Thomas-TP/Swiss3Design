@@ -6,7 +6,12 @@
 import { classifyRings, type Polygon } from "../kernel/extrude";
 import type { Vec2 } from "../kernel/simplify";
 import { requireGlyphFont, type GlyphDetail, type GlyphFont } from "./glyphs";
-import { codePoints, TRACKING_EM, type PlacedLine } from "./layout";
+import {
+  codePoints,
+  pairExtraUnits,
+  TRACKING_EM,
+  type PlacedLine,
+} from "./layout";
 import { polygonRings, type Ring, type ShapeLod } from "./geometry";
 
 /** Précision des glyphes selon le niveau de détail. */
@@ -33,8 +38,12 @@ export function linePolygons(
   const detail = glyphDetail(lod);
   const out: Polygon[] = [];
   let pen = line.x;
+  let previous = "";
   for (const ch of codePoints(line.text)) {
     if (!f.has(ch)) continue;
+    // Anticollision : le même espace supplémentaire que la mesure (layout.ts).
+    if (previous) pen += pairExtraUnits(previous, ch) * scale;
+    previous = ch;
     for (const glyph of f.polygons(ch, detail)) {
       const place = (ring: readonly Vec2[]): Ring =>
         ring.map((p) => [pen + p[0] * scale, line.y + p[1] * scale] as Vec2);

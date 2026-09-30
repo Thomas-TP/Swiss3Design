@@ -3,8 +3,9 @@
 // « Surprenez-moi »). Les textes d'exemple (« Léa Dubois », …) ne vivent PAS
 // ici : ils sont des StudioTexts, jamais dans une configuration ni dans l'URL.
 //
-// WP-02 complète ce fichier pour Cartouche, Relief et Borne (préréglages,
-// `RELIEF_DEFAULT` définitif).
+// WP-02 complète ce fichier pour Cartouche, Relief et Borne : préréglages de
+// chaque objet (`CARTOUCHE_PRESETS`, `RELIEF_PRESETS`, `BORNE_PRESETS`) et
+// `RELIEF_DEFAULT` définitif (graine 1291, 8 strates, lac 18 %).
 import { between, intBetween, mulberry32, pick, type Rng } from "./kernel/rng";
 import { checkLavaux, nearVaseSpirale } from "./guards";
 import { gradinsDepthMax, quantizeMm } from "./schemas";
@@ -253,6 +254,228 @@ export const LAVAUX_PRESETS: readonly LavauxPreset[] = [
     },
   },
 ];
+
+// ── Préréglages des objets plats (WP-02) ─────────────────────────────────────
+//
+// Un préréglage est une configuration complète, sans texte (les textes ne sont
+// jamais dans une configuration) ; son nom est `studioCore.presets.<id>`. Les
+// identifiants sont uniques sur les quatre objets (test). Les bandes du
+// sous-verre sont calées sur les sommets de strates : `snapReliefBands` ne les
+// modifie pas (test de point fixe).
+
+export interface ObjectPreset<C extends StudioConfig> {
+  /** Clé de traduction : studioCore.presets.<id>. */
+  id: string;
+  config: C;
+}
+
+export const CARTOUCHE_PRESETS: readonly ObjectPreset<CartoucheConfig>[] = [
+  { id: "classique", config: CARTOUCHE_DEFAULT },
+  {
+    id: "centree",
+    config: {
+      object: "cartouche",
+      thickness: 1.6,
+      corner: 4,
+      mode: "relief",
+      depth: 0.6,
+      layout: "centree",
+      plate: "gris-molasse",
+      ink: "blanc-neve",
+    },
+  },
+  {
+    id: "cadre",
+    config: {
+      object: "cartouche",
+      thickness: 2,
+      corner: 2,
+      mode: "relief",
+      depth: 0.8,
+      layout: "cartouche",
+      plate: "bleu-leman",
+      ink: "blanc-neve",
+    },
+  },
+  {
+    id: "monogramme",
+    config: {
+      object: "cartouche",
+      thickness: 1.6,
+      corner: 3,
+      mode: "relief",
+      depth: 0.6,
+      layout: "monogramme",
+      plate: "encre",
+      ink: "blanc-neve",
+    },
+  },
+  {
+    id: "incrustee",
+    config: {
+      object: "cartouche",
+      thickness: 2,
+      corner: 3,
+      mode: "gravure",
+      depth: 0.8,
+      layout: "classique",
+      plate: "blanc-neve",
+      ink: "rouge-signal",
+    },
+  },
+];
+
+export const RELIEF_PRESETS: readonly ObjectPreset<ReliefConfig>[] = [
+  { id: "massif", config: RELIEF_DEFAULT },
+  {
+    id: "lac",
+    config: {
+      object: "relief",
+      shape: "rond",
+      size: 100,
+      base: 3,
+      relief: 2.4,
+      levels: 6,
+      seed: 1048,
+      lake: 36,
+      bands: [
+        { filament: "bleu-leman", toMm: 3 },
+        { filament: "vert-lavaux", toMm: 4.2 },
+        { filament: "blanc-neve", toMm: 5.4 },
+      ],
+      label: true,
+    },
+  },
+  {
+    id: "arete",
+    config: {
+      object: "relief",
+      shape: "carre",
+      size: 100,
+      base: 3.4,
+      relief: 4,
+      levels: 12,
+      seed: 3655,
+      lake: 12,
+      bands: [
+        { filament: "encre", toMm: 5 },
+        { filament: "gris-molasse", toMm: 7 },
+        { filament: "blanc-neve", toMm: 8.2 },
+      ],
+      label: true,
+    },
+  },
+  {
+    id: "glacier",
+    config: {
+      object: "relief",
+      shape: "carre",
+      size: 100,
+      base: 3,
+      relief: 3.2,
+      levels: 8,
+      seed: 3892,
+      lake: 8,
+      bands: [
+        { filament: "glacier", toMm: 3.8 },
+        { filament: "gris-molasse", toMm: 5.4 },
+        { filament: "blanc-neve", toMm: 6.2 },
+      ],
+      label: true,
+    },
+  },
+  {
+    id: "plateau",
+    config: {
+      object: "relief",
+      shape: "rond",
+      size: 100,
+      base: 2.4,
+      relief: 1.6,
+      levels: 4,
+      seed: 2470,
+      lake: 24,
+      bands: [
+        { filament: "vert-lavaux", toMm: 2.8 },
+        { filament: "ambre", toMm: 3.6 },
+        { filament: "blanc-neve", toMm: 4 },
+      ],
+      label: true,
+    },
+  },
+];
+
+export const BORNE_PRESETS: readonly ObjectPreset<BorneConfig>[] = [
+  { id: "pilule", config: BORNE_DEFAULT },
+  {
+    id: "etiquette",
+    config: {
+      object: "borne",
+      shape: "etiquette",
+      cap: 7,
+      thickness: 4,
+      ring: "droite",
+      ringD: 5,
+      mode: "relief",
+      base: "bleu-leman",
+      ink: "blanc-neve",
+    },
+  },
+  {
+    id: "goutte",
+    config: {
+      object: "borne",
+      shape: "goutte",
+      cap: 8,
+      thickness: 4,
+      ring: "gauche",
+      ringD: 5,
+      mode: "relief",
+      base: "rouge-signal",
+      ink: "blanc-neve",
+    },
+  },
+  {
+    id: "pic",
+    config: {
+      object: "borne",
+      shape: "pic",
+      cap: 6,
+      thickness: 4.4,
+      ring: "gauche",
+      ringD: 4.5,
+      mode: "relief",
+      base: "gris-molasse",
+      ink: "encre",
+    },
+  },
+  {
+    id: "grave",
+    config: {
+      object: "borne",
+      shape: "pilule",
+      cap: 8,
+      thickness: 4,
+      ring: "aucun",
+      ringD: 5,
+      mode: "gravure",
+      base: "blanc-neve",
+      ink: "encre",
+    },
+  },
+];
+
+/** Préréglages de chaque objet, dans l'ordre d'affichage. */
+export const PRESETS: {
+  [K in StudioObjectId]: readonly ObjectPreset<
+    Extract<StudioConfig, { object: K }>
+  >[];
+} = {
+  lavaux: LAVAUX_PRESETS.map((p) => ({ id: p.id, config: p.config })),
+  cartouche: CARTOUCHE_PRESETS,
+  relief: RELIEF_PRESETS,
+  borne: BORNE_PRESETS,
+};
 
 // ── « Surprenez-moi » (§6.7) ─────────────────────────────────────────────────
 

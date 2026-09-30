@@ -20,6 +20,7 @@ import {
   LAVAUX_WALLS,
   RELIEF_RANGES,
 } from "./schemas";
+import { TEXT_LIMITS } from "./text/fields";
 import { parseGlyphFont, setGlyphFont, type GlyphFont } from "./text/glyphs";
 import type {
   Band,
@@ -208,20 +209,33 @@ export function randomText(rng: Rng, max: number): string {
   return out.slice(0, max).trim();
 }
 
-/** Textes aléatoires d'un objet, dans les longueurs du §6.2. */
+/**
+ * Longueur tirée pour un champ : le plus souvent un texte de taille courante,
+ * une fois sur quatre la longueur saisissable maximale (§6.2) : ces derniers
+ * dépassent parfois la place disponible (`text-fit`), ce que le test filtre.
+ */
+function randomLength(rng: Rng, limit: number): number {
+  return rng() < 0.25 ? limit : intBetween(rng, 1, Math.ceil(limit * 0.6));
+}
+
+/** Textes aléatoires d'un objet, dans les longueurs du §6.2 (`TEXT_LIMITS`). */
 export function randomTexts(rng: Rng, object: StudioObjectId): StudioTexts {
+  const L = TEXT_LIMITS;
   switch (object) {
     case "cartouche":
       return {
-        name: randomText(rng, 16),
-        role: rng() < 0.8 ? randomText(rng, 20) : undefined,
-        line1: rng() < 0.8 ? randomText(rng, 24) : undefined,
-        line2: rng() < 0.6 ? randomText(rng, 24) : undefined,
+        name: randomText(rng, randomLength(rng, L.name)),
+        role:
+          rng() < 0.8 ? randomText(rng, randomLength(rng, L.role)) : undefined,
+        line1:
+          rng() < 0.8 ? randomText(rng, randomLength(rng, L.line1)) : undefined,
+        line2:
+          rng() < 0.6 ? randomText(rng, randomLength(rng, L.line2)) : undefined,
       };
     case "relief":
-      return { peak: randomText(rng, 9) };
+      return { peak: randomText(rng, randomLength(rng, L.peak)) };
     case "borne":
-      return { text: randomText(rng, 11) };
+      return { text: randomText(rng, randomLength(rng, L.text)) };
     default:
       return {};
   }

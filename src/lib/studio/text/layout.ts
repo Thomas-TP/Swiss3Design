@@ -10,7 +10,7 @@
 // (réduction jusqu'au minimum, sinon erreur `text-fit`) ; trait = `stem` ×
 // échelle : < 0,8 mm avertissement, < 0,6 mm erreur ; capitale minimale 3,6 mm
 // (4 mm pour le nom).
-import { FONT_METRICS, GLYPH_TABLE } from "./glyph-metrics";
+import { FONT_METRICS, GLYPH_HOOKS, GLYPH_TABLE } from "./glyph-metrics";
 
 /** Approche entre deux glyphes : 0,02 em, sans crénage. */
 export const TRACKING_EM = 0.02;
@@ -88,6 +88,39 @@ const EMPTY: TextMeasure = {
   yMaxPerCap: 0,
 };
 
+/** Marge verticale (unités de police) : un voisin qui frôle la hauteur du dépassement compte aussi. */
+const HOOK_Y_MARGIN = 12;
+
+function overlapsY(a0: number, a1: number, b0: number, b1: number): boolean {
+  return a0 - HOOK_Y_MARGIN <= b1 && b0 <= a1 + HOOK_Y_MARGIN;
+}
+
+/**
+ * Espace supplémentaire (unités de police) entre deux glyphes voisins dont
+ * l'encre se frôlerait : l'accent de î ou ï sous la barre d'un T, le caron de ď
+ * devant n'importe quelle lettre haute, le crochet de j sous une parenthèse…
+ * Ce n'est PAS un crénage (aucune paire n'est resserrée) : seulement le
+ * dépassement de chaque glyphe hors de sa boîte de chasse, et seulement contre un
+ * voisin dont l'encre monte ou descend à la même hauteur. Les formes d'encre
+ * restent ainsi disjointes, condition de la gravure sans CSG (test sur les
+ * 322 × 322 paires du jeu). Le même calcul sert à la mesure (SSR) et au maillage.
+ */
+export function pairExtraUnits(a: string, b: string): number {
+  const ha = Object.hasOwn(GLYPH_HOOKS, a) ? GLYPH_HOOKS[a] : undefined;
+  const hb = Object.hasOwn(GLYPH_HOOKS, b) ? GLYPH_HOOKS[b] : undefined;
+  if (!ha && !hb) return 0;
+  let extra = 0;
+  if (ha && ha[3] > 0) {
+    const [, , lo, hi] = GLYPH_TABLE[b];
+    if (overlapsY(ha[4], ha[5], lo, hi)) extra += ha[3];
+  }
+  if (hb && hb[0] > 0) {
+    const [, , lo, hi] = GLYPH_TABLE[a];
+    if (overlapsY(hb[1], hb[2], lo, hi)) extra += hb[0];
+  }
+  return extra;
+}
+
 /**
  * Mesure d'un texte (déjà normalisé) à la capitale de 1 mm : la largeur et
  * l'aire se déduisent de toute capitale par `× capMm` et `× capMm²`. Les
@@ -101,9 +134,12 @@ export function measureText(text: string): TextMeasure {
   let perimeter = 0;
   let yMin = 0;
   let yMax = 0;
+  let previous = "";
   for (const ch of chars) {
     const [adv, areaHundreds, lo, hi, perimeterTens] = GLYPH_TABLE[ch];
     advance += adv;
+    if (previous) advance += pairExtraUnits(previous, ch);
+    previous = ch;
     area += areaHundreds * 100;
     perimeter += perimeterTens * 10;
     if (lo < yMin) yMin = lo;

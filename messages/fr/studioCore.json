@@ -57,7 +57,22 @@
     "houle": "Houle",
     "pave": "Pavé",
     "colonne": "Colonne",
-    "galet": "Galet"
+    "galet": "Galet",
+    "classique": "Classique",
+    "centree": "Centrée",
+    "cadre": "Cadre",
+    "monogramme": "Monogramme",
+    "incrustee": "Incrustée",
+    "massif": "Massif",
+    "lac": "Lac",
+    "arete": "Arête",
+    "glacier": "Glacier",
+    "plateau": "Plateau",
+    "pilule": "Pilule",
+    "etiquette": "Étiquette",
+    "goutte": "Goutte",
+    "pic": "Pic",
+    "grave": "Gravé"
   },
   "options": {
     "mode": {
@@ -135,5 +150,13 @@
     "peak": "Pointe {name}",
     "summit": "{peak} · {altitude} m",
     "fictional": "altitude fictive"
+  },
+  "examples": {
+    "name": "Léa Dubois",
+    "role": "Architecte",
+    "line1": "lea@exemple.ch",
+    "line2": "+41 21 000 00 00",
+    "peak": "Léa",
+    "text": "Léa"
   }
 }

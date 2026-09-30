@@ -213,8 +213,54 @@ if (!existsSync(oflNext)) {
 // Calculée sur les mêmes polylignes que le maillage (détail « fine »).
 const parsed = new GlyphFont(data);
 const rows: string[] = [];
+const hookRows: string[] = [];
 let ascentMax = 0;
 let descentMax = 0;
+
+/**
+ * Part d'un glyphe qui dépasse de sa boîte de chasse d'un côté : largeur du
+ * dépassement et intervalle vertical de l'encre qui dépasse (accents de î, ï, ĩ,
+ * caron de ď, ľ, crochet de j…). `side` −1 : à gauche de x = 0 ; +1 : à droite de
+ * x = chasse. Sert à l'anticollision (`pairExtraUnits`) : sans elle, deux
+ * glyphes voisins se recouvrent (« Tî », « gî », « 7ï »), ce qui casse la
+ * gravure (les formes d'encre doivent être disjointes).
+ */
+function overhang(
+  rings: readonly (readonly (readonly [number, number])[])[],
+  adv: number,
+  side: -1 | 1,
+): { width: number; y0: number; y1: number } | null {
+  const edge = side < 0 ? 0 : adv;
+  const beyond = (x: number) => (side < 0 ? x < edge : x > edge);
+  let width = 0;
+  let y0 = Infinity;
+  let y1 = -Infinity;
+  for (const ring of rings) {
+    for (let i = 0; i < ring.length; i++) {
+      const [ax, ay] = ring[i];
+      const [bx, by] = ring[(i + 1) % ring.length];
+      if (beyond(ax)) {
+        width = Math.max(width, Math.abs(ax - edge));
+        y0 = Math.min(y0, ay);
+        y1 = Math.max(y1, ay);
+      }
+      // Croisement de l'arête avec la frontière de la boîte de chasse.
+      if (beyond(ax) !== beyond(bx)) {
+        const y = ay + ((edge - ax) / (bx - ax)) * (by - ay);
+        y0 = Math.min(y0, y);
+        y1 = Math.max(y1, y);
+      }
+    }
+  }
+  // Sous HOOK_MARGIN + quelques unités, l'approche (0,02 em) suffit : on les ignore.
+  return width > HOOK_MIN ? { width, y0, y1 } : null;
+}
+
+/** Marge ajoutée au dépassement (unités) : l'écart minimal entre deux glyphes qui se frôlent. */
+const HOOK_MARGIN = 10;
+/** Dépassement en dessous duquel l'approche suffit (unités) : g, X, đ, ſ… */
+const HOOK_MIN = 4;
+
 for (const ch of Object.keys(glyphs)) {
   const polygons = parsed.polygons(ch, "fine");
   let area = 0;
@@ -237,6 +283,16 @@ for (const ch of Object.keys(glyphs)) {
   rows.push(
     `  ${JSON.stringify(ch)}: [${glyphs[ch].adv}, ${Math.round(area / 100)}, ${Math.round(yMin)}, ${Math.round(yMax)}, ${Math.round(perimeter / 10)}],`,
   );
+  const outers = polygons.map((p) => p.outer);
+  const left = overhang(outers, glyphs[ch].adv, -1);
+  const right = overhang(outers, glyphs[ch].adv, 1);
+  if (left || right) {
+    const part = (h: ReturnType<typeof overhang>) =>
+      h
+        ? `${Math.ceil(h.width) + HOOK_MARGIN}, ${Math.floor(h.y0) - 1}, ${Math.ceil(h.y1) + 1}`
+        : "0, 0, 0";
+    hookRows.push(`  ${JSON.stringify(ch)}: [${part(left)}, ${part(right)}],`);
+  }
 }
 
 const metrics = `// GÉNÉRÉ par scripts/fonts/build-glyphs.ts : ne pas éditer à la main.
@@ -272,6 +328,25 @@ export type GlyphMetric = readonly [
 
 export const GLYPH_TABLE: Readonly<Record<string, GlyphMetric>> = {
 ${rows.join("\n")}
+};
+
+/**
+ * Glyphes dont l'encre dépasse de la boîte de chasse (accents de î, ï, ĩ, caron
+ * de ď, crochet de j…) : [dépassement à gauche, y bas, y haut, dépassement à
+ * droite, y bas, y haut], unités de police, marge de ${HOOK_MARGIN} comprise. Sert à
+ * l'anticollision de \`pairExtraUnits\` (text/layout.ts).
+ */
+export type GlyphHook = readonly [
+  left: number,
+  leftY0: number,
+  leftY1: number,
+  right: number,
+  rightY0: number,
+  rightY1: number,
+];
+
+export const GLYPH_HOOKS: Readonly<Record<string, GlyphHook>> = {
+${hookRows.join("\n")}
 };
 `;
 writeFileSync(metricsPath, metrics);

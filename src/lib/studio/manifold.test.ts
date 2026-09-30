@@ -6,15 +6,39 @@
 // en-tête qui ne commence pas par « solid », des normales unitaires.
 //
 // WP-01 couvre le vase Lavaux ; WP-02 ajoute les trois autres objets au même
-// fichier (même mécanique, même graine).
-import { describe, expect, it } from "vitest";
+// fichier (même mécanique, même graine), PAR COQUE : un objet plat en relief est
+// une plaque plus autant de coques que de lettres et de formes, chacune fermée.
+import { beforeAll, describe, expect, it } from "vitest";
 import { buildStudioMesh, exportStl } from "./build";
 import { checkManifold, meshVolume } from "./kernel/mesh";
-import { mulberry32 } from "./kernel/rng";
+import { intBetween, mulberry32, pick } from "./kernel/rng";
 import { buildLavaux } from "./objects/lavaux";
-import { HERO_CONFIG, LAVAUX_PRESETS, heroVariant } from "./presets";
-import { randomLavaux } from "./testing";
-import type { LavauxConfig, MeshData } from "./types";
+import { checkPrintability } from "./guards";
+import {
+  BORNE_PRESETS,
+  CARTOUCHE_PRESETS,
+  HERO_CONFIG,
+  LAVAUX_PRESETS,
+  RELIEF_PRESETS,
+  heroVariant,
+} from "./presets";
+import { computeStats } from "./stats";
+import {
+  loadTestFont,
+  randomBorne,
+  randomCartouche,
+  randomLavaux,
+  randomRelief,
+  randomTexts,
+} from "./testing";
+import { DEFAULT_TEXTS } from "./text/fields";
+import type {
+  LavauxConfig,
+  MeshData,
+  StudioConfig,
+  StudioObjectId,
+  StudioTexts,
+} from "./types";
 import { STL_MAX_TRIANGLES, stlHeader, writeBinaryStl } from "./stl";
 
 /**
@@ -297,6 +321,174 @@ describe("Lavaux : déterminisme", () => {
   it("un autre réglage donne une autre empreinte", () => {
     const other = { ...HERO_CONFIG, h: 151 };
     expect(exportStl(other).hash).not.toBe(exportStl(HERO_CONFIG).hash);
+  });
+});
+
+// ── Objets plats (WP-02) : Cartouche, Relief, Borne ─────────────────────────
+
+const LOCALES = ["fr", "de", "it", "en"] as const;
+
+/**
+ * Vérifie un maillage d'export objet plat, PAR COQUE : toutes les arêtes
+ * partagées par exactement 2 triangles opposés, aucun triangle d'aire < 1e-6,
+ * chaque coque de volume signé > 0, boîte dans 250³, plateau en z = 0.
+ */
+function expectShells(
+  mesh: MeshData,
+  label: string,
+  expectedHeight?: number,
+): ReturnType<typeof checkManifold> {
+  const report = checkManifold(mesh);
+  expect(report.closed, `${label} : ${JSON.stringify(report)}`).toBe(true);
+  expect(report.degenerateTriangles, label).toBe(0);
+  expect(report.componentVolumes, label).toHaveLength(report.components);
+  for (const volume of report.componentVolumes) {
+    expect(volume, `${label} : coque de volume ${volume}`).toBeGreaterThan(0);
+  }
+  expect(meshVolume(mesh), label).toBeGreaterThan(0);
+  const [x0, y0, z0, x1, y1, z1] = mesh.bbox;
+  expect(x1 - x0, label).toBeLessThanOrEqual(250);
+  expect(y1 - y0, label).toBeLessThanOrEqual(250);
+  expect(z1 - z0, label).toBeLessThanOrEqual(250);
+  expect(z0, label).toBeCloseTo(0, 6);
+  if (expectedHeight !== undefined) {
+    expect(z1, label).toBeCloseTo(expectedHeight, 4);
+  }
+  expect(mesh.triangles, label).toBeLessThanOrEqual(STL_MAX_TRIANGLES);
+  return report;
+}
+
+describe("Objets plats : variété du maillage d'export (200 configurations par objet)", () => {
+  beforeAll(() => {
+    loadTestFont();
+  });
+
+  /** Une configuration aléatoire valide (texte sans erreur bloquante) avec ses textes et sa langue. */
+  function* valid<C extends StudioConfig>(
+    seed: number,
+    object: StudioObjectId,
+    draw: (rng: () => number) => C,
+    count: number,
+  ) {
+    const rng = mulberry32(seed);
+    let produced = 0;
+    let rejected = 0;
+    while (produced < count) {
+      const config = draw(rng);
+      // Une fois sur dix : aucun texte (plaque seule, massif sans étiquette).
+      const texts: StudioTexts =
+        rng() < 0.1 ? {} : randomTexts(rng, object);
+      const locale = pick(rng, LOCALES);
+      if (checkPrintability(config, texts, locale).status === "error") {
+        rejected++;
+        continue;
+      }
+      produced++;
+      yield { config, texts, locale, index: produced };
+    }
+    // Le filtre ne doit écarter qu'une minorité de tirages.
+    expect(rejected, `${object} : tirages refusés`).toBeLessThan(count);
+  }
+
+  it("Cartouche : 200 configurations, coques fermées et orientées", () => {
+    for (const { config, texts, locale, index } of valid(
+      20260930,
+      "cartouche",
+      randomCartouche,
+      200,
+    )) {
+      const label = `cartouche #${index} ${JSON.stringify(config)} ${JSON.stringify(texts)}`;
+      const mesh = buildStudioMesh(config, texts, { lod: "export", locale });
+      // La hauteur du maillage est celle des statistiques (un seul calcul).
+      const report = expectShells(
+        mesh,
+        label,
+        computeStats(config, texts).heightMm,
+      );
+      // Gravure : une seule coque (plaque et poches recollées) ; relief : la
+      // plaque plus au moins une coque par lettre ou par forme.
+      if (config.mode === "gravure") expect(report.components, label).toBe(1);
+      else expect(report.components, label).toBeGreaterThanOrEqual(1);
+    }
+  }, 240_000);
+
+  it("Relief : 200 configurations, coques fermées et orientées", () => {
+    for (const { config, texts, locale, index } of valid(
+      20260931,
+      "relief",
+      randomRelief,
+      200,
+    )) {
+      const label = `relief #${index} ${JSON.stringify(config)} ${JSON.stringify(texts)} ${locale}`;
+      const mesh = buildStudioMesh(config, texts, { lod: "export", locale });
+      const strata = computeStats(config, texts, undefined, locale).heightMm;
+      expectShells(mesh, label, strata);
+    }
+  }, 240_000);
+
+  it("Borne : 200 configurations, coques fermées et orientées", () => {
+    for (const { config, texts, locale, index } of valid(
+      20260932,
+      "borne",
+      randomBorne,
+      200,
+    )) {
+      const label = `borne #${index} ${JSON.stringify(config)} ${JSON.stringify(texts)}`;
+      const mesh = buildStudioMesh(config, texts, { lod: "export", locale });
+      const report = expectShells(
+        mesh,
+        label,
+        computeStats(config, texts).heightMm,
+      );
+      if (config.mode === "gravure") expect(report.components, label).toBe(1);
+      // Le porte-nom tient dans 40 à 80 mm (§6.2), congés compris.
+      const length = mesh.bbox[3] - mesh.bbox[0];
+      expect(length, label).toBeGreaterThanOrEqual(39.95);
+      expect(length, label).toBeLessThanOrEqual(80.05);
+    }
+  }, 240_000);
+
+  it("les trois niveaux de détail et tous les préréglages sont des coques fermées", () => {
+    const presets: (readonly [StudioObjectId, StudioConfig])[] = [
+      ...CARTOUCHE_PRESETS.map((p) => ["cartouche", p.config] as const),
+      ...RELIEF_PRESETS.map((p) => ["relief", p.config] as const),
+      ...BORNE_PRESETS.map((p) => ["borne", p.config] as const),
+    ];
+    for (const [object, config] of presets) {
+      for (const lod of ["drag", "display", "export"] as const) {
+        for (const texts of [DEFAULT_TEXTS[object], {}]) {
+          const label = `${lod} ${JSON.stringify(config)}`;
+          expectShells(buildStudioMesh(config, texts, { lod }), label);
+        }
+      }
+    }
+  });
+
+  it("un texte qui déborde ne plante pas le maillage (erreur text-fit signalée, jamais d'exception)", () => {
+    const rng = mulberry32(77);
+    for (let i = 0; i < 40; i++) {
+      const object = pick(rng, ["cartouche", "relief", "borne"] as const);
+      const config =
+        object === "cartouche"
+          ? randomCartouche(rng)
+          : object === "relief"
+            ? { ...randomRelief(rng), label: true }
+            : randomBorne(rng);
+      // Au-delà de toutes les longueurs saisissables (et parfois du plafond dur de 64).
+      const long = "W".repeat(intBetween(rng, 45, 80));
+      const texts: StudioTexts = {
+        name: long,
+        role: long,
+        line1: long,
+        line2: long,
+        peak: long,
+        text: long,
+      };
+      const lod = pick(rng, ["drag", "display", "export"] as const);
+      const mesh = buildStudioMesh(config, texts, { lod });
+      expect(mesh.triangles).toBeGreaterThan(0);
+      expect(checkPrintability(config, texts).status).toBe("error");
+    }
   });
 });
 

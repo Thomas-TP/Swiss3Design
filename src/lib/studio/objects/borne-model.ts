@@ -20,6 +20,7 @@ import {
   circleRing,
   hullRing,
   mirrorRingX,
+  ringsBox,
   roundedPolygonRing,
   roundedRectRing,
   translateRing,
@@ -42,16 +43,28 @@ export const BORNE_MIN_CAP_MM = 5;
 /** Hauteur du relief ou profondeur de la gravure (mm) : le même pour les deux modes (§6.2). */
 export const BORNE_INK_MM = 0.8;
 
+const PIC_TIP_RADIUS = 1.8; // congé des trois sommets du pic (mm)
 const PAD_V = 1.5; // marge verticale du texte (mm)
 const PAD_X = 1.8; // marge horizontale du texte avant le bord (mm)
 const WALL = 2; // matière autour du trou d'anneau (mm)
 /**
  * Demi-hauteur d'encre (en capitales) au-dessus et au-dessous de l'axe des
- * capitales centrées : les accents des capitales montent à 1,29 capitale (soit
- * 0,79 au-dessus de l'axe) et les queues descendent à 0,31 (0,81 au-dessous) ;
- * le corps tient donc les deux avec la même marge.
+ * capitales centrées, d'après le texte : les accents des capitales montent à
+ * 1,29 capitale (soit 0,79 au-dessus de l'axe) et les queues descendent à 0,31
+ * (0,81 au-dessous) ; ce sont des plafonds, donc le corps ne change pas à la
+ * saisie d'un é. Seuls un Å (1,37) ou une cédille de virgule (Ģ, −0,56) le
+ * grandissent : sans cela leur encre sortirait de la plaque.
  */
-const HALF_INK = 0.805;
+const HALF_INK_FLOOR = 0.81;
+const ASCENT_FLOOR = 1.29;
+const DESCENT_FLOOR = 0.31;
+
+export function halfInkOf(text: string): number {
+  const m = measureText(text);
+  const up = Math.max(ASCENT_FLOOR, m.yMaxPerCap) - 0.5;
+  const down = 0.5 + Math.max(DESCENT_FLOOR, -m.yMinPerCap);
+  return Math.max(HALF_INK_FLOOR, up, down);
+}
 
 interface Plan {
   length: number;
@@ -68,9 +81,9 @@ function arcInset(radius: number, dy: number): number {
   return radius - Math.sqrt(Math.max(radius * radius - dy * dy, 0));
 }
 
-/** Hauteur du corps pour une capitale (mm). */
-export function borneBodyHeight(capMm: number): number {
-  return 2 * (HALF_INK * capMm + PAD_V);
+/** Hauteur du corps pour une capitale et une demi-hauteur d'encre (mm). */
+export function borneBodyHeight(capMm: number, halfInk = HALF_INK_FLOOR): number {
+  return 2 * (halfInk * capMm + PAD_V);
 }
 
 /**
@@ -82,13 +95,14 @@ function plan(
   config: BorneConfig,
   capMm: number,
   textWidth: number,
+  halfInk: number,
   arc: number,
 ): Plan {
-  const H = borneBodyHeight(capMm);
+  const H = borneBodyHeight(capMm, halfInk);
   const R = H / 2;
   const hasRing = config.ring !== "aucun";
   const ringR = config.ringD / 2;
-  const dyMax = HALF_INK * capMm;
+  const dyMax = halfInk * capMm;
   const lug = arcInset(R, dyMax) + PAD_X;
 
   switch (config.shape) {
@@ -157,22 +171,27 @@ function plan(
       const start = (hasRing ? holeX + ringR + WALL : 3) + PAD_X;
       const need = H + 1.6;
       const share = 1 - need / base;
-      const length = Math.max(
-        BORNE_LENGTH.min,
-        (start + textWidth + 1) / share,
-      );
-      const reach = length * share - 1;
+      // Le congé de la pointe raccourcit la longueur réelle de
+      // `r / sin(demi-angle) − r` : le sommet du triangle va plus loin pour que
+      // le porte-nom mesure bien 40 mm au moins (et la longueur du texte au
+      // plus, 80 mm).
+      const shave = (apex: number) =>
+        PIC_TIP_RADIUS * (1 / Math.sin(Math.atan(base / 2 / apex)) - 1);
+      let minApex = BORNE_LENGTH.min;
+      for (let i = 0; i < 4; i++) minApex = BORNE_LENGTH.min + shave(minApex);
+      const apex = Math.max(minApex, (start + textWidth + 1) / share);
+      const reach = apex * share - 1;
       return {
-        length,
+        length: apex - shave(apex),
         height: base,
         textLeft: start + (reach - start - textWidth) / 2,
         outline: roundedPolygonRing(
           [
             [0, -base / 2],
-            [length, 0],
+            [apex, 0],
             [0, base / 2],
           ],
-          1.8,
+          PIC_TIP_RADIUS,
           arc,
         ),
         hole: hasRing ? { x: holeX, r: ringR } : null,
@@ -193,15 +212,16 @@ export function layoutBorne(
     issues.push({ code: "text-char", field: "text", char });
   }
   const perCap = measureText(text).perCap;
+  const halfInk = halfInkOf(text);
 
   // Plus grande capitale (au dixième de mm, de la demandée à 5 mm) dont le
   // porte-nom tient dans 80 mm ; sinon la capitale minimale et `text-fit`.
   let tenths = Math.round(config.cap * 10);
   const minTenths = Math.round(BORNE_MIN_CAP_MM * 10);
-  let chosen = plan(config, tenths / 10, perCap * (tenths / 10), arc);
+  let chosen = plan(config, tenths / 10, perCap * (tenths / 10), halfInk, arc);
   while (chosen.length > BORNE_LENGTH.max + 1e-9 && tenths > minTenths) {
     tenths--;
-    chosen = plan(config, tenths / 10, perCap * (tenths / 10), arc);
+    chosen = plan(config, tenths / 10, perCap * (tenths / 10), halfInk, arc);
   }
   const capMm = tenths / 10;
   if (chosen.length > BORNE_LENGTH.max + 1e-9) {
@@ -256,6 +276,10 @@ export function layoutBorne(
       ]
     : [];
 
+  // Dimensions réelles du contour (les pointes arrondies du pic raccourcissent
+  // un peu la longueur nominale).
+  const [bx0, by0, bx1, by1] = ringsBox([outline.outer]);
+
   return {
     object: "borne",
     mode: config.mode,
@@ -264,8 +288,8 @@ export function layoutBorne(
     decor: [],
     plateMm: config.thickness,
     inkMm: BORNE_INK_MM,
-    widthMm: length,
-    depthMm: chosen.height,
+    widthMm: bx1 - bx0,
+    depthMm: by1 - by0,
     plate: config.base,
     ink: config.ink,
     issues,

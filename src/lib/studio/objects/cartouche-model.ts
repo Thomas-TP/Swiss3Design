@@ -15,6 +15,14 @@
 // longue rétrécit jusqu'à ce minimum, puis `text-fit` (le texte est quand même
 // tracé, débordant : l'interface bloque l'envoi tant qu'une erreur subsiste).
 //
+// Lignes EMPILÉES d'après l'encre réelle : chaque ligne se place sous la
+// précédente à `GAP_MM` de sa plus basse encre (queue de g, cédille) et sous la
+// plus haute de la suivante (accent des capitales). Les plafonds (accents à
+// 1,29 capitale, queues à 0,31) valent aussi pour une ligne vide ou sans
+// accent : la mise en page ne bouge donc que pour un Å (1,37) ou un Ģ (−0,56),
+// jamais à la saisie d'un é. Sans cela, l'accent d'une fonction frôle la queue
+// d'un nom, et la gravure (qui suppose des formes d'encre disjointes) s'ouvre.
+//
 // Modèle pur (métriques seulement, aucun contour de glyphe) : identique en SSR
 // et côté client. Le maillage est dans `cartouche.ts`.
 import type { Polygon } from "../kernel/extrude";
@@ -30,6 +38,7 @@ import {
   codePoints,
   isSupportedChar,
   lineStartX,
+  measureText,
   MIN_CAP_MM,
   MIN_NAME_CAP_MM,
   textWidthMm,
@@ -46,15 +55,53 @@ const MARGIN = 5;
 /** Largeur maximale des initiales du monogramme (mm) et capitale nominale / minimale. */
 const MONOGRAM = { capMm: 18, minCapMm: 8, maxWidthMm: 28, gapMm: 5 } as const;
 
-interface LineSlot {
-  field: TextField;
-  cap: number;
-  /** Ligne de base (mm). */
-  baseline: number;
-  /** Repère horizontal et alignement. */
+/** Écart minimal entre l'encre de deux lignes superposées (mm). */
+export const GAP_MM = 0.8;
+/** Écart entre l'encre du nom et le filet, puis entre le filet et la fonction (mm). */
+const RULE_GAP_MM = 1.2;
+const RULE_HEIGHT_MM = 1;
+/** Plafonds de l'encre d'une ligne, en capitales : accents des capitales, queues (g, p, y, ç). */
+const ASCENT_FLOOR = 1.29;
+const DESCENT_FLOOR = 0.31;
+
+const NAME = 5.2;
+const ROLE = 4;
+const SMALL = 3.6;
+const FIELDS = ["name", "role", "line1", "line2"] as const;
+type CardField = (typeof FIELDS)[number];
+
+interface Column {
   x: number;
   align: TextAlign;
   maxWidth: number;
+}
+
+/** Ce qui change d'une mise en page à l'autre : colonnes, repères et formes d'encre. */
+interface Plan {
+  decor: Polygon[];
+  column: Record<CardField, Column>;
+  /** Nom : arête haute de ses capitales (mm), ou sa ligne de base. */
+  nameTop?: number;
+  nameBaseline?: number;
+  /** Ligne 2 : arête basse de son encre (mm), ou sa ligne de base. */
+  bottomEdge?: number;
+  line2Baseline?: number;
+  /** Filet entre le nom et la fonction : abscisses. */
+  rule?: { x0: number; x1: number };
+  /** Sommet des initiales du monogramme (mm). */
+  monogramTop?: number;
+}
+
+/** Encre d'une ligne au-dessus et au-dessous de sa ligne de base (mm), plafonds compris. */
+function inkExtent(
+  text: string | undefined,
+  cap: number,
+): { up: number; down: number } {
+  const m = text ? measureText(text) : null;
+  return {
+    up: Math.max(ASCENT_FLOOR, m?.yMaxPerCap ?? 0) * cap,
+    down: Math.max(DESCENT_FLOOR, -(m?.yMinPerCap ?? 0)) * cap,
+  };
 }
 
 /** Profondeur réelle de la gravure : la plaque garde au moins 0,4 mm sous la gravure. */
@@ -96,250 +143,98 @@ export function layoutCartouche(
   const top = y1 - MARGIN;
   const bottom = y0 + MARGIN;
   const clean = sanitizeTexts("cartouche", texts);
-  const decor: Polygon[] = [];
-  const slots: LineSlot[] = [];
   const lines: PlacedLine[] = [];
   const issues: TextIssue[] = [];
 
-  const NAME = 5.2;
-  const ROLE = 4;
-  const SMALL = 3.6;
-  // Descente des caractères à queue (g, p, y, ç) : 0,3 capitale, gardée sous la ligne du bas.
-  const lowBase = bottom + 0.3 * SMALL;
-  const nameBase = top - NAME;
-  const roleBase = nameBase - 6.7;
-  const lineGap = SMALL + 2.6;
+  const plan = planOf(config, clean.name, {
+    x0,
+    x1,
+    y0,
+    y1,
+    left,
+    right,
+    top,
+    bottom,
+    arc,
+  });
 
-  switch (config.layout) {
-    case "classique": {
-      decor.push({ outer: circleRing(right - 1.5, top - 1.5, 1.5, 4 * arc) });
-      const nameMax = right - 6 - left;
-      slots.push(
-        {
-          field: "name",
-          cap: NAME,
-          baseline: nameBase,
-          x: left,
-          align: "left",
-          maxWidth: nameMax,
-        },
-        {
-          field: "role",
-          cap: ROLE,
-          baseline: roleBase,
-          x: left,
-          align: "left",
-          maxWidth: right - left,
-        },
-        {
-          field: "line1",
-          cap: SMALL,
-          baseline: lowBase + lineGap,
-          x: left,
-          align: "left",
-          maxWidth: right - left,
-        },
-        {
-          field: "line2",
-          cap: SMALL,
-          baseline: lowBase,
-          x: left,
-          align: "left",
-          maxWidth: right - left,
-        },
-      );
-      break;
-    }
-    case "centree": {
-      const maxWidth = right - left;
-      slots.push(
-        {
-          field: "name",
-          cap: NAME,
-          baseline: 9.6,
-          x: 0,
-          align: "center",
-          maxWidth,
-        },
-        {
-          field: "role",
-          cap: ROLE,
-          baseline: 2.9,
-          x: 0,
-          align: "center",
-          maxWidth,
-        },
-        {
-          field: "line1",
-          cap: SMALL,
-          baseline: -7.5,
-          x: 0,
-          align: "center",
-          maxWidth,
-        },
-        {
-          field: "line2",
-          cap: SMALL,
-          baseline: -13.7,
-          x: 0,
-          align: "center",
-          maxWidth,
-        },
-      );
-      break;
-    }
-    case "cartouche": {
-      // Cadre de 1 mm à 4 mm du bord ; contenu à 8 mm du bord.
-      const r = config.corner;
-      decor.push({
-        outer: roundedRectRing(
-          x0 + 4,
-          y0 + 4,
-          x1 - 4,
-          y1 - 4,
-          Math.max(0, r - 4),
-          arc,
-        ),
-        holes: [
-          roundedRectRing(
-            x0 + 5,
-            y0 + 5,
-            x1 - 5,
-            y1 - 5,
-            Math.max(0, r - 5),
-            arc,
-          ),
-        ],
+  // 1. Capitale retenue de chaque ligne (ajustement à la largeur de sa colonne).
+  const cap: Record<CardField, number> = { name: NAME, role: ROLE, line1: SMALL, line2: SMALL };
+  for (const field of FIELDS) {
+    const text = clean[field];
+    if (!text) continue;
+    const check = checkLine({
+      field,
+      text,
+      capMm: field === "name" ? NAME : field === "role" ? ROLE : SMALL,
+      minCapMm: field === "name" ? MIN_NAME_CAP_MM : MIN_CAP_MM,
+      maxWidthMm: plan.column[field].maxWidth,
+    });
+    issues.push(...check.issues);
+    cap[field] = check.capMm;
+  }
+
+  // 2. Lignes de base : du haut vers le bas pour le nom, le filet et la
+  //    fonction ; du bas vers le haut pour la ligne 2 puis la ligne 1.
+  const ext = {
+    name: inkExtent(clean.name, cap.name),
+    role: inkExtent(clean.role, cap.role),
+    line1: inkExtent(clean.line1, cap.line1),
+    line2: inkExtent(clean.line2, cap.line2),
+  };
+  const base = {} as Record<CardField, number>;
+  base.name = plan.nameBaseline ?? (plan.nameTop ?? top) - cap.name;
+  const decor = plan.decor.slice();
+  if (plan.rule) {
+    const ruleTop = base.name - ext.name.down - RULE_GAP_MM;
+    decor.push({
+      outer: [
+        [plan.rule.x0, ruleTop - RULE_HEIGHT_MM],
+        [plan.rule.x1, ruleTop - RULE_HEIGHT_MM],
+        [plan.rule.x1, ruleTop],
+        [plan.rule.x0, ruleTop],
+      ],
+    });
+    base.role =
+      ruleTop - RULE_HEIGHT_MM - RULE_GAP_MM - ext.role.up;
+  } else {
+    base.role = base.name - ext.name.down - GAP_MM - ext.role.up;
+  }
+  base.line2 = plan.line2Baseline ?? (plan.bottomEdge ?? bottom) + ext.line2.down;
+  base.line1 = base.line2 + ext.line2.up + GAP_MM + ext.line1.down;
+
+  // 3. Initiales du monogramme : sommet de l'encre au repère haut.
+  if (plan.monogramTop !== undefined && clean.name) {
+    const initials = initialsOf(clean.name);
+    if (initials) {
+      const check = checkLine({
+        field: "name",
+        text: initials,
+        capMm: MONOGRAM.capMm,
+        minCapMm: MONOGRAM.minCapMm,
+        maxWidthMm: MONOGRAM.maxWidthMm,
       });
-      const cl = x0 + 8;
-      const cr = x1 - 8;
-      const ct = y1 - 8;
-      const cb = y0 + 8;
-      const base1 = ct - NAME;
-      const ruleTop = base1 - 0.3 * NAME - 1.6;
-      decor.push({
-        outer: [
-          [cl, ruleTop - 1],
-          [cr, ruleTop - 1],
-          [cr, ruleTop],
-          [cl, ruleTop],
-        ],
+      const up = Math.max(1, measureText(initials).yMaxPerCap) * check.capMm;
+      lines.push({
+        key: "monogram",
+        text: initials,
+        capMm: check.capMm,
+        x: left,
+        y: plan.monogramTop - up,
       });
-      const low = cb + 0.3 * SMALL;
-      const maxWidth = cr - cl;
-      slots.push(
-        {
-          field: "name",
-          cap: NAME,
-          baseline: base1,
-          x: cl,
-          align: "left",
-          maxWidth,
-        },
-        {
-          field: "role",
-          cap: ROLE,
-          baseline: ruleTop - 1 - 1.3 - ROLE,
-          x: cl,
-          align: "left",
-          maxWidth,
-        },
-        {
-          field: "line1",
-          cap: SMALL,
-          baseline: low + lineGap,
-          x: cl,
-          align: "left",
-          maxWidth,
-        },
-        {
-          field: "line2",
-          cap: SMALL,
-          baseline: low,
-          x: cl,
-          align: "left",
-          maxWidth,
-        },
-      );
-      break;
-    }
-    case "monogramme": {
-      const initials = clean.name ? initialsOf(clean.name) : "";
-      let columnX = left;
-      if (initials) {
-        const check = checkLine({
-          field: "name",
-          text: initials,
-          capMm: MONOGRAM.capMm,
-          minCapMm: MONOGRAM.minCapMm,
-          maxWidthMm: MONOGRAM.maxWidthMm,
-        });
-        const width = textWidthMm(initials, check.capMm);
-        lines.push({
-          key: "monogram",
-          text: initials,
-          capMm: check.capMm,
-          x: left,
-          y: top - check.capMm,
-        });
-        columnX = left + width + MONOGRAM.gapMm;
-      }
-      const columnWidth = right - columnX;
-      slots.push(
-        {
-          field: "name",
-          cap: NAME,
-          baseline: nameBase,
-          x: columnX,
-          align: "left",
-          maxWidth: columnWidth,
-        },
-        {
-          field: "role",
-          cap: ROLE,
-          baseline: roleBase,
-          x: columnX,
-          align: "left",
-          maxWidth: columnWidth,
-        },
-        {
-          field: "line1",
-          cap: SMALL,
-          baseline: lowBase + lineGap,
-          x: left,
-          align: "left",
-          maxWidth: right - left,
-        },
-        {
-          field: "line2",
-          cap: SMALL,
-          baseline: lowBase,
-          x: left,
-          align: "left",
-          maxWidth: right - left,
-        },
-      );
-      break;
     }
   }
 
-  for (const slot of slots) {
-    const text = clean[slot.field];
+  for (const field of FIELDS) {
+    const text = clean[field];
     if (!text) continue;
-    const check = checkLine({
-      field: slot.field,
-      text,
-      capMm: slot.cap,
-      minCapMm: slot.field === "name" ? MIN_NAME_CAP_MM : MIN_CAP_MM,
-      maxWidthMm: slot.maxWidth,
-    });
-    issues.push(...check.issues);
+    const column = plan.column[field];
     lines.push({
-      key: slot.field,
+      key: field,
       text,
-      capMm: check.capMm,
-      x: lineStartX(text, check.capMm, slot.x, slot.align),
-      y: slot.baseline,
+      capMm: cap[field],
+      x: lineStartX(text, cap[field], column.x, column.align),
+      y: base[field],
     });
   }
 
@@ -359,4 +254,134 @@ export function layoutCartouche(
     ink: config.ink,
     issues,
   };
+}
+
+interface Frame {
+  x0: number;
+  x1: number;
+  y0: number;
+  y1: number;
+  left: number;
+  right: number;
+  top: number;
+  bottom: number;
+  arc: number;
+}
+
+/** Colonnes, repères et formes d'encre de la mise en page. */
+function planOf(
+  config: CartoucheConfig,
+  name: string | undefined,
+  f: Frame,
+): Plan {
+  const full: Column = {
+    x: f.left,
+    align: "left",
+    maxWidth: f.right - f.left,
+  };
+  switch (config.layout) {
+    case "classique":
+      return {
+        decor: [
+          {
+            outer: circleRing(f.right - 1.5, f.top - 1.5, 1.5, 4 * f.arc),
+          },
+        ],
+        // Le nom laisse 6 mm au disque de 3 mm.
+        column: {
+          name: { ...full, maxWidth: f.right - 6 - f.left },
+          role: full,
+          line1: full,
+          line2: full,
+        },
+        nameTop: f.top,
+        bottomEdge: f.bottom,
+      };
+    case "centree": {
+      const centered: Column = {
+        x: 0,
+        align: "center",
+        maxWidth: f.right - f.left,
+      };
+      return {
+        decor: [],
+        column: {
+          name: centered,
+          role: centered,
+          line1: centered,
+          line2: centered,
+        },
+        nameBaseline: 9.6,
+        line2Baseline: -13.7,
+      };
+    }
+    case "cartouche": {
+      // Cadre de 1 mm à 4 mm du bord ; contenu à 8 mm du bord.
+      const r = config.corner;
+      const cl = f.x0 + 8;
+      const cr = f.x1 - 8;
+      const content: Column = { x: cl, align: "left", maxWidth: cr - cl };
+      return {
+        decor: [
+          {
+            outer: roundedRectRing(
+              f.x0 + 4,
+              f.y0 + 4,
+              f.x1 - 4,
+              f.y1 - 4,
+              Math.max(0, r - 4),
+              f.arc,
+            ),
+            holes: [
+              roundedRectRing(
+                f.x0 + 5,
+                f.y0 + 5,
+                f.x1 - 5,
+                f.y1 - 5,
+                Math.max(0, r - 5),
+                f.arc,
+              ),
+            ],
+          },
+        ],
+        column: {
+          name: content,
+          role: content,
+          line1: content,
+          line2: content,
+        },
+        nameTop: f.y1 - 8,
+        bottomEdge: f.y0 + 8,
+        rule: { x0: cl, x1: cr },
+      };
+    }
+    case "monogramme": {
+      // La colonne du nom et de la fonction commence après les initiales.
+      let columnX = f.left;
+      const initials = name ? initialsOf(name) : "";
+      if (initials) {
+        const check = checkLine({
+          field: "name",
+          text: initials,
+          capMm: MONOGRAM.capMm,
+          minCapMm: MONOGRAM.minCapMm,
+          maxWidthMm: MONOGRAM.maxWidthMm,
+        });
+        columnX =
+          f.left + textWidthMm(initials, check.capMm) + MONOGRAM.gapMm;
+      }
+      const column: Column = {
+        x: columnX,
+        align: "left",
+        maxWidth: f.right - columnX,
+      };
+      return {
+        decor: [],
+        column: { name: column, role: column, line1: full, line2: full },
+        nameTop: f.top,
+        bottomEdge: f.bottom,
+        monogramTop: f.top,
+      };
+    }
+  }
 }
