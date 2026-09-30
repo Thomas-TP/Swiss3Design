@@ -2125,6 +2125,19 @@ glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0�
   `stem × échelle` < 0,8 mm → avertissement, < 0,6 mm → erreur ; hauteur de capitale minimale
   3,6 mm (4 mm pour le nom).
 
+> **Note du 01.10.2026 (WP-02, anticollision des glyphes)** : « pas de crénage » reste vrai (aucune
+> paire n'est resserrée, `AV` et `VA` gardent leur largeur), mais sans garde-fou **923 paires du jeu
+> de 322 caractères se chevauchaient** (« Tî », « gî », « 7ï », ď, ľ…) : l'accent ou le crochet d'un
+> glyphe entre dans la boîte de chasse du voisin, ce qui ouvre la coque de gravure (la condition de la
+> gravure sans CSG est que les formes d'encre restent disjointes). Correctif : une table
+> `GLYPH_HOOKS` (≈ 27 glyphes dont l'encre dépasse de leur boîte : î, ï, ĩ, ď, ľ, j…, générée avec
+> les métriques dans `text/glyph-metrics.ts`) et `pairExtraUnits(a, b)` (`text/layout.ts`), qui ajoute
+> à l'approche **seulement** l'espace que réclame le dépassement, et seulement contre un voisin dont
+> l'encre monte ou descend à la même hauteur. C'est le même calcul pour la mesure (SSR, sans
+> contours) et pour le maillage, donc les chiffres affichés restent ceux de la pièce. Test des
+> 322 × 322 paires (`text/text.test.ts`, outil `text/overlap.ts`) : aucun chevauchement, écart
+> minimal positif.
+
 #### 6.3.4 Cartouche, Relief, Borne (WP-02)
 
 - **Cartouche** : plaque = rectangle arrondi extrudé ; **relief** : glyphes extrudés de `e` sur la
@@ -2148,6 +2161,32 @@ glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0�
   pic = triangle arrondi générique) dimensionné sur le texte, trou d'anneau (`Shape.holes` au sens
   earcut), extrusion `t`, texte en relief ou gravé de 0,8 mm. **Jamais de croix suisse ni
   d'armoiries** ; la forme « pic » n'est pas le mark.
+
+> **Note du 01.10.2026 (WP-02, écarts assumés au brief)** :
+>
+> 1. **Strates du Relief** : la strate k (k = 1 à `lv`) est la zone au-dessus du seuil `t_{k−1}`
+>    (et non au-dessus de `t_k`), sinon la strate du sommet (seuil 1) serait vide.
+> 2. **Cartouche** : les lignes sont empilées d'après l'**encre réelle** (plafonds d'accents 1,29 de
+>    capitale, queues 0,31, écart 0,8 mm, filet à 1,2 mm) et non sur la grille fixe ci-dessus ; les
+>    initiales du monogramme sont calées par le sommet de l'encre. La mise en page ne bouge pas à la
+>    saisie d'un é, seulement pour Å (1,37) ou Ģ (−0,56). Avant : l'accent d'une ligne touchait la
+>    queue d'un nom et ouvrait la gravure (cas n° 164 du tirage aléatoire).
+> 3. **Monogramme** : deux initiales ne tiennent pas à 18 mm dans 28 mm : elles rétrécissent
+>    (« LD » ≈ 12 mm) et le nom rétrécit à son tour (≈ 4,3 mm avec « Léa Dubois ») ; une seule initiale
+>    reste à 18 mm.
+> 4. **Borne** : la hauteur du corps est calculée sur l'encre du texte (mêmes plafonds) ; largeur et
+>    profondeur annoncées = celles du contour réel ; la pointe du pic est compensée pour que le
+>    porte-nom mesure 40 mm au moins.
+> 5. **Pic** : c'est un triangle, donc seuls les mots courts (≈ 3 à 5 lettres à 5 mm) y tiennent en
+>    80 mm ; au-delà l'erreur `text-fit` apparaît.
+> 6. **Étiquette du massif** : « POINTE LÉA · 3 107 M » est **illustrative**. L'altitude réelle est
+>    `peakAltitude(nom)` ; pour « Léa » elle vaut **2 566 m** (le libellé produit est
+>    « POINTE LÉA · 2 566 M », contrôlé le 01.10.2026). **WP-HOME (chapitre 02) doit appeler
+>    `peakLabel(name, locale)`** (ré-exporté par `objects/relief.ts`) et ne jamais figer le texte.
+> 7. **`ranges.ts`** (nouveau) : plages, bornage et aides de strates sortis de `schemas.ts`, qui les
+>    ré-exporte en entier (aucun importeur à changer). Les générateurs, les statistiques, les
+>    garde-fous et `poster-flat` n'embarquent plus zod (Worker de géométrie : 26,7 Kio gzip au lieu de
+>    48,5 ; budget du brief : 60).
 
 #### 6.3.5 Test de variété (WP-01 pour Lavaux, WP-02 pour les autres)
 
