@@ -673,8 +673,11 @@ export function PrinterSchematic({
     >
       <title>{title}</title>
 
-      {/* La machine d'abord : les annotations se posent par-dessus. */}
-      <g transform={`translate(${g.offsetX} ${g.offsetY})`}>
+      {/* La machine d'abord : les annotations se posent par-dessus.
+          `data-machine` : la chorégraphie « about » (src/motion/choreo/about.tsx)
+          y retrouve les tracés à « imprimer » couche par couche ; les renvois,
+          eux, ne portent aucun attribut et n'apparaissent qu'ensuite. */}
+      <g data-machine="" transform={`translate(${g.offsetX} ${g.offsetY})`}>
         {variant === "p1s" ? (
           <>
             <AmsUnit />
