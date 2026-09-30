@@ -8,6 +8,37 @@
 @custom-variant motion-off (&:where([data-motion="reduce"], [data-motion="reduce"] *));
 @custom-variant motion-on (&:where([data-motion="full"], [data-motion="full"] *));
 
+/* ── Repli de Geist Mono ──────────────────────────────────────────────────
+   Geist Mono est à chasse fixe : 0,6 em par caractère, mesuré. Son repli doit
+   l'être aussi, sinon chaque libellé mono change de largeur quand le fichier
+   arrive (voir src/app/fonts.ts). Toutes les polices ci-dessous font 0,60 à
+   0,603 em (mesuré pour Lucida Console : 0,6025 ; Courier New : 0,6001) : au
+   plus 0,4 % d'écart, soit 1 px sur un libellé de 300 px. Le premier installé
+   est pris, dans l'ordre des dessins proches de Geist Mono (sans empattement) :
+   Menlo (macOS, iOS), Lucida Console (Windows), Liberation Mono, Noto Sans Mono,
+   Droid Sans Mono, DejaVu Sans Mono (Linux, Android), et Courier New en dernier
+   recours (à empattements, mais à la bonne chasse). Les métriques verticales
+   sont celles de Geist Mono (1,01 / 0,30 d'em) : le repli y occupe la même
+   hauteur de ligne. */
+@font-face {
+  font-family: "S3D Mono Fallback";
+  src:
+    local("Menlo-Regular"),
+    local("Menlo"),
+    local("Lucida Console"),
+    local("LucidaConsole"),
+    local("Liberation Mono"),
+    local("Noto Sans Mono"),
+    local("Droid Sans Mono"),
+    local("DejaVu Sans Mono"),
+    local("Courier New"),
+    local("CourierNewPSMT");
+  size-adjust: 100%;
+  ascent-override: 101%;
+  descent-override: 30%;
+  line-gap-override: 0%;
+}
+
 /* ── Jetons thémables (noms = contrat, valeurs = direction « Strates ») ──── */
 :root {
   --paper: #f4f0e8;
@@ -98,7 +129,8 @@
   --font-display:
     var(--font-archivo), var(--font-geist-sans), ui-sans-serif, sans-serif;
   --font-mono:
-    var(--font-geist-mono), ui-monospace, "SFMono-Regular", Menlo, monospace;
+    var(--font-geist-mono), "S3D Mono Fallback", ui-monospace,
+    "SFMono-Regular", Menlo, monospace;
 }
 
 @theme {

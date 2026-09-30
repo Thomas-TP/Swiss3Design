@@ -160,7 +160,11 @@ export function AboutNav({
                   data-id={item.id}
                   aria-current={active ? "location" : undefined}
                   className={cx(
-                    "s3d-label relative flex h-12 items-center gap-2 transition-colors duration-150 ease-strate",
+                    // Hauteur fixe et jamais de retour à la ligne : la barre ne
+                    // change ni de hauteur ni de défilement interne quand la
+                    // police mono arrive (le repli a la même chasse, voir
+                    // globals.css).
+                    "s3d-label relative flex h-12 items-center gap-2 whitespace-nowrap transition-colors duration-150 ease-strate",
                     active ? "text-ink" : "text-soft hover:text-ink",
                   )}
                 >

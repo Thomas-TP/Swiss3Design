@@ -17,11 +17,22 @@ export const geist = Geist({
 });
 
 // Télémétrie mono : jamais un élément LCP, donc pas de préchargement.
+//
+// adjustFontFallback désactivé : next/font calcule le repli contre Arial
+// (size-adjust 134,59 %), donc une police À CHASSE VARIABLE. Or Geist Mono est
+// à chasse fixe (0,6 em par caractère) : avant l'arrivée du fichier, un libellé
+// en capitales et chiffres était environ 25 % plus large (0 : 74,9 px contre
+// 60 px à 100 px de corps, W : 127 contre 60, i : 30 contre 60), puis se
+// rétrécissait d'un coup au remplacement (la barre de l'Atelier passait de 311
+// à 230 px, décalage de mise en page de 0,04 à 0,1). Le repli est déclaré à la
+// main dans globals.css (« S3D Mono Fallback », Courier New et équivalents,
+// eux aussi à 0,6 em) : mêmes largeurs, le remplacement ne déplace plus rien.
 export const geistMono = Geist_Mono({
   subsets: ["latin"],
   variable: "--font-geist-mono",
   display: "swap",
   preload: false,
+  adjustFontFallback: false,
 });
 
 // Titres : Archivo, largeur figée à 112,5 (SemiExpanded), graisse variable
