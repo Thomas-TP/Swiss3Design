@@ -104,7 +104,11 @@ export function checkQuoteFile(
   name: string,
   bytes: number,
 ): QuoteUploadErrorCode | null {
-  if (!(QUOTE_UPLOAD_EXTENSIONS as readonly string[]).includes(fileExtension(name)))
+  if (
+    !(QUOTE_UPLOAD_EXTENSIONS as readonly string[]).includes(
+      fileExtension(name),
+    )
+  )
     return 415;
   if (bytes > QUOTE_UPLOAD_MAX_BYTES) return 413;
   return null;

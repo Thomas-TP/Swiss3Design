@@ -167,7 +167,9 @@ describe("uploadQuoteFile", () => {
     for (const status of [500, 502, 404]) {
       const pending = uploadQuoteFile(stl());
       xhr().respond(status, "boom");
-      const error = (await pending.catch((e: unknown) => e)) as QuoteUploadError;
+      const error = (await pending.catch(
+        (e: unknown) => e,
+      )) as QuoteUploadError;
       expect(error.code).toBe("network");
       expect(error.status).toBe(status);
     }

@@ -67,7 +67,10 @@ export default async function CustomPage({
             {/* Ancre sur la fiche : Lenis (ou le navigateur) fait défiler. */}
             <a
               href="#demande"
-              className={buttonClass({ variant: "secondary", className: "mt-auto" })}
+              className={buttonClass({
+                variant: "secondary",
+                className: "mt-auto",
+              })}
             >
               {t("entries.file.cta")}
               <ArrowDown size={16} strokeWidth={1.5} aria-hidden="true" />
@@ -78,14 +81,8 @@ export default async function CustomPage({
             <h2 className="font-display text-title text-ink">
               {t("entries.studio.title")}
             </h2>
-            <p className="max-w-[45ch] text-soft">
-              {t("entries.studio.body")}
-            </p>
-            <ButtonLink
-              href="/studio"
-              variant="secondary"
-              className="mt-auto"
-            >
+            <p className="max-w-[45ch] text-soft">{t("entries.studio.body")}</p>
+            <ButtonLink href="/studio" variant="secondary" className="mt-auto">
               {tShell("studio")}
             </ButtonLink>
           </li>

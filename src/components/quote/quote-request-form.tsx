@@ -201,8 +201,7 @@ export function QuoteRequestForm({
   // oxlint-enable exhaustive-deps
 
   // Variante « drawer » avec description préremplie : tout vient de `prefill`.
-  const locked =
-    variant === "drawer" && Boolean(prefill?.description?.trim());
+  const locked = variant === "drawer" && Boolean(prefill?.description?.trim());
   const showMaterial = !locked && Boolean(materials && materials.length > 0);
   const showFileField = variant === "page" && !attachment;
   const uploading = file.state.status === "uploading";
@@ -366,8 +365,16 @@ export function QuoteRequestForm({
 
       {locked ? (
         <>
-          <input type="hidden" name="description" value={prefill?.description} />
-          <input type="hidden" name="material" value={prefill?.material ?? ""} />
+          <input
+            type="hidden"
+            name="description"
+            value={prefill?.description}
+          />
+          <input
+            type="hidden"
+            name="material"
+            value={prefill?.material ?? ""}
+          />
           <input type="hidden" name="colors" value={prefill?.colors ?? ""} />
           <input
             type="hidden"
@@ -388,7 +395,9 @@ export function QuoteRequestForm({
             <Field
               label={tCustom("description")}
               htmlFor={ids.description}
-              hint={t("hints.description", { min: QUOTE_LIMITS.descriptionMin })}
+              hint={t("hints.description", {
+                min: QUOTE_LIMITS.descriptionMin,
+              })}
               required
             >
               <textarea
@@ -411,9 +420,7 @@ export function QuoteRequestForm({
                 <div className="flex flex-col gap-2">
                   <span className="s3d-label text-soft">
                     {tCustom("material")}{" "}
-                    <span className="normal-case">
-                      ({tCustom("optional")})
-                    </span>
+                    <span className="normal-case">({tCustom("optional")})</span>
                   </span>
                   <Select
                     name="material"
@@ -438,9 +445,7 @@ export function QuoteRequestForm({
                 label={
                   <>
                     {tCustom("colors")}{" "}
-                    <span className="normal-case">
-                      ({tCustom("optional")})
-                    </span>
+                    <span className="normal-case">({tCustom("optional")})</span>
                   </>
                 }
                 htmlFor={ids.colors}

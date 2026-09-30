@@ -17,11 +17,7 @@ import {
   uploadQuoteFile,
   type QuoteUploadErrorCode,
 } from "@/lib/quote-upload-client";
-import {
-  QUOTE_CONTACT_EMAIL,
-  formatBytes,
-  formatPercent,
-} from "./quote-logic";
+import { QUOTE_CONTACT_EMAIL, formatBytes, formatPercent } from "./quote-logic";
 
 // Champ « fichier 3D » du formulaire de devis (brief « Strates », §7.10 :
 // « zone de dépôt plus visible »). Le fichier part à la sélection, pas à
@@ -233,10 +229,7 @@ export function QuoteFileField({
         </label>
       </div>
       {state.status === "error" ? (
-        <p
-          role="alert"
-          className="mt-2 text-sm font-medium text-accent-text"
-        >
+        <p role="alert" className="mt-2 text-sm font-medium text-accent-text">
           {t(`errors.${state.code}`, { email: QUOTE_CONTACT_EMAIL })}
         </p>
       ) : null}
