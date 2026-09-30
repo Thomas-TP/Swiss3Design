@@ -12,7 +12,10 @@
 .page {
   margin-inline: auto;
   inline-size: 100%;
-  max-inline-size: calc(68ch + 6rem);
+  /* 51 rem, pas « 68ch + 6rem » : `ch` suit la police, donc la colonne
+     s'élargissait de 87 px au passage police de repli → Geist (CLS 0,15 à la
+     première visite, mesuré en septembre 2026). Même largeur avec Geist. */
+  max-inline-size: 51rem;
   padding-inline: var(--spacing-margin);
   padding-block: 2.5rem 4rem;
 }
