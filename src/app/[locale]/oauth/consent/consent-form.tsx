@@ -4,6 +4,11 @@ import { useState } from "react";
 import { Check, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
+import {
+  alertError,
+  btnAccentLg,
+  btnGhost,
+} from "../../account/(dashboard)/_ui";
 
 // Réponse au consentement : POST /api/auth/oauth2/consent avec la requête
 // signée de l'URL (jointe par le plugin client oauth-provider). better-auth
@@ -36,7 +41,7 @@ export function ConsentForm() {
   return (
     <div className="space-y-3">
       {failed && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
+        <p role="alert" className={alertError}>
           {t("error")}
         </p>
       )}
@@ -44,18 +49,18 @@ export function ConsentForm() {
         type="button"
         onClick={() => answer(true)}
         disabled={pending !== null}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+        className={btnAccentLg}
       >
-        <Check size={16} />
+        <Check size={16} strokeWidth={1.5} />
         {pending === "accept" ? t("processing") : t("allow")}
       </button>
       <button
         type="button"
         onClick={() => answer(false)}
         disabled={pending !== null}
-        className="flex w-full items-center justify-center gap-2 rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-ink disabled:opacity-60"
+        className={`${btnGhost} w-full`}
       >
-        <X size={16} />
+        <X size={16} strokeWidth={1.5} />
         {pending === "deny" ? t("processing") : t("deny")}
       </button>
     </div>

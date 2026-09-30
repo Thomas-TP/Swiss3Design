@@ -13,6 +13,13 @@ import { useRouter } from "@/i18n/navigation";
 import { useIsDark } from "@/lib/theme";
 import { stripeAppearance } from "@/lib/stripe-appearance";
 import { formatChf } from "@/lib/format";
+import {
+  alertError,
+  badge,
+  badgeNeutral,
+  btnAccentLg,
+  card,
+} from "../../../_ui";
 
 let stripePromise: ReturnType<typeof loadStripe> | null = null;
 // Clé publiable à l'exécution (vars Worker) avec repli sur la valeur inlinée
@@ -62,11 +69,7 @@ export function QuotePayFlow({
   }, [quoteId, locale, t]);
 
   if (error) {
-    return (
-      <p className="mt-5 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
-        {error}
-      </p>
-    );
+    return <p className={`${alertError} mt-5`}>{error}</p>;
   }
   if (!clientSecret) {
     return <p className="mt-5 text-sm text-soft">{t("quotePay.loading")}</p>;
@@ -119,20 +122,22 @@ function PayStep({
   }
 
   return (
-    <div className="mt-5 rounded-card border border-line bg-surface p-5 sm:p-7">
+    <div className={`${card} mt-5 sm:p-7`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="text-lg font-bold tracking-tight">{tc("paymentTitle")}</p>
-        <span className="flex items-center gap-1.5 rounded-full bg-paper px-2.5 py-1 text-[11px] font-semibold text-soft ring-1 ring-line">
-          <Lock size={12} />
+        <p className="font-display text-subtitle font-bold text-ink">
+          {tc("paymentTitle")}
+        </p>
+        <span className={`${badge} ${badgeNeutral} gap-1.5`}>
+          <Lock size={12} strokeWidth={1.5} />
           {tc("securedByStripe")}
         </span>
       </div>
 
-      <div className="mt-5 flex items-baseline justify-between rounded-2xl bg-paper px-4 py-3.5 ring-1 ring-line">
+      <div className="mt-5 flex items-baseline justify-between rounded-field bg-paper px-4 py-3.5 ring-1 ring-line">
         <span className="text-sm font-medium text-soft">
           {tc("totalToPay")}
         </span>
-        <span className="text-xl font-bold tabular-nums tracking-tight">
+        <span className="s3d-num font-display text-subtitle font-bold">
           {formatChf(totalCents, locale)}
         </span>
       </div>
@@ -148,16 +153,12 @@ function PayStep({
           }}
         />
       </div>
-      {error && (
-        <p className="mt-5 rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
-          {error}
-        </p>
-      )}
+      {error && <p className={`${alertError} mt-5`}>{error}</p>}
       <button
         type="button"
         onClick={pay}
         disabled={checkoutState.type !== "success" || paying}
-        className="mt-6 flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+        className={`${btnAccentLg} mt-6`}
       >
         {paying ? (
           <>
@@ -169,14 +170,14 @@ function PayStep({
           </>
         ) : (
           <>
-            <Lock size={15} />
+            <Lock size={15} strokeWidth={1.5} />
             {tc("payNow", { amount: formatChf(totalCents, locale) })}
           </>
         )}
       </button>
 
       <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-soft">
-        <Lock size={12} className="shrink-0" />
+        <Lock size={12} strokeWidth={1.5} className="shrink-0" />
         {tc("paymentReassurance")}
       </p>
     </div>

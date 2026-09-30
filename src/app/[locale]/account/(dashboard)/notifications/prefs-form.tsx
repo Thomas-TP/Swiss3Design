@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { textSuccess } from "../_ui";
 import { updatePreferences } from "./actions";
 
 function Toggle({
@@ -28,12 +29,14 @@ function Toggle({
         aria-checked={checked}
         aria-label={label}
         onClick={() => onChange(!checked)}
-        className={`relative h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors ${
-          checked ? "bg-accent" : "bg-line"
+        // Encre quand c'est activé, gris de contour (4:1) sinon : le rouge reste
+        // aux actions, il ne dit pas « oui » à la place de l'utilisateur.
+        className={`relative h-6 w-11 shrink-0 cursor-pointer rounded-full transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink ${
+          checked ? "bg-ink" : "bg-swatch-ring"
         }`}
       >
         <span
-          className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+          className={`absolute top-0.5 h-5 w-5 rounded-full bg-paper transition-transform duration-150 ease-strate ${
             checked ? "translate-x-5" : "translate-x-0.5"
           }`}
         />
@@ -81,10 +84,12 @@ export function PrefsForm({
         />
       </div>
       {(pending || saved) && (
-        <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-soft">
-          {saved && <Check size={13} className="text-emerald-600" />}
+        <output className="mt-2 flex items-center gap-1.5 text-xs font-medium text-soft">
+          {saved && (
+            <Check size={13} strokeWidth={1.5} className={textSuccess} />
+          )}
           {pending ? t("security.processing") : t("profile.saved")}
-        </p>
+        </output>
       )}
     </div>
   );

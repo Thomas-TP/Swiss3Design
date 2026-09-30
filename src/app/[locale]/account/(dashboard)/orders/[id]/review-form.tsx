@@ -4,6 +4,7 @@ import { useActionState, useState } from "react";
 import { Star } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { submitReview, type ReviewState } from "../actions";
+import { btnPrimarySm, field as fieldClass } from "../../_ui";
 
 // Formulaire d'avis (une ligne de commande livrée). Sélecteur d'étoiles +
 // commentaire. Server Action → état renvoyé (pas de redirect, golden rule).
@@ -24,7 +25,7 @@ export function ReviewForm({
 
   if (state.success) {
     return (
-      <p className="text-sm text-emerald-600 dark:text-emerald-400">
+      <p className="text-sm font-medium text-emerald-800 dark:text-emerald-300">
         {t("thanks")}
       </p>
     );
@@ -55,10 +56,11 @@ export function ReviewForm({
           >
             <Star
               size={22}
+              strokeWidth={1.5}
               className={
                 (hover || rating) >= n
                   ? "fill-accent text-accent-text"
-                  : "text-line"
+                  : "text-swatch-ring"
               }
             />
           </button>
@@ -70,13 +72,16 @@ export function ReviewForm({
         rows={2}
         maxLength={1000}
         placeholder={t("placeholder")}
-        className="w-full rounded-xl border border-line bg-paper px-3 py-2 text-sm outline-none transition-colors focus:border-soft/50"
+        aria-label={t("placeholder")}
+        className={fieldClass}
       />
-      {state.error && <p className="text-xs text-accent-text">{t("error")}</p>}
+      {state.error && (
+        <p className="text-sm font-medium text-accent-text">{t("error")}</p>
+      )}
       <button
         type="submit"
         disabled={pending || rating === 0}
-        className="rounded-full bg-ink px-4 py-1.5 text-xs font-semibold text-paper transition-opacity disabled:opacity-50"
+        className={btnPrimarySm}
       >
         {t("submit")}
       </button>

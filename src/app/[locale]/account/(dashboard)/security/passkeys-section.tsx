@@ -6,7 +6,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { passkey } from "@/lib/auth-client";
 import { describeUserAgent } from "@/lib/user-agent";
-import { card, btnPrimary } from "../_ui";
+import { btnPrimary, card, iconButtonDanger } from "../_ui";
 
 type PasskeyRow = {
   id: string;
@@ -63,11 +63,15 @@ export function PasskeysSection({
   return (
     <div className={card}>
       <div className="flex items-center gap-2.5">
-        <Fingerprint size={18} className="shrink-0 text-soft" />
+        <Fingerprint
+          size={18}
+          strokeWidth={1.5}
+          className="shrink-0 text-soft"
+        />
         <div>
-          <p className="text-sm font-semibold">
+          <h2 className="text-sm font-semibold">
             {t("security.passkeys.title")}
-          </p>
+          </h2>
           <p className="mt-0.5 text-xs text-soft">
             {t("security.passkeys.desc")}
           </p>
@@ -95,10 +99,10 @@ export function PasskeysSection({
                 type="button"
                 onClick={() => onDelete(p.id)}
                 disabled={pending !== null}
-                className="shrink-0 text-soft transition-colors hover:text-accent-text disabled:opacity-40"
+                className={iconButtonDanger}
                 aria-label={t("security.passkeys.delete")}
               >
-                <Trash2 size={15} />
+                <Trash2 size={15} strokeWidth={1.5} />
               </button>
             </li>
           ))}
@@ -115,7 +119,7 @@ export function PasskeysSection({
         disabled={pending !== null}
         className={`${btnPrimary} mt-4`}
       >
-        <Plus size={15} />
+        <Plus size={15} strokeWidth={1.5} />
         {pending === "add"
           ? t("security.processing")
           : t("security.passkeys.add")}

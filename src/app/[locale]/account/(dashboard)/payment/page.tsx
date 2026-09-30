@@ -3,7 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getStripe } from "@/lib/stripe";
 import { getServerSession } from "@/lib/session";
-import { card } from "../_ui";
+import { AccountTitle } from "../account-title";
+import { card, linkAccent } from "../_ui";
 
 export const dynamic = "force-dynamic";
 
@@ -47,21 +48,24 @@ export default async function PaymentTab() {
 
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-xl font-bold">
-        <CreditCard size={19} className="text-soft" />
-        {t("payment.title")}
-      </h1>
-      <p className="mt-1 mb-6 text-sm text-soft">{t("payment.subtitle")}</p>
+      <AccountTitle
+        title={t("payment.title")}
+        subtitle={t("payment.subtitle")}
+        icon={CreditCard}
+      />
 
       <div className="space-y-4">
         <div className={card}>
           <div className="flex items-start gap-2.5">
             <ShieldCheck
               size={18}
+              strokeWidth={1.5}
               className="mt-0.5 shrink-0 text-emerald-600"
             />
             <div>
-              <p className="text-sm font-semibold">{t("payment.linkTitle")}</p>
+              <h2 className="text-sm font-semibold">
+                {t("payment.linkTitle")}
+              </h2>
               <p className="mt-1 text-sm text-soft">{t("payment.linkDesc")}</p>
             </div>
           </div>
@@ -69,16 +73,16 @@ export default async function PaymentTab() {
             href="https://link.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-accent-text hover:underline"
+            className={`${linkAccent} mt-4 inline-flex items-center gap-1.5 text-sm`}
           >
             {t("payment.manageOnLink")}
-            <ExternalLink size={14} />
+            <ExternalLink size={14} strokeWidth={1.5} />
           </a>
         </div>
 
         {cards.length > 0 && (
           <div className={card}>
-            <p className="text-sm font-semibold">{t("payment.cardsTitle")}</p>
+            <h2 className="text-sm font-semibold">{t("payment.cardsTitle")}</h2>
             <ul className="mt-3 divide-y divide-line">
               {cards.map((c) => (
                 <li
@@ -86,10 +90,14 @@ export default async function PaymentTab() {
                   className="flex items-center justify-between gap-3 py-2.5 text-sm"
                 >
                   <span className="flex items-center gap-2.5">
-                    <CreditCard size={15} className="text-soft" />
+                    <CreditCard
+                      size={15}
+                      strokeWidth={1.5}
+                      className="text-soft"
+                    />
                     {BRAND_LABELS[c.brand] ?? c.brand} •••• {c.last4}
                   </span>
-                  <span className="text-xs text-soft tabular-nums">
+                  <span className="s3d-num text-xs text-soft">
                     {String(c.expMonth).padStart(2, "0")}/{c.expYear}
                   </span>
                 </li>

@@ -5,8 +5,9 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { enabledSocialProviders } from "@/lib/auth";
 import { SocialButtons } from "../social-buttons";
+import { AuthShell } from "../auth-shell";
+import { linkAccent, linkSoft } from "../(dashboard)/_ui";
 import { LoginForm } from "./login-form";
-import { BrandMark } from "@/components/brand-mark";
 
 export const dynamic = "force-dynamic";
 
@@ -37,42 +38,36 @@ export default async function LoginPage({
   const isAdminReauthentication = reauth === "admin";
 
   return (
-    <div className="mx-auto max-w-md px-4 py-14 sm:px-6 md:py-20">
-      <BrandMark className="mx-auto h-10 w-10 text-ink" />
-      <h1 className="mt-5 text-center text-3xl font-bold tracking-tight">
-        {t("signInTitle")}
-      </h1>
-      {reauth && (
-        <p className="mt-4 text-center text-sm text-soft">
-          {t(isAdminReauthentication ? "adminReauthNotice" : "reauthNotice")}
-        </p>
+    <AuthShell
+      title={t("signInTitle")}
+      intro={
+        reauth
+          ? t(isAdminReauthentication ? "adminReauthNotice" : "reauthNotice")
+          : undefined
+      }
+      below={
+        <>
+          <p className="mt-5 text-center text-sm text-soft">
+            {t("noAccount")}{" "}
+            <Link href="/account/register" className={linkAccent}>
+              {t("signUpTitle")}
+            </Link>
+          </p>
+          <p className="mt-3 text-center">
+            <Link href="/track" className={linkSoft}>
+              {t("trackOrderLink")}
+            </Link>
+          </p>
+        </>
+      }
+    >
+      <LoginForm
+        next={nextPath}
+        strongReauthentication={isAdminReauthentication}
+      />
+      {!isAdminReauthentication && (
+        <SocialButtons providers={providers} next={nextPath} />
       )}
-      <div className="mt-8 rounded-card border border-line bg-surface p-6 sm:p-8">
-        <LoginForm
-          next={nextPath}
-          strongReauthentication={isAdminReauthentication}
-        />
-        {!isAdminReauthentication && (
-          <SocialButtons providers={providers} next={nextPath} />
-        )}
-      </div>
-      <p className="mt-5 text-center text-sm text-soft">
-        {t("noAccount")}{" "}
-        <Link
-          href="/account/register"
-          className="font-semibold text-accent-text hover:underline"
-        >
-          {t("signUpTitle")}
-        </Link>
-      </p>
-      <p className="mt-3 text-center text-sm text-soft">
-        <Link
-          href="/track"
-          className="font-medium hover:text-ink hover:underline"
-        >
-          {t("trackOrderLink")}
-        </Link>
-      </p>
-    </div>
+    </AuthShell>
   );
 }

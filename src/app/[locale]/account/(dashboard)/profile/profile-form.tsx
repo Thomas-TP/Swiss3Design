@@ -38,6 +38,8 @@ export function ProfileForm({ name }: { name: string }) {
           setSaved(false);
         }}
         maxLength={120}
+        aria-label={t("profile.nameTitle")}
+        autoComplete="name"
         required
         className={`${field} sm:flex-1`}
       />
@@ -46,7 +48,7 @@ export function ProfileForm({ name }: { name: string }) {
         disabled={pending || !value.trim() || value.trim() === name}
         className={btnPrimary}
       >
-        {saved ? <Check size={15} /> : null}
+        {saved ? <Check size={15} strokeWidth={1.5} /> : null}
         {pending
           ? t("security.processing")
           : saved

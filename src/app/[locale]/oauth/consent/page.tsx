@@ -7,8 +7,9 @@ import { oauthClient } from "@/db/schema";
 import { Link, redirect } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getServerSession } from "@/lib/session";
-import { BrandMark } from "@/components/brand-mark";
 import { ScopeList } from "@/components/agent-scope-list";
+import { AuthShell } from "../../account/auth-shell";
+import { alertWarn } from "../../account/(dashboard)/_ui";
 import { ConsentForm } from "./consent-form";
 
 export const dynamic = "force-dynamic";
@@ -39,7 +40,9 @@ function hostOf(url: string | undefined): string | null {
 // Page de consentement OAuth : better-auth y redirige avec la requête
 // d'autorisation signée (?client_id=…&scope=…&sig=…). Le client voit qui
 // demande l'accès, à quoi, et vers quel site il sera renvoyé ; la réponse part
-// par POST /oauth2/consent (ConsentForm), jamais par un simple lien.
+// par POST /oauth2/consent (ConsentForm), jamais par un simple lien. Cadre
+// commun des écrans d'authentification (AuthShell) : hors du groupe (site), donc
+// ni Lenis ni canvas ; le <main> est celui du layout racine.
 export default async function ConsentPage({
   params,
   searchParams,
@@ -80,49 +83,52 @@ export default async function ConsentPage({
   const redirectHost = hostOf(first(query.redirect_uri));
   const appName = client?.name?.trim() || redirectHost || t("consent.unnamed");
 
+  if (!valid) {
+    return (
+      <AuthShell title={t("consent.invalidTitle")}>
+        <p className="text-center text-sm text-soft">
+          {t("consent.invalidBody")}
+        </p>
+      </AuthShell>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-md px-4 py-14 sm:px-6 md:py-20">
-      <BrandMark className="mx-auto h-10 w-10 text-ink" />
-      {valid ? (
-        <>
-          <h1 className="mt-5 text-center text-2xl font-bold tracking-tight">
-            {t("consent.heading", { app: appName })}
-          </h1>
-          <p className="mt-3 text-center text-sm text-soft">
-            {t("consent.signedInAs", { email: session!.user.email })}
-          </p>
-          <div className="mt-8 space-y-5 rounded-card border border-line bg-surface p-6 sm:p-8">
-            <div>
-              <p className="text-sm font-semibold">{t("consent.willAccess")}</p>
-              <ScopeList scopes={scopes} className="mt-3" />
-            </div>
-            {redirectHost && (
-              <p className="text-sm text-soft">
-                {t("consent.redirectTo", { host: redirectHost })}
-              </p>
-            )}
-            <p className="flex gap-2 rounded-xl bg-amber-500/10 px-4 py-3 text-xs text-amber-800 dark:text-amber-200">
-              <ShieldAlert size={16} className="mt-0.5 shrink-0" />
-              {t("consent.unverified")}
-            </p>
-            <ConsentForm />
-          </div>
-          <p className="mt-5 text-center text-xs text-soft">
-            {t("consent.revokeHint")}{" "}
-            <Link
-              href="/account/agents"
-              className="font-medium hover:text-ink hover:underline"
-            >
-              {t("consent.revokeLink")}
-            </Link>
-          </p>
-        </>
-      ) : (
-        <div className="mt-8 rounded-card border border-line bg-surface p-6 text-center sm:p-8">
-          <h1 className="text-xl font-bold">{t("consent.invalidTitle")}</h1>
-          <p className="mt-3 text-sm text-soft">{t("consent.invalidBody")}</p>
+    <AuthShell
+      title={t("consent.heading", { app: appName })}
+      intro={t("consent.signedInAs", { email: session!.user.email })}
+      below={
+        <p className="mt-5 text-center text-sm text-soft">
+          {t("consent.revokeHint")}{" "}
+          <Link
+            href="/account/agents"
+            className="font-medium text-ink underline decoration-line decoration-1 underline-offset-4 transition-colors duration-150 hover:decoration-ink"
+          >
+            {t("consent.revokeLink")}
+          </Link>
+        </p>
+      }
+    >
+      <div className="space-y-5">
+        <div>
+          <h2 className="text-sm font-semibold">{t("consent.willAccess")}</h2>
+          <ScopeList scopes={scopes} className="mt-3" />
         </div>
-      )}
-    </div>
+        {redirectHost && (
+          <p className="text-sm text-soft">
+            {t("consent.redirectTo", { host: redirectHost })}
+          </p>
+        )}
+        <p className={`${alertWarn} flex gap-2`}>
+          <ShieldAlert
+            size={16}
+            strokeWidth={1.5}
+            className="mt-0.5 shrink-0"
+          />
+          {t("consent.unverified")}
+        </p>
+        <ConsentForm />
+      </div>
+    </AuthShell>
   );
 }

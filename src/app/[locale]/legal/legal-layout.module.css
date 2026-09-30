@@ -1,0 +1,113 @@
+/* Typographie des pages légales (brief « Strates » §7.22) : on ne touche qu'à
+   la mise en page, jamais au texte. Les contenus (content.tsx) ne portent que
+   des <p>, des <strong>, des liens et le bouton d'opposition de la politique de
+   confidentialité ; tout ce qui les habille vit ici, lu dans les jetons du
+   thème (`--ink`, `--soft`, `--line`, `--accent-text`) pour suivre le mode
+   sombre. Aucune animation : ces routes sont hors du groupe (site).
+
+   Mesure : 68 caractères au plus par ligne de texte (texte de loi : on lit, on
+   ne survole pas). Le numéro « Art. n » passe dans une colonne de marge à partir
+   de 48 rem ; en dessous il précède le titre sur la même ligne. */
+
+.page {
+  margin-inline: auto;
+  inline-size: 100%;
+  max-inline-size: calc(68ch + 6rem);
+  padding-inline: var(--spacing-margin);
+  padding-block: 2.5rem 4rem;
+}
+
+@media (width >= 48rem) {
+  .page {
+    padding-block: 4rem 6rem;
+  }
+}
+
+/* Avis « la version française fait foi » (de, it, en) : un filet, pas une carte. */
+.notice {
+  margin-block-start: 1.5rem;
+  max-inline-size: 68ch;
+  border-inline-start: 2px solid var(--iso-index);
+  padding-inline-start: 1rem;
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--soft);
+}
+
+.prose {
+  margin-block-start: 3rem;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+/* Un filet entre deux articles, jamais autour : c'est un texte continu. */
+.section {
+  border-block-start: 1px solid var(--line);
+  padding-block: 1.75rem 0.25rem;
+}
+
+.section:first-child {
+  border-block-start: 0;
+  padding-block-start: 0;
+}
+
+.heading {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin: 0 0 0.875rem;
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+/* « Art. 3 » : mono, majuscules, chiffres à chasse fixe (comme une cote). */
+.art {
+  flex: none;
+  min-inline-size: 3.25rem;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1.3;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-variant-numeric: tabular-nums slashed-zero;
+  color: var(--soft);
+}
+
+.body {
+  max-inline-size: 68ch;
+  /* Encre à 84 % : lisible de longue haleine, sans le noir plein des titres. */
+  color: color-mix(in srgb, var(--ink) 84%, transparent);
+}
+
+.body > * + * {
+  margin-block-start: 0.75rem;
+}
+
+.body p {
+  margin: 0;
+}
+
+.body strong {
+  font-weight: 600;
+  color: var(--ink);
+}
+
+@media (width >= 48rem) {
+  .heading {
+    gap: 1.5rem;
+  }
+
+  .art {
+    min-inline-size: 4.5rem;
+  }
+
+  /* Le texte s'aligne sous le titre, le numéro reste dans la marge. */
+  .body {
+    margin-inline-start: 6rem;
+  }
+}

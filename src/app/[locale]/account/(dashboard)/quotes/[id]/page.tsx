@@ -16,21 +16,10 @@ import { getDb } from "@/db";
 import { quoteRequests, quoteMessages } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { formatChf, renderTime } from "@/lib/format";
+import { backLink, btnPrimary, card, statusBadge } from "../../_ui";
 import { QuoteActions } from "./quote-actions";
 
 export const dynamic = "force-dynamic";
-
-const statusStyle: Record<string, string> = {
-  received: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-  quoted: "bg-blue-500/15 text-blue-700 dark:text-blue-300",
-  revision_requested: "bg-orange-500/15 text-orange-700 dark:text-orange-300",
-  accepted: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  declined: "bg-red-500/15 text-red-600 dark:text-red-300",
-  paid: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  in_production: "bg-blue-500/15 text-blue-700 dark:text-blue-300",
-  done: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-  rejected: "bg-stone-500/15 text-stone-600 dark:text-stone-300",
-};
 
 export default async function QuoteDetailPage({
   params,
@@ -95,20 +84,17 @@ export default async function QuoteDetailPage({
 
   return (
     <div className="max-w-xl">
-      <Link
-        href="/account"
-        className="mb-6 inline-flex items-center gap-1.5 text-sm font-medium text-soft transition-colors hover:text-ink"
-      >
-        <ArrowLeft size={15} />
+      <Link href="/account" className={backLink}>
+        <ArrowLeft size={15} strokeWidth={1.5} />
         {t("orderDetail.back")}
       </Link>
 
       {/* En-tête : titre + statut + date */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-bold tracking-tight">{td("title")}</h1>
-        <span
-          className={`rounded-full px-3 py-1 text-xs font-semibold ${statusStyle[quote.status] ?? "bg-line text-soft"}`}
-        >
+        <h1 className="break-words font-display text-title text-ink">
+          {td("title")}
+        </h1>
+        <span className={statusBadge(quote.status)}>
           {t(`quoteStatus.${quote.status}`)}
         </span>
       </div>
@@ -118,7 +104,7 @@ export default async function QuoteDetailPage({
 
       {/* Récap de la demande */}
       <section className="mt-6 rounded-card border border-line bg-surface p-5">
-        <h2 className="mb-2 text-sm font-semibold">{td("requestTitle")}</h2>
+        <h2 className="s3d-label mb-2 text-soft">{td("requestTitle")}</h2>
         <p className="whitespace-pre-wrap text-sm leading-relaxed text-soft">
           {quote.description}
         </p>
@@ -134,7 +120,7 @@ export default async function QuoteDetailPage({
         )}
         {quote.fileName && (
           <p className="mt-3 flex items-center gap-1.5 border-t border-line pt-3 text-sm text-soft">
-            <FileBox size={14} className="shrink-0" />
+            <FileBox size={14} strokeWidth={1.5} className="shrink-0" />
             {quote.fileName}
           </p>
         )}
@@ -142,23 +128,23 @@ export default async function QuoteDetailPage({
 
       {/* Le devis chiffré */}
       {hasQuote && (
-        <section className="mt-5 rounded-card border border-line bg-surface p-5 sm:p-6">
+        <section className={`${card} mt-5`}>
           <p className="text-sm font-medium text-soft">{t("quotedPrice")}</p>
-          <p className="mt-1 text-3xl font-bold tabular-nums tracking-tight">
+          <p className="s3d-num mt-1 font-display text-title text-ink">
             {formatChf(quote.quotedPriceCents!, locale)}
           </p>
           {quote.validUntil && (
             <p
               className={`mt-2 inline-flex items-center gap-1.5 text-xs font-medium ${expired ? "text-accent-text" : "text-soft"}`}
             >
-              <Clock size={13} />
+              <Clock size={13} strokeWidth={1.5} />
               {expired
                 ? td("expired")
                 : td("validUntil", { date: dateFmt(quote.validUntil) })}
             </p>
           )}
           {quote.adminMessage && (
-            <p className="mt-4 whitespace-pre-wrap rounded-xl bg-paper px-4 py-3 text-sm leading-relaxed text-soft ring-1 ring-line">
+            <p className="mt-4 whitespace-pre-wrap rounded-field bg-paper px-4 py-3 text-sm leading-relaxed text-soft ring-1 ring-line">
               {quote.adminMessage}
             </p>
           )}
@@ -196,12 +182,9 @@ export default async function QuoteDetailPage({
       )}
       {quote.status === "declined" && (
         <div className="mt-5 rounded-card border border-line bg-surface p-5 text-center">
-          <Ban size={22} className="mx-auto text-soft" strokeWidth={1.8} />
+          <Ban size={22} className="mx-auto text-soft" strokeWidth={1.5} />
           <p className="mt-3 text-sm text-soft">{td("declinedNote")}</p>
-          <Link
-            href="/custom"
-            className="mt-4 inline-flex items-center gap-1.5 rounded-full bg-ink px-5 py-2.5 text-sm font-semibold text-paper transition-opacity hover:opacity-90"
-          >
+          <Link href="/custom" className={`${btnPrimary} mt-5`}>
             {td("newRequest")}
           </Link>
         </div>
@@ -213,7 +196,7 @@ export default async function QuoteDetailPage({
       {/* Fil de discussion */}
       {messages.length > 0 && (
         <section className="mt-8">
-          <h2 className="mb-3 text-sm font-semibold">{td("threadTitle")}</h2>
+          <h2 className="s3d-label mb-3 text-soft">{td("threadTitle")}</h2>
           <ul className="space-y-3">
             {messages.map((m) => {
               const mine = m.sender === "customer";
@@ -223,26 +206,28 @@ export default async function QuoteDetailPage({
                   className={`flex flex-col ${mine ? "items-end" : "items-start"}`}
                 >
                   <div
-                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
-                      mine
-                        ? "rounded-br-sm bg-accent/10 text-ink"
-                        : "rounded-bl-sm border border-line bg-surface text-ink"
+                    className={`max-w-[85%] rounded-card border bg-surface px-4 py-3 text-sm leading-relaxed text-ink ${
+                      mine ? "border-ink" : "border-line"
                     }`}
                   >
                     {m.priceCents != null && (
-                      <p className="mb-1 text-base font-bold tabular-nums">
+                      <p className="s3d-num mb-1 text-base font-bold">
                         {formatChf(m.priceCents, locale)}
                       </p>
                     )}
                     {m.body && <p className="whitespace-pre-wrap">{m.body}</p>}
                     {m.fileName && (
                       <p className="mt-1.5 flex items-center gap-1.5 text-xs text-soft">
-                        <Paperclip size={12} className="shrink-0" />
+                        <Paperclip
+                          size={12}
+                          strokeWidth={1.5}
+                          className="shrink-0"
+                        />
                         {m.fileName}
                       </p>
                     )}
                   </div>
-                  <span className="mt-1 px-1 text-[11px] text-soft">
+                  <span className="mt-1 px-1 text-xs text-soft">
                     {mine ? td("you") : td("studio")} ·{" "}
                     {m.createdAt.toLocaleDateString(`${locale}-CH`, {
                       day: "numeric",
@@ -271,7 +256,7 @@ function StateNote({
   const styles = {
     info: "border-blue-500/30 bg-blue-500/5 text-blue-700 dark:text-blue-300",
     success:
-      "border-emerald-500/30 bg-emerald-500/5 text-emerald-700 dark:text-emerald-300",
+      "border-emerald-500/30 bg-emerald-500/5 text-emerald-800 dark:text-emerald-300",
     muted: "border-line bg-surface text-soft",
   }[tone];
   return (

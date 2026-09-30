@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { getDb } from "@/db";
 import { notificationPreferences } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
+import { AccountTitle } from "../account-title";
 import { card } from "../_ui";
 import { PrefsForm } from "./prefs-form";
 
@@ -23,13 +24,11 @@ export default async function NotificationsTab() {
 
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-xl font-bold">
-        <Bell size={19} className="text-soft" />
-        {t("notifications.title")}
-      </h1>
-      <p className="mt-1 mb-6 text-sm text-soft">
-        {t("notifications.subtitle")}
-      </p>
+      <AccountTitle
+        title={t("notifications.title")}
+        subtitle={t("notifications.subtitle")}
+        icon={Bell}
+      />
 
       <div className="space-y-4">
         <div className={card}>

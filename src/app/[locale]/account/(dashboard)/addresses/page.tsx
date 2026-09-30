@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { getDb } from "@/db";
 import { customerAddresses } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
+import { AccountTitle } from "../account-title";
 import { AddressBook } from "./address-book";
 
 export const dynamic = "force-dynamic";
@@ -25,11 +26,11 @@ export default async function AddressesTab() {
 
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-xl font-bold">
-        <MapPin size={19} className="text-soft" />
-        {t("addresses.title")}
-      </h1>
-      <p className="mt-1 mb-6 text-sm text-soft">{t("addresses.subtitle")}</p>
+      <AccountTitle
+        title={t("addresses.title")}
+        subtitle={t("addresses.subtitle")}
+        icon={MapPin}
+      />
       <AddressBook
         addresses={addresses.map((a) => ({
           id: a.id,

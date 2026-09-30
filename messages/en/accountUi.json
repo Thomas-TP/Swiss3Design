@@ -1,1 +1,8 @@
-{}
+{
+  "nav": {
+    "label": "Account navigation"
+  },
+  "legal": {
+    "article": "Art."
+  }
+}

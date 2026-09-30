@@ -7,7 +7,16 @@ import { getDb } from "@/db";
 import { orders, quoteRequests } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { formatChf } from "@/lib/format";
-import { card, statusStyle } from "./_ui";
+import { AccountTitle } from "./account-title";
+import {
+  btnAccent,
+  card,
+  linkSoft,
+  rowLink,
+  rowLinkBlock,
+  rowList,
+  statusBadge,
+} from "./_ui";
 
 export const dynamic = "force-dynamic";
 
@@ -70,64 +79,66 @@ export default async function AccountOverview({
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-xl font-bold">
-          {t("greeting", { name: user.name })}
-        </h1>
-        <p className="mt-1 text-sm text-soft">{t("overview.subtitle")}</p>
-      </div>
+      <AccountTitle
+        title={t("greeting", { name: user.name })}
+        subtitle={t("overview.subtitle")}
+        className=""
+      />
 
-      {/* Cartes de synthèse */}
+      {/* Cartes de synthèse : le chiffre d'abord (grand chiffre en Archivo),
+          son libellé dessous. Aucun mouvement au survol. */}
       <div className="grid gap-4 sm:grid-cols-2">
         <Link
           href="/account/orders"
-          className={`${card} group flex items-center justify-between`}
+          className={`${card} group flex items-center justify-between transition-colors duration-150 hover:border-ink`}
         >
           <div>
-            <p className="text-3xl font-bold tabular-nums">{openOrderCount}</p>
+            <p className="s3d-num font-display text-title text-ink">
+              {openOrderCount}
+            </p>
             <p className="mt-1 flex items-center gap-1.5 text-sm text-soft">
-              <Package size={15} />
+              <Package size={15} strokeWidth={1.5} />
               {t("overview.openOrders")}
             </p>
           </div>
           <ArrowRight
             size={18}
-            className="text-soft transition-transform group-hover:translate-x-0.5"
+            strokeWidth={1.5}
+            className="text-soft transition-colors duration-150 group-hover:text-ink"
           />
         </Link>
         <Link
           href="/account/quotes"
-          className={`${card} group flex items-center justify-between`}
+          className={`${card} group flex items-center justify-between transition-colors duration-150 hover:border-ink`}
         >
           <div>
-            <p className="text-3xl font-bold tabular-nums">
+            <p className="s3d-num font-display text-title text-ink">
               {actionQuoteCount}
             </p>
             <p className="mt-1 flex items-center gap-1.5 text-sm text-soft">
-              <FileText size={15} />
+              <FileText size={15} strokeWidth={1.5} />
               {t("overview.actionQuotes")}
             </p>
           </div>
           <ArrowRight
             size={18}
-            className="text-soft transition-transform group-hover:translate-x-0.5"
+            strokeWidth={1.5}
+            className="text-soft transition-colors duration-150 group-hover:text-ink"
           />
         </Link>
       </div>
 
       {isEmpty ? (
         <div className={`${card} text-center`}>
-          <Sparkles size={22} className="mx-auto text-accent-text" />
+          <Sparkles size={22} strokeWidth={1.5} className="mx-auto text-soft" />
           <p className="mt-3 text-sm font-semibold">
             {t("overview.emptyTitle")}
           </p>
           <p className="mt-1 text-sm text-soft">{t("overview.emptyDesc")}</p>
-          <Link
-            href="/shop"
-            className="mt-4 inline-flex items-center gap-2 rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-accent-dark"
-          >
+          {/* Seul bouton rouge de l'écran : l'action principale. */}
+          <Link href="/shop" className={`${btnAccent} mt-5`}>
             {t("overview.emptyCta")}
-            <ArrowRight size={16} />
+            <ArrowRight size={16} strokeWidth={1.5} />
           </Link>
         </div>
       ) : (
@@ -136,36 +147,30 @@ export default async function AccountOverview({
             <section>
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="flex items-center gap-2 font-semibold">
-                  <Package size={17} className="text-soft" />
+                  <Package size={17} strokeWidth={1.5} className="text-soft" />
                   {t("myOrders")}
                 </h2>
-                <Link
-                  href="/account/orders"
-                  className="text-xs font-semibold text-soft transition-colors hover:text-ink"
-                >
+                <Link href="/account/orders" className={linkSoft}>
                   {t("overview.seeAll")}
                 </Link>
               </div>
-              <ul className="divide-y divide-line rounded-card border border-line bg-surface px-5">
+              <ul className={rowList}>
                 {recentOrders.map((o) => (
                   <li key={o.id}>
-                    <Link
-                      href={`/account/orders/${o.id}`}
-                      className="flex items-center justify-between gap-3 py-4 transition-opacity hover:opacity-70"
-                    >
+                    <Link href={`/account/orders/${o.id}`} className={rowLink}>
                       <div>
-                        <p className="text-sm font-semibold">{o.orderNumber}</p>
+                        <p className="s3d-num text-sm font-semibold">
+                          {o.orderNumber}
+                        </p>
                         <p className="text-xs text-soft">
                           {o.createdAt.toLocaleDateString(`${locale}-CH`)}
                         </p>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span
-                          className={`rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusStyle[o.status] ?? "bg-line text-soft"}`}
-                        >
+                        <span className={statusBadge(o.status)}>
                           {t(`status.${o.status}`)}
                         </span>
-                        <span className="text-sm font-semibold tabular-nums">
+                        <span className="s3d-num text-sm font-semibold">
                           {formatChf(o.totalCents, locale)}
                         </span>
                       </div>
@@ -180,30 +185,25 @@ export default async function AccountOverview({
             <section>
               <div className="mb-3 flex items-center justify-between">
                 <h2 className="flex items-center gap-2 font-semibold">
-                  <FileText size={17} className="text-soft" />
+                  <FileText size={17} strokeWidth={1.5} className="text-soft" />
                   {t("myQuotes")}
                 </h2>
-                <Link
-                  href="/account/quotes"
-                  className="text-xs font-semibold text-soft transition-colors hover:text-ink"
-                >
+                <Link href="/account/quotes" className={linkSoft}>
                   {t("overview.seeAll")}
                 </Link>
               </div>
-              <ul className="divide-y divide-line rounded-card border border-line bg-surface px-5">
+              <ul className={rowList}>
                 {recentQuotes.map((q) => (
                   <li key={q.id}>
                     <Link
                       href={`/account/quotes/${q.id}`}
-                      className="block py-4 transition-opacity hover:opacity-70"
+                      className={rowLinkBlock}
                     >
                       <div className="flex items-center justify-between gap-3">
                         <p className="line-clamp-1 text-sm font-medium">
                           {q.description}
                         </p>
-                        <span
-                          className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${statusStyle[q.status] ?? "bg-line text-soft"}`}
-                        >
+                        <span className={statusBadge(q.status)}>
                           {t(`quoteStatus.${q.status}`)}
                         </span>
                       </div>

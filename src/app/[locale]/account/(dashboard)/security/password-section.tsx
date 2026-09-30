@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { KeyRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { changePassword, listAccounts } from "@/lib/auth-client";
-import { card, field, btnPrimary } from "../_ui";
+import { btnPrimary, card, field, textSuccess } from "../_ui";
 import { setPasswordAction } from "./actions";
 
 export function PasswordSection() {
@@ -64,11 +64,11 @@ export function PasswordSection() {
   return (
     <div className={card}>
       <div className="flex items-center gap-2.5">
-        <KeyRound size={18} className="shrink-0 text-soft" />
+        <KeyRound size={18} strokeWidth={1.5} className="shrink-0 text-soft" />
         <div>
-          <p className="text-sm font-semibold">
+          <h2 className="text-sm font-semibold">
             {t("security.passwordSection.title")}
-          </p>
+          </h2>
           <p className="mt-0.5 text-xs text-soft">
             {hasPassword
               ? t("security.passwordSection.descChange")
@@ -85,6 +85,7 @@ export function PasswordSection() {
             onChange={(e) => setCurrent(e.target.value)}
             autoComplete="current-password"
             placeholder={t("security.passwordSection.current")}
+            aria-label={t("security.passwordSection.current")}
             required
             className={field}
           />
@@ -95,6 +96,7 @@ export function PasswordSection() {
           onChange={(e) => setNext(e.target.value)}
           autoComplete="new-password"
           placeholder={t("security.passwordSection.new")}
+          aria-label={t("security.passwordSection.new")}
           minLength={8}
           required
           className={field}
@@ -103,9 +105,9 @@ export function PasswordSection() {
           <p className="text-sm font-medium text-accent-text">{error}</p>
         )}
         {done && (
-          <p className="text-sm font-medium text-emerald-600">
+          <output className={`block text-sm font-medium ${textSuccess}`}>
             {t("security.passwordSection.saved")}
-          </p>
+          </output>
         )}
         <button
           type="submit"

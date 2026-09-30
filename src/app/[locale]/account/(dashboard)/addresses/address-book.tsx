@@ -5,7 +5,17 @@ import { MapPin, Pencil, Plus, Star, Trash2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { CANTONS } from "@/lib/cantons";
-import { card, field, btnPrimary, btnGhost } from "../_ui";
+import {
+  badge,
+  badgeSuccess,
+  btnGhost,
+  btnPrimary,
+  card,
+  field,
+  iconButton,
+  iconButtonDanger,
+  textAction,
+} from "../_ui";
 import {
   addAddress,
   updateAddress,
@@ -64,6 +74,7 @@ function AddressForm({
         value={value.label ?? ""}
         onChange={(e) => setValue({ ...value, label: e.target.value })}
         placeholder={t("addresses.labelPlaceholder")}
+        aria-label={t("addresses.labelPlaceholder")}
         maxLength={40}
         className={field}
       />
@@ -71,6 +82,8 @@ function AddressForm({
         value={value.name}
         onChange={(e) => setValue({ ...value, name: e.target.value })}
         placeholder={tCheckout("name")}
+        aria-label={tCheckout("name")}
+        autoComplete="name"
         required
         minLength={2}
         className={field}
@@ -79,6 +92,8 @@ function AddressForm({
         value={value.street}
         onChange={(e) => setValue({ ...value, street: e.target.value })}
         placeholder={tCheckout("street")}
+        aria-label={tCheckout("street")}
+        autoComplete="street-address"
         required
         minLength={3}
         className={field}
@@ -93,6 +108,8 @@ function AddressForm({
             })
           }
           placeholder={tCheckout("npa")}
+          aria-label={tCheckout("npa")}
+          autoComplete="postal-code"
           inputMode="numeric"
           required
           className={field}
@@ -101,6 +118,8 @@ function AddressForm({
           value={value.city}
           onChange={(e) => setValue({ ...value, city: e.target.value })}
           placeholder={tCheckout("city")}
+          aria-label={tCheckout("city")}
+          autoComplete="address-level2"
           required
           minLength={2}
           className={field}
@@ -109,6 +128,7 @@ function AddressForm({
       <select
         value={value.canton}
         onChange={(e) => setValue({ ...value, canton: e.target.value })}
+        aria-label={tCheckout("canton")}
         required
         className={field}
       >
@@ -182,13 +202,17 @@ export function AddressBook({ addresses }: { addresses: Address[] }) {
             className={`${card} flex items-start justify-between gap-3`}
           >
             <div className="flex items-start gap-2.5">
-              <MapPin size={17} className="mt-0.5 shrink-0 text-soft" />
+              <MapPin
+                size={17}
+                strokeWidth={1.5}
+                className="mt-0.5 shrink-0 text-soft"
+              />
               <div>
                 <p className="flex items-center gap-2 text-sm font-semibold">
                   {a.label || t("addresses.unnamed")}
                   {a.isDefault && (
-                    <span className="flex items-center gap-1 rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
-                      <Star size={11} />
+                    <span className={`${badge} ${badgeSuccess} gap-1`}>
+                      <Star size={11} strokeWidth={1.5} />
                       {t("addresses.default")}
                     </span>
                   )}
@@ -199,13 +223,13 @@ export function AddressBook({ addresses }: { addresses: Address[] }) {
                 </p>
               </div>
             </div>
-            <div className="flex shrink-0 items-center gap-3">
+            <div className="flex shrink-0 flex-wrap items-center justify-end gap-x-2 gap-y-1">
               {!a.isDefault && (
                 <button
                   type="button"
                   onClick={() => onSetDefault(a.id)}
                   disabled={pending !== null}
-                  className="text-xs font-semibold text-soft transition-colors hover:text-ink disabled:opacity-40"
+                  className={textAction}
                 >
                   {t("addresses.makeDefault")}
                 </button>
@@ -213,19 +237,19 @@ export function AddressBook({ addresses }: { addresses: Address[] }) {
               <button
                 type="button"
                 onClick={() => setEditingId(a.id)}
-                className="text-soft transition-colors hover:text-ink"
+                className={iconButton}
                 aria-label={t("addresses.edit")}
               >
-                <Pencil size={15} />
+                <Pencil size={15} strokeWidth={1.5} />
               </button>
               <button
                 type="button"
                 onClick={() => onDelete(a.id)}
                 disabled={pending !== null}
-                className="text-soft transition-colors hover:text-accent-text disabled:opacity-40"
+                className={iconButtonDanger}
                 aria-label={t("addresses.delete")}
               >
-                <Trash2 size={15} />
+                <Trash2 size={15} strokeWidth={1.5} />
               </button>
             </div>
           </div>
@@ -253,7 +277,7 @@ export function AddressBook({ addresses }: { addresses: Address[] }) {
           onClick={() => setAdding(true)}
           className={btnPrimary}
         >
-          <Plus size={15} />
+          <Plus size={15} strokeWidth={1.5} />
           {t("addresses.add")}
         </button>
       )}

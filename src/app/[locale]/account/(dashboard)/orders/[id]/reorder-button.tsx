@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useCart } from "@/lib/cart";
 import { getReorderItems } from "../actions";
+import { btnGhost } from "../../_ui";
 
 export function ReorderButton({ orderId }: { orderId: string }) {
   const t = useTranslations("account");
@@ -52,13 +53,13 @@ export function ReorderButton({ orderId }: { orderId: string }) {
         type="button"
         onClick={onReorder}
         disabled={pending}
-        className="flex items-center gap-1.5 rounded-full border border-line bg-surface px-4 py-2.5 text-sm font-semibold transition-colors hover:border-ink disabled:opacity-60"
+        className={btnGhost}
       >
-        <RotateCcw size={15} />
+        <RotateCcw size={15} strokeWidth={1.5} />
         {pending ? t("security.processing") : t("orderDetail.reorder")}
       </button>
       {error && (
-        <p className="mt-2 text-xs font-medium text-accent-text">{error}</p>
+        <p className="mt-2 text-sm font-medium text-accent-text">{error}</p>
       )}
     </div>
   );

@@ -1,6 +1,8 @@
+import { User } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getServerSession } from "@/lib/session";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { AccountTitle } from "../account-title";
 import { card } from "../_ui";
 import { ProfileForm } from "./profile-form";
 import { EmailForm } from "./email-form";
@@ -14,22 +16,27 @@ export default async function ProfileTab() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold">{t("profile.title")}</h1>
-      <p className="mt-1 mb-6 text-sm text-soft">{t("profile.subtitle")}</p>
+      <AccountTitle
+        title={t("profile.title")}
+        subtitle={t("profile.subtitle")}
+        icon={User}
+      />
 
       <div className="space-y-4">
         <div className={card}>
-          <p className="text-sm font-semibold">{t("profile.nameTitle")}</p>
+          <h2 className="text-sm font-semibold">{t("profile.nameTitle")}</h2>
           <ProfileForm name={user.name} />
         </div>
 
         <div className={card}>
-          <p className="text-sm font-semibold">{t("profile.emailTitle")}</p>
+          <h2 className="text-sm font-semibold">{t("profile.emailTitle")}</h2>
           <EmailForm email={user.email} verified={user.emailVerified} />
         </div>
 
         <div className={card}>
-          <p className="text-sm font-semibold">{t("profile.languageTitle")}</p>
+          <h2 className="text-sm font-semibold">
+            {t("profile.languageTitle")}
+          </h2>
           <p className="mt-0.5 text-xs text-soft">
             {t("profile.languageDesc")}
           </p>

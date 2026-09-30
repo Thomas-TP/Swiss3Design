@@ -3,6 +3,9 @@
 import { useLocale, useTranslations } from "next-intl";
 import { authClient } from "@/lib/auth-client";
 import { SOCIAL_ICONS, SOCIAL_LABELS } from "@/components/social-icons";
+import { buttonClass } from "@/components/ui/button";
+
+const socialButton = buttonClass({ variant: "secondary", full: true });
 
 export function SocialButtons({
   providers,
@@ -33,7 +36,7 @@ export function SocialButtons({
                 callbackURL: `/${locale}${next}`,
               })
             }
-            className="flex w-full items-center justify-center gap-2.5 rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold transition-colors hover:border-ink"
+            className={socialButton}
           >
             {SOCIAL_ICONS[p]}
             {SOCIAL_LABELS[p]}

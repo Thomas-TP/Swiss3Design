@@ -5,8 +5,9 @@ import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { enabledSocialProviders } from "@/lib/auth";
 import { SocialButtons } from "../social-buttons";
+import { AuthShell } from "../auth-shell";
+import { linkAccent, linkSoft } from "../(dashboard)/_ui";
 import { RegisterForm } from "./register-form";
-import { BrandMark } from "@/components/brand-mark";
 
 export const dynamic = "force-dynamic";
 
@@ -36,32 +37,26 @@ export default async function RegisterPage({
     email && /^\S+@\S+\.\S+$/.test(email) ? email.toLowerCase() : "";
 
   return (
-    <div className="mx-auto max-w-md px-4 py-14 sm:px-6 md:py-20">
-      <BrandMark className="mx-auto h-10 w-10 text-ink" />
-      <h1 className="mt-5 text-center text-3xl font-bold tracking-tight">
-        {t("signUpTitle")}
-      </h1>
-      <div className="mt-8 rounded-card border border-line bg-surface p-6 sm:p-8">
-        <RegisterForm defaultEmail={defaultEmail} />
-        <SocialButtons providers={providers} />
-      </div>
-      <p className="mt-5 text-center text-sm text-soft">
-        {t("haveAccount")}{" "}
-        <Link
-          href="/account/login"
-          className="font-semibold text-accent-text hover:underline"
-        >
-          {t("signInTitle")}
-        </Link>
-      </p>
-      <p className="mt-3 text-center text-sm text-soft">
-        <Link
-          href="/track"
-          className="font-medium hover:text-ink hover:underline"
-        >
-          {t("trackOrderLink")}
-        </Link>
-      </p>
-    </div>
+    <AuthShell
+      title={t("signUpTitle")}
+      below={
+        <>
+          <p className="mt-5 text-center text-sm text-soft">
+            {t("haveAccount")}{" "}
+            <Link href="/account/login" className={linkAccent}>
+              {t("signInTitle")}
+            </Link>
+          </p>
+          <p className="mt-3 text-center">
+            <Link href="/track" className={linkSoft}>
+              {t("trackOrderLink")}
+            </Link>
+          </p>
+        </>
+      }
+    >
+      <RegisterForm defaultEmail={defaultEmail} />
+      <SocialButtons providers={providers} />
+    </AuthShell>
   );
 }
