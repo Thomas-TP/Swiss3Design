@@ -164,6 +164,26 @@ function bandsFromShort(value: unknown): Band[] | null {
 }
 
 /**
+ * Bandes du défaut ramenées à une nouvelle hauteur : mêmes proportions, la
+ * dernière finit à `h`. Une hauteur qui n'est pas un nombre est laissée telle
+ * quelle (le schéma la refusera).
+ */
+function scaleBands(
+  bands: readonly Band[],
+  fromHeight: number,
+  h: unknown,
+): Band[] {
+  if (typeof h !== "number" || !(h > 0) || h === fromHeight) return [...bands];
+  return bands.map((b, k) => ({
+    filament: b.filament,
+    toMm:
+      k === bands.length - 1
+        ? h
+        : Math.round(((b.toMm * h) / fromHeight) * 10) / 10,
+  }));
+}
+
+/**
  * Motif à partir des clés courtes. Les paramètres absents prennent ceux du
  * motif de référence s'il est de la même famille, sinon le défaut de la plage.
  */
@@ -222,12 +242,15 @@ function longConfig(
       const d = defaults as Extract<StudioConfig, { object: "lavaux" }>;
       const kind = pick("m", d.pattern.kind) as LavauxPattern["kind"];
       const pattern = patternFromShort(kind, d.pattern, pick);
+      const h = pick("h", d.h);
+      // Sans `bd`, les bandes du défaut suivent la nouvelle hauteur (mêmes
+      // proportions, la dernière finit à h) : un lien « h=200 » reste valide.
       const bands = Object.hasOwn(short, "bd")
         ? bandsFromShort(short.bd)
-        : d.bands;
+        : scaleBands(d.bands, d.h, h);
       return {
         object,
-        h: pick("h", d.h),
+        h,
         d: pick("d", d.d),
         profile: pick("p", d.profile),
         belly: pick("b", d.belly),
