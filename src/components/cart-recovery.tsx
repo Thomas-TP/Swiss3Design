@@ -2,6 +2,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import { useCart, parseCart } from "@/lib/cart";
+
+// Restauration d'un panier depuis le lien d'un e-mail de relance
+// (#restore=<jeton>). Le jeton reste dans le fragment et n'en sort qu'en
+// POST ; le résultat s'affiche dans une note de statut sobre (le point rouge
+// de la note « état courant » : le rouge dit la chaleur, pas le décor).
 export function CartRecovery() {
   const { restore } = useCart();
   const restoreRef = useRef(restore);
@@ -39,6 +44,10 @@ export function CartRecovery() {
       .catch(() => setStatus("restoreError"));
   }, []);
   return status === "idle" ? null : (
-    <output className="mx-auto mt-4 max-w-6xl px-4 text-sm">{t(status)}</output>
+    <div className="s3d-page pt-4">
+      <output className="block rounded-field border border-line border-l-accent bg-surface px-4 py-3 text-sm text-ink border-l-3">
+        {t(status)}
+      </output>
+    </div>
   );
 }
