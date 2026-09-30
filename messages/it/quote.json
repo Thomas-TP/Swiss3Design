@@ -1,1 +1,80 @@
-{}
+{
+  "entries": {
+    "file": {
+      "kicker": "STL · 3MF · OBJ · STEP",
+      "title": "Ho un file",
+      "body": "Alleghi il Suo modello 3D alla richiesta: l'atelier lo verifica prima di risponderLe con un preventivo personalizzato.",
+      "cta": "Compila la richiesta"
+    },
+    "studio": {
+      "kicker": "Studio",
+      "title": "Non ho un file",
+      "body": "Regoli nello Studio un vaso, un biglietto da visita, un sottobicchiere o un portanome, poi lo invii all'atelier. Un'idea senza file? La descriva nel modulo."
+    }
+  },
+  "sheet": {
+    "kicker": "Scheda di richiesta",
+    "title": "La Sua richiesta",
+    "project": "Progetto",
+    "file": "File 3D",
+    "contact": "Contatti"
+  },
+  "facts": {
+    "formats": "Formati",
+    "formatsValue": "STL, 3MF, OBJ, STEP",
+    "size": "Dimensione massima",
+    "sizeValue": "30 MB",
+    "answer": "Risposta",
+    "answerValue": "Entro 48 ore, per e-mail"
+  },
+  "hints": {
+    "description": "Almeno {min} caratteri.",
+    "email": "L'atelier Le risponde a questo indirizzo."
+  },
+  "file": {
+    "drop": "Trascini qui il file",
+    "browse": "oppure sfogli le cartelle",
+    "dropActive": "Rilasci per inviare il file",
+    "uploading": "Caricamento del file · {percent}",
+    "attached": "Allegato alla richiesta",
+    "remove": "Rimuovi il file {name}",
+    "noscript": "Per allegare un file, attivi JavaScript o scriva a {email}."
+  },
+  "studioCard": {
+    "kicker": "Configurazione Studio allegata",
+    "objects": {
+      "lavaux": "Vaso «Lavaux»",
+      "cartouche": "Biglietto «Cartouche»",
+      "relief": "Sottobicchiere «Relief»",
+      "borne": "Portanome «Borne»"
+    },
+    "fileSent": "File inviato: {name} · {size}",
+    "triangles": "{count} triangoli",
+    "noFile": "Nessun file allegato: la richiesta contiene il link della configurazione.",
+    "edit": "Modifica nello Studio",
+    "remove": "Rimuovi",
+    "prefilled": "Campi precompilati dallo Studio: può correggerli."
+  },
+  "progress": {
+    "prepare": "1/3 Preparazione del file",
+    "prepareTriangles": "1/3 Preparazione del file · {triangles} triangoli",
+    "upload": "2/3 Invio all'atelier",
+    "uploadDetail": "2/3 Invio all'atelier · {size} · {percent}",
+    "submit": "3/3 Registrazione della richiesta"
+  },
+  "errors": {
+    "400": "Non è stato possibile leggere il file: forse è vuoto o danneggiato. Lo verifichi e riprovi.",
+    "413": "Questo file supera i 30 MB. Lo riduca o scriva a {email}.",
+    "415": "Formato non supportato. Invii un file STL, 3MF, OBJ o STEP.",
+    "429": "Troppi invii da questa connessione (10 all'ora). Riprovi più tardi o scriva a {email}.",
+    "network": "Invio non riuscito. Verifichi la connessione e riprovi.",
+    "unknown": "Non è stato possibile preparare il file. Riprovi o scriva a {email}."
+  },
+  "retry": "Riprova",
+  "success": {
+    "title": "Ricevuto.",
+    "form": "L'atelier esamina la Sua richiesta e Le risponde per e-mail entro 48 ore.",
+    "studio": "L'atelier verifica il Suo pezzo e Le risponde entro 48 ore con un prezzo fermo.",
+    "account": "Segui la mia richiesta"
+  }
+}
