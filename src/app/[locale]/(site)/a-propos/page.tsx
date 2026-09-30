@@ -43,6 +43,16 @@ export async function generateMetadata({
 }
 
 /**
+ * Typographie française à l'affichage : espace insécable devant « ? ! : ; » et
+ * à l'intérieur des guillemets, pour qu'un signe ne tombe jamais seul en début
+ * de ligne (« Une question / ? Parlons-en. »). Affichage seulement : le
+ * contenu source (ABOUT_CONTENT) et faqJsonLd gardent leurs espaces ordinaires.
+ */
+function typo(text: string): string {
+  return text.replace(/ ([?!:;»])/g, " $1").replace(/(«) /g, "$1 ");
+}
+
+/**
  * Pile de strates décorative : `count` couches empilées de bas en haut, la
  * dernière (celle qu'on « dépose » à cette étape) en rouge, la chaleur de la
  * buse. Même idée que le mark : le procédé se lit comme un empilement.
@@ -104,15 +114,21 @@ export default async function AboutPage({
         <JsonLd data={faqJsonLd(c.faq)} />
 
         <div className="s3d-page pb-12 pt-10 md:pb-16 md:pt-16">
-          <PageHeader eyebrow={c.badge} title={c.title} intro={c.intro} />
+          <PageHeader eyebrow={c.badge} title={typo(c.title)} intro={c.intro} />
         </div>
 
         {/* Chiffres clés, en bande de mesure : valeur d'abord, étiquette mono. */}
         <section aria-label={t("stats.label")} className="s3d-page pb-14">
-          <ul className="s3d-rise grid grid-cols-2 gap-px border-y border-line bg-line lg:grid-cols-4">
+          {/* Quatre colonnes seulement dès 1280 px, et une valeur plus modeste que
+              les titres : « Jusqu'à 4 » (la plus longue, en fr) doit tenir sur
+              une ligne dans une cellule, sinon le chiffre tombe seul à la ligne. */}
+          <ul className="s3d-rise grid grid-cols-2 gap-px border-y border-line bg-line xl:grid-cols-4">
             {c.stats.map((s) => (
-              <li key={s.label} className="bg-paper px-1 py-6 sm:px-5">
-                <p className="s3d-num font-display text-[clamp(2rem,1.3rem+2.6vw,3.5rem)] font-extrabold leading-none text-ink">
+              <li
+                key={s.label}
+                className="bg-paper py-6 pl-5 pr-2 max-xl:odd:pl-0 xl:first:pl-0"
+              >
+                <p className="s3d-num font-display text-[clamp(1.5rem,1.1rem+1.6vw,2.5rem)] font-extrabold leading-none text-ink">
                   {s.value}
                 </p>
                 <p className="s3d-label mt-3 text-soft">{s.label}</p>
@@ -142,7 +158,7 @@ export default async function AboutPage({
           id="equipment"
           number="01"
           eyebrow={c.equipmentKicker}
-          title={c.equipmentTitle}
+          title={typo(c.equipmentTitle)}
           intro={c.equipmentText}
           tone="ink"
           className={CHAPTER}
@@ -161,7 +177,7 @@ export default async function AboutPage({
           id="process"
           number="02"
           eyebrow={c.processKicker}
-          title={c.processTitle}
+          title={typo(c.processTitle)}
           className={CHAPTER}
         >
           <ol className="s3d-page mt-14 grid gap-x-gutter gap-y-10 sm:grid-cols-2 lg:grid-cols-5">
@@ -188,7 +204,7 @@ export default async function AboutPage({
           id="materials"
           number="03"
           eyebrow={c.materialsKicker}
-          title={c.materialsTitle}
+          title={typo(c.materialsTitle)}
           intro={c.materialsText}
           className={CHAPTER_RULED}
         >
@@ -225,7 +241,7 @@ export default async function AboutPage({
           id="trust"
           number="04"
           eyebrow={c.trustKicker}
-          title={c.trustTitle}
+          title={typo(c.trustTitle)}
           className={CHAPTER_RULED}
         >
           <ul className="s3d-page mt-14 grid gap-x-gutter gap-y-10 sm:grid-cols-2 lg:grid-cols-4">
@@ -258,7 +274,7 @@ export default async function AboutPage({
           id="faq"
           number="05"
           eyebrow={c.faqKicker}
-          title={c.faqTitle}
+          title={typo(c.faqTitle)}
           className={CHAPTER_RULED}
         >
           <div className="s3d-page mt-14">
@@ -266,7 +282,7 @@ export default async function AboutPage({
               {c.faq.map((item) => (
                 <details key={item.q} className="faq-item border-b border-line">
                   <summary className="flex min-h-14 cursor-pointer items-center justify-between gap-4 py-4 text-lg font-semibold text-ink">
-                    {item.q}
+                    {typo(item.q)}
                     <ChevronDown
                       size={20}
                       strokeWidth={1.5}
@@ -288,17 +304,20 @@ export default async function AboutPage({
           id="contact"
           number="06"
           eyebrow={c.contactKicker}
-          title={c.contactTitle}
+          title={typo(c.contactTitle)}
           intro={c.contactText}
           className={CHAPTER_RULED}
         >
-          <div className="s3d-page mt-14">
-            <div className="max-w-2xl">
-              <div className="rounded-card border border-line bg-surface p-6 sm:p-8">
-                <ContactForm />
-              </div>
-              <ContactLinks className="mt-6" />
+          {/* Fiche à gauche ; à droite (dès lg), les deux autres façons de nous
+              joindre : le formulaire reste l'action principale de l'écran. */}
+          <div className="s3d-page s3d-grid mt-14 gap-y-8">
+            <div className="col-span-full rounded-card border border-line bg-surface p-6 sm:p-8 lg:col-span-7">
+              <ContactForm />
             </div>
+            <ContactLinks
+              stacked
+              className="col-span-full lg:col-span-4 lg:col-start-9"
+            />
           </div>
         </Chapter>
       </div>
