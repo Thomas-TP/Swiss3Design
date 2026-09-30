@@ -67,7 +67,7 @@ export function isQuoteUploadError(value: unknown): value is QuoteUploadError {
   return value instanceof QuoteUploadError;
 }
 
-export interface QuoteUploadProgress {
+export interface UploadBytesProgress {
   /** Octets envoyés (corps multipart compris : jamais au-dessus de `total`). */
   loaded: number;
   total: number;
@@ -148,7 +148,7 @@ function parseResult(text: string): QuoteUploadResult | null {
  */
 export function uploadQuoteFile(
   file: Blob,
-  onProgress?: (progress: QuoteUploadProgress) => void,
+  onProgress?: (progress: UploadBytesProgress) => void,
   options: QuoteUploadOptions = {},
 ): Promise<QuoteUploadResult> {
   const fileName =

@@ -1,1 +1,82 @@
-{}
+{
+  "entries": {
+    "file": {
+      "kicker": "STL · 3MF · OBJ · STEP",
+      "title": "J'ai un fichier",
+      "body": "Joignez votre modèle 3D à la demande : l'atelier le vérifie avant de vous répondre avec un devis personnalisé.",
+      "cta": "Remplir la demande"
+    },
+    "studio": {
+      "kicker": "Studio",
+      "title": "Je n'ai pas de fichier",
+      "body": "Réglez un vase, une carte de visite, un sous-verre ou un porte-nom dans le Studio, puis envoyez-le à l'atelier. Une idée sans fichier ? Décrivez-la dans le formulaire."
+    }
+  },
+  "sheet": {
+    "kicker": "Fiche de demande",
+    "title": "Votre demande",
+    "project": "Projet",
+    "file": "Fichier 3D",
+    "contact": "Coordonnées"
+  },
+  "facts": {
+    "formats": "Formats",
+    "formatsValue": "STL, 3MF, OBJ, STEP",
+    "size": "Taille maximale",
+    "sizeValue": "30 Mo",
+    "answer": "Réponse",
+    "answerValue": "Sous 48 h, par e-mail"
+  },
+  "hints": {
+    "description": "{min} caractères au minimum.",
+    "email": "L'atelier vous répond à cette adresse."
+  },
+  "file": {
+    "drop": "Déposez votre fichier ici",
+    "browse": "ou parcourez vos dossiers",
+    "dropActive": "Relâchez pour envoyer le fichier",
+    "uploading": "Envoi du fichier · {percent}",
+    "attached": "Joint à la demande",
+    "replace": "Remplacer",
+    "remove": "Retirer le fichier {name}",
+    "noscript": "Pour joindre un fichier, activez JavaScript ou écrivez à {email}."
+  },
+  "studioCard": {
+    "kicker": "Configuration Studio jointe",
+    "thumbnailAlt": "Aperçu de la configuration",
+    "objects": {
+      "lavaux": "Vase « Lavaux »",
+      "cartouche": "Carte « Cartouche »",
+      "relief": "Sous-verre « Relief »",
+      "borne": "Porte-nom « Borne »"
+    },
+    "fileSent": "Fichier envoyé : {name} · {size}",
+    "triangles": "{count} triangles",
+    "noFile": "Aucun fichier joint : la demande contient le lien de configuration.",
+    "edit": "Modifier dans le Studio",
+    "remove": "Retirer",
+    "prefilled": "Champs préremplis depuis le Studio : vous pouvez les corriger."
+  },
+  "progress": {
+    "prepare": "1/3 Préparation du fichier",
+    "prepareTriangles": "1/3 Préparation du fichier · {triangles} triangles",
+    "upload": "2/3 Envoi à l'atelier",
+    "uploadDetail": "2/3 Envoi à l'atelier · {size} · {percent}",
+    "submit": "3/3 Enregistrement de la demande"
+  },
+  "errors": {
+    "429": "Trop d'envois depuis cette connexion (10 par heure). Réessayez plus tard ou écrivez à {email}.",
+    "413": "Ce fichier dépasse 30 Mo. Réduisez-le ou écrivez à {email}.",
+    "415": "Format non pris en charge. Envoyez un fichier STL, 3MF, OBJ ou STEP.",
+    "400": "Le fichier n'a pas pu être lu : il est peut-être vide ou endommagé. Vérifiez-le et réessayez.",
+    "network": "L'envoi a échoué. Vérifiez votre connexion et réessayez.",
+    "unknown": "Le fichier n'a pas pu être préparé. Réessayez, ou écrivez à {email}."
+  },
+  "retry": "Réessayer",
+  "success": {
+    "title": "Reçu.",
+    "form": "L'atelier relit votre demande et vous répond par e-mail sous 48 h.",
+    "studio": "L'atelier vérifie votre pièce et vous répond sous 48 h avec un prix ferme.",
+    "account": "Suivre ma demande"
+  }
+}

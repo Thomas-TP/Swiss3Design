@@ -1,220 +1,114 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
-import { CheckCircle2, Send, Paperclip, X } from "lucide-react";
+import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { Select } from "@/components/select";
-import { useSession } from "@/lib/auth-client";
-import { track } from "@/lib/analytics";
-import { submitQuoteRequest, type QuoteFormState } from "./actions";
+import {
+  QuoteRequestForm,
+  type QuoteAttachment,
+  type QuotePrefill,
+} from "@/components/quote/quote-request-form";
+import { formatBytes, formatCount } from "@/components/quote/quote-logic";
+import { motionBridge } from "@/lib/motion-bridge/store";
+import {
+  clearQuoteHandoff,
+  readQuoteHandoff,
+  type QuoteHandoff,
+} from "@/lib/quote-handoff";
 
-const field =
-  "w-full rounded-xl border border-line bg-surface px-4 py-3 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none";
+// Enveloppe de /custom autour du formulaire partagé (brief « Strates », §7.10).
+// Seul travail propre à la page : retrouver le passage Studio → /custom
+// (sessionStorage, lu après l'hydratation : le serveur n'en sait rien et rend
+// le formulaire nu) et, s'il existe, en tirer la carte « Configuration Studio
+// jointe », les champs préremplis et la pièce jointe déjà envoyée.
+//
+// Le passage est lu dès qu'il existe, avec ou sans `#studio` dans l'adresse :
+// le Studio y envoie (`/custom#studio`), mais un visiteur qui y revient par la
+// navigation garde sa configuration (24 h au plus, « Retirer » l'efface). Avec
+// `#studio`, la page défile jusqu'à la fiche, où se trouve la carte.
+
+const SHEET_ID = "demande";
+
+function scrollToSheet() {
+  const sheet = document.getElementById(SHEET_ID);
+  if (!sheet) return;
+  const scroll = motionBridge.get().scroll;
+  // Lenis en marche : on passe par lui (l'en-tête fait 64 px, marge de 16).
+  // Sinon un saut natif, que scroll-mt-24 de la fiche règle sous l'en-tête.
+  if (scroll) scroll.to(sheet, { offset: -80 });
+  else sheet.scrollIntoView({ behavior: "auto", block: "start" });
+}
 
 export function QuoteForm({ materials }: { materials: string[] }) {
-  const t = useTranslations("custom");
+  const t = useTranslations("quote.studioCard");
   const locale = useLocale();
-  const { data: authSession } = useSession();
-  const [state, formAction, pending] = useActionState<QuoteFormState, FormData>(
-    submitQuoteRequest,
-    { status: "idle" },
-  );
-  const [material, setMaterial] = useState("");
-  const [file, setFile] = useState<{ key: string; name: string } | null>(null);
-  const [uploading, setUploading] = useState(false);
-  const [fileError, setFileError] = useState(false);
+  const [handoff, setHandoff] = useState<QuoteHandoff | null>(null);
 
-  // Demande de devis = lead principal de l'impression sur mesure.
-  // oxlint-disable exhaustive-deps -- un seul envoi, au passage en succès ; matière et fichier sont lus à cet instant
+  // Lecture unique après le montage : sessionStorage n'existe pas côté serveur.
   useEffect(() => {
-    if (state.status !== "success") return;
-    track("Quote Requested", {
-      material: material || undefined,
-      has_file: Boolean(file),
-      signed_in: Boolean(authSession),
-    });
-  }, [state.status]);
-  // oxlint-enable exhaustive-deps
+    const found = readQuoteHandoff();
+    if (!found) return;
+    setHandoff(found);
+    if (window.location.hash === "#studio")
+      requestAnimationFrame(scrollToSheet);
+  }, []);
 
-  async function onFile(input: HTMLInputElement) {
-    const selected = input.files?.[0];
-    if (!selected) return;
-    setUploading(true);
-    setFileError(false);
-    try {
-      const body = new FormData();
-      body.append("file", selected);
-      const res = await fetch("/api/quote-upload", { method: "POST", body });
-      if (!res.ok) throw new Error();
-      const data = (await res.json()) as { key: string; fileName: string };
-      setFile({ key: data.key, name: data.fileName });
-    } catch {
-      setFileError(true);
-    } finally {
-      setUploading(false);
-      input.value = "";
-    }
-  }
-
-  if (state.status === "success") {
+  if (!handoff) {
     return (
-      <div className="rounded-card border border-emerald-500/30 bg-emerald-500/10 p-8 text-center">
-        <CheckCircle2 size={32} className="mx-auto text-emerald-600" />
-        <p className="mt-4 font-semibold text-emerald-800 dark:text-emerald-200">
-          {t("success")}
-        </p>
-      </div>
+      <QuoteRequestForm
+        key="form"
+        materials={materials}
+        source="form"
+        variant="page"
+      />
     );
   }
 
+  const { prefill: raw, attachment: sent } = handoff;
+  const prefill: QuotePrefill = {
+    description: raw.description,
+    material: raw.material,
+    colors: raw.colors,
+    dimensions: raw.dimensions,
+  };
+  const lines = [
+    raw.dimensions,
+    raw.colors,
+    sent
+      ? `${t("fileSent", {
+          name: sent.name,
+          size: formatBytes(sent.bytes, locale),
+        })} · ${t("triangles", { count: formatCount(sent.triangles, locale) })}`
+      : t("noFile"),
+  ].filter(Boolean);
+  const attachment: QuoteAttachment = {
+    key: sent?.key,
+    name: sent?.name,
+    summary: {
+      title: t(`objects.${handoff.object}`),
+      lines,
+      note: t("prefilled"),
+      thumbnail: handoff.thumbnail,
+      editHref: handoff.link,
+      onRemove: () => {
+        clearQuoteHandoff();
+        setHandoff(null);
+      },
+    },
+  };
+
   return (
-    <form action={formAction} className="space-y-5">
-      <input type="hidden" name="locale" value={locale} />
-
-      <div>
-        <label htmlFor="email" className="mb-1.5 block text-sm font-semibold">
-          {t("email")}
-        </label>
-        <input
-          key={authSession?.user.email ?? "anon"}
-          id="email"
-          name="email"
-          type="email"
-          required
-          autoComplete="email"
-          defaultValue={authSession?.user.email ?? ""}
-          className={field}
-        />
-      </div>
-
-      <div>
-        <label
-          htmlFor="description"
-          className="mb-1.5 block text-sm font-semibold"
-        >
-          {t("description")}
-        </label>
-        <textarea
-          id="description"
-          name="description"
-          required
-          minLength={10}
-          rows={5}
-          placeholder={t("descriptionPlaceholder")}
-          className={field}
-        />
-      </div>
-
-      <div className="grid gap-5 sm:grid-cols-2">
-        <div>
-          <label
-            htmlFor="material"
-            className="mb-1.5 block text-sm font-semibold"
-          >
-            {t("material")}{" "}
-            <span className="font-normal text-soft">({t("optional")})</span>
-          </label>
-          <Select
-            name="material"
-            value={material}
-            onChange={setMaterial}
-            options={[
-              { value: "", label: t("materialAny") },
-              ...materials.map((m) => ({ value: m, label: m })),
-            ]}
-            placeholder={t("materialAny")}
-            ariaLabel={t("material")}
-          />
-        </div>
-        <div>
-          <label
-            htmlFor="colors"
-            className="mb-1.5 block text-sm font-semibold"
-          >
-            {t("colors")}{" "}
-            <span className="font-normal text-soft">({t("optional")})</span>
-          </label>
-          <input
-            id="colors"
-            name="colors"
-            placeholder={t("colorsPlaceholder")}
-            className={field}
-          />
-        </div>
-      </div>
-
-      <div>
-        <label
-          htmlFor="dimensions"
-          className="mb-1.5 block text-sm font-semibold"
-        >
-          {t("dimensions")}{" "}
-          <span className="font-normal text-soft">({t("optional")})</span>
-        </label>
-        <input
-          id="dimensions"
-          name="dimensions"
-          placeholder={t("dimensionsPlaceholder")}
-          className={field}
-        />
-      </div>
-
-      <div>
-        <span className="mb-1.5 block text-sm font-semibold">
-          {t("file")}{" "}
-          <span className="font-normal text-soft">({t("optional")})</span>
-        </span>
-        {file ? (
-          <div className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-sm">
-            <span className="flex min-w-0 items-center gap-2">
-              <Paperclip size={15} className="shrink-0 text-soft" />
-              <span className="truncate font-medium">{file.name}</span>
-            </span>
-            <button
-              type="button"
-              onClick={() => setFile(null)}
-              aria-label="×"
-              className="rounded-full p-1 text-soft transition-colors hover:bg-line/60 hover:text-accent-text"
-            >
-              <X size={15} />
-            </button>
-          </div>
-        ) : (
-          <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border-2 border-dashed border-line px-4 py-4 text-sm font-medium text-soft transition-colors hover:border-ink hover:text-ink">
-            <Paperclip size={16} />
-            {uploading ? t("fileUploading") : t("fileHint")}
-            <input
-              type="file"
-              accept=".stl,.3mf,.obj,.step,.stp"
-              disabled={uploading}
-              onChange={(e) => onFile(e.currentTarget)}
-              className="hidden"
-            />
-          </label>
-        )}
-        {fileError && (
-          <p className="mt-1.5 text-xs font-medium text-accent-text">
-            {t("fileError")}
-          </p>
-        )}
-        {file && <input type="hidden" name="fileKey" value={file.key} />}
-        {file && <input type="hidden" name="fileName" value={file.name} />}
-      </div>
-
-      {state.status === "error" && (
-        <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
-          {t("error")}
-        </p>
-      )}
-
-      <button
-        type="submit"
-        disabled={pending}
-        className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
-      >
-        <Send size={16} />
-        {pending ? t("submitting") : t("submit")}
-      </button>
-    </form>
+    <QuoteRequestForm
+      // Une autre configuration = des champs neufs (préremplissage relu).
+      key={`studio-${handoff.createdAt}`}
+      // La matière vient du Studio (PLA) : pas de sélecteur.
+      source="studio"
+      object={handoff.object}
+      prefill={prefill}
+      attachment={attachment}
+      variant="page"
+      // Envoyé (ou « Retirer ») : le passage est consommé. On n'efface que le
+      // stockage, pas l'état : le panneau de succès doit rester à l'écran.
+      onSuccess={clearQuoteHandoff}
+    />
   );
 }

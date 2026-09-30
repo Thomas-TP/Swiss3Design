@@ -1,1 +1,82 @@
-{}
+{
+  "entries": {
+    "file": {
+      "kicker": "STL · 3MF · OBJ · STEP",
+      "title": "Ich habe eine Datei",
+      "body": "Hängen Sie Ihr 3D-Modell an die Anfrage an: Das Atelier prüft es, bevor es Ihnen mit einer persönlichen Offerte antwortet.",
+      "cta": "Anfrage ausfüllen"
+    },
+    "studio": {
+      "kicker": "Studio",
+      "title": "Ich habe keine Datei",
+      "body": "Stellen Sie im Studio eine Vase, eine Visitenkarte, einen Untersetzer oder ein Namensschild ein und senden Sie es dem Atelier. Eine Idee ohne Datei? Beschreiben Sie sie im Formular."
+    }
+  },
+  "sheet": {
+    "kicker": "Anfrageformular",
+    "title": "Ihre Anfrage",
+    "project": "Projekt",
+    "file": "3D-Datei",
+    "contact": "Kontakt"
+  },
+  "facts": {
+    "formats": "Formate",
+    "formatsValue": "STL, 3MF, OBJ, STEP",
+    "size": "Maximale Grösse",
+    "sizeValue": "30 MB",
+    "answer": "Antwort",
+    "answerValue": "Innert 48 Stunden, per E-Mail"
+  },
+  "hints": {
+    "description": "Mindestens {min} Zeichen.",
+    "email": "Das Atelier antwortet an diese Adresse."
+  },
+  "file": {
+    "drop": "Datei hier ablegen",
+    "browse": "oder Ordner durchsuchen",
+    "dropActive": "Loslassen, um die Datei zu senden",
+    "uploading": "Datei wird hochgeladen · {percent}",
+    "attached": "An die Anfrage angehängt",
+    "replace": "Ersetzen",
+    "remove": "Datei {name} entfernen",
+    "noscript": "Um eine Datei anzuhängen, aktivieren Sie JavaScript oder schreiben Sie an {email}."
+  },
+  "studioCard": {
+    "kicker": "Studio-Konfiguration angehängt",
+    "thumbnailAlt": "Vorschau der Konfiguration",
+    "objects": {
+      "lavaux": "Vase «Lavaux»",
+      "cartouche": "Visitenkarte «Cartouche»",
+      "relief": "Untersetzer «Relief»",
+      "borne": "Namensschild «Borne»"
+    },
+    "fileSent": "Datei gesendet: {name} · {size}",
+    "triangles": "{count} Dreiecke",
+    "noFile": "Keine Datei angehängt: Die Anfrage enthält den Konfigurationslink.",
+    "edit": "Im Studio ändern",
+    "remove": "Entfernen",
+    "prefilled": "Felder aus dem Studio vorausgefüllt: Sie können sie korrigieren."
+  },
+  "progress": {
+    "prepare": "1/3 Datei wird vorbereitet",
+    "prepareTriangles": "1/3 Datei wird vorbereitet · {triangles} Dreiecke",
+    "upload": "2/3 Versand ans Atelier",
+    "uploadDetail": "2/3 Versand ans Atelier · {size} · {percent}",
+    "submit": "3/3 Anfrage wird gespeichert"
+  },
+  "errors": {
+    "429": "Zu viele Uploads von dieser Verbindung (10 pro Stunde). Versuchen Sie es später erneut oder schreiben Sie an {email}.",
+    "413": "Diese Datei ist grösser als 30 MB. Verkleinern Sie sie oder schreiben Sie an {email}.",
+    "415": "Format nicht unterstützt. Senden Sie eine STL-, 3MF-, OBJ- oder STEP-Datei.",
+    "400": "Die Datei konnte nicht gelesen werden: Sie ist vielleicht leer oder beschädigt. Prüfen Sie sie und versuchen Sie es erneut.",
+    "network": "Der Upload ist fehlgeschlagen. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+    "unknown": "Die Datei konnte nicht vorbereitet werden. Versuchen Sie es erneut oder schreiben Sie an {email}."
+  },
+  "retry": "Erneut versuchen",
+  "success": {
+    "title": "Erhalten.",
+    "form": "Das Atelier prüft Ihre Anfrage und antwortet Ihnen innert 48 Stunden per E-Mail.",
+    "studio": "Das Atelier prüft Ihr Teil und antwortet Ihnen innert 48 Stunden mit einem verbindlichen Preis.",
+    "account": "Meine Anfrage verfolgen"
+  }
+}

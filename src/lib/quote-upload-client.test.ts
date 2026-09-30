@@ -7,7 +7,7 @@ import {
   fileExtension,
   isQuoteUploadError,
   uploadQuoteFile,
-  type QuoteUploadProgress,
+  type UploadBytesProgress,
 } from "./quote-upload-client";
 
 // Faux XMLHttpRequest : le client n'utilise que open, send, abort, upload.* et
@@ -137,7 +137,7 @@ describe("uploadQuoteFile", () => {
   });
 
   it("rapporte la progression, plafonnée au total, puis 100 % à la fin", async () => {
-    const seen: QuoteUploadProgress[] = [];
+    const seen: UploadBytesProgress[] = [];
     const pending = uploadQuoteFile(stl("a.stl", 1000), (p) => seen.push(p));
     xhr().progress(250, 1300);
     xhr().progress(1100, 1300); // corps multipart : peut dépasser la taille du fichier
