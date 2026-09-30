@@ -46,9 +46,11 @@
     }
   },
   "card": {
-    "days": "{days} d"
+    "days": "{days} d",
+    "height": "Height {height} mm"
   },
   "plate": {
+    "ref": "No. {n}",
     "view": "View details"
   },
   "product": {
@@ -94,7 +96,11 @@
     "poster": "Photo of the printed piece. The 3D preview replaces it as soon as it is ready (WebGL required).",
     "loading": "Loading the 3D model",
     "loadingSize": "Loading the 3D model (≈ {size} MB)",
-    "ready": "3D model ready. Left and right arrow keys rotate it."
+    "ready": "3D model ready. Left and right arrow keys rotate it.",
+    "error": "3D preview unavailable. The photo of the piece stays in place.",
+    "label": "3D preview of {name}: arrow keys to rotate",
+    "turnLeft": "Rotate left",
+    "turnRight": "Rotate right"
   },
   "cross": {
     "title": "A vase in your colors?",

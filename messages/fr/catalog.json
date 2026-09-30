@@ -46,9 +46,11 @@
     }
   },
   "card": {
-    "days": "{days} j"
+    "days": "{days} j",
+    "height": "Hauteur {height} mm"
   },
   "plate": {
+    "ref": "N° {n}",
     "view": "Voir la fiche"
   },
   "product": {
@@ -94,7 +96,11 @@
     "poster": "Photo de la pièce imprimée. L'aperçu 3D la remplace dès qu'il est prêt (WebGL requis).",
     "loading": "Chargement du modèle 3D",
     "loadingSize": "Chargement du modèle 3D (≈ {size} Mo)",
-    "ready": "Modèle 3D prêt. Flèches gauche et droite pour tourner."
+    "ready": "Modèle 3D prêt. Flèches gauche et droite pour tourner.",
+    "error": "Aperçu 3D indisponible. La photo de la pièce reste affichée.",
+    "label": "Aperçu 3D de {name} : flèches pour tourner",
+    "turnLeft": "Tourner vers la gauche",
+    "turnRight": "Tourner vers la droite"
   },
   "cross": {
     "title": "Un vase à vos couleurs ?",

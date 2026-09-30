@@ -6,6 +6,8 @@ import { formatChf } from "@/lib/format";
 import { AddToCart, BuyNow } from "@/components/add-to-cart";
 import { FavoriteButton } from "@/components/favorite-button";
 import { useProductColor } from "@/components/product-color-context";
+import { chipClass } from "@/components/ui/chip";
+import { cx } from "@/components/ui/cx";
 
 interface Variant {
   id: string;
@@ -14,9 +16,11 @@ interface Variant {
   stock: number | null;
 }
 
-// Bloc d'achat de la fiche produit : prix, disponibilité, sélection de couleur
-// (palette du filament) et de variante (taille/finition), puis boutons — le
-// tout réactif aux choix.
+// Bloc d'achat de la fiche produit (brief « Strates », §7.9) : disponibilité,
+// prix, sélection de couleur (pastilles `aria-pressed`, palette du filament) et
+// de variante (taille/finition), puis les boutons. Le bouton d'ajout est LE
+// rouge de l'écran ; « Acheter » est en encre. Colonne collante dès le premier
+// écran : tout ce qui décide de l'achat reste sous les yeux.
 export function ProductPurchase({
   productId,
   slug,
@@ -80,35 +84,39 @@ export function ProductPurchase({
     saleType,
   };
 
-  const badgeClass =
+  // Point d'état + libellé : l'information est dans le texte, la couleur du
+  // point n'est qu'un renfort (vert = en stock, rouge = rupture, sépia = sur
+  // commande).
+  const status =
     saleType === "stock"
       ? stock === 0
-        ? "bg-red-500/15 text-red-600 dark:text-red-300"
-        : "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-      : "bg-amber-500/15 text-amber-700 dark:text-amber-300";
+        ? { label: t("outOfStock"), dot: "bg-accent" }
+        : { label: t("inStock"), dot: "bg-emerald-600" }
+      : {
+          label: t("onDemand", { days: productionDays ?? 3 }),
+          dot: "bg-iso-index",
+        };
 
   return (
-    <div className="mt-5">
-      <span
-        className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${badgeClass}`}
-      >
-        {saleType === "stock"
-          ? stock === 0
-            ? t("outOfStock")
-            : t("inStock")
-          : t("onDemand", { days: productionDays ?? 3 })}
-      </span>
+    <div className="mt-6">
+      <p className="s3d-label flex items-center gap-2 normal-case text-ink">
+        <span
+          aria-hidden="true"
+          className={cx("h-2 w-2 rounded-full", status.dot)}
+        />
+        {status.label}
+      </p>
 
-      <p className="mt-3 text-2xl font-semibold tabular-nums">
+      <p className="s3d-num mt-3 font-display text-title text-ink">
         {formatChf(priceCents, locale)}
       </p>
 
       {colors.length > 0 && (
-        <div className="mt-5">
-          <p className="mb-2 text-sm font-semibold">
+        <div className="mt-6">
+          <p className="s3d-label mb-3 text-soft">
             {t("color")}
             {selectedColor && (
-              <span className="ml-1.5 font-normal text-soft">
+              <span className="ml-1.5 normal-case text-ink">
                 · {selectedColor.name}
               </span>
             )}
@@ -124,11 +132,12 @@ export function ProductPurchase({
                   aria-pressed={active}
                   aria-label={c.name}
                   title={c.name}
-                  className={`h-9 w-9 rounded-full border transition-transform ${
+                  className={cx(
+                    "h-9 w-9 rounded-full border transition-transform duration-300 ease-purge",
                     active
-                      ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-paper"
-                      : "border-swatch-ring hover:scale-110"
-                  }`}
+                      ? "scale-105 border-ink ring-2 ring-ink ring-offset-2 ring-offset-paper"
+                      : "border-swatch-ring hover:scale-105",
+                  )}
                   style={{ backgroundColor: c.hex }}
                 />
               );
@@ -138,8 +147,8 @@ export function ProductPurchase({
       )}
 
       {variants.length > 0 && (
-        <div className="mt-5">
-          <p className="mb-2 text-sm font-semibold">{t("variant")}</p>
+        <div className="mt-6">
+          <p className="s3d-label mb-3 text-soft">{t("variant")}</p>
           <div className="flex flex-wrap gap-2">
             {variants.map((v) => {
               const vSoldOut = saleType === "stock" && v.stock === 0;
@@ -150,11 +159,11 @@ export function ProductPurchase({
                   type="button"
                   onClick={() => setSelectedId(v.id)}
                   aria-pressed={active}
-                  className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors ${
-                    active
-                      ? "border-ink bg-ink text-paper"
-                      : "border-line bg-surface hover:border-ink"
-                  } ${vSoldOut ? "opacity-50" : ""}`}
+                  className={cx(
+                    chipClass(active),
+                    "cursor-pointer",
+                    vSoldOut && "opacity-50",
+                  )}
                 >
                   {v.name}
                   {vSoldOut ? ` · ${t("outOfStock")}` : ""}
@@ -173,7 +182,7 @@ export function ProductPurchase({
           <FavoriteButton
             item={favoriteItem}
             size={20}
-            className="grid w-[50px] shrink-0 place-items-center rounded-full border border-line bg-surface hover:border-ink/30"
+            className="grid w-[52px] shrink-0 place-items-center rounded-field border border-line bg-surface hover:border-ink"
           />
         </div>
         <BuyNow disabled={soldOut} item={item} />

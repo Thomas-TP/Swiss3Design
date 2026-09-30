@@ -46,9 +46,11 @@
     }
   },
   "card": {
-    "days": "{days} g"
+    "days": "{days} g",
+    "height": "Altezza {height} mm"
   },
   "plate": {
+    "ref": "N. {n}",
     "view": "Vedi la scheda"
   },
   "product": {
@@ -94,7 +96,11 @@
     "poster": "Foto del pezzo stampato. L'anteprima 3D la sostituisce non appena è pronta (richiede WebGL).",
     "loading": "Caricamento del modello 3D",
     "loadingSize": "Caricamento del modello 3D (≈ {size} MB)",
-    "ready": "Modello 3D pronto. Frecce sinistra e destra per ruotare."
+    "ready": "Modello 3D pronto. Frecce sinistra e destra per ruotare.",
+    "error": "Anteprima 3D non disponibile. Resta visibile la foto del pezzo.",
+    "label": "Anteprima 3D di {name}: frecce per ruotare",
+    "turnLeft": "Ruota verso sinistra",
+    "turnRight": "Ruota verso destra"
   },
   "cross": {
     "title": "Un vaso nei Suoi colori?",

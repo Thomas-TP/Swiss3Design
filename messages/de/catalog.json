@@ -46,9 +46,11 @@
     }
   },
   "card": {
-    "days": "{days} T"
+    "days": "{days} T",
+    "height": "Höhe {height} mm"
   },
   "plate": {
+    "ref": "Nr. {n}",
     "view": "Zum Artikel"
   },
   "product": {
@@ -94,7 +96,11 @@
     "poster": "Foto des gedruckten Stücks. Die 3D-Ansicht ersetzt es, sobald sie bereit ist (WebGL erforderlich).",
     "loading": "3D-Modell wird geladen",
     "loadingSize": "3D-Modell wird geladen (≈ {size} MB)",
-    "ready": "3D-Modell bereit. Mit den Pfeiltasten links und rechts drehen."
+    "ready": "3D-Modell bereit. Mit den Pfeiltasten links und rechts drehen.",
+    "error": "3D-Ansicht nicht verfügbar. Das Foto des Stücks bleibt sichtbar.",
+    "label": "3D-Ansicht von {name}: Pfeiltasten zum Drehen",
+    "turnLeft": "Nach links drehen",
+    "turnRight": "Nach rechts drehen"
   },
   "cross": {
     "title": "Eine Vase in Ihren Farben?",

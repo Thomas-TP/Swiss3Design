@@ -1,58 +1,38 @@
 "use client";
 
-import dynamic from "next/dynamic";
-import { useState } from "react";
-import { Box } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { useState, ViewTransition } from "react";
 import { cfImage } from "@/lib/cf-image";
-const ModelViewer = dynamic(
-  () => import("./product-viewer-3d").then((m) => m.ModelViewer),
-  { ssr: false },
-);
-const ModelThumbnail3D = dynamic(
-  () => import("./product-viewer-3d").then((m) => m.ModelThumbnail3D),
-  { ssr: false },
-);
-import { useProductColor } from "./product-color-context";
+import { cx } from "@/components/ui/cx";
+import "@/components/catalog/morph.css";
 
 interface GalleryImage {
   url: string;
   alt: string | null;
 }
 
-// Galerie de la page produit : grande image + vignettes. Quand le produit a un
-// modèle 3D, celui-ci devient le **dernier slot** de la galerie — une vignette
-// qui, sélectionnée, remplace la grande image par le viewer interactif. Plus de
-// bouton « Voir en 3D » séparé : la 3D vit parmi les images. La vignette est un
-// **vrai rendu de la scène 3D** (snapshot hors-écran de `showroom-scene`), pas
-// la photo produit. La teinte du modèle suit la couleur du bloc d'achat.
+// Galerie de la fiche (brief « Strates », §7.9, chapitre 01) : la grande photo
+// et ses vignettes, rien d'autre. Plus de vignette 3D : le modèle vit dans son
+// propre chapitre (« Tourner », product-viewer.tsx), où il a la place de
+// tourner. La grande photo porte `fetchPriority="high"` (c'est l'élément LCP) et
+// le nom de transition `product-<slug>` : la photo de la carte de la boutique
+// vient s'y poser (« morph », §3.4).
 export function ProductGallery({
   images,
   name,
-  model3dUrl,
+  slug,
 }: {
   images: GalleryImage[];
   name: string;
-  model3dUrl?: string | null;
+  slug: string;
 }) {
-  const t = useTranslations("viewer");
-  const { colors } = useProductColor();
-  const has3d = Boolean(model3dUrl);
-  // Le slot 3D occupe l'index juste après la dernière image.
-  const slot3dIndex = images.length;
-  const slotCount = images.length + (has3d ? 1 : 0);
-
-  const [index, setIndex] = useState(images.length ? 0 : -1);
-  const is3d = has3d && index === slot3dIndex;
+  const [index, setIndex] = useState(0);
   const current = images[index] ?? images[0];
 
   return (
     <div>
-      <div className="overflow-hidden rounded-card border border-line bg-gradient-to-br from-paper to-line/40">
-        {is3d && model3dUrl ? (
-          <ModelViewer modelUrl={model3dUrl} />
-        ) : (
-          current && (
+      <ViewTransition name={`product-${slug}`} share="morph" default="none">
+        <div className="overflow-hidden rounded-card border border-line bg-surface">
+          {current && (
             <img
               src={cfImage(current.url, { width: 1200 })}
               alt={current.alt ?? name}
@@ -60,10 +40,11 @@ export function ProductGallery({
               fetchPriority="high"
               className="aspect-square w-full object-cover"
             />
-          )
-        )}
-      </div>
-      {(slotCount > 1 || has3d) && (
+          )}
+          {!current && <div className="aspect-square w-full" />}
+        </div>
+      </ViewTransition>
+      {images.length > 1 && (
         <div className="mt-3 grid grid-cols-5 gap-3">
           {images.map((img, i) => (
             <button
@@ -72,9 +53,10 @@ export function ProductGallery({
               onClick={() => setIndex(i)}
               aria-label={`${name} ${i + 1}/${images.length}`}
               aria-current={i === index}
-              className={`overflow-hidden rounded-xl border bg-surface transition-colors ${
-                i === index ? "border-ink" : "border-line hover:border-ink/40"
-              }`}
+              className={cx(
+                "overflow-hidden rounded-field border bg-surface transition-colors duration-150 ease-strate",
+                i === index ? "border-ink" : "border-line hover:border-iso",
+              )}
             >
               <img
                 src={cfImage(img.url, { width: 200 })}
@@ -85,27 +67,6 @@ export function ProductGallery({
               />
             </button>
           ))}
-          {has3d && (
-            <button
-              type="button"
-              onClick={() => setIndex(slot3dIndex)}
-              aria-label={t("view3d")}
-              aria-current={is3d}
-              className={`relative overflow-hidden rounded-xl border bg-surface transition-colors ${
-                is3d ? "border-ink" : "border-line hover:border-ink/40"
-              }`}
-            >
-              <ModelThumbnail3D
-                modelUrl={model3dUrl!}
-                color={colors[0]?.hex ?? "#E5231C"}
-              />
-              {/* Petite pastille : signale une visualisation 3D interactive. */}
-              <span className="absolute bottom-1 right-1 flex items-center gap-0.5 rounded-md bg-black/60 px-1.5 py-0.5 text-[9px] font-bold text-white backdrop-blur">
-                <Box size={9} />
-                3D
-              </span>
-            </button>
-          )}
         </div>
       )}
     </div>

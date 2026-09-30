@@ -1,14 +1,43 @@
+import { ViewTransition } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Link } from "@/i18n/navigation";
 import { formatChf } from "@/lib/format";
 import { cfImage } from "@/lib/cf-image";
 import type { ProductListItem } from "@/db/queries";
+import { cx } from "@/components/ui/cx";
+import { SiteLink } from "@/components/ui/site-link";
+import { heightMmOf } from "@/components/catalog/specs";
+import "@/components/catalog/morph.css";
 import { MulticolorDots } from "./multicolor-dots";
 import { AddToCartMini } from "./add-to-cart";
 import { FavoriteButton } from "./favorite-button";
+import styles from "./product-card.module.css";
 
-export function ProductCard({ product }: { product: ProductListItem }) {
+// `ProductListItem` (src/db/queries.ts) ne porte ni le texte de dimensions ni
+// la 2ᵉ photo : la boutique les ajoute (catalog/card-extras.ts). L'accueil et
+// les produits liés passent un `ProductListItem` nu, la carte s'en contente.
+export interface ProductCardItem extends ProductListItem {
+  dimensionsMm?: string | null;
+  secondImage?: { url: string; alt: string | null } | null;
+}
+
+// Carte produit (brief « Strates », §7.8) : image, nom (h2 + lien étiré), prix,
+// une ligne mono où l'unité réelle passe d'abord (« Hauteur 209 mm · PLA · 3 j »),
+// pastilles, favori, ajout rapide en contour (un seul rouge par écran). L'image
+// porte le nom de transition `product-<slug>` : elle glisse jusqu'à la galerie
+// de la fiche (« morph », classe posée par share="morph").
+export function ProductCard({
+  product,
+  priority = false,
+  heading: Heading = "h2",
+}: {
+  product: ProductCardItem;
+  /** Première rangée de l'écran : image chargée tout de suite (LCP). */
+  priority?: boolean;
+  /** Niveau du titre : h3 quand la carte vit sous un chapitre (h2). */
+  heading?: "h2" | "h3";
+}) {
   const t = useTranslations("product");
+  const tc = useTranslations("catalog.card");
   const locale = useLocale();
 
   // Ajout rapide depuis la carte : si le produit a des couleurs, on prend la
@@ -25,76 +54,110 @@ export function ProductCard({ product }: { product: ProductListItem }) {
     colorHex: firstColor?.hex ?? null,
   };
 
+  const soldOut = product.saleType === "stock" && product.stock === 0;
+  const height = heightMmOf(product.dimensionsMm);
+  const facts = [
+    height === null
+      ? null
+      : tc("height", {
+          height: new Intl.NumberFormat(`${locale}-CH`, {
+            maximumFractionDigits: 1,
+          }).format(height),
+        }),
+    product.material,
+    product.saleType === "stock"
+      ? soldOut
+        ? t("outOfStock")
+        : t("inStock")
+      : tc("days", { days: product.productionDays ?? 3 }),
+  ].filter((fact): fact is string => Boolean(fact));
+
   return (
-    <article className="group relative flex flex-col overflow-hidden rounded-card border border-line bg-surface transition-all duration-300 hover:-translate-y-1 hover:border-soft/30 hover:shadow-xl hover:shadow-ink/[0.07] dark:hover:shadow-black/40">
-      <div className="relative aspect-square overflow-hidden bg-gradient-to-br from-paper to-line/40">
-        {product.imageUrl && (
-          <img
-            src={cfImage(product.imageUrl, { width: 600 })}
-            alt={product.imageAlt ?? product.name}
-            loading="lazy"
-            decoding="async"
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
-          />
-        )}
-        {product.multicolor && (
-          <span className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-surface/90 px-2.5 py-1 text-[11px] font-semibold backdrop-blur">
-            <MulticolorDots size={6} />
-            {t("multicolorBadge")}
-          </span>
-        )}
-        <FavoriteButton
-          item={item}
-          className="absolute z-10 right-3 top-3 grid h-9 w-9 place-items-center rounded-full bg-surface/90 backdrop-blur"
-        />
-      </div>
-      <div className="flex flex-1 flex-col gap-1 p-4">
-        <h2 className="font-semibold leading-snug">
-          <Link
-            href={`/products/${product.slug}`}
-            className="after:absolute after:inset-0 focus-visible:outline-2 focus-visible:outline-accent"
-          >
-            {product.name}
-          </Link>
-        </h2>
-        <p
-          className={`text-xs ${
-            product.saleType === "stock" && product.stock === 0
-              ? "font-semibold text-accent-text"
-              : "text-soft"
-          }`}
-        >
-          {product.saleType === "stock"
-            ? product.stock === 0
-              ? t("outOfStock")
-              : t("inStock")
-            : t("onDemand", { days: product.productionDays ?? 3 })}
-        </p>
-        <p className="mt-2 font-semibold tabular-nums">
-          {formatChf(product.priceCents, locale)}
-        </p>
-        {product.colors.length > 0 && (
-          <div className="mt-2 flex items-center gap-1.5">
-            {product.colors.slice(0, 5).map((c) => (
-              <span
-                key={c.name}
-                title={c.name}
-                className="h-3.5 w-3.5 rounded-full border border-swatch-ring"
-                style={{ backgroundColor: c.hex }}
+    <article className={cx("group relative flex flex-col", styles.card)}>
+      <ViewTransition
+        name={`product-${product.slug}`}
+        share="morph"
+        default="none"
+      >
+        <div className="relative aspect-square overflow-hidden rounded-card border border-line bg-surface">
+          <div className="s3d-print absolute inset-0">
+            {product.imageUrl && (
+              <img
+                src={cfImage(product.imageUrl, { width: 600 })}
+                alt={product.imageAlt ?? product.name}
+                loading={priority ? "eager" : "lazy"}
+                fetchPriority={priority ? "high" : undefined}
+                decoding="async"
+                className="h-full w-full object-cover"
               />
-            ))}
-            {product.colors.length > 5 && (
-              <span className="text-[11px] font-medium text-soft">
-                +{product.colors.length - 5}
-              </span>
+            )}
+            {product.secondImage && (
+              <img
+                src={cfImage(product.secondImage.url, { width: 600 })}
+                alt=""
+                loading="lazy"
+                decoding="async"
+                className={styles.second}
+              />
             )}
           </div>
-        )}
-        <div className="relative z-10 mt-3">
-          <AddToCartMini
+          {product.multicolor && (
+            <span className="s3d-label absolute left-3 top-3 flex items-center gap-1.5 rounded-hair bg-paper/90 px-2 py-1 normal-case text-ink">
+              <MulticolorDots size={6} />
+              {t("multicolorBadge")}
+            </span>
+          )}
+          <FavoriteButton
             item={item}
-            disabled={product.saleType === "stock" && product.stock === 0}
+            className="absolute right-3 top-3 z-10 grid h-9 w-9 place-items-center rounded-full bg-paper/90"
           />
+        </div>
+      </ViewTransition>
+
+      <div className="flex flex-1 flex-col pt-3">
+        <Heading className="font-display text-[1.0625rem] font-bold leading-snug tracking-tight text-ink">
+          {/* Le morph fait le travail de transition : pas de « Coupe » sur un
+            clic de carte, mais la buse d'attente du header (page dynamique). */}
+          <SiteLink
+            href={`/products/${product.slug}`}
+            coupe={false}
+            className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ink"
+          >
+            {product.name}
+          </SiteLink>
+        </Heading>
+        <p
+          className={cx(
+            "s3d-label mt-1.5 normal-case",
+            soldOut ? "text-accent-text" : "text-soft",
+          )}
+        >
+          {facts.join(" · ")}
+        </p>
+        <div className="mt-2 flex items-center justify-between gap-3">
+          <p className="s3d-num font-semibold text-ink">
+            {formatChf(product.priceCents, locale)}
+          </p>
+          {product.colors.length > 0 && (
+            <div className="flex items-center gap-1.5">
+              {product.colors.slice(0, 5).map((c) => (
+                <span
+                  key={c.name}
+                  title={c.name}
+                  className="h-3.5 w-3.5 rounded-full border border-swatch-ring"
+                  style={{ backgroundColor: c.hex }}
+                />
+              ))}
+              {product.colors.length > 5 && (
+                <span className="s3d-label normal-case text-soft">
+                  +{product.colors.length - 5}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+        <div className="relative z-10 mt-3">
+          <AddToCartMini item={item} disabled={soldOut} />
         </div>
       </div>
     </article>

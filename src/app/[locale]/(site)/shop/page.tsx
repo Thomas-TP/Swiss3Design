@@ -1,15 +1,24 @@
 import type { Metadata } from "next";
 import { Search } from "lucide-react";
 import { getTranslations } from "next-intl/server";
-import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getUsedFilters, getProducts, type ProductSort } from "@/db/queries";
 import { collectionJsonLd, pageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 import { TrackEvent } from "@/components/track-event";
-import { ProductCard } from "@/components/product-card";
+import { ProductCard, type ProductCardItem } from "@/components/product-card";
 import { PageHeader } from "@/components/page-header";
 import { PageCut } from "@/components/ui/page-cut";
+import { SiteLink } from "@/components/ui/site-link";
+import { ButtonLink } from "@/components/ui/button";
+import { chipClass } from "@/components/ui/chip";
+import { cx } from "@/components/ui/cx";
+import { fieldClass } from "@/components/ui/field";
+import { getCardExtras } from "@/components/catalog/card-extras";
+import { ProductPlate } from "@/components/catalog/product-plate";
+import { RegistryTable } from "@/components/catalog/registry-table";
+import { ShopCollection } from "@/components/catalog/shop-collection";
+import { FileLine, StudioRow } from "@/components/catalog/studio-row";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +43,11 @@ export async function generateMetadata({
 }
 
 const SORTS: ProductSort[] = ["new", "price_asc", "price_desc"];
+
+// Au plus N produits : une planche par produit plutôt qu'une grille presque
+// vide (brief « Strates », §7.8). Au-delà, ou dès qu'un filtre est actif, la
+// grille et ses filtres.
+const PLATE_MAX = 2;
 
 function hrefFor(query: Record<string, string | undefined>) {
   const clean: Record<string, string> = {};
@@ -71,8 +85,9 @@ export default async function ShopPage({
   const linkFor = (query: Parameters<typeof hrefFor>[0]) =>
     hrefFor({ ...query, q: searchParam });
 
-  const [t, tSeo, filters, products] = await Promise.all([
+  const [t, tc, tSeo, filters, listed] = await Promise.all([
     getTranslations("shop"),
+    getTranslations("catalog.shop"),
     getTranslations("seo"),
     getUsedFilters(locale),
     getProducts(locale, {
@@ -85,36 +100,39 @@ export default async function ShopPage({
     }),
   ]);
 
-  const chip = (active: boolean) =>
-    `rounded-full px-4 py-2 text-sm font-medium transition-colors ${
-      active
-        ? "bg-ink text-paper"
-        : "border border-line bg-surface text-soft hover:border-soft/40 hover:text-ink"
-    }`;
-  const sortChip = (active: boolean) =>
-    `rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-      active ? "bg-ink text-paper shadow-sm" : "text-soft hover:text-ink"
-    }`;
+  // Dimensions, poids et 2ᵉ photo : une lecture groupée pour toute la liste.
+  const extras = await getCardExtras(listed.map((p) => p.id));
+  const products: ProductCardItem[] = listed.map((p) => ({
+    ...p,
+    dimensionsMm: extras.get(p.id)?.dimensionsMm ?? null,
+    secondImage: extras.get(p.id)?.secondImage ?? null,
+  }));
 
   // Le schéma ItemList ne décrit que le catalogue complet (la page canonique),
-  // pas une vue filtrée.
+  // pas une vue filtrée. Même critère pour la planche éditoriale : un filtre
+  // actif donne toujours la grille et sa liste de résultats.
   const isFullCatalog =
     !category && !material && !color && !multicolorOn && !searchParam;
+  const plates = isFullCatalog && products.length <= PLATE_MAX;
 
   return (
     <PageCut>
-      <div className="mx-auto max-w-6xl px-4 py-10 sm:px-6 md:py-16">
+      <div className="s3d-page pb-section pt-10 md:pt-16">
         {isFullCatalog && (
           <JsonLd
             data={collectionJsonLd({
               locale,
               name: tSeo("shopTitle"),
               description: tSeo("shopDescription"),
-              products,
+              products: listed,
             })}
           />
         )}
-        <PageHeader title={t("title")} intro={t("subtitle")} />
+        <PageHeader
+          eyebrow={tc("eyebrow")}
+          title={tc("title")}
+          intro={t("subtitle")}
+        />
         {/* Recherches sans résultat = produits que les visiteurs attendent. */}
         {searchParam && (
           <TrackEvent
@@ -136,187 +154,257 @@ export default async function ShopPage({
           />
         )}
 
-        {/* Barre de filtres groupée */}
-        <div className="mt-8 rounded-card border border-line bg-surface/60 p-3 backdrop-blur-sm sm:p-4">
-          {/* Recherche : formulaire GET (sans JS) ; les filtres actifs sont
-            conservés via des champs cachés. */}
-          <form action={`/${locale}/shop`} className="relative mb-3">
-            <Search
-              size={16}
-              className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-soft"
-            />
-            <input
-              type="search"
-              name="q"
-              defaultValue={searchParam ?? ""}
-              placeholder={t("searchPlaceholder")}
-              aria-label={t("searchPlaceholder")}
-              className="w-full rounded-full border border-line bg-paper py-2.5 pl-10 pr-4 text-sm outline-none transition-colors focus:border-soft/50"
-            />
-            {category && (
-              <input type="hidden" name="category" value={category} />
-            )}
-            {material && (
-              <input type="hidden" name="material" value={material} />
-            )}
-            {color && <input type="hidden" name="color" value={color} />}
-            {multicolorParam && (
-              <input type="hidden" name="multicolor" value={multicolorParam} />
-            )}
-            {sortParam && <input type="hidden" name="sort" value={sortParam} />}
-          </form>
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href={linkFor({
-                material,
-                color,
-                multicolor: multicolorParam,
-                sort: sortParam,
-              })}
-              className={chip(!category)}
-            >
-              {t("all")}
-            </Link>
-            {filters.categories.map((c) => (
-              <Link
-                key={c.id}
-                href={linkFor({
-                  category: c.slug,
-                  material,
-                  color,
-                  multicolor: multicolorParam,
-                  sort: sortParam,
-                })}
-                className={chip(category === c.slug)}
-              >
-                {c.name}
-              </Link>
-            ))}
-            {(filters.materials.length > 0 ||
-              filters.multicolor ||
-              multicolorOn) && (
-              <span className="mx-1 hidden w-px self-stretch bg-line sm:block" />
-            )}
-            {filters.materials.map((m) => (
-              <Link
-                key={m}
-                href={linkFor({
-                  category,
-                  material: material === m ? undefined : m,
-                  color,
-                  multicolor: multicolorParam,
-                  sort: sortParam,
-                })}
-                className={chip(material === m)}
-              >
-                {m}
-              </Link>
-            ))}
-            {(filters.multicolor || multicolorOn) && (
-              <Link
-                href={linkFor({
-                  category,
-                  material,
-                  color,
-                  multicolor: multicolorOn ? undefined : "1",
-                  sort: sortParam,
-                })}
-                className={chip(multicolorOn)}
-              >
-                {t("filterMulticolor")}
-              </Link>
+        {plates ? (
+          <div className="mt-12 md:mt-16">
+            {products.length === 0 ? (
+              <p className="max-w-[46rem] text-lead text-soft">
+                {tc("emptyCatalog")}
+              </p>
+            ) : (
+              <div className="space-y-12 md:space-y-16">
+                {products.map((p, index) => (
+                  <ProductPlate
+                    key={p.id}
+                    product={p}
+                    index={index}
+                    primary={index === 0}
+                    weightGrams={extras.get(p.id)?.weightGrams ?? null}
+                  />
+                ))}
+              </div>
             )}
           </div>
-
-          {(filters.colors.length > 0 || color) && (
-            <div className="mt-3 flex flex-wrap items-center gap-2.5 border-t border-line pt-3">
-              <span className="text-xs font-medium text-soft">
-                {t("filterColor")}
-              </span>
-              {filters.colors.map((c) => {
-                const active = color === c.name;
-                return (
-                  <Link
-                    key={c.name}
+        ) : (
+          <>
+            {/* Filtres en puces : des LIENS (rendu serveur, sans JS), la
+              recherche un formulaire GET dont les champs cachés gardent les
+              filtres actifs. Aucun paramètre d'URL de plus (robots, analytics). */}
+            <div className="mt-10 border-t border-line pt-6">
+              <form
+                action={`/${locale}/shop`}
+                className="relative mb-5 max-w-[32rem]"
+              >
+                <Search
+                  aria-hidden="true"
+                  size={16}
+                  className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-soft"
+                />
+                <input
+                  type="search"
+                  name="q"
+                  defaultValue={searchParam ?? ""}
+                  placeholder={t("searchPlaceholder")}
+                  aria-label={t("searchPlaceholder")}
+                  className={cx(fieldClass, "pl-10")}
+                />
+                {category && (
+                  <input type="hidden" name="category" value={category} />
+                )}
+                {material && (
+                  <input type="hidden" name="material" value={material} />
+                )}
+                {color && <input type="hidden" name="color" value={color} />}
+                {multicolorParam && (
+                  <input
+                    type="hidden"
+                    name="multicolor"
+                    value={multicolorParam}
+                  />
+                )}
+                {sortParam && (
+                  <input type="hidden" name="sort" value={sortParam} />
+                )}
+              </form>
+              <div className="flex flex-wrap gap-2">
+                <SiteLink
+                  href={linkFor({
+                    material,
+                    color,
+                    multicolor: multicolorParam,
+                    sort: sortParam,
+                  })}
+                  aria-current={!category ? "true" : undefined}
+                  className={chipClass(!category)}
+                >
+                  {t("all")}
+                </SiteLink>
+                {filters.categories.map((c) => (
+                  <SiteLink
+                    key={c.id}
                     href={linkFor({
-                      category,
+                      category: c.slug,
                       material,
-                      color: active ? undefined : c.name,
+                      color,
                       multicolor: multicolorParam,
                       sort: sortParam,
                     })}
-                    title={c.name}
-                    className={`h-7 w-7 rounded-full border transition-transform hover:scale-110 ${
-                      active
-                        ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-surface"
-                        : "border-swatch-ring"
-                    }`}
-                    style={{ backgroundColor: c.hex }}
+                    aria-current={category === c.slug ? "true" : undefined}
+                    className={chipClass(category === c.slug)}
                   >
-                    {/* Texte d'ancre réel (masqué) plutôt qu'un aria-label :
-                      lecteurs d'écran ET robots (Semrush signale les liens
-                      sans ancre) lisent le nom de la couleur. */}
-                    <span className="sr-only">{c.name}</span>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-
-          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-3">
-            <p className="text-sm text-soft">
-              {t("results", { count: products.length })}
-            </p>
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-soft">
-                {t("sortLabel")}
-              </span>
-              <div className="inline-flex items-center rounded-full border border-line bg-paper p-1">
-                {SORTS.map((s) => (
-                  <Link
-                    key={s}
+                    {c.name}
+                  </SiteLink>
+                ))}
+                {(filters.materials.length > 0 ||
+                  filters.multicolor ||
+                  multicolorOn) && (
+                  <span
+                    aria-hidden="true"
+                    className="mx-1 hidden w-px self-stretch bg-line sm:block"
+                  />
+                )}
+                {filters.materials.map((m) => (
+                  <SiteLink
+                    key={m}
+                    href={linkFor({
+                      category,
+                      material: material === m ? undefined : m,
+                      color,
+                      multicolor: multicolorParam,
+                      sort: sortParam,
+                    })}
+                    aria-current={material === m ? "true" : undefined}
+                    className={chipClass(material === m)}
+                  >
+                    {m}
+                  </SiteLink>
+                ))}
+                {(filters.multicolor || multicolorOn) && (
+                  <SiteLink
                     href={linkFor({
                       category,
                       material,
                       color,
-                      multicolor: multicolorParam,
-                      sort: s === "new" ? undefined : s,
+                      multicolor: multicolorOn ? undefined : "1",
+                      sort: sortParam,
                     })}
-                    className={sortChip(activeSort === s)}
+                    aria-current={multicolorOn ? "true" : undefined}
+                    className={chipClass(multicolorOn)}
                   >
-                    {t(
-                      s === "new"
-                        ? "sortNew"
-                        : s === "price_asc"
-                          ? "sortPriceAsc"
-                          : "sortPriceDesc",
-                    )}
-                  </Link>
-                ))}
+                    {t("filterMulticolor")}
+                  </SiteLink>
+                )}
               </div>
-            </div>
-          </div>
-        </div>
 
-        {products.length === 0 ? (
-          <div className="mt-8 rounded-card border border-line bg-surface p-12 text-center">
-            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-paper ring-1 ring-line">
-              <Search size={22} strokeWidth={1.6} className="text-soft" />
-            </span>
-            <p className="mt-4 text-soft">{t("empty")}</p>
-            <Link
-              href="/shop"
-              className="mt-5 inline-flex items-center rounded-full border border-line bg-paper px-5 py-2.5 text-sm font-semibold transition-colors hover:border-ink"
-            >
-              {t("all")}
-            </Link>
-          </div>
-        ) : (
-          <div className="mt-6 grid grid-cols-1 min-[480px]:grid-cols-2 gap-4 lg:grid-cols-3 lg:gap-6">
-            {products.map((p) => (
-              <ProductCard key={p.id} product={p} />
-            ))}
-          </div>
+              {(filters.colors.length > 0 || color) && (
+                <div className="mt-4 flex flex-wrap items-center gap-2.5">
+                  <span className="s3d-label text-soft">
+                    {t("filterColor")}
+                  </span>
+                  {filters.colors.map((c) => {
+                    const active = color === c.name;
+                    return (
+                      <SiteLink
+                        key={c.name}
+                        href={linkFor({
+                          category,
+                          material,
+                          color: active ? undefined : c.name,
+                          multicolor: multicolorParam,
+                          sort: sortParam,
+                        })}
+                        title={c.name}
+                        aria-current={active ? "true" : undefined}
+                        className={cx(
+                          "h-7 w-7 rounded-full border transition-transform duration-300 ease-purge hover:scale-105",
+                          active
+                            ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-paper"
+                            : "border-swatch-ring",
+                        )}
+                        style={{ backgroundColor: c.hex }}
+                      >
+                        {/* Texte d'ancre réel (masqué) plutôt qu'un aria-label :
+                          lecteurs d'écran ET robots (Semrush signale les liens
+                          sans ancre) lisent le nom de la couleur. */}
+                        <span className="sr-only">{c.name}</span>
+                      </SiteLink>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+
+            {products.length === 0 ? (
+              <div className="mt-10">
+                <div className="border-y border-line py-12">
+                  <p className="text-lead text-soft">{t("empty")}</p>
+                  <ButtonLink
+                    href="/shop"
+                    variant="secondary"
+                    size="md"
+                    className="mt-6"
+                  >
+                    {t("all")}
+                  </ButtonLink>
+                </div>
+              </div>
+            ) : (
+              <div className="mt-8">
+                <ShopCollection
+                  summary={
+                    <p className="s3d-label normal-case text-soft">
+                      {t("results", { count: products.length })}
+                    </p>
+                  }
+                  sort={
+                    <div className="flex items-center gap-2">
+                      <span className="s3d-label text-soft">
+                        {t("sortLabel")}
+                      </span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {SORTS.map((s) => (
+                          <SiteLink
+                            key={s}
+                            href={linkFor({
+                              category,
+                              material,
+                              color,
+                              multicolor: multicolorParam,
+                              sort: s === "new" ? undefined : s,
+                            })}
+                            aria-current={activeSort === s ? "true" : undefined}
+                            className={cx(
+                              chipClass(activeSort === s),
+                              "min-h-8 px-3 py-1 text-xs",
+                            )}
+                          >
+                            {t(
+                              s === "new"
+                                ? "sortNew"
+                                : s === "price_asc"
+                                  ? "sortPriceAsc"
+                                  : "sortPriceDesc",
+                            )}
+                          </SiteLink>
+                        ))}
+                      </div>
+                    </div>
+                  }
+                  grid={
+                    <div className="grid grid-cols-1 gap-x-4 gap-y-10 min-[480px]:grid-cols-2 lg:grid-cols-3 lg:gap-x-6">
+                      {products.map((p, index) => (
+                        <ProductCard
+                          key={p.id}
+                          product={p}
+                          priority={index < 3}
+                        />
+                      ))}
+                    </div>
+                  }
+                  registry={<RegistryTable products={products} />}
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        {/* À régler au Studio : des objets de l'atelier, pas des produits (aucun
+          prix fixe). Rangée et lien « J'ai un fichier » hors d'une vue filtrée,
+          sauf si elle ne donne rien : c'est alors l'état vide utile. */}
+        {(isFullCatalog || products.length === 0) && (
+          <>
+            <StudioRow className="mt-16 md:mt-24" />
+            <FileLine className="mt-12 md:mt-16" />
+          </>
         )}
       </div>
     </PageCut>
