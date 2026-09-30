@@ -2836,7 +2836,14 @@ order_id`, `revenue` port compris), `AttributionQuestion`, conversion invité �
   `LocaleShell`). **Reste rendu côté client** : un `notFound()` lancé par une page qui
   correspond à une route (fiche produit supprimée, `[locale]/not-found.tsx`) garde le statut
   404 et le `noindex`, mais son contenu s'écrit après l'hydratation : Next ne fixe le statut 404
-  que dans ce repli, et aucune API de page ne permet de le poser autrement.
+  que dans ce repli, et aucune API de page ne permet de le poser autrement. Preuve dans le
+  code de Next 16.3.6 (`node_modules/next/dist/server/app-render/app-render.js`) : le repli
+  d'une erreur de coquille (`catch` « errorRecovery », vers la ligne 2382) fixe le statut puis
+  rend `getErrorRSCPayload`, dont la graine est `<html id="__next_error__">` au `<body>` vide
+  (vers la ligne 1325) ; la vraie arborescence, donc la limite `not-found`, n'est lue que par
+  le client. Revérifié le 01.10.2026 : `/fr/products/slug-inexistant` répond 404 + `noindex`
+  avec ce corps vide, `/fr/zzz-inconnu` et `/de/zzz` répondent 404 + `noindex` avec un
+  header, un `<main>`, un h1 et un footer dans le HTML brut.
 
 ### 7.19 Erreur (WP-UTILITY, `src/app/[locale]/error.tsx`)
 

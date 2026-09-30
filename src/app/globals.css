@@ -23,15 +23,9 @@
 @font-face {
   font-family: "S3D Mono Fallback";
   src:
-    local("Menlo-Regular"),
-    local("Menlo"),
-    local("Lucida Console"),
-    local("LucidaConsole"),
-    local("Liberation Mono"),
-    local("Noto Sans Mono"),
-    local("Droid Sans Mono"),
-    local("DejaVu Sans Mono"),
-    local("Courier New"),
+    local("Menlo-Regular"), local("Menlo"), local("Lucida Console"),
+    local("LucidaConsole"), local("Liberation Mono"), local("Noto Sans Mono"),
+    local("Droid Sans Mono"), local("DejaVu Sans Mono"), local("Courier New"),
     local("CourierNewPSMT");
   size-adjust: 100%;
   ascent-override: 101%;
@@ -129,8 +123,8 @@
   --font-display:
     var(--font-archivo), var(--font-geist-sans), ui-sans-serif, sans-serif;
   --font-mono:
-    var(--font-geist-mono), "S3D Mono Fallback", ui-monospace,
-    "SFMono-Regular", Menlo, monospace;
+    var(--font-geist-mono), "S3D Mono Fallback", ui-monospace, "SFMono-Regular",
+    Menlo, monospace;
 }
 
 @theme {
