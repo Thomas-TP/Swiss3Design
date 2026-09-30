@@ -1,1 +1,131 @@
-{}
+{
+  "objects": {
+    "lavaux": {
+      "name": "Vase «Lavaux»",
+      "noun": "Vase",
+      "tagline": "Eine Vase zum Einstellen: Profil, Muster, bis zu vier Farben."
+    },
+    "cartouche": {
+      "name": "Visitenkarte «Cartouche»",
+      "noun": "Visitenkarte",
+      "tagline": "Ihre Visitenkarte von 85 × 55 mm, erhaben oder graviert."
+    },
+    "relief": {
+      "name": "Untersetzer «Relief»",
+      "noun": "Untersetzer",
+      "tagline": "Ein Untersetzer von 100 mm: ein Bergmassiv in Schichten, Ihr Name auf dem Gipfel."
+    },
+    "borne": {
+      "name": "Namensschild «Borne»",
+      "noun": "Namensschild",
+      "tagline": "Ein Namensschild in zwei Farben, mit Ihrem Text."
+    }
+  },
+  "profiles": {
+    "cylindre": "Zylinder",
+    "galet": "Kiesel",
+    "amphore": "Amphore",
+    "cone": "Kegel",
+    "tulipe": "Tulpe"
+  },
+  "patterns": {
+    "lisse": "Glatt",
+    "gradins": "Stufen",
+    "vagues": "Wellen",
+    "voronoi": "Voronoi",
+    "nervures": "Rippen"
+  },
+  "palettes": {
+    "leman": "Léman",
+    "molasse": "Molasse",
+    "signal": "Signal",
+    "uni": "Uni"
+  },
+  "filaments": {
+    "blanc-neve": "Schneeweiss",
+    "encre": "Tintenschwarz",
+    "rouge-signal": "Signalrot",
+    "bleu-leman": "Léman-Blau",
+    "vert-lavaux": "Lavaux-Grün",
+    "gris-molasse": "Molassegrau",
+    "ambre": "Bernstein",
+    "glacier": "Gletscherblau"
+  },
+  "options": {
+    "mode": {
+      "relief": "Erhaben",
+      "gravure": "Graviert"
+    },
+    "layout": {
+      "classique": "Klassisch",
+      "centree": "Zentriert",
+      "cartouche": "Kartusche",
+      "monogramme": "Monogramm"
+    },
+    "shape": {
+      "rond": "Rund",
+      "carre": "Quadrat",
+      "pilule": "Pille",
+      "etiquette": "Etikett",
+      "goutte": "Tropfen",
+      "pic": "Spitze"
+    },
+    "ring": {
+      "gauche": "Links",
+      "droite": "Rechts",
+      "aucun": "Keiner"
+    }
+  },
+  "units": {
+    "layers": "{count, plural, one {# Schicht} other {# Schichten}}",
+    "filaments": "{count, plural, one {# Filament} other {# Filamente}}",
+    "bands": "{count, plural, one {# Farbzone} other {# Farbzonen}}",
+    "changes": "{count, plural, =0 {kein Wechsel} one {# Wechsel} other {# Wechsel}}",
+    "triangles": "{count, plural, one {# Dreieck} other {# Dreiecke}}",
+    "dimensions": "{width} × {depth} × {height} mm"
+  },
+  "measure": {
+    "strip": "H {height} · Ø {diameter} · {layers} · ≈ {grams} · ≈ {duration} · {changes} · Spülmenge ≈ {purge}",
+    "hero": "{height} · {layers} · {filaments} · ≈ {grams} · ≈ {duration}",
+    "onQuote": "Auf Offerte",
+    "priceLater": "Preis innert 48 Stunden bestätigt"
+  },
+  "duration": {
+    "real": "Reale Dauer ≈ {duration}",
+    "simulated": "Reale Dauer ≈ {duration} · bei ×{speed}: {simulated}",
+    "extra": "+ ≈ {duration}"
+  },
+  "bands": {
+    "label": "{filament} · Schichten {from}–{to} · {fromMm}–{toMm} · ≈ {grams}",
+    "range": "{filament} {from}–{to}",
+    "layerReadout": "Schicht {layer} / {total} · z {z} · {filament}",
+    "change": "Filamentwechsel → {filament} · Schicht {layer}",
+    "boundary": "Wechsel {index} bei {z}, Schicht {layer}",
+    "purge": "{changes} · Spülmenge ≈ {grams} · + ≈ {duration}",
+    "single": "Eine einzige Farbe: kein Filamentwechsel, keine Spülmenge."
+  },
+  "guard": {
+    "status": {
+      "ok": "Druckbar",
+      "warn": "Zu prüfen",
+      "error": "Nicht druckbar"
+    },
+    "fix": "Korrigieren",
+    "issue": {
+      "overhang": "Überhang von {angle}° bei {at} mm: über 45° wird der Druck unsicher.",
+      "baseNarrow": "Schmaler Fuss (Radius {value} mm): Das Stück kann sich von der Druckplatte lösen.",
+      "plate": "Das Stück ({value} mm) ist grösser als die Druckplatte von 250 mm.",
+      "bandThin": "Farbzone von {value} mm: mindestens 2 mm (10 Schichten) für einen sauberen Farbwechsel.",
+      "patternCoupling": "Dieses Muster ist für Abstand, Wellenlänge oder Wandstärke zu ausgeprägt: Der Wert wird in die Grenzen zurückgeführt.",
+      "textStroke": "Strichstärke der Buchstaben {value} mm: mindestens 0,8 mm bei einer Düse von 0,4 mm.",
+      "textFit": "Der Text passt in der Mindestgrösse nicht: Kürzen Sie ihn.",
+      "textChar": "Nicht druckbares Zeichen: {char}",
+      "nearVase": "Diese Kombination erinnert an Ians Vase spirale (Lizenz ohne Bearbeitungen). Verringern Sie die Drehung oder die Anzahl Rippen."
+    }
+  },
+  "relief": {
+    "peak": "Piz {name}",
+    "summit": "{peak} · {altitude} m",
+    "fictional": "fiktive Höhe"
+  }
+}

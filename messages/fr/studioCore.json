@@ -1,1 +1,131 @@
-{}
+{
+  "objects": {
+    "lavaux": {
+      "name": "Vase « Lavaux »",
+      "noun": "Vase",
+      "tagline": "Un vase à régler : profil, motif, jusqu'à quatre couleurs."
+    },
+    "cartouche": {
+      "name": "Carte « Cartouche »",
+      "noun": "Carte de visite",
+      "tagline": "Votre carte de visite de 85 × 55 mm, en relief ou gravée."
+    },
+    "relief": {
+      "name": "Sous-verre « Relief »",
+      "noun": "Sous-verre",
+      "tagline": "Un sous-verre de 100 mm : un massif en strates, votre nom au sommet."
+    },
+    "borne": {
+      "name": "Porte-nom « Borne »",
+      "noun": "Porte-nom",
+      "tagline": "Un porte-nom imprimé en deux couleurs, avec votre texte."
+    }
+  },
+  "profiles": {
+    "cylindre": "Cylindre",
+    "galet": "Galet",
+    "amphore": "Amphore",
+    "cone": "Cône",
+    "tulipe": "Tulipe"
+  },
+  "patterns": {
+    "lisse": "Lisse",
+    "gradins": "Gradins",
+    "vagues": "Vagues",
+    "voronoi": "Voronoï",
+    "nervures": "Nervures"
+  },
+  "palettes": {
+    "leman": "Léman",
+    "molasse": "Molasse",
+    "signal": "Signal",
+    "uni": "Uni"
+  },
+  "filaments": {
+    "blanc-neve": "Blanc névé",
+    "encre": "Encre",
+    "rouge-signal": "Rouge Signal",
+    "bleu-leman": "Bleu Léman",
+    "vert-lavaux": "Vert Lavaux",
+    "gris-molasse": "Gris molasse",
+    "ambre": "Ambre",
+    "glacier": "Glacier"
+  },
+  "options": {
+    "mode": {
+      "relief": "En relief",
+      "gravure": "Gravé"
+    },
+    "layout": {
+      "classique": "Classique",
+      "centree": "Centrée",
+      "cartouche": "Cartouche",
+      "monogramme": "Monogramme"
+    },
+    "shape": {
+      "rond": "Rond",
+      "carre": "Carré",
+      "pilule": "Pilule",
+      "etiquette": "Étiquette",
+      "goutte": "Goutte",
+      "pic": "Pic"
+    },
+    "ring": {
+      "gauche": "Gauche",
+      "droite": "Droite",
+      "aucun": "Aucun"
+    }
+  },
+  "units": {
+    "layers": "{count, plural, one {# couche} other {# couches}}",
+    "filaments": "{count, plural, one {# filament} other {# filaments}}",
+    "bands": "{count, plural, one {# bande} other {# bandes}}",
+    "changes": "{count, plural, =0 {aucun changement} one {# changement} other {# changements}}",
+    "triangles": "{count, plural, one {# triangle} other {# triangles}}",
+    "dimensions": "{width} × {depth} × {height} mm"
+  },
+  "measure": {
+    "strip": "H {height} · Ø {diameter} · {layers} · ≈ {grams} · ≈ {duration} · {changes} · purge ≈ {purge}",
+    "hero": "{height} · {layers} · {filaments} · ≈ {grams} · ≈ {duration}",
+    "onQuote": "Sur devis",
+    "priceLater": "Prix confirmé sous 48 h"
+  },
+  "duration": {
+    "real": "Durée réelle ≈ {duration}",
+    "simulated": "Durée réelle ≈ {duration} · à ×{speed} : {simulated}",
+    "extra": "+ ≈ {duration}"
+  },
+  "bands": {
+    "label": "{filament} · couches {from}–{to} · {fromMm}–{toMm} · ≈ {grams}",
+    "range": "{filament} {from}–{to}",
+    "layerReadout": "Couche {layer} / {total} · z {z} · {filament}",
+    "change": "Changement de filament → {filament} · couche {layer}",
+    "boundary": "Changement {index} à {z}, couche {layer}",
+    "purge": "{changes} · purge ≈ {grams} · + ≈ {duration}",
+    "single": "Une seule couleur : aucun changement de filament, aucune purge."
+  },
+  "guard": {
+    "status": {
+      "ok": "Imprimable",
+      "warn": "À vérifier",
+      "error": "Non imprimable"
+    },
+    "fix": "Corriger",
+    "issue": {
+      "overhang": "Surplomb de {angle}° à {at} mm : au-delà de 45°, l'impression devient incertaine.",
+      "baseNarrow": "Pied étroit (rayon {value} mm) : la pièce risque de se décoller du plateau.",
+      "plate": "La pièce ({value} mm) dépasse le plateau d'impression de 250 mm.",
+      "bandThin": "Bande de {value} mm : 2 mm au minimum (10 couches) pour un changement de couleur net.",
+      "patternCoupling": "Ce motif est trop marqué pour son pas, sa longueur d'onde ou la paroi : la valeur est ramenée dans les limites.",
+      "textStroke": "Trait des lettres à {value} mm : 0,8 mm au minimum pour une buse de 0,4 mm.",
+      "textFit": "Le texte ne tient pas à la taille minimale : raccourcissez-le.",
+      "textChar": "Caractère non imprimable : {char}",
+      "nearVase": "Cette combinaison rappelle le Vase spirale de Ian (licence sans modification). Réduisez la torsion ou le nombre de nervures."
+    }
+  },
+  "relief": {
+    "peak": "Pointe {name}",
+    "summit": "{peak} · {altitude} m",
+    "fictional": "altitude fictive"
+  }
+}

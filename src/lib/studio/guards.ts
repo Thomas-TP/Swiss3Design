@@ -45,6 +45,35 @@ export const OVERHANG_ERROR_SLOPE = 1.7;
 
 type Issue = Extract<Printability, { issues: unknown }>["issues"][number];
 
+/**
+ * Clé du message d'une anomalie dans le namespace `studioCore` : à traduire
+ * avec `useTranslations("studioCore")` et les valeurs de `issueValues`
+ * (`textChar` attend en plus `{ char }`, que seul le texte saisi connaît).
+ */
+export const ISSUE_MESSAGE_KEYS: Record<IssueCode, string> = {
+  overhang: "guard.issue.overhang",
+  "base-narrow": "guard.issue.baseNarrow",
+  plate: "guard.issue.plate",
+  "band-thin": "guard.issue.bandThin",
+  "pattern-coupling": "guard.issue.patternCoupling",
+  "text-stroke": "guard.issue.textStroke",
+  "text-fit": "guard.issue.textFit",
+  "text-char": "guard.issue.textChar",
+  "near-vase-spirale": "guard.issue.nearVase",
+};
+
+/** Arguments ICU d'une anomalie : `angle` et `at` (surplomb), `value` (les autres). */
+export function issueValues(issue: Issue): Record<string, number> {
+  const out: Record<string, number> = {};
+  if (issue.code === "overhang") {
+    if (issue.value !== undefined) out.angle = issue.value;
+    if (issue.atMm !== undefined) out.at = issue.atMm;
+  } else if (issue.value !== undefined) {
+    out.value = issue.value;
+  }
+  return out;
+}
+
 /** Silhouette du Vase spirale de Ian : nervures fines et torsadées, col fin. */
 export function nearVaseSpirale(config: StudioConfig): boolean {
   if (config.object !== "lavaux") return false;
