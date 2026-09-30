@@ -146,11 +146,11 @@ put` on an environment with real users without `--env <name>` explicitly
    **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
-10. **Keep the Worker bundle lean: 3 062 KiB gzip (2026-09-28 measurement,
-    end of WP-00 of the redesign, see
-    [`docs/redesign-2026/measures-wp00.md`](docs/redesign-2026/measures-wp00.md);
-    the whole redesign must stay ≤ 3 125 KiB, brief §4.11 — re-measure rather
-    than trust this figure as it ages).
+10. **Keep the Worker bundle lean: 3 109 KiB gzip (2026-09-30 measurement,
+    end of wave 1 of the redesign, see
+    [`docs/redesign-2026/measures-wave1.md`](docs/redesign-2026/measures-wave1.md);
+    the whole redesign must stay ≤ 3 185 KiB, owner's decision of 2026-09-30,
+    brief §4.11 — re-measure rather than trust this figure as it ages).
     Never add a binary asset through a Next file convention.** Since
     2026-09-26 the account is on **Workers Paid**, whose cap is 10 MiB
     **gzipped**. The **Free** plan's 3 MiB cap is what broke the deploy in
