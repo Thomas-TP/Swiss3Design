@@ -30,8 +30,8 @@ const DRAW_DURATION = 0.7;
 const ENTER_LINE = 0.82;
 
 /**
- * Anime le schéma du panneau actif (`[role="tabpanel"]` non masqué) de la
- * vitrine `scope`. Tous les panneaux sont dans le HTML (les deux machines sont
+ * Anime le schéma (`[data-machine]`) du panneau actif (`[role="tabpanel"]` non
+ * masqué) de la vitrine `scope`. Tous les panneaux sont dans le HTML (les deux machines sont
  * lisibles sans JS), seul l'actif est affiché.
  *
  * - Au montage : si le schéma est sous la ligne de flottaison, il est masqué
@@ -63,10 +63,12 @@ export function SchematicDraw({
 
       const root = scope.current;
       if (!root || readReducedMotion()) return;
-      const svg = root.querySelector<SVGSVGElement>(
-        '[role="tabpanel"]:not([hidden]) svg',
+      // Par `data-machine`, pas par « le premier <svg> du panneau » : l'en-tête
+      // du panneau porte une icône (un <svg> lucide) avant le schéma.
+      const machine = root.querySelector<SVGGElement>(
+        '[role="tabpanel"]:not([hidden]) [data-machine]',
       );
-      const machine = svg?.querySelector<SVGGElement>("[data-machine]");
+      const svg = machine?.ownerSVGElement;
       if (!svg || !machine) return;
 
       const top = svg.getBoundingClientRect().top;
