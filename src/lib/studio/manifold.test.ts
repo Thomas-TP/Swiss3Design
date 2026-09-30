@@ -336,25 +336,24 @@ const LOCALES = ["fr", "de", "it", "en"] as const;
 function expectShells(
   mesh: MeshData,
   label: string,
-  expectedHeight?: number,
+  expectedHeight: number,
 ): ReturnType<typeof checkManifold> {
   const report = checkManifold(mesh);
   expect(report.closed, `${label} : ${JSON.stringify(report)}`).toBe(true);
-  expect(report.degenerateTriangles, label).toBe(0);
-  expect(report.componentVolumes, label).toHaveLength(report.components);
+  expect(report.degenerateTriangles, `${label}`).toBe(0);
+  expect(report.componentVolumes, `${label}`).toHaveLength(report.components);
   for (const volume of report.componentVolumes) {
     expect(volume, `${label} : coque de volume ${volume}`).toBeGreaterThan(0);
   }
-  expect(meshVolume(mesh), label).toBeGreaterThan(0);
+  expect(meshVolume(mesh), `${label}`).toBeGreaterThan(0);
   const [x0, y0, z0, x1, y1, z1] = mesh.bbox;
-  expect(x1 - x0, label).toBeLessThanOrEqual(250);
-  expect(y1 - y0, label).toBeLessThanOrEqual(250);
-  expect(z1 - z0, label).toBeLessThanOrEqual(250);
-  expect(z0, label).toBeCloseTo(0, 6);
-  if (expectedHeight !== undefined) {
-    expect(z1, label).toBeCloseTo(expectedHeight, 4);
-  }
-  expect(mesh.triangles, label).toBeLessThanOrEqual(STL_MAX_TRIANGLES);
+  expect(x1 - x0, `${label}`).toBeLessThanOrEqual(250);
+  expect(y1 - y0, `${label}`).toBeLessThanOrEqual(250);
+  expect(z1 - z0, `${label}`).toBeLessThanOrEqual(250);
+  expect(z0, `${label}`).toBeCloseTo(0, 6);
+  // La hauteur du maillage est celle des statistiques (un seul calcul).
+  expect(z1, `${label}`).toBeCloseTo(expectedHeight, 4);
+  expect(mesh.triangles, `${label}`).toBeLessThanOrEqual(STL_MAX_TRIANGLES);
   return report;
 }
 
@@ -376,8 +375,7 @@ describe("Objets plats : variété du maillage d'export (200 configurations par 
     while (produced < count) {
       const config = draw(rng);
       // Une fois sur dix : aucun texte (plaque seule, massif sans étiquette).
-      const texts: StudioTexts =
-        rng() < 0.1 ? {} : randomTexts(rng, object);
+      const texts: StudioTexts = rng() < 0.1 ? {} : randomTexts(rng, object);
       const locale = pick(rng, LOCALES);
       if (checkPrintability(config, texts, locale).status === "error") {
         rejected++;
@@ -391,6 +389,8 @@ describe("Objets plats : variété du maillage d'export (200 configurations par 
   }
 
   it("Cartouche : 200 configurations, coques fermées et orientées", () => {
+    let count = 0;
+    let engraved = 0;
     for (const { config, texts, locale, index } of valid(
       20260930,
       "cartouche",
@@ -399,20 +399,25 @@ describe("Objets plats : variété du maillage d'export (200 configurations par 
     )) {
       const label = `cartouche #${index} ${JSON.stringify(config)} ${JSON.stringify(texts)}`;
       const mesh = buildStudioMesh(config, texts, { lod: "export", locale });
-      // La hauteur du maillage est celle des statistiques (un seul calcul).
       const report = expectShells(
         mesh,
         label,
         computeStats(config, texts).heightMm,
       );
       // Gravure : une seule coque (plaque et poches recollées) ; relief : la
-      // plaque plus au moins une coque par lettre ou par forme.
-      if (config.mode === "gravure") expect(report.components, label).toBe(1);
-      else expect(report.components, label).toBeGreaterThanOrEqual(1);
+      // plaque plus une coque par lettre ou par forme.
+      const shells = config.mode === "gravure" ? report.components : 1;
+      expect(shells, `${label}`).toBe(1);
+      count++;
+      if (config.mode === "gravure") engraved++;
     }
+    expect(count).toBe(200);
+    expect(engraved).toBeGreaterThan(50);
   }, 240_000);
 
   it("Relief : 200 configurations, coques fermées et orientées", () => {
+    let count = 0;
+    let labelled = 0;
     for (const { config, texts, locale, index } of valid(
       20260931,
       "relief",
@@ -423,10 +428,16 @@ describe("Objets plats : variété du maillage d'export (200 configurations par 
       const mesh = buildStudioMesh(config, texts, { lod: "export", locale });
       const strata = computeStats(config, texts, undefined, locale).heightMm;
       expectShells(mesh, label, strata);
+      count++;
+      if (config.label && texts.peak) labelled++;
     }
+    expect(count).toBe(200);
+    expect(labelled).toBeGreaterThan(50);
   }, 240_000);
 
   it("Borne : 200 configurations, coques fermées et orientées", () => {
+    let count = 0;
+    let engraved = 0;
     for (const { config, texts, locale, index } of valid(
       20260932,
       "borne",
@@ -440,12 +451,17 @@ describe("Objets plats : variété du maillage d'export (200 configurations par 
         label,
         computeStats(config, texts).heightMm,
       );
-      if (config.mode === "gravure") expect(report.components, label).toBe(1);
+      const shells = config.mode === "gravure" ? report.components : 1;
+      expect(shells, `${label}`).toBe(1);
       // Le porte-nom tient dans 40 à 80 mm (§6.2), congés compris.
       const length = mesh.bbox[3] - mesh.bbox[0];
-      expect(length, label).toBeGreaterThanOrEqual(39.95);
-      expect(length, label).toBeLessThanOrEqual(80.05);
+      expect(length, `${label}`).toBeGreaterThanOrEqual(39.95);
+      expect(length, `${label}`).toBeLessThanOrEqual(80.05);
+      count++;
+      if (config.mode === "gravure") engraved++;
     }
+    expect(count).toBe(200);
+    expect(engraved).toBeGreaterThan(50);
   }, 240_000);
 
   it("les trois niveaux de détail et tous les préréglages sont des coques fermées", () => {
@@ -454,14 +470,18 @@ describe("Objets plats : variété du maillage d'export (200 configurations par 
       ...RELIEF_PRESETS.map((p) => ["relief", p.config] as const),
       ...BORNE_PRESETS.map((p) => ["borne", p.config] as const),
     ];
+    let checked = 0;
     for (const [object, config] of presets) {
       for (const lod of ["drag", "display", "export"] as const) {
         for (const texts of [DEFAULT_TEXTS[object], {}]) {
           const label = `${lod} ${JSON.stringify(config)}`;
-          expectShells(buildStudioMesh(config, texts, { lod }), label);
+          const mesh = buildStudioMesh(config, texts, { lod });
+          expectShells(mesh, label, computeStats(config, texts).heightMm);
+          checked++;
         }
       }
     }
+    expect(checked).toBe(presets.length * 6);
   });
 
   it("un texte qui déborde ne plante pas le maillage (erreur text-fit signalée, jamais d'exception)", () => {

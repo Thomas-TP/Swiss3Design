@@ -46,7 +46,14 @@ function pointSegmentDist2(
   return qx * qx + qy * qy;
 }
 
-function orient(ax: number, ay: number, bx: number, by: number, cx: number, cy: number) {
+function orient(
+  ax: number,
+  ay: number,
+  bx: number,
+  by: number,
+  cx: number,
+  cy: number,
+) {
   return (bx - ax) * (cy - ay) - (by - ay) * (cx - ax);
 }
 
@@ -89,12 +96,12 @@ function inMatter(polygon: Polygon, x: number, y: number): boolean {
 }
 
 /**
- * Plus petite distance (mm) entre les matières de deux polygones : 0 s'ils se
- * touchent, se croisent ou si l'un est dans la matière de l'autre ; sinon la
- * plus courte distance entre contours. `Infinity` dès que l'écart dépasse `stopAt`
- * (le calcul s'arrête : on ne veut qu'un test « plus proche que `stopAt` »).
+ * Plus courte distance (mm) entre les CONTOURS de deux polygones (0 s'ils se
+ * croisent ou se touchent), sans tenir compte de l'inclusion : la marge d'une
+ * lettre à l'intérieur d'une plaque, par exemple. `Infinity` dès que l'écart
+ * dépasse `stopAt`.
  */
-export function polygonGap(
+export function boundaryGap(
   a: Polygon,
   b: Polygon,
   stopAt: number = Infinity,
@@ -127,6 +134,23 @@ export function polygonGap(
       }
     }
   }
+  const gap = Math.sqrt(best);
+  return gap > stopAt ? Infinity : gap;
+}
+
+/**
+ * Plus petite distance (mm) entre les matières de deux polygones : 0 s'ils se
+ * touchent, se croisent ou si l'un est dans la matière de l'autre ; sinon la
+ * plus courte distance entre contours. `Infinity` dès que l'écart dépasse `stopAt`
+ * (le calcul s'arrête : on ne veut qu'un test « plus proche que `stopAt` »).
+ */
+export function polygonGap(
+  a: Polygon,
+  b: Polygon,
+  stopAt: number = Infinity,
+): number {
+  const boundary = boundaryGap(a, b, stopAt);
+  if (boundary === 0) return 0;
   // Aucun contour ne se touche : l'un peut contenir l'autre (îlot d'un trou exclu).
   if (
     inMatter(b, a.outer[0][0], a.outer[0][1]) ||
@@ -134,8 +158,7 @@ export function polygonGap(
   ) {
     return 0;
   }
-  const gap = Math.sqrt(best);
-  return gap > stopAt ? Infinity : gap;
+  return boundary;
 }
 
 /** Vrai si les deux polygones se touchent, se croisent ou se contiennent (distance < `clearance`). */

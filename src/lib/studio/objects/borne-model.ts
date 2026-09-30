@@ -82,7 +82,10 @@ function arcInset(radius: number, dy: number): number {
 }
 
 /** Hauteur du corps pour une capitale et une demi-hauteur d'encre (mm). */
-export function borneBodyHeight(capMm: number, halfInk = HALF_INK_FLOOR): number {
+export function borneBodyHeight(
+  capMm: number,
+  halfInk = HALF_INK_FLOOR,
+): number {
   return 2 * (halfInk * capMm + PAD_V);
 }
 

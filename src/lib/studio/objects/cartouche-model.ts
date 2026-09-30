@@ -27,7 +27,7 @@
 // et côté client. Le maillage est dans `cartouche.ts`.
 import type { Polygon } from "../kernel/extrude";
 import { checkLine, type TextIssue } from "../text/check";
-import { sanitizeTexts, type TextField } from "../text/fields";
+import { sanitizeTexts } from "../text/fields";
 import {
   ARC_SEGMENTS,
   circleRing,
@@ -159,7 +159,12 @@ export function layoutCartouche(
   });
 
   // 1. Capitale retenue de chaque ligne (ajustement à la largeur de sa colonne).
-  const cap: Record<CardField, number> = { name: NAME, role: ROLE, line1: SMALL, line2: SMALL };
+  const cap: Record<CardField, number> = {
+    name: NAME,
+    role: ROLE,
+    line1: SMALL,
+    line2: SMALL,
+  };
   for (const field of FIELDS) {
     const text = clean[field];
     if (!text) continue;
@@ -195,12 +200,12 @@ export function layoutCartouche(
         [plan.rule.x0, ruleTop],
       ],
     });
-    base.role =
-      ruleTop - RULE_HEIGHT_MM - RULE_GAP_MM - ext.role.up;
+    base.role = ruleTop - RULE_HEIGHT_MM - RULE_GAP_MM - ext.role.up;
   } else {
     base.role = base.name - ext.name.down - GAP_MM - ext.role.up;
   }
-  base.line2 = plan.line2Baseline ?? (plan.bottomEdge ?? bottom) + ext.line2.down;
+  base.line2 =
+    plan.line2Baseline ?? (plan.bottomEdge ?? bottom) + ext.line2.down;
   base.line1 = base.line2 + ext.line2.up + GAP_MM + ext.line1.down;
 
   // 3. Initiales du monogramme : sommet de l'encre au repère haut.
@@ -367,8 +372,7 @@ function planOf(
           minCapMm: MONOGRAM.minCapMm,
           maxWidthMm: MONOGRAM.maxWidthMm,
         });
-        columnX =
-          f.left + textWidthMm(initials, check.capMm) + MONOGRAM.gapMm;
+        columnX = f.left + textWidthMm(initials, check.capMm) + MONOGRAM.gapMm;
       }
       const column: Column = {
         x: columnX,

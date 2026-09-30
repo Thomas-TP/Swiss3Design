@@ -45,6 +45,7 @@ import {
   readFileSync,
   writeFileSync,
 } from "node:fs";
+import { spawnSync } from "node:child_process";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { gzipSync } from "node:zlib";
@@ -350,6 +351,18 @@ ${hookRows.join("\n")}
 };
 `;
 writeFileSync(metricsPath, metrics);
+// Le fichier généré passe par oxfmt : sans cela `format:check` le trouverait
+// toujours différent de la sortie brute du script.
+const formatted = spawnSync("bunx", ["oxfmt", metricsPath], {
+  cwd: root,
+  stdio: "ignore",
+  shell: process.platform === "win32",
+});
+if (formatted.status !== 0) {
+  console.warn(
+    "  ! oxfmt n'a pas pu formater glyph-metrics.ts : lancez bun run format",
+  );
+}
 
 const gzip = gzipSync(Buffer.from(json), { level: 9 }).length;
 console.log(

@@ -152,7 +152,9 @@ function box(outline: readonly Ring[]): [number, number, number, number] {
 /** Marge du cadrage autour de l'objet (mm). */
 const PAD_MM = 2;
 
-function viewBoxOf(b: [number, number, number, number]): TopViewData["viewBox"] {
+function viewBoxOf(
+  b: [number, number, number, number],
+): TopViewData["viewBox"] {
   return [
     n(b[0] - PAD_MM),
     -n(b[3] + PAD_MM),
@@ -161,10 +163,7 @@ function viewBoxOf(b: [number, number, number, number]): TopViewData["viewBox"] 
   ];
 }
 
-function flatTopView(
-  model: FlatModel,
-  options: TopViewOptions,
-): TopViewData {
+function flatTopView(model: FlatModel, options: TopViewOptions): TopViewData {
   const theme = options.theme ?? "light";
   const plate = filamentHex(model.plate);
   const ink = filamentHex(model.ink);
@@ -319,7 +318,8 @@ export function topViewToSvg(
         layer.stroke === "none"
           ? ' stroke="none"'
           : ` stroke="${layer.stroke}" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke"`;
-      const opacity = layer.opacity < 1 ? ` fill-opacity="${layer.opacity}"` : "";
+      const opacity =
+        layer.opacity < 1 ? ` fill-opacity="${layer.opacity}"` : "";
       return `<path fill="${layer.fill}"${opacity}${stroke} fill-rule="evenodd" d="${layer.d}"/>`;
     })
     .join("");

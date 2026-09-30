@@ -41,7 +41,9 @@ for (const theme of THEMES) {
   );
   const bytes = Buffer.byteLength(svg);
   if (bytes > RELIEF_POSTER_MAX_BYTES) {
-    console.error(`✗ ${name} : ${bytes} o dépasse ${RELIEF_POSTER_MAX_BYTES} o`);
+    console.error(
+      `✗ ${name} : ${bytes} o dépasse ${RELIEF_POSTER_MAX_BYTES} o`,
+    );
     process.exit(1);
   }
   if (check) {
@@ -55,6 +57,8 @@ for (const theme of THEMES) {
     continue;
   }
   writeFileSync(file, svg);
-  console.log(`✓ ${name.padEnd(28)} ${(bytes / 1024).toFixed(1).padStart(5)} Ko`);
+  console.log(
+    `✓ ${name.padEnd(28)} ${(bytes / 1024).toFixed(1).padStart(5)} Ko`,
+  );
 }
 if (stale > 0) process.exit(1);
