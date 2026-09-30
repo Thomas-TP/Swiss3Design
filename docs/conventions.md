@@ -153,8 +153,47 @@ KV-backed fixed window, per IP + route; a no-op locally (no `cf-connecting-ip`).
   locales, the same ICU arguments (`{count, plural, …}`, `{name}`), no empty
   value, and **no `ß` in German** (de-CH writes « ss »: « Grösse »,
   « Schliessen », « Mass »).
-- Budget: everything reaches the client (`NextIntlClientProvider` inherits
-  the merged messages), so keep new text ≤ 25 KB per locale in total.
+- **Client messages are opt-in, by layer.** The merged messages (~45 KB of
+  JSON in French) used to go to every page through `NextIntlClientProvider`;
+  now the browser only gets what its `"use client"` components read. Server
+  components (no directive, reached from a server component) read messages on
+  the server and cost the client nothing. The layers add up:
+  1. **Root**: `LocaleShell` provides `ROOT_CLIENT_NAMESPACES`
+     ([`src/i18n/client-namespaces.ts`](../src/i18n/client-namespaces.ts):
+     `nav`, `shell`, `consent`, `errors`, `system.error`), i.e. the header,
+     BottomNav, footer toggles, consent banner and `error.tsx` (which replaces
+     the page and cannot be wrapped). Add to that list only what the shared
+     chrome itself reads.
+  2. **Segment or page**: declare what your client components read with
+     `<ClientMessages namespaces={["catalog.viewer"]}>` from
+     [`src/i18n/client-messages.tsx`](../src/i18n/client-messages.tsx), in the
+     `layout.tsx` next to your `page.tsx` (or around the relevant subtree of
+     the page when nested pages must not inherit it, e.g. `checkout/page.tsx`
+     vs `checkout/success/layout.tsx`). It merges with its parents (a nested
+     provider alone would _replace_ them). Shared atoms go on the route group
+     (`(site)/layout.tsx` declares `product` and `favorites` for the product
+     cards).
+  3. A **namespace** here is exactly the argument of a client-side
+     `useTranslations("…")`: a whole root key (`account`) or a dotted path
+     (`system.cart`, `atelier.form`); pick the narrowest that covers your
+     calls, and never call `useTranslations()` without an argument in client
+     code.
+
+  [`src/i18n/client-messages.test.ts`](../src/i18n/client-messages.test.ts)
+  checks it on the source: from every `page`, `layout`, `error` and
+  `not-found` in `src/app` it follows the imports, and every namespace read
+  by client code must be provided by the root or by `<ClientMessages>` in the
+  entry file or an ancestor layout; every declared namespace must exist in the
+  4 locales; `namespaces` must be a literal array. A forgotten namespace also
+  shows as `MISSING_MESSAGE` in the browser console in dev. **A new package
+  (WP-HOME `landing`, WP-STUDIO `studio` / `studioCore`) adds its
+  `<ClientMessages>` in its own layout and does not edit the root list.**
+  Measured (dev server, 2026-10-01): `/fr` 182 → 137 KiB raw (38.7 → 24.6 KiB
+  gzip), `/fr/contact` 146 → 102 KiB.
+
+- Budget: keep new text ≤ 25 KB per locale in total (it is bundled in the
+  Worker whatever the page, see golden rule 10); what reaches the browser is
+  governed by the layers above.
 - Navigate with the locale-aware helpers from
   [`src/i18n/navigation.ts`](../src/i18n/navigation.ts) (`Link`, `redirect`,
   `useRouter`), not bare `next/link` / `next/navigation`, so the `/fr` `/de` …
@@ -187,7 +226,7 @@ live in `src/motion/**` and are reached only through `src/gates/**`
   OAuth, track, legal) never get Lenis or the canvas; never put Lenis, a
   transform or an animated overflow around a Stripe iframe.
 - **Motion preference** = `data-motion="reduce" | "full"` on `<html>`, set
-  **before paint** by the anti-FOUC script of the `[locale]` layout (choice
+  **before paint** by the anti-FOUC script of the root layout `src/app/layout.tsx` (choice
   stored in `localStorage["s3d-motion"]` by the footer's `MotionToggle`, else
   `prefers-reduced-motion`). Style with the Tailwind variants `motion-on:` /
   `motion-off:`; in JS read `readReducedMotion()` /
@@ -377,7 +416,7 @@ on _every_ page at once.
   PostHog needs them to match the project's recording domains, and without
   them session replay silently stays disabled.
 - **Location** comes from Cloudflare (`cf` → `data-geo-*` on `<html>`, set in
-  the `[locale]` layout) with `$geoip_disable`, so there is one source and the
+  the root layout `src/app/layout.tsx`) with `$geoip_disable`, so there is one source and the
   IP never needs to be kept.
 - **Swiss opt-out regime (art. 45c LTC, nLPD), not EU opt-in.** The target
   market is Switzerland, so GDPR-style prior consent is deliberately not

@@ -121,6 +121,26 @@ bun run db:seed:local        # seed local D1 from scripts/seed.sql
   order's `stripePaymentIntentId`). The app has no refund UI.
 - **TWINT:** available via Stripe — enable in the Stripe dashboard (payment
   methods); no code change needed.
+- **A local Stripe TEST payment** (`bun run dev`, up to `/checkout/success`)
+  needs three things, none of them in the repo by default:
+  1. In `.dev.vars`, **`STRIPE_PAYMENT_METHOD_CONFIGURATION=""`** (blank).
+     `wrangler.jsonc` carries the **production** `pmc_…` at its top level, and a
+     test-mode key cannot use a live-mode payment method configuration, so
+     the Payment Element would not get its payment methods. Blank = Stripe uses
+     the test account's defaults. (`env.preview` already blanks it.)
+  2. In `.dev.vars`, **`BETTER_AUTH_URL`** pointing at the port you run on
+     (`http://localhost:3000`, or the `-p` you passed): the top-level
+     production value (`https://swiss3design.ch`) makes Better Auth log
+     `Invalid origin` and answer 403 to the login/forgot/register forms
+     (seen on `localhost:3111`), and return URLs would leave localhost.
+  3. A **valid `pk_test_…`** in `.env.development`
+     (`NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`), **from the same Stripe account as
+     the test `STRIPE_SECRET_KEY`** in `.dev.vars`: an expired key, or one from
+     another account than the secret key, leaves `/checkout` without a working
+     card field. Use Stripe's published test card (`4242 4242 4242 4242`, any
+     future date, any CVC).
+     The Stripe.js warning « live integrations must use HTTPS » on `http://localhost`
+     is expected. Never put a `pk_live_…` / `sk_live_…` in these files.
 
 ### Agentic commerce (sales through AI agents)
 

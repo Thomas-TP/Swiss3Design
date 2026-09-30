@@ -15,25 +15,41 @@ import { withDot } from "./ui/dot-title";
  */
 export function PageHeader({
   eyebrow,
+  reserveEyebrow = false,
   title,
   intro,
   actions,
   className = "",
 }: {
   eyebrow?: string;
+  /**
+   * Garde la place du surtitre quand il n'est pas encore connu (un compte lu
+   * dans le navigateur, par exemple) : sans elle, son arrivée poussait le
+   * titre de 28 px, donc toute la page (décalage de mise en page).
+   */
+  reserveEyebrow?: boolean;
   title: ReactNode;
   intro?: ReactNode;
   actions?: ReactNode;
   className?: string;
 }) {
+  const hasEyebrowSlot = Boolean(eyebrow) || reserveEyebrow;
   return (
     <div
       className={`flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between ${className}`}
     >
       <div className="min-w-0">
-        {eyebrow && <p className="s3d-label text-soft">{eyebrow}</p>}
+        {eyebrow ? (
+          <p className="s3d-label text-soft">{eyebrow}</p>
+        ) : reserveEyebrow ? (
+          // Même ligne que le surtitre, invisible et muette pour les lecteurs
+          // d'écran : espace insécable pour que la boîte garde sa hauteur.
+          <p aria-hidden="true" className="s3d-label select-none text-soft">
+            {" "}
+          </p>
+        ) : null}
         <h1
-          className={`font-display text-display break-words text-ink ${eyebrow ? "mt-3" : ""}`}
+          className={`font-display text-display break-words text-ink ${hasEyebrowSlot ? "mt-3" : ""}`}
         >
           {typeof title === "string" ? withDot(title) : title}
         </h1>

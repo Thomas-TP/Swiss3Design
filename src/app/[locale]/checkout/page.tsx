@@ -6,6 +6,7 @@ import { getDb } from "@/db";
 import { customerAddresses } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { PageHeader } from "@/components/page-header";
+import { ClientMessages } from "@/i18n/client-messages";
 import { CheckoutFlow, type CheckoutAddress } from "./checkout-flow";
 
 export const dynamic = "force-dynamic";
@@ -53,12 +54,19 @@ export default async function CheckoutPage() {
       <div className="mx-auto max-w-5xl">
         <PageHeader title={t("title")} />
         <div className="mt-8">
-          <CheckoutFlow
-            shippingSettings={await getShippingSettings()}
-            initialAddress={initialAddress}
-            sessionEmail={session?.user.email ?? null}
-            stripePublishableKey={env.STRIPE_PUBLISHABLE_KEY ?? ""}
-          />
+          {/* Messages client du tunnel, déclarés ici et non dans le layout :
+              la page de retour Stripe (checkout/success) est dessous et n'en
+              a pas besoin. `footer` : les mentions sous le bouton de paiement. */}
+          <ClientMessages
+            namespaces={["checkout", "footer", "system.checkout"]}
+          >
+            <CheckoutFlow
+              shippingSettings={await getShippingSettings()}
+              initialAddress={initialAddress}
+              sessionEmail={session?.user.email ?? null}
+              stripePublishableKey={env.STRIPE_PUBLISHABLE_KEY ?? ""}
+            />
+          </ClientMessages>
         </div>
       </div>
     </div>

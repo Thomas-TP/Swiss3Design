@@ -70,6 +70,10 @@ export function FavoritesList() {
     <div className="s3d-page py-10 md:py-16">
       <PageHeader
         title={ts("title")}
+        // Le compte vient du stockage du navigateur : la ligne du surtitre est
+        // réservée tant qu'il n'est pas lu, sinon le titre, les onglets et le
+        // pied de page descendaient de 28 px à son arrivée.
+        reserveEyebrow={view === "objects" && !ready}
         eyebrow={
           view === "objects"
             ? ready
@@ -102,7 +106,17 @@ export function FavoritesList() {
       </fieldset>
 
       {view === "objects" ? (
-        <section aria-label={ts("tabObjects")} className="mt-8">
+        // Hauteur réservée avant la lecture du stockage : la section est vide
+        // au rendu serveur, puis reçoit soit l'état « vide » (~180 px), soit la
+        // grille. Sans plancher, le pied de page (et tout ce qui le suit)
+        // tombait d'un bloc (0,08 de décalage de mise en page). La moitié de
+        // l'écran couvre l'état vide et le début de la grille, et place le
+        // pied de page sous la ligne de flottaison sur un écran courant.
+        <section
+          aria-label={ts("tabObjects")}
+          aria-busy={!ready}
+          className="mt-8 min-h-[50svh]"
+        >
           {!ready ? null : items.length === 0 ? (
             <div className="max-w-xl py-6">
               <p className="text-lead text-ink">{t("empty")}</p>

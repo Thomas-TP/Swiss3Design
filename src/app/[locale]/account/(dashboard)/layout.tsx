@@ -1,5 +1,6 @@
 import type { Locale } from "@/i18n/routing";
 import { redirect } from "@/i18n/navigation";
+import { ClientMessages } from "@/i18n/client-messages";
 import { getServerSession } from "@/lib/session";
 import { AccountNav } from "./account-nav";
 import { AvatarPicker } from "./avatar-picker";
@@ -14,6 +15,13 @@ export const dynamic = "force-dynamic";
 // Le <main> est celui du layout racine de [locale] (cible du lien « Aller au
 // contenu ») : un second <main> ici en faisait deux dans la page. Le contenu
 // de l'onglet est donc un simple <div>.
+//
+// Messages client de tout l'espace authentifié, pages comprises : `account`
+// (formulaires, sécurité, adresses, devis, en-tête), `accountUi` (onglets),
+// `checkout` (carnet d'adresses et paiement d'un devis, qui réutilisent ses
+// libellés), `reviews` (avis sur une commande) et `agentAccess.account`
+// (révocation d'un agent). `auth` vient du layout de /account. Zone connectée
+// et hors index : regrouper ici évite un layout par onglet pour quelques Ko.
 export default async function AccountLayout({
   children,
   params,
@@ -29,24 +37,34 @@ export default async function AccountLayout({
   const { user } = session!;
 
   return (
-    <div className="mx-auto max-w-5xl px-margin py-10 md:py-14">
-      <header className="flex items-center justify-between gap-4">
-        <div className="flex min-w-0 items-center gap-3">
-          <AvatarPicker current={user.image ?? null} />
-          <div className="min-w-0">
-            <p className="truncate font-display text-subtitle font-bold text-ink">
-              {user.name}
-            </p>
-            <p className="truncate text-sm text-soft">{user.email}</p>
+    <ClientMessages
+      namespaces={[
+        "account",
+        "accountUi",
+        "agentAccess.account",
+        "checkout",
+        "reviews",
+      ]}
+    >
+      <div className="mx-auto max-w-5xl px-margin py-10 md:py-14">
+        <header className="flex items-center justify-between gap-4">
+          <div className="flex min-w-0 items-center gap-3">
+            <AvatarPicker current={user.image ?? null} />
+            <div className="min-w-0">
+              <p className="truncate font-display text-subtitle font-bold text-ink">
+                {user.name}
+              </p>
+              <p className="truncate text-sm text-soft">{user.email}</p>
+            </div>
           </div>
-        </div>
-        <SignOutButton />
-      </header>
+          <SignOutButton />
+        </header>
 
-      <div className="mt-8 flex flex-col gap-6 md:flex-row md:gap-10">
-        <AccountNav isAdmin={user.role === "admin"} />
-        <div className="min-w-0 flex-1">{children}</div>
+        <div className="mt-8 flex flex-col gap-6 md:flex-row md:gap-10">
+          <AccountNav isAdmin={user.role === "admin"} />
+          <div className="min-w-0 flex-1">{children}</div>
+        </div>
       </div>
-    </div>
+    </ClientMessages>
   );
 }

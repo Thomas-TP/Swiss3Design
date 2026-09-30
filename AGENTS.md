@@ -160,7 +160,7 @@ put` on an environment with real users without `--env <name>` explicitly
     their file as base64 **into that bundle** — a full icon set cost ~135 KiB
     and broke the deploy in August 2026 (`error 10027`). Icons therefore live in
     `public/` and are declared via `metadata.icons` in
-    [`src/app/[locale]/layout.tsx`](src/app/[locale]/layout.tsx): `public/` ships
+    [`src/app/layout.tsx`](src/app/layout.tsx): `public/` ships
     as Cloudflare **static assets**, outside the bundle and outside the cap. The
     same trap applies to `opengraph-image.*`, `twitter-image.*` and any
     `import`ed image. Measure before pushing — `bunx wrangler deploy --dry-run`
@@ -198,7 +198,16 @@ put` on an environment with real users without `--env <name>` explicitly
     in its own `messages/<locale>/<namespace>.json` (declared in
     [`src/i18n/namespaces.ts`](src/i18n/namespaces.ts), merged by
     `src/i18n/request.ts`), and `src/i18n/messages.test.ts` enforces the same
-    keys and ICU arguments in the 4 locales and zero `ß` in German. Details:
+    keys and ICU arguments in the 4 locales and zero `ß` in German. **The
+    browser only receives the messages its `"use client"` components read**:
+    the root (`ROOT_CLIENT_NAMESPACES` in
+    [`src/i18n/client-namespaces.ts`](src/i18n/client-namespaces.ts): chrome,
+    consent, `error.tsx`) plus what each segment or page declares with
+    `<ClientMessages namespaces={[…]}>`
+    ([`src/i18n/client-messages.tsx`](src/i18n/client-messages.tsx)) in its own
+    `layout.tsx`. A package that adds a client component reading a new
+    namespace (WP-HOME `landing`, WP-STUDIO `studio`/`studioCore`) declares it
+    there; `src/i18n/client-messages.test.ts` fails otherwise. Details:
     [`docs/conventions.md`](docs/conventions.md) → Motion, i18n, Design tokens.
 
 ## Tech stack
@@ -273,8 +282,13 @@ has a populated shop without ever holding real customer data.
 
 ```
 src/
+  app/layout.tsx  ROOT layout: the only <html>/<body>, theme script, site JSON-LD,
+                  default metadata. app/not-found.tsx = the server-rendered 404 of
+                  any URL without a route (Next's internal /_not-found)
   app/[locale]/   localized pages: shop, products, cart, checkout, custom (quotes),
-                  account, admin, legal, track. error.tsx / not-found.tsx
+                  account, admin, legal, track. layout.tsx = LocaleShell (header,
+                  footer, providers); error.tsx / not-found.tsx (notFound() thrown
+                  by a page, client-rendered by Next: see src/app/layout.tsx)
   app/[locale]/(site)/  route group (not in the URL) of the public showcase
                   pages: home, shop, products, custom, a-propos, contact (and
                   the Studio). Its layout mounts SiteShell (Lenis + WebGL

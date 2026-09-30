@@ -72,6 +72,8 @@
 | `custom.intro` promet aujourd'hui « un devis personnalisé sous 48 h ».                                                                                                                                                                                                      | Le Studio reprend « sous 48 h », rien de plus ambitieux sans accord (§6.9).                         |
 | `messages/de.json` contient « Schließen » (ß).                                                                                                                                                                                                                              | Corrigé par WP-00 ; test anti-ß (§4.9).                                                             |
 
+> **Note du 30.09.2026 (correctif vague 1)** : la ligne « `src/app/[locale]/layout.tsx` est le layout racine (pas de `src/app/layout.tsx`) » n'est plus vraie. `src/app/layout.tsx` existe (seul `<html>`/`<body>`, script anti-flash, JSON-LD, métadonnées par défaut) et `[locale]/layout.tsx` ne porte plus que l'habillage (`LocaleShell`). Motif et conséquences au §7.18.
+
 ---
 
 ## 1. Direction retenue
@@ -936,7 +938,7 @@ dans la chorégraphie qui les utilise (`src/motion/choreo/about.tsx`), jamais ai
   (visible au focus) vers le chapitre 01. Aucun pin sur mobile ni sous 768 px de haut.
 - **Les scrubs ne pilotent que des grandeurs physiques** : hauteur imprimée, bascule de caméra,
   écartement de l'éclaté.
-- **Chapitres** : sections `data-chapter="01"`, `ChapterRail` (desktop ≥ 1280 px : numéros mono,
+- **Chapitres** : sections `data-chapter="01"`, `ChapterRail` (desktop ≥ 1536 px depuis le 30.09.2026, ≥ 1280 px à l'origine : numéros mono,
   point rouge sur le chapitre courant, IntersectionObserver, pas de GSAP), filet rouge de
   progression sous le header (`--s3d-progress`, écrit par le runtime).
 - **Révélations** : par défaut CSS (`.s3d-rise` pour les blocs de texte, `.s3d-print` pour images
@@ -1758,6 +1760,13 @@ large, col à 72 %), gradins horizontaux, aucune nervure, aucune torsion : l'obj
 silhouette du Vase spirale (vérifié par `nearVaseSpirale`, §6.6). Géométrie : §6.3.1. LOD : C2
 `display` 160 segments × ~180 anneaux (≈ 115 k triangles), C1 96 × ~100 (≈ 38 k).
 
+> **Note du 30.09.2026 (WP-01)** : les chiffres du héros que le brief donne (« ≈ 80 g · ≈ 2 h 45 »,
+> §6.5 et §6.7) sont des estimations d'avant le code. Calculés par `computeStats(HERO_CONFIG)`
+> (`src/lib/studio/stats.ts`), ils valent **92,1 g et 3 h 01** (750 couches, 2 changements). **WP-HOME
+> lit `computeStats(HERO_CONFIG)` et ne recopie jamais ces valeurs en dur** (bande de mesure, étiquettes de
+> l'éclaté, texte du chapitre 01) : un chiffre affiché à l'écran doit sortir de la même fonction pure que
+> dans le Studio, sinon les deux divergent au premier réglage du brief ou des coefficients.
+
 ### 5.3 La scène `print-hero` (WP-HOME, `src/motion/stage/scenes/print-hero.ts`)
 
 - **Plateau** : carré arrondi 180 × 180 × 1 mm, teinte `surface`, quadrillage `iso` tous les
@@ -2063,6 +2072,28 @@ Même entrée = même maillage, au bit près (déterminisme testé). Sorties : `
 - **Groupes par bande** (anneaux dupliqués aux frontières) et **bouchons** en couronne générés
   seulement pour l'éclaté d'affichage (jamais dans l'export).
 
+> **Note du 30.09.2026 (WP-01, écarts assumés au brief)** :
+>
+> 1. **Gradins** : la profondeur est bornée par `gd ≤ paroi − 0,2 mm` **en plus de** `gd ≤ 0,5 × pas`
+>    (`gradinsDepthMax`, `schemas.ts`). La paroi intérieure suit l'extérieure (`r_i = r_o − w / cos α`) ;
+>    au retrait net de chaque palier, l'étage du dessus ne recouvre donc celui du dessous que de
+>    `w − gd`. À `gd = w` les deux tubes se touchent en un cercle (arête à quatre triangles, pièce non
+>    variété), au-delà ils se séparent (anneau flottant) ; le héros (1,4 pour 1,6) garde 0,2 mm.
+> 2. **Voronoï** : `e = (F2 − F1) / 2` (la demi-différence, égale à la distance au joint pour des germes
+>    alignés) et rampe `W = max(2,4 ; 3 × relief)` mm, au lieu de `e = F2 − F1` et
+>    `w = max(1,5 ; 1,2 × va)`. Pente maximale du motif `1,5 × va / W = 0,5` ; avec la formule
+>    littérale elle atteint 2,5 (68°) et le héros en voronoï serait « non imprimable ». Le couplage
+>    `w ≥ 1,2 va` du §6.6 reste vrai par construction.
+> 3. **Profil** : `P(t)` est normalisé par son maximum (`Pmax`) avant `R(z) = (d/2 − A) × P(t)`. Sans
+>    cela, une lèvre sur un col de 1,0 (cylindre) monte à `P = 1,08` et l'enveloppe dépasse `d` de 8 %.
+>    Identique au brief quand `Pmax = 1` (le héros).
+> 4. **Export** : pas maximal de **4 mm** (et non un pas de base de 0,8 mm, qui donnait ≈ 8,6 Mo pour
+>    le héros) ; pour les motifs de révolution (gradins, lisse, vagues sans lobes) le nombre de segments
+>    angulaires vient de la même tolérance de corde **0,05 mm** au rayon maximal, plancher **72**
+>    (`EXPORT_LIMITS`, `objects/lavaux.ts`). Les motifs non axisymétriques gardent les segments du brief
+>    (vagues 240, voronoï 360, nervures `max(180, 10 × rn)`). Le héros exporte **52 k triangles,
+>    2,6 Mo** de STL, dans la cible 1–3 Mo du §6.9.
+
 #### 6.3.2 Noyau commun (WP-01)
 
 `kernel/rng.ts` (mulberry32), `kernel/noise.ts` (simplex 2D/3D et FBM, portage MIT d'Ashima/Gustavson,
@@ -2208,6 +2239,13 @@ prix réel de CHF 24 ; le vase du héros ≈ 80 g, ≈ 2 h 45, CHF 17–23 ; une
 plancher (CHF 9–10.50). Le serveur ne recalcule rien en v1 (aucun paiement) ; en P6 (plus tard),
 `estimate.ts` servira au prix ferme côté serveur.
 
+> **Note du 30.09.2026 (WP-01)** : le vase du héros n'est pas « ≈ 80 g, ≈ 2 h 45 » mais **92,1 g et
+> 3 h 01** (750 couches, 181 min, purge 1,6 g ; `computeStats(HERO_CONFIG)`). La fourchette « CHF 17–23 »
+> du héros suit le même décalage, mais `PRICING.validated` vaut `false` : `estimate` est `null` et aucun
+> CHF ne s'affiche. Les mêmes « ≈ 80 g · 2 h 45 » du §6.7 (barre Studio mobile, durée réelle, bande de
+> mesure) sont des exemples de format, pas des valeurs : l'interface les calcule. Voir la note du §5.2 :
+> WP-HOME lit `computeStats(HERO_CONFIG)`, jamais un chiffre recopié.
+
 ### 6.6 Garde-fous (`guards.ts`)
 
 | Code                | Règle                                                                                         | Correction proposée (bouton « Corriger »)                                         |
@@ -2230,6 +2268,18 @@ plancher (CHF 9–10.50). Le serveur ne recalcule rien en v1 (aucun paiement) ; 
   l'atelier relit chaque texte avant l'impression. Nous refusons les marques de tiers, les injures
   et les contenus illicites. »
 - « Envoyer à l'atelier » est désactivé tant qu'il reste une erreur.
+
+> **Note du 30.09.2026 (WP-01, sévérités)** : le brief ne fixe que celles du trait des textes ; WP-01
+> a tranché (`guards.ts`, en-tête du fichier). `error` bloque « Envoyer à l'atelier », `warn` affiche
+> « À vérifier ».
+>
+> - `overhang` : **avertissement entre 45° et 60°** (une petite rampe s'imprime), **erreur au-delà de
+>   60°** (pente `dr/dz > 1,7`, `OVERHANG_ERROR_SLOPE`). Tolérance de mesure de **6 %** sur les 45°
+>   (`OVERHANG_TOLERANCE`) : le héros culmine à 1,01 (45,3°) vers z = 7,5 mm et doit rester
+>   « imprimable » ; les corrections, elles, visent la pente exacte de 45°.
+> - `plate` (boîte > 250 mm) et `near-vase-spirale` (silhouette du Vase spirale) : **erreur**.
+> - `base-narrow`, `band-thin`, `pattern-coupling` : **avertissement** (imprimable, mais à regarder).
+>   Exception : un gradin aussi profond que la paroi (`gd ≥ paroi`) est une erreur.
 
 ### 6.7 Expérience
 
@@ -2507,7 +2557,7 @@ nav-mark`) ; survol = soulignement qui se trace. À droite : thème, langue, fav
 
 - **Objectif** : comprendre l'offre en 5 s, faire un premier réglage, s'orienter (Régler /
   Acheter / J'ai un fichier).
-- **Chapitres** (desktop : `ChapterRail` ≥ 1280 px) :
+- **Chapitres** (desktop : `ChapterRail` ≥ 1536 px ; note du 30.09.2026 : 1280 px à l'origine, le rail recouvrait le cœur des favoris sous 1536 px, la marge droite de la page ne le contenant pas) :
 
 | #   | Titre (FR)                                                | Contenu                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Mouvement (complet)                                                                                   | Réduit / C0                                                     |
 | --- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
@@ -2776,6 +2826,24 @@ order_id`, `revenue` port compris), `AttributionQuestion`, conversion invité �
 - **À préserver** : `TrackEvent "Page Not Found"`, statut 404 réel, rendu dans le shell (le
   `[...rest]` reste en place).
 - **i18n** : `errors.*` + `system`.
+- **Note du 30.09.2026 (correctif vague 1, `claude/redesign-2026--fix-w1`)** : le `[...rest]`
+  n'est plus en place et `src/app/layout.tsx` existe désormais. Un `notFound()` lancé pendant
+  le rendu fait échouer la coquille React (Fizz n'a pas de limite d'erreur côté serveur) : Next
+  retombe alors sur `<html id="__next_error__">` au corps vide. Statut 404 et `noindex` étaient
+  corrects, mais h1, header et footer n'arrivaient qu'après l'hydratation (constaté aussi en
+  production). Une URL sans route passe maintenant par la route interne `/_not-found` de Next,
+  rendue côté serveur par le layout racine et `src/app/not-found.tsx` (habillage
+  `LocaleShell`). **Reste rendu côté client** : un `notFound()` lancé par une page qui
+  correspond à une route (fiche produit supprimée, `[locale]/not-found.tsx`) garde le statut
+  404 et le `noindex`, mais son contenu s'écrit après l'hydratation : Next ne fixe le statut 404
+  que dans ce repli, et aucune API de page ne permet de le poser autrement. Preuve dans le
+  code de Next 16.3.6 (`node_modules/next/dist/server/app-render/app-render.js`) : le repli
+  d'une erreur de coquille (`catch` « errorRecovery », vers la ligne 2382) fixe le statut puis
+  rend `getErrorRSCPayload`, dont la graine est `<html id="__next_error__">` au `<body>` vide
+  (vers la ligne 1325) ; la vraie arborescence, donc la limite `not-found`, n'est lue que par
+  le client. Revérifié le 01.10.2026 : `/fr/products/slug-inexistant` répond 404 + `noindex`
+  avec ce corps vide, `/fr/zzz-inconnu` et `/de/zzz` répondent 404 + `noindex` avec un
+  header, un `<main>`, un h1 et un footer dans le HTML brut.
 
 ### 7.19 Erreur (WP-UTILITY, `src/app/[locale]/error.tsx`)
 

@@ -7,9 +7,11 @@ import { NAMESPACES, mergeNamespaces, type Messages } from "./namespaces";
 // namespace de la refonte (messages/<locale>/<ns>.json, voir namespaces.ts),
 // greffé à la racine : `useTranslations("shell")` lit messages/<locale>/shell.json
 // exactement comme `useTranslations("nav")` lit la clé `nav` du fichier
-// historique. Le layout ne passe pas de `messages` à NextIntlClientProvider :
-// il hérite de cet ensemble fusionné, namespaces compris (d'où le budget du
-// brief §4.9 : ≤ 25 Ko de textes nouveaux par locale, tout part au client).
+// historique. Cet ensemble fusionné reste celui des composants serveur ;
+// le navigateur, lui, n'en reçoit qu'un sous-ensemble (racine + ce que chaque
+// segment déclare avec <ClientMessages>, voir client-namespaces.ts). Le budget
+// du brief §4.9 (≤ 25 Ko de textes nouveaux par locale) borne donc le Worker,
+// plus le HTML des pages.
 //
 // Imports en gabarit : webpack crée un « contexte » qui embarque tout fichier
 // JSON correspondant, un chunk paresseux par fichier. Deux commentaires

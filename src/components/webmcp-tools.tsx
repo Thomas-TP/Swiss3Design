@@ -5,12 +5,12 @@ import { useRouter } from "@/i18n/navigation";
 import { sameLine, useCart } from "@/lib/cart";
 import { fetchCartLine } from "@/lib/agent/cart-line";
 
-// WebMCP : expose aux agents du navigateur (navigator.modelContext) les
+// WebMCP : expose aux agents du navigateur (document.modelContext) les
 // actions clés de la boutique — chercher, lire une fiche, gérer le panier,
 // aller au paiement, suivre une commande. Les outils passent par l'API
 // publique /api/v1 et par le vrai panier (même état que l'interface) ; le
 // paiement lui-même reste une action humaine sur la page de checkout.
-// Sans navigator.modelContext (quasi tous les navigateurs aujourd'hui), rien
+// Sans document.modelContext (quasi tous les navigateurs aujourd'hui), rien
 // n'est enregistré et le composant ne coûte rien.
 
 interface WebMcpTool {
@@ -55,9 +55,12 @@ export function WebMcpTools() {
   });
 
   useEffect(() => {
+    // document.modelContext d'abord : lire navigator.modelContext (déprécié)
+    // affiche un avertissement dans la console de chaque page ; il ne reste que
+    // le repli pour les navigateurs qui n'ont pas encore déplacé l'objet.
     const context =
-      (navigator as Navigator & { modelContext?: ModelContext }).modelContext ??
-      (document as Document & { modelContext?: ModelContext }).modelContext;
+      (document as Document & { modelContext?: ModelContext }).modelContext ??
+      (navigator as Navigator & { modelContext?: ModelContext }).modelContext;
     if (typeof context?.registerTool !== "function") return;
     const controller = new AbortController();
 
