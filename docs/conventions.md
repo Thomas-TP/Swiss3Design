@@ -187,7 +187,7 @@ live in `src/motion/**` and are reached only through `src/gates/**`
   OAuth, track, legal) never get Lenis or the canvas; never put Lenis, a
   transform or an animated overflow around a Stripe iframe.
 - **Motion preference** = `data-motion="reduce" | "full"` on `<html>`, set
-  **before paint** by the anti-FOUC script of the `[locale]` layout (choice
+  **before paint** by the anti-FOUC script of the root layout `src/app/layout.tsx` (choice
   stored in `localStorage["s3d-motion"]` by the footer's `MotionToggle`, else
   `prefers-reduced-motion`). Style with the Tailwind variants `motion-on:` /
   `motion-off:`; in JS read `readReducedMotion()` /
@@ -377,7 +377,7 @@ on _every_ page at once.
   PostHog needs them to match the project's recording domains, and without
   them session replay silently stays disabled.
 - **Location** comes from Cloudflare (`cf` → `data-geo-*` on `<html>`, set in
-  the `[locale]` layout) with `$geoip_disable`, so there is one source and the
+  the root layout `src/app/layout.tsx`) with `$geoip_disable`, so there is one source and the
   IP never needs to be kept.
 - **Swiss opt-out regime (art. 45c LTC, nLPD), not EU opt-in.** The target
   market is Switzerland, so GDPR-style prior consent is deliberately not

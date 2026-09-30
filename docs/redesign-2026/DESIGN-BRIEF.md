@@ -72,6 +72,8 @@
 | `custom.intro` promet aujourd'hui « un devis personnalisé sous 48 h ».                                                                                                                                                                                                      | Le Studio reprend « sous 48 h », rien de plus ambitieux sans accord (§6.9).                         |
 | `messages/de.json` contient « Schließen » (ß).                                                                                                                                                                                                                              | Corrigé par WP-00 ; test anti-ß (§4.9).                                                             |
 
+> **Note du 30.09.2026 (correctif vague 1)** : la ligne « `src/app/[locale]/layout.tsx` est le layout racine (pas de `src/app/layout.tsx`) » n'est plus vraie. `src/app/layout.tsx` existe (seul `<html>`/`<body>`, script anti-flash, JSON-LD, métadonnées par défaut) et `[locale]/layout.tsx` ne porte plus que l'habillage (`LocaleShell`). Motif et conséquences au §7.18.
+
 ---
 
 ## 1. Direction retenue
@@ -2776,6 +2778,17 @@ order_id`, `revenue` port compris), `AttributionQuestion`, conversion invité �
 - **À préserver** : `TrackEvent "Page Not Found"`, statut 404 réel, rendu dans le shell (le
   `[...rest]` reste en place).
 - **i18n** : `errors.*` + `system`.
+- **Note du 30.09.2026 (correctif vague 1, `claude/redesign-2026--fix-w1`)** : le `[...rest]`
+  n'est plus en place et `src/app/layout.tsx` existe désormais. Un `notFound()` lancé pendant
+  le rendu fait échouer la coquille React (Fizz n'a pas de limite d'erreur côté serveur) : Next
+  retombe alors sur `<html id="__next_error__">` au corps vide. Statut 404 et `noindex` étaient
+  corrects, mais h1, header et footer n'arrivaient qu'après l'hydratation (constaté aussi en
+  production). Une URL sans route passe maintenant par la route interne `/_not-found` de Next,
+  rendue côté serveur par le layout racine et `src/app/not-found.tsx` (habillage
+  `LocaleShell`). **Reste rendu côté client** : un `notFound()` lancé par une page qui
+  correspond à une route (fiche produit supprimée, `[locale]/not-found.tsx`) garde le statut
+  404 et le `noindex`, mais son contenu s'écrit après l'hydratation : Next ne fixe le statut 404
+  que dans ce repli, et aucune API de page ne permet de le poser autrement.
 
 ### 7.19 Erreur (WP-UTILITY, `src/app/[locale]/error.tsx`)
 

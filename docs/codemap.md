@@ -36,6 +36,18 @@ Le panneau admin suit le même schéma sous `src/app/[locale]/admin/<section>/`
 `SiteShell` (Lenis + Stage). Panier, checkout, compte, admin, OAuth, agent,
 suivi, favoris et légal restent directement sous `src/app/[locale]/`.
 
+**Document, habillage et 404** : `src/app/layout.tsx` est le layout **racine**
+(seul `<html>`/`<body>`, script anti-flash thème + mouvement, JSON-LD du site,
+métadonnées par défaut, `data-geo-*`) ; `src/components/locale-shell.tsx`
+(providers, Header, `<main>`, Footer, BottomNav, consentement) est posé par
+`src/app/[locale]/layout.tsx`. `src/app/not-found.tsx` rend la 404 d'une URL
+sans route (route interne `/_not-found` de Next, habillée par `LocaleShell`,
+rendu serveur complet, statut 404) ; `src/app/[locale]/not-found.tsx` sert un
+`notFound()` lancé par une page (fiche produit supprimée). Le contenu commun est
+`src/components/not-found-content.tsx`. `<html lang>` suit la langue via
+`components/html-lang-sync.tsx` (le layout racine n'est pas re-rendu au
+changement de langue).
+
 ## `src/lib` — logique métier (1 ligne chacun)
 
 | Fichier                | Rôle                                                                                | Exports clés                                                   |

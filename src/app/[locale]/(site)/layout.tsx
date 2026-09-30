@@ -4,8 +4,9 @@ import { SiteShell } from "@/components/site-shell";
 // sur mesure, Atelier, contact (et le Studio à venir). Il n'existe que pour
 // que ces pages partagent une SiteShell persistante (Lenis, Stage WebGL) que
 // le reste de l'arbre [locale] ne charge jamais (brief de refonte, §4.2).
-// Aucun <html> ici : le layout racine reste src/app/[locale]/layout.tsx, avec
-// Header, Footer, BottomNav et le script anti-flash.
+// Aucun <html> ici : le document (et le script anti-flash) est dans le layout
+// racine src/app/layout.tsx, l'habillage (Header, Footer, BottomNav) dans
+// src/components/locale-shell.tsx, posé par src/app/[locale]/layout.tsx.
 export default function SiteLayout({
   children,
 }: {
