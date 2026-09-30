@@ -176,9 +176,9 @@ describe("Élévation exacte du vase", () => {
   it("tous les préréglages : silhouette fermée dans le viewBox", () => {
     for (const p of LAVAUX_PRESETS) {
       const el = lavauxElevation(p.config);
-      expect(el.widthMm, p.id).toBeLessThanOrEqual(p.config.d + 0.2);
-      expect(el.widthMm, p.id).toBeGreaterThan(p.config.d * 0.85);
-      expect(el.outline.endsWith("Z"), p.id).toBe(true);
+      expect(el.widthMm, `${p.id}`).toBeLessThanOrEqual(p.config.d + 0.2);
+      expect(el.widthMm, `${p.id}`).toBeGreaterThan(p.config.d * 0.85);
+      expect(el.outline.endsWith("Z"), `${p.id}`).toBe(true);
     }
   });
 

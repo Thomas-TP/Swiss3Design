@@ -334,6 +334,6 @@ describe("extrusion de polygones avec trous", () => {
   it("z1 ≤ z0 est refusé", () => {
     expect(() =>
       extrudePolygon(new MeshBuilder(), { outer: square(0, 0, 1) }, 1, 1),
-    ).toThrow();
+    ).toThrow(/z1 doit/);
   });
 });

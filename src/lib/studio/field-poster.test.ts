@@ -37,12 +37,9 @@ describe("posters de champ : fichiers commités", () => {
     for (const id of FIELD_IDS) {
       for (const theme of THEMES) {
         const file = join(POSTERS, fieldFileName(id, theme));
-        expect(existsSync(file), fieldFileName(id, theme)).toBe(true);
+        expect(existsSync(file), `${fieldFileName(id, theme)}`).toBe(true);
         const svg = readFileSync(file, "utf8");
-        expect(
-          Buffer.byteLength(svg),
-          fieldFileName(id, theme),
-        ).toBeLessThanOrEqual(FIELD_MAX_BYTES);
+        expect(Buffer.byteLength(svg), ``).toBeLessThanOrEqual(FIELD_MAX_BYTES);
         expect(
           svg,
           `${fieldFileName(id, theme)} est périmé : bun scripts/gen-field-posters.ts`,
@@ -90,8 +87,8 @@ describe("génération", () => {
   it("des isolignes ordinaires et des courbes maîtresses, toutes fermées et relatives", () => {
     for (const id of FIELD_IDS) {
       const data = generated[id];
-      expect(data.rings.iso, id).toBeGreaterThan(10);
-      expect(data.rings.index, id).toBeGreaterThan(2);
+      expect(data.rings.iso, `${id}`).toBeGreaterThan(10);
+      expect(data.rings.index, `${id}`).toBeGreaterThan(2);
       expect(data.iso.match(/M/g)).toHaveLength(data.rings.iso);
       expect(data.iso.match(/z/g)).toHaveLength(data.rings.iso);
       expect(data.index.match(/z/g)).toHaveLength(data.rings.index);
@@ -105,11 +102,11 @@ describe("génération", () => {
       for (let i = 0; i < 40; i++) {
         const u = (i * 0.0713) % 1;
         const v = (i * 0.1337) % 1;
-        expect(f(u + 1, v, width, height), id).toBeCloseTo(
+        expect(f(u + 1, v, width, height), `${id}`).toBeCloseTo(
           f(u, v, width, height),
           9,
         );
-        expect(f(u, v + 1, width, height), id).toBeCloseTo(
+        expect(f(u, v + 1, width, height), `${id}`).toBeCloseTo(
           f(u, v, width, height),
           9,
         );

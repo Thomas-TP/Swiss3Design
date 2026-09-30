@@ -124,7 +124,7 @@ function analyze(config: LavauxConfig): LavauxAnalysis {
     config.bands.length > 0
       ? config.bands
       : [{ filament: "blanc-neve" as const, toMm: model.height }];
-  const bandVolumes = new Array<number>(bands.length).fill(0);
+  const bandVolumes = Array.from({ length: bands.length }, () => 0);
   let volume = 0;
   for (let j = 0; j < n - 1; j++) {
     const dz = plan.z[j + 1] - plan.z[j];

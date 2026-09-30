@@ -37,11 +37,14 @@ function lookup(tree: Tree, path: string): string | undefined {
 describe("studioCore : couverture du code", () => {
   for (const locale of LOCALES) {
     const tree = load(locale);
+    // Chemins absents : une seule assertion par test, avec la liste en cas d'échec.
+    const missing: string[] = [];
     const has = (path: string) => {
-      expect(lookup(tree, path), `${locale} : ${path}`).toBeTruthy();
+      if (!lookup(tree, path)) missing.push(`${locale} : ${path}`);
     };
 
     it(`${locale} : objets, profils, motifs, palettes, filaments`, () => {
+      missing.length = 0;
       for (const id of STUDIO_OBJECT_IDS) {
         has(`objects.${id}.name`);
         has(`objects.${id}.noun`);
@@ -53,9 +56,11 @@ describe("studioCore : couverture du code", () => {
       for (const filament of FILAMENT_IDS) has(`filaments.${filament}`);
       // Les préréglages nomment leur palette par ses bandes, pas par un id : rien à traduire ici.
       expect(LAVAUX_PRESETS.length).toBeGreaterThan(0);
+      expect(missing).toEqual([]);
     });
 
     it(`${locale} : options des objets plats, unités, mesures, bandes`, () => {
+      missing.length = 0;
       for (const v of ["relief", "gravure"]) has(`options.mode.${v}`);
       for (const v of ["classique", "centree", "cartouche", "monogramme"])
         has(`options.layout.${v}`);
@@ -87,15 +92,18 @@ describe("studioCore : couverture du code", () => {
         has(`bands.${v}`);
       }
       for (const v of ["peak", "summit", "fictional"]) has(`relief.${v}`);
+      expect(missing).toEqual([]);
     });
 
     it(`${locale} : un message par code d'anomalie et par état d'imprimabilité`, () => {
+      missing.length = 0;
       const codes = Object.keys(ISSUE_MESSAGE_KEYS) as IssueCode[];
       expect(codes).toHaveLength(9);
       for (const code of codes) has(ISSUE_MESSAGE_KEYS[code]);
       for (const status of ["ok", "warn", "error"])
         has(`guard.status.${status}`);
       has("guard.fix");
+      expect(missing).toEqual([]);
     });
   }
 
@@ -120,9 +128,10 @@ describe("studioCore : couverture du code", () => {
       "Vase spirale de Ian",
     );
     for (const locale of LOCALES) {
-      expect(lookup(load(locale), "guard.issue.nearVase"), locale).toContain(
-        "Vase spirale",
-      );
+      expect(
+        lookup(load(locale), "guard.issue.nearVase"),
+        `${locale}`,
+      ).toContain("Vase spirale");
     }
   });
 

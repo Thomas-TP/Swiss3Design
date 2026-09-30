@@ -27,14 +27,23 @@ import {
   decodeConfig,
   decodeFragment,
   decodeSearchParams,
+  type DecodeResult,
   encodeConfig,
   encodeSearchParams,
   toShortKeys,
 } from "./url-state";
-import type { StudioConfig, StudioObjectId } from "./types";
+import type { LavauxConfig, StudioConfig, StudioObjectId } from "./types";
 
 const b64 = (obj: unknown) =>
   `v1.${Buffer.from(JSON.stringify(obj)).toString("base64url")}`;
+
+/** Le vase d'un décodage réussi ; lève (avec le détail) si le décodage a échoué. */
+function lavauxOf(result: DecodeResult, label: string): LavauxConfig {
+  if (!result.ok || result.config.object !== "lavaux") {
+    throw new Error(`${label} : décodage en échec ${JSON.stringify(result)}`);
+  }
+  return result.config;
+}
 
 const DEFAULTS: Record<StudioObjectId, StudioConfig> = {
   lavaux: HERO_CONFIG,
@@ -78,7 +87,7 @@ describe("fragment : aller-retour", () => {
         encodeConfig(config),
         DEFAULTS[object],
       );
-      expect(decoded, object).toEqual({ ok: true, config });
+      expect(decoded, `${object}`).toEqual({ ok: true, config });
     }
     for (const p of LAVAUX_PRESETS) {
       expect(
@@ -97,12 +106,10 @@ describe("fragment : aller-retour", () => {
       const value = encodeConfig(config);
       expect(value.length, `#${i}`).toBeLessThanOrEqual(MAX_FRAGMENT_LENGTH);
       const decoded = decodeConfig("lavaux", value, HERO_CONFIG);
-      expect(decoded.ok, `#${i} ${JSON.stringify(decoded)}`).toBe(true);
-      if (decoded.ok) {
-        expect(decoded.config).toEqual(config);
-        // Stable : encoder ce qu'on vient de décoder redonne les mêmes octets.
-        expect(encodeConfig(decoded.config)).toBe(value);
-      }
+      const back = lavauxOf(decoded, `#${i}`);
+      expect(back).toEqual(config);
+      // Stable : encoder ce qu'on vient de décoder redonne les mêmes octets.
+      expect(encodeConfig(back)).toBe(value);
     }
   });
 
@@ -126,16 +133,12 @@ describe("fragment : aller-retour", () => {
       b64({ h: 200, m: "lisse" }),
       HERO_CONFIG,
     );
-    expect(partial.ok).toBe(true);
-    if (partial.ok && partial.config.object === "lavaux") {
-      expect(partial.config.h).toBe(200);
-      expect(partial.config.pattern).toEqual({ kind: "lisse" });
-      expect(partial.config.profile).toBe("galet");
-      // Les bandes du défaut suivent la nouvelle hauteur (dernière = h).
-      expect(partial.config.bands[partial.config.bands.length - 1].toMm).toBe(
-        200,
-      );
-    }
+    const config = lavauxOf(partial, "clés absentes");
+    expect(config.h).toBe(200);
+    expect(config.pattern).toEqual({ kind: "lisse" });
+    expect(config.profile).toBe("galet");
+    // Les bandes du défaut suivent la nouvelle hauteur (dernière = h).
+    expect(config.bands[config.bands.length - 1].toMm).toBe(200);
   });
 });
 
@@ -179,7 +182,7 @@ describe("fragment : rejets", () => {
         new URLSearchParams({ [key]: "Léa" }),
         HERO_CONFIG,
       );
-      expect(get, key).toMatchObject({ ok: false, error: "text-key" });
+      expect(get, `${key}`).toMatchObject({ ok: false, error: "text-key" });
     }
     // Les clés de texte suivent StudioTexts : name, role, line1, line2, peak, text.
     expect([...TEXT_KEYS].sort()).toEqual([
@@ -302,8 +305,7 @@ describe("paramètres GET (formulaire sans JavaScript)", () => {
         new URLSearchParams(encodeSearchParams(c)),
         HERO_CONFIG,
       );
-      expect(r.ok, `#${i}`).toBe(true);
-      if (r.ok) expect(r.config).toEqual(c);
+      expect(lavauxOf(r, `#${i}`)).toEqual(c);
     }
   });
 
@@ -314,7 +316,7 @@ describe("paramètres GET (formulaire sans JavaScript)", () => {
       HERO_CONFIG,
     );
     expect(r).toMatchObject({ ok: true, ignored: ["submit", "utm_source"] });
-    if (r.ok && r.config.object === "lavaux") expect(r.config.h).toBe(120);
+    expect(lavauxOf(r, "formulaire").h).toBe(120);
   });
 
   it("un formulaire envoie tous ses champs : les autres familles de motif sont ignorées", () => {
@@ -333,15 +335,12 @@ describe("paramètres GET (formulaire sans JavaScript)", () => {
       },
       HERO_CONFIG,
     );
-    expect(r.ok).toBe(true);
-    if (r.ok && r.config.object === "lavaux") {
-      expect(r.config.pattern).toEqual({
-        kind: "vagues",
-        wavelength: 14,
-        amplitude: 1.2,
-        lobes: 5,
-      });
-    }
+    expect(lavauxOf(r, "autres familles").pattern).toEqual({
+      kind: "vagues",
+      wavelength: 14,
+      amplitude: 1.2,
+      lobes: 5,
+    });
   });
 
   it("valeurs invalides refusées ; bornage des valeurs valides mais non canoniques", () => {
@@ -358,20 +357,22 @@ describe("paramètres GET (formulaire sans JavaScript)", () => {
       HERO_CONFIG,
     );
     expect(r.ok).toBe(true);
-    if (r.ok && r.config.object === "lavaux") expect(r.config.neck).toBe(0.73);
+    expect(lavauxOf(r, "bornage").neck).toBe(0.73);
   });
 
   it("accepte des tableaux (searchParams de Next) en prenant la première valeur", () => {
     const r = decodeSearchParams("lavaux", { h: ["90", "120"] }, HERO_CONFIG);
     expect(r.ok).toBe(true);
-    if (r.ok && r.config.object === "lavaux") expect(r.config.h).toBe(90);
+    expect(lavauxOf(r, "tableau").h).toBe(90);
   });
 });
 
 describe("schémas et bornage", () => {
   it("parseConfig : le héros et les défauts passent, une clé en trop non", () => {
     for (const object of ["lavaux", "cartouche", "relief", "borne"] as const) {
-      expect(parseConfig(object, defaultConfig(object)).ok, object).toBe(true);
+      expect(parseConfig(object, defaultConfig(object)).ok, `${object}`).toBe(
+        true,
+      );
     }
     expect(
       parseConfig("lavaux", { ...HERO_CONFIG, name: "Léa" }),

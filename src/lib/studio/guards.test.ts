@@ -18,7 +18,9 @@ import {
   surpriseLavaux,
 } from "./presets";
 import { clampLavaux, gradinsDepthMax, LAVAUX_RANGES } from "./schemas";
+import { mulberry32 } from "./kernel/rng";
 import { computeStats } from "./stats";
+import { randomLavaux } from "./testing";
 import type { LavauxConfig, Printability } from "./types";
 
 type Issues = Extract<Printability, { issues: unknown }>["issues"];
@@ -96,7 +98,7 @@ describe("nearVaseSpirale", () => {
       const config = surpriseLavaux(seed);
       expect(nearVaseSpirale(config), `graine ${seed}`).toBe(false);
     }
-  });
+  }, 60_000);
 
   it("le col est borné à 0,5 et il n'existe pas de profil « bouteille » par construction", () => {
     expect(LAVAUX_RANGES.neck.min).toBe(0.5);
@@ -121,7 +123,7 @@ describe("imprimabilité du héros et des préréglages", () => {
       }
     }
     for (const p of LAVAUX_PRESETS) {
-      expect(checkLavaux(p.config).status, p.id).toBe("ok");
+      expect(checkLavaux(p.config).status, `${p.id}`).toBe("ok");
     }
   });
 
@@ -147,14 +149,14 @@ describe("surplomb", () => {
     });
     const result = checkLavaux(steep);
     const overhang = issuesOf(result).find((i) => i.code === "overhang");
-    expect(overhang, JSON.stringify(result)).toBeTruthy();
+    expect(overhang, `${JSON.stringify(result)}`).toBeTruthy();
     expect(["warn", "error"]).toContain(result.status);
-    if (overhang?.fix) {
-      const fixed = clampLavaux({ ...steep, ...overhang.fix } as LavauxConfig);
-      expect(analyzeLavaux(fixed).maxOutwardSlope).toBeLessThanOrEqual(
-        OVERHANG_SLOPE + 1e-9,
-      );
-    }
+    // La correction proposée existe et ramène la pente à 45°.
+    expect(overhang?.fix).toBeTruthy();
+    const fixed = clampLavaux({ ...steep, ...overhang?.fix } as LavauxConfig);
+    expect(analyzeLavaux(fixed).maxOutwardSlope).toBeLessThanOrEqual(
+      OVERHANG_SLOPE + 1e-9,
+    );
   });
 
   it("un motif trop profond sur des vagues courtes est signalé puis corrigé", () => {
@@ -179,6 +181,32 @@ describe("surplomb", () => {
   });
 });
 
+describe("correction des surplombs", () => {
+  it("sur 300 vases tirés dans toutes les plages, chaque correction proposée résout le surplomb", () => {
+    const rng = mulberry32(777);
+    let flagged = 0;
+    let withFix = 0;
+    const unresolved: string[] = [];
+    for (let i = 0; i < 300; i++) {
+      const config = randomLavaux(rng);
+      const overhang = issuesOf(checkLavaux(config)).find(
+        (issue) => issue.code === "overhang",
+      );
+      if (!overhang) continue;
+      flagged++;
+      if (!overhang.fix) continue;
+      withFix++;
+      const fixed = clampLavaux({ ...config, ...overhang.fix } as LavauxConfig);
+      if (codesOf(checkLavaux(fixed)).includes("overhang")) {
+        unresolved.push(`#${i} ${JSON.stringify(overhang.fix)}`);
+      }
+    }
+    expect(flagged).toBeGreaterThan(50);
+    expect(unresolved).toEqual([]);
+    // Une correction existe dans la quasi-totalité des cas (le reste : lèvre maximale sur un vase très court).
+    expect(withFix / flagged).toBeGreaterThan(0.95);
+  }, 60_000);
+});
 describe("pied, plateau, bandes, couplage des gradins", () => {
   it("pied trop étroit : avertissement avec la correction « cylindre »", () => {
     const narrow = clampLavaux({

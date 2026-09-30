@@ -185,30 +185,62 @@ function scalePattern(
 }
 
 /**
- * Correction d'un surplomb : on essaie, du plus discret au plus visible,
- * un motif moins profond, un galbe réduit, puis plus de hauteur (la pente du
- * profil varie comme 1 / h). Chaque essai est vérifié par une analyse (≈ 1 ms)
- * et la première correction qui ramène la pente à 45° l'emporte ; le résultat
- * est la différence avec la configuration d'origine (clés modifiées seulement).
+ * Correction d'un surplomb (vers l'extérieur comme vers l'intérieur) : on
+ * essaie, du plus discret au plus visible, un motif moins profond, un galbe
+ * réduit, une lèvre réduite (sur un vase court, c'est elle qui fait le
+ * surplomb : pente ≈ 1,875 × l × R / (0,08 h)), un col moins serré, puis plus de
+ * hauteur (la pente du profil varie comme 1 / h), puis des combinaisons. Chaque
+ * essai est vérifié par une analyse (≈ 1 ms) ; la première correction qui
+ * ramène les DEUX pentes à 45° l'emporte. Le résultat est la différence avec la
+ * configuration d'origine (clés modifiées seulement).
  */
 function overhangFix(config: LavauxConfig): Partial<LavauxConfig> | undefined {
+  const towardOne = (neck: number, k: number) => neck + (1 - neck) * k;
   const tries: LavauxConfig[] = [];
   if (config.pattern.kind !== "lisse") {
-    for (const k of [0.75, 0.5]) {
+    for (const k of [0.75, 0.5, 0.25]) {
       tries.push({ ...config, pattern: scalePattern(config.pattern, k) });
     }
   }
-  for (const k of [0.75, 0.5])
+  for (const k of [0.75, 0.5, 0.25, 0]) {
     tries.push({ ...config, belly: config.belly * k });
-  for (const k of [1.2, 1.5]) tries.push({ ...config, h: config.h * k });
+  }
+  for (const k of [0.5, 0.25, 0])
+    tries.push({ ...config, lip: config.lip * k });
+  for (const k of [0.25, 0.5, 0.75]) {
+    tries.push({ ...config, neck: towardOne(config.neck, k) });
+  }
+  for (const k of [1.2, 1.5, 2]) tries.push({ ...config, h: config.h * k });
+  // Combinaisons, du plus discret au plus net : dernier recours avant d'abandonner.
+  tries.push(
+    { ...config, belly: config.belly * 0.5, lip: config.lip * 0.25 },
+    {
+      ...config,
+      belly: config.belly * 0.5,
+      lip: config.lip * 0.25,
+      neck: towardOne(config.neck, 0.5),
+    },
+    {
+      ...config,
+      belly: 0,
+      lip: 0,
+      neck: towardOne(config.neck, 0.5),
+      pattern: scalePattern(config.pattern, 0.5),
+      h: config.h * 1.5,
+    },
+  );
   for (const candidate of tries) {
     const fixed = clampLavaux(candidate);
-    if (analyzeLavaux(fixed).maxOutwardSlope > OVERHANG_SLOPE) continue;
+    const a = analyzeLavaux(fixed);
+    if (Math.max(a.maxOutwardSlope, a.maxInwardSlope) > OVERHANG_SLOPE)
+      continue;
     const partial: Partial<LavauxConfig> = {};
     if (JSON.stringify(fixed.pattern) !== JSON.stringify(config.pattern)) {
       partial.pattern = fixed.pattern;
     }
     if (fixed.belly !== config.belly) partial.belly = fixed.belly;
+    if (fixed.lip !== config.lip) partial.lip = fixed.lip;
+    if (fixed.neck !== config.neck) partial.neck = fixed.neck;
     if (fixed.h !== config.h) {
       partial.h = fixed.h;
       partial.bands = fixed.bands; // la hauteur change : les frontières de bande suivent
@@ -268,7 +300,7 @@ export function checkLavauxWith(
           (inward ? analysis.maxInwardSlopeZ : analysis.maxOutwardSlopeZ) * 10,
         ) / 10,
       value: slopeToAngle(slope),
-      fix: inward ? undefined : overhangFix(config),
+      fix: overhangFix(config),
     });
     raise(slope > OVERHANG_ERROR_SLOPE ? "error" : "warn");
   }

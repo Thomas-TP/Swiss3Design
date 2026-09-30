@@ -25,17 +25,17 @@ describe("Lavaux : variété du maillage d'export", () => {
       const report = checkManifold(mesh);
       const label = `#${i} ${JSON.stringify(config)}`;
       expect(report.closed, `${label} : ${JSON.stringify(report)}`).toBe(true);
-      expect(report.components, label).toBe(1);
-      expect(report.degenerateTriangles, label).toBe(0);
-      expect(meshVolume(mesh), label).toBeGreaterThan(0);
-      expect(report.componentVolumes[0], label).toBeGreaterThan(0);
+      expect(report.components, `${label}`).toBe(1);
+      expect(report.degenerateTriangles, `${label}`).toBe(0);
+      expect(meshVolume(mesh), `${label}`).toBeGreaterThan(0);
+      expect(report.componentVolumes[0], `${label}`).toBeGreaterThan(0);
       const [x0, y0, z0, x1, y1, z1] = mesh.bbox;
-      expect(x1 - x0, label).toBeLessThanOrEqual(250);
-      expect(y1 - y0, label).toBeLessThanOrEqual(250);
-      expect(z1 - z0, label).toBeLessThanOrEqual(250);
-      expect(z0, label).toBeCloseTo(0, 6);
-      expect(z1, label).toBeCloseTo(config.h, 4);
-      expect(mesh.triangles, label).toBeLessThanOrEqual(STL_MAX_TRIANGLES);
+      expect(x1 - x0, `${label}`).toBeLessThanOrEqual(250);
+      expect(y1 - y0, `${label}`).toBeLessThanOrEqual(250);
+      expect(z1 - z0, `${label}`).toBeLessThanOrEqual(250);
+      expect(z0, `${label}`).toBeCloseTo(0, 6);
+      expect(z1, `${label}`).toBeCloseTo(config.h, 4);
+      expect(mesh.triangles, `${label}`).toBeLessThanOrEqual(STL_MAX_TRIANGLES);
     }
   }, 240_000);
 
@@ -197,19 +197,18 @@ describe("STL binaire", () => {
     const view = new DataView(stl.buffer);
     // Premier triangle du fond : son plan est z = 0 et sa normale pointe vers le bas,
     // car le solide est au-dessus.
-    let found = 0;
-    for (let t = 0; t < stl.triangles && found < 5; t++) {
+    const bottomNormalsZ: number[] = [];
+    for (let t = 0; t < stl.triangles && bottomNormalsZ.length < 5; t++) {
       const o = 84 + 50 * t;
       const z = [
         view.getFloat32(o + 20, true),
         view.getFloat32(o + 32, true),
         view.getFloat32(o + 44, true),
       ];
-      if (z.every((v) => v === 0)) {
-        expect(view.getFloat32(o + 8, true)).toBeCloseTo(-1, 4);
-        found++;
-      }
+      if (z.every((v) => v === 0))
+        bottomNormalsZ.push(view.getFloat32(o + 8, true));
     }
-    expect(found).toBeGreaterThan(0);
+    expect(bottomNormalsZ.length).toBeGreaterThan(0);
+    for (const nz of bottomNormalsZ) expect(nz).toBeCloseTo(-1, 4);
   });
 });

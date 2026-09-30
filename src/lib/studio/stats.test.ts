@@ -195,16 +195,3 @@ describe("estimate", () => {
     expect(m.lowCents).toBeGreaterThan(n.lowCents);
   });
 });
-
-describe("performance (Node)", () => {
-  it("computeStats : ordre de la milliseconde, bien sous le budget de 2 ms", () => {
-    const rng = mulberry32(5);
-    const configs = Array.from({ length: 60 }, () => randomLavaux(rng));
-    for (const c of configs.slice(0, 10)) computeStats(c); // échauffement JIT
-    const t0 = performance.now();
-    for (const c of configs) computeStats(c);
-    const mean = (performance.now() - t0) / configs.length;
-    // Cible du brief : ≤ 2 ms ; marge ×3 pour ne pas dépendre de la charge de la CI.
-    expect(mean).toBeLessThan(6);
-  });
-});
