@@ -4,6 +4,7 @@ import { useState, useSyncExternalStore } from "react";
 import { Check } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { track } from "@/lib/analytics";
+import { chipClass } from "@/components/ui/chip";
 
 const SOURCES = ["google", "ai", "social", "friend", "other"] as const;
 const noSubscription = () => () => {};
@@ -13,6 +14,8 @@ const noSubscription = () => () => {};
 // comptent en « direct » : seule la réponse de l'acheteur les révèle. Un
 // clic, facultatif, envoyé comme événement anonyme (aucun consentement
 // requis, rien de stocké hormis le fait d'avoir répondu dans cet onglet).
+// Habillage « Strates » : puces du système (chipClass), carte `card`, texte
+// aligné à gauche comme le reste de la page de confirmation.
 export function AttributionQuestion({ orderId }: { orderId: string }) {
   const t = useTranslations("attribution");
   const storageKey = `s3d-attribution:${orderId}`;
@@ -33,17 +36,22 @@ export function AttributionQuestion({ orderId }: { orderId: string }) {
 
   if (alreadyAnswered || justAnswered) {
     return (
-      <p className="mt-6 flex items-center justify-center gap-2 text-sm font-medium text-soft">
-        <Check size={16} className="text-emerald-600" />
+      <output className="mt-6 flex items-center gap-2 text-sm font-medium text-soft">
+        <Check
+          size={16}
+          strokeWidth={1.5}
+          aria-hidden="true"
+          className="text-emerald-700 dark:text-emerald-300"
+        />
         {t("thanks")}
-      </p>
+      </output>
     );
   }
 
   return (
-    <div className="mt-6 rounded-card border border-line bg-surface p-6 text-center">
-      <p className="text-sm font-semibold">{t("question")}</p>
-      <div className="mt-4 flex flex-wrap justify-center gap-2">
+    <section className="mt-6 rounded-card border border-line bg-surface p-6">
+      <p className="text-sm font-semibold text-ink">{t("question")}</p>
+      <div className="mt-4 flex flex-wrap gap-2">
         {SOURCES.map((source) => (
           <button
             key={source}
@@ -60,12 +68,12 @@ export function AttributionQuestion({ orderId }: { orderId: string }) {
               }
               setAnswered(true);
             }}
-            className="rounded-full border border-line px-4 py-2 text-sm font-medium transition-colors hover:border-ink"
+            className={chipClass(false, "min-h-11")}
           >
             {t(source)}
           </button>
         ))}
       </div>
-    </div>
+    </section>
   );
 }

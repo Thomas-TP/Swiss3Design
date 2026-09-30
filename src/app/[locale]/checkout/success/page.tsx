@@ -6,18 +6,20 @@ import {
   UserPlus,
   PackageSearch,
 } from "lucide-react";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
-import { Link } from "@/i18n/navigation";
 import { getDb } from "@/db";
 import { orderItems, orders } from "@/db/schema";
 import { settleSession } from "@/lib/checkout-session";
 import { getStripe } from "@/lib/stripe";
 import { getServerSession } from "@/lib/session";
 import { chf } from "@/lib/analytics";
+import { formatChf } from "@/lib/format";
 import { TrackEvent } from "@/components/track-event";
+import { ButtonLink } from "@/components/ui/button";
+import { withDot } from "@/components/ui/dot-title";
 import { AttributionQuestion } from "./attribution-question";
 import { ClearCart } from "./clear-cart";
 
@@ -68,20 +70,28 @@ async function orderCompletedProperties(
 
 export const dynamic = "force-dynamic";
 
+// Confirmation de commande (brief « Strates » §7.15). Hors groupe (site) : ni
+// Lenis ni canvas. Seul mouvement : la carte « s'imprime » une fois en CSS
+// (`.s3d-print`, 8 paliers, coupé en mouvement réduit). La logique — lecture
+// de la session Stripe, `settleSession` idempotent, panier vidé, « Order
+// Completed » émis une fois — est celle d'avant la refonte.
 export default async function CheckoutSuccessPage({
   searchParams,
 }: {
   searchParams: Promise<{ session_id?: string }>;
 }) {
   const { session_id: sessionId } = await searchParams;
-  const [t, session] = await Promise.all([
+  const [t, ts, locale, session] = await Promise.all([
     getTranslations("orderSuccess"),
+    getTranslations("system.success"),
+    getLocale(),
     getServerSession(),
   ]);
 
   let status: "succeeded" | "processing" | "failed" = "failed";
   let orderNumber: string | null = null;
   let receiptEmail: string | null = null;
+  let amountCents: number | null = null;
   let purchase: Awaited<ReturnType<typeof orderCompletedProperties>> | null =
     null;
 
@@ -94,6 +104,7 @@ export default async function CheckoutSuccessPage({
         { expand: ["payment_intent"] },
       );
       orderNumber = checkoutSession.metadata?.orderNumber ?? null;
+      amountCents = checkoutSession.amount_total;
       receiptEmail =
         checkoutSession.customer_details?.email ??
         checkoutSession.customer_email;
@@ -119,9 +130,39 @@ export default async function CheckoutSuccessPage({
       : status === "processing"
         ? Clock
         : XCircle;
+  // Couleurs de statut conservées (émeraude, ambre) ; l'échec prend le rouge
+  // lisible (< 24 px : `accent-text`).
+  const iconTone =
+    status === "succeeded"
+      ? "text-emerald-700 dark:text-emerald-300"
+      : status === "processing"
+        ? "text-amber-700 dark:text-amber-300"
+        : "text-accent-text";
+  const kicker =
+    status === "succeeded"
+      ? ts("kicker")
+      : status === "processing"
+        ? ts("processingKicker")
+        : ts("failedKicker");
+  const title =
+    status === "succeeded"
+      ? ts("title")
+      : status === "processing"
+        ? t("processingTitle")
+        : t("failedTitle");
+  const text =
+    status === "succeeded"
+      ? ts("text")
+      : status === "processing"
+        ? t("processing")
+        : t("failed");
+
+  // Un seul bouton rouge par écran : « Créer mon compte » quand il est
+  // proposé (invité après un paiement réussi), sinon le lien principal.
+  const guestOffer = status === "succeeded" && !session;
 
   return (
-    <div className="mx-auto max-w-xl px-4 py-20 sm:px-6">
+    <div className="s3d-page py-12 md:py-20">
       {status === "succeeded" && <ClearCart />}
       {purchase && (
         <TrackEvent
@@ -130,84 +171,105 @@ export default async function CheckoutSuccessPage({
           onceKey={purchase.order_id}
         />
       )}
-      <div className="rounded-card border border-line bg-surface p-10 text-center">
-        <span
-          className={`mx-auto grid h-16 w-16 place-items-center rounded-full ${
-            status === "succeeded"
-              ? "bg-emerald-500/15 text-emerald-600 dark:text-emerald-300"
-              : status === "processing"
-                ? "bg-amber-500/15 text-amber-600 dark:text-amber-300"
-                : "bg-accent/10 text-accent-text"
-          }`}
-        >
-          <Icon size={30} strokeWidth={1.8} />
-        </span>
-        <h1 className="mt-6 text-2xl font-bold">
-          {status === "succeeded"
-            ? t("title")
-            : status === "processing"
-              ? t("processingTitle")
-              : t("failedTitle")}
-        </h1>
-        <p className="mt-3 leading-relaxed text-soft">
-          {status === "succeeded"
-            ? t("text", { orderNumber: orderNumber ?? "—" })
-            : status === "processing"
-              ? t("processing")
-              : t("failed")}
+      <div className="mx-auto max-w-3xl">
+        <p className="s3d-label flex items-center gap-2 text-soft">
+          <Icon
+            size={16}
+            strokeWidth={1.5}
+            aria-hidden="true"
+            className={iconTone}
+          />
+          {kicker}
         </p>
-        <Link
-          href={status === "failed" ? "/cart" : "/shop"}
-          className="mt-7 inline-flex items-center gap-2 rounded-full bg-ink px-7 py-3.5 text-sm font-semibold text-paper transition-opacity hover:opacity-90"
-        >
-          {status === "failed" ? t("backCart") : t("backShop")}
-          <ArrowRight size={16} />
-        </Link>
-      </div>
+        <h1 className="mt-3 font-display text-display break-words text-ink">
+          {withDot(title)}
+        </h1>
+        <p className="mt-5 max-w-xl text-lead text-soft">{text}</p>
 
-      {purchase && <AttributionQuestion orderId={purchase.order_id} />}
-
-      {/* Conversion invité → compte : seulement après un paiement réussi et
-          si le client n'est pas déjà connecté. L'e-mail (déjà vérifié au
-          checkout) pré-remplit l'inscription ; ses commandes invité y sont
-          rattachées automatiquement. */}
-      {status === "succeeded" && !session && (
-        <div className="mt-6 rounded-card border border-line bg-surface p-7 text-center sm:p-8">
-          <h2 className="text-lg font-bold tracking-tight">
-            {t("createAccountTitle")}
-          </h2>
-          <p className="mx-auto mt-2 max-w-sm text-sm leading-relaxed text-soft">
-            {t("createAccountText")}
-          </p>
-          <div className="mt-5 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link
-              href={
-                receiptEmail
-                  ? {
-                      pathname: "/account/register",
-                      query: { email: receiptEmail },
-                    }
-                  : "/account/register"
-              }
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] sm:w-auto"
+        {/* La carte de confirmation « s'imprime » une fois (CSS seul, jamais
+            sur le h1). Le ticket est en mono : n° et montant sont des données
+            réelles, lisibles d'un coup d'œil et à copier. */}
+        <section className="s3d-print mt-10 rounded-card border border-line bg-surface p-6 sm:p-8">
+          {status === "succeeded" && (
+            <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
+              <div>
+                <dt className="s3d-label text-soft">{ts("ticketNumber")}</dt>
+                <dd className="mt-1.5 break-all font-mono text-2xl font-medium tracking-tight text-ink">
+                  {orderNumber ?? "—"}
+                </dd>
+              </div>
+              {amountCents !== null && (
+                <div>
+                  <dt className="s3d-label text-soft">{ts("ticketAmount")}</dt>
+                  <dd className="s3d-num mt-1.5 font-mono text-2xl font-medium tracking-tight text-ink">
+                    {formatChf(amountCents, locale)}
+                  </dd>
+                </div>
+              )}
+            </dl>
+          )}
+          <div
+            className={
+              status === "succeeded"
+                ? "mt-6 border-t border-dashed border-iso pt-6"
+                : ""
+            }
+          >
+            <ButtonLink
+              href={status === "failed" ? "/cart" : "/shop"}
+              variant={guestOffer ? "secondary" : "primary"}
+              size="lg"
             >
-              <UserPlus size={16} />
-              {t("createAccountCta")}
-            </Link>
-            <Link
-              href={
-                orderNumber
-                  ? { pathname: "/track", query: { order: orderNumber } }
-                  : "/track"
-              }
-              className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-line px-6 py-3 text-sm font-semibold transition-colors hover:border-ink sm:w-auto"
-            >
-              <PackageSearch size={16} />
-              {t("trackGuestCta")}
-            </Link>
+              {status === "failed" ? t("backCart") : t("backShop")}
+              <ArrowRight size={18} strokeWidth={1.5} />
+            </ButtonLink>
           </div>
-        </div>
-      )}
+        </section>
+
+        {purchase && <AttributionQuestion orderId={purchase.order_id} />}
+
+        {/* Conversion invité → compte : seulement après un paiement réussi et
+            si le client n'est pas déjà connecté. L'e-mail (déjà vérifié au
+            checkout) pré-remplit l'inscription ; ses commandes invité y sont
+            rattachées automatiquement. */}
+        {guestOffer && (
+          <section className="mt-6 rounded-card border border-line bg-surface p-6 sm:p-8">
+            <h2 className="font-display text-title text-ink">
+              {t("createAccountTitle")}
+            </h2>
+            <p className="mt-2 max-w-md text-sm leading-relaxed text-soft">
+              {t("createAccountText")}
+            </p>
+            <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <ButtonLink
+                href={
+                  receiptEmail
+                    ? {
+                        pathname: "/account/register",
+                        query: { email: receiptEmail },
+                      }
+                    : "/account/register"
+                }
+                variant="primary"
+              >
+                <UserPlus size={16} strokeWidth={1.5} />
+                {t("createAccountCta")}
+              </ButtonLink>
+              <ButtonLink
+                href={
+                  orderNumber
+                    ? { pathname: "/track", query: { order: orderNumber } }
+                    : "/track"
+                }
+                variant="secondary"
+              >
+                <PackageSearch size={16} strokeWidth={1.5} />
+                {t("trackGuestCta")}
+              </ButtonLink>
+            </div>
+          </section>
+        )}
+      </div>
     </div>
   );
 }

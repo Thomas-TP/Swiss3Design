@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import type { Locale } from "@/i18n/routing";
 import { NOINDEX } from "@/lib/seo";
+import { PageHeader } from "@/components/page-header";
 import { TrackFlow } from "./track-flow";
 
 export const dynamic = "force-dynamic";
@@ -23,19 +24,19 @@ export default async function TrackPage({
 }: {
   searchParams: Promise<{ order?: string }>;
 }) {
-  const t = await getTranslations("track");
+  const [t, ts] = await Promise.all([
+    getTranslations("track"),
+    getTranslations("system.track"),
+  ]);
   const { order } = await searchParams;
 
   return (
-    <div className="mx-auto max-w-2xl px-4 py-14 sm:px-6 md:py-20">
-      <span className="mx-auto flex h-1 w-10 rounded-full bg-accent" />
-      <h1 className="mt-3 text-center text-3xl font-bold tracking-tight md:text-4xl">
-        {t("title")}
-      </h1>
-      <p className="mx-auto mt-3 max-w-md text-center text-soft">
-        {t("subtitle")}
-      </p>
-      <TrackFlow initialOrderNumber={order ?? ""} />
+    <div className="s3d-page py-14 md:py-20">
+      {/* Hors groupe (site) : ni Lenis ni canvas. Un seul h1 (point rouge). */}
+      <div className="mx-auto max-w-2xl">
+        <PageHeader title={ts("title")} intro={t("subtitle")} />
+        <TrackFlow initialOrderNumber={order ?? ""} />
+      </div>
     </div>
   );
 }
