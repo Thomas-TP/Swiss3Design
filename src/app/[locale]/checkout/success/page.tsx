@@ -21,6 +21,7 @@ import { TrackEvent } from "@/components/track-event";
 import { ButtonLink } from "@/components/ui/button";
 import { withDot } from "@/components/ui/dot-title";
 import { AttributionQuestion } from "./attribution-question";
+import styles from "./success.module.css";
 import { ClearCart } from "./clear-cart";
 
 // « Order Completed » (spécification e-commerce PostHog). `revenue` = montant
@@ -189,7 +190,7 @@ export default async function CheckoutSuccessPage({
         {/* La carte de confirmation « s'imprime » une fois (CSS seul, jamais
             sur le h1). Le ticket est en mono : n° et montant sont des données
             réelles, lisibles d'un coup d'œil et à copier. */}
-        <section className="s3d-print mt-10 rounded-card border border-line bg-surface p-6 sm:p-8">
+        <section className={`s3d-print ${styles.card} mt-10 rounded-card border border-line bg-surface p-6 sm:p-8`}>
           {status === "succeeded" && (
             <dl className="grid gap-x-8 gap-y-5 sm:grid-cols-2">
               <div>

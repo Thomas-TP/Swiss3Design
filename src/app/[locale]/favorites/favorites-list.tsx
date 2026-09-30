@@ -118,8 +118,11 @@ export function FavoritesList() {
           ) : (
             <>
               <div className="flex justify-end">
+                {/* En contour : chaque carte porte déjà son « Ajouter au
+                    panier » (composant du catalogue), et un écran n'a qu'un
+                    seul bouton rouge au plus. */}
                 <Button
-                  variant={addedAll ? "ink" : "primary"}
+                  variant={addedAll ? "ink" : "secondary"}
                   onClick={addAllToCart}
                 >
                   {addedAll ? (
