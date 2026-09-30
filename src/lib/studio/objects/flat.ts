@@ -66,7 +66,8 @@ export function buildFlat(
     return b.build();
   }
   const top = plateMinusInk(model.outline, ink);
-  if (options.separateBands) {
+  // L'éclaté est une vue : jamais dans l'export (une seule coque, comme le vase).
+  if (options.separateBands && options.lod !== "export") {
     extrudePolygon(b, model.outline, 0, floor, { band: 0 });
     for (const polygon of top)
       extrudePolygon(b, polygon, floor, t, { band: 1 });

@@ -8,7 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { bandStats, bandStatsFor } from "./band-stats";
 import { buildStudioMesh, exportStl } from "./build";
 import type { Polygon } from "./kernel/extrude";
-import { meshVolume } from "./kernel/mesh";
+import { checkManifold, meshVolume } from "./kernel/mesh";
 import { mulberry32, pick } from "./kernel/rng";
 import {
   checkFlatWith,
@@ -824,6 +824,20 @@ describe("Gravure sans chevauchement : formes d'encre disjointes sur 200 configu
         for (const [x, y] of glyph.outer) {
           expect(inMatter(model.outline, x, y), `${label}`).toBe(true);
         }
+        // Le trou d'anneau est à distance du texte.
+        for (const hole of model.outline.holes ?? []) {
+          expect(
+            polygonGap(glyph, { outer: hole }, 1),
+            `${label}`,
+          ).toBeGreaterThanOrEqual(0.5);
+        }
+      }
+      // Et il garde de la matière autour de lui.
+      for (const hole of model.outline.holes ?? []) {
+        expect(
+          boundaryGap({ outer: hole }, { outer: model.outline.outer }, 2),
+          `${label}`,
+        ).toBeGreaterThanOrEqual(0.9);
       }
     }
   });
@@ -1256,6 +1270,70 @@ describe("« Surprenez-moi » des objets plats", () => {
       ).levelAreas;
       expect(Math.min(...areas), `relief ${seed}`).toBeGreaterThan(5);
     }
+  });
+});
+
+describe("Groupes de triangles des objets plats (une couleur par bande)", () => {
+  it("les groupes recouvrent tous les index, dans l'ordre des bandes, avec des normales unitaires", () => {
+    for (const object of ["cartouche", "relief", "borne"] as const) {
+      for (const { id, config } of PRESETS[object]) {
+        const texts = DEFAULT_TEXTS[object];
+        const mesh = buildStudioMesh(config, texts, { lod: "display", font });
+        const bands = bandStatsFor(config, texts).bands;
+        let start = 0;
+        let lastBand = -1;
+        for (const g of mesh.groups) {
+          expect(g.start, `${object} ${id}`).toBe(start);
+          expect(g.count % 3, `${object} ${id}`).toBe(0);
+          expect(g.band, `${object} ${id}`).toBeGreaterThan(lastBand);
+          expect(g.band, `${object} ${id}`).toBeLessThan(bands.length);
+          start += g.count;
+          lastBand = g.band;
+        }
+        expect(start, `${object} ${id}`).toBe(mesh.indices.length);
+        for (let i = 0; i < mesh.normals.length; i += 3) {
+          const len = Math.hypot(
+            mesh.normals[i],
+            mesh.normals[i + 1],
+            mesh.normals[i + 2],
+          );
+          expect(Math.abs(len - 1), `${object} ${id}`).toBeLessThan(1e-4);
+        }
+      }
+    }
+  });
+
+  it("éclaté de la Cartouche gravée : deux coques fermées (dalle basse et dalle percée), jamais dans l'export", () => {
+    const config: CartoucheConfig = {
+      ...CARTOUCHE_DEFAULT,
+      mode: "gravure",
+      depth: 0.6,
+    };
+    const split = buildStudioMesh(config, DEFAULT_TEXTS.cartouche, {
+      lod: "display",
+      font,
+      separateBands: true,
+    });
+    const whole = buildStudioMesh(config, DEFAULT_TEXTS.cartouche, {
+      lod: "export",
+      font,
+      separateBands: true,
+    });
+    // Les coques se touchent à la frontière de bande : le Stage les écarte de
+    // 12 mm par groupe, on fait pareil avant de vérifier qu'elles sont fermées.
+    const positions = split.positions.slice();
+    for (const g of split.groups) {
+      for (let i = g.start; i < g.start + g.count; i++) {
+        positions[split.indices[i] * 3 + 2] =
+          split.positions[split.indices[i] * 3 + 2] + g.band * 12;
+      }
+    }
+    const spread = checkManifold({ ...split, positions });
+    expect(spread.closed).toBe(true);
+    expect(spread.components).toBeGreaterThan(1);
+    expect(spread.componentVolumes.every((v) => v > 0)).toBe(true);
+    expect(checkManifold(whole).components).toBe(1);
+    expect(split.groups.map((g) => g.band)).toEqual([0, 1]);
   });
 });
 
