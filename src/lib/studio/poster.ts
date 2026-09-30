@@ -33,7 +33,6 @@ import {
   createLavauxModel,
   innerRadius,
   uniformInterior,
-  type LavauxModel,
 } from "./objects/lavaux-model";
 import type { LavauxConfig } from "./types";
 
@@ -86,9 +85,7 @@ const r1 = (x: number) => Math.round(x * 10) / 10;
 function project(
   spec: CameraSpec,
   aspect: number,
-  model: LavauxModel,
   z: number,
-  nudge: number,
   radiusOf: (theta: number) => number,
   zShift: number,
 ): PosterEllipse {
@@ -99,8 +96,6 @@ function project(
   let y0 = Infinity;
   let y1 = -Infinity;
   const K = 96;
-  void model;
-  void nudge;
   for (let i = 0; i < K; i++) {
     const theta = (i * 2 * Math.PI) / K;
     const r = radiusOf(theta);
@@ -135,7 +130,7 @@ function ringTools(config: LavauxConfig) {
     model.outer(theta, z, nudge, tmp);
     return innerRadius(model.wall, tmp[0], tmp[1], tmp[2]);
   };
-  return { model, outer, mouth };
+  return { outer, mouth };
 }
 
 /** Caméra de l'éclaté : mêmes angles et même part de hauteur que le héros, hauteur totale écartée. */
@@ -166,7 +161,7 @@ export function heroPoster(
         ? explodedCamera(config)
         : heroCameraFor(config)
       : heroCamera();
-  const { model, outer, mouth } = ringTools(config);
+  const { outer, mouth } = ringTools(config);
   const count = Math.floor(config.h / GHOST_STEP_MM + 1e-9);
   const zs: number[] = [];
   for (let k = 1; k <= count; k++) zs.push(k * GHOST_STEP_MM);
@@ -181,9 +176,7 @@ export function heroPoster(
   if (variant === "ghost") {
     return {
       ...base,
-      ghost: zs.map((z) =>
-        project(camera, aspect, model, z, -1, outer(z, -1), 0),
-      ),
+      ghost: zs.map((z) => project(camera, aspect, z, outer(z, -1), 0)),
     };
   }
 
@@ -192,32 +185,27 @@ export function heroPoster(
     const fill = filamentHex(band.filament);
     return { band: k, fill, stroke: shade(fill, 0.38), ellipses: [] };
   });
-  const shift = (z: number) =>
-    exploded ? bandIndexAt(bands, z - 1e-6) * EXPLODE_GAP_MM : 0;
   for (const z of zs) {
     const k = bandIndexAt(bands, z - GHOST_STEP_MM / 2);
     layers[k].ellipses.push(
       project(
         camera,
         aspect,
-        model,
         z,
-        -1,
         outer(z, -1),
         exploded ? k * EXPLODE_GAP_MM : 0,
       ),
     );
   }
-  void shift;
 
   if (exploded) {
     bands.forEach((band, k) => {
       const zTop = Math.min(band.toMm, config.h);
       const s = k * EXPLODE_GAP_MM;
       layers[k].cap = {
-        top: project(camera, aspect, model, zTop, -1, outer(zTop, -1), s),
+        top: project(camera, aspect, zTop, outer(zTop, -1), s),
         topFill: tint(layers[k].fill, 0.22),
-        mouth: project(camera, aspect, model, zTop, -1, mouth(zTop, -1), s),
+        mouth: project(camera, aspect, zTop, mouth(zTop, -1), s),
         mouthFill: shade(layers[k].fill, 0.5),
       };
     });
@@ -229,15 +217,7 @@ export function heroPoster(
     ...base,
     layers,
     mouth: {
-      ellipse: project(
-        camera,
-        aspect,
-        model,
-        config.h,
-        -1,
-        mouth(config.h, -1),
-        0,
-      ),
+      ellipse: project(camera, aspect, config.h, mouth(config.h, -1), 0),
       fill: shade(last.fill, 0.5),
     },
   };

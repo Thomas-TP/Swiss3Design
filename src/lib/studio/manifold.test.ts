@@ -14,8 +14,24 @@ import { mulberry32 } from "./kernel/rng";
 import { buildLavaux } from "./objects/lavaux";
 import { HERO_CONFIG, LAVAUX_PRESETS, heroVariant } from "./presets";
 import { randomLavaux } from "./testing";
+import type { LavauxConfig, MeshData } from "./types";
 import { STL_MAX_TRIANGLES, stlHeader, writeBinaryStl } from "./stl";
 
+/**
+ * Éclaté d'affichage : les coques de bandes se touchent aux frontières (anneaux
+ * dupliqués) ; le Stage les écarte de 12 mm par groupe. On fait pareil avant de
+ * vérifier que chaque bande est une coque fermée et orientée.
+ */
+function spreadByBand(mesh: MeshData) {
+  const positions = mesh.positions.slice();
+  for (const g of mesh.groups) {
+    for (let i = g.start; i < g.start + g.count; i++) {
+      positions[mesh.indices[i] * 3 + 2] =
+        mesh.positions[mesh.indices[i] * 3 + 2] + g.band * 12;
+    }
+  }
+  return checkManifold({ ...mesh, positions });
+}
 describe("Lavaux : variété du maillage d'export", () => {
   it("200 configurations aléatoires : coque fermée, orientée, volume > 0, boîte ≤ 250³", () => {
     const rng = mulberry32(20260930);
@@ -67,15 +83,8 @@ describe("Lavaux : variété du maillage d'export", () => {
       separateBands: true,
     });
     // Les coques se touchent aux frontières (anneaux dupliqués) : le Stage les
-    // écarte de 12 mm par groupe ; on fait pareil avant de tester la variété.
-    const spread = { ...mesh, positions: mesh.positions.slice() };
-    for (const g of mesh.groups) {
-      for (let i = g.start; i < g.start + g.count; i++) {
-        spread.positions[mesh.indices[i] * 3 + 2] =
-          mesh.positions[mesh.indices[i] * 3 + 2] + g.band * 12;
-      }
-    }
-    const report = checkManifold(spread);
+    // écarte de 12 mm par groupe ; spreadByBand fait pareil avant le test de variété.
+    const report = spreadByBand(mesh);
     expect(report.closed).toBe(true);
     expect(report.components).toBe(3);
     expect(report.componentVolumes.every((v) => v > 0)).toBe(true);
@@ -88,6 +97,74 @@ describe("Lavaux : variété du maillage d'export", () => {
     expect(checkManifold(exported).components).toBe(1);
   });
 
+  it("frontières de bande posées sur un retrait de gradin, sur le sommet d'une rampe ou près du plancher", () => {
+    const aligned = {
+      ...HERO_CONFIG,
+      // 40 et 105 sont des multiples du pas (5 mm) : frontière ET corniche au même z.
+      bands: [
+        { filament: "rouge-signal", toMm: 40 },
+        { filament: "encre", toMm: 105 },
+        { filament: "blanc-neve", toMm: 150 },
+      ],
+    } as LavauxConfig;
+    const nearFloor = {
+      ...HERO_CONFIG,
+      bands: [
+        { filament: "ambre", toMm: 2 },
+        { filament: "glacier", toMm: 4.2 },
+        { filament: "blanc-neve", toMm: 150 },
+      ],
+    } as LavauxConfig;
+    for (const config of [aligned, nearFloor]) {
+      for (const lod of ["drag", "display", "export"] as const) {
+        const mesh = buildLavaux(config, { lod });
+        const report = checkManifold(mesh);
+        expect(report.closed, `${lod} ${JSON.stringify(config.bands)}`).toBe(
+          true,
+        );
+        expect(report.components).toBe(1);
+        expect(report.degenerateTriangles).toBe(0);
+      }
+      const split = buildLavaux(config, {
+        lod: "display",
+        tier: 1,
+        separateBands: true,
+      });
+      expect(spreadByBand(split).closed).toBe(true);
+      expect(spreadByBand(split).components).toBe(3);
+    }
+  });
+
+  it("60 vases aléatoires en affichage C1 et C2, éclatés par bande : coques fermées", () => {
+    const rng = mulberry32(8080);
+    const configs = Array.from({ length: 60 }, () => randomLavaux(rng));
+    configs.forEach((config, i) => {
+      for (const tier of [1, 2] as const) {
+        const mesh = buildLavaux(config, { lod: "display", tier });
+        const report = checkManifold(mesh);
+        expect(report.closed, `#${i} C${tier} ${JSON.stringify(config)}`).toBe(
+          true,
+        );
+        expect(report.components).toBe(1);
+      }
+    });
+    // Éclaté : seulement les vases à plusieurs bandes (une coque fermée par bande).
+    const multi = configs
+      .map((config, i) => ({ config, i }))
+      .filter(({ config }) => config.bands.length > 1);
+    expect(multi.length).toBeGreaterThan(20);
+    for (const { config, i } of multi) {
+      const split = spreadByBand(
+        buildLavaux(config, { lod: "display", tier: 1, separateBands: true }),
+      );
+      expect(split.closed, `#${i} éclaté ${JSON.stringify(config.bands)}`).toBe(
+        true,
+      );
+      expect(split.components).toBe(config.bands.length);
+      expect(split.componentVolumes.every((v) => v > 0)).toBe(true);
+    }
+  }, 120_000);
+
   it("budgets de triangles : C2 ≈ 115 k, C1 ≈ 38 k, export ≤ 200 k", () => {
     const c2 = buildLavaux(HERO_CONFIG, { lod: "display", tier: 2 });
     const c1 = buildLavaux(HERO_CONFIG, { lod: "display", tier: 1 });
@@ -95,6 +172,10 @@ describe("Lavaux : variété du maillage d'export", () => {
     expect(c2.triangles).toBeLessThanOrEqual(125_000);
     expect(c1.triangles).toBeGreaterThan(30_000);
     expect(c1.triangles).toBeLessThanOrEqual(42_000);
+    // Cible du brief : 1 à 3 Mo de STL (≈ 20 000 à 60 000 triangles) pour le héros.
+    const hero = buildLavaux(HERO_CONFIG, { lod: "export" });
+    expect(84 + 50 * hero.triangles).toBeLessThan(3_000_000);
+    expect(84 + 50 * hero.triangles).toBeGreaterThan(1_000_000);
     const heavy = buildLavaux(heroVariant("leman", "voronoi"), {
       lod: "export",
     });

@@ -22,7 +22,7 @@
 //    brief et pilote le raffinement (les rampes de gradins dominent le compte) ;
 //  - motifs de révolution (gradins, lisse, vagues sans lobes) : le nombre de
 //    segments vient de la MÊME tolérance de 0,05 mm en θ (flèche de la corde
-//    ≤ 0,05 mm au rayon maximal), avec un plancher de 96 ;
+//    ≤ 0,05 mm au rayon maximal), avec un plancher de 72 (le héros : 52 k triangles, 2,6 Mo) ;
 //  - motifs non axisymétriques : segments du brief (vagues 240, voronoï 360,
 //    nervures max(180, 10 × rn)).
 //
@@ -67,7 +67,7 @@ export const EXPORT_LIMITS = {
   minStep: 0.1,
   /** Plafond de triangles d'un export. */
   maxTriangles: 200_000,
-  minSegments: 96,
+  minSegments: 72,
 } as const;
 
 const DISPLAY = {
