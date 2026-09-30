@@ -7,6 +7,7 @@ import { agentRegistrations, oauthClient, oauthConsent } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { ScopeList } from "@/components/agent-scope-list";
 import { POST_CLAIM_SCOPES } from "@/lib/agent/oauth";
+import { AccountTitle } from "../account-title";
 import { card } from "../_ui";
 import { RevokeButton } from "./revoke-button";
 
@@ -69,11 +70,7 @@ export default async function AgentsTab() {
 
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-xl font-bold">
-        <Bot size={19} className="text-soft" />
-        {t("title")}
-      </h1>
-      <p className="mt-1 mb-6 text-sm text-soft">{t("subtitle")}</p>
+      <AccountTitle title={t("title")} subtitle={t("subtitle")} icon={Bot} />
 
       {apps.length === 0 && agents.length === 0 ? (
         <p className={`${card} text-sm text-soft`}>{t("empty")}</p>
@@ -85,9 +82,9 @@ export default async function AgentsTab() {
               <div key={app.clientId} className={card}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="min-w-0">
-                    <p className="truncate font-semibold">
+                    <h2 className="truncate font-semibold">
                       {app.name?.trim() || host || t("unnamedApp")}
-                    </p>
+                    </h2>
                     <p className="mt-0.5 text-xs text-soft">
                       {host ? `${host} · ` : ""}
                       {t("authorizedOn", { date: date(app.updatedAt) })}
@@ -103,7 +100,7 @@ export default async function AgentsTab() {
             <div key={agent.id} className={card}>
               <div className="flex items-start justify-between gap-4">
                 <div className="min-w-0">
-                  <p className="font-semibold">{t("authMdAgent")}</p>
+                  <h2 className="font-semibold">{t("authMdAgent")}</h2>
                   <p className="mt-0.5 text-xs text-soft">
                     {t("authorizedOn", { date: date(agent.claimedAt) })}
                   </p>

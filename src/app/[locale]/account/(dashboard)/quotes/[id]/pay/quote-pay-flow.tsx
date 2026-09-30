@@ -69,9 +69,7 @@ export function QuotePayFlow({
   }, [quoteId, locale, t]);
 
   if (error) {
-    return (
-      <p className={`${alertError} mt-5`}>{error}</p>
-    );
+    return <p className={`${alertError} mt-5`}>{error}</p>;
   }
   if (!clientSecret) {
     return <p className="mt-5 text-sm text-soft">{t("quotePay.loading")}</p>;
@@ -126,7 +124,9 @@ function PayStep({
   return (
     <div className={`${card} mt-5 sm:p-7`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <p className="font-display text-subtitle font-bold text-ink">{tc("paymentTitle")}</p>
+        <p className="font-display text-subtitle font-bold text-ink">
+          {tc("paymentTitle")}
+        </p>
         <span className={`${badge} ${badgeNeutral} gap-1.5`}>
           <Lock size={12} strokeWidth={1.5} />
           {tc("securedByStripe")}
@@ -153,9 +153,7 @@ function PayStep({
           }}
         />
       </div>
-      {error && (
-        <p className={`${alertError} mt-5`}>{error}</p>
-      )}
+      {error && <p className={`${alertError} mt-5`}>{error}</p>}
       <button
         type="button"
         onClick={pay}

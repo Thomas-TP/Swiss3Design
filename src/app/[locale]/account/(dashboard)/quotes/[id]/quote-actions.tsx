@@ -141,10 +141,7 @@ function RevisePanel({
   }
 
   return (
-    <form
-      action={formAction}
-      className={`${card} mt-3 space-y-4`}
-    >
+    <form action={formAction} className={`${card} mt-3 space-y-4`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold">{t("reviseTitle")}</p>
@@ -173,7 +170,11 @@ function RevisePanel({
       {file ? (
         <div className="flex items-center justify-between gap-3 rounded-field border border-line bg-paper px-4 py-3 text-sm">
           <span className="flex min-w-0 items-center gap-2">
-            <Paperclip size={15} strokeWidth={1.5} className="shrink-0 text-soft" />
+            <Paperclip
+              size={15}
+              strokeWidth={1.5}
+              className="shrink-0 text-soft"
+            />
             <span className="truncate font-medium">{file.name}</span>
           </span>
           <button
@@ -204,10 +205,7 @@ function RevisePanel({
       {file && <input type="hidden" name="fileKey" value={file.key} />}
       {file && <input type="hidden" name="fileName" value={file.name} />}
 
-      {state.status === "error" && (
-        <p className={alertError}>{t("error")}</p>
-
-      )}
+      {state.status === "error" && <p className={alertError}>{t("error")}</p>}
 
       <button
         type="submit"
@@ -238,10 +236,7 @@ function DeclinePanel({
   }, [state.status, onDone]);
 
   return (
-    <form
-      action={formAction}
-      className={`${card} mt-3 space-y-4`}
-    >
+    <form action={formAction} className={`${card} mt-3 space-y-4`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold">{t("declineTitle")}</p>
@@ -265,10 +260,7 @@ function DeclinePanel({
         className={field}
       />
 
-      {state.status === "error" && (
-        <p className={alertError}>{t("error")}</p>
-
-      )}
+      {state.status === "error" && <p className={alertError}>{t("error")}</p>}
 
       <div className="flex flex-col gap-2.5 sm:flex-row-reverse">
         <button
@@ -279,11 +271,7 @@ function DeclinePanel({
           <Ban size={15} strokeWidth={1.5} />
           {pending ? t("sending") : t("declineConfirm")}
         </button>
-        <button
-          type="button"
-          onClick={onClose}
-          className={btnGhost}
-        >
+        <button type="button" onClick={onClose} className={btnGhost}>
           {t("keep")}
           <ArrowRight size={15} strokeWidth={1.5} />
         </button>

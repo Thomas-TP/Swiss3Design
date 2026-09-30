@@ -63,7 +63,11 @@ export function PasskeysSection({
   return (
     <div className={card}>
       <div className="flex items-center gap-2.5">
-        <Fingerprint size={18} strokeWidth={1.5} className="shrink-0 text-soft" />
+        <Fingerprint
+          size={18}
+          strokeWidth={1.5}
+          className="shrink-0 text-soft"
+        />
         <div>
           <h2 className="text-sm font-semibold">
             {t("security.passkeys.title")}

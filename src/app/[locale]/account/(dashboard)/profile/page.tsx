@@ -34,7 +34,9 @@ export default async function ProfileTab() {
         </div>
 
         <div className={card}>
-          <h2 className="text-sm font-semibold">{t("profile.languageTitle")}</h2>
+          <h2 className="text-sm font-semibold">
+            {t("profile.languageTitle")}
+          </h2>
           <p className="mt-0.5 text-xs text-soft">
             {t("profile.languageDesc")}
           </p>

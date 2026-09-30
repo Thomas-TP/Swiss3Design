@@ -54,13 +54,10 @@ export function EmailForm({
 
   if (sent) {
     return (
-      <p
-        role="status"
-        className="mt-3 flex items-center gap-2 rounded-field bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-800 dark:text-emerald-200"
-      >
+      <output className="mt-3 flex items-center gap-2 rounded-field bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-800 dark:text-emerald-200">
         <MailCheck size={16} strokeWidth={1.5} className="shrink-0" />
         {t("profile.emailChangeSent")}
-      </p>
+      </output>
     );
   }
 

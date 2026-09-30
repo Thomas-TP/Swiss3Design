@@ -103,9 +103,7 @@ export default async function OrderDetailPage({
             <Truck size={17} strokeWidth={1.5} className="shrink-0 text-soft" />
             <span>
               <span className="font-semibold">{t("orderDetail.tracking")}</span>{" "}
-              <span className="s3d-num text-soft">
-                {order.trackingNumber}
-              </span>
+              <span className="s3d-num text-soft">{order.trackingNumber}</span>
             </span>
           </span>
           <span className="shrink-0 text-sm font-semibold text-accent-text">

@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import { Unlink } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { btnGhostSm } from "../_ui";
 import { revokeAccess, type RevokeState } from "./actions";
 
 export function RevokeButton({
@@ -24,13 +25,15 @@ export function RevokeButton({
       <button
         type="submit"
         disabled={pending || state.success}
-        className="flex items-center gap-1.5 rounded-full border border-line px-3.5 py-2 text-xs font-semibold text-ink transition-colors hover:border-accent hover:text-accent-text disabled:opacity-60"
+        className={btnGhostSm}
       >
-        <Unlink size={14} />
+        <Unlink size={14} strokeWidth={1.5} />
         {pending ? t("revoking") : state.success ? t("revoked") : t("revoke")}
       </button>
       {state.error && (
-        <p className="mt-1 text-xs text-accent-text">{t("revokeError")}</p>
+        <p className="mt-1 text-xs font-medium text-accent-text">
+          {t("revokeError")}
+        </p>
       )}
     </form>
   );

@@ -30,13 +30,10 @@ export function DeleteAccount() {
       </h2>
       <p className="mt-1 text-xs text-soft">{t("security.dangerDesc")}</p>
       {sent ? (
-        <p
-          role="status"
-          className={`${alertSuccess} mt-4 flex items-center gap-2`}
-        >
+        <output className={`${alertSuccess} mt-4 flex items-center gap-2`}>
           <MailCheck size={16} strokeWidth={1.5} className="shrink-0" />
           {t("security.deleteEmailSent")}
-        </p>
+        </output>
       ) : (
         <button
           type="button"

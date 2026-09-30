@@ -1,6 +1,11 @@
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 import type { Locale } from "@/i18n/routing";
+import styles from "./legal-layout.module.css";
 
+// Mise en page « Strates » des pages légales (brief §7.22) : typographie
+// seulement (legal-layout.module.css), jamais le texte des documents.
+//
 // Dernière mise à jour de chaque document : affichée en tête de page ET
 // reprise comme <lastmod> du sitemap (une seule source, jamais désynchronisées).
 export const LEGAL_UPDATED = {
@@ -49,24 +54,16 @@ export function LegalPage({
     year: "numeric",
   }).format(new Date(updated));
 
+  // Le <main> est celui du layout racine de [locale] : un seul par page.
   return (
-    <div className="mx-auto max-w-2xl px-4 py-10 sm:px-6 md:py-16">
-      <span className="flex h-1 w-10 rounded-full bg-accent" />
-      <h1 className="mt-3 text-3xl font-bold tracking-tight md:text-4xl">
-        {title}
-      </h1>
-      <p className="mt-2 text-sm text-soft">
+    <div className={styles.page}>
+      <h1 className="break-words font-display text-title text-ink">{title}</h1>
+      <p className="mt-3 text-sm text-soft">
         Swiss3Design — Gland (VD), {header.country} · {header.updated}{" "}
-        {updatedLabel}
+        <time dateTime={updated}>{updatedLabel}</time>
       </p>
-      {notice && (
-        <p className="mt-4 rounded-xl border border-line bg-surface px-4 py-3 text-xs text-soft">
-          {notice}
-        </p>
-      )}
-      <div className="legal-prose mt-10 space-y-8 text-[15px] leading-relaxed text-ink">
-        {children}
-      </div>
+      {notice && <p className={styles.notice}>{notice}</p>}
+      <div className={styles.prose}>{children}</div>
     </div>
   );
 }
@@ -80,15 +77,16 @@ export function Section({
   title: string;
   children: ReactNode;
 }) {
+  const t = useTranslations("accountUi");
   return (
-    <section>
-      <h2 className="mb-3 flex items-center gap-2.5 text-lg font-bold">
-        <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-accent/10 text-sm font-bold tabular-nums text-accent-text">
-          {n}
+    <section className={styles.section}>
+      <h2 className={styles.heading}>
+        <span className={styles.art}>
+          {t("legal.article")} {n}
         </span>
-        {title}
+        <span className="min-w-0 break-words">{title}</span>
       </h2>
-      <div className="space-y-2 pl-9 text-soft">{children}</div>
+      <div className={styles.body}>{children}</div>
     </section>
   );
 }

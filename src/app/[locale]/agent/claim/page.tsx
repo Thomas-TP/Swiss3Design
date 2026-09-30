@@ -9,6 +9,7 @@ import { findClaimAttempt } from "@/lib/agent/claim-attempt";
 import { POST_CLAIM_SCOPES } from "@/lib/agent/oauth";
 import { PATHS } from "@/lib/agent/paths";
 import { ScopeList } from "@/components/agent-scope-list";
+import { AuthShell } from "../../account/auth-shell";
 import { ClaimForm } from "./claim-form";
 
 export const dynamic = "force-dynamic";
@@ -56,37 +57,36 @@ export default async function AgentClaimPage({
     expectedEmail = reg?.claimEmail ? maskEmail(reg.claimEmail) : null;
   }
 
+  // Picto d'agent à la place du mark : décoratif, le titre porte le sens.
+  const icon = (
+    <Bot size={40} strokeWidth={1.5} aria-hidden="true" className="text-ink" />
+  );
+
+  if (state !== "ok") {
+    return (
+      <AuthShell icon={icon} title={t(`claim.state.${state}.title`)}>
+        <p className="text-center text-sm text-soft">
+          {t(`claim.state.${state}.body`, {
+            email: expectedEmail ?? "",
+          })}
+        </p>
+      </AuthShell>
+    );
+  }
+
   return (
-    <div className="mx-auto max-w-md px-4 py-14 sm:px-6 md:py-20">
-      <Bot size={40} className="mx-auto text-ink" />
-      {state === "ok" ? (
-        <>
-          <h1 className="mt-5 text-center text-2xl font-bold tracking-tight">
-            {t("claim.heading")}
-          </h1>
-          <p className="mt-3 text-center text-sm text-soft">
-            {t("consent.signedInAs", { email: session!.user.email })}
-          </p>
-          <div className="mt-8 space-y-5 rounded-card border border-line bg-surface p-6 sm:p-8">
-            <div>
-              <p className="text-sm font-semibold">{t("claim.willAccess")}</p>
-              <ScopeList scopes={POST_CLAIM_SCOPES} className="mt-3" />
-            </div>
-            <ClaimForm token={token!} />
-          </div>
-        </>
-      ) : (
-        <div className="mt-8 rounded-card border border-line bg-surface p-6 text-center sm:p-8">
-          <h1 className="text-xl font-bold">
-            {t(`claim.state.${state}.title`)}
-          </h1>
-          <p className="mt-3 text-sm text-soft">
-            {t(`claim.state.${state}.body`, {
-              email: expectedEmail ?? "",
-            })}
-          </p>
+    <AuthShell
+      icon={icon}
+      title={t("claim.heading")}
+      intro={t("consent.signedInAs", { email: session!.user.email })}
+    >
+      <div className="space-y-5">
+        <div>
+          <h2 className="text-sm font-semibold">{t("claim.willAccess")}</h2>
+          <ScopeList scopes={POST_CLAIM_SCOPES} className="mt-3" />
         </div>
-      )}
-    </div>
+        <ClaimForm token={token!} />
+      </div>
+    </AuthShell>
   );
 }

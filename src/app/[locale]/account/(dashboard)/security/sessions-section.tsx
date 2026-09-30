@@ -10,7 +10,13 @@ import {
   revokeOtherSessions,
 } from "@/lib/auth-client";
 import { groupByDevice, type SessionLike } from "@/lib/session-groups";
-import { badge, badgeSuccess, btnGhostSm, card, textActionDanger } from "../_ui";
+import {
+  badge,
+  badgeSuccess,
+  btnGhostSm,
+  card,
+  textActionDanger,
+} from "../_ui";
 
 type SessionRow = SessionLike & { id: string };
 

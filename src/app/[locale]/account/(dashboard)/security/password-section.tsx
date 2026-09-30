@@ -105,9 +105,9 @@ export function PasswordSection() {
           <p className="text-sm font-medium text-accent-text">{error}</p>
         )}
         {done && (
-          <p className={`text-sm font-medium ${textSuccess}`} role="status">
+          <output className={`block text-sm font-medium ${textSuccess}`}>
             {t("security.passwordSection.saved")}
-          </p>
+          </output>
         )}
         <button
           type="submit"

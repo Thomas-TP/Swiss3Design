@@ -63,7 +63,9 @@ export default async function PaymentTab() {
               className="mt-0.5 shrink-0 text-emerald-600"
             />
             <div>
-              <h2 className="text-sm font-semibold">{t("payment.linkTitle")}</h2>
+              <h2 className="text-sm font-semibold">
+                {t("payment.linkTitle")}
+              </h2>
               <p className="mt-1 text-sm text-soft">{t("payment.linkDesc")}</p>
             </div>
           </div>
@@ -88,7 +90,11 @@ export default async function PaymentTab() {
                   className="flex items-center justify-between gap-3 py-2.5 text-sm"
                 >
                   <span className="flex items-center gap-2.5">
-                    <CreditCard size={15} strokeWidth={1.5} className="text-soft" />
+                    <CreditCard
+                      size={15}
+                      strokeWidth={1.5}
+                      className="text-soft"
+                    />
                     {BRAND_LABELS[c.brand] ?? c.brand} •••• {c.last4}
                   </span>
                   <span className="s3d-num text-xs text-soft">

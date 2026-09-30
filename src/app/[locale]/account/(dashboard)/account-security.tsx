@@ -138,9 +138,7 @@ function TwoFactor() {
             </p>
           </div>
         </div>
-        <span
-          className={`${badge} ${enabled ? badgeSuccess : badgeNeutral}`}
-        >
+        <span className={`${badge} ${enabled ? badgeSuccess : badgeNeutral}`}>
           {enabled
             ? t("security.twoFactorActive")
             : t("security.twoFactorInactive")}

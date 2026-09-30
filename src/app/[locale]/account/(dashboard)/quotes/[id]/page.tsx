@@ -218,7 +218,11 @@ export default async function QuoteDetailPage({
                     {m.body && <p className="whitespace-pre-wrap">{m.body}</p>}
                     {m.fileName && (
                       <p className="mt-1.5 flex items-center gap-1.5 text-xs text-soft">
-                        <Paperclip size={12} strokeWidth={1.5} className="shrink-0" />
+                        <Paperclip
+                          size={12}
+                          strokeWidth={1.5}
+                          className="shrink-0"
+                        />
                         {m.fileName}
                       </p>
                     )}

@@ -4,10 +4,19 @@ import { useActionState, useState } from "react";
 import { Check, ShieldAlert, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
+import { Field, fieldClass } from "@/components/ui/field";
+import {
+  alertError,
+  alertSuccess,
+  alertWarn,
+  btnAccentLg,
+  btnGhost,
+  linkAccent,
+} from "../../account/(dashboard)/_ui";
 import { confirmAgentClaim, denyAgentClaim, type ClaimState } from "./actions";
 
-const field =
-  "w-full rounded-xl border border-line bg-surface px-4 py-3 text-center text-lg tracking-[0.4em] transition-colors placeholder:text-soft/60 placeholder:tracking-normal focus:border-ink focus:outline-none";
+// Code à 6 chiffres à recopier : chasse fixe, interlettrage large, centré.
+const codeField = `${fieldClass} text-center font-mono tracking-[0.4em] placeholder:tracking-normal`;
 
 export function ClaimForm({ token }: { token: string }) {
   const t = useTranslations("agentAccess.claim");
@@ -26,19 +35,16 @@ export function ClaimForm({ token }: { token: string }) {
   if (done)
     return (
       <div className="space-y-3 text-center">
-        <p
-          className={`rounded-xl px-4 py-3 text-sm font-medium ${
+        <output
+          className={
             done === "confirmed"
-              ? "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-              : "bg-surface text-soft"
-          }`}
+              ? `${alertSuccess} block`
+              : "block rounded-field border border-line bg-paper px-4 py-3 text-sm font-medium text-soft"
+          }
         >
           {t(done === "confirmed" ? "confirmed" : "denied")}
-        </p>
-        <Link
-          href="/account/agents"
-          className="text-sm font-medium text-accent-text hover:underline"
-        >
+        </output>
+        <Link href="/account/agents" className={`${linkAccent} text-sm`}>
           {t("manage")}
         </Link>
       </div>
@@ -46,39 +52,38 @@ export function ClaimForm({ token }: { token: string }) {
 
   return (
     <div className="space-y-4">
-      <p className="flex gap-2 rounded-xl bg-amber-500/10 px-4 py-3 text-xs text-amber-800 dark:text-amber-200">
-        <ShieldAlert size={16} className="mt-0.5 shrink-0" />
+      <p className={`${alertWarn} flex gap-2`}>
+        <ShieldAlert size={16} strokeWidth={1.5} className="mt-0.5 shrink-0" />
         {t("warning")}
       </p>
       <form action={confirm} className="space-y-3">
         <input type="hidden" name="token" value={token} />
-        <label htmlFor="code" className="block text-sm font-semibold">
-          {t("codeLabel")}
-        </label>
-        <input
-          id="code"
-          name="code"
-          value={code}
-          onChange={(e) =>
-            setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
-          }
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          placeholder="000000"
-          required
-          className={field}
-        />
+        <Field label={t("codeLabel")} htmlFor="code">
+          <input
+            id="code"
+            name="code"
+            value={code}
+            onChange={(e) =>
+              setCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+            }
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            placeholder="000000"
+            required
+            className={codeField}
+          />
+        </Field>
         {error && (
-          <p className="rounded-xl bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text">
+          <p role="alert" className={alertError}>
             {t(`errors.${error}`, { remaining: confirmState.remaining ?? 0 })}
           </p>
         )}
         <button
           type="submit"
           disabled={confirming || denying || code.length < 6}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-accent px-6 py-3.5 text-sm font-semibold text-white transition-all hover:bg-accent-dark active:scale-[0.98] disabled:opacity-60"
+          className={btnAccentLg}
         >
-          <Check size={16} />
+          <Check size={16} strokeWidth={1.5} />
           {confirming ? t("processing") : t("confirm")}
         </button>
       </form>
@@ -87,9 +92,9 @@ export function ClaimForm({ token }: { token: string }) {
         <button
           type="submit"
           disabled={confirming || denying}
-          className="flex w-full items-center justify-center gap-2 rounded-full border border-line bg-surface px-6 py-3 text-sm font-semibold text-ink transition-colors hover:border-ink disabled:opacity-60"
+          className={`${btnGhost} w-full`}
         >
-          <X size={16} />
+          <X size={16} strokeWidth={1.5} />
           {denying ? t("processing") : t("deny")}
         </button>
       </form>

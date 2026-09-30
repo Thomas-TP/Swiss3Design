@@ -130,11 +130,7 @@ export default async function AccountOverview({
 
       {isEmpty ? (
         <div className={`${card} text-center`}>
-          <Sparkles
-            size={22}
-            strokeWidth={1.5}
-            className="mx-auto text-soft"
-          />
+          <Sparkles size={22} strokeWidth={1.5} className="mx-auto text-soft" />
           <p className="mt-3 text-sm font-semibold">
             {t("overview.emptyTitle")}
           </p>
