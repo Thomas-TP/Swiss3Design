@@ -5,6 +5,7 @@
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
+import { bandStats, bandStatsFor } from "./band-stats";
 import { buildStudioMesh, exportStl } from "./build";
 import type { Polygon } from "./kernel/extrude";
 import { meshVolume } from "./kernel/mesh";
@@ -44,9 +45,13 @@ import {
   BORNE_PRESETS,
   CARTOUCHE_DEFAULT,
   CARTOUCHE_PRESETS,
+  HERO_CONFIG,
   PRESETS,
   RELIEF_DEFAULT,
   RELIEF_PRESETS,
+  surpriseBorne,
+  surpriseCartouche,
+  surpriseRelief,
 } from "./presets";
 import { PRICING } from "./pricing-params";
 import { clampConfig, parseConfig, strataTops } from "./schemas";
@@ -948,6 +953,63 @@ describe("Statistiques des objets plats", () => {
   });
 });
 
+describe("Statistiques par bande (éclaté) des objets plats", () => {
+  const objects = ["cartouche", "relief", "borne"] as const;
+
+  it("couches contiguës de la première à la dernière, changements et masses cohérents avec computeStats", () => {
+    for (const object of objects) {
+      for (const { id, config } of PRESETS[object]) {
+        for (const texts of [DEFAULT_TEXTS[object], {}]) {
+          const summary = bandStatsFor(config, texts);
+          const stats = computeStats(config, texts);
+          const label = `${object} ${id}`;
+          expect(summary.changes, `${label}`).toBe(stats.changes);
+          expect(summary.purgeGrams, `${label}`).toBe(stats.purgeGrams);
+          expect(summary.bands[0].fromLayer, `${label}`).toBe(1);
+          expect(summary.bands.at(-1)!.toLayer, `${label}`).toBe(stats.layers);
+          summary.bands.forEach((band, k) => {
+            expect(band.layers, `${label}`).toBeGreaterThan(0);
+            const previousEnd = k > 0 ? summary.bands[k - 1].toLayer : 0;
+            expect(band.fromLayer, `${label}`).toBe(previousEnd + 1);
+          });
+          const grams = summary.bands.reduce((sum, b) => sum + b.grams, 0);
+          // Arrondis au dixième de gramme de chaque bande.
+          expect(
+            Math.abs(grams + summary.purgeGrams - stats.grams),
+            `${label}`,
+          ).toBeLessThan(0.1 * summary.bands.length + 0.06);
+        }
+      }
+    }
+  });
+
+  it("Cartouche : relief = plaque puis encre ; gravure = encre puis plaque ; sans encre, une bande", () => {
+    const relief = bandStatsFor(CARTOUCHE_DEFAULT, DEFAULT_TEXTS.cartouche);
+    expect(relief.bands.map((b) => b.filament)).toEqual([
+      "blanc-neve",
+      "encre",
+    ]);
+    expect(relief.bands[0].toMm).toBe(1.6);
+    expect(relief.bands[1].startsWithChange).toBe(true);
+    const engraved = bandStatsFor(
+      { ...CARTOUCHE_DEFAULT, mode: "gravure", depth: 0.6 },
+      DEFAULT_TEXTS.cartouche,
+    );
+    expect(engraved.bands.map((b) => b.filament)).toEqual([
+      "encre",
+      "blanc-neve",
+    ]);
+    expect(engraved.bands[0].toMm).toBeCloseTo(1, 6);
+    const empty = bandStatsFor({ ...CARTOUCHE_DEFAULT, layout: "centree" }, {});
+    expect(empty.bands).toHaveLength(1);
+    expect(empty.changes).toBe(0);
+  });
+
+  it("Lavaux : inchangé (même résultat que bandStats)", () => {
+    expect(bandStatsFor(HERO_CONFIG)).toEqual(bandStats(HERO_CONFIG));
+  });
+});
+
 describe("Garde-fous des objets plats", () => {
   it("caractère hors jeu : erreur `text-char` avec le caractère, le champ et la clé de message", () => {
     const printable = checkPrintability(CARTOUCHE_DEFAULT, {
@@ -1138,6 +1200,61 @@ describe("Préréglages des objets plats", () => {
         expect(Object.keys(config)).not.toContain("text");
         expect(Object.keys(config)).not.toContain("peak");
       }
+    }
+  });
+});
+
+describe("« Surprenez-moi » des objets plats", () => {
+  const draws = [
+    ["cartouche", surpriseCartouche, CARTOUCHE_PRESETS],
+    ["relief", surpriseRelief, RELIEF_PRESETS],
+    ["borne", surpriseBorne, BORNE_PRESETS],
+  ] as const;
+
+  it("300 tirages par objet : configuration stable, imprimable avec les textes d'exemple dans les quatre langues, déterministe", () => {
+    for (const [object, draw, presets] of draws) {
+      const seen = new Set<string>();
+      let fallbacks = 0;
+      for (let seed = 0; seed < 300; seed++) {
+        const config = draw(seed);
+        expect(config.object).toBe(object);
+        expect(clampConfig(config), `${object} ${seed}`).toEqual(config);
+        expect(JSON.stringify(draw(seed))).toBe(JSON.stringify(config));
+        for (const locale of LOCALES) {
+          expect(
+            checkPrintability(config, DEFAULT_TEXTS[object], locale).status,
+            `${object} ${seed} ${locale}`,
+          ).toBe("ok");
+        }
+        seen.add(JSON.stringify(config));
+        if (
+          presets.some(
+            (p) => JSON.stringify(p.config) === JSON.stringify(config),
+          )
+        ) {
+          fallbacks++;
+        }
+      }
+      // Des tirages variés, et presque jamais le préréglage de secours.
+      expect(seen.size, `${object}`).toBeGreaterThan(200);
+      expect(fallbacks, `${object}`).toBeLessThan(15);
+    }
+  });
+
+  it("le texte reste lisible : plaque et encre contrastées ; le massif garde toutes ses strates", () => {
+    for (let seed = 0; seed < 200; seed++) {
+      for (const config of [surpriseCartouche(seed), surpriseBorne(seed)]) {
+        const [a, b] =
+          config.object === "cartouche"
+            ? [config.plate, config.ink]
+            : [(config as BorneConfig).base, (config as BorneConfig).ink];
+        expect(a, `${config.object} ${seed}`).not.toBe(b);
+      }
+      const relief = surpriseRelief(seed);
+      const areas = analyzeRelief(
+        layoutRelief(relief, DEFAULT_TEXTS.relief),
+      ).levelAreas;
+      expect(Math.min(...areas), `relief ${seed}`).toBeGreaterThan(5);
     }
   });
 });

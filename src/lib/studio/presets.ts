@@ -7,8 +7,16 @@
 // chaque objet (`CARTOUCHE_PRESETS`, `RELIEF_PRESETS`, `BORNE_PRESETS`) et
 // `RELIEF_DEFAULT` définitif (graine 1291, 8 strates, lac 18 %).
 import { between, intBetween, mulberry32, pick, type Rng } from "./kernel/rng";
-import { checkLavaux, nearVaseSpirale } from "./guards";
-import { gradinsDepthMax, quantizeMm } from "./schemas";
+import { checkLavaux, checkPrintability, nearVaseSpirale } from "./guards";
+import { analyzeRelief, layoutRelief } from "./objects/relief-model";
+import {
+  clampBorne,
+  clampCartouche,
+  clampRelief,
+  gradinsDepthMax,
+  quantizeMm,
+} from "./schemas";
+import { DEFAULT_TEXTS } from "./text/fields";
 import type {
   Band,
   BorneConfig,
@@ -598,4 +606,127 @@ export function surpriseLavaux(seed: number): LavauxConfig {
     if (checkLavaux(config).status === "ok") return config;
   }
   return structuredClone(pick(rng, LAVAUX_PRESETS).config);
+}
+
+// ── « Surprenez-moi » des objets plats (WP-02) ───────────────────────────────
+//
+// Même contrat que `surpriseLavaux` : bornes « belles », teintes contrastées,
+// garde-fous vérifiés (10 essais), un préréglage sûr à défaut. Les textes
+// d'exemple servent à la vérification (un texte saisi par le visiteur ne change
+// jamais la configuration tirée).
+
+/** Écart de luminosité minimal entre la plaque et l'encre (lisibilité du texte). */
+const INK_CONTRAST = 0.45;
+
+function contrastedPair(rng: Rng): [FilamentId, FilamentId] {
+  for (let attempt = 0; attempt < 24; attempt++) {
+    const a = pick(rng, SURPRISE_FILAMENTS);
+    const b = pick(rng, SURPRISE_FILAMENTS);
+    if (Math.abs(LUMA[a] - LUMA[b]) >= INK_CONTRAST) return [a, b];
+  }
+  return ["blanc-neve", "encre"];
+}
+
+/** Carte au hasard : mise en page, mode, épaisseur, coins, couleurs contrastées. */
+export function surpriseCartouche(seed: number): CartoucheConfig {
+  const rng = mulberry32(seed);
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const [plate, ink] = contrastedPair(rng);
+    const mode = pick(rng, ["relief", "relief", "gravure"] as const);
+    const config = clampCartouche({
+      object: "cartouche",
+      thickness: pick(rng, [1.6, 1.8, 2, 2.2, 2.4] as const),
+      corner: pick(rng, [2, 3, 3, 4, 5] as const),
+      mode,
+      depth: pick(rng, [0.6, 0.8] as const),
+      layout: pick(rng, [
+        "classique",
+        "centree",
+        "cartouche",
+        "monogramme",
+      ] as const),
+      plate,
+      ink,
+    });
+    if (checkPrintability(config, DEFAULT_TEXTS.cartouche).status === "ok") {
+      return config;
+    }
+  }
+  return structuredClone(pick(rng, CARTOUCHE_PRESETS).config);
+}
+
+/** Palettes du sous-verre : lac, prairie, roche, neige (2 à 4 bandes, du bas vers le haut). */
+const RELIEF_PALETTES: readonly (readonly FilamentId[])[] = [
+  ["bleu-leman", "vert-lavaux", "gris-molasse", "blanc-neve"],
+  ["bleu-leman", "vert-lavaux", "blanc-neve"],
+  ["glacier", "gris-molasse", "blanc-neve"],
+  ["vert-lavaux", "ambre", "blanc-neve"],
+  ["encre", "gris-molasse", "blanc-neve"],
+  ["bleu-leman", "glacier", "blanc-neve"],
+  ["rouge-signal", "ambre", "blanc-neve"],
+];
+
+/** Massif au hasard : graine, forme, relief, strates, lac, palette, bandes calées sur les strates. */
+export function surpriseRelief(seed: number): ReliefConfig {
+  const rng = mulberry32(seed);
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const palette = pick(rng, RELIEF_PALETTES);
+    const base = pick(rng, [2.6, 3, 3.4] as const);
+    const relief = pick(rng, [2.4, 2.8, 3.2, 3.6, 4] as const);
+    const levels = intBetween(rng, 6, 10);
+    // Frontières à peu près également réparties sur la hauteur ; `clampRelief` les cale sur les strates.
+    const bands: Band[] = palette.map((filament, k) => ({
+      filament,
+      toMm:
+        k === palette.length - 1
+          ? base + relief
+          : base + (relief * (k + 0.6)) / palette.length,
+    }));
+    const config = clampRelief({
+      object: "relief",
+      shape: pick(rng, ["rond", "rond", "carre"] as const),
+      size: 100,
+      base,
+      relief,
+      levels,
+      seed: intBetween(rng, 0, 9999),
+      lake: intBetween(rng, 10, 30),
+      bands,
+      label: true,
+    });
+    // Un massif dont une strate disparaît (sommet trop pointu) n'est pas « beau ».
+    const areas = analyzeRelief(
+      layoutRelief(config, DEFAULT_TEXTS.relief),
+    ).levelAreas;
+    if (
+      Math.min(...areas) >= 5 &&
+      checkPrintability(config, DEFAULT_TEXTS.relief).status === "ok"
+    ) {
+      return config;
+    }
+  }
+  return structuredClone(pick(rng, RELIEF_PRESETS).config);
+}
+
+/** Porte-nom au hasard : forme, taille, anneau, mode, couleurs contrastées. */
+export function surpriseBorne(seed: number): BorneConfig {
+  const rng = mulberry32(seed);
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const [base, ink] = contrastedPair(rng);
+    const config = clampBorne({
+      object: "borne",
+      shape: pick(rng, ["pilule", "etiquette", "goutte", "pic"] as const),
+      cap: pick(rng, [6, 6.5, 7, 7.5, 8] as const),
+      thickness: pick(rng, [3.6, 4, 4.4, 4.8] as const),
+      ring: pick(rng, ["gauche", "gauche", "droite", "aucun"] as const),
+      ringD: pick(rng, [4.5, 5, 5.5] as const),
+      mode: pick(rng, ["relief", "relief", "gravure"] as const),
+      base,
+      ink,
+    });
+    if (checkPrintability(config, DEFAULT_TEXTS.borne).status === "ok") {
+      return config;
+    }
+  }
+  return structuredClone(pick(rng, BORNE_PRESETS).config);
 }

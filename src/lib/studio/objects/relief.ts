@@ -21,6 +21,11 @@ import {
   type Locale,
 } from "./relief-model";
 
+// Contrat de la fiche WP-02 : `peakLabel(name, locale)` et `peakAltitude(name)`
+// sont servis par l'objet ; le code de rendu serveur, qui n'a pas besoin de
+// l'extrusion, les importe de `relief-model` (plus léger).
+export { peakAltitude, peakLabel, type Locale } from "./relief-model";
+
 export interface ReliefBuildOptions {
   lod: ShapeLod;
   separateBands?: boolean;
