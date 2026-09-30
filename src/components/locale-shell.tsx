@@ -1,6 +1,8 @@
-import { getTranslations } from "next-intl/server";
+import { getMessages, getTranslations } from "next-intl/server";
 import { cookies } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
+import { ROOT_CLIENT_NAMESPACES, pickMessages } from "@/i18n/client-namespaces";
+import type { Messages } from "@/i18n/namespaces";
 import { CartProvider } from "@/lib/cart";
 import { FavoritesProvider } from "@/lib/favorites";
 import { Header } from "@/components/header";
@@ -26,16 +28,23 @@ export async function LocaleShell({
   locale: string;
   children: React.ReactNode;
 }) {
-  const [nav, cookieStore] = await Promise.all([
+  const [nav, cookieStore, allMessages] = await Promise.all([
     getTranslations("nav"),
     cookies(),
+    getMessages(),
   ]);
   const hasSession = cookieStore
     .getAll()
     .some(({ name }) => name.endsWith("better-auth.session_token"));
 
   return (
-    <NextIntlClientProvider>
+    // Le client ne reçoit que les messages de l'habillage commun ; chaque
+    // segment ou page ajoute les siens avec <ClientMessages> (voir
+    // src/i18n/client-namespaces.ts). Sans `messages`, le fournisseur
+    // enverrait les ~45 Ko de tous les namespaces dans le HTML de chaque page.
+    <NextIntlClientProvider
+      messages={pickMessages(allMessages as Messages, ROOT_CLIENT_NAMESPACES)}
+    >
       <HtmlLangSync locale={locale} />
       <CartProvider>
         <FavoritesProvider>

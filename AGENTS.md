@@ -198,7 +198,16 @@ put` on an environment with real users without `--env <name>` explicitly
     in its own `messages/<locale>/<namespace>.json` (declared in
     [`src/i18n/namespaces.ts`](src/i18n/namespaces.ts), merged by
     `src/i18n/request.ts`), and `src/i18n/messages.test.ts` enforces the same
-    keys and ICU arguments in the 4 locales and zero `ß` in German. Details:
+    keys and ICU arguments in the 4 locales and zero `ß` in German. **The
+    browser only receives the messages its `"use client"` components read**:
+    the root (`ROOT_CLIENT_NAMESPACES` in
+    [`src/i18n/client-namespaces.ts`](src/i18n/client-namespaces.ts): chrome,
+    consent, `error.tsx`) plus what each segment or page declares with
+    `<ClientMessages namespaces={[…]}>`
+    ([`src/i18n/client-messages.tsx`](src/i18n/client-messages.tsx)) in its own
+    `layout.tsx`. A package that adds a client component reading a new
+    namespace (WP-HOME `landing`, WP-STUDIO `studio`/`studioCore`) declares it
+    there; `src/i18n/client-messages.test.ts` fails otherwise. Details:
     [`docs/conventions.md`](docs/conventions.md) → Motion, i18n, Design tokens.
 
 ## Tech stack
