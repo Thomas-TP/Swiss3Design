@@ -30,8 +30,11 @@ import { simplifyClosed, type Vec2 } from "../kernel/simplify";
 import { checkLine, type TextIssue } from "../text/check";
 import { cleanText, overLimit, sanitizeTexts } from "../text/fields";
 import {
+  ARC_SEGMENTS,
+  circleRing,
   polygonsArea,
   polygonsPerimeter,
+  roundedRectRing,
   type ShapeLod,
 } from "../text/geometry";
 import {
@@ -322,6 +325,26 @@ export function reliefLevels(config: ReliefConfig, n: number): Polygon[][] {
   levelCache.set(key, levels);
   if (levelCache.size > 3) levelCache.delete(levelCache.keys().next().value!);
   return levels;
+}
+
+// ── Silhouette du socle ──────────────────────────────────────────────────────
+
+/** Segments du disque du socle selon le niveau de détail. */
+const DISC_SEGMENTS: Record<ShapeLod, number> = {
+  drag: 96,
+  display: 160,
+  export: 240,
+};
+
+/** Rayon des coins du sous-verre carré (mm). */
+const SQUARE_CORNER_MM = 4;
+
+/** Silhouette du socle : disque ou carré aux coins arrondis, centré sur l'origine. */
+export function reliefOutline(config: ReliefConfig, lod: ShapeLod): Vec2[] {
+  const R = config.size / 2;
+  return config.shape === "rond"
+    ? circleRing(0, 0, R, DISC_SEGMENTS[lod])
+    : roundedRectRing(-R, -R, R, R, SQUARE_CORNER_MM, ARC_SEGMENTS[lod]);
 }
 
 // ── Modèle complet ───────────────────────────────────────────────────────────

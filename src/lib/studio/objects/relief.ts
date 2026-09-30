@@ -8,12 +8,7 @@
 import { extrudePolygon, extrudeSlabs, type Slab } from "../kernel/extrude";
 import { MeshBuilder } from "../kernel/mesh";
 import type { GlyphFont } from "../text/glyphs";
-import {
-  ARC_SEGMENTS,
-  circleRing,
-  roundedRectRing,
-  type ShapeLod,
-} from "../text/geometry";
+import type { ShapeLod } from "../text/geometry";
 import { linesPolygons } from "../text/shapes";
 import type { MeshData, ReliefConfig, StudioTexts } from "../types";
 import {
@@ -21,6 +16,7 @@ import {
   LABEL_HEIGHT_MM,
   layoutRelief,
   reliefLevels,
+  reliefOutline,
   RELIEF_GRID,
   type Locale,
 } from "./relief-model";
@@ -31,24 +27,6 @@ export interface ReliefBuildOptions {
   font?: GlyphFont | null;
   /** Langue de l'étiquette (« POINTE » / « PIZ » / « PIZZO » / « MOUNT »), français par défaut. */
   locale?: Locale;
-}
-
-/** Segments du disque du socle selon le niveau de détail. */
-const DISC_SEGMENTS: Record<ShapeLod, number> = {
-  drag: 96,
-  display: 160,
-  export: 240,
-};
-
-/** Rayon des coins du sous-verre carré (mm). */
-const SQUARE_CORNER_MM = 4;
-
-/** Silhouette du socle : disque ou carré aux coins arrondis, centré sur l'origine. */
-export function reliefOutline(config: ReliefConfig, lod: ShapeLod) {
-  const R = config.size / 2;
-  return config.shape === "rond"
-    ? circleRing(0, 0, R, DISC_SEGMENTS[lod])
-    : roundedRectRing(-R, -R, R, R, SQUARE_CORNER_MM, ARC_SEGMENTS[lod]);
 }
 
 /** Dalles d'une extrusion de z0 à z1, découpées aux frontières de bande qui la traversent. */
