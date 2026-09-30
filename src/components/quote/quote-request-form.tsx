@@ -150,7 +150,10 @@ export function QuoteRequestForm({
   );
   const file = useQuoteFile();
 
-  const [email, setEmail] = useState("");
+  // E-mail : `null` tant que le visiteur n'a rien saisi. Le champ montre alors
+  // celui de la session (dérivé au rendu, sans effet), et une saisie, même
+  // vidée, l'emporte toujours.
+  const [typedEmail, setTypedEmail] = useState<string | null>(null);
   const [description, setDescription] = useState(prefill?.description ?? "");
   const [material, setMaterial] = useState(prefill?.material ?? "");
   const [colors, setColors] = useState(prefill?.colors ?? "");
@@ -175,11 +178,7 @@ export function QuoteRequestForm({
   const busy = pending || progress !== null;
   const steps = submitSteps(Boolean(attachment?.prepare && !attachment.key));
 
-  // E-mail de la session : préremplit le champ, sans écraser une saisie.
-  const sessionEmail = authSession?.user.email;
-  useEffect(() => {
-    if (sessionEmail) setEmail((current) => current || sessionEmail);
-  }, [sessionEmail]);
+  const email = typedEmail ?? authSession?.user.email ?? "";
 
   // Succès : évènement (une fois), rappel de l'hôte, focus sur le panneau
   // (le formulaire vient de disparaître : le focus serait perdu).
@@ -539,7 +538,7 @@ export function QuoteRequestForm({
               autoComplete="email"
               inputMode="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => setTypedEmail(e.target.value)}
               aria-describedby={fieldIds(ids.email).hint}
               className={fieldClass}
             />
@@ -577,9 +576,7 @@ export function QuoteRequestForm({
           <p aria-hidden="true" className="s3d-label min-h-4 text-soft">
             {narration?.visible}
           </p>
-          <p role="status" className="sr-only">
-            {narration?.announce}
-          </p>
+          <output className="sr-only">{narration?.announce}</output>
         </div>
       </div>
     </>

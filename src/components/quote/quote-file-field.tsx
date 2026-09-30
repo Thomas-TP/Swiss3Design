@@ -142,19 +142,13 @@ export function QuoteFileField({
             <X size={16} strokeWidth={1.5} aria-hidden="true" />
           </button>
         </div>
-        <div
-          role="progressbar"
+        {/* <progress> natif, habillé (WebKit et Gecko n'ont pas les mêmes pseudo-éléments). */}
+        <progress
+          max={100}
+          value={Math.round(fraction * 100)}
           aria-label={t("file.uploading", { percent })}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={Math.round(fraction * 100)}
-          className="mt-2 h-1 overflow-hidden rounded-full bg-line"
-        >
-          <div
-            className="h-full bg-ink"
-            style={{ width: `${Math.round(fraction * 100)}%` }}
-          />
-        </div>
+          className="mt-2 block h-1 w-full appearance-none overflow-hidden rounded-full border-0 bg-line [&::-moz-progress-bar]:bg-ink [&::-webkit-progress-bar]:bg-line [&::-webkit-progress-value]:bg-ink"
+        />
         <p className="s3d-label mt-2 text-soft" aria-hidden="true">
           {t("file.uploading", { percent })}
         </p>
@@ -199,6 +193,7 @@ export function QuoteFileField({
           onChange={onChange}
           className="peer sr-only"
         />
+        {/* oxlint-disable no-noninteractive-element-interactions -- glisser-déposer en plus du champ natif, qui reste le chemin clavier (l'étiquette lui est liée par htmlFor) */}
         <label
           htmlFor={id}
           onDragOver={(event) => {
@@ -227,6 +222,7 @@ export function QuoteFileField({
             {tCustom("fileHint")}
           </span>
         </label>
+        {/* oxlint-enable no-noninteractive-element-interactions */}
       </div>
       {state.status === "error" ? (
         <p role="alert" className="mt-2 text-sm font-medium text-accent-text">

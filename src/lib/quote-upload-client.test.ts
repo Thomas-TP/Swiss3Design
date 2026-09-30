@@ -112,8 +112,9 @@ describe("uploadQuoteFile", () => {
     const req = xhr();
     expect(req.method).toBe("POST");
     expect(req.url).toBe("/api/quote-upload");
-    expect(req.body?.get("file")).toBeInstanceOf(File);
-    expect((req.body?.get("file") as File).name).toBe("vase.stl");
+    const sent = req.body?.get("file");
+    expect(sent).toBeInstanceOf(File);
+    expect((sent as File).name).toBe("vase.stl");
     req.respond(200, { key: "quotes/abc-vase.stl", fileName: "vase.stl" });
     await expect(pending).resolves.toEqual({
       key: "quotes/abc-vase.stl",

@@ -43,7 +43,12 @@ export function QuoteForm({ materials }: { materials: string[] }) {
   const locale = useLocale();
   const [handoff, setHandoff] = useState<QuoteHandoff | null>(null);
 
-  // Lecture unique après le montage : sessionStorage n'existe pas côté serveur.
+  // Lecture unique après le montage : sessionStorage est un système externe
+  // que le serveur ne voit pas (le HTML rendu est le formulaire nu, et la
+  // première passe du client doit lui ressembler). Un useSyncExternalStore ne
+  // conviendrait pas : « Retirer » et le succès effacent le stockage alors que
+  // l'état, lui, doit rester (le panneau de succès ne doit pas disparaître).
+  // oxlint-disable set-state-in-effect -- lecture d'un stockage navigateur après l'hydratation
   useEffect(() => {
     const found = readQuoteHandoff();
     if (!found) return;
@@ -51,6 +56,7 @@ export function QuoteForm({ materials }: { materials: string[] }) {
     if (window.location.hash === "#studio")
       requestAnimationFrame(scrollToSheet);
   }, []);
+  // oxlint-enable set-state-in-effect
 
   if (!handoff) {
     return (
