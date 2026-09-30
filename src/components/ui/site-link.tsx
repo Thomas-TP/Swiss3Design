@@ -14,9 +14,10 @@ import { motionBridge, useMotionBridge } from "@/lib/motion-bridge/store";
 //    DIFFÉRENTES du groupe (site) : vers le panier, le compte ou le légal,
 //    l'ancienne page resterait figée par-dessus la nouvelle pendant que le
 //    soulignement de la nav glisse. En mouvement réduit, aucun type : React
-//    ne démarre alors aucune View Transition (au lieu d'une transition de
-//    durée nulle qui capturerait quand même deux instantanés). Le bouton
-//    retour du navigateur n'a jamais de type : pas d'animation, par design.
+//    démarre quand même une View Transition (mesuré : types vides, durées
+//    ramenées à 0 par le CSS, ~200 ms, deux instantanés), mais rien ne
+//    s'anime ni ne se voit. Le bouton retour du navigateur n'a jamais de
+//    type : pas d'animation, par design.
 // 2. Attente serveur : prefetch coupé et pages dynamiques, un clic peut
 //    attendre le Worker. useLinkStatus() (seul import toléré de next/link) le
 //    signale au pont (navPending), et le header fait courir sa buse rouge.

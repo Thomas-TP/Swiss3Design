@@ -159,6 +159,15 @@ class Runtime {
   }
 
   private dropLenis() {
+    // Lenis 1.3.26 : destroy() ne coupe pas le minuteur de 400 ms armé par un
+    // défilement natif (_resetVelocityTimeout). À son expiration, le setter
+    // isScrolling remettait la classe « lenis » sur <html> alors que Lenis
+    // n'existait plus (interrupteur actionné ou tap sur « Panier » juste après
+    // un défilement). stop(), API publique, appelle reset() en interne (sans
+    // autoToggle, notre cas) et passe isScrolling à false d'abord : le
+    // minuteur ne change alors plus rien, et destroy() nettoie les classes
+    // pour de bon.
+    this.lenis?.stop();
     this.lenis?.destroy();
     this.lenis = null;
     this.writtenProgress = -1;
