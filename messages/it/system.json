@@ -1,1 +1,85 @@
-{}
+{
+  "cart": {
+    "title": "Il Suo carrello.",
+    "count": "{count, plural, one {# articolo} other {# articoli}}",
+    "unitPrice": "{price} cad.",
+    "summary": "Riepilogo",
+    "checkout": "Concludi l'ordine",
+    "freeHint": "Ancora {amount} per la spedizione gratuita.",
+    "freeReached": "Spedizione gratuita.",
+    "emptyKicker": "Terreno vergine",
+    "emptyTitle": "Il carrello è vuoto.",
+    "emptyText": "Qui non è ancora stato impilato nulla. Regoli un oggetto nello Studio, scelga in negozio o ci invii il Suo file."
+  },
+  "checkout": {
+    "title": "Ordine.",
+    "stepsLabel": "Fasi dell'ordine",
+    "stepContact": "Contatto",
+    "stepPayment": "Pagamento"
+  },
+  "success": {
+    "kicker": "L'ugello si scalda.",
+    "processingKicker": "Conferma in attesa",
+    "failedKicker": "Pagamento non completato",
+    "title": "Grazie, il Suo ordine è stato ricevuto.",
+    "text": "A breve riceverà un'e-mail di conferma. Conservi il numero qui sotto: serve per il tracciamento.",
+    "ticketNumber": "N. d'ordine",
+    "ticketAmount": "Importo pagato"
+  },
+  "track": {
+    "title": "Tracciamento ordine.",
+    "layersLabel": "Avanzamento dell'ordine",
+    "layer": {
+      "order": "Ordine",
+      "print": "Stampa",
+      "check": "Controllo",
+      "shipped": "Spedito",
+      "delivered": "Consegnato"
+    },
+    "state": {
+      "done": "concluso",
+      "current": "in corso",
+      "todo": "in arrivo"
+    },
+    "now": {
+      "pending": "In attesa del pagamento.",
+      "paid": "Pagamento ricevuto. La stampa non è ancora iniziata.",
+      "in_production": "L'atelier sta stampando il Suo ordine.",
+      "shipped": "Affidato alla Posta svizzera.",
+      "delivered": "Consegnato all'indirizzo indicato.",
+      "cancelled": "Per questo ordine non è prevista alcuna stampa."
+    }
+  },
+  "favorites": {
+    "title": "I miei preferiti.",
+    "tabsLabel": "Preferiti e creazioni",
+    "tabObjects": "Oggetti",
+    "tabCreations": "Le mie creazioni",
+    "objectsCount": "{count, plural, one {# oggetto} other {# oggetti}}",
+    "creationsCount": "{count, plural, one {# creazione salvata} other {# creazioni salvate}}",
+    "creationsEmptyTitle": "Ancora nulla di salvato.",
+    "creationsEmptyText": "Regoli un oggetto nello Studio e clicchi su Conserva.",
+    "creationsNote": "Queste creazioni restano in questo browser. All'atelier non viene inviato nulla prima della Sua richiesta.",
+    "savedOn": "Salvata il {date}",
+    "reopen": "Riapri",
+    "delete": "Elimina",
+    "deleted": "Creazione eliminata.",
+    "objects": {
+      "lavaux": "Vaso «Lavaux»",
+      "cartouche": "Biglietto «Cartouche»",
+      "relief": "Sottobicchiere «Relief»",
+      "borne": "Portanome «Borne»"
+    }
+  },
+  "notFound": {
+    "kicker": "Punto non quotato",
+    "title": "Pagina non trovata.",
+    "line": "Quota 404 m, cioè 32 m sopra il Lemano. Qui non è stato stampato nulla.",
+    "here": "Lei è qui"
+  },
+  "error": {
+    "kicker": "Errore imprevisto",
+    "title": "Uno strato non è riuscito. Riproviamo?",
+    "reference": "Riferimento {digest}"
+  }
+}
