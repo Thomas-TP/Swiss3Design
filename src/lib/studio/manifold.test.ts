@@ -182,6 +182,67 @@ describe("Lavaux : variété du maillage d'export", () => {
     expect(heavy.triangles).toBeLessThanOrEqual(STL_MAX_TRIANGLES);
   });
 
+  it("les normales de sommet suivent le sens des triangles (héros, préréglages, 20 vases aléatoires)", () => {
+    // Cosinus entre la normale géométrique d'un triangle et la moyenne de ses
+    // normales de sommet : un signe inversé éclairerait le vase à l'envers.
+    // Statistique (moyenne haute, presque aucun triangle négatif) : sur un relief
+    // très marqué (voronoï 2,2 mm, nervures torsadées) quelques triangles de
+    // flanc s'écartent de plus de 90° de la normale lissée, sans inversion.
+    const agreement = (mesh: MeshData) => {
+      const p = mesh.positions;
+      const n = mesh.normals;
+      const ix = mesh.indices;
+      let sum = 0;
+      let negative = 0;
+      let counted = 0;
+      for (let t = 0; t < ix.length; t += 3) {
+        const a = ix[t] * 3;
+        const b = ix[t + 1] * 3;
+        const c = ix[t + 2] * 3;
+        const ux = p[b] - p[a];
+        const uy = p[b + 1] - p[a + 1];
+        const uz = p[b + 2] - p[a + 2];
+        const vx = p[c] - p[a];
+        const vy = p[c + 1] - p[a + 1];
+        const vz = p[c + 2] - p[a + 2];
+        const gx = uy * vz - uz * vy;
+        const gy = uz * vx - ux * vz;
+        const gz = ux * vy - uy * vx;
+        const gl = Math.hypot(gx, gy, gz);
+        if (gl < 1e-9) continue;
+        const sx = n[a] + n[b] + n[c];
+        const sy = n[a + 1] + n[b + 1] + n[c + 1];
+        const sz = n[a + 2] + n[b + 2] + n[c + 2];
+        const sl = Math.hypot(sx, sy, sz) || 1;
+        const cos = (gx * sx + gy * sy + gz * sz) / (gl * sl);
+        sum += cos;
+        if (cos < 0) negative++;
+        counted++;
+      }
+      return { mean: sum / counted, negativeShare: negative / counted };
+    };
+    const rng = mulberry32(5150);
+    const configs = [
+      HERO_CONFIG,
+      heroVariant("leman", "vagues"),
+      heroVariant("leman", "voronoi"),
+      ...LAVAUX_PRESETS.map((p) => p.config),
+      ...Array.from({ length: 20 }, () => randomLavaux(rng)),
+    ];
+    for (const config of configs) {
+      for (const lod of ["display", "export"] as const) {
+        const { mean, negativeShare } = agreement(buildLavaux(config, { lod }));
+        expect(
+          mean,
+          `${lod} ${JSON.stringify(config.pattern)}`,
+        ).toBeGreaterThan(0.95);
+        expect(
+          negativeShare,
+          `${lod} ${JSON.stringify(config.pattern)}`,
+        ).toBeLessThan(0.001);
+      }
+    }
+  }, 120_000);
   it("normales unitaires et attribut side 0/1 ; groupes qui couvrent tous les index", () => {
     const mesh = buildLavaux(HERO_CONFIG, { lod: "display", tier: 1 });
     for (let i = 0; i < mesh.normals.length; i += 3) {
