@@ -5,7 +5,7 @@ import { Link2, Link2Off, Users } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { listAccounts, linkSocial, unlinkAccount } from "@/lib/auth-client";
 import { SOCIAL_ICONS, SOCIAL_LABELS } from "@/components/social-icons";
-import { card, btnGhost } from "../_ui";
+import { btnGhostSm, card } from "../_ui";
 
 export function ConnectedAccountsSection({
   providers,
@@ -78,11 +78,11 @@ export function ConnectedAccountsSection({
   return (
     <div className={card}>
       <div className="flex items-center gap-2.5">
-        <Users size={18} className="shrink-0 text-soft" />
+        <Users size={18} strokeWidth={1.5} className="shrink-0 text-soft" />
         <div>
-          <p className="text-sm font-semibold">
+          <h2 className="text-sm font-semibold">
             {t("security.connected.title")}
-          </p>
+          </h2>
           <p className="mt-0.5 text-xs text-soft">
             {t("security.connected.desc")}
           </p>
@@ -106,9 +106,9 @@ export function ConnectedAccountsSection({
                   type="button"
                   onClick={() => onUnlink(p)}
                   disabled={pending !== null}
-                  className={`${btnGhost} !py-2 text-xs`}
+                  className={btnGhostSm}
                 >
-                  <Link2Off size={13} />
+                  <Link2Off size={13} strokeWidth={1.5} />
                   {pending === p
                     ? t("security.processing")
                     : t("security.connected.unlink")}
@@ -118,9 +118,9 @@ export function ConnectedAccountsSection({
                   type="button"
                   onClick={() => onLink(p)}
                   disabled={pending !== null}
-                  className={`${btnGhost} !py-2 text-xs`}
+                  className={btnGhostSm}
                 >
-                  <Link2 size={13} />
+                  <Link2 size={13} strokeWidth={1.5} />
                   {pending === p
                     ? t("security.processing")
                     : t("security.connected.link")}

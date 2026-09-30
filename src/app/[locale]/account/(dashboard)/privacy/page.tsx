@@ -1,5 +1,6 @@
 import { Lock } from "lucide-react";
 import { getTranslations } from "next-intl/server";
+import { AccountTitle } from "../account-title";
 import { card } from "../_ui";
 import { ExportButton } from "./export-button";
 import { DeleteAccount } from "./delete-account";
@@ -11,15 +12,15 @@ export default async function PrivacyTab() {
 
   return (
     <div>
-      <h1 className="flex items-center gap-2 text-xl font-bold">
-        <Lock size={19} className="text-soft" />
-        {t("privacy.title")}
-      </h1>
-      <p className="mt-1 mb-6 text-sm text-soft">{t("privacy.subtitle")}</p>
+      <AccountTitle
+        title={t("privacy.title")}
+        subtitle={t("privacy.subtitle")}
+        icon={Lock}
+      />
 
       <div className="space-y-4">
         <div className={card}>
-          <p className="text-sm font-semibold">{t("privacy.exportTitle")}</p>
+          <h2 className="text-sm font-semibold">{t("privacy.exportTitle")}</h2>
           <p className="mt-1 text-sm text-soft">{t("privacy.exportDesc")}</p>
           <div className="mt-4">
             <ExportButton />

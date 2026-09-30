@@ -65,6 +65,23 @@ export const rowLink =
 export const rowLinkBlock =
   "block px-5 py-4 transition-colors duration-150 hover:bg-paper";
 
+// Bouton-icône (modifier, supprimer) : cible de 36 px au lieu d'un pictogramme
+// nu de 15 px, fond discret au survol, pas de transform.
+export const iconButton =
+  "inline-grid h-9 w-9 shrink-0 place-items-center rounded-field text-soft transition-colors duration-150 ease-strate hover:bg-line/60 hover:text-ink disabled:pointer-events-none disabled:opacity-40";
+export const iconButtonDanger =
+  "inline-grid h-9 w-9 shrink-0 place-items-center rounded-field text-soft transition-colors duration-150 ease-strate hover:bg-accent/10 hover:text-accent-text disabled:pointer-events-none disabled:opacity-40";
+
+// Action en texte, dans une ligne de liste (« Définir par défaut », « Révoquer »).
+export const textAction =
+  "text-sm font-semibold text-soft underline decoration-line decoration-1 underline-offset-4 transition-colors duration-150 hover:text-ink hover:decoration-ink disabled:pointer-events-none disabled:opacity-40";
+export const textActionDanger =
+  "text-sm font-semibold text-accent-text underline decoration-1 underline-offset-4 transition-colors duration-150 hover:decoration-2 disabled:pointer-events-none disabled:opacity-40";
+
+// Texte de confirmation (« Enregistré », « Mot de passe modifié ») : le vert
+// -800 tient 4,5:1 sur le papier clair, le -300 sur le papier sombre.
+export const textSuccess = "text-emerald-800 dark:text-emerald-300";
+
 // Messages d'état : toujours un texte, jamais une couleur seule.
 export const alertError =
   "rounded-field bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text";

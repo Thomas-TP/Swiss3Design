@@ -4,7 +4,15 @@ import { useState } from "react";
 import { BadgeCheck, MailCheck, Pencil } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { changeEmail, sendVerificationEmail } from "@/lib/auth-client";
-import { field, btnPrimary, btnGhost } from "../_ui";
+import {
+  badge,
+  badgeWarn,
+  btnGhost,
+  btnPrimary,
+  field,
+  textAction,
+  textSuccess,
+} from "../_ui";
 
 export function EmailForm({
   email,
@@ -46,8 +54,11 @@ export function EmailForm({
 
   if (sent) {
     return (
-      <p className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-300">
-        <MailCheck size={16} className="shrink-0" />
+      <p
+        role="status"
+        className="mt-3 flex items-center gap-2 rounded-field bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-800 dark:text-emerald-200"
+      >
+        <MailCheck size={16} strokeWidth={1.5} className="shrink-0" />
         {t("profile.emailChangeSent")}
       </p>
     );
@@ -55,16 +66,18 @@ export function EmailForm({
 
   return (
     <div className="mt-3">
-      <div className="flex items-center justify-between gap-3">
-        <span className="flex items-center gap-2 text-sm">
-          {email}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
+          <span className="break-all">{email}</span>
           {verified ? (
-            <span className="flex items-center gap-1 text-xs font-semibold text-emerald-600">
-              <BadgeCheck size={14} />
+            <span
+              className={`flex items-center gap-1 text-xs font-semibold ${textSuccess}`}
+            >
+              <BadgeCheck size={14} strokeWidth={1.5} />
               {t("profile.emailVerified")}
             </span>
           ) : (
-            <span className="rounded-full bg-amber-500/15 px-2 py-0.5 text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+            <span className={`${badge} ${badgeWarn}`}>
               {t("profile.emailUnverified")}
             </span>
           )}
@@ -77,9 +90,9 @@ export function EmailForm({
               setValue("");
               setError(null);
             }}
-            className="flex items-center gap-1.5 text-xs font-semibold text-soft transition-colors hover:text-ink"
+            className={`${textAction} flex shrink-0 items-center gap-1.5`}
           >
-            <Pencil size={13} />
+            <Pencil size={13} strokeWidth={1.5} />
             {t("profile.emailChange")}
           </button>
         )}
@@ -106,6 +119,7 @@ export function EmailForm({
             value={value}
             onChange={(e) => setValue(e.target.value)}
             placeholder={t("profile.emailNewPlaceholder")}
+            aria-label={t("profile.emailNewPlaceholder")}
             required
             autoComplete="email"
             className={`${field} sm:flex-1`}

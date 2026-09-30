@@ -1,9 +1,11 @@
 import { headers } from "next/headers";
+import { ShieldCheck } from "lucide-react";
 import { getTranslations } from "next-intl/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getAuthenticatorName } from "@better-auth/passkey";
 import { getAuth, enabledSocialProviders } from "@/lib/auth";
 import { AccountSecurity } from "../account-security";
+import { AccountTitle } from "../account-title";
 import { PasswordSection } from "./password-section";
 import { SessionsSection } from "./sessions-section";
 import { ConnectedAccountsSection } from "./connected-accounts-section";
@@ -30,8 +32,11 @@ export default async function SecurityTab() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold">{t("security.title")}</h1>
-      <p className="mt-1 mb-6 text-sm text-soft">{t("security.subtitle")}</p>
+      <AccountTitle
+        title={t("security.title")}
+        subtitle={t("security.subtitle")}
+        icon={ShieldCheck}
+      />
       <div className="space-y-4">
         <PasswordSection />
         <PasskeysSection initialPasskeys={passkeys} />

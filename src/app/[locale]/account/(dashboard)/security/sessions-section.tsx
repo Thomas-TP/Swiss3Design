@@ -10,7 +10,7 @@ import {
   revokeOtherSessions,
 } from "@/lib/auth-client";
 import { groupByDevice, type SessionLike } from "@/lib/session-groups";
-import { card, btnGhost } from "../_ui";
+import { badge, badgeSuccess, btnGhostSm, card, textActionDanger } from "../_ui";
 
 type SessionRow = SessionLike & { id: string };
 
@@ -63,11 +63,11 @@ export function SessionsSection() {
     <div className={card}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-center gap-2.5">
-          <Laptop size={18} className="shrink-0 text-soft" />
+          <Laptop size={18} strokeWidth={1.5} className="shrink-0 text-soft" />
           <div>
-            <p className="text-sm font-semibold">
+            <h2 className="text-sm font-semibold">
               {t("security.sessions.title")}
-            </p>
+            </h2>
             <p className="mt-0.5 text-xs text-soft">
               {t("security.sessions.desc")}
             </p>
@@ -78,9 +78,9 @@ export function SessionsSection() {
             type="button"
             onClick={onRevokeOthers}
             disabled={revoking !== null}
-            className={`${btnGhost} shrink-0 !py-2 text-xs`}
+            className={`${btnGhostSm} shrink-0`}
           >
-            <ShieldAlert size={13} />
+            <ShieldAlert size={13} strokeWidth={1.5} />
             {t("security.sessions.revokeAllOthers")}
           </button>
         )}
@@ -111,7 +111,7 @@ export function SessionsSection() {
                 <p className="flex items-center gap-2 text-sm font-medium">
                   {label}
                   {g.isCurrent && (
-                    <span className="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300">
+                    <span className={`${badge} ${badgeSuccess}`}>
                       {t("security.sessions.thisDevice")}
                     </span>
                   )}
@@ -119,7 +119,7 @@ export function SessionsSection() {
                 <p className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-0.5 text-xs text-soft">
                   {g.ipAddress && (
                     <span className="flex items-center gap-1">
-                      <MapPin size={11} />
+                      <MapPin size={11} strokeWidth={1.5} />
                       {g.ipAddress}
                     </span>
                   )}
@@ -138,7 +138,7 @@ export function SessionsSection() {
                   type="button"
                   onClick={() => onRevokeGroup(revocableTokens)}
                   disabled={revoking !== null}
-                  className="shrink-0 text-xs font-semibold text-accent-text transition-opacity hover:opacity-70 disabled:opacity-40"
+                  className={`${textActionDanger} shrink-0`}
                 >
                   {revoking === revocableTokens[0]
                     ? t("security.processing")

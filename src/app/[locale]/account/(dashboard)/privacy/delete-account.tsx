@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Trash2, MailCheck } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { deleteUser } from "@/lib/auth-client";
+import { alertSuccess, btnDanger } from "../_ui";
 
 // Déplacé depuis l'onglet Sécurité vers Confidentialité (Phase 5) : la
 // suppression de compte relève du droit à l'effacement (nLPD), à sa place
@@ -22,15 +23,18 @@ export function DeleteAccount() {
   }
 
   return (
-    <div className="rounded-card border border-red-500/30 bg-red-500/5 p-5 sm:p-6">
-      <p className="flex items-center gap-2 text-sm font-semibold text-accent-text">
-        <Trash2 size={16} />
+    <div className="rounded-card border border-accent-text/40 bg-accent/5 p-5 sm:p-6">
+      <h2 className="flex items-center gap-2 text-sm font-semibold text-accent-text">
+        <Trash2 size={16} strokeWidth={1.5} />
         {t("security.dangerTitle")}
-      </p>
+      </h2>
       <p className="mt-1 text-xs text-soft">{t("security.dangerDesc")}</p>
       {sent ? (
-        <p className="mt-4 flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-300">
-          <MailCheck size={16} className="shrink-0" />
+        <p
+          role="status"
+          className={`${alertSuccess} mt-4 flex items-center gap-2`}
+        >
+          <MailCheck size={16} strokeWidth={1.5} className="shrink-0" />
           {t("security.deleteEmailSent")}
         </p>
       ) : (
@@ -38,9 +42,9 @@ export function DeleteAccount() {
           type="button"
           onClick={onDelete}
           disabled={pending}
-          className="mt-4 inline-flex items-center gap-1.5 rounded-full border border-red-500/40 bg-red-500/10 px-4 py-2.5 text-sm font-semibold text-accent-text transition-colors hover:bg-red-500/20 disabled:opacity-60"
+          className={`${btnDanger} mt-4`}
         >
-          <Trash2 size={15} />
+          <Trash2 size={15} strokeWidth={1.5} />
           {pending ? t("security.processing") : t("security.deleteButton")}
         </button>
       )}

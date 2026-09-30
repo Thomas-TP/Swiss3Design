@@ -6,7 +6,16 @@ import { ShieldCheck, ShieldOff, KeyRound, Copy } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { useSession, twoFactor } from "@/lib/auth-client";
-import { field, btnPrimary, btnGhost } from "./_ui";
+import {
+  badge,
+  badgeNeutral,
+  badgeSuccess,
+  btnGhost,
+  btnPrimary,
+  card,
+  field,
+  textAction,
+} from "./_ui";
 
 function TwoFactor() {
   const t = useTranslations("account");
@@ -104,32 +113,33 @@ function TwoFactor() {
   }
 
   return (
-    <div className="rounded-card border border-line bg-surface p-5 sm:p-6">
+    <div className={card}>
       <div className="flex items-start justify-between gap-3">
         <div className="flex items-start gap-2.5">
           {enabled ? (
             <ShieldCheck
               size={18}
+              strokeWidth={1.5}
               className="mt-0.5 shrink-0 text-emerald-600"
             />
           ) : (
-            <ShieldOff size={18} className="mt-0.5 shrink-0 text-soft" />
+            <ShieldOff
+              size={18}
+              strokeWidth={1.5}
+              className="mt-0.5 shrink-0 text-soft"
+            />
           )}
           <div>
-            <p className="text-sm font-semibold">
+            <h2 className="text-sm font-semibold">
               {t("security.twoFactorTitle")}
-            </p>
+            </h2>
             <p className="mt-0.5 text-xs text-soft">
               {t("security.twoFactorDesc")}
             </p>
           </div>
         </div>
         <span
-          className={`shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold ${
-            enabled
-              ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
-              : "bg-line text-soft"
-          }`}
+          className={`${badge} ${enabled ? badgeSuccess : badgeNeutral}`}
         >
           {enabled
             ? t("security.twoFactorActive")
@@ -142,7 +152,7 @@ function TwoFactor() {
         <div className="mt-5 space-y-4">
           <p className="text-sm text-soft">{t("security.scanQr")}</p>
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:items-start">
-            <span className="inline-block rounded-xl bg-white p-3 ring-1 ring-line">
+            <span className="inline-block rounded-field bg-white p-3 ring-1 ring-line">
               <QRCodeSVG value={setup.uri} size={148} />
             </span>
             <div className="min-w-0 flex-1">
@@ -162,9 +172,9 @@ function TwoFactor() {
                 onClick={() =>
                   navigator.clipboard?.writeText(setup.codes.join("\n"))
                 }
-                className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-soft hover:text-ink"
+                className={`${textAction} mt-2 inline-flex items-center gap-1.5`}
               >
-                <Copy size={13} />
+                <Copy size={13} strokeWidth={1.5} />
                 {t("security.copyCodes")}
               </button>
             </div>
@@ -179,6 +189,7 @@ function TwoFactor() {
                 }
                 inputMode="numeric"
                 autoComplete="one-time-code"
+                aria-label={t("security.enterCode")}
                 placeholder={t("security.codePlaceholder")}
                 className={`${field} tracking-[0.3em]`}
               />
@@ -199,7 +210,7 @@ function TwoFactor() {
       ) : enabled ? (
         <div className="mt-4 space-y-3">
           {newBackupCodes ? (
-            <div className="rounded-xl bg-paper p-4">
+            <div className="rounded-field bg-paper p-4 ring-1 ring-line">
               <p className="text-xs font-semibold text-soft">
                 {t("security.backupTitle")}
               </p>
@@ -216,15 +227,15 @@ function TwoFactor() {
                 onClick={() =>
                   navigator.clipboard?.writeText(newBackupCodes.join("\n"))
                 }
-                className="mt-2 inline-flex items-center gap-1.5 text-xs font-semibold text-soft hover:text-ink"
+                className={`${textAction} mt-2 inline-flex items-center gap-1.5`}
               >
-                <Copy size={13} />
+                <Copy size={13} strokeWidth={1.5} />
                 {t("security.copyCodes")}
               </button>
               <button
                 type="button"
                 onClick={() => setNewBackupCodes(null)}
-                className="mt-3 block text-xs font-semibold text-soft hover:text-ink"
+                className={`${textAction} mt-3 block`}
               >
                 {t("security.backupDone")}
               </button>
@@ -236,6 +247,7 @@ function TwoFactor() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
+                aria-label={t("security.password")}
                 placeholder={t("security.password")}
                 className={field}
               />
@@ -249,7 +261,7 @@ function TwoFactor() {
                   disabled={pending || !password}
                   className={btnGhost}
                 >
-                  <ShieldOff size={15} />
+                  <ShieldOff size={15} strokeWidth={1.5} />
                   {pending ? t("security.processing") : t("security.disable")}
                 </button>
                 <button
@@ -258,7 +270,7 @@ function TwoFactor() {
                   disabled={pending || !password}
                   className={btnGhost}
                 >
-                  <KeyRound size={15} />
+                  <KeyRound size={15} strokeWidth={1.5} />
                   {pending
                     ? t("security.processing")
                     : t("security.regenerateBackupCodes")}
@@ -274,6 +286,7 @@ function TwoFactor() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             autoComplete="current-password"
+            aria-label={t("security.password")}
             placeholder={t("security.password")}
             className={field}
           />
@@ -287,7 +300,7 @@ function TwoFactor() {
             disabled={pending}
             className={btnPrimary}
           >
-            <KeyRound size={15} />
+            <KeyRound size={15} strokeWidth={1.5} />
             {pending ? t("security.processing") : t("security.enable")}
           </button>
         </div>

@@ -50,7 +50,7 @@ export function ExportButton() {
         disabled={pending}
         className={btnPrimary}
       >
-        <Download size={15} />
+        <Download size={15} strokeWidth={1.5} />
         {pending ? t("security.processing") : t("privacy.exportButton")}
       </button>
       {error && (
