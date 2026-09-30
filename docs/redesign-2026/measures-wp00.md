@@ -243,3 +243,176 @@ redirige alors `http:` vers `https:` (`src/middleware.ts`, lignes 156 à 163, an
   décoratif (`.s3d-dot`, texte transparent) ; bandeau de consentement (servi seulement
   en dev, hôte non mesuré en preview), clair ≥ 5,92, sombre ≥ 6,04. Aucun texte sous
   4,5:1.
+
+## 4. Contre-vérification de WP-00 (après les correctifs)
+
+Checkout principal, branche `claude/redesign-2026` au commit `0f88d0f`, 30.09.2026, après
+`8bc44f3` (mouvement réduit suivi par le héros, les `Reveal` et `motion/react`), `385a3a4`
+(runtime sans SplitText ni Flip), `93772d2` (posters de champ), `5258857` (« Coupe » sur
+les six pages), `a02f035`, `8cb26dd` (docs) et `0f88d0f` (`bun run preview` sans boucle de
+308). Mêmes outils qu'en section 1. Navigateur : Chromium 1234 (Playwright), headless,
+piloté par CDP depuis un script Bun jetable, non commité ; pas de Safari sous Windows.
+
+### Contrôles du §10
+
+| Contrôle               | Résultat                                                                                                                |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `bun run lint`         | vert (oxlint, aucun diagnostic)                                                                                         |
+| `bun run typecheck`    | vert (lancé après le build)                                                                                             |
+| `bun run test`         | vert : 22 fichiers, 376 tests (1 fichier et 15 tests ignorés sans URL)                                                  |
+| `bun run format:check` | vert pour le dépôt : seul `docs/signature-infomaniak.html`, fichier du propriétaire non suivi (hors dépôt), est signalé |
+
+### Worker
+
+| Mesure                                              | Référence     | Section 3     | Contre-vérification | Écart / référence |
+| --------------------------------------------------- | ------------- | ------------- | ------------------- | ----------------- |
+| `Total Upload` (dry-run)                            | 15 853,89 KiB | 15 743,98 KiB | 15 755,25 KiB       | −98,6 KiB         |
+| `gzip` (dry-run)                                    | 3 064,86 KiB  | 3 062,66 KiB  | **3 064,04 KiB**    | −0,8 KiB          |
+| Signatures three/gsap/lenis (`check-worker-bundle`) | 0             | 0             | **0**               | —                 |
+
+Dans le budget de WP-00 (≤ 3 084,86 KiB). Ventilation `check-worker-bundle` : 1 565
+fichiers, `node_modules/` 5 011,8 KiB, `handler.mjs` 2 586,8 KiB, `.next/` 2 311,8 KiB,
+middleware 102,0 KiB.
+
+### Chunks client
+
+173 chunks, 1 091,1 KiB gzip (3 374,4 KiB brut).
+
+| Route (JS initial, borne haute)      | gzip          | brut      | chunks | Écart / section 3 |
+| ------------------------------------ | ------------- | --------- | ------ | ----------------- |
+| `/[locale]` (accueil)                | **225,6 KiB** | 711,3 KiB | 14     | +0,8 KiB          |
+| `/[locale]/shop`                     | 225,1 KiB     | 710,2 KiB | 13     | +0,3 KiB          |
+| `/[locale]/products/[slug]`          | 228,2 KiB     | 718,9 KiB | 14     | +0,3 KiB          |
+| `/[locale]/custom`                   | 243,8 KiB     | 763,5 KiB | 15     | +0,3 KiB          |
+| `/[locale]/a-propos`                 | 246,6 KiB     | 774,3 KiB | 15     | +0,8 KiB          |
+| `/[locale]/contact`                  | 242,7 KiB     | 759,4 KiB | 15     | +0,7 KiB          |
+| `/[locale]/cart` (hors `(site)`)     | 245,6 KiB     | 768,4 KiB | 15     | +0,3 KiB          |
+| `/[locale]/checkout` (hors `(site)`) | 255,6 KiB     | 797,3 KiB | 16     | +0,3 KiB          |
+
+Accueil dans le budget (≤ 233,7 KiB). Gates (`.next/react-loadable-manifest.json`, gzip
+zlib par défaut) :
+
+| Gate                                | Chunks                                               | gzip             | Budget    |
+| ----------------------------------- | ---------------------------------------------------- | ---------------- | --------- |
+| `@/motion/runtime` (gsap + Lenis)   | `c15bf2b0…` 19,50 · `2160…` 32,79 · `7783…` 1,84     | **54,13 KiB**    | ≤ 65 KiB  |
+| `@/motion/stage/stage-root` (three) | `bd904a5c…` 99,44 · `b536a0f1…` 87,26 · `5445…` 7,08 | **193,77 KiB**   | ≤ 200 KiB |
+| 4 scènes (stubs)                    | `3753…`, `5907…`, `6344…`, `5129…`                   | 2,59 KiB chacune | ≤ 15 KiB  |
+
+Le runtime repasse sous son budget (65,36 → 54,13 KiB, −11,2 KiB sans SplitText ni Flip).
+
+### Navigateur (`bun run preview`, CSP de production)
+
+Premier `bun run preview` : build et « Ready on http://127.0.0.1:8787 », puis wrangler
+s'arrête à la première requête sur `getaddrinfo EAI_AGAIN` (hôte Neon), un échec DNS
+passager (résolu une minute plus tard depuis Bun et Node). Relancé sur le même build avec
+la seconde moitié du script seulement, `opennextjs-cloudflare preview -- --upstream-protocol
+https`. **Plus de boucle de 308** : tout est servi en HTTP sur `127.0.0.1:8787`.
+
+- **SSR** (requêtes HTTP) : 200 et un seul h1 sur `/fr`, `/fr/shop`,
+  `/fr/products/vase-spirale`, `/fr/contact`, `/fr/a-propos`, `/fr/custom`, `/fr/cart`,
+  `/fr/checkout`, `/fr/legal/terms`, `/fr/track`, `/fr/favorites` ; `/fr/account` → 307 vers
+  la connexion ; `/fr/studio` → 404 (WP-STUDIO). CSP à nonce partout, 100 % des scripts
+  inline portent le nonce.
+- **Console**, six pages vitrine × clair et sombre, 1440 × 900, mouvement complet, page
+  défilée jusqu'en bas : aucune violation CSP (console et `securitypolicyviolation`), aucune
+  erreur (hydratation comprise), aucune réponse 4xx (les posters du footer sont servis).
+  Seul avertissement, sur chaque page : `navigator.modelContext is deprecated. Please use
+document.modelContext instead.` (`src/components/webmcp-tools.tsx`, ligne 59, antérieur à
+  la refonte).
+- **`html.lenis`** : présent sur les six pages vitrine ; absent sur `/fr/cart`,
+  `/fr/checkout`, `/fr/account` (→ `/fr/account/login`), `/fr/legal/terms`, `/fr/track`,
+  `/fr/favorites`, où le chunk runtime n'est jamais téléchargé ; en navigation client,
+  l'icône panier retire la classe et le logo la remet. **Défaut** : `destroy()` de Lenis
+  1.3.26 ne coupe pas le minuteur de 400 ms qu'arme un défilement natif
+  (`_resetVelocityTimeout`, `onNativeScroll`) ; s'il expire après la destruction,
+  `isScrolling = false` rappelle `updateClassName()`, qui repose `lenis` sur `<html>`.
+  Reproduit à coup sûr : interrupteur actionné moins de 400 ms après un défilement natif
+  (la classe revient ~300 ms après la destruction et reste) ; sur mobile, défilement natif
+  puis tap sur « Panier » de la BottomNav dans le même délai : `/fr/cart` garde
+  `html.lenis`. Avec 1 s d'attente, la classe est bien retirée. Seule `lenis` revient (ni
+  `lenis-smooth` ni `lenis-stopped`), l'effet visuel est nul, mais l'invariant « pas de
+  Lenis hors `(site)` » est faux sur ce chemin.
+- **three** : aucun chunk three demandé sur les six pages vitrine (`/fr/contact` compris)
+  ni hors `(site)`.
+- **Mouvement réduit par l'interrupteur** (OS sans préférence) : bascule sans
+  rechargement (`data-motion="reduce"`, `localStorage["s3d-motion"]`) ; héros figé
+  (`clip-path: inset(0%…)`, `transform: none`, 6 relevés sur 1,5 s identiques, contre 6
+  valeurs différentes en mouvement complet) ; 8 `Reveal` sur 8 dans leur état final (en
+  complet, 3 sur 8 attendent encore à opacité 0 avant défilement) ; aucune erreur. Après
+  rechargement : runtime non téléchargé, pas de Lenis, même état final, `data-motion`
+  conservé après l'hydratation ; `/fr/a-propos` 26 `Reveal` sur 26 finaux. Retour à
+  « full » par l'interrupteur : Lenis revient sans rechargement. La barre d'espace bascule
+  aussi l'interrupteur.
+- **Mouvement réduit par l'OS** (`prefers-reduced-motion` émulé par CDP), six pages :
+  `data-motion="reduce"` toujours là 3,5 s après le chargement, pas de Lenis, pas de chunk
+  runtime, héros figé, `Reveal` finaux (8/8 accueil, 26/26 Atelier, 3/3 contact),
+  interrupteur affiché coché, **aucune erreur #418**.
+- **Anti-FOUC** : `data-motion` est posé (MutationObserver) à 544–669 ms, quand `<body>`
+  n'a encore que deux enfants, avant le first-paint (616–888 ms), dans les trois cas (OS
+  complet, OS réduit, choix « reduce » mémorisé).
+- **« Coupe »** (`document.startViewTransition` instrumenté) : nav du header `/fr` →
+  `/fr/shop` → `/fr/a-propos` → `/fr/custom`, trois transitions typées `s3d-coupe`, la
+  nouvelle page animée `s3d-print` 480 ms (fin à 615–721 ms), `nav-mark` qui glisse en
+  280 ms, **aucune animation sur `site-header`** (header à `top: 0` au démarrage de la
+  transition). BottomNav mobile `/fr` → `/fr/shop` : idem, `site-bottom-nav` immobile.
+  Bouton retour (`Page.navigateToHistoryEntry`) : aucune transition. Vitrine → panier :
+  aucune ; panier → accueil : transition sans type, sans animation. Mouvement réduit
+  (interrupteur et OS) : aucun type ; React démarre tout de même une View Transition
+  (types vides, toutes les durées à 0, finie en ~205 ms) : rien de visible. Safari non
+  vérifié.
+- **Mobile** 375 × 812 (tactile, UA Android, DPR 3) : aucun défilement horizontal sur les
+  six pages et `/fr/cart` (l'Atelier garde sa rangée de pastilles dans son propre
+  défilement horizontal) ; BottomNav fixe de 747 à 812 px ; `<main>` garde 96 px en bas, le
+  dernier texte du footer finit à 692 px ; encarts de sécurité émulés (bas 34 px) :
+  BottomNav de 99 px (34 px de `safe-area`), bandeau 7 px au-dessus d'elle avec et sans
+  encarts (740/747, 706/713). La meta viewport ne déclare pas `viewport-fit=cover` : sans
+  lui, Safari iOS garde la page dans la zone sûre et `env(safe-area-inset-bottom)` y vaut en
+  principe 0 (padding inerte ; à confirmer sur un iPhone).
+- **Bandeau de consentement** en preview : il n'apparaît que sur l'hôte `swiss3design.ch`
+  (`measurableHost`). Page chargée comme `https://swiss3design.ch/fr` avec **toutes** les
+  requêtes interceptées par CDP (Fetch) : celles de l'hôte servies par la preview locale,
+  les 53 appels de mesure (`/api/relay`) refusés, aucune autre requête sortie. Bandeau
+  présent, aucune violation CSP, aucune erreur ; en bas à gauche (24 px) sur desktop.
+- **Contrastes** (texte réel, couleur composée sur le fond effectif, opacités comprises) :
+
+  | Zone      | Clair (min)                  | Sombre (min) | Sous le seuil |
+  | --------- | ---------------------------- | ------------ | ------------- |
+  | Header    | 5,21 (`soft` sur `paper`)    | 7,07         | aucun         |
+  | Footer    | 5,21                         | 6,45         | aucun         |
+  | BottomNav | 5,59                         | 6,52         | aucun         |
+  | Bandeau   | 5,92 (`soft` sur `elevated`) | 6,04         | aucun         |
+
+  Le point rouge décoratif (`.s3d-dot`, texte transparent) est hors mesure.
+
+- **Clavier** (`/fr`, 1440 × 900) : Tab 1 → « Aller au contenu », visible à (16, 16),
+  151 × 56, anneau encre de 2 px ; Entrée → focus sur `main#main-content`, la tabulation
+  suivante atteint le premier lien du contenu. Tab 2 → « Aller au pied de page » ; Entrée
+  → focus sur `footer#site-footer`, à l'écran. 60 tabulations sur `/fr/contact` : tous les
+  liens du header et du footer portent l'anneau de 2 px ; l'interrupteur le porte sur sa
+  piste visible (`peer-focus-visible`). Les champs du formulaire de contact (balisage
+  d'avant la refonte, WP-ABOUT) n'ont que le passage de la bordure de `line` à `ink`
+  (1 px, `focus:outline-none`).
+
+### Écarts et suites
+
+1. **`html.lenis` rémanent** (ci-dessus) : `src/motion/runtime.tsx`, `dropLenis()`, lignes
+   161-162. Avant `destroy()`, neutraliser le minuteur de Lenis : par exemple
+   `(this.lenis as unknown as { reset(): void }).reset()` (remet `_isScrolling` à `false`,
+   le setter appelé par le minuteur devient sans effet) ou `clearTimeout` de
+   `_resetVelocityTimeout` ; ajouter un test, signaler le défaut en amont. Non corrigé ici :
+   API privée de Lenis, pas un correctif d'une ligne évident.
+2. `src/components/ui/site-link.tsx`, lignes 16-17 (et `page-cut.tsx`, ligne 11) : le
+   commentaire dit qu'en mouvement réduit React ne démarre aucune View Transition ; il en
+   démarre une, de durée nulle (deux instantanés pris, rien de visible). Corriger le
+   commentaire.
+3. `src/components/webmcp-tools.tsx`, lignes 59-60 : préférer `document.modelContext` à
+   `navigator.modelContext` (avertissement de dépréciation de Chromium sur chaque page ;
+   hors WP-00).
+4. Liens vers `/studio` (404 jusqu'à WP-STUDIO) : header (`header.tsx`, ligne 38),
+   BottomNav (`bottom-nav.tsx`, ligne 54, bouton rouge central), footer (`footer.tsx`,
+   ligne 115). À avoir en tête pour le jalon J0.
+5. Champs du formulaire de contact : passer au primitif `Field` (anneau `focus-visible`)
+   dans WP-ABOUT.
+6. `viewport-fit=cover` : à décider avec le propriétaire (sans lui, le padding
+   `safe-area` de la BottomNav et du bandeau reste en principe inerte sur iOS).
+7. Non mesurés dans cette passe : Safari (« Coupe »), Lighthouse mobile, captures admin.
