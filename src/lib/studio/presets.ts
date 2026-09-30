@@ -15,7 +15,7 @@ import {
   clampRelief,
   gradinsDepthMax,
   quantizeMm,
-} from "./schemas";
+} from "./ranges";
 import { DEFAULT_TEXTS } from "./text/fields";
 import type {
   Band,

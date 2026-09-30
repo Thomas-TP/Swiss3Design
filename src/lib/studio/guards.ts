@@ -32,7 +32,7 @@ import {
   gradinsDepthMax,
   MIN_BAND_MM,
   vaguesWavelengthMin,
-} from "./schemas";
+} from "./ranges";
 import { strokeLevel, type TextIssue } from "./text/check";
 import { capForStroke, STROKE_WARN_MM } from "./text/layout";
 import type {

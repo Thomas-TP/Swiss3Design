@@ -1314,6 +1314,53 @@ describe("Export STL des objets plats", () => {
   });
 });
 
+describe("Fermeture d'imports du générateur (budget du Worker de géométrie)", () => {
+  /** Modules du dépôt atteints depuis `entry` par des imports statiques relatifs (hors `import type`). */
+  function closure(entry: string): Map<string, string> {
+    const files = new Map<string, string>();
+    const visit = (file: string) => {
+      if (files.has(file)) return;
+      const source = readFileSync(file, "utf8");
+      files.set(file, source);
+      for (const match of source.matchAll(
+        /^(?:import|export)\s+(?!type\b)[^;]*?\sfrom\s+"([^"]+)"/gm,
+      )) {
+        const spec = match[1];
+        if (!spec.startsWith(".")) continue;
+        visit(fileURLToPath(new URL(`${spec}.ts`, `file:///${file.replace(/\\/g, "/")}`)));
+      }
+    };
+    visit(entry);
+    return files;
+  }
+
+  const entry = (name: string) =>
+    fileURLToPath(new URL(name, import.meta.url));
+
+  it("build.ts n'embarque ni zod, ni three, ni le JSON des glyphes, ni les utilitaires de test", () => {
+    const files = closure(entry("./build.ts"));
+    expect(files.size).toBeGreaterThan(20);
+    const names = [...files.keys()].map((f) => f.replace(/\\/g, "/"));
+    for (const [file, source] of files) {
+      expect(source, file).not.toMatch(/from "(zod|three|gsap|lenis)/);
+      expect(source, file).not.toMatch(/(?:from\s+|import\()"[^"]*\.json"/);
+    }
+    expect(names.some((n) => n.endsWith("/schemas.ts"))).toBe(false);
+    expect(names.some((n) => n.endsWith("/testing.ts"))).toBe(false);
+    expect(names.some((n) => n.endsWith("/text/overlap.ts"))).toBe(false);
+    expect(names.some((n) => n.endsWith("/ranges.ts"))).toBe(true);
+  });
+
+  it("stats.ts, guards.ts et poster-flat.ts (rendu serveur) n'embarquent pas zod non plus", () => {
+    for (const name of ["./stats.ts", "./guards.ts", "./poster-flat.ts", "./band-stats.ts"]) {
+      const files = closure(entry(name));
+      for (const [file, source] of files) {
+        expect(source, `${name} → ${file}`).not.toMatch(/from "zod"/);
+      }
+    }
+  });
+});
+
 describe("Sources du dépôt", () => {
   it("le JSON des glyphes n'est importé par aucun module du dépôt (règle d'or 10 : il reste dans public/)", () => {
     const here = fileURLToPath(new URL("./text/glyphs.ts", import.meta.url));

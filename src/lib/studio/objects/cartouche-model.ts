@@ -45,7 +45,7 @@ import {
   type PlacedLine,
   type TextAlign,
 } from "../text/layout";
-import { cartoucheDepthMax } from "../schemas";
+import { cartoucheDepthMax } from "../ranges";
 import type { CartoucheConfig, StudioTexts } from "../types";
 import type { FlatModel } from "./flat-model";
 

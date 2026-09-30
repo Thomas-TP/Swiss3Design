@@ -46,7 +46,7 @@ import {
   MIN_CAP_MM,
   type PlacedLine,
 } from "../text/layout";
-import { strataThickness, strataTops } from "../schemas";
+import { strataThickness, strataTops } from "../ranges";
 import type { Band, ReliefConfig, StudioTexts } from "../types";
 
 export type Locale = "fr" | "de" | "it" | "en";

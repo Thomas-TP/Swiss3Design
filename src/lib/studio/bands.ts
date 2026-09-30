@@ -7,7 +7,7 @@
 // « Ajouter une bande » / « Retirer » (WP-STUDIO) ne font que les appeler, donc
 // aucune séquence de gestes ne peut produire une configuration invalide.
 import { FILAMENT_IDS } from "./filaments";
-import { MAX_BANDS, MIN_BAND_MM, quantizeMm } from "./schemas";
+import { MAX_BANDS, MIN_BAND_MM, quantizeMm } from "./ranges";
 import type { Band, FilamentId } from "./types";
 
 /** Pas d'une frontière : une couche. */
