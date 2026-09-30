@@ -366,6 +366,15 @@ export function customServiceJsonLd({
   };
 }
 
+// Crédit de conception d'un modèle imprimé tel quel (sous-ensemble de
+// `Attribution`, src/lib/attribution.ts : structurellement compatible).
+export interface ProductJsonLdDesign {
+  title: string;
+  author: string;
+  url: string;
+  licenseUrl: string;
+}
+
 export interface ProductJsonLdInput {
   slug: string;
   name: string;
@@ -380,6 +389,8 @@ export interface ProductJsonLdInput {
   colors: string[];
   imageUrls: string[]; // chemins relatifs (/api/files/…) ou absolus
   sku?: string;
+  /** Crédit de conception (CC BY-ND) : ajoute le nœud `3DModel` ci-dessous. */
+  design?: ProductJsonLdDesign;
 }
 
 // Données structurées d'un produit (prix, devise, disponibilité, livraison,
@@ -431,6 +442,22 @@ export function productJsonLd(
             "@type": "PropertyValue",
             name: "Dimensions (mm)",
             value: p.dimensionsMm,
+          },
+        }
+      : {}),
+    // Attribution du design : `isBasedOn` n'a pour domaine que CreativeWork,
+    // pas Product (invalide ici, et « basé sur » dirait à tort « dérivé »). Le
+    // modèle de l'auteur est donc un nœud 3DModel séparé, relié au Product par
+    // `subjectOf`, avec son créateur, son lien et sa licence.
+    ...(p.design
+      ? {
+          subjectOf: {
+            "@type": "3DModel",
+            name: p.design.title,
+            creator: { "@type": "Person", name: p.design.author },
+            url: p.design.url,
+            license: p.design.licenseUrl,
+            isAccessibleForFree: true,
           },
         }
       : {}),
