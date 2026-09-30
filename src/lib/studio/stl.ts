@@ -22,11 +22,20 @@ export interface StlResult {
   bytes: number;
 }
 
-/** Empreinte courte d'une configuration et de ses textes (clé d'envoi, nom de fichier). */
+/**
+ * Empreinte courte d'une configuration et de ses textes (clé d'envoi, nom de
+ * fichier). L'étiquette du sous-verre dépend de la langue (« POINTE » / « PIZ »
+ * …) : la langue entre dans l'empreinte de ce seul objet, quand il porte un
+ * texte ; sans étiquette l'empreinte ne change pas d'une langue à l'autre.
+ */
 export function studioHash(
   config: StudioConfig,
   texts: StudioTexts = {},
+  locale?: string,
 ): string {
+  if (config.object === "relief" && config.label && texts.peak) {
+    return hash8({ config, texts, locale: locale ?? "fr" });
+  }
   return hash8({ config, texts });
 }
 

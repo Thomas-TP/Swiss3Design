@@ -7,16 +7,40 @@
 //   durée    = V(mm³) / 8 mm³/s + couches × 1,5 s + changements × 110 s + 6 min
 //   changements = frontières de bande où le filament change
 //
-// Les objets plats (Cartouche, Relief, Borne) sont livrés par WP-02 : leurs
-// aires exactes s'ajoutent ici sans changer le contrat de `StudioStats`.
+// Objets plats (WP-02) : aires EXACTES des polygones (plaque, disque, cadre,
+// contours des strates) et, pour le texte, la table de métriques des glyphes
+// (aire et chasse de chaque caractère) : pas de contour de glyphe, donc le même
+// chiffre en SSR et côté client. Le Relief et la Borne, pleins et de plus de
+// 3 mm, s'impriment en coque de 0,8 mm + remplissage à 15 % (§6.5) ; la
+// Cartouche, mince, est pleine.
 import { estimate } from "./estimate";
-import { checkLavauxWith } from "./guards";
+import {
+  borneStrokeFix,
+  checkFlatWith,
+  checkLavauxWith,
+  checkReliefWith,
+} from "./guards";
+import { layoutBorne } from "./objects/borne-model";
+import { layoutCartouche } from "./objects/cartouche-model";
+import {
+  analyzeFlat,
+  flatBands,
+  flatHeight,
+  type FlatModel,
+} from "./objects/flat-model";
 import { analyzeLavaux } from "./objects/lavaux-analysis";
 import { LAYER_HEIGHT } from "./objects/lavaux-model";
+import {
+  analyzeRelief,
+  layoutRelief,
+  type Locale,
+} from "./objects/relief-model";
 import { PRICING, type PricingParams } from "./pricing-params";
 import type {
   Band,
   LavauxConfig,
+  Printability,
+  ReliefConfig,
   StudioConfig,
   StudioStats,
   StudioTexts,
@@ -85,17 +109,118 @@ function lavauxStats(config: LavauxConfig, params: PricingParams): StudioStats {
   return stats;
 }
 
+/** Épaisseur de la coque pleine (mm) et remplissage des objets épais (§6.5). */
+export const SHELL_MM = 0.8;
+export const INFILL = 0.15;
+
+/**
+ * Volume imprimé (mm³) d'un objet plein de plus de 3 mm : coque de 0,8 mm
+ * pleine + remplissage à 15 % du reste (`V_coque = min(V, A × 0,8)`).
+ */
+export function solidPrintVolume(
+  volumeMm3: number,
+  surfaceMm2: number,
+): number {
+  const shell = Math.min(volumeMm3, surfaceMm2 * SHELL_MM);
+  return shell + INFILL * (volumeMm3 - shell);
+}
+
+function finish(
+  base: Omit<StudioStats, "grams" | "minutes" | "purgeGrams" | "estimate"> & {
+    printVolumeMm3: number;
+  },
+  params: PricingParams,
+): StudioStats {
+  const { printVolumeMm3, ...rest } = base;
+  const { grams, minutes, purgeGrams } = printFigures(
+    printVolumeMm3,
+    rest.layers,
+    rest.changes,
+    params,
+  );
+  const stats: StudioStats = {
+    ...rest,
+    grams: Math.round(grams * 10) / 10,
+    minutes: Math.round(minutes),
+    purgeGrams: Math.round(purgeGrams * 10) / 10,
+  };
+  stats.estimate = estimate(stats, params);
+  return stats;
+}
+
+function flatStats(
+  model: FlatModel,
+  printable: Printability,
+  solid: boolean,
+  params: PricingParams,
+): StudioStats {
+  const analysis = analyzeFlat(model);
+  const height = flatHeight(model);
+  return finish(
+    {
+      heightMm: height,
+      widthMm: Math.round(model.widthMm * 10) / 10,
+      depthMm: Math.round(model.depthMm * 10) / 10,
+      layers: layerCount(height),
+      volumeCm3: Math.round(analysis.volumeMm3) / 1000,
+      changes: countChanges(flatBands(model)),
+      printable,
+      printVolumeMm3: solid
+        ? solidPrintVolume(analysis.volumeMm3, analysis.surfaceMm2)
+        : analysis.volumeMm3,
+    },
+    params,
+  );
+}
+
+function reliefStats(
+  config: ReliefConfig,
+  texts: StudioTexts | undefined,
+  locale: Locale | undefined,
+  params: PricingParams,
+): StudioStats {
+  const model = layoutRelief(config, texts, locale);
+  const analysis = analyzeRelief(model);
+  return finish(
+    {
+      heightMm: model.heightMm,
+      widthMm: config.size,
+      depthMm: config.size,
+      layers: layerCount(model.heightMm),
+      volumeCm3: Math.round(analysis.volumeMm3) / 1000,
+      changes: countChanges(config.bands),
+      printable: checkReliefWith(config, model),
+      printVolumeMm3: solidPrintVolume(analysis.volumeMm3, analysis.surfaceMm2),
+    },
+    params,
+  );
+}
+
 /**
  * Statistiques d'une configuration. `texts` n'influe que sur les objets à
- * texte (WP-02). `params` permet de tester un barème validé sans toucher à
+ * texte (Cartouche, Relief, Borne) ; `locale` seulement sur l'étiquette du
+ * sous-verre. `params` permet de tester un barème validé sans toucher à
  * PRICING (aucun CHF tant que `PRICING.validated` vaut false).
  */
 export function computeStats(
   config: StudioConfig,
   texts?: StudioTexts,
   params: PricingParams = PRICING,
+  locale?: Locale,
 ): StudioStats {
-  void texts;
-  if (config.object === "lavaux") return lavauxStats(config, params);
-  throw new Error(`computeStats : « ${config.object} » est livré par WP-02`);
+  switch (config.object) {
+    case "lavaux":
+      return lavauxStats(config, params);
+    case "cartouche": {
+      const model = layoutCartouche(config, texts);
+      return flatStats(model, checkFlatWith(model), false, params);
+    }
+    case "borne": {
+      const model = layoutBorne(config, texts);
+      const printable = checkFlatWith(model, () => borneStrokeFix(config));
+      return flatStats(model, printable, true, params);
+    }
+    case "relief":
+      return reliefStats(config, texts, locale, params);
+  }
 }

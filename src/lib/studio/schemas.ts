@@ -127,6 +127,100 @@ export function quantizeMm(mm: number): number {
 
 const toLayer = quantizeMm;
 
+// ── Objets plats (WP-02) : couplages de la Cartouche et du Relief ───────────
+
+/**
+ * Profondeur maximale (mm) d'une Cartouche : 1,2 mm en relief ; en gravure le
+ * fond garde au moins 0,4 mm (deux couches) sous les lettres, donc
+ * `profondeur ≤ épaisseur − 0,4` (à 1,2 mm de plaque : 0,8 mm de gravure).
+ */
+export function cartoucheDepthMax(
+  thickness: number,
+  mode: "relief" | "gravure",
+): number {
+  const max = CARTOUCHE_RANGES.depth.max;
+  if (mode !== "gravure") return max;
+  const limit = Math.floor((thickness - 0.4) / 0.2 + 1e-9) * 0.2;
+  return Math.min(
+    max,
+    Math.max(CARTOUCHE_RANGES.depth.min, Number(limit.toFixed(1))),
+  );
+}
+
+/**
+ * Épaisseur d'une strate du sous-verre (mm) : Δ = max(0,4 ; round(relief /
+ * strates / 0,2) × 0,2) (§6.3.4) ; le relief réel est `strates × Δ`, qui peut
+ * dépasser le `relief` demandé quand les strates sont nombreuses.
+ */
+export function strataThickness(levels: number, relief: number): number {
+  return Math.max(
+    0.4,
+    Number((Math.round(relief / levels / 0.2) * 0.2).toFixed(1)),
+  );
+}
+
+/** Sommets de strates (mm) : `base + k × Δ`, k = 0 (le socle) à `levels` (le sommet). */
+export function strataTops(
+  base: number,
+  relief: number,
+  levels: number,
+): number[] {
+  const delta = strataThickness(levels, relief);
+  return Array.from({ length: levels + 1 }, (_, k) =>
+    quantizeMm(base + k * delta),
+  );
+}
+
+/** Hauteur réelle du sous-verre (mm) : le sommet de la dernière strate. */
+export function reliefTop(
+  base: number,
+  relief: number,
+  levels: number,
+): number {
+  return strataTops(base, relief, levels)[levels];
+}
+
+/**
+ * Bandes du sous-verre « calées sur les sommets de strates » (§6.4) : chaque
+ * frontière rejoint le sommet de strate le plus proche, strictement croissant,
+ * la première au plus bas sur le socle (la bande « lac » couvre le socle), la
+ * dernière au sommet. 2 à 4 bandes ; une liste trop courte est complétée.
+ */
+export function snapReliefBands(
+  bands: readonly Band[],
+  base: number,
+  relief: number,
+  levels: number,
+): Band[] {
+  const tops = strataTops(base, relief, levels);
+  const list = bands.slice(0, MAX_BANDS);
+  while (list.length < 2) {
+    list.push({
+      filament: list.length === 0 ? "bleu-leman" : "vert-lavaux",
+      toMm: tops[levels],
+    });
+  }
+  const delta = strataThickness(levels, relief);
+  const out: Band[] = [];
+  let prev = -1;
+  list.forEach((band, i) => {
+    const last = i === list.length - 1;
+    if (last) {
+      out.push({ filament: band.filament, toMm: tops[levels] });
+      return;
+    }
+    // Indice de strate voulu, borné pour laisser un cran à chaque bande suivante.
+    const wanted = Math.round((band.toMm - base) / delta);
+    const k = Math.min(
+      Math.max(wanted, prev + 1, 0),
+      levels - (list.length - 1 - i),
+    );
+    out.push({ filament: band.filament, toMm: tops[k] });
+    prev = k;
+  });
+  return out;
+}
+
 /**
  * Bandes valides pour une hauteur : frontières à la couche, épaisseur ≥ 2 mm,
  * 1 à 4 bandes, la dernière finit à `h`. Une bande de trop (hauteur trop
@@ -257,12 +351,17 @@ const filamentOr = (v: FilamentId, fallback: FilamentId): FilamentId =>
 
 export function clampCartouche(config: CartoucheConfig): CartoucheConfig {
   const R = CARTOUCHE_RANGES;
+  const thickness = clampRange(config.thickness, R.thickness);
+  const mode = oneOf(config.mode, ["relief", "gravure"], "relief");
   return {
     object: "cartouche",
-    thickness: clampRange(config.thickness, R.thickness),
+    thickness,
     corner: clampRange(config.corner, R.corner),
-    mode: oneOf(config.mode, ["relief", "gravure"], "relief"),
-    depth: clampRange(config.depth, R.depth),
+    mode,
+    depth: Math.min(
+      clampRange(config.depth, R.depth),
+      cartoucheDepthMax(thickness, mode),
+    ),
     layout: oneOf(
       config.layout,
       ["classique", "centree", "cartouche", "monogramme"],
@@ -277,24 +376,20 @@ export function clampRelief(config: ReliefConfig): ReliefConfig {
   const R = RELIEF_RANGES;
   const base = clampRange(config.base, R.base);
   const relief = clampRange(config.relief, R.relief);
-  const total = base + relief;
+  const levels = clampRange(config.levels, R.levels);
   return {
     object: "relief",
     shape: oneOf(config.shape, ["rond", "carre"], "rond"),
     size: clampRange(config.size, R.size),
     base,
     relief,
-    levels: clampRange(config.levels, R.levels),
+    levels,
     seed: clampRange(config.seed, R.seed),
     lake: clampRange(config.lake, R.lake),
-    // Bandes : 2 à 4, calées sur les sommets de strates par WP-02 ; ici on
-    // garantit seulement la forme (frontières à la couche, ordre, dernière = sommet).
-    bands: normalizeBands(
-      config.bands,
-      toLayer(total),
-      "bleu-leman",
-      0.2,
-    ).slice(0, MAX_BANDS),
+    // Bandes : 2 à 4, calées sur les sommets de strates (la première couvre le
+    // socle, la dernière finit au sommet) : la barre altimétrique ne propose
+    // que ces crans, un lien décodé y est ramené.
+    bands: snapReliefBands(config.bands, base, relief, levels),
     label: Boolean(config.label),
   };
 }
@@ -432,7 +527,9 @@ export const reliefSchema = z
     bands: bandsSchema(2, MAX_BANDS),
     label: z.boolean(),
   })
-  .refine((c) => increasingTo(c.bands, c.base + c.relief, 1), {
+  // Le sommet réel (`base + strates × Δ`) dépend des strates : le schéma ne
+  // vérifie que l'ordre, le bornage ramène ensuite chaque frontière au cran.
+  .refine((c) => increasingTo(c.bands, c.bands[c.bands.length - 1].toMm), {
     message: "les bandes doivent être croissantes",
     path: ["bands"],
   });
