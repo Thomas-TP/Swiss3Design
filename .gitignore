@@ -58,3 +58,6 @@ key.txt
 # Preuves locales, captures et scripts temporaires de diagnostic
 /output/
 /.playwright-cli/
+
+# Instances statiques de police (fabrication des glyphes, jamais commitees)
+/build/

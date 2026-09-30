@@ -57,7 +57,22 @@
     "houle": "Swell",
     "pave": "Cobblestone",
     "colonne": "Column",
-    "galet": "Pebble"
+    "galet": "Pebble",
+    "classique": "Classic",
+    "centree": "Centered",
+    "cadre": "Frame",
+    "monogramme": "Monogram",
+    "incrustee": "Inlaid",
+    "massif": "Massif",
+    "lac": "Lake",
+    "arete": "Ridge",
+    "glacier": "Glacier",
+    "plateau": "Plateau",
+    "pilule": "Pill",
+    "etiquette": "Tag",
+    "goutte": "Drop",
+    "pic": "Peak",
+    "grave": "Engraved"
   },
   "options": {
     "mode": {
@@ -135,5 +150,13 @@
     "peak": "Mount {name}",
     "summit": "{peak} · {altitude} m",
     "fictional": "fictional altitude"
+  },
+  "examples": {
+    "name": "Léa Dubois",
+    "role": "Architect",
+    "line1": "lea@example.ch",
+    "line2": "+41 21 000 00 00",
+    "peak": "Léa",
+    "text": "Léa"
   }
 }

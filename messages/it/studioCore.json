@@ -57,7 +57,22 @@
     "houle": "Onda lunga",
     "pave": "Acciottolato",
     "colonne": "Colonna",
-    "galet": "Ciottolo"
+    "galet": "Ciottolo",
+    "classique": "Classico",
+    "centree": "Centrato",
+    "cadre": "Cornice",
+    "monogramme": "Monogramma",
+    "incrustee": "Intarsiato",
+    "massif": "Massiccio",
+    "lac": "Lago",
+    "arete": "Cresta",
+    "glacier": "Ghiacciaio",
+    "plateau": "Altopiano",
+    "pilule": "Pillola",
+    "etiquette": "Etichetta",
+    "goutte": "Goccia",
+    "pic": "Picco",
+    "grave": "Inciso"
   },
   "options": {
     "mode": {
@@ -135,5 +150,13 @@
     "peak": "Pizzo {name}",
     "summit": "{peak} · {altitude} m",
     "fictional": "quota immaginaria"
+  },
+  "examples": {
+    "name": "Léa Dubois",
+    "role": "Architetta",
+    "line1": "lea@esempio.ch",
+    "line2": "+41 21 000 00 00",
+    "peak": "Léa",
+    "text": "Léa"
   }
 }

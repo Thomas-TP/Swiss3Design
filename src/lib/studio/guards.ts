@@ -18,19 +18,31 @@
 //
 // Silhouette d'Ian (Vase spirale, CC BY-ND 4.0, §1.5) : pas de profil
 // « bouteille », col ≥ 0,5 (exclus par construction) et `nearVaseSpirale`.
+import { layoutBorne } from "./objects/borne-model";
+import { layoutCartouche } from "./objects/cartouche-model";
+import type { FlatModel } from "./objects/flat-model";
 import { analyzeLavaux, type LavauxAnalysis } from "./objects/lavaux-analysis";
+import {
+  layoutRelief,
+  type Locale,
+  type ReliefModel,
+} from "./objects/relief-model";
 import {
   clampLavaux,
   gradinsDepthMax,
   MIN_BAND_MM,
   vaguesWavelengthMin,
-} from "./schemas";
+} from "./ranges";
+import { strokeLevel, type TextIssue } from "./text/check";
+import { capForStroke, STROKE_WARN_MM } from "./text/layout";
 import type {
   Band,
+  BorneConfig,
   IssueCode,
   LavauxConfig,
   Printability,
   StudioConfig,
+  StudioTexts,
 } from "./types";
 
 /** Volume maximal d'impression des machines de l'atelier (mm) : P1S 256, K2 260. */
@@ -77,6 +89,16 @@ export function issueValues(issue: Issue): Record<string, number> {
     out.value = issue.value;
   }
   return out;
+}
+
+/**
+ * Arguments ICU de type chaîne d'une anomalie : `char` pour `text-char`
+ * (« Caractère non imprimable : {char} »). À fusionner avec `issueValues`.
+ */
+export function issueStrings(issue: Issue): Record<string, string> {
+  return issue.code === "text-char" && issue.char !== undefined
+    ? { char: issue.char }
+    : {};
 }
 
 /** Silhouette du Vase spirale de Ian : nervures fines et torsadées, col fin. */
@@ -350,14 +372,121 @@ export function checkLavaux(config: LavauxConfig): Printability {
   return checkLavauxWith(config, analyzeLavaux(config));
 }
 
+// ── Objets plats à texte (WP-02) ─────────────────────────────────────────────
+//
+// Textes (brief §6.3.3 et §6.6) : un caractère hors du jeu de glyphes est une
+// ERREUR (`text-char`, « Caractère non imprimable : ✦ », retirez-le) ; un texte
+// qui ne tient pas à la capitale minimale est une ERREUR (`text-fit`,
+// « raccourcissez-le ») ; un trait sous 0,8 mm est un AVERTISSEMENT, sous
+// 0,6 mm une ERREUR (`text-stroke`, agrandissez les lettres). Le porte-nom
+// propose la correction (la hauteur de ses lettres) ; la carte et le sous-verre
+// n'ont pas de réglage de taille de texte : pas de correction automatique.
+
+type Found = { issue: Issue; level: "warn" | "error" };
+
+/** Anomalies de texte d'un modèle, avec leur niveau. */
+function textIssues(
+  issues: readonly TextIssue[],
+  fixStroke?: () => Partial<StudioConfig> | undefined,
+): Found[] {
+  return issues.map((t): Found => {
+    if (t.code === "text-char") {
+      return {
+        level: "error",
+        issue: { code: "text-char", field: t.field, char: t.char },
+      };
+    }
+    if (t.code === "text-fit") {
+      return {
+        level: "error",
+        issue: {
+          code: "text-fit",
+          field: t.field,
+          ...(t.value !== undefined ? { value: t.value } : {}),
+        },
+      };
+    }
+    const fix = fixStroke?.();
+    return {
+      level: strokeLevel(t.value ?? 0),
+      issue: {
+        code: "text-stroke",
+        field: t.field,
+        ...(t.value !== undefined ? { value: t.value } : {}),
+        ...(fix ? { fix } : {}),
+      },
+    };
+  });
+}
+
+function toPrintability(found: Found[]): Printability {
+  if (found.length === 0) return { status: "ok" };
+  const status = found.some((f) => f.level === "error") ? "error" : "warn";
+  return { status, issues: found.map((f) => f.issue) };
+}
+
+function plateIssue(width: number, depth: number, height: number): Found[] {
+  const biggest = Math.max(width, depth, height);
+  return biggest > PLATE_MM
+    ? [
+        {
+          level: "error",
+          issue: { code: "plate", value: Math.round(biggest * 10) / 10 },
+        },
+      ]
+    : [];
+}
+
+/** Garde-fous d'un modèle de Cartouche ou de Borne (plaque + encre). */
+export function checkFlatWith(
+  model: FlatModel,
+  fixStroke?: () => Partial<StudioConfig> | undefined,
+): Printability {
+  return toPrintability([
+    ...plateIssue(model.widthMm, model.depthMm, model.plateMm + model.inkMm),
+    ...textIssues(model.issues, fixStroke),
+  ]);
+}
+
+/** Garde-fous du sous-verre : le plateau et le texte de l'étiquette. */
+export function checkReliefWith(
+  config: { size: number },
+  model: ReliefModel,
+): Printability {
+  return toPrintability([
+    ...plateIssue(config.size, config.size, model.heightMm),
+    ...textIssues(model.issues),
+  ]);
+}
+
+/** Correction du trait du porte-nom : la plus petite hauteur de lettres (0,5 mm près) qui donne 0,8 mm. */
+export function borneStrokeFix(
+  config: BorneConfig,
+): Partial<BorneConfig> | undefined {
+  const cap = Math.min(10, Math.ceil(capForStroke(STROKE_WARN_MM) * 2) / 2);
+  return cap > config.cap ? { cap } : undefined;
+}
+
 /**
- * Garde-fous d'une configuration quelconque. Les objets à texte et plats
- * (Cartouche, Relief, Borne) arrivent avec WP-02 : ils lèvent ici plutôt que
- * de répondre « imprimable » sans avoir rien vérifié.
+ * Garde-fous d'une configuration quelconque. Les objets à texte lisent `texts` ;
+ * `locale` ne compte que pour l'étiquette du sous-verre (sa longueur varie avec
+ * « POINTE » / « PIZ » / « PIZZO » / « MOUNT »).
  */
-export function checkPrintability(config: StudioConfig): Printability {
-  if (config.object === "lavaux") return checkLavaux(config);
-  throw new Error(
-    `checkPrintability : « ${config.object} » est livré par WP-02`,
-  );
+export function checkPrintability(
+  config: StudioConfig,
+  texts?: StudioTexts,
+  locale?: Locale,
+): Printability {
+  switch (config.object) {
+    case "lavaux":
+      return checkLavaux(config);
+    case "cartouche":
+      return checkFlatWith(layoutCartouche(config, texts));
+    case "borne":
+      return checkFlatWith(layoutBorne(config, texts), () =>
+        borneStrokeFix(config),
+      );
+    case "relief":
+      return checkReliefWith(config, layoutRelief(config, texts, locale));
+  }
 }

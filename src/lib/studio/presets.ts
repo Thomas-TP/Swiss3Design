@@ -3,11 +3,20 @@
 // « Surprenez-moi »). Les textes d'exemple (« Léa Dubois », …) ne vivent PAS
 // ici : ils sont des StudioTexts, jamais dans une configuration ni dans l'URL.
 //
-// WP-02 complète ce fichier pour Cartouche, Relief et Borne (préréglages,
-// `RELIEF_DEFAULT` définitif).
+// WP-02 complète ce fichier pour Cartouche, Relief et Borne : préréglages de
+// chaque objet (`CARTOUCHE_PRESETS`, `RELIEF_PRESETS`, `BORNE_PRESETS`) et
+// `RELIEF_DEFAULT` définitif (graine 1291, 8 strates, lac 18 %).
 import { between, intBetween, mulberry32, pick, type Rng } from "./kernel/rng";
-import { checkLavaux, nearVaseSpirale } from "./guards";
-import { gradinsDepthMax, quantizeMm } from "./schemas";
+import { checkLavaux, checkPrintability, nearVaseSpirale } from "./guards";
+import { analyzeRelief, layoutRelief } from "./objects/relief-model";
+import {
+  clampBorne,
+  clampCartouche,
+  clampRelief,
+  gradinsDepthMax,
+  quantizeMm,
+} from "./ranges";
+import { DEFAULT_TEXTS } from "./text/fields";
 import type {
   Band,
   BorneConfig,
@@ -254,6 +263,228 @@ export const LAVAUX_PRESETS: readonly LavauxPreset[] = [
   },
 ];
 
+// ── Préréglages des objets plats (WP-02) ─────────────────────────────────────
+//
+// Un préréglage est une configuration complète, sans texte (les textes ne sont
+// jamais dans une configuration) ; son nom est `studioCore.presets.<id>`. Les
+// identifiants sont uniques sur les quatre objets (test). Les bandes du
+// sous-verre sont calées sur les sommets de strates : `snapReliefBands` ne les
+// modifie pas (test de point fixe).
+
+export interface ObjectPreset<C extends StudioConfig> {
+  /** Clé de traduction : studioCore.presets.<id>. */
+  id: string;
+  config: C;
+}
+
+export const CARTOUCHE_PRESETS: readonly ObjectPreset<CartoucheConfig>[] = [
+  { id: "classique", config: CARTOUCHE_DEFAULT },
+  {
+    id: "centree",
+    config: {
+      object: "cartouche",
+      thickness: 1.6,
+      corner: 4,
+      mode: "relief",
+      depth: 0.6,
+      layout: "centree",
+      plate: "gris-molasse",
+      ink: "blanc-neve",
+    },
+  },
+  {
+    id: "cadre",
+    config: {
+      object: "cartouche",
+      thickness: 2,
+      corner: 2,
+      mode: "relief",
+      depth: 0.8,
+      layout: "cartouche",
+      plate: "bleu-leman",
+      ink: "blanc-neve",
+    },
+  },
+  {
+    id: "monogramme",
+    config: {
+      object: "cartouche",
+      thickness: 1.6,
+      corner: 3,
+      mode: "relief",
+      depth: 0.6,
+      layout: "monogramme",
+      plate: "encre",
+      ink: "blanc-neve",
+    },
+  },
+  {
+    id: "incrustee",
+    config: {
+      object: "cartouche",
+      thickness: 2,
+      corner: 3,
+      mode: "gravure",
+      depth: 0.8,
+      layout: "classique",
+      plate: "blanc-neve",
+      ink: "rouge-signal",
+    },
+  },
+];
+
+export const RELIEF_PRESETS: readonly ObjectPreset<ReliefConfig>[] = [
+  { id: "massif", config: RELIEF_DEFAULT },
+  {
+    id: "lac",
+    config: {
+      object: "relief",
+      shape: "rond",
+      size: 100,
+      base: 3,
+      relief: 2.4,
+      levels: 6,
+      seed: 1048,
+      lake: 36,
+      bands: [
+        { filament: "bleu-leman", toMm: 3 },
+        { filament: "vert-lavaux", toMm: 4.2 },
+        { filament: "blanc-neve", toMm: 5.4 },
+      ],
+      label: true,
+    },
+  },
+  {
+    id: "arete",
+    config: {
+      object: "relief",
+      shape: "carre",
+      size: 100,
+      base: 3.4,
+      relief: 4,
+      levels: 12,
+      seed: 3655,
+      lake: 12,
+      bands: [
+        { filament: "encre", toMm: 5 },
+        { filament: "gris-molasse", toMm: 7 },
+        { filament: "blanc-neve", toMm: 8.2 },
+      ],
+      label: true,
+    },
+  },
+  {
+    id: "glacier",
+    config: {
+      object: "relief",
+      shape: "carre",
+      size: 100,
+      base: 3,
+      relief: 3.2,
+      levels: 8,
+      seed: 3892,
+      lake: 8,
+      bands: [
+        { filament: "glacier", toMm: 3.8 },
+        { filament: "gris-molasse", toMm: 5.4 },
+        { filament: "blanc-neve", toMm: 6.2 },
+      ],
+      label: true,
+    },
+  },
+  {
+    id: "plateau",
+    config: {
+      object: "relief",
+      shape: "rond",
+      size: 100,
+      base: 2.4,
+      relief: 1.6,
+      levels: 4,
+      seed: 2470,
+      lake: 24,
+      bands: [
+        { filament: "vert-lavaux", toMm: 2.8 },
+        { filament: "ambre", toMm: 3.6 },
+        { filament: "blanc-neve", toMm: 4 },
+      ],
+      label: true,
+    },
+  },
+];
+
+export const BORNE_PRESETS: readonly ObjectPreset<BorneConfig>[] = [
+  { id: "pilule", config: BORNE_DEFAULT },
+  {
+    id: "etiquette",
+    config: {
+      object: "borne",
+      shape: "etiquette",
+      cap: 7,
+      thickness: 4,
+      ring: "droite",
+      ringD: 5,
+      mode: "relief",
+      base: "bleu-leman",
+      ink: "blanc-neve",
+    },
+  },
+  {
+    id: "goutte",
+    config: {
+      object: "borne",
+      shape: "goutte",
+      cap: 8,
+      thickness: 4,
+      ring: "gauche",
+      ringD: 5,
+      mode: "relief",
+      base: "rouge-signal",
+      ink: "blanc-neve",
+    },
+  },
+  {
+    id: "pic",
+    config: {
+      object: "borne",
+      shape: "pic",
+      cap: 6,
+      thickness: 4.4,
+      ring: "gauche",
+      ringD: 4.5,
+      mode: "relief",
+      base: "gris-molasse",
+      ink: "encre",
+    },
+  },
+  {
+    id: "grave",
+    config: {
+      object: "borne",
+      shape: "pilule",
+      cap: 8,
+      thickness: 4,
+      ring: "aucun",
+      ringD: 5,
+      mode: "gravure",
+      base: "blanc-neve",
+      ink: "encre",
+    },
+  },
+];
+
+/** Préréglages de chaque objet, dans l'ordre d'affichage. */
+export const PRESETS: {
+  [K in StudioObjectId]: readonly ObjectPreset<
+    Extract<StudioConfig, { object: K }>
+  >[];
+} = {
+  lavaux: LAVAUX_PRESETS.map((p) => ({ id: p.id, config: p.config })),
+  cartouche: CARTOUCHE_PRESETS,
+  relief: RELIEF_PRESETS,
+  borne: BORNE_PRESETS,
+};
+
 // ── « Surprenez-moi » (§6.7) ─────────────────────────────────────────────────
 
 const SURPRISE_PROFILES: LavauxConfig["profile"][] = [
@@ -375,4 +606,127 @@ export function surpriseLavaux(seed: number): LavauxConfig {
     if (checkLavaux(config).status === "ok") return config;
   }
   return structuredClone(pick(rng, LAVAUX_PRESETS).config);
+}
+
+// ── « Surprenez-moi » des objets plats (WP-02) ───────────────────────────────
+//
+// Même contrat que `surpriseLavaux` : bornes « belles », teintes contrastées,
+// garde-fous vérifiés (10 essais), un préréglage sûr à défaut. Les textes
+// d'exemple servent à la vérification (un texte saisi par le visiteur ne change
+// jamais la configuration tirée).
+
+/** Écart de luminosité minimal entre la plaque et l'encre (lisibilité du texte). */
+const INK_CONTRAST = 0.45;
+
+function contrastedPair(rng: Rng): [FilamentId, FilamentId] {
+  for (let attempt = 0; attempt < 24; attempt++) {
+    const a = pick(rng, SURPRISE_FILAMENTS);
+    const b = pick(rng, SURPRISE_FILAMENTS);
+    if (Math.abs(LUMA[a] - LUMA[b]) >= INK_CONTRAST) return [a, b];
+  }
+  return ["blanc-neve", "encre"];
+}
+
+/** Carte au hasard : mise en page, mode, épaisseur, coins, couleurs contrastées. */
+export function surpriseCartouche(seed: number): CartoucheConfig {
+  const rng = mulberry32(seed);
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const [plate, ink] = contrastedPair(rng);
+    const mode = pick(rng, ["relief", "relief", "gravure"] as const);
+    const config = clampCartouche({
+      object: "cartouche",
+      thickness: pick(rng, [1.6, 1.8, 2, 2.2, 2.4] as const),
+      corner: pick(rng, [2, 3, 3, 4, 5] as const),
+      mode,
+      depth: pick(rng, [0.6, 0.8] as const),
+      layout: pick(rng, [
+        "classique",
+        "centree",
+        "cartouche",
+        "monogramme",
+      ] as const),
+      plate,
+      ink,
+    });
+    if (checkPrintability(config, DEFAULT_TEXTS.cartouche).status === "ok") {
+      return config;
+    }
+  }
+  return structuredClone(pick(rng, CARTOUCHE_PRESETS).config);
+}
+
+/** Palettes du sous-verre : lac, prairie, roche, neige (2 à 4 bandes, du bas vers le haut). */
+const RELIEF_PALETTES: readonly (readonly FilamentId[])[] = [
+  ["bleu-leman", "vert-lavaux", "gris-molasse", "blanc-neve"],
+  ["bleu-leman", "vert-lavaux", "blanc-neve"],
+  ["glacier", "gris-molasse", "blanc-neve"],
+  ["vert-lavaux", "ambre", "blanc-neve"],
+  ["encre", "gris-molasse", "blanc-neve"],
+  ["bleu-leman", "glacier", "blanc-neve"],
+  ["rouge-signal", "ambre", "blanc-neve"],
+];
+
+/** Massif au hasard : graine, forme, relief, strates, lac, palette, bandes calées sur les strates. */
+export function surpriseRelief(seed: number): ReliefConfig {
+  const rng = mulberry32(seed);
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const palette = pick(rng, RELIEF_PALETTES);
+    const base = pick(rng, [2.6, 3, 3.4] as const);
+    const relief = pick(rng, [2.4, 2.8, 3.2, 3.6, 4] as const);
+    const levels = intBetween(rng, 6, 10);
+    // Frontières à peu près également réparties sur la hauteur ; `clampRelief` les cale sur les strates.
+    const bands: Band[] = palette.map((filament, k) => ({
+      filament,
+      toMm:
+        k === palette.length - 1
+          ? base + relief
+          : base + (relief * (k + 0.6)) / palette.length,
+    }));
+    const config = clampRelief({
+      object: "relief",
+      shape: pick(rng, ["rond", "rond", "carre"] as const),
+      size: 100,
+      base,
+      relief,
+      levels,
+      seed: intBetween(rng, 0, 9999),
+      lake: intBetween(rng, 10, 30),
+      bands,
+      label: true,
+    });
+    // Un massif dont une strate disparaît (sommet trop pointu) n'est pas « beau ».
+    const areas = analyzeRelief(
+      layoutRelief(config, DEFAULT_TEXTS.relief),
+    ).levelAreas;
+    if (
+      Math.min(...areas) >= 5 &&
+      checkPrintability(config, DEFAULT_TEXTS.relief).status === "ok"
+    ) {
+      return config;
+    }
+  }
+  return structuredClone(pick(rng, RELIEF_PRESETS).config);
+}
+
+/** Porte-nom au hasard : forme, taille, anneau, mode, couleurs contrastées. */
+export function surpriseBorne(seed: number): BorneConfig {
+  const rng = mulberry32(seed);
+  for (let attempt = 0; attempt < 10; attempt++) {
+    const [base, ink] = contrastedPair(rng);
+    const config = clampBorne({
+      object: "borne",
+      shape: pick(rng, ["pilule", "etiquette", "goutte", "pic"] as const),
+      cap: pick(rng, [6, 6.5, 7, 7.5, 8] as const),
+      thickness: pick(rng, [3.6, 4, 4.4, 4.8] as const),
+      ring: pick(rng, ["gauche", "gauche", "droite", "aucun"] as const),
+      ringD: pick(rng, [4.5, 5, 5.5] as const),
+      mode: pick(rng, ["relief", "relief", "gravure"] as const),
+      base,
+      ink,
+    });
+    if (checkPrintability(config, DEFAULT_TEXTS.borne).status === "ok") {
+      return config;
+    }
+  }
+  return structuredClone(pick(rng, BORNE_PRESETS).config);
 }

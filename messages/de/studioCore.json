@@ -57,7 +57,22 @@
     "houle": "Dünung",
     "pave": "Pflaster",
     "colonne": "Säule",
-    "galet": "Kiesel"
+    "galet": "Kiesel",
+    "classique": "Klassisch",
+    "centree": "Zentriert",
+    "cadre": "Rahmen",
+    "monogramme": "Monogramm",
+    "incrustee": "Eingelegt",
+    "massif": "Massiv",
+    "lac": "See",
+    "arete": "Grat",
+    "glacier": "Gletscher",
+    "plateau": "Hochebene",
+    "pilule": "Pille",
+    "etiquette": "Etikett",
+    "goutte": "Tropfen",
+    "pic": "Spitze",
+    "grave": "Graviert"
   },
   "options": {
     "mode": {
@@ -135,5 +150,13 @@
     "peak": "Piz {name}",
     "summit": "{peak} · {altitude} m",
     "fictional": "fiktive Höhe"
+  },
+  "examples": {
+    "name": "Léa Dubois",
+    "role": "Architektin",
+    "line1": "lea@beispiel.ch",
+    "line2": "+41 21 000 00 00",
+    "peak": "Léa",
+    "text": "Léa"
   }
 }

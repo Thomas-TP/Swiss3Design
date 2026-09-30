@@ -144,6 +144,10 @@ export type Printability =
         code: IssueCode;
         atMm?: number;
         value?: number;
+        /** `text-char` : le caractère refusé (argument `{char}` du message). */
+        char?: string;
+        /** Champ de texte concerné (`name`, `role`, `line1`, `line2`, `peak`, `text`). */
+        field?: string;
         fix?: Partial<StudioConfig>;
       }[];
     };

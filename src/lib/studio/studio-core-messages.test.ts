@@ -8,8 +8,9 @@ import { fileURLToPath } from "node:url";
 import { describe, expect, it } from "vitest";
 import { FILAMENT_IDS } from "./filaments";
 import { ISSUE_MESSAGE_KEYS, issueValues } from "./guards";
-import { HERO_PALETTE_KEYS, LAVAUX_PRESETS } from "./presets";
+import { HERO_PALETTE_KEYS, PRESETS } from "./presets";
 import { LAVAUX_PATTERN_KINDS, LAVAUX_PROFILES } from "./schemas";
+import { DEFAULT_TEXTS, OBJECT_TEXT_FIELDS } from "./text/fields";
 import { STUDIO_OBJECT_IDS, type IssueCode } from "./types";
 
 const LOCALES = ["fr", "de", "it", "en"] as const;
@@ -54,8 +55,18 @@ describe("studioCore : couverture du code", () => {
       for (const pattern of LAVAUX_PATTERN_KINDS) has(`patterns.${pattern}`);
       for (const palette of HERO_PALETTE_KEYS) has(`palettes.${palette}`);
       for (const filament of FILAMENT_IDS) has(`filaments.${filament}`);
-      for (const preset of LAVAUX_PRESETS) has(`presets.${preset.id}`);
-      expect(LAVAUX_PRESETS.length).toBeGreaterThan(0);
+      for (const id of STUDIO_OBJECT_IDS) {
+        expect(PRESETS[id].length).toBeGreaterThan(0);
+        for (const preset of PRESETS[id]) has(`presets.${preset.id}`);
+      }
+      expect(missing).toEqual([]);
+    });
+
+    it(`${locale} : textes d'exemple de chaque champ de texte`, () => {
+      missing.length = 0;
+      for (const id of STUDIO_OBJECT_IDS) {
+        for (const field of OBJECT_TEXT_FIELDS[id]) has(`examples.${field}`);
+      }
       expect(missing).toEqual([]);
     });
 
@@ -121,6 +132,22 @@ describe("studioCore : couverture du code", () => {
     });
     expect(issueValues({ code: "near-vase-spirale" })).toEqual({});
     expect(lookup(fr, ISSUE_MESSAGE_KEYS["text-char"])).toContain("{char}");
+  });
+
+  it("les textes d'exemple français sont DEFAULT_TEXTS (posters, statistiques du défaut)", () => {
+    const fr = load("fr");
+    for (const id of STUDIO_OBJECT_IDS) {
+      for (const field of OBJECT_TEXT_FIELDS[id]) {
+        expect(lookup(fr, `examples.${field}`), `${id}.${field}`).toBe(
+          DEFAULT_TEXTS[id][field],
+        );
+      }
+    }
+  });
+
+  it("identifiants de préréglage uniques sur les quatre objets", () => {
+    const ids = STUDIO_OBJECT_IDS.flatMap((id) => PRESETS[id].map((p) => p.id));
+    expect(new Set(ids).size).toBe(ids.length);
   });
 
   it("le message du Vase spirale est celui du brief, dans les 4 langues", () => {
