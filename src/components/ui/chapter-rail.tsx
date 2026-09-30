@@ -4,8 +4,16 @@ import { useEffect, useState } from "react";
 import { motionBridge } from "@/lib/motion-bridge/store";
 import { cx } from "./cx";
 
-// Rail des chapitres (brief « Strates », §3.3) : desktop ≥ 1280 px seulement,
-// numéros mono à droite de l'écran, point rouge sur le chapitre courant.
+// Rail des chapitres (brief « Strates », §3.3) : grand écran seulement
+// (≥ 96 rem, soit 1536 px), numéros mono à droite de l'écran, point rouge sur le
+// chapitre courant. Le seuil n'est pas 1280 px comme le brief le prévoyait :
+// le rail (24 px du bord + 52 px de large) est posé dans la marge droite de la
+// page, et celle-ci (`--spacing-margin`, plus le surplus au-delà des 90 rem de
+// `.s3d-page`) ne dépasse 84 px, rail et 8 px de respiration compris, qu'à
+// partir de 1536 px, scrollbar de 17 px comprise. En dessous, il recouvrait
+// le cœur « Ajouter aux favoris » de la colonne d'achat (32 px à 1440, 52 px à
+// 1280). Pas de marge réservée sur les sections : elle couperait les bandes
+// pleine largeur des chapitres « encre » sur leur côté droit.
 // IntersectionObserver, pas de GSAP : le chapitre courant est celui qui
 // traverse la bande centrale de l'écran. Un lien reste un vrai lien d'ancre
 // (#id, utilisable sans JS et au clavier) ; quand Lenis tourne, le défilement
@@ -52,7 +60,7 @@ export function ChapterRail({
   return (
     <nav
       aria-label={label}
-      className="fixed right-6 top-1/2 z-30 hidden -translate-y-1/2 rounded-card bg-paper/80 px-2.5 py-2 backdrop-blur min-[80rem]:block"
+      className="fixed right-6 top-1/2 z-30 hidden -translate-y-1/2 rounded-card bg-paper/80 px-2.5 py-2 backdrop-blur min-[96rem]:block"
     >
       <ol className="flex flex-col gap-3">
         {chapters.map((chapter) => {

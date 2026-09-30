@@ -938,7 +938,7 @@ dans la chorégraphie qui les utilise (`src/motion/choreo/about.tsx`), jamais ai
   (visible au focus) vers le chapitre 01. Aucun pin sur mobile ni sous 768 px de haut.
 - **Les scrubs ne pilotent que des grandeurs physiques** : hauteur imprimée, bascule de caméra,
   écartement de l'éclaté.
-- **Chapitres** : sections `data-chapter="01"`, `ChapterRail` (desktop ≥ 1280 px : numéros mono,
+- **Chapitres** : sections `data-chapter="01"`, `ChapterRail` (desktop ≥ 1536 px depuis le 30.09.2026, ≥ 1280 px à l'origine : numéros mono,
   point rouge sur le chapitre courant, IntersectionObserver, pas de GSAP), filet rouge de
   progression sous le header (`--s3d-progress`, écrit par le runtime).
 - **Révélations** : par défaut CSS (`.s3d-rise` pour les blocs de texte, `.s3d-print` pour images
@@ -2509,7 +2509,7 @@ nav-mark`) ; survol = soulignement qui se trace. À droite : thème, langue, fav
 
 - **Objectif** : comprendre l'offre en 5 s, faire un premier réglage, s'orienter (Régler /
   Acheter / J'ai un fichier).
-- **Chapitres** (desktop : `ChapterRail` ≥ 1280 px) :
+- **Chapitres** (desktop : `ChapterRail` ≥ 1536 px ; note du 30.09.2026 : 1280 px à l'origine, le rail recouvrait le cœur des favoris sous 1536 px, la marge droite de la page ne le contenant pas) :
 
 | #   | Titre (FR)                                                | Contenu                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Mouvement (complet)                                                                                   | Réduit / C0                                                     |
 | --- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
