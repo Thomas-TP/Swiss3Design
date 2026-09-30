@@ -259,7 +259,8 @@ export function QuoteRequestForm({
       <div
         ref={successPanel}
         tabIndex={-1}
-        className="rounded-card border border-emerald-500/30 bg-emerald-500/10 p-6 outline-none sm:p-8"
+        // scroll-mt-24 : le focus amène le panneau sous l'en-tête fixe, pas derrière.
+        className="scroll-mt-24 rounded-card border border-emerald-500/30 bg-emerald-500/10 p-6 outline-none sm:p-8"
       >
         <CheckCircle2
           size={28}
