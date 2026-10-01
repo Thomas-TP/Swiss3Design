@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useMemo, useState } from "react";
+import { memo, useEffect, useId, useMemo, useState } from "react";
 import {
   QuoteRequestForm,
   type QuoteAttachment,
@@ -83,7 +83,22 @@ export function SendDrawer(props: SendDrawerProps) {
   );
 }
 
-function SendBody({
+/**
+ * Fermé, le corps ne se redessine pas : un glissé de curseur change `input` à
+ * chaque événement, et le formulaire de devis (long) n'a aucune raison de le
+ * suivre. À l'ouverture, il reprend la configuration du moment.
+ */
+const SendBody = memo(
+  SendBodyImpl,
+  (previous, next) =>
+    !previous.open &&
+    !next.open &&
+    previous.onClose === next.onClose &&
+    previous.object === next.object &&
+    previous.locale === next.locale,
+);
+
+function SendBodyImpl({
   open,
   onClose,
   input,
@@ -103,16 +118,21 @@ function SendBody({
   useEffect(() => {
     if (!open) return;
     let cancelled = false;
-    void makeThumbnail({
-      config: input.config,
-      texts: input.texts,
-      locale,
-      size: 512,
-    }).then((url) => {
-      if (!cancelled) setThumbnail(url);
-    });
+    // Après le premier affichage du tiroir : le rendu hors écran (WebGL, lecture
+    // des pixels) ne retarde jamais l'ouverture elle-même.
+    const timer = window.setTimeout(() => {
+      void makeThumbnail({
+        config: input.config,
+        texts: input.texts,
+        locale,
+        size: 512,
+      }).then((url) => {
+        if (!cancelled) setThumbnail(url);
+      });
+    }, 350);
     return () => {
       cancelled = true;
+      window.clearTimeout(timer);
     };
   }, [open, input.config, input.texts, locale]);
   // oxlint-enable set-state-in-effect
