@@ -4,6 +4,7 @@ import { useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { sameLine, useCart } from "@/lib/cart";
 import { fetchCartLine } from "@/lib/agent/cart-line";
+import { FILAMENT_IDS } from "@/lib/studio/filaments";
 
 // WebMCP : expose aux agents du navigateur (document.modelContext) les
 // actions clés de la boutique — chercher, lire une fiche, gérer le panier,
@@ -149,6 +150,56 @@ export function WebMcpTools() {
           return text(
             await api(`/api/v1/store?language=${state.current.locale}`),
           );
+        },
+      },
+      {
+        name: "studio_configure",
+        title: "Configure a Studio object",
+        description:
+          "Builds a shareable Studio link for one of Swiss3Design's own configurable objects " +
+          "(lavaux vase, cartouche business card, relief coaster, borne name tag) and returns its stats. " +
+          "Personal texts (names, contacts) are never accepted here: the human types them on the page.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            object: {
+              enum: ["lavaux", "cartouche", "relief", "borne"],
+              description: "Which Studio object to configure",
+            },
+            params: {
+              type: "object",
+              description:
+                "Numeric or enum parameters using the link keys (lavaux: h, d, p, b, n, l, m, gs, gd, wl, wa, wk, vc, va, vs, rn, ra, rt, w; cartouche: t, r, mo, e, ly, fp, ft; relief: sh, s, ba, re, lv, sd, lk, lb; borne: sh, c, t, rg, rd, mo, fb, ft); clamped to valid ranges.",
+            },
+            palette: {
+              type: "array",
+              items: { enum: [...FILAMENT_IDS] },
+              maxItems: 4,
+              description:
+                "Filament ids, bottom to top for vases and coasters; plate then text for cards and name tags.",
+            },
+            open: {
+              type: "boolean",
+              description: "Navigate the tab to the link.",
+            },
+          },
+          required: ["object"],
+        },
+        annotations: { readOnlyHint: true },
+        async execute(input) {
+          // Chargé à la demande : l'outil est rare, ses modules ne pèsent pas sur les pages.
+          const { configureFromTool, describeConfiguration } = await import(
+            "@/components/studio/configure-tool"
+          );
+          const result = configureFromTool(input);
+          if (!result.ok) throw new Error(result.error);
+          const answer = describeConfiguration(
+            result.config,
+            location.origin,
+            state.current.locale,
+          );
+          if (input.open === true) location.assign(answer.link);
+          return text(answer);
         },
       },
       {

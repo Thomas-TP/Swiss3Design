@@ -19,6 +19,11 @@ export const dynamic = "force-dynamic";
 const STATIC_PAGES: { path: string; lastModified?: string }[] = [
   { path: "" },
   { path: "/shop" },
+  { path: "/studio" },
+  { path: "/studio/lavaux" },
+  { path: "/studio/cartouche" },
+  { path: "/studio/relief" },
+  { path: "/studio/borne" },
   { path: "/custom" },
   { path: "/a-propos" },
   { path: "/contact" },

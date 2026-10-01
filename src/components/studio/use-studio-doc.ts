@@ -88,6 +88,27 @@ export function useStudioDoc(
   }, [object, initial]);
   // oxlint-enable set-state-in-effect
 
+  // Un lien ouvert dans l'onglet déjà ouvert (outil WebMCP, lien du fil d'une
+  // conversation) change le fragment sans recharger la page : on le relit.
+  useEffect(() => {
+    function onHashChange() {
+      if (!/[#&]c=/.test(window.location.hash)) return;
+      const decoded = decodeFragment(
+        object,
+        window.location.hash,
+        defaultConfig(object),
+      );
+      if (decoded.ok)
+        dispatch({
+          type: "set",
+          patch: { config: decoded.config },
+          commit: true,
+        });
+    }
+    window.addEventListener("hashchange", onHashChange);
+    return () => window.removeEventListener("hashchange", onHashChange);
+  }, [object]);
+
   // Fragment : 300 ms après le dernier changement de configuration.
   const config = history.present.config;
   useEffect(() => {
