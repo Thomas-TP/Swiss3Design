@@ -37,6 +37,7 @@ import type { PrintHeroController } from "../stage/scenes/print-hero";
 gsap.registerPlugin(SplitText);
 
 const PIN_QUERY = "(min-width: 1024px) and (min-height: 768px)";
+const SMALL_QUERY = "(max-width: 1023px), (max-height: 767px)";
 const INTRO_TO = 0.38;
 const INTRO_S = 3.2;
 const AUTOPLAY_S = 4.2;
@@ -86,6 +87,17 @@ function whenReady(id: string, cb: () => void): () => void {
   return stop;
 }
 
+/**
+ * Réveille une vue que le Stage a figée en image (mobile, au repos) : le
+ * Stage ne réveille une vue que sur un changement de props, un pointerdown ou
+ * un changement de thème, jamais sur une propriété de contrôleur. On lui donne
+ * donc des props neuves (même contenu : les scènes les comparent par valeur).
+ */
+function wake(id: string) {
+  const view = motionBridge.views.get(id);
+  if (view) motionBridge.views.update(id, { ...(view.props as object) });
+}
+
 function emit<T>(name: string, detail: T) {
   window.dispatchEvent(new CustomEvent<T>(name, { detail }));
 }
@@ -116,8 +128,10 @@ export function HomeChoreo() {
     };
 
     let total = 750;
+    let heroId = "";
     disposers.push(
       whenView("hero", (id) => {
+        heroId = id;
         const props = motionBridge.views.get(id)?.props as
           | PrintHeroProps
           | undefined;
@@ -156,7 +170,10 @@ export function HomeChoreo() {
     let intro: gsap.core.Tween | null = null;
     let autoplay: gsap.core.Tween | null = null;
     const mm = gsap.matchMedia();
-    mm.add({ wide: PIN_QUERY }, (context) => {
+    // gsap.matchMedia n'appelle la fonction que si AU MOINS UNE condition est
+    // vraie : d'où la condition complémentaire (petit écran), sans quoi rien
+    // ne se jouerait sur mobile.
+    mm.add({ wide: PIN_QUERY, small: SMALL_QUERY }, (context) => {
       const pinned = context.conditions?.wide === true && capability === 2;
       return pinned ? pinHero() : autoplayHero();
     });
@@ -213,10 +230,15 @@ export function HomeChoreo() {
       // « Quand le héros est visible à 50 % » : après sa première frame.
       let ready = false;
       let visible = false;
+      let viewId = "";
       const start = () => {
-        if (ready && visible) autoplay?.play();
+        if (!ready || !visible || !autoplay || autoplay.isActive()) return;
+        if (autoplay.progress() >= 1) return;
+        wake(viewId);
+        autoplay.play();
       };
       const stopView = whenView("hero", (id, element) => {
+        viewId = id;
         const observer = new IntersectionObserver(
           ([entry]) => {
             visible = entry.isIntersecting;
@@ -240,10 +262,15 @@ export function HomeChoreo() {
     }
 
     // Réglette Z (mobile) : le geste du visiteur remplace l'autoplay.
+    let lastWake = 0;
     const onScrub = (event: Event) => {
       const { progress } = (event as CustomEvent<HeroScrubDetail>).detail;
       autoplay?.kill();
       manual = true;
+      // Au clavier (flèches du curseur), aucun pointerdown n'a réveillé la vue.
+      const now = performance.now();
+      if (heroId && now - lastWake > 600) wake(heroId);
+      lastWake = now;
       if (ctrl.hero) ctrl.hero.progress = progress;
     };
     window.addEventListener(HERO_EVENTS.scrub, onScrub);
@@ -286,12 +313,14 @@ export function HomeChoreo() {
               trigger: element,
               start: "top 70%",
               once: true,
-              onEnter: () =>
+              onEnter: () => {
+                wake(id);
                 void gsap.to(c, {
                   explode: 1,
                   duration: 1.2,
                   ease: "s3d.buse",
-                }),
+                });
+              },
             });
           }),
         );

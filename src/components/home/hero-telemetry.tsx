@@ -82,6 +82,9 @@ export function HeroTelemetry() {
 
   return (
     <div className="mt-4">
+      <p className="s3d-label mb-3 normal-case text-soft lg:hidden">
+        {t("label")}
+      </p>
       <MeasureStrip items={items} live label={t("measures")} />
       <p
         aria-hidden="true"

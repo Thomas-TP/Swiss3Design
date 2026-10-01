@@ -71,7 +71,10 @@ export function HeroVisual({
         <div className={styles.ghost}>{ghost}</div>
         <div className={styles.final}>{custom ?? final}</div>
       </div>
-      <p className={cx("s3d-label normal-case", styles.label)}>{t("label")}</p>
+      {/* Desktop : étiquette posée sur la boîte ; mobile : sous la boîte (télémétrie). */}
+      <p className={cx("s3d-label hidden normal-case lg:block", styles.label)}>
+        {t("label")}
+      </p>
       <HeroChange />
       {capability === 1 ? <HeroRuler /> : null}
     </figure>
