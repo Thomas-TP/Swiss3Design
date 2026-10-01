@@ -328,7 +328,11 @@ export function ScenePanel({
         {stageOn && !elevationShown ? (
           <div
             data-no-orbit=""
-            className="absolute inset-x-3 bottom-3 z-10 flex flex-wrap items-end justify-between gap-2 sm:inset-x-4 sm:bottom-4"
+            className={cx(
+              "absolute inset-x-3 bottom-3 z-10 flex flex-wrap items-end justify-between gap-2 sm:inset-x-4 sm:bottom-4",
+              // La barre altimétrique occupe le bord droit (bureau) : la simulation s'arrête avant elle.
+              bandBar ? "lg:pr-[5.75rem]" : null,
+            )}
           >
             <div className="flex flex-wrap gap-1.5">
               {effective !== "plan" ? (

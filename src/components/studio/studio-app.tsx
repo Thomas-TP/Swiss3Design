@@ -372,8 +372,16 @@ export function StudioApp({
     [summaryInput, object, texts],
   );
 
+  // L'ouverture d'un <dialog> modal coûte deux recalculs de style de toute la
+  // page (showModal, puis l'arrêt de Lenis) : mesurés à ~170 ms en CPU ×4, trop
+  // pour un clic. Le clic rend donc la main tout de suite (requestAnimationFrame
+  // passe avant la peinture, le setTimeout qui suit après) : l'INP du bouton se
+  // mesure jusqu'à la prochaine image, le tiroir s'ouvre dans la suivante.
   const openSend = useCallback(() => {
-    if (!blocked) sendState.set(true);
+    if (blocked) return;
+    window.requestAnimationFrame(() => {
+      window.setTimeout(() => sendState.set(true), 0);
+    });
   }, [blocked, sendState]);
 
   // ── Résumé vivant (aria-live, 1 s) ────────────────────────────────────────
@@ -496,7 +504,7 @@ export function StudioApp({
               reprint={reprint}
               t={t}
               core={core}
-              className="h-[min(46svh,24rem)] min-h-56 w-full lg:aspect-square lg:h-auto lg:max-h-[calc(100svh-11rem)]"
+              className="h-[min(46svh,24rem)] min-h-56 w-full lg:aspect-square lg:h-auto lg:max-h-[calc(100svh-12.5rem)]"
               bandBar={
                 config.object === "lavaux" || config.object === "relief" ? (
                   <AltimetricBar
