@@ -121,3 +121,155 @@ Les quatre dernières lignes viennent d'une copie jetable de `chunk-report.ts` d
 | `@/motion/stage/stage-root` (three) | **148,9 KiB**            | ≤ 200 KiB ✓ |
 | `@/motion/choreo/about`             | 49,7 KiB (2,8 en propre) | —           |
 | `@/motion/choreo/product`           | 50,5 KiB (3,7 en propre) | —           |
+
+## 3. Navigateur (preview, CSP de production)
+
+Preview local : `opennextjs-cloudflare preview -- --upstream-protocol https --port 8790
+--inspector-port 9330` sur le build du worktree (même code que la section 2.1), Hyperdrive
+lu dans `.env.local` et posé en `$env:` dans la même commande (branche Neon `preview`). Le
+premier lancement a démarré du premier coup (pas de `EAI_AGAIN` cette fois). Navigateur :
+Edge 155 headless, contextes neufs, 1440 × 900 sauf mention.
+
+### 3.1 HTML brut (`curl`-équivalent, sans JavaScript)
+
+Statut, structure et poids, `accept-encoding: identity` puis gzip niveau 9 :
+
+| URL                              | Statut  | header | `<main>` | h1  | footer | Brut      | Gzip     |
+| -------------------------------- | ------- | ------ | -------- | --- | ------ | --------- | -------- |
+| `/fr`                            | 200     | 1      | 1        | 1   | 1      | 119,6 KiB | **19,6** |
+| `/fr/shop`                       | 200     | 1      | 1        | 1   | 1      | 143,7 KiB | **20,5** |
+| `/fr/products/vase-spirale`      | 200     | 5      | 1        | 1   | 1      | 131,0 KiB | **21,0** |
+| `/fr/custom`                     | 200     | 1      | 1        | 1   | 1      | 93,5 KiB  | 18,3     |
+| `/fr/a-propos`                   | 200     | 7      | 1        | 1   | 1      | 179,3 KiB | 32,1     |
+| `/fr/contact`                    | 200     | 1      | 1        | 1   | 1      | 87,5 KiB  | **16,1** |
+| `/fr/cart`                       | 200     | 1      | 1        | 1   | 1      | 76,4 KiB  | 14,1     |
+| `/fr/checkout`                   | 200     | 1      | 1        | 1   | 1      | 75,2 KiB  | 13,6     |
+| `/fr/track`                      | 200     | 1      | 1        | 1   | 1      | 74,7 KiB  | 13,1     |
+| `/fr/favorites`                  | 200     | 1      | 1        | 1   | 1      | 72,3 KiB  | 12,7     |
+| `/fr/account/login`              | 200     | 1      | 1        | 1   | 1      | 78,2 KiB  | 14,7     |
+| `/fr/legal/terms`                | 200     | 1      | 1        | 1   | 1      | 105,1 KiB | 22,3     |
+| `/de/shop`                       | 200     | 1      | 1        | 1   | 1      | 143,6 KiB | 20,7     |
+| `/fr/zzz-inconnu` (sans route)   | **404** | 1      | 1        | 1   | 1      | 68,7 KiB  | 12,0     |
+| `/de/zzz` (sans route)           | **404** | 1      | 1        | 1   | 1      | 68,6 KiB  | 11,9     |
+| `/fr/products/slug-supprime-xyz` | **404** | 0      | 0        | 0   | 0      | 49,3 KiB  | 8,9      |
+
+(« header » compte les balises `<header>`, celles des sections comprises : les fiches
+produit et `/a-propos` en portent plusieurs, d'où 5 et 7.)
+
+- **Poids du HTML : l'écart 5 de la vague 1 est résorbé.** `/fr/contact` : **30,3 → 16,1 KiB
+  gzip** (118,6 → 87,5 KiB brut) ; `/fr` : 34,6 → 19,6 KiB gzip (151,6 → 119,6 brut). Les
+  pages ne reçoivent plus que les namespaces qu'elles lisent (`ClientMessages`, `fix-w1`) :
+  `/fr/contact` est même sous la production d'avant la refonte (21,4 KiB gzip, 85,3 brut).
+  Le HTML le plus lourd est `/fr/a-propos` (32,1 KiB gzip : FAQ de 10 `<details>`, JSON-LD).
+- **404 d'une URL sans route** (`/fr/zzz-inconnu`, `/de/zzz`) : statut 404, `<meta name="robots"
+content="noindex">` (pas d'en-tête `X-Robots-Tag`, le `noindex` passe par la balise), et
+  **un header, un `<main>`, un h1 et un footer dans le HTML brut** (961 caractères de texte
+  visible hors scripts : « Point non coté », « Page introuvable. », « Altitude 404 m… ») :
+  la correction de `fix-w1` tient en production-like. Le `<title>` est « Page introuvable ·
+  Swiss3Design ».
+- **Fiche produit supprimée** (`/fr/products/slug-supprime-xyz`) : statut **404**, `noindex`,
+  `<title>` « Page introuvable · Swiss3Design », mais **corps vide dans le HTML brut**
+  (`<body><div hidden><!--$--><!--/$--></div>` puis les scripts, 0 caractère de texte visible,
+  `id="__next_error__"`). **La limite documentée au §7.18 du brief est confirmée** : c'est le
+  repli d'erreur de coquille de Next 16.3.6 (`app-render.js`, repli `errorRecovery` vers les
+  lignes 2364 à 2412, graine `id: '__next_error__'` à la ligne 1326 : les numéros ont glissé
+  d'une ligne ou deux depuis la note du brief), qui fixe le statut 404 et laisse le contenu au
+  client. Le navigateur affiche bien la page 404 après hydratation (h1 = 1 dans le DOM, voir 3.2).
+  Rien à corriger côté dépôt tant que Next ne permet pas de poser le statut autrement.
+- **Nonce** : sur les 15 pages ci-dessus, **chaque** `<script>` inline porte le nonce de
+  l'en-tête `Content-Security-Policy` (la valeur est comparée, pas seulement sa présence :
+  0 écart, de 2 à 6 scripts inline par page) et chaque `<script src>` aussi (5 à 22). **Le
+  script anti-flash du nouveau layout racine `src/app/layout.tsx` porte le nonce sur les 15
+  pages**, repli d'erreur de la fiche supprimée compris. `script-src 'self' 'nonce-…'
+https://js.stripe.com https://static.cloudflareinsights.com https://*.posthog.com`.
+
+### 3.2 Console, CSP, hydratation, 4xx
+
+Les 15 URL demandées (`/fr`, `/fr/shop`, la fiche `vase-spirale`, `/fr/custom`,
+`/fr/a-propos`, `/fr/contact`, `/fr/cart`, `/fr/checkout`, `/fr/track`, `/fr/favorites`,
+`/fr/account/login`, `/fr/legal/terms`, `/de/shop`, `/fr/zzz-inconnu` et la fiche supprimée),
+page défilée jusqu'en bas. Les autres modes ont été passés sur 4 pages seulement
+(`/fr/shop`, `/fr/a-propos`, `/fr/legal/terms`, `/fr/favorites`).
+
+| Mode                                                 | Pages | Violations CSP | Erreurs d'hydratation | MISSING_MESSAGE / IntlError | 4xx inattendus | Débordement horizontal |
+| ---------------------------------------------------- | ----- | -------------- | --------------------- | --------------------------- | -------------- | ---------------------- |
+| Clair, mouvement complet                             | 15    | 0              | 0                     | 0                           | 0              | aucun                  |
+| Sombre                                               | 4     | 0              | 0                     | 0                           | 0              | aucun                  |
+| Mouvement réduit par l'OS (`prefers-reduced-motion`) | 4     | 0              | 0                     | 0                           | 0              | aucun                  |
+| Mouvement réduit par l'interrupteur du footer        | 4     | 0              | 0                     | 0                           | 0              | aucun                  |
+| Mobile 375 × 812 (tactile, DPR 2)                    | 4     | 0              | 0                     | 0                           | 0              | aucun (0 px)           |
+
+- Aucun `securitypolicyviolation` capturé dans la page, aucun message « Refused to… », aucune
+  erreur React (#418, #423, #425, « did not match »), aucun `MISSING_MESSAGE`. **Le journal
+  serveur du preview ne contient aucune erreur** (2 522 lignes en fin de passage, 2 448
+  requêtes : 2 336 × 200, 97 × 304, 2 × 307 de `GET /` vers la langue, 13 × 404).
+- **Les seuls messages** : (1) sur `/fr/checkout`, l'avertissement de Stripe.js « live Stripe.js
+  integrations must use HTTPS » (attendu en HTTP local) et 47 lignes « Tracking Prevention »
+  d'Edge (bruit du navigateur sur les ressources tierces de Stripe, pas une erreur de
+  l'application) ; (2) sur les deux 404, « Failed to load resource: 404 », c'est-à-dire le
+  document lui-même. **L'avertissement `navigator.modelContext is deprecated` de la vague 1
+  n'apparaît sur aucune page** : `fix-w1` a inversé l'ordre de lecture dans
+  `webmcp-tools.tsx` (`document.modelContext` d'abord). Constaté dans Edge 155 seulement,
+  pas dans un navigateur sans `document.modelContext`.
+- 13 réponses 404 côté serveur, toutes attendues : les trois URL sans page, chacune
+  demandée plusieurs fois par les différents scripts (4 × `/fr/zzz-inconnu`, 4 × la fiche
+  supprimée, 1 × `/de/zzz`) et **4 × `GET /fr/studio`**, des préchargements du lien
+  « Studio » de la page 404 (`not-found-content.tsx`). Le Studio n'existe qu'avec WP-STUDIO ;
+  à surveiller à la fusion, pas un défaut d'ici.
+
+### 3.3 `html.lenis`, mouvement réduit, mobile
+
+- **`html.lenis` uniquement dans `(site)`** : présent sur `/fr`, `/fr/shop`, la fiche
+  produit, `/fr/custom`, `/fr/a-propos`, `/fr/contact` et `/de/shop` (clair, sombre, mobile) ;
+  **absent** sur `/fr/cart`, `/fr/checkout`, `/fr/track`, `/fr/favorites`, `/fr/account/login`,
+  `/fr/legal/terms`, la 404 et la fiche supprimée. **Absent partout en mouvement réduit**,
+  OS comme interrupteur du footer (`data-motion="reduce"` posé sur les 4 pages testées, y
+  compris celles qui sont dans `(site)`, comme `/fr/shop` et `/fr/a-propos`).
+- Interrupteur du footer : partant de `data-motion="full"`, un clic le passe à `reduce` et
+  retire `html.lenis` sur `/fr/shop` et `/fr/a-propos` (le défaut de `destroy()` de la
+  vague 1 reste corrigé).
+- Aucun élément `<canvas>` dans le DOM sur aucune page (la sonde de capacité WebGL jette son
+  contexte), comme en vague 1. **Mobile 375 × 812** : `scrollWidth − innerWidth = 0` sur
+  `/fr/shop`, `/fr/a-propos`, `/fr/legal/terms` et `/fr/favorites`.
+
+### 3.4 CLS de laboratoire
+
+`PerformanceObserver` (`layout-shift`, `hadRecentInput` exclu), **cache désactivé** (CDP),
+première visite, 3 runs par page, 3,5 s d'observation. Seuil : ≤ 0,05.
+
+| Page (largeur)                 | Run 1  | Run 2  | Run 3  | Vague 1                 |
+| ------------------------------ | ------ | ------ | ------ | ----------------------- |
+| `/fr/a-propos` (1440)          | 0,0115 | 0,0115 | 0,0115 | 0,04 à 0,105 (écart 7)  |
+| `/fr/favorites` (1440)         | 0,0014 | 0,0014 | 0,0014 | 0,076 à 0,085 (écart 4) |
+| `/fr/legal/terms` (1440)       | 0,0014 | 0,0014 | 0,0014 | 0,152 avant correctif   |
+| `/fr/a-propos` (375 mobile)    | 0      | 0      | 0      | —                       |
+| `/fr/favorites` (375 mobile)   | 0      | 0      | 0      | —                       |
+| `/fr/legal/terms` (375 mobile) | 0      | 0      | 0      | —                       |
+| `/de/a-propos` (1440)          | 0,0107 | 0,0107 | 0,0107 | —                       |
+| `/it/favorites` (1440)         | 0,0020 | 0,0020 | 0,0020 | —                       |
+| `/de/favorites` (1440)         | 0,0016 | 0,0016 | 0,0016 | —                       |
+| `/en/legal/terms` (1440)       | 0,0045 | 0,0045 | 0,0045 | —                       |
+| `/en/a-propos` (1440)          | 0,0318 | 0,0318 | 0,0318 | —                       |
+
+**Tous ≤ 0,05** (maximum 0,0318 sur `/en/a-propos`, où deux sections se décalent au
+remplacement de la police à t ≈ 370 ms). Les trois pages demandées passent de 0,04–0,15 à
+≤ 0,0115 : les correctifs CLS de `fix-w1` (légal, favoris) tiennent, et le décalage de
+police de `/a-propos` (écart 7 de la vague 1, jusqu'à 0,105) tombe à 0,0115 ici. Les trois
+runs sont identiques à 4 décimales (la police arrive toujours au même instant sur ce poste,
+donc le cas intermittent de la vague 1 n'a pas été rejoué à d'autres instants) ; le
+laboratoire ne remplace pas les web vitals de PostHog en cache chaud.
+
+### 3.5 Bouton « Ajouter aux favoris » de la fiche produit
+
+`elementFromPoint` au centre du bouton (`aria-label` « Ajouter aux favoris »), après
+`scrollIntoView` centré :
+
+| Largeur | Bouton (x)  | Élément touché      | Rail « Chapitres de la fiche » |
+| ------- | ----------- | ------------------- | ------------------------------ |
+| 1280    | 1173 – 1225 | **le bouton** (svg) | masqué                         |
+| 1440    | 1329 – 1381 | **le bouton** (svg) | masqué                         |
+| 1536    | 1382 – 1434 | **le bouton** (svg) | visible, x 1445 – 1497 (11 px) |
+| 1920    | 1564 – 1616 | **le bouton** (svg) | visible, x 1829 – 1881         |
+
+Le clic tombe toujours sur le bouton, jamais sur le rail (écart 2 de la vague 1 corrigé : le
+rail ne s'affiche qu'à partir de `min-[96rem]`, soit 1536 px, avec 11 px de dégagement).
