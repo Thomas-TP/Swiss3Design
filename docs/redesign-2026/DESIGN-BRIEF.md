@@ -1694,6 +1694,16 @@ retire déjà). **Stockage local ajouté** : `s3d-motion`, `s3d-creations-v1` (l
 | GPU                                                                                    | 1 contexte WebGL par page ; DPR ≤ 2 (C2), ≤ 1,5 (C1) ; < 20 draw calls ; ≤ 120 k triangles (C2), ≤ 40 k (C1) visibles ; ≤ 8 ms de GPU par frame sur un iGPU 2020                                                                                                                                     | Spector ou `renderer.info` en dev                                                                                                              |
 | Mémoire                                                                                | géométries du Stage ≤ 20 Mo                                                                                                                                                                                                                                                                          | `renderer.info.memory`                                                                                                                         |
 
+> **Note du 01.10.2026 (vérification de la vague 2a, `measures-wave2a.md`)** : **mesurer le Worker
+> toujours dans un dossier dont le chemin absolu fait 41 caractères** (celui du checkout
+> principal). Les manifestes du Worker embarquent des chemins absolus : un build dans un dossier de
+> 77 caractères pèse 520 KiB de brut en plus, et le gzip du même code varie de ±6 KiB d'un build à
+> l'autre (3 138 à 3 150 KiB sur quatre builds de WP-02). Relevé de référence en 41 caractères, même
+> `node_modules` : fin de la vague 1 (`ac9d0a5`)
+> **3 110,61 KiB**, après `fix-w1` **3 150,19**, après WP-02 **3 145,30** (la hausse vient de `fix-w1`,
+> WP-02 n'ajoute rien au Worker). Marge restante sur 3 185 : **≈ 40 KiB** pour WP-HOME, WP-STUDIO et
+> WP-99. JS initial de l'accueil : 231,4 KiB pour 233,7 (marge 2,3 KiB).
+
 ---
 
 ## 5. Héros : « L'impression réglable »

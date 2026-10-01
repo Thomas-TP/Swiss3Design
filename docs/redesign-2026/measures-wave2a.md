@@ -347,3 +347,71 @@ rectifié), comme `STRIPE_PROFILE_ID` l'était déjà pour la même raison.
   pas) : à purger à la main si le propriétaire veut un catalogue de démo propre. Aucune
   écriture manuelle n'a été faite (la lecture de la base passe par un client `SELECT`
   seulement).
+
+## 5. Reprise documentaire de WP-02
+
+Faite au commit `4ab94a2` (la première moitié de ce passage), contrôlée ici contre les
+« requests » et « notes » du résultat de WP-02 :
+
+- `docs/codemap.md` : entrées de `src/lib/studio/text/` (`glyphs`, `layout`, `shapes`, `check`,
+  `fields`, `geometry`, `glyph-metrics` généré, `overlap`), `objects/{cartouche,relief,borne}`
+  et leurs `-model`, `objects/{flat,flat-model}`, `poster-flat.ts`, `band-stats.ts`,
+  **`ranges.ts` (plages et bornage sans zod, qui garde zod hors des générateurs, des
+  statistiques et des garde-fous ; `schemas.ts` le ré-exporte)**, `scripts/fonts/{build-glyphs,
+gen-relief-posters}.ts`, `public/studio/glyphs/*`, `public/posters/relief-default-*.svg` et
+  les trois fichiers de test.
+- `docs/redesign-2026/DESIGN-BRIEF.md` : note du 01.10.2026 au §6.3.3 (anticollision des
+  glyphes : `pairExtraUnits`, table `GLYPH_HOOKS`, pas un crénage) et au §6.3.4 (sept écarts
+  assumés : strates, Cartouche sur l'encre réelle, monogramme, Borne, pic triangulaire,
+  **étiquette « POINTE LÉA · 3 107 M » illustrative** (`peakAltitude("Léa")` = 2 566 m,
+  **WP-HOME doit appeler `peakLabel(name, locale)`**), `ranges.ts`).
+- Ajouté par ce passage : une note du 01.10.2026 au §4.11 du brief (méthode de mesure du
+  Worker à chemin égal, relevés de la section 2, marge restante) et `.dev.vars.example`
+  (section 4).
+- **Non fait, hors périmètre** (fichiers que ce paquet ne possède pas) : la valeur « 3 109 KiB »
+  de la règle 10 d'`AGENTS.md` est celle de la vague 1 ; voir la demande de la section 6.
+
+## 6. Écarts et suites
+
+Classés par gravité ; rien d'autre que `.dev.vars.example` n'est corrigé ici. Fichier et
+ligne, puis correctif recommandé.
+
+1. **Marge de l'accueil : 2,3 KiB** sur 233,7 (231,4 KiB de JS initial, 3,4 de marge en vague
+   1. pour un paquet, WP-HOME, qui va précisément y ajouter du JS. Aucun défaut de code :
+      `fix-w1` a ajouté ≈ +1,1 KiB sur l'accueil (+0,8 à +1,7 sur toutes les routes). À décider
+      avant WP-HOME : soit fixer à WP-HOME un plafond de +2 KiB hors gate, soit relever le
+      budget de l'accueil (décision du propriétaire, comme celle du Worker le 30.09).
+2. **Worker : 3 145,30 KiB sur 3 185, marge de ≈ 40 KiB** (section 2.1), **+35 KiB depuis la
+   vague 1, tous venus de `fix-w1`** (restructuration du layout racine, `LocaleShell`,
+   `ClientMessages`) ; WP-02 ne pèse rien. Demande : mettre à jour `AGENTS.md` règle 10
+   (« 3 109 KiB (2026-09-30…) » → « ≈ 3 145 KiB, mesure du 01.10.2026 dans un dossier de
+   41 caractères, voir `measures-wave2a.md` »). À re-mesurer **dans un dossier de 41
+   caractères** après chaque fusion (HOME, STUDIO) : un build dans un worktree donne +520 KiB
+   de brut et un gzip qui varie de ±6 KiB, donc inutilisable pour comparer.
+3. **`bun run dev` envoie la clé publiable LIVE à Stripe.js** tant que `.dev.vars` ne porte
+   pas `STRIPE_PUBLISHABLE_KEY` de test (`checkout-flow.tsx:51`, `checkout/page.tsx:67`,
+   `quote-pay-flow.tsx:29` et `quotes/[id]/pay/page.tsx:131` sont dans le même cas).
+   Corrigé dans `.dev.vars.example` (ligne ajoutée, commentaire rectifié). Correctif plus
+   robuste, à la main du propriétaire : surcharger la variable dans l'environnement `preview`
+   de `wrangler.jsonc` pour `next dev` (`initOpenNextCloudflareForDev({ environment })`), ou
+   refuser une clé `pk_live_` quand `STRIPE_SECRET_KEY` commence par `sk_test_`.
+4. **Hygiène de la branche Neon `preview`** : deux commandes `pending` avec stock réservé
+   (`S3D-MUOQCSH3PHXM`, `S3D-MUPI78C0HZLA`) et une `paid` (`S3D-MUPI90LS1WN1`) créées par ces
+   essais, plus des lignes d'`email_outbox` écartées pour 365 jours. À nettoyer à la main
+   (écritures refusées à ce paquet) si le catalogue de démo doit rester propre.
+5. **Le lien « Studio » de la page 404 pointe vers un 404 tant que WP-STUDIO n'est pas fusionné**
+   (`src/components/not-found-content.tsx`, 4 préchargements `/fr/studio` 404 dans le journal).
+   Attendu ; si WP-STUDIO glisse, masquer le lien d'ici là.
+6. **404 d'une fiche supprimée sans contenu dans le HTML brut** (limite documentée §7.18,
+   **confirmée** en section 3.1) : statut et `noindex` corrects, h1, header et footer arrivent
+   après l'hydratation. Rien à corriger tant que Next 16.3.6 ne permet pas de fixer le statut
+   autrement ; à revérifier à chaque mise à jour de Next.
+7. **`/en/a-propos` : CLS 0,0318** (sous le seuil de 0,05 mais le plus haut du relevé ; deux
+   sections se décalent au remplacement de la police à t ≈ 370 ms). Le cas intermittent de
+   la vague 1 (écart 7) n'a pas été rejoué à d'autres instants ; à confirmer par les web
+   vitals de PostHog en cache chaud.
+8. **Non exercé** : paiement jusqu'à l'état « processing » (session complète mais non réglée),
+   webhook Stripe réel (non livré en local), paiement 3-D Secure, parcours en sombre dès le
+   départ, envoi de formulaire avec e-mail (clé Resend vide), Safari. Le preview et le serveur
+   de dev affichent « AI bindings always access remote resources » : rien n'a appelé le
+   binding `env.AI`.
