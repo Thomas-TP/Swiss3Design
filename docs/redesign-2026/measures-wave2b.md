@@ -11,7 +11,27 @@ faite (la limite d'usage a déjà coupé des passages précédents).
 
 ## Résumé
 
-_(rempli en fin de passage)_
+| Critère                                                                   | Résultat                                                                                                                                                                             |
+| ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Lint, typecheck, tests, format                                            | **verts** (843 tests passés, 15 ignorés sans URL de base ; 64 fichiers)                                                                                                              |
+| A1 vie privée : champs cachés du devis hors des enregistrements de visite | **corrigé** et vérifié dans le tiroir réel (`ph-no-capture` sur les 4 champs et la vignette)                                                                                         |
+| A2 échec réseau de la Server Action                                       | **corrigé** : page conservée, message « L'envoi a échoué… », « Réessayer » réussit sans second téléversement (`/custom` et tiroir)                                                   |
+| A3 « POINTE POINTE ZORGL »                                                | **corrigé** (`startsWithPeakWord`), accueil et gravure du Studio par `peakLabelParts`                                                                                                |
+| A4 chapitre 02 avec la vraie scène                                        | **conforme** : relief du nom gravé, fond encre `#1a1614`, étiquette DOM, **0 requête** pendant la frappe, texte au Studio par `sessionStorage` (4 langues)                           |
+| A5 (trouvé) violation CSP « eval » sur les pages d'objet du Studio        | **corrigé** (zod en `jitless`) ; 5 violations avant, **0** après                                                                                                                     |
+| **Worker gzip ≤ 3 185 KiB**                                               | **ÉCHEC : 3 326,10 KiB** (+180,8 depuis la vague 2a) ; HOME +17,8 (budget +10), **STUDIO +161,6 (budget +10)** ; plafond Cloudflare 10 MiB non menacé ; **décision du propriétaire** |
+| 0 signature three / gsap / lenis dans le Worker                           | **0**                                                                                                                                                                                |
+| JS initial de l'accueil ≤ 233,7 KiB                                       | **194,2 KiB** (marge 39,5 ; baisse uniforme de 37 à 44 KiB sur toutes les routes, non expliquée) ; Studio objet 302,7 KiB                                                            |
+| Gates : runtime ≤ 65, Stage ≤ 200, moteur Studio + Worker, glyphes ≤ 45   | **54,2 / 157,3 / 2,2 + 28,1 / 34,0 KiB**, tous dans le budget                                                                                                                        |
+| 20 URL : 0 CSP, 0 hydratation, 0 MISSING_MESSAGE, 0 4xx inattendu         | **0 / 0 / 0 / 0** ; nonce correct sur chaque script (21 URL en HTML brut) ; journal du serveur sans erreur ni 5xx                                                                    |
+| Un contexte WebGL au plus par page ; `html.lenis` seulement dans `(site)` | **oui** ; mouvement réduit (OS et footer) et 375 × 812 conformes (0 px de débordement)                                                                                               |
+| CLS de laboratoire ≤ 0,05                                                 | **≤ 0,0317** (Lighthouse), 0 à 0,0203 (pilote CDP)                                                                                                                                   |
+| LCP ≤ 2,0 s (mobile 9 Mbps, 150 ms, CPU × 4)                              | `/fr` **1,93 s** (h1 ✓) ; Studio **2,02 à 2,17 s** (chapeau, à la limite) ; desktop `/fr` 2,8 à 4,0 s observés avec WebGL logiciel (0,72 s sans WebGL)                               |
+| TBT                                                                       | **4,7 à 5,7 s (`/fr`) et 2,6 à 2,7 s (Studio) en Lighthouse avec WebGL logiciel ; 29 et 100 ms sans WebGL** : à confirmer sur un vrai GPU                                            |
+
+**Verdict** : prêt pour J1 sous réserve de la décision sur le plafond du Worker ; **les mesures de
+fil principal (TBT, LCP desktop) du chemin WebGL doivent être refaites sur de vrais appareils** avant
+de les tenir pour acquises. Détail en sections 7 à 9.
 
 ## Environnement
 
@@ -156,14 +176,14 @@ Builds : `bunx opennextjs-cloudflare build`, puis `bunx wrangler deploy --dry-ru
 été faits dans `C:\s3d-matched-path-w2a-0123456789abcdefg` (41 caractères, mêmes `package.json`
 et `bun.lock` que la vague 2a, sources recopiées par `robocopy` depuis `git archive`).
 
-| Révision (même dossier de 41 caractères)         | `Total Upload` (brut)                 | `gzip` (dry-run) | Écart de gzip | Budget du brief |
-| ------------------------------------------------ | ------------------------------------- | ---------------- | ------------- | --------------- |
-| `6ceaf0c` après WP-02 (relevé de la vague 2a)    | 16 170,02 KiB                         | **3 145,30 KiB** | —             | —               |
-| `f2dd5b5` + **WP-HOME**                          | 16 310,31 KiB                         | **3 163,14 KiB** | **+17,84**    | +10             |
-| `cdefa67` + **WP-STUDIO** (avant mes correctifs) | 16 974,36 KiB                         | **3 324,75 KiB** | **+161,61**   | +10             |
-| HEAD de ce passage, sans le correctif zod        | 16 975,44 KiB                         | 3 324,97 KiB     | +0,22 (bruit) | —               |
-| **HEAD final** (A1 à A5, zod en jitless)       | 16 979,06 KiB                         | **3 326,10 KiB** | +1,35 (bruit) | —               |
-| même HEAD, build dans le worktree (77 car.)      | 17 256,25 KiB                         | 3 323,83 KiB     | (chemin long) | —               |
+| Révision (même dossier de 41 caractères)         | `Total Upload` (brut) | `gzip` (dry-run) | Écart de gzip | Budget du brief |
+| ------------------------------------------------ | --------------------- | ---------------- | ------------- | --------------- |
+| `6ceaf0c` après WP-02 (relevé de la vague 2a)    | 16 170,02 KiB         | **3 145,30 KiB** | —             | —               |
+| `f2dd5b5` + **WP-HOME**                          | 16 310,31 KiB         | **3 163,14 KiB** | **+17,84**    | +10             |
+| `cdefa67` + **WP-STUDIO** (avant mes correctifs) | 16 974,36 KiB         | **3 324,75 KiB** | **+161,61**   | +10             |
+| HEAD de ce passage, sans le correctif zod        | 16 975,44 KiB         | 3 324,97 KiB     | +0,22 (bruit) | —               |
+| **HEAD final** (A1 à A5, zod en jitless)         | 16 979,06 KiB         | **3 326,10 KiB** | +1,35 (bruit) | —               |
+| même HEAD, build dans le worktree (77 car.)      | 17 256,25 KiB         | 3 323,83 KiB     | (chemin long) | —               |
 
 **Total : 3 326,10 KiB, soit +180,8 KiB depuis la vague 2a et 141 KiB AU-DESSUS du plafond de
 3 185 KiB** (décision du propriétaire du 30.09, brief §4.11). **C'est le seul critère chiffré en
@@ -331,13 +351,13 @@ Chaque page est défilée jusqu'en bas par paliers de 700 px (le balayage échan
 contextes WebGL). Violation CSP = événement `securitypolicyviolation` capté dans la page +
 messages « Refused to… » de la console.
 
-| Mode                                                  | Pages | Violations CSP | Erreurs d'hydratation | MISSING_MESSAGE / IntlError | 4xx inattendus | Débordement horizontal |
-| ----------------------------------------------------- | ----- | -------------- | --------------------- | --------------------------- | -------------- | ---------------------- |
-| Clair, mouvement complet (les 20 URL du balayage)     | 20    | **0**          | 0                     | 0                           | 0              | aucun                  |
-| Sombre                                                | 4     | 0              | 0                     | 0                           | 0              | aucun                  |
-| Mouvement réduit par l'OS (`prefers-reduced-motion`)  | 4     | 0              | 0                     | 0                           | 0              | aucun                  |
-| Mouvement réduit par l'interrupteur du footer         | 4     | 0              | 0                     | 0                           | 0              | aucun                  |
-| Mobile 375 × 812 (tactile, DPR 2)                     | 4     | 0              | 0                     | 0                           | 0              | aucun (0 px)           |
+| Mode                                                 | Pages | Violations CSP | Erreurs d'hydratation | MISSING_MESSAGE / IntlError | 4xx inattendus | Débordement horizontal |
+| ---------------------------------------------------- | ----- | -------------- | --------------------- | --------------------------- | -------------- | ---------------------- |
+| Clair, mouvement complet (les 20 URL du balayage)    | 20    | **0**          | 0                     | 0                           | 0              | aucun                  |
+| Sombre                                               | 4     | 0              | 0                     | 0                           | 0              | aucun                  |
+| Mouvement réduit par l'OS (`prefers-reduced-motion`) | 4     | 0              | 0                     | 0                           | 0              | aucun                  |
+| Mouvement réduit par l'interrupteur du footer        | 4     | 0              | 0                     | 0                           | 0              | aucun                  |
+| Mobile 375 × 812 (tactile, DPR 2)                    | 4     | 0              | 0                     | 0                           | 0              | aucun (0 px)           |
 
 (Les quatre pages des modes spéciaux : `/fr`, `/fr/studio/lavaux`, `/fr/studio/relief`,
 `/fr/shop`.) Les 20 URL : `/fr`, `/de`, `/fr/studio`, les quatre objets en français,
@@ -396,17 +416,17 @@ simulées), vient d'un pilote CDP (`Emulation.setCPUThrottlingRate` ×4, `Networ
 
 ### 7.1 Lighthouse, mobile (9 Mbps / 150 ms / CPU × 4)
 
-| Page                     | Run | Score | FCP      | **LCP**      | Élément LCP                        | **TBT**    | CLS    | TTI    |
-| ------------------------ | --- | ----- | -------- | ------------ | ---------------------------------- | ---------- | ------ | ------ |
-| `/fr`                    | 1   | 69    | 1,38 s   | **1,93 s**   | `h1#hero-title`                    | 4 723 ms   | 0,0018 | 7,9 s  |
-| `/fr`                    | 2   | 69    | 1,38 s   | **1,94 s**   | `h1#hero-title`                    | 5 677 ms   | 0,0018 | 8,7 s  |
-| `/fr`                    | 3   | 69    | 1,38 s   | **1,93 s**   | `h1#hero-title`                    | 5 037 ms   | 0,0018 | 8,2 s  |
-| `/fr/studio/lavaux`      | 1   | 70    | 1,38 s   | **2,02 s**   | `p` (chapeau « Cinq profils… »)    | 2 608 ms   | 0,0317 | 5,1 s  |
-| `/fr/studio/lavaux`      | 2   | 70    | 1,38 s   | **2,10 s**   | idem                               | 2 649 ms   | 0,0317 | 5,0 s  |
-| `/fr/studio/lavaux`      | 3   | 69    | 1,38 s   | **2,17 s**   | idem                               | 2 739 ms   | 0,0317 | 5,2 s  |
-| _`/fr/shop` (témoin sans Stage)_ | 1 | 84 | 1,38 s | 2,01 s | `img` « Vase Spirale »             | 575 ms     | 0,0015 | 2,6 s  |
-| _`/fr` sans WebGL (C0)_  | 1   | 100   | 1,23 s   | 1,62 s       | `h1#hero-title`                    | **29 ms**  | 0,0018 | 1,9 s  |
-| _`/fr/studio/lavaux` sans WebGL_ | 1 | 98 | 1,38 s | 2,01 s    | `p` (chapeau)                      | **100 ms** | 0,0317 | 2,2 s  |
+| Page                             | Run | Score | FCP    | **LCP**    | Élément LCP                     | **TBT**    | CLS    | TTI   |
+| -------------------------------- | --- | ----- | ------ | ---------- | ------------------------------- | ---------- | ------ | ----- |
+| `/fr`                            | 1   | 69    | 1,38 s | **1,93 s** | `h1#hero-title`                 | 4 723 ms   | 0,0018 | 7,9 s |
+| `/fr`                            | 2   | 69    | 1,38 s | **1,94 s** | `h1#hero-title`                 | 5 677 ms   | 0,0018 | 8,7 s |
+| `/fr`                            | 3   | 69    | 1,38 s | **1,93 s** | `h1#hero-title`                 | 5 037 ms   | 0,0018 | 8,2 s |
+| `/fr/studio/lavaux`              | 1   | 70    | 1,38 s | **2,02 s** | `p` (chapeau « Cinq profils… ») | 2 608 ms   | 0,0317 | 5,1 s |
+| `/fr/studio/lavaux`              | 2   | 70    | 1,38 s | **2,10 s** | idem                            | 2 649 ms   | 0,0317 | 5,0 s |
+| `/fr/studio/lavaux`              | 3   | 69    | 1,38 s | **2,17 s** | idem                            | 2 739 ms   | 0,0317 | 5,2 s |
+| _`/fr/shop` (témoin sans Stage)_ | 1   | 84    | 1,38 s | 2,01 s     | `img` « Vase Spirale »          | 575 ms     | 0,0015 | 2,6 s |
+| _`/fr` sans WebGL (C0)_          | 1   | 100   | 1,23 s | 1,62 s     | `h1#hero-title`                 | **29 ms**  | 0,0018 | 1,9 s |
+| _`/fr/studio/lavaux` sans WebGL_ | 1   | 98    | 1,38 s | 2,01 s     | `p` (chapeau)                   | **100 ms** | 0,0317 | 2,2 s |
 
 Avec le profil par défaut de Lighthouse (« slow 4G », 1,6 Mbps) : `/fr` LCP 3,69 à 3,70 s
 (score 57 à 58, TBT 4,4 à 4,6 s), `/fr/studio/lavaux` LCP 4,16 à 4,18 s (score 56, TBT 2,1 à
@@ -432,14 +452,14 @@ Avec le profil par défaut de Lighthouse (« slow 4G », 1,6 Mbps) : `/fr` LCP 3
 Pilote CDP, 3 runs par page, observation 9 s après `load`. TBT = tâches longues (> 50 ms)
 entre le FCP et la fin de l'observation ; « Stage prêt » = apparition de `data-stage-ready="true"`.
 
-| Page                | Run | TTFB   | FCP     | **LCP**  | Élément LCP            | CLS    | TBT      | Tâche la plus longue | Stage prêt |
-| ------------------- | --- | ------ | ------- | -------- | ---------------------- | ------ | -------- | -------------------- | ---------- |
-| `/fr`               | 1   | 533 ms | 1,26 s  | **1,26 s** | `h1#hero-title`      | 0      | 946 ms   | 581 ms               | 5,24 s     |
-| `/fr`               | 2   | 517 ms | 1,18 s  | **1,18 s** | idem                 | 0      | 1 042 ms | 588 ms               | 5,33 s     |
-| `/fr`               | 3   | 537 ms | 1,16 s  | **1,16 s** | idem                 | 0      | 1 114 ms | 606 ms               | 5,44 s     |
-| `/fr/studio/lavaux` | 1   | 183 ms | 0,76 s  | **0,76 s** | `p` (chapeau)        | 0,0203 | 532 ms   | 192 ms               | 3,72 s     |
-| `/fr/studio/lavaux` | 2   | 189 ms | 0,78 s  | **0,78 s** | idem                 | 0,0203 | 520 ms   | 190 ms               | 3,78 s     |
-| `/fr/studio/lavaux` | 3   | 197 ms | 0,78 s  | **0,78 s** | idem                 | 0,0203 | 451 ms   | 193 ms               | 3,75 s     |
+| Page                | Run | TTFB   | FCP    | **LCP**    | Élément LCP     | CLS    | TBT      | Tâche la plus longue | Stage prêt |
+| ------------------- | --- | ------ | ------ | ---------- | --------------- | ------ | -------- | -------------------- | ---------- |
+| `/fr`               | 1   | 533 ms | 1,26 s | **1,26 s** | `h1#hero-title` | 0      | 946 ms   | 581 ms               | 5,24 s     |
+| `/fr`               | 2   | 517 ms | 1,18 s | **1,18 s** | idem            | 0      | 1 042 ms | 588 ms               | 5,33 s     |
+| `/fr`               | 3   | 537 ms | 1,16 s | **1,16 s** | idem            | 0      | 1 114 ms | 606 ms               | 5,44 s     |
+| `/fr/studio/lavaux` | 1   | 183 ms | 0,76 s | **0,76 s** | `p` (chapeau)   | 0,0203 | 532 ms   | 192 ms               | 3,72 s     |
+| `/fr/studio/lavaux` | 2   | 189 ms | 0,78 s | **0,78 s** | idem            | 0,0203 | 520 ms   | 190 ms               | 3,78 s     |
+| `/fr/studio/lavaux` | 3   | 197 ms | 0,78 s | **0,78 s** | idem            | 0,0203 | 451 ms   | 193 ms               | 3,75 s     |
 
 Ici le LCP du mobile throttlé est de **1,2 s pour `/fr`** et **0,8 s pour le Studio**
 (le h1 / le chapeau est peint au premier rendu) ; le TBT tombe à 0,5 à 1,1 s, la scène WebGL est
@@ -448,14 +468,14 @@ prête en 3,7 à 5,4 s. Les poids transférés (cache désactivé) : `/fr` 702 K
 
 ### 7.3 Desktop 1440 × 900
 
-| Page / outil                           | FCP      | **LCP**                            | TBT       | CLS    | Remarque                                                                                   |
-| -------------------------------------- | -------- | ---------------------------------- | --------- | ------ | ------------------------------------------------------------------------------------------ |
-| `/fr`, Lighthouse (preset desktop)     | 0,43 s   | 1,99 s simulé (**3,97 s observé**) | 1 177 ms  | 0,0133 | score 60 ; délai de rendu de l'élément observé : 3 327 ms                                   |
-| `/fr`, pilote CDP (4 runs)             | 0,78 à 0,82 s | **2,83 à 2,92 s**             | 923 à 954 ms | 0,0022 | une tâche de 880 à 903 ms ; Stage prêt à 1,35 s                                             |
-| `/fr` sans WebGL, Lighthouse desktop   | 0,43 s   | **0,72 s**                         | **0 ms**  | 0,0133 | score 100                                                                                  |
-| `/fr/studio/lavaux`, Lighthouse desktop | 0,43 s  | 0,92 s                             | 734 ms    | 0,0124 | score 73                                                                                   |
-| `/fr/studio/lavaux`, pilote CDP        | 0,33 s   | 0,33 s                             | 51 ms     | 0,0115 | Stage prêt à 1,83 s                                                                        |
-| `/fr/shop`, pilote CDP (témoin)        | 0,95 s   | 0,95 s                             | 0 ms      | 0,0019 | sans Stage                                                                                 |
+| Page / outil                            | FCP           | **LCP**                            | TBT          | CLS    | Remarque                                                  |
+| --------------------------------------- | ------------- | ---------------------------------- | ------------ | ------ | --------------------------------------------------------- |
+| `/fr`, Lighthouse (preset desktop)      | 0,43 s        | 1,99 s simulé (**3,97 s observé**) | 1 177 ms     | 0,0133 | score 60 ; délai de rendu de l'élément observé : 3 327 ms |
+| `/fr`, pilote CDP (4 runs)              | 0,78 à 0,82 s | **2,83 à 2,92 s**                  | 923 à 954 ms | 0,0022 | une tâche de 880 à 903 ms ; Stage prêt à 1,35 s           |
+| `/fr` sans WebGL, Lighthouse desktop    | 0,43 s        | **0,72 s**                         | **0 ms**     | 0,0133 | score 100                                                 |
+| `/fr/studio/lavaux`, Lighthouse desktop | 0,43 s        | 0,92 s                             | 734 ms       | 0,0124 | score 73                                                  |
+| `/fr/studio/lavaux`, pilote CDP         | 0,33 s        | 0,33 s                             | 51 ms        | 0,0115 | Stage prêt à 1,83 s                                       |
+| `/fr/shop`, pilote CDP (témoin)         | 0,95 s        | 0,95 s                             | 0 ms         | 0,0019 | sans Stage                                                |
 
 **Le LCP du héros sur desktop, 2,8 à 4,0 s observés, est le point à regarder** : le h1 de `/fr`
 est peint au premier rendu (FCP 0,8 s) mais l'élément est re-déclaré plus grand à 2,1 puis 4,3 s
@@ -519,7 +539,7 @@ sont faits, les points ci-dessous ne le sont pas.
    jour avec la décision du point 1 (3 326 KiB mesuré le 01.10.2026, dossier de 41 caractères).
 10. **Effets de bord sur la base de test** (branche Neon de développement) : deux demandes de
     devis `w3-net@example.test` et `w3-drawer@example.test`, leurs deux lignes d'outbox (aucun envoi,
-    clé Resend vide), une archive STL de 30 Ko environ dans le R2 local du preview (non partagé).
+    clé Resend vide), un fichier STL dans le R2 local du preview (non partagé).
     Rien n'a été écrit autrement ; les vérifications du chapitre 02 n'écrivent nulle part.
 
 ## 9. Prêt pour J1 / J2 ?
@@ -528,7 +548,7 @@ sont faits, les points ci-dessous ne le sont pas.
 propriétaire sur le plafond du Worker (écart 1), qui ne bloque pas le déploiement mais ne peut
 plus attendre WP-99 sans réponse ; (b) le correctif A5 (zod en `jitless`) est dans la branche,
 sinon chaque visite d'une page d'objet du Studio produit un rapport CSP « eval » dans
-`/api/csp-report`. **Aucun blocage fonctionnel** : lint, typecheck, 842+ tests, format verts ;
+`/api/csp-report`. **Aucun blocage fonctionnel** : lint, typecheck, 843 tests, format verts ;
 20 pages sans violation CSP, sans erreur d'hydratation, sans message manquant, sans 4xx
 inattendu ; un seul contexte WebGL par page ; `html.lenis` seulement dans `(site)` ; mouvement
 réduit et 375 × 812 conformes ; 0 signature d'un moteur dans le Worker.
