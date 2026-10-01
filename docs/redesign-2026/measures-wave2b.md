@@ -15,12 +15,12 @@ _(rempli en fin de passage)_
 
 ## Environnement
 
-|            |                                                                                                                                                                                                  |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Outils     | Bun 1.4.2 · Next 16.3.6 (webpack) · `@opennextjs/cloudflare` 1.20.6 · Vitest 5.0.2 · Node 26.7                                                                                                   |
-| Dépôt      | worktree `wf_c69b4bef-c00-1`, `bun install` à neuf (523 paquets) ; mesures du Worker aussi dans `C:\s3d-matched-path-w2a-0123456789abcdefg` (41 caractères, mêmes `package.json` et `bun.lock`)  |
+|            |                                                                                                                                                                                                    |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Outils     | Bun 1.4.2 · Next 16.3.6 (webpack) · `@opennextjs/cloudflare` 1.20.6 · Vitest 5.0.2 · Node 26.7                                                                                                     |
+| Dépôt      | worktree `wf_c69b4bef-c00-1`, `bun install` à neuf (523 paquets) ; mesures du Worker aussi dans `C:\s3d-matched-path-w2a-0123456789abcdefg` (41 caractères, mêmes `package.json` et `bun.lock`)    |
 | Navigateur | Edge headless piloté par CDP (Playwright `connectOverCDP`, port 9343), profil isolé, contextes neufs, consentement non donné ; WebGL par SwiftShader (logiciel, voir les réserves de la section 7) |
-| Garde-fous | jeux d'essai uniquement sur `localhost`, base = branche Neon de développement, clés Stripe de test, clé Resend vide (aucun e-mail réel), ports 3130 / 8792 / 9332 / 9343                          |
+| Garde-fous | jeux d'essai uniquement sur `localhost`, base = branche Neon de développement, clés Stripe de test, clé Resend vide (aucun e-mail réel), ports 3130 / 8792 / 9332 / 9343                           |
 
 ## A. Correctifs
 
@@ -93,10 +93,10 @@ autre langue), et l'étiquette gravée par `layoutLabel` suit la même règle.
 Server Action sont coupés par Playwright (`route.abort("connectionfailed")` sur toute requête
 portant l'en-tête `next-action`) :
 
-| Cas                                         | Après l'échec                                                                                                                                                                                                                  | Après « Réessayer »                              |
-| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| `/fr/custom` (variante page)                | **page conservée** (1 h1, ni `error.tsx` ni « Erreur inattendue »), alerte « L'envoi a échoué. Vérifiez votre connexion et réessayez. », bouton « Réessayer », **description et e-mail intacts**, une ligne `[quote] envoi interrompu TypeError: Failed to fetch` en console | panneau « Reçu. » (demande enregistrée)          |
-| Tiroir du Studio (`/fr/studio/lavaux`)      | tiroir ouvert, même alerte, **1 téléversement** (`/api/quote-upload`) fait avant la coupure                                                                                                                                    | « Reçu. », **0 téléversement de plus** (total 1) |
+| Cas                                    | Après l'échec                                                                                                                                                                                                                                                                | Après « Réessayer »                              |
+| -------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------ |
+| `/fr/custom` (variante page)           | **page conservée** (1 h1, ni `error.tsx` ni « Erreur inattendue »), alerte « L'envoi a échoué. Vérifiez votre connexion et réessayez. », bouton « Réessayer », **description et e-mail intacts**, une ligne `[quote] envoi interrompu TypeError: Failed to fetch` en console | panneau « Reçu. » (demande enregistrée)          |
+| Tiroir du Studio (`/fr/studio/lavaux`) | tiroir ouvert, même alerte, **1 téléversement** (`/api/quote-upload`) fait avant la coupure                                                                                                                                                                                  | « Reçu. », **0 téléversement de plus** (total 1) |
 
 **Preuve DOM de A1** dans le tiroir réel : les quatre champs cachés `description` (819
 caractères), `material`, `colors`, `dimensions` portent `ph-no-capture` (`locale` non, il ne
@@ -112,17 +112,17 @@ Preview de production (`/fr`, `/de`, `/en`, `/it`, 1440 × 900, WebGL SwiftShade
 non donné). Le chapitre `#sommet` est amené à l'écran, le moteur (gate `home-tools`) s'y charge
 (marge 150 %), puis frappe au clavier dans `#summit-input` (90 ms par touche).
 
-| Contrôle                                              | Résultat                                                                                                                                                                                                                 |
-| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Scène                                                 | vue `studio-object` (`data-stage-ready="true"`), **un canvas, un seul contexte WebGL vivant** (la sonde en avait créé un autre, jeté) ; l'affiche SVG passe à `opacity: 0` une fois la vue prête                           |
-| **Relief du nom**                                     | capture du chapitre (1 image, 712 × 845) : le sous-verre est rendu en strates (bleu, vert, gris, blanc) avec « POINTE ZORGL · 4 364 M » **gravé en relief** sur la zone plate, sur le quadrillage de la carte                |
-| **Fond encre**                                        | le conteneur `[data-tone="ink"]` devient transparent quand la vue est prête (`rgba(0,0,0,0)`) ; le Stage peint le fond : pixel de coin = **(26, 22, 20) = `#1a1614`**, le jeton `--paper` du ton encre (les autres coins tombent sur le filet de l'en-tête et le quadrillage) |
-| **Étiquette DOM** (`p[aria-live]`, `ph-mask`)         | fr « POINTE LÉA · 2 566 M » (exemple) → « POINTE ZORGL · 2 359 M » en tapant « Zorgl » ; de « PIZ ZORGL · 2’359 M », en « MOUNT ZORGL », it « PIZZO ZORGL » (séparateur de milliers de la langue)                          |
-| **Plus de doublon (A3)**                              | « Pointe Zorgl » en français → « POINTE ZORGL · 4 364 M » (et non « POINTE POINTE ZORGL ») ; sous `/de`, `/en`, `/it` le mot d'une autre langue est conservé (« PIZ POINTE ZORGL »), comme voulu                            |
-| **Zéro requête réseau pendant la frappe**             | **0** requête (`page.on("request")`) pour « Zorgl » puis pour « Pointe Zorgl », dans les quatre langues                                                                                                                  |
-| Texte au Studio par `sessionStorage`                  | `s3d-studio-texts-v1` = `{"relief":{"peak":"Zorgl"}}` ; vidé en effaçant le champ (retour à l'exemple) ; **jamais dans l'URL** (le lien du bouton rouge ne porte que la configuration, `#c=v1.…`)                         |
-| Arrivée au Studio                                     | `/fr/studio/relief#c=…` : le champ du nom est prérempli (« Zorgl »), le résumé dit « texte : « Zorgl » », l'URL ne contient pas le texte, un canvas et un contexte WebGL vivants                                          |
-| Console                                               | 0 erreur, 0 avertissement (hors la violation CSP « eval » du Studio, voir A5)                                                                                                                                           |
+| Contrôle                                      | Résultat                                                                                                                                                                                                                                                                      |
+| --------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Scène                                         | vue `studio-object` (`data-stage-ready="true"`), **un canvas, un seul contexte WebGL vivant** (la sonde en avait créé un autre, jeté) ; l'affiche SVG passe à `opacity: 0` une fois la vue prête                                                                              |
+| **Relief du nom**                             | capture du chapitre (1 image, 712 × 845) : le sous-verre est rendu en strates (bleu, vert, gris, blanc) avec « POINTE ZORGL · 4 364 M » **gravé en relief** sur la zone plate, sur le quadrillage de la carte                                                                 |
+| **Fond encre**                                | le conteneur `[data-tone="ink"]` devient transparent quand la vue est prête (`rgba(0,0,0,0)`) ; le Stage peint le fond : pixel de coin = **(26, 22, 20) = `#1a1614`**, le jeton `--paper` du ton encre (les autres coins tombent sur le filet de l'en-tête et le quadrillage) |
+| **Étiquette DOM** (`p[aria-live]`, `ph-mask`) | fr « POINTE LÉA · 2 566 M » (exemple) → « POINTE ZORGL · 2 359 M » en tapant « Zorgl » ; de « PIZ ZORGL · 2’359 M », en « MOUNT ZORGL », it « PIZZO ZORGL » (séparateur de milliers de la langue)                                                                             |
+| **Plus de doublon (A3)**                      | « Pointe Zorgl » en français → « POINTE ZORGL · 4 364 M » (et non « POINTE POINTE ZORGL ») ; sous `/de`, `/en`, `/it` le mot d'une autre langue est conservé (« PIZ POINTE ZORGL »), comme voulu                                                                              |
+| **Zéro requête réseau pendant la frappe**     | **0** requête (`page.on("request")`) pour « Zorgl » puis pour « Pointe Zorgl », dans les quatre langues                                                                                                                                                                       |
+| Texte au Studio par `sessionStorage`          | `s3d-studio-texts-v1` = `{"relief":{"peak":"Zorgl"}}` ; vidé en effaçant le champ (retour à l'exemple) ; **jamais dans l'URL** (le lien du bouton rouge ne porte que la configuration, `#c=v1.…`)                                                                             |
+| Arrivée au Studio                             | `/fr/studio/relief#c=…` : le champ du nom est prérempli (« Zorgl »), le résumé dit « texte : « Zorgl » », l'URL ne contient pas le texte, un canvas et un contexte WebGL vivants                                                                                              |
+| Console                                       | 0 erreur, 0 avertissement (hors la violation CSP « eval » du Studio, voir A5)                                                                                                                                                                                                 |
 
 La bande de mesure (`MeasureStrip live`) montre « 100 × 100 × 6,2 mm, ≈ 23 g, ≈ 47 min, 3
 changements » avant et après la frappe : les chiffres sont arrondis à ce niveau et l'étiquette
@@ -156,13 +156,13 @@ Builds : `bunx opennextjs-cloudflare build`, puis `bunx wrangler deploy --dry-ru
 été faits dans `C:\s3d-matched-path-w2a-0123456789abcdefg` (41 caractères, mêmes `package.json`
 et `bun.lock` que la vague 2a, sources recopiées par `robocopy` depuis `git archive`).
 
-| Révision (même dossier de 41 caractères)     | `Total Upload` (brut) | `gzip` (dry-run)   | Écart de gzip | Budget du brief  |
-| -------------------------------------------- | --------------------- | ------------------ | ------------- | ---------------- |
-| `6ceaf0c` après WP-02 (relevé de la vague 2a) | 16 170,02 KiB         | **3 145,30 KiB**   | —             | —                |
-| `f2dd5b5` + **WP-HOME**                       | 16 310,31 KiB         | **3 163,14 KiB**   | **+17,84**    | +10              |
-| `cdefa67` + **WP-STUDIO** (avant mes correctifs) | 16 974,36 KiB      | **3 324,75 KiB**   | **+161,61**   | +10              |
-| `7bd21df`… HEAD de ce passage (+ A1 à A3, zod) | 16 975,44 KiB (sans le correctif zod) | **3 324,97 KiB** | +0,22 (bruit) | —                |
-| même HEAD, build dans le worktree (77 car.)   | 17 252,94 KiB         | 3 323,61 KiB       | (chemin long) | —                |
+| Révision (même dossier de 41 caractères)         | `Total Upload` (brut)                 | `gzip` (dry-run) | Écart de gzip | Budget du brief |
+| ------------------------------------------------ | ------------------------------------- | ---------------- | ------------- | --------------- |
+| `6ceaf0c` après WP-02 (relevé de la vague 2a)    | 16 170,02 KiB                         | **3 145,30 KiB** | —             | —               |
+| `f2dd5b5` + **WP-HOME**                          | 16 310,31 KiB                         | **3 163,14 KiB** | **+17,84**    | +10             |
+| `cdefa67` + **WP-STUDIO** (avant mes correctifs) | 16 974,36 KiB                         | **3 324,75 KiB** | **+161,61**   | +10             |
+| `7bd21df`… HEAD de ce passage (+ A1 à A3, zod)   | 16 975,44 KiB (sans le correctif zod) | **3 324,97 KiB** | +0,22 (bruit) | —               |
+| même HEAD, build dans le worktree (77 car.)      | 17 252,94 KiB                         | 3 323,61 KiB     | (chemin long) | —               |
 
 **Total : 3 324,97 KiB, soit +179,7 KiB depuis la vague 2a et 140 KiB AU-DESSUS du plafond de
 3 185 KiB** (décision du propriétaire du 30.09, brief §4.11). **C'est le seul critère chiffré en
@@ -174,10 +174,10 @@ fait.
 
 **Croissance par paquet** (gzip du dry-run, 41 caractères) :
 
-| Paquet                    | Budget | Mesuré       | Dépassement |
-| ------------------------- | ------ | ------------ | ----------- |
-| WP-HOME (`f2dd5b5`)       | +10    | **+17,84**   | +7,8 (dans le bruit de ±6 d'un build à l'autre) |
-| WP-STUDIO (`cdefa67`)     | +10    | **+161,61**  | **+151,6**  |
+| Paquet                | Budget | Mesuré      | Dépassement                                     |
+| --------------------- | ------ | ----------- | ----------------------------------------------- |
+| WP-HOME (`f2dd5b5`)   | +10    | **+17,84**  | +7,8 (dans le bruit de ±6 d'un build à l'autre) |
+| WP-STUDIO (`cdefa67`) | +10    | **+161,61** | **+151,6**                                      |
 
 Le brut grossit de 140 KiB (HOME) puis 664 KiB (STUDIO). Attribution du côté Studio
 (comparaison fichier par fichier de `.next/server` entre les builds `f2dd5b5` et `cdefa67`,
@@ -185,15 +185,15 @@ Le brut grossit de 140 KiB (HOME) puis 664 KiB (STUDIO). Attribution du côté S
 +43 KiB bruts dans le chunk des messages (`4569.js`, les quatre langues du namespace `studio`
 chargées dans le Worker) :
 
-| Fichier serveur ajouté                         | Brut    | gzip   | Contenu (modules webpack les plus gros)                                                                                   |
-| ---------------------------------------------- | ------- | ------ | ------------------------------------------------------------------------------------------------------------------------- |
-| `app/[locale]/(site)/studio/[objet]/page.js`   | 92 KiB  | 29 KiB | `StudioApp` rendu côté serveur (module 27826, 68,5 KiB) : le composant client est rendu en SSR, donc embarqué dans le Worker |
-| `chunks/5629.js`                               | 93 KiB  | 29 KiB | **zod** (module 32769, 81,2 KiB) + earcut (7 KiB) + d3-array (4,5 KiB) : une copie de zod de plus (couche SSR), `schemas.ts` étant importé par le code client du Studio |
-| `chunks/2956.js`                               | 68 KiB  | 26 KiB | bibliothèque du Studio : `ranges`, schémas, géométrie, statistiques (21 modules)                                          |
-| `chunks/345.js`                                | 35 KiB  | 14 KiB | texte en relief, mise en page de l'étiquette (19 modules)                                                                 |
-| `chunks/9689.js`                               | 25 KiB  | 9 KiB  | `QuoteRequestForm` (13,3 KiB) et ses voisins, tirés par le tiroir d'envoi                                                 |
-| `app/…/studio/page.js` (index du Studio)       | 24 KiB  | 8 KiB  | page du hub                                                                                                               |
-| 7 autres (manifestes, petits chunks)           | 137 KiB | 30 KiB |                                                                                                                           |
+| Fichier serveur ajouté                       | Brut    | gzip   | Contenu (modules webpack les plus gros)                                                                                                                                 |
+| -------------------------------------------- | ------- | ------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/[locale]/(site)/studio/[objet]/page.js` | 92 KiB  | 29 KiB | `StudioApp` rendu côté serveur (module 27826, 68,5 KiB) : le composant client est rendu en SSR, donc embarqué dans le Worker                                            |
+| `chunks/5629.js`                             | 93 KiB  | 29 KiB | **zod** (module 32769, 81,2 KiB) + earcut (7 KiB) + d3-array (4,5 KiB) : une copie de zod de plus (couche SSR), `schemas.ts` étant importé par le code client du Studio |
+| `chunks/2956.js`                             | 68 KiB  | 26 KiB | bibliothèque du Studio : `ranges`, schémas, géométrie, statistiques (21 modules)                                                                                        |
+| `chunks/345.js`                              | 35 KiB  | 14 KiB | texte en relief, mise en page de l'étiquette (19 modules)                                                                                                               |
+| `chunks/9689.js`                             | 25 KiB  | 9 KiB  | `QuoteRequestForm` (13,3 KiB) et ses voisins, tirés par le tiroir d'envoi                                                                                               |
+| `app/…/studio/page.js` (index du Studio)     | 24 KiB  | 8 KiB  | page du hub                                                                                                                                                             |
+| 7 autres (manifestes, petits chunks)         | 137 KiB | 30 KiB |                                                                                                                                                                         |
 
 Le Worker contenait déjà deux copies de zod (chunks `7031.js` 300 KiB et `7377.js` 101 KiB, côté
 actions et routes) ; celle de `5629.js` est la troisième : webpack ne partage pas un module entre
@@ -232,22 +232,22 @@ fichier). Mêmes 0 sur les builds `f2dd5b5` et `cdefa67`. `node_modules/` 5 011,
 aussi les routes du Studio, `/track`, `/favorites`, `/account/login` et `/legal/terms`
 (14 routes au lieu de 8 ; plus besoin de la copie jetable de la vague 2a).
 
-| Route (JS initial, borne haute)        | gzip          | brut      | chunks | Vague 2a  |
-| -------------------------------------- | ------------- | --------- | ------ | --------- |
-| `/[locale]` (accueil)                  | **194,2 KiB** | 612,1 KiB | 17     | 231,4     |
-| `/[locale]/studio`                     | **188,8 KiB** | 594,7 KiB | 18     | —         |
-| `/[locale]/studio/[objet]`             | **302,1 KiB** | 924,4 KiB | 28     | —         |
-| `/[locale]/shop`                       | 187,1 KiB     | 590,9 KiB | 18     | 230,4     |
-| `/[locale]/products/[slug]`            | 187,7 KiB     | 594,6 KiB | 17     | 234,8     |
-| `/[locale]/custom`                     | 217,2 KiB     | 675,8 KiB | 21     | 259,7     |
-| `/[locale]/a-propos`                   | 215,7 KiB     | 674,6 KiB | 20     | 258,9     |
-| `/[locale]/contact`                    | 210,2 KiB     | 654,9 KiB | 20     | 253,5     |
-| `/[locale]/cart` (hors `(site)`)       | 213,0 KiB     | 664,0 KiB | 20     | 256,3     |
-| `/[locale]/checkout` (hors `(site)`)   | 222,0 KiB     | 690,1 KiB | 20     | 265,3     |
-| `/[locale]/track`                      | 191,5 KiB     | 602,2 KiB | 19     | 234,8     |
-| `/[locale]/favorites`                  | 190,3 KiB     | 600,2 KiB | 17     | 233,2     |
-| `/[locale]/account/login`              | 212,8 KiB     | 663,7 KiB | 19     | 256,1     |
-| `/[locale]/legal/terms`                | 182,6 KiB     | 579,3 KiB | 16     | 225,9     |
+| Route (JS initial, borne haute)      | gzip          | brut      | chunks | Vague 2a |
+| ------------------------------------ | ------------- | --------- | ------ | -------- |
+| `/[locale]` (accueil)                | **194,2 KiB** | 612,1 KiB | 17     | 231,4    |
+| `/[locale]/studio`                   | **188,8 KiB** | 594,7 KiB | 18     | —        |
+| `/[locale]/studio/[objet]`           | **302,1 KiB** | 924,4 KiB | 28     | —        |
+| `/[locale]/shop`                     | 187,1 KiB     | 590,9 KiB | 18     | 230,4    |
+| `/[locale]/products/[slug]`          | 187,7 KiB     | 594,6 KiB | 17     | 234,8    |
+| `/[locale]/custom`                   | 217,2 KiB     | 675,8 KiB | 21     | 259,7    |
+| `/[locale]/a-propos`                 | 215,7 KiB     | 674,6 KiB | 20     | 258,9    |
+| `/[locale]/contact`                  | 210,2 KiB     | 654,9 KiB | 20     | 253,5    |
+| `/[locale]/cart` (hors `(site)`)     | 213,0 KiB     | 664,0 KiB | 20     | 256,3    |
+| `/[locale]/checkout` (hors `(site)`) | 222,0 KiB     | 690,1 KiB | 20     | 265,3    |
+| `/[locale]/track`                    | 191,5 KiB     | 602,2 KiB | 19     | 234,8    |
+| `/[locale]/favorites`                | 190,3 KiB     | 600,2 KiB | 17     | 233,2    |
+| `/[locale]/account/login`            | 212,8 KiB     | 663,7 KiB | 19     | 256,1    |
+| `/[locale]/legal/terms`              | 182,6 KiB     | 579,3 KiB | 16     | 225,9    |
 
 - **Accueil : 194,2 KiB pour un budget de 233,7 KiB** (« base + 15 »), marge de **39,5 KiB**.
   Toutes les routes ont perdu 37 à 44 KiB par rapport à la vague 2a, de façon uniforme : ce n'est
@@ -261,17 +261,17 @@ aussi les routes du Studio, `/track`, `/favorites`, `/account/login` et `/legal/
   `3125`) en fait partie (piste 1 ci-dessus).
 - Gates (`.next/react-loadable-manifest.json`, gzip zlib par défaut, chunks partagés compris) :
 
-| Gate                                                   | gzip         | Budget       |
-| ------------------------------------------------------ | ------------ | ------------ |
-| `@/motion/runtime` (gsap + Lenis)                      | **54,2 KiB** | ≤ 65 ✓       |
-| `@/motion/stage/stage-root` (three)                    | **157,3 KiB**| ≤ 200 ✓ (148,9 en 2a : +8,4) |
-| scène `studio-object`                                  | 14,4 KiB     | ≤ 15 ✓       |
-| scène `print-hero`                                     | 38,8 KiB (6 chunks, partagés compris) | ≤ 15 en propre (non isolable ici) |
-| `@/motion/studio/engine` + `geometry-core` (Worker)    | 2,2 + 28,1 KiB | ≤ 40 + ≤ 60 ✓ |
-| `@/motion/choreo/home` / `home-tools`                  | 52,3 / 32,5 KiB | —         |
-| `@/motion/choreo/about` / `product`                    | 50,1 / 51,0 KiB | —         |
-| outil WebMCP `configure-tool` (chargé à la demande)    | 58,4 KiB     | —            |
-| posthog-js (`instrumentation-client`, paresseux)       | 193,0 KiB (2 chunks) | —    |
+| Gate                                                | gzip                                  | Budget                            |
+| --------------------------------------------------- | ------------------------------------- | --------------------------------- |
+| `@/motion/runtime` (gsap + Lenis)                   | **54,2 KiB**                          | ≤ 65 ✓                            |
+| `@/motion/stage/stage-root` (three)                 | **157,3 KiB**                         | ≤ 200 ✓ (148,9 en 2a : +8,4)      |
+| scène `studio-object`                               | 14,4 KiB                              | ≤ 15 ✓                            |
+| scène `print-hero`                                  | 38,8 KiB (6 chunks, partagés compris) | ≤ 15 en propre (non isolable ici) |
+| `@/motion/studio/engine` + `geometry-core` (Worker) | 2,2 + 28,1 KiB                        | ≤ 40 + ≤ 60 ✓                     |
+| `@/motion/choreo/home` / `home-tools`               | 52,3 / 32,5 KiB                       | —                                 |
+| `@/motion/choreo/about` / `product`                 | 50,1 / 51,0 KiB                       | —                                 |
+| outil WebMCP `configure-tool` (chargé à la demande) | 58,4 KiB                              | —                                 |
+| posthog-js (`instrumentation-client`, paresseux)    | 193,0 KiB (2 chunks)                  | —                                 |
 
 - Glyphes 3D : `public/studio/glyphs/s3d-relief-v1.json` **34,0 KiB** gzip (121,4 bruts) pour un
   budget de ≤ 45 ✓ (fichier statique, hors Worker).
