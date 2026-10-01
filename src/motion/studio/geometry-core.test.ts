@@ -19,7 +19,7 @@ const GLYPH_FILE = fileURLToPath(
 
 /** `fetch` qui sert le JSON de glyphes du dépôt (le Worker le lit par URL). */
 function serveGlyphs() {
-  const fake = vi.fn<typeof fetch>(async () =>
+  const fake = vi.fn<(url?: string) => Promise<Response>>(async () =>
     Response.json(JSON.parse(readFileSync(GLYPH_FILE, "utf8"))),
   );
   vi.stubGlobal("fetch", fake);

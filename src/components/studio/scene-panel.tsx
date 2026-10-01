@@ -19,6 +19,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
 import { StageView } from "@/components/ui/stage-view";
+import { filamentHex } from "@/lib/studio/filaments";
 import type { BandSummary } from "@/lib/studio/band-stats";
 import {
   formatClock,
@@ -26,6 +27,7 @@ import {
   formatMm,
   simulatedSeconds,
   formatDuration,
+  formatGrams,
 } from "@/lib/studio/format";
 import type {
   StudioConfig,
@@ -34,7 +36,7 @@ import type {
   StudioTexts,
 } from "@/lib/studio/types";
 import { ElevationView } from "./elevation-view";
-import { layerTop } from "./layers";
+import { layerTop, spreadVertically } from "./layers";
 import { LayerSlider, SimulationControls } from "./layer-panel";
 import {
   defaultView,
@@ -263,30 +265,47 @@ export function ScenePanel({
           </div>
         ) : null}
 
-        {/* Étiquettes de l'éclaté : une par bande, au bord de sa coque. */}
-        {sceneProps.exploded && !elevationShown
-          ? anchors.map((anchor, index) => {
+        {/* Étiquettes de l'éclaté : une colonne à gauche de la barre altimétrique,
+            chacune à la hauteur de sa bande (écartées si elles se chevauchent),
+            avec la pastille de sa teinte. */}
+        {sceneProps.exploded && !elevationShown && anchors.length > 0 ? (
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute inset-y-0 right-3 z-10 w-[min(15rem,52%)] lg:right-[4.75rem]"
+          >
+            {spreadVertically(
+              anchors.map((anchor) => anchor.y),
+              52,
+              28,
+              Number.POSITIVE_INFINITY,
+            ).map((top, index) => {
               const band = bands.bands[index];
               if (!band) return null;
               return (
                 <p
                   key={index}
-                  aria-hidden="true"
-                  className="s3d-label ph-no-capture pointer-events-none absolute z-10 max-w-[16rem] -translate-y-1/2 rounded-hair bg-paper/85 px-2 py-1 normal-case text-ink"
-                  style={{ left: anchor.x + 10, top: anchor.y }}
+                  className="s3d-label ph-no-capture absolute right-0 flex max-w-full -translate-y-1/2 items-start gap-2 rounded-hair bg-paper/85 px-2 py-1 normal-case text-ink"
+                  style={{ top }}
                 >
-                  {core("bands.label", {
-                    filament: filamentName(band.filament),
-                    from: band.fromLayer,
-                    to: band.toLayer,
-                    fromMm: mm(band.fromMm, locale),
-                    toMm: mm(band.toMm, locale),
-                    grams: `${num(band.grams, locale)} g`,
-                  })}
+                  <span
+                    className="mt-0.5 size-2.5 shrink-0 rounded-full border border-swatch-ring"
+                    style={{ backgroundColor: filamentHex(band.filament) }}
+                  />
+                  <span>
+                    {core("bands.label", {
+                      filament: filamentName(band.filament),
+                      from: band.fromLayer,
+                      to: band.toLayer,
+                      fromMm: num(band.fromMm, locale),
+                      toMm: mm(band.toMm, locale),
+                      grams: formatGrams(band.grams, locale),
+                    })}
+                  </span>
                 </p>
               );
-            })
-          : null}
+            })}
+          </div>
+        ) : null}
 
         {/* Réglette Z de la vue « Couches », au bord gauche. */}
         {stageOn && layersView ? (

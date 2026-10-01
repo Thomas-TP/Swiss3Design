@@ -195,8 +195,22 @@ function splitByBand(
   return parts;
 }
 
+/**
+ * Un cheveu au-dessus de chaque frontière de bande : une face horizontale posée
+ * EXACTEMENT sur une frontière (le dessus de la plaque d'une carte, le socle d'un
+ * sous-verre, un sommet de strate) a une hauteur interpolée qui flotte de
+ * 1e-7 mm autour d'elle ; le shader, qui compare `vZ > frontière`, y mélangerait
+ * pixel par pixel les deux teintes (un grain de poivre sur toute la face). Avec
+ * 0,02 mm de marge, la face appartient franchement à la bande du dessous ; sur
+ * une paroi, 0,02 mm est dix fois moins qu'une couche : invisible.
+ */
+const BAND_EPSILON_MM = 0.02;
+
 const toPrintBands = (built: BuiltMesh): PrintBand[] =>
-  built.bands.map((b) => ({ topMm: b.toMm, color: filamentHex(b.filament) }));
+  built.bands.map((b) => ({
+    topMm: b.toMm + BAND_EPSILON_MM,
+    color: filamentHex(b.filament),
+  }));
 
 const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
   const scene = new Scene();
