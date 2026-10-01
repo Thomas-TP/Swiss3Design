@@ -40,10 +40,18 @@ Chaque point : symptôme rapporté → piste et fichiers → critère de fin.
   purge dans les statistiques (`computeStats`), c'est un vrai coût d'impression.
 - **R05 · Message « Changement de filament → Blanc névé · couche 0541 » inutile** → le retirer
   (`src/components/home/hero-telemetry.tsx` et la clé de `messages/*/landing.json`).
-- **R06 · Animations saccadées, notamment l'apparition des articles** (chapitre boutique) →
-  n'animer que `transform` et `opacity`, décaler sans rafale, ne rien lancer pendant la
-  compilation des shaders : `src/components/home/chapter-shop.tsx`, `src/motion/choreo/home.tsx`,
-  classes `.s3d-rise`/`.s3d-print` de `globals.css`. Voir aussi R18.
+- **R06 · Animations saccadées, notamment l'apparition des articles** (chapitre boutique).
+  Le propriétaire précise qu'il n'y avait **aucun ralentissement** : la saccade est voulue par
+  le code, pas un problème de performance. La révélation `.s3d-print` avance en
+  **`steps(8, end)`** (`src/app/globals.css:297`), donc en 8 sauts visibles au lieu d'un
+  glissement. Même cause au survol des cartes produit (`src/components/product-card.module.css:14`,
+  `clip-path … steps(8, end)`). **Décision qui en découle : plus aucune animation par paliers
+  sur le site** ; remplacer `steps(8, end)` par une courbe continue du système de mouvement
+  (§3.2 du brief, par exemple la courbe de sortie de la marque). Si l'on veut garder l'idée des
+  couches d'impression, la porter par un détail **statique** (un bord de découpe doux, de fines
+  lignes de couche fixes) et jamais par un minutage en marches. Fin : la révélation et le survol
+  glissent sans à-coup à 60 images/s, en mouvement complet ; rien ne change en mouvement réduit
+  (déjà sans animation). Noter l'abandon des paliers au §3.2 et §3.4 du brief.
 - **R14a · « Romanshorn » incompréhensible** (titre du chapitre 05 : « Livré de Genève à
   Romanshorn. ») → « Imprimé à Gland et à Pully. **Livré partout en Suisse.** » dans les 4
   langues (`messages/*/landing.json`, commentaire de `chapter-atelier.tsx`). Relire au passage
@@ -52,11 +60,13 @@ Chaque point : symptôme rapporté → piste et fichiers → critère de fin.
 
 ### Transitions et défilement (tout le site)
 
-- **R07 · Transition entre les pages saccadée** (« Coupe ») → la rendre plus courte et moins
-  chère (8 paliers → moins, `clip-path`/`opacity` seulement), et ne pas rendre le Stage pendant
-  qu'elle joue : `src/components/ui/page-cut.tsx`, `site-link.tsx`, règles `::view-transition-*`
-  de `globals.css`, `src/motion/stage/loop.ts`. Fin : aucune image > 50 ms pendant une
-  transition en CPU ×4 sur un vrai GPU.
+- **R07 · Transition entre les pages saccadée** (« Coupe »). Même cause que R06, sans
+  ralentissement : la nouvelle page « s'imprime » en **`steps(8, end)`**
+  (`src/app/globals.css:432`, `s3d-print var(--dur-page) steps(8, end)`). Passer à une courbe
+  continue (découpe de bas en haut qui glisse, éventuellement avec un léger fondu), même durée
+  ou plus courte : règles `::view-transition-*` de `globals.css`, `src/components/ui/page-cut.tsx`,
+  `site-link.tsx`. Fin : la transition glisse sans à-coup entre deux pages de `(site)` ; le retour
+  arrière du navigateur reste sans animation ; le mouvement réduit reste sans animation.
 - **R15 · Une navigation ne remet pas en haut de la page** → à l'arrivée sur une nouvelle page
   (pas une ancre), `scrollY` doit valoir 0. Piste : Lenis garde sa cible de défilement à travers
   la navigation ; dans `onRoute()` de `src/motion/runtime.tsx`, `lenis.scrollTo(0, { immediate:
@@ -111,17 +121,20 @@ true, force: true })` quand le chemin change sans ancre ; vérifier aussi hors `
 ### Technique, lié aux saccades
 
 - **R18 · Coût du chemin WebGL au chargement** (TBT 2,6 à 5,7 s mesuré en rendu logiciel,
-  `measures-wave2b.md`) → `renderer.compileAsync` avant le premier rendu (`print-hero.ts`,
-  `studio-object.ts`) et montage du Stage après `load` + `requestIdleCallback`
-  (`src/components/site-shell.tsx`). À mesurer sur un vrai GPU et un vrai téléphone.
+  `measures-wave2b.md`). **Sans lien avec les saccades R06/R07** : le propriétaire n'a constaté
+  aucun ralentissement sur son matériel. Reste un point de mesure, pas un défaut : prendre un
+  Lighthouse mobile sur un vrai téléphone, et seulement s'il confirme un TBT élevé,
+  `renderer.compileAsync` avant le premier rendu (`print-hero.ts`, `studio-object.ts`) et
+  montage du Stage après `load` + `requestIdleCallback` (`src/components/site-shell.tsx`).
 
 ## Découpage proposé pour la vague R1 (après le 07.10)
 
 Trois agents parallèles, propriété disjointe, puis une vérification de production, un push sur
 la preview et une nouvelle revue du propriétaire :
 
-1. **Accueil** : R01 à R06, R14a.
+1. **Accueil** : R01 à R05, R14a.
 2. **Studio** : R08 à R12, R17 (avec `catalog/studio-row.tsx` pour R08).
-3. **Socle** : R07, R13, R15, R16, R18, et le vocabulaire « Personnaliser » dans les namespaces
+3. **Socle** : R06 et R07 (les `steps(8, end)` de `globals.css` et de `product-card.module.css`),
+   R13, R15, R16, R18, et le vocabulaire « Personnaliser » dans les namespaces
    communs (`shell`, `system`, `quote`), les autres textes allant à leur propriétaire (landing à
    l'accueil, catalog et studio au Studio).
