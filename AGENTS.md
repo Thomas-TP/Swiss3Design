@@ -146,10 +146,14 @@ put` on an environment with real users without `--env <name>` explicitly
    **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
-10. **Keep the Worker bundle lean: 3 145 KiB gzip (2026-10-01 measurement,
-    redesign after WP-02, see
-    [`docs/redesign-2026/measures-wave2a.md`](docs/redesign-2026/measures-wave2a.md);
-    the whole redesign must stay ≤ 3 185 KiB, owner's decision of 2026-09-30,
+10. **Keep the Worker bundle lean: 3 326 KiB gzip (2026-10-01 measurement,
+    redesign with the Studio, see
+    [`docs/redesign-2026/measures-wave2b.md`](docs/redesign-2026/measures-wave2b.md)).
+    The Studio's full server rendering (no-JS form, stats, posters) pushed it
+    past the 3 185 KiB cap of 2026-09-30; the owner accepted the overrun on
+    2026-10-01 on the condition that WP-99 claws back what it can without
+    changing behaviour (zod/mini instead of zod, no duplicate RSC/SSR copies of
+    `src/lib/studio/**`, Studio messages per locale), target ≈ 3 250 KiB,
     brief §4.11 — re-measure rather than trust this figure as it ages, and
     compare two builds only from checkouts at the same path length: a long
     worktree path alone shifts the gzip figure by up to ±6 KiB).
