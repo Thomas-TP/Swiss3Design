@@ -22,6 +22,16 @@ import type { Band, FilamentId, StudioConfig, StudioObjectId } from "./types";
 
 export * from "./ranges";
 
+// Sans compilation à la volée : zod sonde `Function("")` à la construction du
+// premier objet pour savoir s'il peut compiler ses schémas. Sous la CSP de
+// production (`script-src` sans 'unsafe-eval'), cette sonde est rapportée comme
+// `securitypolicyviolation` (« eval ») sur chaque page du Studio, même si
+// l'exception est avalée, et elle part dans /api/csp-report. `jitless` la
+// saute (zod le documente pour cet usage) ; ces petits schémas, validés une
+// fois par lien ou par outil WebMCP, n'en tirent aucun gain. Doit précéder la
+// construction des schémas ci-dessous. Dans le Worker, zod ne compile déjà pas.
+z.config({ jitless: true });
+
 // ── Schémas zod (noms longs) ─────────────────────────────────────────────────
 
 const num = (range: Range) => z.number().min(range.min).max(range.max);
