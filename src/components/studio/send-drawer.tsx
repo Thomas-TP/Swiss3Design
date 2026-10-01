@@ -1,6 +1,14 @@
 "use client";
 
-import { memo, useEffect, useId, useMemo, useState } from "react";
+import {
+  memo,
+  useCallback,
+  useEffect,
+  useId,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import {
   QuoteRequestForm,
   type QuoteAttachment,
@@ -62,6 +70,46 @@ export interface SendDrawerProps {
   locale: StudioLocale;
   /** Lien de configuration (chemin + fragment), SANS texte personnel. */
   link: () => string;
+}
+
+/**
+ * État ouvert / fermé du tiroir, HORS de React : le bouton « Envoyer à l'atelier »
+ * l'ouvre sans que StudioApp (tout le formulaire de réglage) ne se redessine ;
+ * seul l'hôte du tiroir s'abonne. C'est ce qui tient le clic sous 150 ms en
+ * CPU ×4 (INP) : l'ouverture ne paie que le tiroir.
+ */
+export interface OpenState {
+  get(): boolean;
+  set(next: boolean): void;
+  subscribe(listener: () => void): () => void;
+}
+
+export function createOpenState(): OpenState {
+  let open = false;
+  const listeners = new Set<() => void>();
+  return {
+    get: () => open,
+    set(next) {
+      if (next === open) return;
+      open = next;
+      for (const listener of listeners) listener();
+    },
+    subscribe(listener) {
+      listeners.add(listener);
+      return () => {
+        listeners.delete(listener);
+      };
+    },
+  };
+}
+
+export function SendDrawerHost({
+  state,
+  ...props
+}: Omit<SendDrawerProps, "open" | "onClose"> & { state: OpenState }) {
+  const open = useSyncExternalStore(state.subscribe, state.get, () => false);
+  const onClose = useCallback(() => state.set(false), [state]);
+  return <SendDrawer {...props} open={open} onClose={onClose} />;
 }
 
 export function SendDrawer(props: SendDrawerProps) {

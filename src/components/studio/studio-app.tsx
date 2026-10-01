@@ -47,7 +47,7 @@ import type {
 } from "@/lib/studio/types";
 import { listCreations } from "@/lib/studio/creations";
 import { missingText, textsForObject } from "./objects";
-import { SendDrawer } from "./send-drawer";
+import { SendDrawerHost, createOpenState } from "./send-drawer";
 import type { StudioLocale } from "./scene-props";
 import { ScenePanel } from "./scene-panel";
 import { AltimetricBar, type Ctl } from "./studio-controls";
@@ -144,7 +144,8 @@ export function StudioApp({
 
   const [reprint, setReprint] = useState(0);
   const [tab, setTab] = useState<SectionId>("shape");
-  const [sending, setSending] = useState(false);
+  // Le tiroir d'envoi s'ouvre sans redessiner ce composant (voir send-drawer.tsx).
+  const sendState = useMemo(() => createOpenState(), []);
 
   // ── Chiffres : une fonction pure, identique côté serveur ──────────────────
   const examples = useMemo(() => exampleTexts(object, core), [object, core]);
@@ -372,8 +373,8 @@ export function StudioApp({
   );
 
   const openSend = useCallback(() => {
-    if (!blocked) setSending(true);
-  }, [blocked]);
+    if (!blocked) sendState.set(true);
+  }, [blocked, sendState]);
 
   // ── Résumé vivant (aria-live, 1 s) ────────────────────────────────────────
   const summary = liveSummary(summaryInput);
@@ -599,9 +600,8 @@ export function StudioApp({
         </div>
       </div>
 
-      <SendDrawer
-        open={sending}
-        onClose={() => setSending(false)}
+      <SendDrawerHost
+        state={sendState}
         input={sendInput}
         object={object}
         locale={locale}
