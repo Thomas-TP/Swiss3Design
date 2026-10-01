@@ -399,16 +399,20 @@ export function StudioApp({
       >
         {t("send.noscript")}
       </ButtonLink>
-      <Button
-        variant="primary"
-        size="lg"
-        disabled={blocked}
-        onClick={openSend}
-        aria-describedby={reason ? reasonId : undefined}
-        className="hidden group-data-[js]/studio:max-lg:hidden group-data-[js]/studio:inline-flex"
-      >
-        {t("send.cta")}
-      </Button>
+      {/* Le conteneur porte l'affichage conditionnel : le bouton a son propre
+          `inline-flex`, que `hidden` ne battrait pas (même spécificité), et un
+          bouton sans effet sans JavaScript serait trompeur. */}
+      <div className="hidden group-data-[js]/studio:max-lg:hidden group-data-[js]/studio:block">
+        <Button
+          variant="primary"
+          size="lg"
+          disabled={blocked}
+          onClick={openSend}
+          aria-describedby={reason ? reasonId : undefined}
+        >
+          {t("send.cta")}
+        </Button>
+      </div>
       {reason ? (
         <p
           id={reasonId}
@@ -423,6 +427,12 @@ export function StudioApp({
 
   const noscriptNote = (
     <div className="flex flex-col gap-3 group-data-[js]/studio:hidden">
+      {/* Avec JavaScript, le même constat est un toast (§6.7 « États »). */}
+      {initialInvalid ? (
+        <output className="block text-sm font-medium text-accent-text">
+          {t("toast.invalidLink")}
+        </output>
+      ) : null}
       <p className="text-sm text-soft">{t("send.noscriptNote")}</p>
       <details className="rounded-card border border-line p-3 text-sm">
         <summary className="cursor-pointer text-ink">

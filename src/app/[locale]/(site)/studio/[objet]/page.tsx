@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { JsonLd } from "@/components/json-ld";
+import { adaptBandsParam } from "@/components/studio/get-params";
 import { StudioApp } from "@/components/studio/studio-app";
 import { TrackEvent } from "@/components/track-event";
 import { ButtonLink } from "@/components/ui/button";
@@ -70,7 +71,11 @@ export default async function StudioObjectPage({
   const defaults = defaultConfig(object);
   const hasQuery = Object.keys(query).length > 0;
   const decoded = hasQuery
-    ? decodeSearchParams(object, query as SearchParamsLike, defaults)
+    ? decodeSearchParams(
+        object,
+        adaptBandsParam(object, query) as SearchParamsLike,
+        defaults,
+      )
     : null;
   const initialConfig = decoded?.ok ? decoded.config : defaults;
   // Une requête sans clé du Studio (suivi, publicité) n'est pas une erreur.
