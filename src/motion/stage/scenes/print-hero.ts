@@ -95,9 +95,13 @@ const FLASH_S = 0.32;
 const PARK_S = 0.8;
 const NOZZLE_RATE = 2.4; // rad/s pendant l'impression
 const EXPLODE_GAP_MM = 12;
-const PLATE_MM = 180;
-const TOWER = { x: 70, y: -55, size: 16 } as const;
-const PARK = { x: 62, lift: 10 } as const;
+// Plateau : 120 mm au lieu des 180 mm du brief. À 78 % de la hauteur de la
+// vue (fov 20°, azimut −28°), la boîte 4:5 ne montre que ≈ 168 mm de large :
+// un plateau de 180 mm serait coupé net par le bord de la vue. 120 mm tient
+// entier (carré tourné de 28° : 162 mm de large), et le grillage garde 10 mm.
+const PLATE_MM = 120;
+const TOWER = { x: 44, y: -34, size: 16 } as const;
+const PARK = { x: 50, lift: 10 } as const;
 const ABOVE_ALL_MM = 1e6;
 const EMIT_MS = 100;
 const PLAN = { fov: 12, elevation: 89.5, fraction: 0.6 } as const;
@@ -455,7 +459,7 @@ const create = (
       opacity: 0.5,
       toneMapped: false,
     });
-    const shadowPlane = new Mesh(new PlaneGeometry(150, 150), shadowMaterial);
+    const shadowPlane = new Mesh(new PlaneGeometry(110, 110), shadowMaterial);
     shadowPlane.rotation.x = -Math.PI / 2;
     shadowPlane.position.y = 0.04;
     plate.add(shadowPlane);

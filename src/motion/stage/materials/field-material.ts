@@ -67,8 +67,11 @@ export function fieldHeight(u: number, v: number): number {
     period *= 2;
   }
   const h = sum / total;
-  // Contraste : le FBM de valeurs est mou autour de 0,5.
-  return Math.min(1, Math.max(0, (h - 0.22) / 0.56));
+  // Contraste : le FBM de valeurs est mou autour de 0,5. Courbe logistique et
+  // non écrêtage : un plateau exactement plat à une valeur entière de niveau
+  // serait peint en entier comme une courbe (0 est un multiple de 5, donc une
+  // « courbe maîtresse »), et les creux et les crêtes garderaient des aplats.
+  return 1 / (1 + Math.exp(-(h - 0.5) * 7.5));
 }
 
 let heightTexture: DataTexture | null = null;

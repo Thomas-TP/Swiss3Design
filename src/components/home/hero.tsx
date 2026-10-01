@@ -38,7 +38,12 @@ export function Hero() {
         corner="top-right"
       />
       <div className={cx("s3d-page s3d-grid", styles.heroGrid)}>
-        <div className={cx("col-span-full lg:col-span-7", styles.heroText)}>
+        <div
+          className={cx(
+            "col-span-full lg:col-span-7 lg:col-start-1 lg:row-start-1",
+            styles.heroText,
+          )}
+        >
           <p className="s3d-label text-soft">{t("kicker")}</p>
           <DotTitle
             as="h1"
