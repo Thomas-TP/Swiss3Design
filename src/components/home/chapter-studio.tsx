@@ -3,41 +3,29 @@ import { Chapter } from "@/components/ui/chapter";
 import { MeasureStrip } from "@/components/ui/measure-strip";
 import { SiteLink } from "@/components/ui/site-link";
 import { formatChfRange } from "@/lib/studio/format";
-import { PosterSvg } from "./poster-svg";
+import type { StudioObjectId } from "@/lib/studio/types";
 import { getHeroPoster } from "./hero-poster";
+import { HOME_DATA } from "./home-data.generated";
+import type { HomeLocale, ObjectPoster } from "./home-data-types";
+import { PosterSvg } from "./poster-svg";
 import { statsItems, type UnitsTranslator } from "./stats-items";
-import {
-  BORNE_DEFAULT,
-  CARTOUCHE_DEFAULT,
-  DEFAULT_CONFIGS,
-} from "@/lib/studio/presets";
-import {
-  borneTopView,
-  cartoucheTopView,
-  topViewToSvg,
-} from "@/lib/studio/poster-flat";
-import { computeStats } from "@/lib/studio/stats";
-import type { StudioObjectId, StudioTexts } from "@/lib/studio/types";
 import styles from "./home.module.css";
 
 // Chapitre 03 « Réglez-le. On l'imprime. » (brief « Strates », §7.5) : quatre
 // cartes d'objet (poster SSR, nom, une ligne, chiffres de la configuration
 // d'exemple, « Sur devis » ou fourchette) puis « Comment ça marche » en
 // <ol>. Tout est rendu par le serveur : aucun JavaScript, aucune vue WebGL.
-// Les chiffres sortent de `computeStats` (la fonction du Studio) ; un prix n'est
-// affiché que si `PRICING.validated` l'a rendu possible (`stats.estimate`).
+// Les chiffres sont ceux de `computeStats` (la fonction du Studio), calculés avec
+// les textes d'exemple de chaque langue et figés dans home-data.generated.ts ;
+// un prix n'est affiché que si `PRICING.validated` l'a rendu possible
+// (`estimate`), sinon « Sur devis ».
 const OBJECTS: StudioObjectId[] = ["lavaux", "cartouche", "relief", "borne"];
 const STEPS = ["set", "send", "check", "print"] as const;
 
-function ObjectPoster({
-  id,
-  texts,
-}: {
-  id: StudioObjectId;
-  texts: StudioTexts;
-}) {
-  if (id === "lavaux") return <PosterSvg poster={getHeroPoster("final")} />;
-  if (id === "relief")
+function Poster({ poster }: { poster: ObjectPoster }) {
+  if (poster.kind === "hero")
+    return <PosterSvg poster={getHeroPoster("final")} />;
+  if (poster.kind === "relief")
     return (
       <>
         <img
@@ -56,36 +44,20 @@ function ObjectPoster({
         />
       </>
     );
-  const data =
-    id === "cartouche"
-      ? cartoucheTopView(CARTOUCHE_DEFAULT, texts)
-      : borneTopView(BORNE_DEFAULT, texts);
   return (
     <span
       className="contents"
       // SVG calculé par le code (topViewToSvg) : aucun texte du visiteur.
-      dangerouslySetInnerHTML={{
-        __html: topViewToSvg(data, { className: "h-full w-full" }),
-      }}
+      dangerouslySetInnerHTML={{ __html: poster.svg }}
     />
   );
 }
 
 export function ChapterStudio({ freeOver }: { freeOver: string }) {
-  const locale = useLocale() as "fr" | "de" | "it" | "en";
+  const locale = useLocale() as HomeLocale;
   const t = useTranslations("landing.studio");
   const tc = useTranslations("studioCore");
-  const tex = useTranslations("studioCore.examples");
   const tu = useTranslations("studioCore.units");
-
-  const texts: StudioTexts = {
-    name: tex("name"),
-    role: tex("role"),
-    line1: tex("line1"),
-    line2: tex("line2"),
-    peak: tex("peak"),
-    text: tex("text"),
-  };
 
   return (
     <Chapter
@@ -98,16 +70,11 @@ export function ChapterStudio({ freeOver }: { freeOver: string }) {
       <div className="s3d-page mt-12 lg:mt-16">
         <ul className="s3d-grid gap-y-4">
           {OBJECTS.map((id) => {
-            const stats = computeStats(
-              DEFAULT_CONFIGS[id],
-              texts,
-              undefined,
-              locale,
-            );
-            const price = stats.estimate
+            const card = HOME_DATA.objects[locale][id];
+            const price = card.estimate
               ? formatChfRange(
-                  stats.estimate.lowCents,
-                  stats.estimate.highCents,
+                  card.estimate.lowCents,
+                  card.estimate.highCents,
                   locale,
                 )
               : tc("measure.onQuote");
@@ -118,7 +85,7 @@ export function ChapterStudio({ freeOver }: { freeOver: string }) {
               >
                 <div className="relative flex h-full flex-col overflow-hidden rounded-card border border-line bg-surface">
                   <div className={styles.objectPoster} aria-hidden="true">
-                    <ObjectPoster id={id} texts={texts} />
+                    <Poster poster={card.poster} />
                   </div>
                   <div className="flex flex-1 flex-col p-5">
                     <h3 className="font-display text-[1.0625rem] font-bold leading-snug tracking-tight text-ink">
@@ -133,7 +100,11 @@ export function ChapterStudio({ freeOver }: { freeOver: string }) {
                       {tc(`objects.${id}.tagline`)}
                     </p>
                     <MeasureStrip
-                      items={statsItems(stats, locale, tu as UnitsTranslator)}
+                      items={statsItems(
+                        card.stats,
+                        locale,
+                        tu as UnitsTranslator,
+                      )}
                       className="mt-4 text-soft"
                     />
                     <p className="s3d-label mt-3 flex items-center justify-between normal-case text-ink">

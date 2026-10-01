@@ -8,7 +8,7 @@ import { ChapterShop } from "@/components/home/chapter-shop";
 import { ChapterStudio } from "@/components/home/chapter-studio";
 import { ChapterSummit } from "@/components/home/chapter-summit";
 import { Hero } from "@/components/home/hero";
-import { buildHeroData } from "@/components/home/hero-data-build";
+import { HOME_DATA } from "@/components/home/home-data.generated";
 import { HomeConfigProvider } from "@/components/home/home-config-context";
 import { HomeMotion } from "@/components/home/home-motion";
 import { TrustStrip } from "@/components/home/trust-strip";
@@ -59,7 +59,7 @@ export default async function HomePage({
     getProducts(locale, { featuredOnly: true }),
     getShippingSettings(),
   ]);
-  const heroData = buildHeroData();
+  const heroData = HOME_DATA.hero;
   const freeOver = formatChf(shipping.freeOverCents, locale);
 
   const chapters: RailChapter[] = [

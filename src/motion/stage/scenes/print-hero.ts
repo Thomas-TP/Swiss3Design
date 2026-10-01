@@ -39,6 +39,7 @@ import {
   Vector3,
   BoxGeometry,
 } from "three";
+import { READOUT_INTERVAL_MS } from "@/components/home/contract";
 import type { PrintHeroProps } from "@/components/home/stage-props";
 import type { HeroPatternKey } from "@/components/home/hero-data";
 import {
@@ -103,7 +104,6 @@ const PLATE_MM = 120;
 const TOWER = { x: 44, y: -34, size: 16 } as const;
 const PARK = { x: 50, lift: 10 } as const;
 const ABOVE_ALL_MM = 1e6;
-const EMIT_MS = 100;
 const PLAN = { fov: 12, elevation: 89.5, fraction: 0.6 } as const;
 const RAD = Math.PI / 180;
 
@@ -811,7 +811,7 @@ const create = (
       if (
         controller.onLayer &&
         layer !== lastLayer &&
-        (frame.time - lastEmitAt) * 1000 >= EMIT_MS
+        (frame.time - lastEmitAt) * 1000 >= READOUT_INTERVAL_MS
       ) {
         lastLayer = layer;
         lastEmitAt = frame.time;

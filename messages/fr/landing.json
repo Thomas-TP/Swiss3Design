@@ -61,7 +61,6 @@
     "title": "Réglez-le. On l'imprime.",
     "intro": "Quatre objets originaux, que vous réglez en 3D avant de nous les envoyer. Le prix ferme est confirmé sur devis, sous 48 h.",
     "adjust": "Régler",
-    "stats": "{height} · ≈ {grams} · ≈ {duration} · {changes}",
     "stepsTitle": "Comment ça marche",
     "steps": {
       "set": {

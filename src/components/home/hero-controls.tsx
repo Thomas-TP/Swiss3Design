@@ -52,7 +52,8 @@ export function HeroControls() {
   const { data, palette, pattern, setPalette, setPattern } = useHomeConfig();
 
   return (
-    <div className={styles.controls}>
+    <fieldset className={styles.controls}>
+      <legend className="sr-only">{t("controls")}</legend>
       <fieldset className={styles.group}>
         <legend className="s3d-label mb-2 text-soft">{t("palette")}</legend>
         <div className={styles.chips}>
@@ -95,6 +96,6 @@ export function HeroControls() {
           ))}
         </div>
       </fieldset>
-    </div>
+    </fieldset>
   );
 }

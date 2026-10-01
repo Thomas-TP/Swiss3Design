@@ -56,7 +56,7 @@ export function MapBody({ explodedPoster }: { explodedPoster: ReactNode }) {
     bakeWhenIdle: capability === 1,
     priority: 1,
   });
-  const custom = useStaticPoster("exploded", staticPoster);
+  const { poster: custom, engine } = useStaticPoster("exploded", staticPoster);
 
   // Du sommet au plateau.
   const bands = [...figures.bands].reverse();
@@ -118,6 +118,7 @@ export function MapBody({ explodedPoster }: { explodedPoster: ReactNode }) {
         <figcaption className="s3d-label mt-3 normal-case text-soft">
           {t("figure")}
         </figcaption>
+        {engine}
       </figure>
     </div>
   );

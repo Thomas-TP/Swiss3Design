@@ -20,8 +20,11 @@ import {
   readStudioTexts,
   writeStudioTexts,
 } from "@/lib/studio/texts-store";
-import type { ReliefConfig, StudioStats } from "@/lib/studio/types";
+import type { ReliefConfig } from "@/lib/studio/types";
+import { SummitEngine } from "@/gates/home";
 import { HOME_VIEW_ATTR } from "./contract";
+import type { HomeLocale } from "./home-data-types";
+import type { ReliefTools } from "./summit-tools";
 import { statsItems } from "./stats-items";
 import { useHomeMotion, useHomeView } from "./use-home-motion";
 import styles from "./home.module.css";
@@ -43,18 +46,6 @@ import styles from "./home.module.css";
 // n'est chargé (import asynchrone) que lorsque la section approche (marge
 // 150 %). Avant lui, et tant que le champ est vide, la page montre ceux de
 // l'exemple, calculés par le serveur.
-
-type Locale = "fr" | "de" | "it" | "en";
-
-interface Tools {
-  peakLabel(name: string, locale: Locale): string;
-  computeStats(
-    config: ReliefConfig,
-    texts: { peak: string },
-    params: undefined,
-    locale: Locale,
-  ): StudioStats;
-}
 
 interface SummitValue {
   raw: string;
@@ -89,11 +80,12 @@ export function SummitProvider({
   initialItems: string[];
   children: ReactNode;
 }) {
-  const locale = useLocale() as Locale;
+  const locale = useLocale() as HomeLocale;
   const tu = useTranslations("studioCore.units");
   const [raw, setRawState] = useState("");
   const [debounced, setDebounced] = useState("");
-  const [tools, setTools] = useState<Tools | null>(null);
+  const [tools, setTools] = useState<ReliefTools | null>(null);
+  const [near, setNear] = useState(false);
   const touched = useRef(false);
 
   const setRaw = useCallback((value: string) => {
@@ -125,7 +117,8 @@ export function SummitProvider({
     else clearStudioTexts("relief");
   }, [debounced]);
 
-  // Modèle du sous-verre : chargé quand la section approche.
+  // Modèle du sous-verre : le moteur (gate de l'accueil, chunk à part) n'est
+  // monté que lorsque la section approche (marge 150 %).
   useEffect(() => {
     const section = document.getElementById("sommet");
     if (!section || typeof IntersectionObserver === "undefined") return;
@@ -133,22 +126,13 @@ export function SummitProvider({
       ([entry]) => {
         if (!entry.isIntersecting) return;
         observer.disconnect();
-        void Promise.all([
-          import("@/lib/studio/objects/relief-model"),
-          import("@/lib/studio/stats"),
-        ]).then(([relief, stats]) =>
-          setTools({
-            peakLabel: relief.peakLabel,
-            computeStats: stats.computeStats as Tools["computeStats"],
-          }),
-        );
+        setNear(true);
       },
       { rootMargin: "150% 0px" },
     );
     observer.observe(section);
     return () => observer.disconnect();
   }, []);
-
   const typed = debounced.trim();
   const peak = typed || example;
   const label = useMemo(
@@ -172,7 +156,10 @@ export function SummitProvider({
     [raw, setRaw, peak, label, items, config],
   );
   return (
-    <SummitContext.Provider value={value}>{children}</SummitContext.Provider>
+    <SummitContext.Provider value={value}>
+      {near ? <SummitEngine onReady={setTools} /> : null}
+      {children}
+    </SummitContext.Provider>
   );
 }
 
@@ -202,10 +189,13 @@ export function SummitInput({
         autoComplete="off"
         autoCapitalize="words"
         spellCheck={false}
+        aria-describedby="summit-note"
         onChange={(event) => setRaw(event.currentTarget.value)}
         className="ph-mask mt-2 h-12 w-full max-w-sm rounded-field border border-line bg-elevated px-4 text-base text-ink placeholder:text-soft focus:border-ink"
       />
-      <p className="mt-3 max-w-[40ch] text-sm text-soft">{t("note")}</p>
+      <p id="summit-note" className="mt-3 max-w-[40ch] text-sm text-soft">
+        {t("note")}
+      </p>
       <MeasureStrip items={items} live className="mt-6" />
       <ButtonLink href={href} variant="primary" size="lg" className="mt-8">
         {t("cta")}

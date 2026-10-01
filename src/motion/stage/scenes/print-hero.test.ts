@@ -1,5 +1,9 @@
+import { PerspectiveCamera, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
-import { heroCamera } from "@/lib/studio/camera";
+import { cameraEye, heroCamera, toThreeWorld } from "@/lib/studio/camera";
+import { createLavauxModel } from "@/lib/studio/objects/lavaux-model";
+import { heroPoster } from "@/lib/studio/poster";
+import { HERO_CONFIG } from "@/lib/studio/presets";
 import {
   bandOfCut,
   cameraAt,
@@ -64,6 +68,53 @@ describe("print-hero · logique pure", () => {
     expect(
       towerHeight(150, ["encre", "blanc-neve", "blanc-neve"], bounds),
     ).toBe(43);
+  });
+
+  it("les anneaux du poster SSR tombent sur ceux de la scène, au dixième de pixel", () => {
+    // Même caméra, même projection : la première frame WebGL se superpose au
+    // poster (« raccord au pixel », §5.7). On projette l'anneau de la scène avec
+    // three, tel que print-hero le fait, et on le compare à l'ellipse du poster.
+    const W = 541;
+    const H = 676;
+    const spec = heroCamera();
+    const camera = new PerspectiveCamera(spec.fovDeg, W / H, 20, 3000);
+    const eye = toThreeWorld(cameraEye(spec));
+    const target = toThreeWorld(spec.target);
+    camera.position.set(eye[0], eye[1], eye[2]);
+    camera.lookAt(new Vector3(target[0], target[1], target[2]));
+    camera.updateMatrixWorld();
+    camera.updateProjectionMatrix();
+    const model = createLavauxModel(HERO_CONFIG);
+    const poster = heroPoster(HERO_CONFIG, "ghost");
+    const scale = W / poster.width;
+    const out = new Float64Array(3);
+    for (const k of [75, 40, 5]) {
+      const z = k * 2;
+      let x0 = Infinity;
+      let x1 = -Infinity;
+      let y0 = Infinity;
+      let y1 = -Infinity;
+      for (let i = 0; i < 360; i++) {
+        const theta = (i * 2 * Math.PI) / 360;
+        model.outer(theta, z, -1, out);
+        const p = new Vector3(
+          out[0] * Math.cos(theta),
+          z,
+          -out[0] * Math.sin(theta),
+        ).project(camera);
+        const px = ((p.x + 1) / 2) * W;
+        const py = ((1 - p.y) / 2) * H;
+        x0 = Math.min(x0, px);
+        x1 = Math.max(x1, px);
+        y0 = Math.min(y0, py);
+        y1 = Math.max(y1, py);
+      }
+      const e = poster.ghost![k - 1];
+      expect(Math.abs(x0 - (e.cx - e.rx) * scale)).toBeLessThan(0.3);
+      expect(Math.abs(x1 - (e.cx + e.rx) * scale)).toBeLessThan(0.3);
+      expect(Math.abs(y0 - (e.cy - e.ry) * scale)).toBeLessThan(0.4);
+      expect(Math.abs(y1 - (e.cy + e.ry) * scale)).toBeLessThan(0.4);
+    }
   });
 
   it("la bascule va de la caméra du héros à la vue de plan, fov 20° → 12°", () => {

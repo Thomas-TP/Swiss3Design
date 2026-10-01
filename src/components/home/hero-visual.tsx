@@ -57,7 +57,7 @@ export function HeroVisual({
     bakeWhenIdle: capability === 1,
     priority: 1,
   });
-  const custom = useStaticPoster("final", staticPoster);
+  const { poster: custom, engine } = useStaticPoster("final", staticPoster);
 
   return (
     <figure
@@ -77,6 +77,7 @@ export function HeroVisual({
       </p>
       <HeroChange />
       {capability === 1 ? <HeroRuler /> : null}
+      {engine}
     </figure>
   );
 }

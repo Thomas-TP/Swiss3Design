@@ -15,14 +15,15 @@ import {
   variantConfig,
   variantKey,
 } from "./hero-data";
-import { buildHeroData } from "./hero-data-build";
+import { HOME_DATA } from "./home-data.generated";
 
 // Les données du héros doivent rester celles du Studio : les douze variantes,
 // leurs chiffres et le lien du bouton rouge. Le module léger (hero-data.ts) ne
 // tire ni presets ni url-state dans le JavaScript initial ; ce test l'égale
 // aux versions complètes, il ne peut donc pas dériver sans que la CI le dise.
 describe("données du héros (accueil)", () => {
-  const data = buildHeroData();
+  // La page lit les données figées ; home-data.test.ts prouve qu'elles sont à jour.
+  const data = HOME_DATA.hero;
 
   it("liste les mêmes palettes et motifs que les préréglages du Studio", () => {
     expect([...PALETTE_KEYS].sort()).toEqual(Object.keys(HERO_PALETTES).sort());
