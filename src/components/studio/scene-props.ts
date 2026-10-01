@@ -53,6 +53,11 @@ export interface StudioSceneProps extends StudioObjectViewProps {
   reprint?: number;
   /** Durée réelle d'impression (minutes) : base de la simulation. */
   printMinutes?: number;
+  /**
+   * La vue 2D exacte (Élévation) recouvre la 3D : la scène garde son état mais
+   * ne dessine plus rien (aucun coût GPU derrière un dessin opaque).
+   */
+  hidden?: boolean;
   onStatus?: (status: StudioSceneStatus) => void;
   onSimulate?: (simulation: StudioSimulation) => void;
   /** Éclaté : position de chaque bande, pour les étiquettes DOM. */
