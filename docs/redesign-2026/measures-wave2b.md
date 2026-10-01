@@ -89,9 +89,62 @@ Studio, STL compris) en dérivent, les deux suivent donc la règle. Les clés
 langues (casse, accents, espaces, trait d'union, mot seul), préfixe ajouté sinon (mot entier,
 autre langue), et l'étiquette gravée par `layoutLabel` suit la même règle.
 
+**Vérification dans le navigateur (preview de production, Edge, 01.10.2026).** Les appels de
+Server Action sont coupés par Playwright (`route.abort("connectionfailed")` sur toute requête
+portant l'en-tête `next-action`) :
+
+| Cas                                         | Après l'échec                                                                                                                                                                                                                  | Après « Réessayer »                              |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------ |
+| `/fr/custom` (variante page)                | **page conservée** (1 h1, ni `error.tsx` ni « Erreur inattendue »), alerte « L'envoi a échoué. Vérifiez votre connexion et réessayez. », bouton « Réessayer », **description et e-mail intacts**, une ligne `[quote] envoi interrompu TypeError: Failed to fetch` en console | panneau « Reçu. » (demande enregistrée)          |
+| Tiroir du Studio (`/fr/studio/lavaux`)      | tiroir ouvert, même alerte, **1 téléversement** (`/api/quote-upload`) fait avant la coupure                                                                                                                                    | « Reçu. », **0 téléversement de plus** (total 1) |
+
+**Preuve DOM de A1** dans le tiroir réel : les quatre champs cachés `description` (819
+caractères), `material`, `colors`, `dimensions` portent `ph-no-capture` (`locale` non, il ne
+porte rien de personnel), la vignette porte `ph-no-capture`, la liste du résumé `ph-mask`.
+
+**Effets de bord sur la base de test** : deux demandes de devis `@example.test`
+(`w3-net@…`, `w3-drawer@…`) créées par ces essais dans la branche Neon de développement ; leurs
+e-mails sont dans l'outbox, **aucun envoi** (clé Resend vide).
+
 ### A4. Chapitre 02 de l'accueil avec la vraie scène du Studio
 
-_(section 6.4, après la mesure)_
+Preview de production (`/fr`, `/de`, `/en`, `/it`, 1440 × 900, WebGL SwiftShader, consentement
+non donné). Le chapitre `#sommet` est amené à l'écran, le moteur (gate `home-tools`) s'y charge
+(marge 150 %), puis frappe au clavier dans `#summit-input` (90 ms par touche).
+
+| Contrôle                                              | Résultat                                                                                                                                                                                                                 |
+| ----------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Scène                                                 | vue `studio-object` (`data-stage-ready="true"`), **un canvas, un seul contexte WebGL vivant** (la sonde en avait créé un autre, jeté) ; l'affiche SVG passe à `opacity: 0` une fois la vue prête                           |
+| **Relief du nom**                                     | capture du chapitre (1 image, 712 × 845) : le sous-verre est rendu en strates (bleu, vert, gris, blanc) avec « POINTE ZORGL · 4 364 M » **gravé en relief** sur la zone plate, sur le quadrillage de la carte                |
+| **Fond encre**                                        | le conteneur `[data-tone="ink"]` devient transparent quand la vue est prête (`rgba(0,0,0,0)`) ; le Stage peint le fond : pixel de coin = **(26, 22, 20) = `#1a1614`**, le jeton `--paper` du ton encre (les autres coins tombent sur le filet de l'en-tête et le quadrillage) |
+| **Étiquette DOM** (`p[aria-live]`, `ph-mask`)         | fr « POINTE LÉA · 2 566 M » (exemple) → « POINTE ZORGL · 2 359 M » en tapant « Zorgl » ; de « PIZ ZORGL · 2’359 M », en « MOUNT ZORGL », it « PIZZO ZORGL » (séparateur de milliers de la langue)                          |
+| **Plus de doublon (A3)**                              | « Pointe Zorgl » en français → « POINTE ZORGL · 4 364 M » (et non « POINTE POINTE ZORGL ») ; sous `/de`, `/en`, `/it` le mot d'une autre langue est conservé (« PIZ POINTE ZORGL »), comme voulu                            |
+| **Zéro requête réseau pendant la frappe**             | **0** requête (`page.on("request")`) pour « Zorgl » puis pour « Pointe Zorgl », dans les quatre langues                                                                                                                  |
+| Texte au Studio par `sessionStorage`                  | `s3d-studio-texts-v1` = `{"relief":{"peak":"Zorgl"}}` ; vidé en effaçant le champ (retour à l'exemple) ; **jamais dans l'URL** (le lien du bouton rouge ne porte que la configuration, `#c=v1.…`)                         |
+| Arrivée au Studio                                     | `/fr/studio/relief#c=…` : le champ du nom est prérempli (« Zorgl »), le résumé dit « texte : « Zorgl » », l'URL ne contient pas le texte, un canvas et un contexte WebGL vivants                                          |
+| Console                                               | 0 erreur, 0 avertissement (hors la violation CSP « eval » du Studio, voir A5)                                                                                                                                           |
+
+La bande de mesure (`MeasureStrip live`) montre « 100 × 100 × 6,2 mm, ≈ 23 g, ≈ 47 min, 3
+changements » avant et après la frappe : les chiffres sont arrondis à ce niveau et l'étiquette
+ne pèse que quelques dixièmes de gramme, ils ne changent donc pas d'un nom à l'autre ; le
+recalcul lui-même est couvert par les tests du chapitre (`home-data.test.ts`).
+
+### A5. CSP : violation « eval » sur chaque page objet du Studio (trouvée par le balayage)
+
+**Défaut.** `/fr/studio/{lavaux,cartouche,relief,borne}` et `/it/studio/lavaux` déclenchent
+chacune **une `securitypolicyviolation`** (`script-src`, bloqué : `eval`) en production, donc
+un rapport vers `/api/csp-report` à chaque visite et un critère « 0 violation CSP » en échec.
+Source : `Function("")`, la sonde de **zod 4** (`allowsEval`) qui s'exécute à la construction
+du premier schéma, dans le chunk client `3125-*` (colonne 6 346 de sa ligne 1). L'exception est
+avalée, donc **aucune fonctionnalité n'est cassée** ; mais Edge la signale quand même. Le Studio
+est le seul code client qui importe zod (`src/lib/studio/schemas.ts:10`).
+
+**Correctif.** `z.config({ jitless: true })` juste après les imports de `schemas.ts`, avant la
+construction du premier schéma (zod saute alors la sonde : son propre commentaire le documente
+pour les CSP strictes). Dans le Worker, zod ne compilait déjà pas (« Cloudflare » dans le
+`userAgent`). **Test** `schemas-csp.test.ts` : un espion sur `Function` ne voit **aucun** appel
+`Function("")` pendant le chargement de `schemas.ts` et trois `parseConfig` (le test échoue sans
+le correctif, vérifié). La preuve en navigateur est en section 6.
 
 ## B. Vérification de production
 
