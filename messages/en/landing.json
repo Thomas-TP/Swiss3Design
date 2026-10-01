@@ -1,1 +1,110 @@
-{}
+{
+  "seo": {
+    "title": "Swiss3Design · Multicolor 3D printing in Switzerland",
+    "description": "Adjust a vase, a card or a coaster in 3D, then let the workshop print it in up to four colors, in Gland and Pully. Delivered across Switzerland.",
+    "imageAlt": "Swiss3Design: a vase printed layer by layer in three colors"
+  },
+  "rail": {
+    "label": "Home page chapters",
+    "hero": "Relief",
+    "map": "The map",
+    "summit": "Your peak",
+    "studio": "The Studio",
+    "shop": "The shop",
+    "atelier": "The workshop",
+    "file": "Your file"
+  },
+  "hero": {
+    "kicker": "Multicolor 3D printing · Gland & Pully (VD)",
+    "title": "Every relief starts with a layer.",
+    "lead": "Objects designed in our workshop that you adjust live: shape, pattern, up to four colors. You set it, we print it, in Gland and Pully.",
+    "ctaStudio": "Adjust an object",
+    "ctaShop": "Shop",
+    "ctaFile": "I have a file",
+    "label": "Studio object · sample configuration · real-time render",
+    "skip": "Skip the animation",
+    "palette": "Palette",
+    "pattern": "Pattern",
+    "controls": "Adjust the hero vase",
+    "coords": "46°25′N 6°16′E · Gland — 46°31′N 6°40′E · Pully",
+    "visual": "\"Lavaux\" vase printed layer by layer: the print follows the palette and the pattern you pick.",
+    "ruler": "Printed layer",
+    "rulerValue": "Layer {layer} of {total}, {height} printed"
+  },
+  "trust": {
+    "shipping": "Free delivery from {amount}",
+    "made": "Printed in Gland and Pully",
+    "payment": "TWINT, cards, Google Pay"
+  },
+  "map": {
+    "eyebrow": "The map",
+    "title": "One color per altitude.",
+    "intro": "An FDM printer has nothing but altitudes to stack. At 0.2 mm per layer, this {height} vase is a relief of {layers} contour lines, and each color band plays the tint of a map.",
+    "figure": "The same vase, exploded: one band per color, from the build plate to the summit.",
+    "bands": "Color bands, from the summit to the build plate",
+    "purgeNote": "That is all the color costs, and we show it to you.",
+    "cta": "Adjust the bands in the Studio"
+  },
+  "summit": {
+    "eyebrow": "Your peak",
+    "title": "Your name, in relief. Literally.",
+    "lead": "The \"Relief\" coaster is a massif made of strata. Your name crowns its summit, with a fictional altitude computed from it.",
+    "input": "Name your peak",
+    "note": "The text stays in your browser until you send it to the workshop.",
+    "label": "Peak label",
+    "cta": "Continue in the Studio",
+    "poster": "\"Relief\" coaster: a massif made of strata, seen from above."
+  },
+  "studio": {
+    "eyebrow": "The Studio",
+    "title": "You set it. We print it.",
+    "intro": "Four original objects that you adjust in 3D before sending them to us. The firm price is confirmed on quote, within 48 hours.",
+    "adjust": "Adjust",
+    "stats": "{height} · ≈ {grams} · ≈ {duration} · {changes}",
+    "stepsTitle": "How it works",
+    "steps": {
+      "set": {
+        "title": "Adjust",
+        "text": "Shape, pattern, colors, text: the object is adjusted in 3D, and grams and duration follow every move."
+      },
+      "send": {
+        "title": "Send",
+        "text": "One click sends the piece and its configuration to the workshop."
+      },
+      "check": {
+        "title": "The workshop checks",
+        "text": "A person reads every text and checks the piece: a firm price comes back within 48 hours."
+      },
+      "print": {
+        "title": "Printed and delivered",
+        "text": "Printed in Gland or Pully, shipped by Swiss Post, free from {amount}."
+      }
+    }
+  },
+  "shop": {
+    "eyebrow": "The shop",
+    "title": "Selected objects, printed to order.",
+    "intro": "Models picked for their design, started to order in our workshops.",
+    "all": "See all",
+    "empty": "No object in the shop for now. Adjust yours in the Studio or send us a file."
+  },
+  "atelier": {
+    "eyebrow": "The workshop",
+    "title": "Printed in Gland and Pully. Delivered from Geneva to Romanshorn.",
+    "intro": "Each piece is started, checked and packed in one of our two Vaud workshops, then shipped by Swiss Post.",
+    "gland": "Gland",
+    "glandMachine": "Bambu Lab P1S · AMS 2 Pro",
+    "pully": "Pully",
+    "pullyMachine": "Creality K2 · CFS",
+    "glandCoords": "46°25′N 6°16′E",
+    "pullyCoords": "46°31′N 6°40′E",
+    "delivery": "Free delivery from {amount}",
+    "payment": "TWINT, cards, Google Pay",
+    "visit": "Visit the workshop"
+  },
+  "file": {
+    "title": "Already have a file?",
+    "text": "STL, 3MF, OBJ or STEP: send it, and the workshop replies within 48 hours with a quote.",
+    "cta": "Send a file"
+  }
+}

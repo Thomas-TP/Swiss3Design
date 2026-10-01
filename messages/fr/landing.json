@@ -1,1 +1,110 @@
-{}
+{
+  "seo": {
+    "title": "Swiss3Design · Impression 3D multicolore en Suisse",
+    "description": "Réglez un vase, une carte ou un sous-verre en 3D, puis laissez l'atelier l'imprimer en jusqu'à quatre couleurs, à Gland et à Pully. Livré partout en Suisse.",
+    "imageAlt": "Swiss3Design : un vase imprimé couche par couche en trois couleurs"
+  },
+  "rail": {
+    "label": "Chapitres de l'accueil",
+    "hero": "Relief",
+    "map": "La carte",
+    "summit": "Votre sommet",
+    "studio": "Le Studio",
+    "shop": "La boutique",
+    "atelier": "L'atelier",
+    "file": "Votre fichier"
+  },
+  "hero": {
+    "kicker": "Impression 3D multicolore · Gland & Pully (VD)",
+    "title": "Tout relief commence par une couche.",
+    "lead": "Des objets dessinés par notre atelier, que vous réglez en direct : forme, motif, jusqu'à quatre couleurs. Vous réglez, on imprime, à Gland et à Pully.",
+    "ctaStudio": "Régler un objet",
+    "ctaShop": "Boutique",
+    "ctaFile": "J'ai un fichier",
+    "label": "Objet Studio · configuration d'exemple · rendu temps réel",
+    "skip": "Passer l'animation",
+    "palette": "Palette",
+    "pattern": "Motif",
+    "controls": "Régler le vase du héros",
+    "coords": "46°25′N 6°16′E · Gland — 46°31′N 6°40′E · Pully",
+    "visual": "Vase « Lavaux » imprimé couche par couche : l'impression se règle avec la palette et le motif.",
+    "ruler": "Couche imprimée",
+    "rulerValue": "Couche {layer} sur {total}, {height} imprimés"
+  },
+  "trust": {
+    "shipping": "Livraison offerte dès {amount}",
+    "made": "Imprimé à Gland et à Pully",
+    "payment": "TWINT, cartes, Google Pay"
+  },
+  "map": {
+    "eyebrow": "La carte",
+    "title": "Une couleur par altitude.",
+    "intro": "Une imprimante FDM n'a que des altitudes à empiler. À 0,2 mm par couche, ce vase de {height} est un relief de {layers} courbes de niveau, et chaque bande de couleur y joue la teinte d'une carte.",
+    "figure": "Le même vase, éclaté : une bande par couleur, du plateau au sommet.",
+    "bands": "Bandes de couleur, du sommet au plateau",
+    "purgeNote": "C'est tout ce que coûte la couleur, et on vous le montre.",
+    "cta": "Régler les bandes dans le Studio"
+  },
+  "summit": {
+    "eyebrow": "Votre sommet",
+    "title": "Votre nom, en relief. Littéralement.",
+    "lead": "Le sous-verre « Relief » est un massif en strates. Votre nom en coiffe le sommet, avec une altitude fictive calculée à partir de lui.",
+    "input": "Nommez votre sommet",
+    "note": "Le texte reste dans votre navigateur jusqu'à l'envoi à l'atelier.",
+    "label": "Étiquette du sommet",
+    "cta": "Continuer dans le Studio",
+    "poster": "Sous-verre « Relief » : un massif en strates, vu de dessus."
+  },
+  "studio": {
+    "eyebrow": "Le Studio",
+    "title": "Réglez-le. On l'imprime.",
+    "intro": "Quatre objets originaux, que vous réglez en 3D avant de nous les envoyer. Le prix ferme est confirmé sur devis, sous 48 h.",
+    "adjust": "Régler",
+    "stats": "{height} · ≈ {grams} · ≈ {duration} · {changes}",
+    "stepsTitle": "Comment ça marche",
+    "steps": {
+      "set": {
+        "title": "Réglez",
+        "text": "Forme, motif, couleurs, texte : l'objet se règle en 3D, et les grammes et la durée suivent chaque geste."
+      },
+      "send": {
+        "title": "Envoyez",
+        "text": "Un clic transmet la pièce et sa configuration à l'atelier."
+      },
+      "check": {
+        "title": "L'atelier vérifie",
+        "text": "Un humain relit chaque texte et contrôle la pièce : un prix ferme vous répond sous 48 h."
+      },
+      "print": {
+        "title": "Imprimé et livré",
+        "text": "Imprimé à Gland ou à Pully, expédié par la Poste suisse, offert dès {amount}."
+      }
+    }
+  },
+  "shop": {
+    "eyebrow": "La boutique",
+    "title": "Des objets choisis, imprimés à la commande.",
+    "intro": "Des modèles retenus pour leur dessin, lancés à la commande dans nos ateliers.",
+    "all": "Tout voir",
+    "empty": "Aucun objet en boutique pour le moment. Réglez le vôtre au Studio ou envoyez-nous un fichier."
+  },
+  "atelier": {
+    "eyebrow": "L'atelier",
+    "title": "Imprimé à Gland et à Pully. Livré de Genève à Romanshorn.",
+    "intro": "Chaque pièce est lancée, contrôlée et emballée dans l'un de nos deux ateliers vaudois, puis expédiée par la Poste suisse.",
+    "gland": "Gland",
+    "glandMachine": "Bambu Lab P1S · AMS 2 Pro",
+    "pully": "Pully",
+    "pullyMachine": "Creality K2 · CFS",
+    "glandCoords": "46°25′N 6°16′E",
+    "pullyCoords": "46°31′N 6°40′E",
+    "delivery": "Livraison offerte dès {amount}",
+    "payment": "TWINT, cartes, Google Pay",
+    "visit": "Visiter l'atelier"
+  },
+  "file": {
+    "title": "Vous avez déjà un fichier ?",
+    "text": "STL, 3MF, OBJ ou STEP : envoyez-le, l'atelier vous répond sous 48 h avec un devis.",
+    "cta": "Envoyer un fichier"
+  }
+}
