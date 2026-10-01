@@ -30,7 +30,7 @@ export function spreadVertically(
   max: number,
 ): number[] {
   const order = ys.map((_, index) => index).sort((a, b) => ys[a] - ys[b]);
-  const placed = new Array<number>(ys.length).fill(0);
+  const placed = Array.from({ length: ys.length }, () => 0);
   let previous = Number.NEGATIVE_INFINITY;
   for (const index of order) {
     const y = Math.max(ys[index], min, previous + gap);
