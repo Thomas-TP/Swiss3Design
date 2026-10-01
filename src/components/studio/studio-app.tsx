@@ -498,24 +498,25 @@ export function StudioApp({
         >
           <div className="flex flex-col gap-8">
             {intro}
-            <StudioToolbar
-              className="lg:hidden"
-              canUndo={doc.canUndo}
-              canRedo={doc.canRedo}
-              onUndo={undo}
-              onRedo={redo}
-              onSurprise={onSurprise}
-              onCopy={copyLink}
-              onKeep={keep}
-              labels={{
-                undo: t("tools.undo"),
-                redo: t("tools.redo"),
-                surprise: t("tools.surprise"),
-                copy: t("tools.copy"),
-                keep: t("tools.keep"),
-                group: t("tools.group"),
-              }}
-            />
+            <div className="lg:hidden">
+              <StudioToolbar
+                canUndo={doc.canUndo}
+                canRedo={doc.canRedo}
+                onUndo={undo}
+                onRedo={redo}
+                onSurprise={onSurprise}
+                onCopy={copyLink}
+                onKeep={keep}
+                labels={{
+                  undo: t("tools.undo"),
+                  redo: t("tools.redo"),
+                  surprise: t("tools.surprise"),
+                  copy: t("tools.copy"),
+                  keep: t("tools.keep"),
+                  group: t("tools.group"),
+                }}
+              />
+            </div>
             <SectionTabs
               legend={t("sections.legend")}
               sections={sections}

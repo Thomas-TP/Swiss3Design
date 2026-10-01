@@ -133,7 +133,7 @@ export default async function StudioObjectPage({
           }
           intro={
             <div>
-              <h1 className="font-display text-display break-words text-ink">
+              <h1 className="font-display text-display break-words text-ink lg:text-[clamp(2.25rem,3.1vw,3.5rem)]">
                 {withDot(name)}
               </h1>
               <p className="mt-4 max-w-[46ch] text-lead text-soft">

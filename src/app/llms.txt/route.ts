@@ -74,7 +74,7 @@ ${productLines.join("\n")}
 - [Cartouche business card](${url("/studio/cartouche")}): 85 × 55 mm, embossed or engraved text, two colors
 - [Relief coaster](${url("/studio/relief")}): a 100 mm coaster shaped like a layered mountain range, with your name on the summit
 - [Borne name tag](${url("/studio/borne")}): a two-color name tag with your text
-- Configuration links carry only the settings (`#c=v1.…` fragment), never personal text. Agents can build one with the WebMCP tool `studio_configure`.
+- Configuration links carry only the settings ("#c=v1.…" fragment), never personal text. Agents can build one with the WebMCP tool "studio_configure".
 
 ## Services
 
