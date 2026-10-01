@@ -1,0 +1,142 @@
+/* Styles du Studio qui ne s'écrivent pas en utilitaires (globals.css est figé
+   après WP-00) : curseurs natifs habillés, barre altimétrique, onglets mobiles.
+   Jetons uniquement (jamais de valeur hexadécimale en dur). */
+
+/* ── Curseur horizontal : piste fine, pouce rond de 22 px, hauteur de prise de
+   44 px (la hauteur de l'input). ─────────────────────────────────────────── */
+.range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 2.75rem;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.range:focus {
+  outline: none;
+}
+.range::-webkit-slider-runnable-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-line);
+}
+.range::-moz-range-track {
+  height: 4px;
+  border-radius: 2px;
+  background: var(--color-line);
+}
+.range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-top: -9px;
+  border-radius: 999px;
+  border: 2px solid var(--color-paper);
+  background: var(--color-ink);
+  box-shadow: 0 0 0 1px var(--color-ink);
+}
+.range::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid var(--color-paper);
+  background: var(--color-ink);
+  box-shadow: 0 0 0 1px var(--color-ink);
+}
+.range:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+.range:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+.range:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Frontières de la barre altimétrique : chaque input va de 0 à la hauteur
+   totale et traverse toute la barre ; la piste laisse passer le pointeur, seul le
+   repère (le « pouce », une poignée fine qui traverse la barre) le reçoit. Le
+   filet transparent agrandit la zone de prise sans agrandir le dessin. ───── */
+.bandRangeV,
+.bandRangeH {
+  -webkit-appearance: none;
+  appearance: none;
+  margin: 0;
+  padding: 0;
+  background: transparent;
+  pointer-events: none;
+}
+.bandRangeV {
+  writing-mode: vertical-lr;
+  direction: rtl;
+}
+.bandRangeV::-webkit-slider-runnable-track,
+.bandRangeH::-webkit-slider-runnable-track {
+  background: transparent;
+}
+.bandRangeV::-moz-range-track,
+.bandRangeH::-moz-range-track {
+  background: transparent;
+}
+.bandRangeV::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: auto;
+  cursor: grab;
+  width: 48px;
+  height: 34px;
+  border: solid transparent;
+  border-width: 12px 6px;
+  background: var(--color-ink);
+  background-clip: padding-box;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--color-paper);
+}
+.bandRangeH::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  pointer-events: auto;
+  cursor: grab;
+  width: 34px;
+  height: 48px;
+  border: solid transparent;
+  border-width: 6px 12px;
+  background: var(--color-ink);
+  background-clip: padding-box;
+  border-radius: 6px;
+  box-shadow: 0 0 0 1px var(--color-paper);
+}
+.bandRangeV::-moz-range-thumb {
+  pointer-events: auto;
+  cursor: grab;
+  width: 36px;
+  height: 10px;
+  border: 1px solid var(--color-paper);
+  border-radius: 5px;
+  background: var(--color-ink);
+}
+.bandRangeH::-moz-range-thumb {
+  pointer-events: auto;
+  cursor: grab;
+  width: 10px;
+  height: 36px;
+  border: 1px solid var(--color-paper);
+  border-radius: 5px;
+  background: var(--color-ink);
+}
+.bandRangeV:focus,
+.bandRangeH:focus {
+  outline: none;
+}
+.bandRangeV:focus-visible::-webkit-slider-thumb,
+.bandRangeH:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
+.bandRangeV:focus-visible::-moz-range-thumb,
+.bandRangeH:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--color-accent-text);
+  outline-offset: 2px;
+}
