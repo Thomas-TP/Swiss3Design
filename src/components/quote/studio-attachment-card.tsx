@@ -49,10 +49,12 @@ export function StudioAttachmentCard({
       <div className="flex gap-4 p-4 sm:gap-5 sm:p-5">
         {thumbnail ? (
           // Vignette décorative : le titre et les lignes portent l'information.
+          // ph-no-capture : elle montre le texte gravé par le visiteur (Studio),
+          // et une data: URL entrerait telle quelle dans l'enregistrement de visite.
           <img
             src={thumbnail}
             alt=""
-            className="size-20 shrink-0 rounded-hair border border-line bg-surface object-contain sm:size-24"
+            className="ph-no-capture size-20 shrink-0 rounded-hair border border-line bg-surface object-contain sm:size-24"
           />
         ) : null}
         <div className="min-w-0 flex-1">
@@ -63,7 +65,9 @@ export function StudioAttachmentCard({
             {title}
           </p>
           {lines.length > 0 ? (
-            <ul className="mt-2 space-y-1 text-sm text-ink">
+            // ph-mask : une ligne peut reprendre les textes à imprimer (le
+            // tiroir du Studio y met le résumé des textes saisis).
+            <ul className="ph-mask mt-2 space-y-1 text-sm text-ink">
               {lines.map((line, index) => (
                 // Lignes d'un résumé figé : l'ordre ne change jamais.
                 <li key={index} className="break-words">

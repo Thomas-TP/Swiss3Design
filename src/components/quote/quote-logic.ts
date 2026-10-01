@@ -39,6 +39,32 @@ export function userMessageOf(error: unknown): string | null {
   return typeof message === "string" && message.trim() ? message : null;
 }
 
+/**
+ * Résultat d'un appel de Server Action qui peut ne pas aboutir : l'état rendu
+ * par l'action, ou l'erreur levée (connexion coupée, 5xx, réponse inattendue).
+ */
+export type QuoteSubmitOutcome<State> =
+  | { ok: true; state: State }
+  | { ok: false; error: unknown };
+
+/**
+ * Appelle l'action et ne lève jamais. Une Server Action passée à
+ * `useActionState` qui échoue au niveau réseau LÈVE dans le rendu du
+ * composant et remplace la page entière par error.tsx (même sur /custom, où
+ * le visiteur perdrait sa saisie) ; ici l'échec devient une valeur, que le
+ * formulaire (resté monté, fichier déjà envoyé conservé) affiche en
+ * « L'envoi a échoué… Réessayer ».
+ */
+export async function attemptSubmit<State>(
+  run: () => Promise<State>,
+): Promise<QuoteSubmitOutcome<State>> {
+  try {
+    return { ok: true, state: await run() };
+  } catch (error) {
+    return { ok: false, error };
+  }
+}
+
 const MEBIOCTET = 1024 * 1024;
 
 /**

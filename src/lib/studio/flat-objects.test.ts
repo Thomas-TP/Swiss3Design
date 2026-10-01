@@ -37,6 +37,7 @@ import {
   reliefGrid,
   reliefLevels,
   RELIEF_GRID,
+  startsWithPeakWord,
   strataThresholds,
   type Locale,
 } from "./objects/relief-model";
@@ -641,6 +642,54 @@ describe("Relief : étiquette du sommet, massif, strates", () => {
           `${locale} ${name}`,
         ).toEqual([]);
       }
+    }
+  });
+
+  it("le préfixe n'est pas doublé quand le nom le porte déjà (casse et accents sans effet)", () => {
+    // Le mot de préfixe de CHAQUE langue, tapé tel quel ou presque.
+    expect(peakLabelParts("Pointe Zorgl", "fr").peak).toBe("POINTE ZORGL");
+    expect(peakLabelParts("pointe zorgl", "fr").peak).toBe("POINTE ZORGL");
+    expect(peakLabelParts("POINTÉ Zorgl", "fr").peak).toBe("POINTÉ ZORGL");
+    expect(peakLabelParts("Piz Bernina", "de").peak).toBe("PIZ BERNINA");
+    expect(peakLabelParts("pizzo Rotondo", "it").peak).toBe("PIZZO ROTONDO");
+    expect(peakLabelParts("Mount Everest", "en").peak).toBe("MOUNT EVEREST");
+    expect(peakLabel("Pointe Zorgl", "fr")).toBe(
+      `POINTE ZORGL · ${peakLabelParts("Pointe Zorgl", "fr").altitude}`,
+    );
+    // Espaces superflus : le nom nettoyé commence bien par le mot.
+    expect(peakLabelParts("  Pointe   Zorgl ", "fr").peak).toBe("POINTE ZORGL");
+    // Trait d'union : « Pointe-Noire » est un nom qui commence par le mot.
+    expect(peakLabelParts("Pointe-Noire", "fr").peak).toBe("POINTE-NOIRE");
+    // Le mot seul : aucun doublon non plus.
+    expect(peakLabelParts("Pointe", "fr").peak).toBe("POINTE");
+    // L'altitude reste celle du nom saisi (déterministe, jamais celle d'un nom préfixé à part).
+    expect(peakLabelParts("Pointe Zorgl", "fr").altitude).toBe(
+      peakLabelParts("pointe  zorgl", "fr").altitude,
+    );
+  });
+
+  it("le préfixe est ajouté quand le nom ne le porte pas (mot entier seulement, langue de la page)", () => {
+    expect(peakLabelParts("Pointer", "fr").peak).toBe("POINTE POINTER");
+    expect(peakLabelParts("Mountain", "en").peak).toBe("MOUNT MOUNTAIN");
+    expect(peakLabelParts("Pizzaiolo", "it").peak).toBe("PIZZO PIZZAIOLO");
+    // Le mot d'une autre langue n'est pas celui de la page : « Piz » sous /fr garde « Pointe ».
+    expect(peakLabelParts("Piz Bernina", "fr").peak).toBe("POINTE PIZ BERNINA");
+    expect(peakLabelParts("Pointe Zorgl", "de").peak).toBe("PIZ POINTE ZORGL");
+    expect(peakLabelParts("Zorgl", "fr").peak).toBe("POINTE ZORGL");
+    expect(startsWithPeakWord("Mount", "en")).toBe(true);
+    expect(startsWithPeakWord("Mountain", "en")).toBe(false);
+    expect(startsWithPeakWord("", "fr")).toBe(false);
+  });
+
+  it("l'étiquette gravée du Relief suit la même règle que le texte affiché", () => {
+    // layoutLabel (gravure) et peakLabel (accueil, Studio) partagent peakLabelParts.
+    for (const locale of LOCALES) {
+      const word = peakLabelParts("x", locale).peak.split(" ")[0];
+      const typed = `${word.charAt(0)}${word.slice(1).toLowerCase()} Zorgl`;
+      const { lines } = layoutLabel(RELIEF_DEFAULT, { peak: typed }, locale);
+      const engraved = lines.map((line) => line.text).join(" ");
+      expect(engraved, `${locale}`).not.toContain(`${word} ${word}`);
+      expect(engraved, `${locale}`).toContain(`${word} ZORGL`);
     }
   });
 

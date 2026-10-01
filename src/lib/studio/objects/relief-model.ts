@@ -119,14 +119,34 @@ export interface PeakLabelParts {
   altitude: string;
 }
 
+/** Minuscules sans accents : « Pointé » vaut « pointe » (comparaison du mot de préfixe). */
+function foldedText(text: string): string {
+  return text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
+}
+
+/**
+ * Vrai quand le nom commence déjà par le mot de préfixe de la langue (« Pointe
+ * Zorgl » en français, « Piz Bernina » en allemand…) : le mot entier, sans
+ * tenir compte de la casse ni des accents. « Pointe-Noire » compte (la
+ * frontière est une non-lettre), « Pointer » non.
+ */
+export function startsWithPeakWord(name: string, locale: Locale): boolean {
+  const word = foldedText(PEAK_WORD[locale]);
+  return new RegExp(`^${word}(?![\\p{L}\\p{N}])`, "u").test(foldedText(name));
+}
+
 /** Les deux moitiés de l'étiquette (deux lignes quand une seule ne tient pas). */
 export function peakLabelParts(
   name: string,
   locale: Locale = "fr",
 ): PeakLabelParts {
   const clean = cleanText(name);
+  // Le visiteur qui tape « Pointe Zorgl » ne lit pas « POINTE POINTE ZORGL ».
+  const full = startsWithPeakWord(clean, locale)
+    ? clean
+    : `${PEAK_WORD[locale]} ${clean}`;
   return {
-    peak: upperCase(`${PEAK_WORD[locale]} ${clean}`),
+    peak: upperCase(full),
     altitude: upperCase(`${groupedAltitude(peakAltitude(clean), locale)} m`),
   };
 }

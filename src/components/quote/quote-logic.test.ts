@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { QuoteUploadError } from "@/lib/quote-upload-client";
 import {
+  attemptSubmit,
   formatBytes,
   formatCount,
   formatPercent,
@@ -8,6 +9,29 @@ import {
   uploadErrorKey,
   userMessageOf,
 } from "./quote-logic";
+
+describe("attemptSubmit", () => {
+  it("rend l'état de l'action quand elle répond", async () => {
+    const outcome = await attemptSubmit(async () => ({ status: "success" }));
+    expect(outcome).toEqual({ ok: true, state: { status: "success" } });
+  });
+
+  it("transforme une action qui échoue au niveau réseau en valeur", async () => {
+    const failure = new TypeError("Failed to fetch");
+    const outcome = await attemptSubmit(async () => {
+      throw failure;
+    });
+    expect(outcome).toEqual({ ok: false, error: failure });
+  });
+
+  it("attrape aussi une erreur levée avant la première attente", async () => {
+    const failure = new Error("An unexpected response was received");
+    const outcome = await attemptSubmit(() => {
+      throw failure;
+    });
+    expect(outcome).toEqual({ ok: false, error: failure });
+  });
+});
 
 describe("uploadErrorKey", () => {
   it("reprend le code d'une QuoteUploadError", () => {
