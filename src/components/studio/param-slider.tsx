@@ -64,8 +64,7 @@ export function ParamSlider({
   const decimals = decimalsOf(range.step);
   const [draft, setDraft] = useState<string | null>(null);
   const hintId = hint ? `${id}-hint` : undefined;
-  const clamp = (v: number) =>
-    clampRange(v, { ...range, default: value });
+  const clamp = (v: number) => clampRange(v, { ...range, default: value });
   const shown = Math.min(Math.max(value, range.min), range.max);
 
   function applyDraft() {

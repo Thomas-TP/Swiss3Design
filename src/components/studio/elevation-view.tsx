@@ -102,7 +102,9 @@ export function flatViewData(
   texts: StudioTexts,
   locale: StudioLocale,
   theme: "light" | "dark",
-): { kind: "elevation"; data: ElevationData } | { kind: "top"; data: TopViewData } {
+):
+  | { kind: "elevation"; data: ElevationData }
+  | { kind: "top"; data: TopViewData } {
   switch (config.object) {
     case "lavaux":
       return { kind: "elevation", data: lavauxElevation(config) };

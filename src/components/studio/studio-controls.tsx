@@ -113,7 +113,10 @@ const filamentName = (ctl: Ctl) => (id: FilamentId) =>
 
 // ── Vase « Lavaux » ─────────────────────────────────────────────────────────
 
-function defaultPattern(kind: LavauxPattern["kind"], wall: number): LavauxPattern {
+function defaultPattern(
+  kind: LavauxPattern["kind"],
+  wall: number,
+): LavauxPattern {
   const R = LAVAUX_RANGES;
   switch (kind) {
     case "lisse":
@@ -122,7 +125,10 @@ function defaultPattern(kind: LavauxPattern["kind"], wall: number): LavauxPatter
       return {
         kind,
         step: R.gradins.step.default,
-        depth: Math.min(R.gradins.depth.default, gradinsDepthMax(R.gradins.step.default, wall)),
+        depth: Math.min(
+          R.gradins.depth.default,
+          gradinsDepthMax(R.gradins.step.default, wall),
+        ),
       };
     case "vagues":
       return {
@@ -148,11 +154,20 @@ function defaultPattern(kind: LavauxPattern["kind"], wall: number): LavauxPatter
   }
 }
 
-export function LavauxShape({ ctl, config }: { ctl: Ctl; config: LavauxConfig }) {
+export function LavauxShape({
+  ctl,
+  config,
+}: {
+  ctl: Ctl;
+  config: LavauxConfig;
+}) {
   const { t, locale, uid, change, commit } = ctl;
   const R = LAVAUX_RANGES;
-  const set = (patch: Partial<LavauxConfig>, control: string, reprint = false) =>
-    change({ ...config, ...patch }, control, { reprint });
+  const set = (
+    patch: Partial<LavauxConfig>,
+    control: string,
+    reprint = false,
+  ) => change({ ...config, ...patch }, control, { reprint });
   const layers = ctl.stats.layers;
   return (
     <div className="flex flex-col gap-6">
@@ -235,12 +250,12 @@ export function LavauxShape({ ctl, config }: { ctl: Ctl; config: LavauxConfig })
           value: wall,
           label: mm(wall, locale),
         }))}
-        onChange={(wall) =>
-          change({ ...config, wall }, "w", { commit: true })
-        }
+        onChange={(wall) => change({ ...config, wall }, "w", { commit: true })}
       />
       <p className="sr-only">
-        {t("value.layersTotal", { layers: ctl.core("units.layers", { count: layers }) })}
+        {t("value.layersTotal", {
+          layers: ctl.core("units.layers", { count: layers }),
+        })}
       </p>
     </div>
   );
@@ -256,8 +271,11 @@ export function LavauxPatternSection({
   const { t, locale, uid, change, commit } = ctl;
   const R = LAVAUX_RANGES;
   const p = config.pattern;
-  const setPattern = (pattern: LavauxPattern, control: string, commitNow = false) =>
-    change({ ...config, pattern }, control, { commit: commitNow });
+  const setPattern = (
+    pattern: LavauxPattern,
+    control: string,
+    commitNow = false,
+  ) => change({ ...config, pattern }, control, { commit: commitNow });
   return (
     <div className="flex flex-col gap-6">
       <RadioGroup
@@ -316,7 +334,10 @@ export function LavauxPatternSection({
             hint={t("ctl.vagues.hint")}
             value={p.wavelength}
             range={{
-              min: Math.max(R.vagues.wavelength.min, vaguesWavelengthMin(p.amplitude)),
+              min: Math.max(
+                R.vagues.wavelength.min,
+                vaguesWavelengthMin(p.amplitude),
+              ),
               max: R.vagues.wavelength.max,
               step: R.vagues.wavelength.step,
             }}
@@ -388,7 +409,10 @@ export function LavauxPatternSection({
                 size="sm"
                 onClick={() =>
                   change(
-                    { ...config, pattern: { ...p, seed: ctl.newSeed() % 10000 } },
+                    {
+                      ...config,
+                      pattern: { ...p, seed: ctl.newSeed() % 10000 },
+                    },
                     "vs",
                     { commit: true, reprint: true },
                   )
@@ -463,9 +487,7 @@ export function BandsSection({
   const summary = ctl.bands.bands;
   const fromTo = (index: number) => {
     const band = summary[index];
-    return band
-      ? `${num(band.fromMm, locale)}–${mm(band.toMm, locale)}`
-      : "";
+    return band ? `${num(band.fromMm, locale)}–${mm(band.toMm, locale)}` : "";
   };
   return (
     <div className="flex flex-col gap-6">
@@ -499,13 +521,9 @@ export function BandsSection({
       <BandList
         bands={bands}
         canAdd={
-          geometry
-            ? canAddReliefBand(bands, geometry)
-            : canAddBand(bands)
+          geometry ? canAddReliefBand(bands, geometry) : canAddBand(bands)
         }
-        canRemove={
-          geometry ? canRemoveReliefBand(bands) : canRemoveBand(bands)
-        }
+        canRemove={geometry ? canRemoveReliefBand(bands) : canRemoveBand(bands)}
         onFilament={(index, filament) =>
           apply(setBandFilament(bands, index, filament), "palette")
         }
@@ -564,10 +582,7 @@ export function AltimetricBar({
     config.object === "relief"
       ? config.bands[config.bands.length - 1].toMm
       : config.h;
-  const stepMm =
-    config.object === "relief"
-      ? reliefStep(config)
-      : 0.2;
+  const stepMm = config.object === "relief" ? reliefStep(config) : 0.2;
   const onBoundary = (index: number, raw: number) => {
     const bands =
       config.object === "relief"
@@ -670,7 +685,11 @@ export function CartoucheShape({
       <ParamSlider
         id={`${uid}-e`}
         name="e"
-        label={t(config.mode === "relief" ? "ctl.cartouche.heightRelief" : "ctl.cartouche.depthGravure")}
+        label={t(
+          config.mode === "relief"
+            ? "ctl.cartouche.heightRelief"
+            : "ctl.cartouche.depthGravure",
+        )}
         value={config.depth}
         range={{
           min: R.depth.min,
@@ -708,12 +727,12 @@ export function CartoucheShape({
         legend={t("ctl.cartouche.layout")}
         name="ly"
         value={config.layout}
-        options={(["classique", "centree", "cartouche", "monogramme"] as const).map(
-          (layout) => ({
-            value: layout,
-            label: ctl.core(`options.layout.${layout}`),
-          }),
-        )}
+        options={(
+          ["classique", "centree", "cartouche", "monogramme"] as const
+        ).map((layout) => ({
+          value: layout,
+          label: ctl.core(`options.layout.${layout}`),
+        }))}
         onChange={(layout) =>
           change({ ...config, layout }, "ly", { commit: true, reprint: true })
         }
@@ -733,8 +752,11 @@ export function ReliefShape({
 }) {
   const { t, locale, uid, change, commit } = ctl;
   const R = RELIEF_RANGES;
-  const set = (patch: Partial<ReliefConfig>, control: string, reprint = false) =>
-    change({ ...config, ...patch }, control, { reprint });
+  const set = (
+    patch: Partial<ReliefConfig>,
+    control: string,
+    reprint = false,
+  ) => change({ ...config, ...patch }, control, { reprint });
   return (
     <div className="flex flex-col gap-6">
       <RadioGroup
@@ -752,7 +774,11 @@ export function ReliefShape({
       <ParamSlider
         id={`${uid}-s`}
         name="s"
-        label={config.shape === "rond" ? t("ctl.relief.diameter") : t("ctl.relief.side")}
+        label={
+          config.shape === "rond"
+            ? t("ctl.relief.diameter")
+            : t("ctl.relief.side")
+        }
         value={config.size}
         range={R.size}
         unit="mm"
@@ -808,11 +834,10 @@ export function ReliefShape({
             variant="secondary"
             size="sm"
             onClick={() =>
-              change(
-                { ...config, seed: ctl.newSeed() % 10000 },
-                "sd",
-                { commit: true, reprint: true },
-              )
+              change({ ...config, seed: ctl.newSeed() % 10000 }, "sd", {
+                commit: true,
+                reprint: true,
+              })
             }
           >
             {t("ctl.surprise")}
@@ -836,13 +861,7 @@ export function ReliefShape({
 
 // ── Porte-nom « Borne » ─────────────────────────────────────────────────────
 
-export function BorneShape({
-  ctl,
-  config,
-}: {
-  ctl: Ctl;
-  config: BorneConfig;
-}) {
+export function BorneShape({ ctl, config }: { ctl: Ctl; config: BorneConfig }) {
   const { t, locale, uid, change, commit } = ctl;
   const R = BORNE_RANGES;
   const set = (patch: Partial<BorneConfig>, control: string) =>
@@ -1002,7 +1021,9 @@ export function TextSection({
           </Field>
         );
       })}
-      <p className="max-w-[60ch] text-sm text-soft">{t("ctl.text.moderation")}</p>
+      <p className="max-w-[60ch] text-sm text-soft">
+        {t("ctl.text.moderation")}
+      </p>
     </div>
   );
 }

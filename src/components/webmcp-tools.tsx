@@ -188,9 +188,8 @@ export function WebMcpTools() {
         annotations: { readOnlyHint: true },
         async execute(input) {
           // Chargé à la demande : l'outil est rare, ses modules ne pèsent pas sur les pages.
-          const { configureFromTool, describeConfiguration } = await import(
-            "@/components/studio/configure-tool"
-          );
+          const { configureFromTool, describeConfiguration } =
+            await import("@/components/studio/configure-tool");
           const result = configureFromTool(input);
           if (!result.ok) throw new Error(result.error);
           const answer = describeConfiguration(

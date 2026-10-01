@@ -57,9 +57,12 @@ function create(): StudioWorkerClient {
   function start(): Worker | null {
     if (worker || failed) return worker;
     try {
-      const next = new Worker(new URL("./geometry.worker.ts", import.meta.url), {
-        type: "module",
-      });
+      const next = new Worker(
+        new URL("./geometry.worker.ts", import.meta.url),
+        {
+          type: "module",
+        },
+      );
       next.onmessage = (event: MessageEvent<FromWorker>) => {
         const message = event.data;
         if (message.t === "glyphs") return;
@@ -164,8 +167,12 @@ function create(): StudioWorkerClient {
     },
     preloadGlyphs() {
       const target = start();
-      if (target) target.postMessage({ t: "glyphs", url: GLYPH_URL } satisfies ToWorker);
-      else void import("./geometry-core").then((core) => core.ensureGlyphs()).catch(() => {});
+      if (target)
+        target.postMessage({ t: "glyphs", url: GLYPH_URL } satisfies ToWorker);
+      else
+        void import("./geometry-core")
+          .then((core) => core.ensureGlyphs())
+          .catch(() => {});
     },
   };
 }

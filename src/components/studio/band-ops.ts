@@ -42,13 +42,16 @@ export function moveReliefBoundary(
   rawMm: number,
   g: Geometry,
 ): Band[] {
-  if (index < 0 || index >= bands.length - 1) return bands.map((b) => ({ ...b }));
+  if (index < 0 || index >= bands.length - 1)
+    return bands.map((b) => ({ ...b }));
   const tops = strataTops(g.base, g.relief, g.levels);
   const floor = index === 0 ? 0 : strataIndex(tops, bands[index - 1].toMm) + 1;
   const ceiling = strataIndex(tops, bands[index + 1].toMm) - 1;
   const wanted = strataIndex(tops, rawMm);
   const k = Math.min(Math.max(wanted, floor), Math.max(floor, ceiling));
-  return bands.map((b, i) => (i === index ? { ...b, toMm: tops[k] } : { ...b }));
+  return bands.map((b, i) =>
+    i === index ? { ...b, toMm: tops[k] } : { ...b },
+  );
 }
 
 export function canAddReliefBand(bands: readonly Band[], g: Geometry): boolean {
@@ -121,7 +124,8 @@ export function removeReliefBand(
 ): Band[] {
   if (!canRemoveReliefBand(bands) || index < 0 || index >= bands.length)
     return bands.map((b) => ({ ...b }));
-  if (index === 0) return snapReliefBands(bands.slice(1), g.base, g.relief, g.levels);
+  if (index === 0)
+    return snapReliefBands(bands.slice(1), g.base, g.relief, g.levels);
   const out = bands.map((b) => ({ ...b }));
   out[index - 1].toMm = bands[index].toMm;
   out.splice(index, 1);

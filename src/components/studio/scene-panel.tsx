@@ -242,7 +242,10 @@ export function ScenePanel({
 
         {/* Vues et éclaté, en surimpression en haut à gauche. */}
         {views.length > 1 || stageOn ? (
-          <div data-no-orbit="" className="absolute left-3 top-3 z-10 sm:left-4 sm:top-4">
+          <div
+            data-no-orbit=""
+            className="absolute left-3 top-3 z-10 sm:left-4 sm:top-4"
+          >
             <ViewSwitch
               legend={t("scene.viewsLegend")}
               views={views}

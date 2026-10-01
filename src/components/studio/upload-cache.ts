@@ -76,8 +76,7 @@ function readAll(now: number): Record<string, CachedUpload> {
     if (!data || typeof data !== "object" || Array.isArray(data)) return {};
     const out: Record<string, CachedUpload> = {};
     for (const [hash, entry] of Object.entries(data)) {
-      if (/^[0-9a-f]{16}$/.test(hash) && isEntry(entry, now))
-        out[hash] = entry;
+      if (/^[0-9a-f]{16}$/.test(hash) && isEntry(entry, now)) out[hash] = entry;
     }
     return out;
   } catch {

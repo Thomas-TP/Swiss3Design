@@ -95,7 +95,11 @@ export default async function StudioIndexPage({
       tagline: core(`objects.${object}.tagline`),
       figures: `${size} · ≈ ${formatGrams(stats.grams, locale)} · ≈ ${formatDuration(stats.minutes, locale)}`,
       price: stats.estimate
-        ? formatChfRange(stats.estimate.lowCents, stats.estimate.highCents, locale)
+        ? formatChfRange(
+            stats.estimate.lowCents,
+            stats.estimate.highCents,
+            locale,
+          )
         : core("measure.onQuote"),
     };
   });
@@ -161,10 +165,7 @@ export default async function StudioIndexPage({
         </ul>
 
         <section aria-labelledby="studio-how" className="mt-section">
-          <h2
-            id="studio-how"
-            className="font-display text-title text-ink"
-          >
+          <h2 id="studio-how" className="font-display text-title text-ink">
             {t("how.title")}
           </h2>
           <ol className="s3d-grid mt-8 gap-y-8">
@@ -182,7 +183,9 @@ export default async function StudioIndexPage({
                 <h3 className="font-display text-[1.0625rem] font-bold text-ink">
                   {t(`how.steps.${key}.title`)}
                 </h3>
-                <p className="text-sm text-soft">{t(`how.steps.${key}.text`)}</p>
+                <p className="text-sm text-soft">
+                  {t(`how.steps.${key}.text`)}
+                </p>
               </li>
             ))}
           </ol>

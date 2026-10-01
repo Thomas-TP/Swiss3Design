@@ -114,7 +114,10 @@ export default async function StudioObjectPage({
           initialInvalid={initialInvalid}
           action={`/${locale}/studio/${object}`}
           breadcrumb={
-            <nav aria-label={t("breadcrumb.label")} className="s3d-label text-soft">
+            <nav
+              aria-label={t("breadcrumb.label")}
+              className="s3d-label text-soft"
+            >
               <ol className="flex flex-wrap items-center gap-2 normal-case">
                 <li>
                   <SiteLink
@@ -143,10 +146,7 @@ export default async function StudioObjectPage({
           }
         />
 
-        <section
-          aria-labelledby="studio-faq"
-          className="mt-section max-w-3xl"
-        >
+        <section aria-labelledby="studio-faq" className="mt-section max-w-3xl">
           <h2 id="studio-faq" className="font-display text-title text-ink">
             {t("faq.title")}
           </h2>

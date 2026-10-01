@@ -21,7 +21,11 @@ import { saveCreation } from "@/lib/studio/creations";
 import { clampConfig } from "@/lib/studio/ranges";
 import { computeStats } from "@/lib/studio/stats";
 import { bandStatsFor } from "@/lib/studio/band-stats";
-import { formatChfRange, formatDuration, formatGrams } from "@/lib/studio/format";
+import {
+  formatChfRange,
+  formatDuration,
+  formatGrams,
+} from "@/lib/studio/format";
 import {
   ISSUE_MESSAGE_KEYS,
   issueStrings,
@@ -310,7 +314,18 @@ export function StudioApp({
     });
     toast.show(saved ? t("toast.kept") : t("toast.keepFailed"));
     if (saved) track("Studio Saved", { object });
-  }, [config, shown, locale, object, texts, summaryInput, core, stats, t, toast]);
+  }, [
+    config,
+    shown,
+    locale,
+    object,
+    texts,
+    summaryInput,
+    core,
+    stats,
+    t,
+    toast,
+  ]);
 
   // Un lien partagé illisible : réglages de départ et un mot (§6.7 « États »).
   useEffect(() => {
@@ -326,9 +341,7 @@ export function StudioApp({
     if (!hash) return;
     const match = listCreations().find(
       (c) =>
-        c.object === object &&
-        c.texts &&
-        c.fragment.replace(/^#/, "") === hash,
+        c.object === object && c.texts && c.fragment.replace(/^#/, "") === hash,
     );
     if (match?.texts) dispatch({ type: "texts", patch: match.texts });
     // Une fois, quand l'URL est lue.
@@ -547,10 +560,7 @@ export function StudioApp({
       {/* Résumé vivant : le canvas est muet pour les lecteurs d'écran (§6.10). */}
       <p
         aria-live="polite"
-        className={cx(
-          "sr-only",
-          summaryHasText(config, shown) && "ph-mask",
-        )}
+        className={cx("sr-only", summaryHasText(config, shown) && "ph-mask")}
       >
         {announced}
       </p>

@@ -30,7 +30,7 @@ export type Translate = (
   values?: Record<string, string | number>,
 ) => string;
 
-const SPACES = /[  ]/g;
+const SPACES = /[\u00a0\u202f]/g;
 
 /** Espaces insécables → espaces ordinaires (texte brut d'un e-mail). */
 export const plain = (text: string) => text.replace(SPACES, " ");
@@ -143,7 +143,11 @@ export function measureItems({
     );
   items.push(
     stats.estimate
-      ? formatChfRange(stats.estimate.lowCents, stats.estimate.highCents, locale)
+      ? formatChfRange(
+          stats.estimate.lowCents,
+          stats.estimate.highCents,
+          locale,
+        )
       : core("measure.priceLater"),
   );
   return items;

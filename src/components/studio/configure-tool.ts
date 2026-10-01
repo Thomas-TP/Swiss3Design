@@ -9,14 +9,17 @@
 // « Copier le lien ».
 import { FILAMENT_IDS, isFilamentId } from "@/lib/studio/filaments";
 import { PRICING } from "@/lib/studio/pricing-params";
+import { bandsForPalette, defaultConfig } from "@/lib/studio/presets";
 import {
-  bandsForPalette,
-  defaultConfig,
-} from "@/lib/studio/presets";
-import {
+  BORNE_RANGES,
+  CARTOUCHE_RANGES,
+  LAVAUX_RANGES,
   MAX_BANDS,
+  RELIEF_RANGES,
   clampConfig,
+  clampRange,
   snapReliefBands,
+  type Range,
 } from "@/lib/studio/ranges";
 import { computeStats } from "@/lib/studio/stats";
 import { DEFAULT_TEXTS } from "@/lib/studio/text/fields";
@@ -42,6 +45,51 @@ export const STUDIO_TOOL_OBJECTS: readonly StudioObjectId[] = [
 export type ConfigureResult =
   | { ok: true; config: StudioConfig; ignored: string[] }
   | { ok: false; error: string };
+
+/**
+ * Plage de chaque clé numérique du lien, par objet : une valeur hors plage est
+ * ramenée à la plage (« clamped to valid ranges », §6.13) au lieu d'être
+ * refusée par le schéma de lecture du fragment.
+ */
+const L = LAVAUX_RANGES;
+const NUMERIC_RANGES: Record<StudioObjectId, Record<string, Range>> = {
+  lavaux: {
+    h: L.h,
+    d: L.d,
+    b: L.belly,
+    n: L.neck,
+    l: L.lip,
+    gs: L.gradins.step,
+    gd: L.gradins.depth,
+    wl: L.vagues.wavelength,
+    wa: L.vagues.amplitude,
+    wk: L.vagues.lobes,
+    vc: L.voronoi.cells,
+    va: L.voronoi.relief,
+    vs: L.voronoi.seed,
+    rn: L.nervures.count,
+    ra: L.nervures.depth,
+    rt: L.nervures.twistDeg,
+  },
+  cartouche: {
+    t: CARTOUCHE_RANGES.thickness,
+    r: CARTOUCHE_RANGES.corner,
+    e: CARTOUCHE_RANGES.depth,
+  },
+  relief: {
+    s: RELIEF_RANGES.size,
+    ba: RELIEF_RANGES.base,
+    re: RELIEF_RANGES.relief,
+    lv: RELIEF_RANGES.levels,
+    sd: RELIEF_RANGES.seed,
+    lk: RELIEF_RANGES.lake,
+  },
+  borne: {
+    c: BORNE_RANGES.cap,
+    t: BORNE_RANGES.thickness,
+    rd: BORNE_RANGES.ringD,
+  },
+};
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null && !Array.isArray(value);
@@ -71,7 +119,12 @@ function withPalette(
       }));
       return {
         ...config,
-        bands: snapReliefBands(spread, config.base, config.relief, config.levels),
+        bands: snapReliefBands(
+          spread,
+          config.base,
+          config.relief,
+          config.levels,
+        ),
       };
     }
     case "cartouche":
@@ -90,7 +143,9 @@ function withPalette(
 }
 
 /** Construit la configuration demandée par un agent : bornée, canonique, sans texte. */
-export function configureFromTool(input: Record<string, unknown>): ConfigureResult {
+export function configureFromTool(
+  input: Record<string, unknown>,
+): ConfigureResult {
   const object = input.object;
   if (!isStudioObjectId(object))
     return {
@@ -112,7 +167,10 @@ export function configureFromTool(input: Record<string, unknown>): ConfigureResu
     const param = asParam(value);
     if (param === null)
       return { ok: false, error: `params.${key} must be a number or a string` };
-    query[key] = param;
+    const range = NUMERIC_RANGES[object][key];
+    if (range && /^-?\d+(\.\d+)?$/.test(param))
+      query[key] = String(clampRange(Number(param), range));
+    else query[key] = param;
   }
   // Les bandes se donnent en liste de filaments (`palette`), jamais en `bd` brut :
   // une clé `bd` est tout de même acceptée si elle est bien formée (« filament:mm,… »).

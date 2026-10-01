@@ -27,17 +27,23 @@ import {
 
 let glyphsPending: Promise<void> | null = null;
 
-/** Charge les glyphes une fois (un échec réseau n'est pas mémorisé : on peut réessayer). */
+/**
+ * Charge les glyphes une fois. La police enregistrée fait foi ; la promesse
+ * n'est gardée que pendant le chargement (deux constructions simultanées
+ * n'envoient qu'une requête), un échec réseau n'est jamais mémorisé.
+ */
 export function ensureGlyphs(url: string = GLYPH_URL): Promise<void> {
   if (getGlyphFont()) return Promise.resolve();
   glyphsPending ??= loadGlyphFont(url)
     .then(() => undefined)
     .catch((error: unknown) => {
-      glyphsPending = null;
       throw new StudioWorkerError(
         "glyphs",
         error instanceof Error ? error.message : String(error),
       );
+    })
+    .finally(() => {
+      glyphsPending = null;
     });
   return glyphsPending;
 }

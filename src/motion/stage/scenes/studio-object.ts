@@ -274,7 +274,11 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
     force = false,
   ) {
     const now = performance.now();
-    if (!force && state === lastReported && now - lastStatusAt < STATUS_INTERVAL_MS)
+    if (
+      !force &&
+      state === lastReported &&
+      now - lastStatusAt < STATUS_INTERVAL_MS
+    )
       return;
     lastReported = state;
     lastStatusAt = now;
@@ -310,7 +314,10 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
   ): Display {
     const mat =
       material ??
-      createPrintMaterial({ heightMm: built.heightMm, bands: toPrintBands(built) });
+      createPrintMaterial({
+        heightMm: built.heightMm,
+        bands: toPrintBands(built),
+      });
     if (!material && theme) mat.setTheme(theme);
     mat.uniforms.uHeight.value = built.heightMm;
     const group = new Group();
@@ -323,7 +330,10 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
       parts = splitByBand(built.mesh, carrier, built.bands.length);
       for (const part of parts) {
         const mesh = new Mesh(part, mat.material);
-        mesh.position.z = explodeOffset(part.userData.band as number, EXPLODE_GAP);
+        mesh.position.z = explodeOffset(
+          part.userData.band as number,
+          EXPLODE_GAP,
+        );
         mesh.frustumCulled = false;
         group.add(mesh);
         meshes.push(mesh);
@@ -385,7 +395,10 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
       return;
     }
     const startReprint =
-      pendingReprint && previous !== null && !ctx.reduced && reprintStart === NONE;
+      pendingReprint &&
+      previous !== null &&
+      !ctx.reduced &&
+      reprintStart === NONE;
     pendingReprint = false;
     const next = buildDisplay(built, separate, null);
     if (previous) {
@@ -487,7 +500,8 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
         } catch (error) {
           window.clearTimeout(slowTimer);
           if (disposed) return;
-          const message = error instanceof Error ? error.message : String(error);
+          const message =
+            error instanceof Error ? error.message : String(error);
           console.error("[studio-object] maillage indisponible", error);
           report("error", { message }, true);
           resolveFirst?.();
@@ -911,7 +925,7 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
         (planBlend > 0.5
           ? fitDistancePlan({ width, depth, aspect })
           : fitDistance({ height, radius, aspect })) / zoom;
-      target.set(cx, (planBlend > 0.5 ? 0 : height / 2), -cy);
+      target.set(cx, planBlend > 0.5 ? 0 : height / 2, -cy);
       const [px, py, pz] = orbitPosition(
         [target.x, target.y, target.z],
         distance,

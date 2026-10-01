@@ -6,11 +6,7 @@
 //
 // Les requêtes sont servies une à une, dans l'ordre : le client n'en garde
 // qu'une en vol par canal (la scène recoupe les glissés, voir studio-object.ts).
-import {
-  StudioWorkerError,
-  type FromWorker,
-  type ToWorker,
-} from "./protocol";
+import { StudioWorkerError, type FromWorker, type ToWorker } from "./protocol";
 import { ensureGlyphs, runBuild, runExport } from "./geometry-core";
 
 interface WorkerScope {
@@ -43,7 +39,11 @@ scope.onmessage = async (event) => {
         await ensureGlyphs(message.url);
         scope.postMessage({ t: "glyphs", ok: true });
       } catch (error) {
-        scope.postMessage({ t: "glyphs", ok: false, message: messageOf(error) });
+        scope.postMessage({
+          t: "glyphs",
+          ok: false,
+          message: messageOf(error),
+        });
       }
       return;
     }

@@ -111,8 +111,18 @@ export function BandBar({
               style={{
                 backgroundColor: filamentHex(band.filament),
                 ...(vertical
-                  ? { left: 0, right: 0, bottom: `${start}%`, height: `${size}%` }
-                  : { top: 0, bottom: 0, left: `${start}%`, width: `${size}%` }),
+                  ? {
+                      left: 0,
+                      right: 0,
+                      bottom: `${start}%`,
+                      height: `${size}%`,
+                    }
+                  : {
+                      top: 0,
+                      bottom: 0,
+                      left: `${start}%`,
+                      width: `${size}%`,
+                    }),
               }}
             />
           );
@@ -129,7 +139,9 @@ export function BandBar({
             aria-label={labelOf(index + 1)}
             aria-valuetext={valueTextOf(index + 1, band.toMm)}
             aria-orientation={orientation}
-            onChange={(event) => onBoundary(index, Number(event.currentTarget.value))}
+            onChange={(event) =>
+              onBoundary(index, Number(event.currentTarget.value))
+            }
             onPointerUp={onCommit}
             onKeyUp={onCommit}
             onBlur={onCommit}
@@ -225,7 +237,12 @@ export function BandList({
         ))}
       </ul>
       <div>
-        <Button variant="secondary" size="sm" disabled={!canAdd} onClick={onAdd}>
+        <Button
+          variant="secondary"
+          size="sm"
+          disabled={!canAdd}
+          onClick={onAdd}
+        >
           {addLabel}
         </Button>
       </div>
