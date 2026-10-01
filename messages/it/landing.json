@@ -29,6 +29,7 @@
     "coords": "46°25′N 6°16′E · Gland — 46°31′N 6°40′E · Pully",
     "visual": "Vaso «Lavaux» stampato strato dopo strato: la stampa segue la tavolozza e il motivo scelti.",
     "ruler": "Strato stampato",
+    "measures": "Misure del vaso",
     "rulerValue": "Strato {layer} di {total}, {height} stampati"
   },
   "trust": {
@@ -42,7 +43,7 @@
     "intro": "Una stampante FDM non fa che impilare quote. Con 0,2 mm per strato, questo vaso di {height} è un rilievo di {layers} curve di livello, e ogni fascia di colore vi recita la tinta di una carta.",
     "figure": "Lo stesso vaso, esploso: una fascia per colore, dal piatto alla vetta.",
     "bands": "Fasce di colore, dalla vetta al piatto",
-    "purgeNote": "È tutto ciò che costa il colore, e Glielo mostriamo.",
+    "purgeLine": "{purge}: è tutto ciò che costa il colore, e Glielo mostriamo.",
     "cta": "Regola le fasce nello Studio"
   },
   "summit": {

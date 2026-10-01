@@ -29,6 +29,7 @@
     "coords": "46°25′N 6°16′E · Gland — 46°31′N 6°40′E · Pully",
     "visual": "\"Lavaux\" vase printed layer by layer: the print follows the palette and the pattern you pick.",
     "ruler": "Printed layer",
+    "measures": "Vase measurements",
     "rulerValue": "Layer {layer} of {total}, {height} printed"
   },
   "trust": {
@@ -42,7 +43,7 @@
     "intro": "An FDM printer has nothing but altitudes to stack. At 0.2 mm per layer, this {height} vase is a relief of {layers} contour lines, and each color band plays the tint of a map.",
     "figure": "The same vase, exploded: one band per color, from the build plate to the summit.",
     "bands": "Color bands, from the summit to the build plate",
-    "purgeNote": "That is all the color costs, and we show it to you.",
+    "purgeLine": "{purge}: that is all the color costs, and we show it to you.",
     "cta": "Adjust the bands in the Studio"
   },
   "summit": {

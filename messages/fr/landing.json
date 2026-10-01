@@ -29,6 +29,7 @@
     "coords": "46°25′N 6°16′E · Gland — 46°31′N 6°40′E · Pully",
     "visual": "Vase « Lavaux » imprimé couche par couche : l'impression se règle avec la palette et le motif.",
     "ruler": "Couche imprimée",
+    "measures": "Mesures du vase",
     "rulerValue": "Couche {layer} sur {total}, {height} imprimés"
   },
   "trust": {
@@ -42,7 +43,7 @@
     "intro": "Une imprimante FDM n'a que des altitudes à empiler. À 0,2 mm par couche, ce vase de {height} est un relief de {layers} courbes de niveau, et chaque bande de couleur y joue la teinte d'une carte.",
     "figure": "Le même vase, éclaté : une bande par couleur, du plateau au sommet.",
     "bands": "Bandes de couleur, du sommet au plateau",
-    "purgeNote": "C'est tout ce que coûte la couleur, et on vous le montre.",
+    "purgeLine": "{purge} : c'est tout ce que coûte la couleur, et on vous le montre.",
     "cta": "Régler les bandes dans le Studio"
   },
   "summit": {

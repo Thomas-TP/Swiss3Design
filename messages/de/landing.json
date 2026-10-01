@@ -29,6 +29,7 @@
     "coords": "46°25′N 6°16′E · Gland — 46°31′N 6°40′E · Pully",
     "visual": "Vase «Lavaux», Schicht für Schicht gedruckt: Der Druck folgt der gewählten Palette und dem gewählten Muster.",
     "ruler": "Gedruckte Schicht",
+    "measures": "Masse der Vase",
     "rulerValue": "Schicht {layer} von {total}, {height} gedruckt"
   },
   "trust": {
@@ -42,7 +43,7 @@
     "intro": "Ein FDM-Drucker stapelt nichts als Höhen. Bei 0,2 mm pro Schicht ist diese Vase von {height} ein Relief aus {layers} Höhenlinien, und jede Farbzone spielt die Farbe einer Karte.",
     "figure": "Dieselbe Vase, auseinandergezogen: eine Zone pro Farbe, von der Druckplatte bis zum Gipfel.",
     "bands": "Farbzonen, vom Gipfel zur Druckplatte",
-    "purgeNote": "Mehr kostet die Farbe nicht, und wir zeigen es Ihnen.",
+    "purgeLine": "{purge}: Mehr kostet die Farbe nicht, und wir zeigen es Ihnen.",
     "cta": "Farbzonen im Studio einstellen"
   },
   "summit": {
