@@ -44,10 +44,12 @@ const ENGINES: { name: string; signatures: string[] }[] = [
   { name: "lenis", signatures: ["lenis-smooth", "lenis-stopped"] },
 ];
 
-// Pages dont on suit le JS initial : les six routes déplacées dans (site) par
-// WP-00 et, en témoin, deux pages qui restent hors du groupe. Les clés sont
+// Pages dont on suit le JS initial : les routes de (site) (dont le Studio,
+// WP-STUDIO) et, en témoin, les pages qui restent hors du groupe. Les clés sont
 // normalisées (groupes de routes retirés) : le rapport reste comparable avant
-// et après le `git mv` vers `(site)/`.
+// et après le `git mv` vers `(site)/`. Les huit premières sont celles des
+// relevés des vagues 1 et 2a ; une route absente du build est signalée, pas
+// ignorée.
 const ROUTES = [
   "/[locale]",
   "/[locale]/shop",
@@ -57,6 +59,12 @@ const ROUTES = [
   "/[locale]/contact",
   "/[locale]/cart",
   "/[locale]/checkout",
+  "/[locale]/studio",
+  "/[locale]/studio/[objet]",
+  "/[locale]/track",
+  "/[locale]/favorites",
+  "/[locale]/account/login",
+  "/[locale]/legal/terms",
 ];
 
 const kib = (bytes: number) => `${(bytes / 1024).toFixed(1)} KiB`;
