@@ -140,3 +140,56 @@
   outline: 2px solid var(--color-accent-text);
   outline-offset: 2px;
 }
+
+/* ── Réglette Z de la vue « Couches » : curseur vertical (0 en bas), pouce de
+   44 px. `writing-mode` + `direction: rtl` : le minimum est en bas, comme sur
+   le plateau, et les flèches Haut / Droite montent. ─────────────────────── */
+.zRange {
+  -webkit-appearance: none;
+  appearance: none;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  width: 2.75rem;
+  margin: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.zRange:focus {
+  outline: none;
+}
+.zRange::-webkit-slider-runnable-track {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--color-line);
+}
+.zRange::-moz-range-track {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--color-line);
+}
+.zRange::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 22px;
+  height: 22px;
+  margin-left: -9px;
+  border-radius: 999px;
+  border: 2px solid var(--color-paper);
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-ink);
+}
+.zRange::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  border: 2px solid var(--color-paper);
+  background: var(--color-accent);
+  box-shadow: 0 0 0 1px var(--color-ink);
+}
+.zRange:focus-visible::-webkit-slider-thumb {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}
+.zRange:focus-visible::-moz-range-thumb {
+  outline: 2px solid var(--color-ink);
+  outline-offset: 3px;
+}

@@ -27,6 +27,8 @@ export interface StudioHistory {
 export type HistoryAction =
   /** Met à jour l'état (partiellement) ; `commit` termine le geste dans la foulée. */
   | { type: "set"; patch: Partial<StudioDoc>; commit: boolean }
+  /** Frappe dans un champ de texte : fusionne dans les textes présents (jamais dans un état périmé). */
+  | { type: "texts"; patch: StudioTexts }
   /** Termine le geste en cours (relâchement, sortie de champ). */
   | { type: "commit" }
   | { type: "undo" }
@@ -71,6 +73,13 @@ export function historyReducer(
         base: history.base ?? history.present,
       };
       return action.commit ? finish(next) : next;
+    }
+    case "texts": {
+      const present: StudioDoc = {
+        ...history.present,
+        texts: { ...history.present.texts, ...action.patch },
+      };
+      return { ...history, present, base: history.base ?? history.present };
     }
     case "commit":
       return finish(history);
