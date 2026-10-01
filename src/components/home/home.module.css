@@ -1,0 +1,369 @@
+/* Accueil « Strates » : ce que Tailwind ne dit pas simplement. Règles hors
+   @layer : elles l'emportent sur les utilitaires, donc chacune est ciblée sur
+   une classe du module. Jetons du système seulement, aucune couleur en dur. */
+
+/* ── Héros ─────────────────────────────────────────────────────────────── */
+
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Sous l'en-tête collant de 64 px : la section remplit l'écran visible. */
+  min-height: max(640px, calc(100svh - 4rem));
+  padding-block: clamp(1rem, 3.5svh, 3.5rem) clamp(1rem, 3.5svh, 3.5rem);
+}
+
+.heroGrid {
+  flex: 1;
+  align-items: center;
+  row-gap: 2.5rem;
+}
+
+.heroText {
+  position: relative;
+  z-index: 2; /* le titre peut chevaucher l'objet : il reste au-dessus du canvas */
+  min-width: 0;
+}
+
+/* h1 de l'accueil : jeton text-hero, plafonné pour que le héros épinglé tienne
+   dans la fenêtre (titre, chapeau, réglages, CTA). Deux plafonds : la largeur de
+   la colonne (jamais plus de 90 rem de page : « Tout relief » doit tenir sur
+   une ligne, sinon le titre passe à cinq lignes) et la hauteur de l'écran
+   (quatre lignes au plus). Le chapeau, les réglages et les CTA resserrent leur
+   rythme avec la hauteur, pour la même raison. */
+@media (min-width: 64rem) {
+  .title {
+    font-size: min(
+      var(--text-hero),
+      min(7.4vw, 6.6rem),
+      max(2.75rem, calc((100svh - 30rem) / 3.6))
+    );
+  }
+  .lead {
+    margin-top: clamp(0.75rem, 2.2svh, 1.5rem);
+    font-size: clamp(1rem, 2.4svh, 1.375rem);
+  }
+  .ctas {
+    margin-top: clamp(1rem, 3svh, 2rem);
+  }
+}
+
+/* Réglages : deux groupes natifs côte à côte (desktop), en rangées
+   défilantes à l'horizontale (mobile). */
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  min-width: 0;
+  margin: 2rem 0 0;
+  padding: 0;
+  border: 0;
+}
+.group {
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+.chips {
+  display: flex;
+  gap: 0.5rem;
+  overflow-x: auto;
+  padding-block: 0.125rem 0.25rem;
+  margin-inline: calc(var(--spacing-margin) * -1);
+  padding-inline: var(--spacing-margin);
+  scrollbar-width: none;
+}
+.chips::-webkit-scrollbar {
+  display: none;
+}
+.chips > * {
+  flex: none;
+}
+@media (min-width: 40rem) {
+  .controls {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1.25rem 2.5rem;
+  }
+  .chips {
+    flex-wrap: wrap;
+    overflow: visible;
+    margin-inline: 0;
+    padding-inline: 0;
+  }
+}
+
+@media (min-width: 64rem) {
+  .controls {
+    margin-top: clamp(1rem, 3svh, 2rem);
+  }
+}
+
+/* Pastille de palette : les trois bandes, du plateau (bas) au sommet (haut). */
+.bands {
+  display: inline-flex;
+  flex-direction: column-reverse;
+  width: 0.75rem;
+  height: 1rem;
+  overflow: hidden;
+  border: 1px solid var(--color-swatch-ring);
+  border-radius: 2px;
+}
+.band {
+  flex: 1;
+}
+
+/* Boîte visuelle : carrée sur mobile, 4:5 sur desktop (hauteur plafonnée). */
+.visual {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+}
+@media (min-width: 64rem) {
+  .visual {
+    width: auto;
+    aspect-ratio: 4 / 5;
+    height: min(78svh, 820px, calc(100svh - 14rem));
+    margin-inline-start: auto;
+  }
+}
+.visualColumn {
+  min-width: 0;
+}
+
+/* Les deux posters du héros : le dessin (fantômes), puis la matière. Mouvement
+   réduit : la matière seule, tout de suite. Appareil sans WebGL : le dessin
+   devient matière en 240 ms, en 2D. */
+.poster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.ghost,
+.final {
+  position: absolute;
+  inset: 0;
+}
+.final {
+  opacity: 0;
+  transition: opacity 240ms var(--ease-strate);
+}
+.static .final {
+  opacity: 1;
+}
+.static .ghost {
+  opacity: 0;
+  transition: opacity 240ms var(--ease-strate);
+}
+:global(html[data-motion="reduce"]) .ghost {
+  display: none;
+}
+:global(html[data-motion="reduce"]) .final {
+  opacity: 1;
+  transition: none;
+}
+
+.label {
+  position: absolute;
+  inset-inline-start: 0.75rem;
+  bottom: 0.75rem;
+  max-width: calc(100% - 1.5rem);
+  padding: 0.25rem 0.5rem;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--color-paper) 82%, transparent);
+  color: var(--color-soft);
+  pointer-events: none;
+}
+
+/* « Changement de filament → Vert Lavaux · couche 0211 » : 1,6 s. */
+.change {
+  position: absolute;
+  inset-inline: 0.75rem;
+  top: 0.75rem;
+  width: fit-content;
+  padding: 0.25rem 0.5rem;
+  border-radius: 2px;
+  background: var(--color-ink);
+  color: var(--color-paper);
+  opacity: 0;
+  transition: opacity 240ms var(--ease-strate);
+  pointer-events: none;
+}
+.change[data-visible="true"] {
+  opacity: 1;
+}
+
+/* Réglette Z du héros mobile (C1) : sur le bord droit de la boîte visuelle,
+   Z vers le haut, curseur natif. */
+.ruler {
+  position: absolute;
+  inset-block: 1rem;
+  inset-inline-end: 0.25rem;
+  display: none;
+  width: 44px;
+}
+.rulerOn {
+  display: block;
+}
+@media (min-width: 64rem) {
+  .rulerOn {
+    display: none;
+  }
+}
+.rulerInput {
+  position: absolute;
+  inset: 0;
+  width: 44px;
+  height: 100%;
+  margin: 0;
+  background: transparent;
+  writing-mode: vertical-lr;
+  direction: rtl;
+  accent-color: var(--color-accent);
+  cursor: grab;
+}
+
+/* Lecture de couche : une ligne réservée, aucun saut de mise en page. */
+.readout {
+  min-height: 2.6em;
+}
+
+/* ── Chapitre 01 : la carte ────────────────────────────────────────────── */
+
+.mapFigure {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1;
+  max-width: 34rem;
+  margin-inline: auto;
+}
+@media (min-width: 64rem) {
+  .mapFigure {
+    aspect-ratio: 4 / 5;
+    max-width: none;
+    height: min(70svh, 720px);
+    width: auto;
+    margin-inline: auto 0;
+  }
+}
+
+/* Le champ de courbes couvre tout le chapitre, derrière le texte. */
+.fieldView {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.fieldPoster {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.9;
+}
+.lightOnly {
+  display: block;
+}
+.darkOnly {
+  display: none;
+}
+:global(.dark) .lightOnly {
+  display: none;
+}
+:global(.dark) .darkOnly {
+  display: block;
+}
+
+/* Texte posé sur le champ de courbes : un halo de la couleur du fond (pas de
+   fond opaque, le champ doit rester visible) garde les cotes lisibles. */
+.halo {
+  text-shadow:
+    0 0 0.35rem var(--color-paper),
+    0 0 0.9rem var(--color-paper);
+}
+
+.bandItem {
+  border-inline-start: 4px solid var(--band, var(--color-iso));
+}
+
+/* ── Chapitre 02 : votre sommet ────────────────────────────────────────── */
+
+/* Deux moitiés « encre » pleine largeur : le texte à gauche (fond DOM), la
+   vue de l'objet à droite (la vue peint le fond encre elle-même, comme tout
+   chapitre qui porte une vue). Sur mobile elles s'empilent. */
+.summit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+}
+@media (min-width: 64rem) {
+  .summit {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: min(46rem, 100svh);
+  }
+}
+/* Demi-colonne : le titre d'affichage entier n'y tiendrait pas (« Littéralement. »). */
+@media (min-width: 64rem) {
+  .summitTitle {
+    font-size: clamp(2.25rem, 1.1rem + 3.4vw, 4.75rem);
+  }
+}
+.summitText {
+  padding-block: var(--spacing-section);
+  padding-inline: var(--spacing-margin);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+@media (min-width: 64rem) {
+  .summitText {
+    padding-inline-start: max(
+      var(--spacing-margin),
+      calc((100vw - 90rem) / 2 + var(--spacing-margin))
+    );
+    padding-inline-end: clamp(2rem, 4vw, 4rem);
+  }
+}
+.summitStage {
+  position: relative;
+  min-height: 24rem;
+}
+.summitView {
+  position: absolute;
+  inset: 0;
+}
+.summitPoster {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 2.5rem;
+}
+.summitPoster img {
+  width: min(100%, 26rem);
+  height: auto;
+}
+.summitCaption {
+  position: absolute;
+  inset-inline: 1rem;
+  bottom: 1.25rem;
+  text-align: center;
+}
+
+/* ── Chapitre 03 : le Studio ───────────────────────────────────────────── */
+
+.objectPoster {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 5 / 4;
+  padding: 1.25rem;
+  border-bottom: 1px solid var(--color-line);
+  background: var(--color-paper);
+}
+.objectPoster svg,
+.objectPoster img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}

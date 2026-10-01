@@ -1,1 +1,110 @@
-{}
+{
+  "seo": {
+    "title": "Swiss3Design · Stampa 3D multicolore in Svizzera",
+    "description": "Regoli in 3D un vaso, un biglietto o un sottobicchiere, poi l'atelier lo stampa fino a quattro colori, a Gland e Pully. Consegna in tutta la Svizzera.",
+    "imageAlt": "Swiss3Design: un vaso stampato strato dopo strato in tre colori"
+  },
+  "rail": {
+    "label": "Capitoli della home",
+    "hero": "Rilievo",
+    "map": "La carta",
+    "summit": "La Sua vetta",
+    "studio": "Lo Studio",
+    "shop": "Il negozio",
+    "atelier": "L'atelier",
+    "file": "Il Suo file"
+  },
+  "hero": {
+    "kicker": "Stampa 3D multicolore · Gland & Pully (VD)",
+    "title": "Ogni rilievo nasce da uno strato.",
+    "lead": "Oggetti disegnati nel nostro atelier, che Lei regola dal vivo: forma, motivo, fino a quattro colori. Lei regola, noi stampiamo, a Gland e Pully.",
+    "ctaStudio": "Regola un oggetto",
+    "ctaShop": "Negozio",
+    "ctaFile": "Ho un file",
+    "label": "Oggetto Studio · configurazione di esempio · rendering in tempo reale",
+    "skip": "Salta l'animazione",
+    "palette": "Tavolozza",
+    "pattern": "Motivo",
+    "controls": "Regolare il vaso della sezione iniziale",
+    "coords": "46°25′N 6°16′E · Gland — 46°31′N 6°40′E · Pully",
+    "visual": "Vaso «Lavaux» stampato strato dopo strato: la stampa segue la tavolozza e il motivo scelti.",
+    "ruler": "Strato stampato",
+    "measures": "Misure del vaso",
+    "rulerValue": "Strato {layer} di {total}, {height} stampati"
+  },
+  "trust": {
+    "shipping": "Consegna gratuita da {amount}",
+    "made": "Stampato a Gland e Pully",
+    "payment": "TWINT, carte, Google Pay"
+  },
+  "map": {
+    "eyebrow": "La carta",
+    "title": "Un colore per ogni quota.",
+    "intro": "Una stampante FDM non fa che impilare quote. Con 0,2 mm per strato, questo vaso di {height} è un rilievo di {layers} curve di livello, e ogni fascia di colore vi recita la tinta di una carta.",
+    "figure": "Lo stesso vaso, esploso: una fascia per colore, dal piatto alla vetta.",
+    "bands": "Fasce di colore, dalla vetta al piatto",
+    "purgeLine": "{purge}: è tutto ciò che costa il colore, e Glielo mostriamo.",
+    "cta": "Regola le fasce nello Studio"
+  },
+  "summit": {
+    "eyebrow": "La Sua vetta",
+    "title": "Il Suo nome, in rilievo. Letteralmente.",
+    "lead": "Il sottobicchiere «Relief» è un massiccio a strati. Il Suo nome ne corona la vetta, con una quota immaginaria calcolata a partire da esso.",
+    "input": "Dia un nome alla Sua vetta",
+    "note": "Il testo resta nel Suo browser fino all'invio all'atelier.",
+    "label": "Etichetta della vetta",
+    "cta": "Continua nello Studio",
+    "poster": "Sottobicchiere «Relief»: un massiccio a strati, visto dall'alto."
+  },
+  "studio": {
+    "eyebrow": "Lo Studio",
+    "title": "Lei regola. Noi stampiamo.",
+    "intro": "Quattro oggetti originali, che Lei regola in 3D prima di inviarceli. Il prezzo definitivo è confermato su preventivo, entro 48 ore.",
+    "adjust": "Regola",
+    "stepsTitle": "Come funziona",
+    "steps": {
+      "set": {
+        "title": "Regoli",
+        "text": "Forma, motivo, colori, testo: l'oggetto si regola in 3D, e i grammi e la durata seguono ogni gesto."
+      },
+      "send": {
+        "title": "Invii",
+        "text": "Un clic trasmette il pezzo e la sua configurazione all'atelier."
+      },
+      "check": {
+        "title": "L'atelier verifica",
+        "text": "Una persona rilegge ogni testo e controlla il pezzo: un prezzo definitivo Le risponde entro 48 ore."
+      },
+      "print": {
+        "title": "Stampato e consegnato",
+        "text": "Stampato a Gland o a Pully, spedito dalla Posta svizzera, gratis da {amount}."
+      }
+    }
+  },
+  "shop": {
+    "eyebrow": "Il negozio",
+    "title": "Oggetti scelti, stampati su ordinazione.",
+    "intro": "Modelli scelti per il loro disegno, avviati su ordinazione nei nostri atelier.",
+    "all": "Vedi tutto",
+    "empty": "Nessun oggetto in negozio per il momento. Regoli il Suo nello Studio o ci invii un file."
+  },
+  "atelier": {
+    "eyebrow": "L'atelier",
+    "title": "Stampato a Gland e Pully. Consegnato da Ginevra a Romanshorn.",
+    "intro": "Ogni pezzo viene avviato, controllato e imballato in uno dei nostri due atelier vodesi, poi spedito dalla Posta svizzera.",
+    "gland": "Gland",
+    "glandMachine": "Bambu Lab P1S · AMS 2 Pro",
+    "pully": "Pully",
+    "pullyMachine": "Creality K2 · CFS",
+    "glandCoords": "46°25′N 6°16′E",
+    "pullyCoords": "46°31′N 6°40′E",
+    "delivery": "Consegna gratuita da {amount}",
+    "payment": "TWINT, carte, Google Pay",
+    "visit": "Visita l'atelier"
+  },
+  "file": {
+    "title": "Ha già un file?",
+    "text": "STL, 3MF, OBJ o STEP: lo invii, l'atelier Le risponde entro 48 ore con un preventivo.",
+    "cta": "Invia un file"
+  }
+}

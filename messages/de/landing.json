@@ -1,1 +1,110 @@
-{}
+{
+  "seo": {
+    "title": "Swiss3Design · Mehrfarbiger 3D-Druck in der Schweiz",
+    "description": "Stellen Sie Vase, Karte oder Untersetzer in 3D ein, das Atelier druckt sie in bis zu vier Farben, in Gland und Pully. Lieferung in die ganze Schweiz.",
+    "imageAlt": "Swiss3Design: eine Vase, Schicht für Schicht in drei Farben gedruckt"
+  },
+  "rail": {
+    "label": "Kapitel der Startseite",
+    "hero": "Relief",
+    "map": "Die Karte",
+    "summit": "Ihr Gipfel",
+    "studio": "Das Studio",
+    "shop": "Der Shop",
+    "atelier": "Das Atelier",
+    "file": "Ihre Datei"
+  },
+  "hero": {
+    "kicker": "Mehrfarbiger 3D-Druck · Gland & Pully (VD)",
+    "title": "Jedes Relief beginnt mit einer Schicht.",
+    "lead": "Objekte aus unserem Atelier, die Sie live einstellen: Form, Muster, bis zu vier Farben. Sie stellen ein, wir drucken, in Gland und Pully.",
+    "ctaStudio": "Objekt einstellen",
+    "ctaShop": "Shop",
+    "ctaFile": "Ich habe eine Datei",
+    "label": "Studio-Objekt · Beispielkonfiguration · Echtzeit-Rendering",
+    "skip": "Animation überspringen",
+    "palette": "Palette",
+    "pattern": "Muster",
+    "controls": "Die Vase des Hero-Bereichs einstellen",
+    "coords": "46°25′N 6°16′E · Gland — 46°31′N 6°40′E · Pully",
+    "visual": "Vase «Lavaux», Schicht für Schicht gedruckt: Der Druck folgt der gewählten Palette und dem gewählten Muster.",
+    "ruler": "Gedruckte Schicht",
+    "measures": "Masse der Vase",
+    "rulerValue": "Schicht {layer} von {total}, {height} gedruckt"
+  },
+  "trust": {
+    "shipping": "Gratis Lieferung ab {amount}",
+    "made": "Gedruckt in Gland und Pully",
+    "payment": "TWINT, Karten, Google Pay"
+  },
+  "map": {
+    "eyebrow": "Die Karte",
+    "title": "Eine Farbe pro Höhenstufe.",
+    "intro": "Ein FDM-Drucker stapelt nichts als Höhen. Bei 0,2 mm pro Schicht ist diese Vase von {height} ein Relief aus {layers} Höhenlinien, und jede Farbzone spielt die Farbe einer Karte.",
+    "figure": "Dieselbe Vase, auseinandergezogen: eine Zone pro Farbe, von der Druckplatte bis zum Gipfel.",
+    "bands": "Farbzonen, vom Gipfel zur Druckplatte",
+    "purgeLine": "{purge}: Mehr kostet die Farbe nicht, und wir zeigen es Ihnen.",
+    "cta": "Farbzonen im Studio einstellen"
+  },
+  "summit": {
+    "eyebrow": "Ihr Gipfel",
+    "title": "Ihr Name, im Relief. Wörtlich.",
+    "lead": "Der Untersetzer «Relief» ist ein Massiv aus Schichten. Ihr Name krönt den Gipfel, mit einer fiktiven Höhe, die aus ihm berechnet wird.",
+    "input": "Benennen Sie Ihren Gipfel",
+    "note": "Der Text bleibt in Ihrem Browser, bis Sie ihn ans Atelier senden.",
+    "label": "Gipfelbeschriftung",
+    "cta": "Im Studio weitermachen",
+    "poster": "Untersetzer «Relief»: ein Massiv aus Schichten, von oben gesehen."
+  },
+  "studio": {
+    "eyebrow": "Das Studio",
+    "title": "Sie stellen ein. Wir drucken.",
+    "intro": "Vier Originalobjekte, die Sie in 3D einstellen, bevor Sie sie uns senden. Den verbindlichen Preis bestätigen wir auf Offerte, innert 48 Stunden.",
+    "adjust": "Einstellen",
+    "stepsTitle": "So funktioniert es",
+    "steps": {
+      "set": {
+        "title": "Einstellen",
+        "text": "Form, Muster, Farben, Text: Das Objekt wird in 3D eingestellt, und Gramm und Dauer folgen jeder Bewegung."
+      },
+      "send": {
+        "title": "Senden",
+        "text": "Ein Klick übermittelt das Stück und seine Konfiguration ans Atelier."
+      },
+      "check": {
+        "title": "Das Atelier prüft",
+        "text": "Ein Mensch liest jeden Text gegen und prüft das Stück: Sie erhalten innert 48 Stunden einen verbindlichen Preis."
+      },
+      "print": {
+        "title": "Gedruckt und geliefert",
+        "text": "Gedruckt in Gland oder Pully, per Schweizer Post versandt, gratis ab {amount}."
+      }
+    }
+  },
+  "shop": {
+    "eyebrow": "Der Shop",
+    "title": "Ausgewählte Objekte, auf Bestellung gedruckt.",
+    "intro": "Modelle, die wegen ihrer Gestaltung gewählt wurden, auf Bestellung in unseren Ateliers gedruckt.",
+    "all": "Alles ansehen",
+    "empty": "Im Shop ist im Moment kein Objekt verfügbar. Stellen Sie Ihres im Studio ein oder senden Sie uns eine Datei."
+  },
+  "atelier": {
+    "eyebrow": "Das Atelier",
+    "title": "Gedruckt in Gland und Pully. Geliefert von Genf bis Romanshorn.",
+    "intro": "Jedes Stück wird in einem unserer beiden Waadtländer Ateliers gestartet, geprüft und verpackt und dann per Schweizer Post versandt.",
+    "gland": "Gland",
+    "glandMachine": "Bambu Lab P1S · AMS 2 Pro",
+    "pully": "Pully",
+    "pullyMachine": "Creality K2 · CFS",
+    "glandCoords": "46°25′N 6°16′E",
+    "pullyCoords": "46°31′N 6°40′E",
+    "delivery": "Gratis Lieferung ab {amount}",
+    "payment": "TWINT, Karten, Google Pay",
+    "visit": "Das Atelier besuchen"
+  },
+  "file": {
+    "title": "Sie haben schon eine Datei?",
+    "text": "STL, 3MF, OBJ oder STEP: Senden Sie sie, das Atelier antwortet Ihnen innert 48 Stunden mit einer Offerte.",
+    "cta": "Datei senden"
+  }
+}
