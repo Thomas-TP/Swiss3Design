@@ -132,15 +132,21 @@ export function ScenePanel({
     layersView && layerNow < total ? layerTop(layerNow, stats.heightMm) : null;
   const elevationShown = stageOn && effective === "elevation";
 
-  const onStatus = useCallback((next: StudioSceneStatus) => setStatus(next), []);
+  const onStatus = useCallback(
+    (next: StudioSceneStatus) => setStatus(next),
+    [setStatus],
+  );
   const onAnchors = useCallback(
     (next: StudioBandAnchor[]) => setAnchors(next),
-    [],
+    [setAnchors],
   );
-  const onSimulate = useCallback((state: StudioSimulation) => {
-    setLayer(state.done ? null : state.layer);
-    if (state.done) setSimulate(null);
-  }, []);
+  const onSimulate = useCallback(
+    (state: StudioSimulation) => {
+      setLayer(state.done ? null : state.layer);
+      if (state.done) setSimulate(null);
+    },
+    [setLayer, setSimulate],
+  );
 
   const sceneProps = useMemo<StudioSceneProps>(
     () => ({

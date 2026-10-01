@@ -4,14 +4,13 @@ import { useEffect, useId, useMemo, useState } from "react";
 import {
   QuoteRequestForm,
   type QuoteAttachment,
-  type QuotePrefill,
 } from "@/components/quote/quote-request-form";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
 import { Drawer } from "@/components/ui/drawer";
+import { SiteLink } from "@/components/ui/site-link";
 import { Field, fieldClass, fieldIds } from "@/components/ui/field";
 import { useRouter } from "@/i18n/navigation";
-import { motionBridge } from "@/lib/motion-bridge/store";
 import { writeQuoteHandoff } from "@/lib/quote-handoff";
 import {
   formatChfRange,
@@ -130,9 +129,9 @@ function SendBody({
     quantity,
     remark,
   });
-  const prefill: QuotePrefill = {
+  const prefill = {
     description,
-    material: "PLA",
+    material: "PLA" as const,
     colors: quoteColors(input),
     dimensions: quoteDimensions(input),
   };
@@ -268,13 +267,13 @@ function SendBody({
         }}
       />
       <p className="text-sm text-soft">
-        <a
+        <SiteLink
           href="/custom#studio"
           onClick={openFullForm}
           className="text-ink underline decoration-line decoration-1 underline-offset-4 hover:decoration-ink"
         >
           {t("send.fullForm")}
-        </a>
+        </SiteLink>
       </p>
     </div>
   );

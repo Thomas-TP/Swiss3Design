@@ -54,12 +54,11 @@ export function BandBar({
   className?: string;
 }) {
   const vertical = orientation === "vertical";
-  let from = 0;
-  const segments = bands.map((band) => {
-    const segment = { from, to: band.toMm, band };
-    from = band.toMm;
-    return segment;
-  });
+  const segments = bands.map((band, index) => ({
+    from: index === 0 ? 0 : bands[index - 1].toMm,
+    to: band.toMm,
+    band,
+  }));
 
   function onKeyDown(index: number, event: KeyboardEvent<HTMLInputElement>) {
     const direction =
