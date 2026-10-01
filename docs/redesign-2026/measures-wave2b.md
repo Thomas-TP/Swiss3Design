@@ -161,16 +161,16 @@ et `bun.lock` que la vague 2a, sources recopiées par `robocopy` depuis `git arc
 | `6ceaf0c` après WP-02 (relevé de la vague 2a)    | 16 170,02 KiB                         | **3 145,30 KiB** | —             | —               |
 | `f2dd5b5` + **WP-HOME**                          | 16 310,31 KiB                         | **3 163,14 KiB** | **+17,84**    | +10             |
 | `cdefa67` + **WP-STUDIO** (avant mes correctifs) | 16 974,36 KiB                         | **3 324,75 KiB** | **+161,61**   | +10             |
-| `7bd21df`… HEAD de ce passage (+ A1 à A3, zod)   | 16 975,44 KiB (sans le correctif zod) | **3 324,97 KiB** | +0,22 (bruit) | —               |
-| même HEAD, build dans le worktree (77 car.)      | 17 252,94 KiB                         | 3 323,61 KiB     | (chemin long) | —               |
+| HEAD de ce passage, sans le correctif zod        | 16 975,44 KiB                         | 3 324,97 KiB     | +0,22 (bruit) | —               |
+| **HEAD final** (A1 à A5, zod en jitless)       | 16 979,06 KiB                         | **3 326,10 KiB** | +1,35 (bruit) | —               |
+| même HEAD, build dans le worktree (77 car.)      | 17 256,25 KiB                         | 3 323,83 KiB     | (chemin long) | —               |
 
-**Total : 3 324,97 KiB, soit +179,7 KiB depuis la vague 2a et 140 KiB AU-DESSUS du plafond de
+**Total : 3 326,10 KiB, soit +180,8 KiB depuis la vague 2a et 141 KiB AU-DESSUS du plafond de
 3 185 KiB** (décision du propriétaire du 30.09, brief §4.11). **C'est le seul critère chiffré en
 échec de ce passage** ; il n'y a aucune urgence technique (le plafond de Cloudflare Workers Paid
 est de 10 MiB gzip, nous sommes à 3,2 MiB), mais le budget voté est dépassé et il reste WP-99.
-Le build du `HEAD` a été fait avant le correctif zod (A5) : le correctif ne change pas le Worker
-de façon mesurable (une ligne), le chiffre sera redonné en fin de passage si un nouveau build est
-fait.
+Mes cinq correctifs (A1 à A5) pèsent ensemble +1,35 KiB (dans le bruit de ±6 d'un build à
+l'autre) : le correctif zod (A5) tient en une ligne et ne change pas le Worker de façon mesurable.
 
 **Croissance par paquet** (gzip du dry-run, 41 caractères) :
 
@@ -220,14 +220,14 @@ ici, un seul levier tient dans le périmètre d'un correctif) :
 ### 5.2 `check-worker-bundle`
 
 **0 signature** (WebGLRenderer, NeutralToneMapping, GreenSock, ScrollTrigger, lenis-smooth) sur
-1 582 fichiers (HEAD, 41 caractères : 40 677,0 KiB bruts, 10 565,4 KiB gzip fichier par
-fichier). Mêmes 0 sur les builds `f2dd5b5` et `cdefa67`. `node_modules/` 5 011,8 KiB gzip
-(inchangé), middleware 102,0 KiB.
+le Worker du `HEAD` final (41 caractères : 40 679,7 KiB bruts, 10 567,4 KiB gzip fichier par
+fichier ; `handler.mjs` 2 833,7 KiB gzip). Mêmes 0 sur les builds `f2dd5b5` et `cdefa67` et sur
+le build du worktree. `node_modules/` 5 011,8 KiB gzip (inchangé), middleware 102,0 KiB.
 
 ### 5.3 Chunks client (`bun scripts/chunk-report.ts`, build du worktree)
 
-208 chunks, **1 219,4 KiB gzip** (3 671,3 KiB bruts) contre 189 chunks et 1 071,5 KiB en vague
-2a (+147,9 KiB : le Studio et l'accueil, tous derrière un gate). 6 chunks portent un moteur
+208 chunks, **1 219,9 KiB gzip** (3 672,9 KiB bruts) contre 189 chunks et 1 071,5 KiB en vague
+2a (+148,4 KiB : le Studio et l'accueil, tous derrière un gate). 6 chunks portent un moteur
 (three ×3, gsap ×2, lenis ×1), tous derrière un gate. `scripts/chunk-report.ts` suit désormais
 aussi les routes du Studio, `/track`, `/favorites`, `/account/login` et `/legal/terms`
 (14 routes au lieu de 8 ; plus besoin de la copie jetable de la vague 2a).
@@ -236,7 +236,7 @@ aussi les routes du Studio, `/track`, `/favorites`, `/account/login` et `/legal/
 | ------------------------------------ | ------------- | --------- | ------ | -------- |
 | `/[locale]` (accueil)                | **194,2 KiB** | 612,1 KiB | 17     | 231,4    |
 | `/[locale]/studio`                   | **188,8 KiB** | 594,7 KiB | 18     | —        |
-| `/[locale]/studio/[objet]`           | **302,1 KiB** | 924,4 KiB | 28     | —        |
+| `/[locale]/studio/[objet]`           | **302,7 KiB** | 926,0 KiB | 28     | —        |
 | `/[locale]/shop`                     | 187,1 KiB     | 590,9 KiB | 18     | 230,4    |
 | `/[locale]/products/[slug]`          | 187,7 KiB     | 594,6 KiB | 17     | 234,8    |
 | `/[locale]/custom`                   | 217,2 KiB     | 675,8 KiB | 21     | 259,7    |
