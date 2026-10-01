@@ -1,9 +1,9 @@
 // Calculs purs de la scène `studio-object` (brief « Strates », §6.7), sans three
 // ni DOM : testés sous Node (scene-math.test.ts). La scène ne fait que les appeler.
+import { LAYER_MM, layerAt, layerTop } from "@/components/studio/layers";
 import { simulatedSeconds } from "@/lib/studio/format";
 
-/** Hauteur de couche des objets du Studio (mm). */
-export const LAYER_MM = 0.2;
+export { LAYER_MM, layerAt, layerTop };
 
 export const rad = (deg: number) => (deg * Math.PI) / 180;
 
@@ -81,16 +81,6 @@ export function explodedHeight(
 
 /** Décalage vertical (mm) de la coque `index` dans l'éclaté. */
 export const explodeOffset = (index: number, gap: number) => index * gap;
-
-/** Numéro de couche (depuis 1) atteint à la hauteur `z` ; 0 avant la première. */
-export function layerAt(z: number): number {
-  return z <= 1e-9 ? 0 : Math.ceil(z / LAYER_MM - 1e-6);
-}
-
-/** Hauteur (mm) du haut de la couche `layer` (numérotée depuis 1), bornée à la pièce. */
-export function layerTop(layer: number, heightMm: number): number {
-  return Math.min(heightMm, Math.max(0, layer) * LAYER_MM);
-}
 
 export interface SimulationState {
   /** Hauteur imprimée (mm), quantifiée à la couche. */

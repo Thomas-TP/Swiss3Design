@@ -5,9 +5,11 @@ import { Button } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
 import { Field, fieldClass, fieldIds } from "@/components/ui/field";
 import { SpecTable } from "@/components/ui/spec-table";
+import { canonicalJson } from "@/lib/studio/kernel/hash";
 import {
   HERO_PALETTE_KEYS,
   HERO_PALETTES,
+  PRESETS,
   bandsForPalette,
   type HeroPaletteKey,
 } from "@/lib/studio/presets";
@@ -84,7 +86,10 @@ import { mm, num, type Translate } from "./summary";
 export interface Ctl {
   object: StudioObjectId;
   config: StudioConfig;
+  /** Textes SAISIS par le visiteur (vides tant qu'il n'a rien écrit). */
   texts: StudioTexts;
+  /** Textes d'exemple de la langue : placeholders des champs, et aperçu tant que rien n'est saisi. */
+  examples: StudioTexts;
   stats: StudioStats;
   bands: BandSummary;
   locale: string;
@@ -938,7 +943,7 @@ export function TextSection({
   fields: readonly TextField[];
   issueText: (issue: Issue) => string;
 }) {
-  const { t, uid, texts, stats, commit, setText } = ctl;
+  const { t, uid, texts, examples, stats, commit, setText } = ctl;
   const issues = stats.printable.status === "ok" ? [] : stats.printable.issues;
   const relief = config.object === "relief" ? config : null;
   return (
@@ -983,6 +988,7 @@ export function TextSection({
               type="text"
               form="studio-local"
               value={value}
+              placeholder={examples[field]}
               maxLength={limit * 2}
               autoComplete="off"
               autoCorrect="off"
@@ -1069,6 +1075,53 @@ export function SheetSection({
         <p className="text-sm text-soft">{t("sheet.indicative")}</p>
       ) : null}
       {actions}
+    </div>
+  );
+}
+
+// ── Préréglages ─────────────────────────────────────────────────────────────
+
+/**
+ * Préréglages de l'objet (presets.ts), en boutons à bascule : celui dont la
+ * configuration est exactement la courante est « enfoncé ». Un clic remplace la
+ * configuration (les textes saisis ne bougent pas) et rejoue la réimpression.
+ */
+export function PresetsRow({
+  ctl,
+  config,
+}: {
+  ctl: Ctl;
+  config: StudioConfig;
+}) {
+  const presets = PRESETS[ctl.object] as readonly {
+    id: string;
+    config: StudioConfig;
+  }[];
+  const current = canonicalJson(config);
+  return (
+    <div className="flex flex-col gap-2">
+      <p className="s3d-label text-soft">{ctl.t("ctl.presets")}</p>
+      <div className="flex flex-wrap gap-2">
+        {presets.map((preset) => (
+          <Button
+            key={preset.id}
+            variant={
+              canonicalJson(preset.config) === current ? "ink" : "secondary"
+            }
+            size="sm"
+            className="rounded-full"
+            aria-pressed={canonicalJson(preset.config) === current}
+            onClick={() =>
+              ctl.change(structuredClone(preset.config), "preset", {
+                commit: true,
+                reprint: true,
+              })
+            }
+          >
+            {ctl.core(`presets.${preset.id}`)}
+          </Button>
+        ))}
+      </div>
     </div>
   );
 }

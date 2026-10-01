@@ -19,6 +19,7 @@ export function ViewSwitch({
   exploded,
   onExplode,
   explodeLabel,
+  showExplode = true,
   className,
 }: {
   legend: string;
@@ -29,37 +30,43 @@ export function ViewSwitch({
   exploded: boolean;
   onExplode: () => void;
   explodeLabel: string;
+  /** L'éclaté n'existe qu'en 3D : masqué sans WebGL et sous la vue Élévation. */
+  showExplode?: boolean;
   className?: string;
 }) {
   return (
     <div className={cx("flex flex-wrap items-center gap-2", className)}>
-      <fieldset className="m-0 min-w-0 border-0 p-0">
-        <legend className="sr-only">{legend}</legend>
-        <div className="flex flex-wrap gap-1.5">
-          {views.map((view) => (
-            <ChipRadio
-              key={view}
-              name="view"
-              form="studio-local"
-              value={view}
-              checked={view === value}
-              onChange={() => onChange(view)}
-              className="bg-paper/85"
-            >
-              {labelOf(view)}
-            </ChipRadio>
-          ))}
-        </div>
-      </fieldset>
-      <Button
-        variant={exploded ? "ink" : "secondary"}
-        size="sm"
-        aria-pressed={exploded}
-        onClick={onExplode}
-        className="rounded-full bg-paper/85"
-      >
-        {explodeLabel}
-      </Button>
+      {views.length > 1 ? (
+        <fieldset className="m-0 min-w-0 border-0 p-0">
+          <legend className="sr-only">{legend}</legend>
+          <div className="flex flex-wrap gap-1.5">
+            {views.map((view) => (
+              <ChipRadio
+                key={view}
+                name="view"
+                form="studio-local"
+                value={view}
+                checked={view === value}
+                onChange={() => onChange(view)}
+                className="bg-paper/85"
+              >
+                {labelOf(view)}
+              </ChipRadio>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
+      {showExplode ? (
+        <Button
+          variant={exploded ? "ink" : "secondary"}
+          size="sm"
+          aria-pressed={exploded}
+          onClick={onExplode}
+          className="rounded-full bg-paper/85"
+        >
+          {explodeLabel}
+        </Button>
+      ) : null}
     </div>
   );
 }
