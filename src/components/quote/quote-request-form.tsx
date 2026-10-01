@@ -27,6 +27,7 @@ import type { StudioObjectId } from "@/lib/studio/types";
 import {
   QUOTE_CONTACT_EMAIL,
   QUOTE_LIMITS,
+  attemptSubmit,
   formatBytes,
   formatCount,
   formatPercent,
@@ -69,11 +70,19 @@ import { StudioAttachmentCard } from "./studio-attachment-card";
 //  • `onSuccess` : appelé une fois, au passage en succès.
 //
 // L'envoi est piloté ici : avec JavaScript, onSubmit prépare le fichier,
-// fabrique le FormData et appelle formAction dans une transition. Un champ
-// n'est ainsi jamais effacé par React (le formulaire d'une <form action> se
-// remet à zéro après l'action, même en cas d'erreur : le visiteur perdrait sa
+// fabrique le FormData et appelle la Server Action dans une transition. Un
+// champ n'est ainsi jamais effacé par React (le formulaire d'une <form action>
+// se remet à zéro après l'action, même en cas d'erreur : le visiteur perdrait sa
 // demande). Sans JavaScript, le <form action={formAction}> reste un
 // formulaire natif que le serveur traite (amélioration progressive).
+//
+// L'action est appelée directement et non par `formAction` : une Server Action
+// qui échoue au niveau réseau (connexion coupée, 5xx) LÈVE dans le rendu de
+// `useActionState`, et l'exception remonterait jusqu'à error.tsx en emportant
+// la page entière (/custom comprise) avec la saisie du visiteur. Ici l'échec
+// est attrapé (attemptSubmit), le formulaire reste monté avec sa saisie et son
+// fichier déjà envoyé, et affiche « L'envoi a échoué… » avec « Réessayer » :
+// le second envoi ne repasse ni par l'export ni par le téléversement.
 
 export interface QuotePrefill {
   description?: string;
@@ -144,10 +153,16 @@ export function QuoteRequestForm({
   const locale = useLocale();
   const uid = useId().replace(/:/g, "");
   const { data: authSession } = useSession();
-  const [state, formAction, pending] = useActionState<QuoteFormState, FormData>(
-    submitQuoteRequest,
-    INITIAL_STATE,
-  );
+  // `formAction` ne sert qu'au formulaire natif (sans JavaScript, voir l'en-tête).
+  const [nativeState, formAction, pending] = useActionState<
+    QuoteFormState,
+    FormData
+  >(submitQuoteRequest, INITIAL_STATE);
+  // Réponse de l'action pour un envoi piloté ici (JavaScript actif) : appelée
+  // directement et non par `formAction`, pour qu'un échec réseau soit une valeur
+  // et non une exception du rendu (voir attemptSubmit).
+  const [sentState, setSentState] = useState<QuoteFormState | null>(null);
+  const state = sentState ?? nativeState;
   const file = useQuoteFile();
 
   // E-mail : `null` tant que le visiteur n'a rien saisi. Le champ montre alors
@@ -244,7 +259,21 @@ export function QuoteRequestForm({
         hasFile: Boolean(key),
       };
       setActivity({ since, progress: { phase: "submit" } });
-      startTransition(() => formAction(data));
+      startTransition(async () => {
+        const outcome = await attemptSubmit(() =>
+          submitQuoteRequest(since, data),
+        );
+        if (outcome.ok) {
+          startTransition(() => setSentState(outcome.state));
+          return;
+        }
+        // Connexion coupée ou réponse inattendue : le formulaire reste monté
+        // (saisie et fichier déjà envoyé gardés), le visiteur peut réessayer.
+        // Ni texte saisi ni adresse dans le journal : l'erreur du réseau seule.
+        console.error("[quote] envoi interrompu", outcome.error);
+        setActivity(null);
+        setSubmitError(t("errors.network"));
+      });
     } catch (error) {
       setActivity(null);
       setSubmitError(
@@ -365,21 +394,35 @@ export function QuoteRequestForm({
 
       {locked ? (
         <>
+          {/* ph-no-capture : la description complète (avec les textes à
+              imprimer d'un passage Studio) n'est affichée nulle part, mais
+              l'attribut `value` d'un champ caché entre dans les enregistrements
+              de visite : `maskAllInputs` ne couvre pas le type `hidden`, et
+              `ph-mask` ne masque que les textes. Le bloc est retiré de
+              l'enregistrement, quel que soit l'hôte du formulaire. */}
           <input
             type="hidden"
             name="description"
             value={prefill?.description}
+            className="ph-no-capture"
           />
           <input
             type="hidden"
             name="material"
             value={prefill?.material ?? ""}
+            className="ph-no-capture"
           />
-          <input type="hidden" name="colors" value={prefill?.colors ?? ""} />
+          <input
+            type="hidden"
+            name="colors"
+            value={prefill?.colors ?? ""}
+            className="ph-no-capture"
+          />
           <input
             type="hidden"
             name="dimensions"
             value={prefill?.dimensions ?? ""}
+            className="ph-no-capture"
           />
         </>
       ) : (
