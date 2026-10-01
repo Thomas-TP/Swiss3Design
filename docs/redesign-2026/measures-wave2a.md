@@ -10,6 +10,24 @@ vérification `claude/redesign-2026--verify-w2a` n'ajoute que de la documentatio
 Ce document s'écrit au fil des étapes : chaque section est commitée dès que sa mesure est
 faite (le passage précédent avait été coupé par la limite d'usage avant de rien consigner).
 
+## Résumé
+
+| Critère                                                                 | Résultat                                                                                                         |
+| ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Lint, typecheck, tests, format                                          | **verts** (709 tests)                                                                                            |
+| Worker gzip ≤ 3 185 KiB                                                 | **3 145,30 KiB** à chemin égal (vague 1 : 3 110,61 au même endroit), marge ≈ 40 KiB ; +35 KiB dus à `fix-w1`     |
+| 0 signature three / gsap / lenis dans le Worker                         | **0**                                                                                                            |
+| JS initial de l'accueil ≤ 233,7 KiB                                     | **231,4 KiB** (marge 2,3 KiB, étroite pour WP-HOME)                                                              |
+| 0 CSP, 0 hydratation, 0 MISSING_MESSAGE, 0 4xx inattendu (15 URL)       | **0 / 0 / 0 / 0** ; nonce sur chaque script, anti-flash du layout racine compris                                 |
+| 404 d'une URL inconnue : header, `<main>`, h1, footer dans le HTML brut | **oui**, 404 + `noindex`                                                                                         |
+| 404 d'une fiche supprimée : corps vide (limite Next 16.3.6, §7.18)      | **confirmée** : 404 + `noindex`, 0 caractère visible avant hydratation                                           |
+| HTML gzip de `/fr/contact` (30,3 KiB en vague 1)                        | **16,1 KiB** ; `/fr` 19,6 ; `/fr/shop` 20,5 ; fiche produit 21,0                                                 |
+| CLS de laboratoire ≤ 0,05 (`/a-propos`, `/favorites`, `/legal/terms`)   | **≤ 0,0115** (max du relevé 0,0318 sur `/en/a-propos`)                                                           |
+| « Ajouter aux favoris » jamais sous le rail (1280 à 1920)               | **oui**, 4 largeurs                                                                                              |
+| Mouvement réduit (footer et OS), 375 × 812, `html.lenis` hors `(site)`  | **conformes**, 0 débordement, `lenis` absent hors `(site)` et partout en mouvement réduit                        |
+| Paiement Stripe de test jusqu'à `/checkout/success`                     | **réussi** (38,80 CHF, commande `paid`), « Order Completed » une fois, suivi OK, Payment Element clair et sombre |
+| Reprise documentaire de WP-02                                           | **faite** (`4ab94a2`) et vérifiée                                                                                |
+
 ## Environnement
 
 |            |                                                                                                                                                                                           |
