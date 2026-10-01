@@ -504,7 +504,7 @@ export function StudioApp({
               reprint={reprint}
               t={t}
               core={core}
-              className="h-[min(46svh,24rem)] min-h-56 w-full lg:aspect-square lg:h-auto lg:max-h-[calc(100svh-12.5rem)]"
+              className="h-[min(46svh,24rem)] min-h-56 w-full lg:aspect-square lg:h-auto lg:max-h-[calc(100svh-14rem)]"
               bandBar={
                 config.object === "lavaux" || config.object === "relief" ? (
                   <AltimetricBar
