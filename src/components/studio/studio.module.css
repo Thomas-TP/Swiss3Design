@@ -193,3 +193,18 @@
   outline: 2px solid var(--color-ink);
   outline-offset: 3px;
 }
+
+/* ── Vues et « Éclater » en surimpression : sur mobile, des puces compactes pour
+   tenir sur une seule ligne (344 px) sans masquer l'objet. ───────────────── */
+@media (max-width: 1023px) {
+  .viewChips label > span {
+    min-height: 2rem;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+  }
+  .viewChips button {
+    height: 2rem;
+    padding: 0 0.625rem;
+    font-size: 0.75rem;
+  }
+}

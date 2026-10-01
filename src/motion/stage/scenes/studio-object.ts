@@ -604,8 +604,17 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
     }
   }
 
+  // Pincer à deux doigts : zoom (§3.5, tactile) ; un doigt : orbite.
+  const pointers = new Map<number, { x: number; y: number }>();
+  let pinchStart = 0;
+  let pinchZoom = 1;
+  const pinchDistance = () => {
+    const [a, b] = [...pointers.values()];
+    return Math.hypot(a.x - b.x, a.y - b.y);
+  };
+
   function onPointerDown(event: PointerEvent) {
-    if (!display || planMode) return;
+    if (!display) return;
     if (event.pointerType === "mouse" && event.button !== 0) return;
     const hit = event.target;
     if (
@@ -613,19 +622,37 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
       hit.closest("[data-no-orbit], button, a, input, select, textarea, label")
     )
       return;
-    dragging = true;
-    lastX = event.clientX;
-    lastY = event.clientY;
-    markInteraction();
+    pointers.set(event.pointerId, { x: event.clientX, y: event.clientY });
     try {
       view?.element.setPointerCapture(event.pointerId);
     } catch {
-      // Pointeur déjà libéré : le glissé se terminera à pointerup.
+      // Pointeur déjà libéré : le geste se terminera à pointerup.
+    }
+    markInteraction();
+    if (pointers.size === 2) {
+      dragging = false;
+      pinchStart = Math.max(1, pinchDistance());
+      pinchZoom = zoomTarget;
+    } else if (pointers.size === 1 && !planMode) {
+      dragging = true;
+      lastX = event.clientX;
+      lastY = event.clientY;
     }
     ctx.invalidate();
   }
 
   function onPointerMove(event: PointerEvent) {
+    const known = pointers.get(event.pointerId);
+    if (!known) return;
+    known.x = event.clientX;
+    known.y = event.clientY;
+    if (pointers.size === 2) {
+      zoomTarget = clampZoom(pinchZoom * (pinchDistance() / pinchStart));
+      zoom = zoomTarget;
+      markInteraction();
+      ctx.invalidate();
+      return;
+    }
     if (!dragging) return;
     const dx = event.clientX - lastX;
     const dy = event.clientY - lastY;
@@ -639,7 +666,8 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
   }
 
   function onPointerUp(event: PointerEvent) {
-    if (!dragging) return;
+    if (!pointers.delete(event.pointerId)) return;
+    // Après un pincement, le doigt qui reste ne fait pas tourner l'objet d'un coup.
     dragging = false;
     try {
       view?.element.releasePointerCapture(event.pointerId);

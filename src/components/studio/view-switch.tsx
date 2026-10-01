@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { ChipRadio } from "@/components/ui/chip";
 import { cx } from "@/components/ui/cx";
+import styles from "./studio.module.css";
 import type { StudioViewMode } from "./objects";
 
 // Sélecteur de vue (brief « Strates », §6.7) : 3/4 · Plan · Élévation · Couches,
@@ -35,7 +36,13 @@ export function ViewSwitch({
   className?: string;
 }) {
   return (
-    <div className={cx("flex flex-wrap items-center gap-2", className)}>
+    <div
+      className={cx(
+        "flex flex-wrap items-center gap-1.5 sm:gap-2",
+        styles.viewChips,
+        className,
+      )}
+    >
       {views.length > 1 ? (
         <fieldset className="m-0 min-w-0 border-0 p-0">
           <legend className="sr-only">{legend}</legend>

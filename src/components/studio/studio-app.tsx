@@ -507,7 +507,7 @@ export function StudioApp({
 
         <div
           data-lenis-prevent=""
-          className="max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:overscroll-contain max-lg:pb-6 max-lg:pt-4 lg:col-span-5"
+          className="max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:pb-6 max-lg:pt-4 lg:col-span-5"
         >
           <div className="flex flex-col gap-8">
             {intro}
