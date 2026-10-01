@@ -1,1 +1,334 @@
-{}
+{
+  "breadcrumb": {
+    "label": "Fil d'Ariane",
+    "home": "Accueil",
+    "studio": "Studio"
+  },
+  "seo": {
+    "index": {
+      "title": "Le Studio : réglez votre objet 3D",
+      "description": "Quatre objets à régler en 3D : vase, carte de visite, sous-verre, porte-nom. Jusqu'à quatre couleurs, imprimés en Suisse, prix ferme sous 48 h."
+    },
+    "objects": {
+      "lavaux": {
+        "title": "Vase Lavaux sur mesure, en 3D",
+        "description": "Réglez le profil, le motif et jusqu'à quatre couleurs de votre vase Lavaux, vérifiez-le en 3D puis envoyez-le : impression en Suisse, prix ferme sous 48 h."
+      },
+      "cartouche": {
+        "title": "Carte de visite 3D Cartouche",
+        "description": "Votre carte de visite de 85 × 55 mm en relief ou gravée, deux couleurs, texte à vous : réglez-la en 3D, l'atelier l'imprime en Suisse, prix ferme sous 48 h."
+      },
+      "relief": {
+        "title": "Sous-verre Relief, massif sur mesure",
+        "description": "Un sous-verre de 100 mm en strates : choisissez le massif, le lac, les teintes par altitude et le nom au sommet. Imprimé en Suisse, prix ferme sous 48 h."
+      },
+      "borne": {
+        "title": "Porte-nom Borne en deux couleurs",
+        "description": "Un porte-nom imprimé en deux couleurs avec votre texte, en relief ou gravé, anneau à gauche ou à droite. Réglé en 3D, imprimé en Suisse, prix ferme sous 48 h."
+      }
+    }
+  },
+  "index": {
+    "eyebrow": "Configurateur 3D",
+    "title": "Le Studio",
+    "intro": "Réglez-le. On l'imprime.",
+    "lead": "Quatre objets conçus par l'atelier, bornés pour s'imprimer sur nos machines. Réglez la forme, les couleurs et le texte, vérifiez les chiffres, puis envoyez-le : l'atelier relit chaque demande et répond sous 48 h avec un prix ferme.",
+    "adjust": "Régler"
+  },
+  "how": {
+    "title": "Comment ça marche",
+    "steps": {
+      "adjust": {
+        "title": "Réglez",
+        "text": "Forme, motif, jusqu'à quatre couleurs, votre texte : la 3D suit chaque geste."
+      },
+      "check": {
+        "title": "Vérifiez",
+        "text": "Dimensions, grammes, durée et imprimabilité sont calculés pour de vrai, pas estimés au hasard."
+      },
+      "send": {
+        "title": "Envoyez",
+        "text": "Votre réglage part à l'atelier avec son fichier d'impression. Rien n'est payé à ce stade."
+      },
+      "receive": {
+        "title": "Recevez",
+        "text": "L'atelier relit votre pièce et vous répond sous 48 h avec un prix ferme, à payer en ligne."
+      }
+    }
+  },
+  "faq": {
+    "title": "Questions fréquentes",
+    "items": {
+      "printable": {
+        "q": "Ce que je règle est-il vraiment imprimable ?",
+        "a": "Chaque objet est borné pour s'imprimer sur les machines de l'atelier (256 mm de plateau, PLA, buse de 0,4 mm). Un badge dit « Imprimable », « À vérifier » ou « Non imprimable », avec la première anomalie en clair et un bouton « Corriger » quand une correction existe."
+      },
+      "price": {
+        "q": "Combien ça coûte ?",
+        "a": "Le prix ferme est confirmé par l'atelier sous 48 h, après relecture de votre pièce. Il dépend de la matière, de la durée d'impression et du nombre de changements de couleur. Aucun paiement n'est demandé avant cette confirmation."
+      },
+      "text": {
+        "q": "Mon texte est-il relu ?",
+        "a": "Oui. Un humain de l'atelier relit chaque texte avant l'impression. Nous refusons les marques de tiers, les injures et les contenus illicites. Votre texte n'apparaît jamais dans l'adresse de la page, ni dans les liens que vous copiez."
+      },
+      "colors": {
+        "q": "Comment les couleurs sont-elles imprimées ?",
+        "a": "Par des changements de filament à des hauteurs données, jusqu'à quatre filaments : c'est ce que l'atelier règle dans son logiciel de tranchage. Les teintes affichées sont indicatives, la couleur finale dépend de la bobine en stock."
+      },
+      "after": {
+        "q": "Que se passe-t-il après l'envoi ?",
+        "a": "L'atelier vérifie votre fichier et vous répond par e-mail sous 48 h avec un prix ferme. Vous suivez la demande dans votre compte, puis vous payez en ligne ; la pièce est imprimée et expédiée en Suisse."
+      }
+    }
+  },
+  "custom": {
+    "title": "Un fichier, une idée précise ?",
+    "text": "Pour une pièce qui n'est pas dans le Studio, envoyez votre fichier 3D ou décrivez votre projet : devis personnalisé sous 48 h.",
+    "cta": "Demander un devis sur mesure"
+  },
+  "objects": {
+    "lavaux": {
+      "lead": "Cinq profils, cinq motifs, jusqu'à quatre couleurs par changements de filament. Imprimé en mode standard, jamais en spirale."
+    },
+    "cartouche": {
+      "lead": "85 × 55 mm, le format suisse. Quatre mises en page, texte en relief ou gravé, deux couleurs."
+    },
+    "relief": {
+      "lead": "Un massif en strates sur 100 mm, du lac aux neiges. Votre nom au sommet, à une altitude fictive."
+    },
+    "borne": {
+      "lead": "Un texte de 1 à 14 caractères, quatre formes, un anneau si vous voulez le suspendre."
+    }
+  },
+  "sections": {
+    "legend": "Sections de réglage",
+    "shape": "Forme",
+    "pattern": "Motif",
+    "colors": "Couleurs",
+    "text": "Texte",
+    "sheet": "Fiche"
+  },
+  "apply": "Appliquer les réglages",
+  "tools": {
+    "group": "Outils du Studio",
+    "undo": "Annuler",
+    "redo": "Rétablir",
+    "surprise": "Surprenez-moi",
+    "copy": "Copier le lien",
+    "keep": "Garder"
+  },
+  "toast": {
+    "linkCopied": "Lien copié : le texte n'est pas inclus.",
+    "kept": "Création gardée : retrouvez-la dans Favoris.",
+    "keepFailed": "Impossible de garder cette création : le stockage du navigateur est indisponible.",
+    "invalidLink": "Ce lien n'est pas lisible : réglages par défaut."
+  },
+  "scene": {
+    "viewsLegend": "Vue de l'objet",
+    "view": {
+      "orbit": "3/4",
+      "plan": "Plan",
+      "elevation": "Élévation",
+      "layers": "Couches"
+    },
+    "explode": "Éclater",
+    "preparing": "Préparation du Studio…",
+    "error": "La vue 3D n'a pas pu être calculée.",
+    "retry": "Réessayer"
+  },
+  "layers": {
+    "slider": "Couche affichée",
+    "simulate": "Simuler",
+    "stop": "Arrêter",
+    "speed": "×{speed}"
+  },
+  "measure": {
+    "label": "Mesures de l'objet",
+    "purge": "purge"
+  },
+  "value": {
+    "mm": "{value} millimètres",
+    "height": "{mm} millimètres, {layers, plural, one {# couche} other {# couches}}",
+    "layersTotal": "Hauteur totale : {layers}.",
+    "count": "{count}",
+    "degrees": "{value} degrés",
+    "percent": "{value} pour cent",
+    "seed": "graine {value}"
+  },
+  "ctl": {
+    "presets": "Préréglages",
+    "surprise": "Surprenez-moi",
+    "yes": "Oui",
+    "no": "Non",
+    "lavaux": {
+      "h": "Hauteur",
+      "d": "Diamètre (enveloppe)",
+      "profile": "Profil",
+      "belly": "Galbe",
+      "neck": "Col",
+      "neckHint": "Rayon du haut, rapporté au rayon maximal : 0,5 pour un col étroit, 1 pour un vase droit.",
+      "lip": "Lèvre",
+      "wall": "Paroi",
+      "pattern": "Motif"
+    },
+    "gradins": {
+      "step": "Gradins : pas",
+      "depth": "Gradins : profondeur",
+      "hint": "La profondeur reste sous la moitié du pas et sous l'épaisseur de la paroi."
+    },
+    "vagues": {
+      "wavelength": "Vagues : longueur d'onde",
+      "hint": "Au moins quatre fois l'amplitude.",
+      "amplitude": "Vagues : amplitude",
+      "lobes": "Vagues : lobes"
+    },
+    "voronoi": {
+      "cells": "Voronoï : cellules",
+      "relief": "Voronoï : relief",
+      "seed": "Voronoï : graine"
+    },
+    "nervures": {
+      "count": "Nervures : nombre",
+      "depth": "Nervures : profondeur",
+      "twist": "Nervures : torsion"
+    },
+    "cartouche": {
+      "mode": "Mode",
+      "heightRelief": "Hauteur du relief",
+      "depthGravure": "Profondeur de gravure",
+      "thickness": "Épaisseur de la plaque",
+      "corner": "Coins",
+      "layout": "Mise en page"
+    },
+    "relief": {
+      "shape": "Forme",
+      "diameter": "Diamètre",
+      "side": "Côté",
+      "base": "Socle",
+      "relief": "Relief",
+      "levels": "Strates",
+      "seed": "Massif (graine)",
+      "lake": "Niveau du lac",
+      "label": "Étiquette du sommet"
+    },
+    "borne": {
+      "shape": "Forme",
+      "cap": "Hauteur des lettres",
+      "thickness": "Épaisseur",
+      "ring": "Anneau",
+      "ringD": "Diamètre de l'anneau",
+      "mode": "Mode"
+    },
+    "text": {
+      "name": "Nom",
+      "role": "Fonction",
+      "line1": "Ligne 1",
+      "line2": "Ligne 2",
+      "peak": "Nom au sommet",
+      "text": "Texte",
+      "counter": "{count} / {max} caractères",
+      "moderation": "Un humain de l'atelier relit chaque texte avant l'impression. Nous refusons les marques de tiers, les injures et les contenus illicites."
+    }
+  },
+  "colors": {
+    "plate": "Couleur de la plaque",
+    "ink": "Couleur du texte",
+    "base": "Couleur de base"
+  },
+  "bands": {
+    "palettes": "Palettes",
+    "band": "Bande {index}",
+    "add": "Ajouter une bande",
+    "remove": "Retirer",
+    "removeBand": "Retirer la bande {index}",
+    "filamentLegend": "Couleur de la bande {index}",
+    "boundaryLabel": "Changement de couleur {index}",
+    "hint": "Chaque changement de couleur se fait à une hauteur précise : 2 mm au moins par bande, jusqu'à quatre filaments.",
+    "noscript": "Sans JavaScript, saisissez les bandes ci-dessous : filament, deux-points, hauteur en millimètres, séparés par des virgules.",
+    "field": "Bandes (filament:hauteur, séparées par des virgules)"
+  },
+  "sheet": {
+    "rows": {
+      "dimensions": "Dimensions",
+      "layers": "Couches",
+      "volume": "Volume",
+      "weight": "Masse",
+      "time": "Durée",
+      "changes": "Changements",
+      "material": "Matière",
+      "price": "Prix"
+    },
+    "materialValue": "PLA",
+    "estimate": "Estimation · prix ferme confirmé par l'atelier sous 48 h",
+    "indicative": "Teintes indicatives : la couleur finale dépend de la bobine en stock."
+  },
+  "summary": {
+    "lavaux": "{name}, {height}, {pattern}, {count, plural, one {# couleur} other {# couleurs}} : {colors} ; {status}.",
+    "flat": "{name}, {dimensions}, {count, plural, one {# couleur} other {# couleurs}} : {colors} ; texte : {text} ; {status}."
+  },
+  "send": {
+    "title": "Envoyer à l'atelier",
+    "intro": "L'atelier relit votre pièce et vous répond sous 48 h avec un prix ferme. Rien n'est payé maintenant.",
+    "cta": "Envoyer à l'atelier",
+    "noscript": "Demander un devis",
+    "noscriptNote": "Sans JavaScript, appliquez vos réglages puis copiez-les dans votre demande de devis : l'atelier prépare le fichier pour vous.",
+    "machineLine": "Réglages à coller dans la demande",
+    "blocked": "Corrigez d'abord les points signalés dans la fiche.",
+    "needText": "Saisissez au moins un caractère : {field}.",
+    "estimateNote": "Estimation · prix ferme confirmé par l'atelier sous 48 h.",
+    "colors": "Couleurs :",
+    "quantity": "Quantité",
+    "quantityHint": "De 1 à {max} exemplaires.",
+    "remark": "Remarque (facultative)",
+    "continue": "Continuer dans le Studio",
+    "shop": "Voir la boutique",
+    "fullForm": "Ouvrir dans le formulaire complet",
+    "errors": {
+      "engine": "Le moteur du Studio n'est pas prêt. Rechargez la page, puis réessayez.",
+      "export": "Le fichier n'a pas pu être préparé. Réessayez, ou écrivez à contact@swiss3design.ch."
+    }
+  },
+  "quote": {
+    "yes": "oui",
+    "no": "non",
+    "none": "—",
+    "indicative": "indicatif",
+    "title": "[Studio] {object} · configuration v1",
+    "link": "Lien : {link}",
+    "dimensions": "Dimensions : {dimensions} · {layers} · {detail}",
+    "colors": "Couleurs (changements à la couche) : {colors}",
+    "estimate": "Estimation affichée : {figures}",
+    "texts": "Textes à imprimer : {texts}",
+    "textItem": "{label} : « {value} »",
+    "quantity": "Quantité : {count}",
+    "remark": "Remarque : {remark}",
+    "bandItem": "{filament} {from}–{to} (couches {firstLayer}–{lastLayer})",
+    "field": {
+      "name": "nom",
+      "role": "fonction",
+      "line1": "ligne 1",
+      "line2": "ligne 2",
+      "peak": "sommet",
+      "text": "texte"
+    },
+    "detail": {
+      "lavaux": "paroi {wall} · profil {profile}",
+      "cartouche": "épaisseur {thickness}",
+      "relief": "socle {base} · relief {relief} · forme {shape}",
+      "borne": "épaisseur {thickness}"
+    },
+    "pattern": {
+      "lisse": "{name}",
+      "gradins": "{name} (pas {step}, profondeur {depth})",
+      "vagues": "{name} (longueur d'onde {wavelength}, amplitude {amplitude}, {lobes} lobes)",
+      "voronoi": "{name} ({cells} cellules, relief {relief}, graine {seed})",
+      "nervures": "{name} ({count} nervures, profondeur {depth}, torsion {twist}°)"
+    },
+    "settings": {
+      "lavaux": "Motif : {pattern}",
+      "cartouche": "Réglages : {mode} ({depth}) · mise en page {layout} · coins {corner}",
+      "relief": "Réglages : {levels} strates · lac {lake} % · massif {seed} · étiquette du sommet : {label}",
+      "borne": "Réglages : forme {shape} · lettres {cap} · anneau {ring} · mode {mode}"
+    }
+  }
+}

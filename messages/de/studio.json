@@ -1,1 +1,334 @@
-{}
+{
+  "breadcrumb": {
+    "label": "Brotkrumennavigation",
+    "home": "Startseite",
+    "studio": "Studio"
+  },
+  "seo": {
+    "index": {
+      "title": "Das Studio: Ihr Objekt in 3D einstellen",
+      "description": "Vier Objekte in 3D einstellen: Vase, Visitenkarte, Untersetzer, Namensschild. Bis zu vier Farben, gedruckt in der Schweiz, Festpreis innert 48 Stunden."
+    },
+    "objects": {
+      "lavaux": {
+        "title": "Vase Lavaux nach Mass, in 3D",
+        "description": "Profil, Muster und bis zu vier Farben Ihrer Vase Lavaux einstellen, in 3D prüfen und senden: gedruckt in der Schweiz, Festpreis innert 48 Stunden."
+      },
+      "cartouche": {
+        "title": "3D-Visitenkarte Cartouche",
+        "description": "Ihre Visitenkarte von 85 × 55 mm, erhaben oder graviert, zwei Farben, Ihr Text: in 3D einstellen, in der Schweiz gedruckt, Festpreis innert 48 Stunden."
+      },
+      "relief": {
+        "title": "Untersetzer Relief, Massiv nach Mass",
+        "description": "Ein Untersetzer von 100 mm in Schichten: Massiv, See, Farben nach Höhe und Gipfelname wählen. Gedruckt in der Schweiz, Festpreis innert 48 Stunden."
+      },
+      "borne": {
+        "title": "Namensschild Borne in zwei Farben",
+        "description": "Ein zweifarbiges Namensschild mit Ihrem Text, erhaben oder graviert, Ring links oder rechts. In 3D eingestellt, in der Schweiz gedruckt, Festpreis innert 48 h."
+      }
+    }
+  },
+  "index": {
+    "eyebrow": "3D-Konfigurator",
+    "title": "Das Studio",
+    "intro": "Einstellen. Wir drucken.",
+    "lead": "Vier Objekte aus der Werkstatt, so begrenzt, dass sie sich auf unseren Maschinen drucken lassen. Stellen Sie Form, Farben und Text ein, prüfen Sie die Zahlen und senden Sie das Objekt: Die Werkstatt liest jede Anfrage durch und antwortet innert 48 Stunden mit einem Festpreis.",
+    "adjust": "Einstellen"
+  },
+  "how": {
+    "title": "So funktioniert es",
+    "steps": {
+      "adjust": {
+        "title": "Einstellen",
+        "text": "Form, Muster, bis zu vier Farben, Ihr Text: Die 3D-Ansicht folgt jeder Bewegung."
+      },
+      "check": {
+        "title": "Prüfen",
+        "text": "Masse, Gramm, Dauer und Druckbarkeit werden wirklich berechnet, nicht grob geschätzt."
+      },
+      "send": {
+        "title": "Senden",
+        "text": "Ihre Einstellung geht mit ihrer Druckdatei an die Werkstatt. Bezahlt wird jetzt noch nichts."
+      },
+      "receive": {
+        "title": "Erhalten",
+        "text": "Die Werkstatt prüft Ihr Stück und antwortet innert 48 Stunden mit einem Festpreis, den Sie online bezahlen."
+      }
+    }
+  },
+  "faq": {
+    "title": "Häufige Fragen",
+    "items": {
+      "printable": {
+        "q": "Ist das, was ich einstelle, wirklich druckbar?",
+        "a": "Jedes Objekt ist so begrenzt, dass es auf den Maschinen der Werkstatt gedruckt werden kann (250 mm Druckplatte, PLA, Düse von 0,4 mm). Ein Hinweis zeigt «Druckbar», «Zu prüfen» oder «Nicht druckbar», mit der ersten Auffälligkeit im Klartext und einer Schaltfläche «Korrigieren», wenn es eine Korrektur gibt."
+      },
+      "price": {
+        "q": "Was kostet es?",
+        "a": "Der Festpreis wird von der Werkstatt innert 48 Stunden nach Durchsicht Ihres Stücks bestätigt. Er hängt vom Material, von der Druckdauer und von der Anzahl Farbwechsel ab. Vor dieser Bestätigung wird nichts bezahlt."
+      },
+      "text": {
+        "q": "Wird mein Text durchgesehen?",
+        "a": "Ja. Ein Mensch der Werkstatt liest jeden Text vor dem Druck durch. Wir lehnen Marken Dritter, Beleidigungen und rechtswidrige Inhalte ab. Ihr Text erscheint nie in der Adresse der Seite und nie in Links, die Sie kopieren."
+      },
+      "colors": {
+        "q": "Wie werden die Farben gedruckt?",
+        "a": "Durch Filamentwechsel auf bestimmten Höhen, bis zu vier Filamente: Das stellt die Werkstatt in ihrer Slicer-Software ein. Die angezeigten Farbtöne sind unverbindlich, die endgültige Farbe hängt von der vorrätigen Spule ab."
+      },
+      "after": {
+        "q": "Was passiert nach dem Senden?",
+        "a": "Die Werkstatt prüft Ihre Datei und antwortet innert 48 Stunden per E-Mail mit einem Festpreis. Sie verfolgen die Anfrage in Ihrem Konto und bezahlen dann online; das Stück wird gedruckt und in der Schweiz versandt."
+      }
+    }
+  },
+  "custom": {
+    "title": "Eine Datei, eine genaue Idee?",
+    "text": "Für ein Stück, das nicht im Studio vorkommt, senden Sie Ihre 3D-Datei oder beschreiben Sie Ihr Projekt: persönliche Offerte innert 48 Stunden.",
+    "cta": "Offerte nach Mass anfragen"
+  },
+  "objects": {
+    "lavaux": {
+      "lead": "Fünf Profile, fünf Muster, bis zu vier Farben durch Filamentwechsel. Gedruckt im Standardmodus, nie als Spirale."
+    },
+    "cartouche": {
+      "lead": "85 × 55 mm, das Schweizer Format. Vier Layouts, Text erhaben oder graviert, zwei Farben."
+    },
+    "relief": {
+      "lead": "Ein Bergmassiv in Schichten auf 100 mm, vom See bis zum Schnee. Ihr Name auf dem Gipfel, auf einer fiktiven Höhe."
+    },
+    "borne": {
+      "lead": "Ein Text von 1 bis 14 Zeichen, vier Formen, ein Ring, wenn Sie das Schild aufhängen möchten."
+    }
+  },
+  "sections": {
+    "legend": "Einstellbereiche",
+    "shape": "Form",
+    "pattern": "Muster",
+    "colors": "Farben",
+    "text": "Text",
+    "sheet": "Datenblatt"
+  },
+  "apply": "Einstellungen anwenden",
+  "tools": {
+    "group": "Werkzeuge des Studios",
+    "undo": "Rückgängig",
+    "redo": "Wiederholen",
+    "surprise": "Überraschen Sie mich",
+    "copy": "Link kopieren",
+    "keep": "Behalten"
+  },
+  "toast": {
+    "linkCopied": "Link kopiert: Der Text ist nicht enthalten.",
+    "kept": "Entwurf gespeichert: Sie finden ihn unter Favoriten.",
+    "keepFailed": "Dieser Entwurf kann nicht gespeichert werden: Der Browser-Speicher ist nicht verfügbar.",
+    "invalidLink": "Dieser Link ist nicht lesbar: Standardeinstellungen."
+  },
+  "scene": {
+    "viewsLegend": "Ansicht des Objekts",
+    "view": {
+      "orbit": "3/4",
+      "plan": "Grundriss",
+      "elevation": "Aufriss",
+      "layers": "Schichten"
+    },
+    "explode": "Auseinanderziehen",
+    "preparing": "Studio wird vorbereitet…",
+    "error": "Die 3D-Ansicht konnte nicht berechnet werden.",
+    "retry": "Erneut versuchen"
+  },
+  "layers": {
+    "slider": "Angezeigte Schicht",
+    "simulate": "Simulieren",
+    "stop": "Anhalten",
+    "speed": "×{speed}"
+  },
+  "measure": {
+    "label": "Masse des Objekts",
+    "purge": "Spülmenge"
+  },
+  "value": {
+    "mm": "{value} Millimeter",
+    "height": "{mm} Millimeter, {layers, plural, one {# Schicht} other {# Schichten}}",
+    "layersTotal": "Gesamthöhe: {layers}.",
+    "count": "{count}",
+    "degrees": "{value} Grad",
+    "percent": "{value} Prozent",
+    "seed": "Startwert {value}"
+  },
+  "ctl": {
+    "presets": "Voreinstellungen",
+    "surprise": "Überraschen Sie mich",
+    "yes": "Ja",
+    "no": "Nein",
+    "lavaux": {
+      "h": "Höhe",
+      "d": "Durchmesser (Hüllkurve)",
+      "profile": "Profil",
+      "belly": "Wölbung",
+      "neck": "Hals",
+      "neckHint": "Radius oben im Verhältnis zum grössten Radius: 0,5 für einen engen Hals, 1 für eine gerade Vase.",
+      "lip": "Lippe",
+      "wall": "Wand",
+      "pattern": "Muster"
+    },
+    "gradins": {
+      "step": "Stufen: Abstand",
+      "depth": "Stufen: Tiefe",
+      "hint": "Die Tiefe bleibt unter der Hälfte des Abstands und unter der Wandstärke."
+    },
+    "vagues": {
+      "wavelength": "Wellen: Wellenlänge",
+      "hint": "Mindestens das Vierfache der Amplitude.",
+      "amplitude": "Wellen: Amplitude",
+      "lobes": "Wellen: Lappen"
+    },
+    "voronoi": {
+      "cells": "Voronoi: Zellen",
+      "relief": "Voronoi: Relief",
+      "seed": "Voronoi: Startwert"
+    },
+    "nervures": {
+      "count": "Rippen: Anzahl",
+      "depth": "Rippen: Tiefe",
+      "twist": "Rippen: Drehung"
+    },
+    "cartouche": {
+      "mode": "Modus",
+      "heightRelief": "Höhe des Reliefs",
+      "depthGravure": "Gravurtiefe",
+      "thickness": "Plattendicke",
+      "corner": "Ecken",
+      "layout": "Layout"
+    },
+    "relief": {
+      "shape": "Form",
+      "diameter": "Durchmesser",
+      "side": "Seitenlänge",
+      "base": "Sockel",
+      "relief": "Relief",
+      "levels": "Schichten",
+      "seed": "Massiv (Startwert)",
+      "lake": "Seespiegel",
+      "label": "Gipfelbeschriftung"
+    },
+    "borne": {
+      "shape": "Form",
+      "cap": "Buchstabenhöhe",
+      "thickness": "Dicke",
+      "ring": "Ring",
+      "ringD": "Ringdurchmesser",
+      "mode": "Modus"
+    },
+    "text": {
+      "name": "Name",
+      "role": "Funktion",
+      "line1": "Zeile 1",
+      "line2": "Zeile 2",
+      "peak": "Name auf dem Gipfel",
+      "text": "Text",
+      "counter": "{count} / {max} Zeichen",
+      "moderation": "Ein Mensch der Werkstatt liest jeden Text vor dem Druck durch. Wir lehnen Marken Dritter, Beleidigungen und rechtswidrige Inhalte ab."
+    }
+  },
+  "colors": {
+    "plate": "Farbe der Platte",
+    "ink": "Farbe des Textes",
+    "base": "Grundfarbe"
+  },
+  "bands": {
+    "palettes": "Paletten",
+    "band": "Farbzone {index}",
+    "add": "Farbzone hinzufügen",
+    "remove": "Entfernen",
+    "removeBand": "Farbzone {index} entfernen",
+    "filamentLegend": "Farbe der Farbzone {index}",
+    "boundaryLabel": "Farbwechsel {index}",
+    "hint": "Jeder Farbwechsel geschieht auf einer genauen Höhe: mindestens 2 mm pro Farbzone, bis zu vier Filamente.",
+    "noscript": "Ohne JavaScript geben Sie die Farbzonen unten ein: Filament, Doppelpunkt, Höhe in Millimetern, durch Kommas getrennt.",
+    "field": "Farbzonen (Filament:Höhe, durch Kommas getrennt)"
+  },
+  "sheet": {
+    "rows": {
+      "dimensions": "Masse",
+      "layers": "Schichten",
+      "volume": "Volumen",
+      "weight": "Gewicht",
+      "time": "Dauer",
+      "changes": "Wechsel",
+      "material": "Material",
+      "price": "Preis"
+    },
+    "materialValue": "PLA",
+    "estimate": "Schätzung · Festpreis von der Werkstatt innert 48 Stunden bestätigt",
+    "indicative": "Unverbindliche Farbtöne: Die endgültige Farbe hängt von der vorrätigen Spule ab."
+  },
+  "summary": {
+    "lavaux": "{name}, {height}, {pattern}, {count, plural, one {# Farbe} other {# Farben}}: {colors}; {status}.",
+    "flat": "{name}, {dimensions}, {count, plural, one {# Farbe} other {# Farben}}: {colors}; Text: {text}; {status}."
+  },
+  "send": {
+    "title": "An die Werkstatt senden",
+    "intro": "Die Werkstatt prüft Ihr Stück und antwortet innert 48 Stunden mit einem Festpreis. Jetzt wird nichts bezahlt.",
+    "cta": "An die Werkstatt senden",
+    "noscript": "Offerte anfragen",
+    "noscriptNote": "Ohne JavaScript wenden Sie Ihre Einstellungen an und kopieren sie in Ihre Offertanfrage: Die Werkstatt bereitet die Datei für Sie vor.",
+    "machineLine": "Einstellungen zum Einfügen in die Anfrage",
+    "blocked": "Korrigieren Sie zuerst die im Datenblatt gemeldeten Punkte.",
+    "needText": "Geben Sie mindestens ein Zeichen ein: {field}.",
+    "estimateNote": "Schätzung · Festpreis von der Werkstatt innert 48 Stunden bestätigt.",
+    "colors": "Farben:",
+    "quantity": "Anzahl",
+    "quantityHint": "Von 1 bis {max} Stück.",
+    "remark": "Bemerkung (freiwillig)",
+    "continue": "Im Studio weitermachen",
+    "shop": "Zum Shop",
+    "fullForm": "Im vollständigen Formular öffnen",
+    "errors": {
+      "engine": "Das Studio ist noch nicht bereit. Laden Sie die Seite neu und versuchen Sie es erneut.",
+      "export": "Die Datei konnte nicht vorbereitet werden. Versuchen Sie es erneut oder schreiben Sie an contact@swiss3design.ch."
+    }
+  },
+  "quote": {
+    "yes": "ja",
+    "no": "nein",
+    "none": "—",
+    "indicative": "unverbindlich",
+    "title": "[Studio] {object} · Konfiguration v1",
+    "link": "Link: {link}",
+    "dimensions": "Masse: {dimensions} · {layers} · {detail}",
+    "colors": "Farben (Wechsel pro Schicht): {colors}",
+    "estimate": "Angezeigte Schätzung: {figures}",
+    "texts": "Zu druckende Texte: {texts}",
+    "textItem": "{label}: «{value}»",
+    "quantity": "Anzahl: {count}",
+    "remark": "Bemerkung: {remark}",
+    "bandItem": "{filament} {from}–{to} (Schichten {firstLayer}–{lastLayer})",
+    "field": {
+      "name": "Name",
+      "role": "Funktion",
+      "line1": "Zeile 1",
+      "line2": "Zeile 2",
+      "peak": "Gipfel",
+      "text": "Text"
+    },
+    "detail": {
+      "lavaux": "Wand {wall} · Profil {profile}",
+      "cartouche": "Dicke {thickness}",
+      "relief": "Sockel {base} · Relief {relief} · Form {shape}",
+      "borne": "Dicke {thickness}"
+    },
+    "pattern": {
+      "lisse": "{name}",
+      "gradins": "{name} (Abstand {step}, Tiefe {depth})",
+      "vagues": "{name} (Wellenlänge {wavelength}, Amplitude {amplitude}, {lobes} Lappen)",
+      "voronoi": "{name} ({cells} Zellen, Relief {relief}, Startwert {seed})",
+      "nervures": "{name} ({count} Rippen, Tiefe {depth}, Drehung {twist}°)"
+    },
+    "settings": {
+      "lavaux": "Muster: {pattern}",
+      "cartouche": "Einstellungen: {mode} ({depth}) · Layout {layout} · Ecken {corner}",
+      "relief": "Einstellungen: {levels} Schichten · See {lake} % · Massiv {seed} · Gipfelbeschriftung: {label}",
+      "borne": "Einstellungen: Form {shape} · Buchstaben {cap} · Ring {ring} · Modus {mode}"
+    }
+  }
+}

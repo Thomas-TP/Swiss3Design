@@ -14,6 +14,11 @@ import { SITE_URL } from "@/lib/seo";
 // Google pour la navigation à facettes ; seul ?category= reste explorable.
 // `color=` couvre aussi `multicolor=`.
 //
+// Studio : `/studio/<objet>` est indexé, mais chaque paramètre GET du formulaire
+// sans JavaScript (`?h=150&p=galet…`) crée une URL de plus qui n'a pas de valeur
+// propre (la configuration vit dans le fragment #c=, jamais envoyé au serveur) :
+// `Disallow: /*/studio/*?` les ferme tous, les URL canoniques restent ouvertes.
+//
 // Aucun groupe dédié aux robots IA (GPTBot, ClaudeBot, PerplexityBot…) : un
 // groupe nommé ferait ignorer au robot les règles de `*`. Ils suivent donc
 // exactement les mêmes règles que Google.
@@ -42,6 +47,7 @@ Disallow: /*?*sort=
 Disallow: /*?*material=
 Disallow: /*?*color=
 Disallow: /*?*q=
+Disallow: /*/studio/*?
 Disallow: /api/
 
 Agentmap: ${abs(PATHS.aiCatalog)}
