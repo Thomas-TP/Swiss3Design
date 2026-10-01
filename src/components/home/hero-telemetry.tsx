@@ -131,8 +131,7 @@ export function HeroChange() {
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   return (
-    <p
-      role="status"
+    <output
       data-visible={visible}
       className={cx("s3d-label ph-no-capture normal-case", styles.change)}
     >
@@ -142,7 +141,7 @@ export function HeroChange() {
             layer: formatLayerIndex(change.layer),
           })
         : null}
-    </p>
+    </output>
   );
 }
 

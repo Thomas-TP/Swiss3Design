@@ -101,13 +101,16 @@ export function SummitProvider({
     setRawState(value);
   }, []);
 
-  // Un sommet saisi plus tôt dans la session (retour du Studio, par exemple).
+  // Un sommet saisi plus tôt dans la session (retour du Studio, par exemple) :
+  // sessionStorage n'existe qu'après l'hydratation, on le lit donc ici.
+  // oxlint-disable set-state-in-effect -- lecture d'un stockage externe, une fois
   useEffect(() => {
     const saved = readStudioTexts("relief").peak;
     if (!saved) return;
     setRawState(saved);
     setDebounced(saved);
   }, []);
+  // oxlint-enable set-state-in-effect
 
   useEffect(() => {
     const timer = window.setTimeout(() => setDebounced(raw), DEBOUNCE_MS);

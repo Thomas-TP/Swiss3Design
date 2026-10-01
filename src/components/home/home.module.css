@@ -271,6 +271,12 @@
     min-height: min(46rem, 100svh);
   }
 }
+/* Demi-colonne : le titre d'affichage entier n'y tiendrait pas (« Littéralement. »). */
+@media (min-width: 64rem) {
+  .summitTitle {
+    font-size: clamp(2.25rem, 1.1rem + 3.4vw, 4.75rem);
+  }
+}
 .summitText {
   padding-block: var(--spacing-section);
   padding-inline: var(--spacing-margin);
