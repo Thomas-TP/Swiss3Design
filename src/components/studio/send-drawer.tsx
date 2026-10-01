@@ -21,6 +21,7 @@ import { clearStudioTexts } from "@/lib/studio/texts-store";
 import type { StudioObjectId } from "@/lib/studio/types";
 import { hasTextFields, printedTexts } from "./objects";
 import { prepareStudioFile } from "./quote-send";
+import { SendErrorBoundary } from "./send-error-boundary";
 import type { StudioLocale } from "./scene-props";
 import {
   colorNames,
@@ -64,12 +65,24 @@ export interface SendDrawerProps {
 }
 
 export function SendDrawer(props: SendDrawerProps) {
-  // Le formulaire (sa session, ses champs) n'est monté qu'à la première ouverture.
+  // Le formulaire (sa session, ses champs) n'est monté qu'à la première ouverture,
+  // et APRÈS le premier affichage du tiroir : requestAnimationFrame passe avant
+  // la peinture, le setTimeout qui suit après elle. Le clic « Envoyer à
+  // l'atelier » rend ainsi la main au navigateur avec un tiroir ouvert, sans
+  // attendre la construction du formulaire (INP).
   const [everOpened, setEverOpened] = useState(false);
   // oxlint-disable set-state-in-effect -- ouverture du tiroir : montage différé du formulaire
   useEffect(() => {
-    if (props.open) setEverOpened(true);
-  }, [props.open]);
+    if (!props.open || everOpened) return;
+    let timer = 0;
+    const frame = window.requestAnimationFrame(() => {
+      timer = window.setTimeout(() => setEverOpened(true), 0);
+    });
+    return () => {
+      window.cancelAnimationFrame(frame);
+      window.clearTimeout(timer);
+    };
+  }, [props.open, everOpened]);
   // oxlint-enable set-state-in-effect
   return (
     <Drawer
@@ -224,68 +237,78 @@ function SendBodyImpl({
   return (
     <div className="flex flex-col gap-6">
       <p className="text-sm text-soft">{t("send.intro")}</p>
-      <QuoteRequestForm
-        // Une autre configuration = un formulaire neuf : son fichier préparé ne doit jamais survivre à un réglage.
-        key={hash}
-        source="studio"
-        object={object}
-        variant="drawer"
-        prefill={prefill}
-        attachment={attachment}
-        extraFields={
-          <>
-            <Field
-              label={t("send.quantity")}
-              htmlFor={quantityId}
-              hint={t("send.quantityHint", { max: QUANTITY_MAX })}
-            >
-              <input
-                id={quantityId}
-                type="number"
-                inputMode="numeric"
-                min={1}
-                max={QUANTITY_MAX}
-                step={1}
-                value={quantity}
-                aria-describedby={fieldIds(quantityId).hint}
-                onChange={(event) => {
-                  const value = Math.round(Number(event.currentTarget.value));
-                  setQuantity(
-                    Number.isFinite(value)
-                      ? Math.min(QUANTITY_MAX, Math.max(1, value))
-                      : 1,
-                  );
-                }}
-                className={cx(fieldClass, "s3d-num w-28")}
-              />
-            </Field>
-            <Field label={t("send.remark")} htmlFor={`${uid}-remark`}>
-              <textarea
-                id={`${uid}-remark`}
-                rows={3}
-                maxLength={500}
-                value={remark}
-                onChange={(event) => setRemark(event.currentTarget.value)}
-                className={cx(fieldClass, "resize-y")}
-              />
-            </Field>
-          </>
-        }
-        successActions={
-          <>
-            <Button variant="secondary" onClick={onClose}>
-              {t("send.continue")}
-            </Button>
-            <ButtonLink href="/shop" variant="text">
-              {t("send.shop")}
-            </ButtonLink>
-          </>
-        }
-        onSuccess={() => {
-          // Le texte n'a plus de raison de rester dans la session : il est parti dans la demande.
-          clearStudioTexts(object);
-        }}
-      />
+      {/* ph-no-capture : les enregistrements de visite ne gardent AUCUN champ du
+          formulaire. Un `ph-mask` ne masque que les textes, pas l'attribut `value`
+          des champs cachés (description complète avec les textes à imprimer), ni
+          la vignette qui montre le texte gravé. */}
+      <div className="ph-no-capture">
+        <SendErrorBoundary>
+          <QuoteRequestForm
+            // Une autre configuration = un formulaire neuf : son fichier préparé ne doit jamais survivre à un réglage.
+            key={hash}
+            source="studio"
+            object={object}
+            variant="drawer"
+            prefill={prefill}
+            attachment={attachment}
+            extraFields={
+              <>
+                <Field
+                  label={t("send.quantity")}
+                  htmlFor={quantityId}
+                  hint={t("send.quantityHint", { max: QUANTITY_MAX })}
+                >
+                  <input
+                    id={quantityId}
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    max={QUANTITY_MAX}
+                    step={1}
+                    value={quantity}
+                    aria-describedby={fieldIds(quantityId).hint}
+                    onChange={(event) => {
+                      const value = Math.round(
+                        Number(event.currentTarget.value),
+                      );
+                      setQuantity(
+                        Number.isFinite(value)
+                          ? Math.min(QUANTITY_MAX, Math.max(1, value))
+                          : 1,
+                      );
+                    }}
+                    className={cx(fieldClass, "s3d-num w-28")}
+                  />
+                </Field>
+                <Field label={t("send.remark")} htmlFor={`${uid}-remark`}>
+                  <textarea
+                    id={`${uid}-remark`}
+                    rows={3}
+                    maxLength={500}
+                    value={remark}
+                    onChange={(event) => setRemark(event.currentTarget.value)}
+                    className={cx(fieldClass, "resize-y")}
+                  />
+                </Field>
+              </>
+            }
+            successActions={
+              <>
+                <Button variant="secondary" onClick={onClose}>
+                  {t("send.continue")}
+                </Button>
+                <ButtonLink href="/shop" variant="text">
+                  {t("send.shop")}
+                </ButtonLink>
+              </>
+            }
+            onSuccess={() => {
+              // Le texte n'a plus de raison de rester dans la session : il est parti dans la demande.
+              clearStudioTexts(object);
+            }}
+          />
+        </SendErrorBoundary>
+      </div>
       <p className="text-sm text-soft">
         <SiteLink
           href="/custom#studio"
