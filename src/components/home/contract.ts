@@ -8,12 +8,7 @@
 // ces événements et ces attributs. Pas d'état partagé ailleurs.
 
 /** Nom d'une vue de l'accueil, posé en `data-home-view` sur son conteneur. */
-export type HomeViewName =
-  | "hero"
-  | "heroField"
-  | "map"
-  | "mapField"
-  | "summit";
+export type HomeViewName = "hero" | "heroField" | "map" | "mapField" | "summit";
 
 /** Attribut d'un conteneur de vue : la chorégraphie retrouve la vue par lui. */
 export const HOME_VIEW_ATTR = "data-home-view";

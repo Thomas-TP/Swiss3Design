@@ -7,13 +7,7 @@
 //
 // La scène ne dessine qu'un quad plein cadre ; viewport, scissor et fond sont
 // déjà posés par le Stage. Rendu à la demande : pas d'animation propre.
-import {
-  Mesh,
-  OrthographicCamera,
-  PlaneGeometry,
-  Scene,
-  Vector2,
-} from "three";
+import { Mesh, OrthographicCamera, PlaneGeometry, Scene, Vector2 } from "three";
 import type { ContourFieldProps } from "@/components/home/stage-props";
 import {
   acquireHeightTexture,

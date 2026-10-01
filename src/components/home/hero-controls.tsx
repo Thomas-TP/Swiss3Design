@@ -3,11 +3,7 @@
 import { useTranslations } from "next-intl";
 import { ChipRadio } from "@/components/ui/chip";
 import { filamentHex } from "@/lib/studio/filaments";
-import {
-  PALETTE_KEYS,
-  PATTERN_KEYS,
-  type HeroPatternKey,
-} from "./hero-data";
+import { PALETTE_KEYS, PATTERN_KEYS, type HeroPatternKey } from "./hero-data";
 import { useHomeConfig } from "./home-config-context";
 import styles from "./home.module.css";
 

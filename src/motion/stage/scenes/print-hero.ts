@@ -132,7 +132,10 @@ export function expandBands(
 }
 
 /** Indice de bande d'une hauteur imprimée : le nombre de frontières strictement sous elle. */
-export function bandOfCut(cutMm: number, boundaries: readonly number[]): number {
+export function bandOfCut(
+  cutMm: number,
+  boundaries: readonly number[],
+): number {
   let band = 0;
   for (let k = 0; k < boundaries.length - 1; k++)
     if (cutMm > boundaries[k] + 1e-9) band = k + 1;
@@ -198,7 +201,10 @@ function roundedPlate(size: number, radius: number, depth: number) {
   return geometry;
 }
 
-function canvasTexture(size: number, draw: (g: CanvasRenderingContext2D) => void) {
+function canvasTexture(
+  size: number,
+  draw: (g: CanvasRenderingContext2D) => void,
+) {
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = size;
   const g = canvas.getContext("2d")!;
@@ -353,7 +359,11 @@ const create = (
   };
 
   function configFor(key: HeroPatternKey): LavauxConfig {
-    return { ...props.config, pattern: props.patterns[key], bands: [...props.bands3] };
+    return {
+      ...props.config,
+      pattern: props.patterns[key],
+      bands: [...props.bands3],
+    };
   }
 
   function modelFor(key: HeroPatternKey): LavauxModel {
@@ -387,7 +397,8 @@ const create = (
       next.dark ? 0.06 : 0.45,
     );
     for (const material of plateMaterials)
-      if (material instanceof MeshStandardMaterial) material.color.copy(surface);
+      if (material instanceof MeshStandardMaterial)
+        material.color.copy(surface);
   }
 
   // ── Construction ─────────────────────────────────────────────────────────
@@ -399,9 +410,15 @@ const create = (
     pattern = props.pattern;
     models.set(pattern, modelFor(pattern));
 
-    vaseMaterial = track(createPrintMaterial({ heightMm: height, bands: bandsNow }));
-    nextMaterial = track(createPrintMaterial({ heightMm: height, bands: bandsNow }));
-    towerMaterial = track(createPrintMaterial({ heightMm: height, bands: bandsNow }));
+    vaseMaterial = track(
+      createPrintMaterial({ heightMm: height, bands: bandsNow }),
+    );
+    nextMaterial = track(
+      createPrintMaterial({ heightMm: height, bands: bandsNow }),
+    );
+    towerMaterial = track(
+      createPrintMaterial({ heightMm: height, bands: bandsNow }),
+    );
     vaseMaterial.uniforms.uGhost.value = 1;
     nextMaterial.uniforms.uGhost.value = 0;
     vase = new Mesh(geometryFor(pattern), vaseMaterial.material);
@@ -440,7 +457,10 @@ const create = (
       depthWrite: false,
       toneMapped: false,
     });
-    const gridPlane = new Mesh(new PlaneGeometry(PLATE_MM, PLATE_MM), gridMaterial);
+    const gridPlane = new Mesh(
+      new PlaneGeometry(PLATE_MM, PLATE_MM),
+      gridMaterial,
+    );
     gridPlane.rotation.x = -Math.PI / 2;
     gridPlane.position.y = 0.02;
     plate.add(gridPlane);
@@ -465,14 +485,25 @@ const create = (
     plate.add(shadowPlane);
     plateMaterials = [plateSurface, gridMaterial, shadowMaterial];
     textures.push(grid.texture, shadow.texture);
-    disposables.push(plateGeometry, plateSurface, gridMaterial, shadowMaterial, gridPlane.geometry, shadowPlane.geometry);
+    disposables.push(
+      plateGeometry,
+      plateSurface,
+      gridMaterial,
+      shadowMaterial,
+      gridPlane.geometry,
+      shadowPlane.geometry,
+    );
 
     // Tour de purge : même matériau, mêmes teintes aux mêmes hauteurs.
     tower = new Group();
     tower.position.set(TOWER.x, 0, -TOWER.y);
     const towerObject = new Group();
     towerObject.rotation.x = -Math.PI / 2;
-    const towerGeometry = new BoxGeometry(TOWER.size, TOWER.size, height).translate(0, 0, height / 2);
+    const towerGeometry = new BoxGeometry(
+      TOWER.size,
+      TOWER.size,
+      height,
+    ).translate(0, 0, height / 2);
     towerObject.add(new Mesh(towerGeometry, towerMaterial.material));
     tower.add(towerObject);
     root.add(tower);
@@ -482,7 +513,11 @@ const create = (
     nozzle = new Group();
     const cone = new Mesh(
       new CylinderGeometry(2.2, 0.4, 5, 24),
-      new MeshStandardMaterial({ color: 0x8c8a85, metalness: 0.6, roughness: 0.4 }),
+      new MeshStandardMaterial({
+        color: 0x8c8a85,
+        metalness: 0.6,
+        roughness: 0.4,
+      }),
     );
     cone.position.y = 2.5;
     const block = new Mesh(
@@ -512,7 +547,13 @@ const create = (
     nozzle.add(cone, block, glow);
     root.add(nozzle);
     textures.push(spot.texture);
-    disposables.push(cone.geometry, cone.material, block.geometry, block.material, glow.material);
+    disposables.push(
+      cone.geometry,
+      cone.material,
+      block.geometry,
+      block.material,
+      glow.material,
+    );
   }
 
   function buildShells() {
@@ -534,7 +575,8 @@ const create = (
       tier,
       separateBands: config.bands.length > 1,
     });
-    const parts = config.bands.length > 1 ? bandGeometries(mesh) : [meshToGeometry(mesh)];
+    const parts =
+      config.bands.length > 1 ? bandGeometries(mesh) : [meshToGeometry(mesh)];
     shells = parts.map((geometry, k) => {
       const material = track(
         createPrintMaterial({
@@ -547,7 +589,8 @@ const create = (
       object.add(part);
       return { mesh: part, material };
     });
-    const gap = (z: number) => bandIndexAt(config.bands, z - 1e-6) * EXPLODE_GAP_MM;
+    const gap = (z: number) =>
+      bandIndexAt(config.bands, z - 1e-6) * EXPLODE_GAP_MM;
     baseCamera = heroCameraFor(
       config,
       gap,
@@ -632,7 +675,10 @@ const create = (
     camera.aspect = rect.width / Math.max(1, rect.height);
     if (tilt !== cameraTilt) {
       cameraTilt = tilt;
-      const spec = mode === "hero" ? cameraAt(tilt, baseCamera, props.config.d) : baseCamera;
+      const spec =
+        mode === "hero"
+          ? cameraAt(tilt, baseCamera, props.config.d)
+          : baseCamera;
       const eye = toThreeWorld(cameraEye(spec));
       const target = toThreeWorld(spec.target);
       camera.fov = spec.fovDeg;
@@ -792,7 +838,9 @@ const create = (
       nozzleTheta += omega * dt;
       busy ||= omega > 0;
       const done = progress >= 1 - 1e-6 && front < 0;
-      park = clamp01(park + ((done ? 1 : 0) - park) * Math.min(1, dt / (PARK_S / 4)));
+      park = clamp01(
+        park + ((done ? 1 : 0) - park) * Math.min(1, dt / (PARK_S / 4)),
+      );
       if (Math.abs(park - (done ? 1 : 0)) > 0.002) busy = true;
       else park = done ? 1 : 0;
       const z = front >= 0 ? Math.min(front, height) : cut;

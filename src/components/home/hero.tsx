@@ -48,14 +48,18 @@ export function Hero() {
           <DotTitle
             as="h1"
             id="hero-title"
-            className={cx(
-              "mt-5 font-display text-hero text-ink",
-              styles.title,
-            )}
+            className={cx("mt-5 font-display text-hero text-ink", styles.title)}
           >
             {t("title")}
           </DotTitle>
-          <p className="mt-6 max-w-[34rem] text-lead text-soft">{t("lead")}</p>
+          <p
+            className={cx(
+              "mt-6 max-w-[34rem] text-lead text-soft",
+              styles.lead,
+            )}
+          >
+            {t("lead")}
+          </p>
           <a
             href="#carte"
             data-home={HOME.skip}

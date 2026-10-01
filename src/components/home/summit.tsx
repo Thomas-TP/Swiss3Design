@@ -177,7 +177,13 @@ export function SummitProvider({
 }
 
 /** Champ, note, bande de mesure et CTA de la moitié « texte » du chapitre. */
-export function SummitInput({ href, maxLength }: { href: string; maxLength: number }) {
+export function SummitInput({
+  href,
+  maxLength,
+}: {
+  href: string;
+  maxLength: number;
+}) {
   const t = useTranslations("landing.summit");
   const tex = useTranslations("studioCore.examples");
   const { raw, setRaw, items } = useSummit();

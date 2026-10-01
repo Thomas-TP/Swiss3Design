@@ -206,7 +206,13 @@ export function HomeChoreo() {
       });
       tl.to(state, { scrub: 1, duration: 1.1, onUpdate: apply }, 0).to(
         state,
-        { tilt: 1, reveal: 1, duration: 0.7, ease: "s3d.carte", onUpdate: apply },
+        {
+          tilt: 1,
+          reveal: 1,
+          duration: 0.7,
+          ease: "s3d.carte",
+          onUpdate: apply,
+        },
         1.1,
       );
       disposers.push(
@@ -274,7 +280,9 @@ export function HomeChoreo() {
       if (ctrl.hero) ctrl.hero.progress = progress;
     };
     window.addEventListener(HERO_EVENTS.scrub, onScrub);
-    disposers.push(() => window.removeEventListener(HERO_EVENTS.scrub, onScrub));
+    disposers.push(() =>
+      window.removeEventListener(HERO_EVENTS.scrub, onScrub),
+    );
 
     // « Passer l'animation » : l'intro et l'autoplay se terminent tout de suite ;
     // le défilement vers le chapitre 01 est fait par l'ancre (Lenis ou natif).

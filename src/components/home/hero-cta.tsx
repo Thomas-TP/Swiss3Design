@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { ButtonLink } from "@/components/ui/button";
 import { useHomeConfig } from "./home-config-context";
 import { studioHref } from "./hero-data";
+import styles from "./home.module.css";
 
 // Les trois entrées de l'accueil (brief « Strates », §1.4, §5.1) : Régler
 // (Studio), Acheter (boutique), J'ai un fichier (sur mesure). Le bouton rouge,
@@ -14,7 +15,9 @@ export function HeroCtas() {
   const t = useTranslations("landing.hero");
   const { config } = useHomeConfig();
   return (
-    <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5">
+    <div
+      className={`mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:gap-x-5 ${styles.ctas}`}
+    >
       <ButtonLink
         href={studioHref(config)}
         variant="primary"

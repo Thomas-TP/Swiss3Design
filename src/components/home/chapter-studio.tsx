@@ -11,7 +11,11 @@ import {
   CARTOUCHE_DEFAULT,
   DEFAULT_CONFIGS,
 } from "@/lib/studio/presets";
-import { borneTopView, cartoucheTopView, topViewToSvg } from "@/lib/studio/poster-flat";
+import {
+  borneTopView,
+  cartoucheTopView,
+  topViewToSvg,
+} from "@/lib/studio/poster-flat";
 import { computeStats } from "@/lib/studio/stats";
 import type { StudioObjectId, StudioTexts } from "@/lib/studio/types";
 import styles from "./home.module.css";
@@ -32,8 +36,7 @@ function ObjectPoster({
   id: StudioObjectId;
   texts: StudioTexts;
 }) {
-  if (id === "lavaux")
-    return <PosterSvg poster={getHeroPoster("final")} />;
+  if (id === "lavaux") return <PosterSvg poster={getHeroPoster("final")} />;
   if (id === "relief")
     return (
       <>
@@ -95,7 +98,12 @@ export function ChapterStudio({ freeOver }: { freeOver: string }) {
       <div className="s3d-page mt-12 lg:mt-16">
         <ul className="s3d-grid gap-y-4">
           {OBJECTS.map((id) => {
-            const stats = computeStats(DEFAULT_CONFIGS[id], texts, undefined, locale);
+            const stats = computeStats(
+              DEFAULT_CONFIGS[id],
+              texts,
+              undefined,
+              locale,
+            );
             const price = stats.estimate
               ? formatChfRange(
                   stats.estimate.lowCents,

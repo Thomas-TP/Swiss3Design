@@ -22,7 +22,8 @@ const CELL: Record<"one" | "few" | "many", string> = {
 export function ChapterShop({ products }: { products: ProductListItem[] }) {
   const t = useTranslations("landing.shop");
   const ta = useTranslations("catalog.attribution");
-  const size = products.length === 1 ? "one" : products.length <= 3 ? "few" : "many";
+  const size =
+    products.length === 1 ? "one" : products.length <= 3 ? "few" : "many";
 
   return (
     <Chapter

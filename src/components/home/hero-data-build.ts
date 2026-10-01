@@ -9,11 +9,7 @@
 // résultat est gardé dans le module : il ne dépend ni de la langue ni de la
 // requête.
 import { bandStats } from "@/lib/studio/band-stats";
-import {
-  HERO_CONFIG,
-  HERO_PATTERNS,
-  heroVariant,
-} from "@/lib/studio/presets";
+import { HERO_CONFIG, HERO_PATTERNS, heroVariant } from "@/lib/studio/presets";
 import { computeStats } from "@/lib/studio/stats";
 import {
   PALETTE_KEYS,

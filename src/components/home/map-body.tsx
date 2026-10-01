@@ -64,17 +64,14 @@ export function MapBody({ explodedPoster }: { explodedPoster: ReactNode }) {
   return (
     <div className="s3d-page s3d-grid relative z-[1] mt-12 items-center gap-y-10 lg:mt-16">
       <div className="col-span-full lg:col-span-5">
-        <ol
-          aria-label={t("bands")}
-          className="flex flex-col gap-4 sm:gap-5"
-        >
+        <ol aria-label={t("bands")} className="flex flex-col gap-4 sm:gap-5">
           {bands.map((band) => (
             <li
               key={`${band.filament}-${band.fromLayer}`}
               className={cx("s3d-rise ph-no-capture pl-4", styles.bandItem)}
               style={{ "--band": filamentHex(band.filament) } as CSSProperties}
             >
-              <p className="s3d-label normal-case text-ink">
+              <p className={cx("s3d-label normal-case text-ink", styles.halo)}>
                 {tb("label", {
                   filament: tf(band.filament),
                   from: formatInteger(band.fromLayer, locale),
@@ -87,7 +84,12 @@ export function MapBody({ explodedPoster }: { explodedPoster: ReactNode }) {
             </li>
           ))}
         </ol>
-        <p className="s3d-rise s3d-label ph-no-capture mt-8 max-w-[52ch] normal-case text-soft">
+        <p
+          className={cx(
+            "s3d-rise s3d-label ph-no-capture mt-8 max-w-[52ch] normal-case text-soft",
+            styles.halo,
+          )}
+        >
           {figures.changes > 0
             ? t("purgeLine", {
                 purge: tb("purge", {

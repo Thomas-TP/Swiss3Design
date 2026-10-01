@@ -10,7 +10,7 @@
   flex-direction: column;
   /* Sous l'en-tête collant de 64 px : la section remplit l'écran visible. */
   min-height: max(640px, calc(100svh - 4rem));
-  padding-block: clamp(1.5rem, 4svh, 3.5rem) clamp(2rem, 5svh, 4rem);
+  padding-block: clamp(1rem, 3.5svh, 3.5rem) clamp(1rem, 3.5svh, 3.5rem);
 }
 
 .heroGrid {
@@ -25,11 +25,26 @@
   min-width: 0;
 }
 
-/* h1 de l'accueil : jeton text-hero, plafonné par la hauteur de l'écran pour
-   que le héros épinglé tienne dans la fenêtre (titre, chapeau, réglages, CTA). */
+/* h1 de l'accueil : jeton text-hero, plafonné pour que le héros épinglé tienne
+   dans la fenêtre (titre, chapeau, réglages, CTA). Deux plafonds : la largeur de
+   la colonne (jamais plus de 90 rem de page : « Tout relief » doit tenir sur
+   une ligne, sinon le titre passe à cinq lignes) et la hauteur de l'écran
+   (quatre lignes au plus). Le chapeau, les réglages et les CTA resserrent leur
+   rythme avec la hauteur, pour la même raison. */
 @media (min-width: 64rem) {
   .title {
-    font-size: min(var(--text-hero), max(2.75rem, calc((100svh - 25rem) / 4.4)));
+    font-size: min(
+      var(--text-hero),
+      min(7.4vw, 6.6rem),
+      max(2.75rem, calc((100svh - 30rem) / 3.6))
+    );
+  }
+  .lead {
+    margin-top: clamp(0.75rem, 2.2svh, 1.5rem);
+    font-size: clamp(1rem, 2.4svh, 1.375rem);
+  }
+  .ctas {
+    margin-top: clamp(1rem, 3svh, 2rem);
   }
 }
 
@@ -73,6 +88,12 @@
     overflow: visible;
     margin-inline: 0;
     padding-inline: 0;
+  }
+}
+
+@media (min-width: 64rem) {
+  .controls {
+    margin-top: clamp(1rem, 3svh, 2rem);
   }
 }
 
@@ -250,6 +271,14 @@
 }
 :global(.dark) .darkOnly {
   display: block;
+}
+
+/* Texte posé sur le champ de courbes : un halo de la couleur du fond (pas de
+   fond opaque, le champ doit rester visible) garde les cotes lisibles. */
+.halo {
+  text-shadow:
+    0 0 0.35rem var(--color-paper),
+    0 0 0.9rem var(--color-paper);
 }
 
 .bandItem {

@@ -34,7 +34,8 @@ function useWindowEvent<T>(name: string, handler: (detail: T) => void) {
     latest.current = handler;
   });
   useEffect(() => {
-    const on = (event: Event) => latest.current((event as CustomEvent<T>).detail);
+    const on = (event: Event) =>
+      latest.current((event as CustomEvent<T>).detail);
     window.addEventListener(name, on);
     return () => window.removeEventListener(name, on);
   }, [name]);

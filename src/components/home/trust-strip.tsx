@@ -6,11 +6,7 @@ import { Fragment } from "react";
 // dur) : la page le formate et nous le passe.
 export function TrustStrip({ freeOver }: { freeOver: string }) {
   const t = useTranslations("landing.trust");
-  const items = [
-    t("shipping", { amount: freeOver }),
-    t("made"),
-    t("payment"),
-  ];
+  const items = [t("shipping", { amount: freeOver }), t("made"), t("payment")];
   return (
     <div className="border-y border-line">
       <ul className="s3d-page s3d-label flex flex-wrap items-center gap-x-3 gap-y-1 py-4 normal-case text-soft">

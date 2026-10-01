@@ -17,12 +17,7 @@ export function ChapterAtelier({ freeOver }: { freeOver: string }) {
   ] as const;
 
   return (
-    <Chapter
-      id="atelier"
-      number="05"
-      title={t("title")}
-      eyebrow={t("eyebrow")}
-    >
+    <Chapter id="atelier" number="05" title={t("title")} eyebrow={t("eyebrow")}>
       <div className="s3d-page s3d-grid mt-12 gap-y-10 lg:mt-16">
         <div className="s3d-rise col-span-full lg:col-span-5">
           <p className="max-w-[48ch] text-lead text-soft">{t("intro")}</p>
@@ -39,10 +34,7 @@ export function ChapterAtelier({ freeOver }: { freeOver: string }) {
         </div>
         <dl className="col-span-full grid gap-6 sm:grid-cols-2 lg:col-span-6 lg:col-start-7">
           {places.map((place) => (
-            <div
-              key={place.key}
-              className="s3d-rise border-t border-line pt-4"
-            >
+            <div key={place.key} className="s3d-rise border-t border-line pt-4">
               <dt className="font-display text-title text-ink">
                 {t(place.key)}
               </dt>

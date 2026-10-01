@@ -12,7 +12,7 @@ const locales = { fr, de, it: it_, en } as const;
 
 describe("textes de l'accueil", () => {
   for (const [locale, messages] of Object.entries(locales)) {
-    describe(locale, () => {
+    describe(`langue ${locale}`, () => {
       it("titre ≤ 60 et description entre 110 et 160 caractères", () => {
         expect(messages.seo.title.length).toBeLessThanOrEqual(60);
         expect(messages.seo.description.length).toBeGreaterThanOrEqual(110);

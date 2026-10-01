@@ -84,7 +84,9 @@ export function acquireHeightTexture(): DataTexture {
   const data = new Uint16Array(SIZE * SIZE);
   for (let y = 0; y < SIZE; y++)
     for (let x = 0; x < SIZE; x++)
-      data[y * SIZE + x] = DataUtils.toHalfFloat(fieldHeight(x / SIZE, y / SIZE));
+      data[y * SIZE + x] = DataUtils.toHalfFloat(
+        fieldHeight(x / SIZE, y / SIZE),
+      );
   const texture = new DataTexture(data, SIZE, SIZE, RedFormat, HalfFloatType);
   texture.wrapS = texture.wrapT = RepeatWrapping;
   texture.minFilter = texture.magFilter = LinearFilter;
