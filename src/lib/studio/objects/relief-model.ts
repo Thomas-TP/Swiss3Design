@@ -121,10 +121,7 @@ export interface PeakLabelParts {
 
 /** Minuscules sans accents : « Pointé » vaut « pointe » (comparaison du mot de préfixe). */
 function foldedText(text: string): string {
-  return text
-    .normalize("NFD")
-    .replace(/\p{M}/gu, "")
-    .toLowerCase();
+  return text.normalize("NFD").replace(/\p{M}/gu, "").toLowerCase();
 }
 
 /**

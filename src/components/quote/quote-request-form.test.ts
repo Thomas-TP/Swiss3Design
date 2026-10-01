@@ -59,7 +59,7 @@ describe("QuoteRequestForm : enregistrements de visite", () => {
   it("variante verrouillée : les quatre champs cachés sont hors enregistrement", () => {
     const hidden = hiddenInputs(locked);
     for (const name of ["description", "material", "colors", "dimensions"]) {
-      expect(hidden.get(name), name).toContain("ph-no-capture");
+      expect(hidden.get(name), `${name}`).toContain("ph-no-capture");
     }
     // Le texte du visiteur voyage bien dans la demande (finalité déclarée).
     expect(hidden.get("description")).toContain(TEXTS);

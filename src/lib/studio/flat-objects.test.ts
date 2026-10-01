@@ -688,8 +688,8 @@ describe("Relief : étiquette du sommet, massif, strates", () => {
       const typed = `${word.charAt(0)}${word.slice(1).toLowerCase()} Zorgl`;
       const { lines } = layoutLabel(RELIEF_DEFAULT, { peak: typed }, locale);
       const engraved = lines.map((line) => line.text).join(" ");
-      expect(engraved, locale).not.toContain(`${word} ${word}`);
-      expect(engraved, locale).toContain(`${word} ZORGL`);
+      expect(engraved, `${locale}`).not.toContain(`${word} ${word}`);
+      expect(engraved, `${locale}`).toContain(`${word} ZORGL`);
     }
   });
 
