@@ -220,7 +220,8 @@ page défilée jusqu'en bas. Les autres modes ont été passés sur 4 pages seul
 ### 3.3 `html.lenis`, mouvement réduit, mobile
 
 - **`html.lenis` uniquement dans `(site)`** : présent sur `/fr`, `/fr/shop`, la fiche
-  produit, `/fr/custom`, `/fr/a-propos`, `/fr/contact` et `/de/shop` (clair, sombre, mobile) ;
+  produit, `/fr/custom`, `/fr/a-propos`, `/fr/contact` et `/de/shop` (clair ; sombre et mobile contrôlés sur `/fr/shop` et
+  `/fr/a-propos`) ;
   **absent** sur `/fr/cart`, `/fr/checkout`, `/fr/track`, `/fr/favorites`, `/fr/account/login`,
   `/fr/legal/terms`, la 404 et la fiche supprimée. **Absent partout en mouvement réduit**,
   OS comme interrupteur du footer (`data-motion="reduce"` posé sur les 4 pages testées, y
@@ -273,3 +274,76 @@ laboratoire ne remplace pas les web vitals de PostHog en cache chaud.
 
 Le clic tombe toujours sur le bouton, jamais sur le rail (écart 2 de la vague 1 corrigé : le
 rail ne s'affiche qu'à partir de `min-[96rem]`, soit 1536 px, avec 11 px de dégagement).
+
+## 4. Paiement Stripe de test, de bout en bout (serveur de développement)
+
+`bun run dev -p 3120`, **pas** sur le preview : son hôte `swiss3design.ch` enverrait le
+`return_url` de Stripe vers le vrai site. Clé secrète `sk_test_`, clé publiable `pk_test_`,
+carte de test publiée par Stripe (4242 4242 4242 4242, échéance et CVC fictifs), invité,
+e-mail en `example.test`, adresse suisse de test. Base : la branche Neon `preview`
+(chaîne unique de `.env.development.local`, aucune donnée de production). Script jetable,
+non commité, piloté par CDP.
+
+**Réglage local nécessaire (trouvé en route, corrigé dans l'exemple).** Avec un `.dev.vars`
+qui ne porte que `STRIPE_SECRET_KEY`, la page `/fr/checkout` de `next dev` reçoit une clé
+publiable **`pk_live_`** : `env.STRIPE_PUBLISHABLE_KEY` vient du niveau racine de
+`wrangler.jsonc` (clé live) et prime sur le repli `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` de
+`.env.development` (`checkout-flow.tsx:51`, `checkout/page.tsx:67`) ; or `.dev.vars.example`
+affirmait que la clé publiable de test était dans `.env.development`. Une clé live avec un
+secret de test est incohérente (aucun paiement réel n'est possible : le secret de test ne
+crée que des intentions de test ; l'échec côté Stripe.js n'a pas été rejoué). Posé
+dans le `.dev.vars` local (gitignoré, valeur de test lue dans `.env.development`) ; la page
+reçoit alors `pk_test_`. `.dev.vars.example` est corrigé (une ligne ajoutée, commentaire
+rectifié), comme `STRIPE_PROFILE_ID` l'était déjà pour la même raison.
+
+| Étape                                  | Résultat                                                                                                                                                                                                                                                                       |
+| -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Panier                                 | « Ajouter au panier » de la fiche `vase-spirale` (29,90 CHF), `s3d-cart-v1` écrit                                                                                                                                                                                              |
+| Contact invité                         | e-mail `w2a-verif-…@example.test`, code à 6 chiffres lu dans le journal du serveur de dev (pas de clé Resend local : `[email ignoré]`), « E-mail confirmé »                                                                                                                    |
+| Adresse                                | suggestion `api3.geo.admin.ch` choisie (« Rue du Perron 1, 1196 Gland, VD »), canton VD rempli, « Continuer vers le paiement »                                                                                                                                                 |
+| Paiement                               | total **38,80 CHF** (29,90 + livraison 8,90), bouton « Payer 38.80 CHF », Payment Element en **accordéon** (TWINT, Carte bancaire, Klarna, Billie, Amazon Pay) ; « Carte bancaire » dépliée : champs `cc-number`, `cc-exp`, `cc-csc`, plus les champs Link                     |
+| Retour                                 | redirection vers `/fr/checkout/success?session_id=…` environ 6 s après le clic, sans erreur de console                                                                                                                                                                         |
+| Page de succès                         | h1 « Merci, votre commande est reçue. », surtitre « La buse chauffe. », ticket **N° S3D-MUPI90LS1WN1**, **montant réglé 38.80 CHF**, question d'attribution et offre « Créez votre compte » (invité) ; **panier vidé** (`s3d-cart-v1` = `[]`)                                  |
+| Statut de la commande (base)           | **`paid`** : `paid_at` posé, identifiant de session et d'intention de paiement posés, `total_cents` 3880 = 2990 + 890, stock réservé, canal `web`, langue `fr`                                                                                                                 |
+| `/fr/track` avec le numéro et l'e-mail | commande retrouvée : « PAYÉE · Paiement reçu. L'impression n'a pas encore commencé. », frise Commande terminée puis Impression, Contrôle, Expédiée, Livrée « à venir », 1 × Vase Spirale, sous-total 29.90, livraison 8.90, total 38.80, adresse de livraison, offre de compte |
+
+- **Le webhook n'est pas livré en local, et la commande passe quand même à `paid`** : la page
+  de succès lit la session Stripe et appelle `settleSession` (idempotent, `success/page.tsx:113`)
+  avant d'afficher « succeeded ». Le webhook de production arrive donc en second et ne doit
+  rien changer. Le cas « complete mais pas encore réglé » (« processing ») n'a pas été
+  provoqué. **E-mails** : les lignes `order-confirmation:` et `order-admin:` de la commande
+  sont dans `email_outbox` (1 essai, non envoyées : pas de clé Resend), donc aucun e-mail réel
+  n'est parti.
+- **« Order Completed » part une fois, par le code et par l'observation.** Code :
+  `TrackEvent` (`track-event.tsx:20-31`) écrit `s3d-tracked:Order Completed:<n° de commande>`
+  dans `sessionStorage` puis émet ; au rendu suivant, la clé existe et il sort avant `track()`.
+  Mesuré (espion sur `Storage.setItem`) : **1 écriture** de
+  `s3d-tracked:Order Completed:S3D-MUPI90LS1WN1` au premier affichage, **0** après un
+  rechargement de la page (la clé est toujours là). Le rendu serveur ne l'émet que si
+  `settleSession` a réussi (`purchase` nul sinon). Rien ne sort d'ici : `track()` met en file
+  d'attente et PostHog ne s'attache que si `window.location.hostname` vaut
+  `ANALYTICS_HOSTNAME` (`analytics.ts:186`), donc jamais sur `localhost`.
+- **Payment Element en clair et en sombre** (2 captures, le haut de l'accordéon est hors
+  cadre) : clair = fond papier chaud, cartes à filet fin et texte encre ; sombre = fond
+  brun-noir, cartes sombres, texte gris clair, logos Billie et Amazon Pay sur pastille
+  blanche restés lisibles. **Le Payment Element suit le thème en direct** : après un clic sur le
+  bouton de thème (`html.dark` passe à vrai), l'iframe se redessine en sombre en moins de
+  2,5 s, sans recréer le paiement (`stripeAppearance(isDark)`, `useIsDark`). Le parcours n'a
+  pas été refait en sombre dès le départ (il aurait créé une troisième commande en attente).
+- Console de la page de paiement : seulement les avertissements attendus de Stripe.js en HTTP
+  local (HTTPS conseillé ; Apple Pay non enregistré pour `localhost`) et un
+  `Origin trial controlled feature not enabled: 'tools'` d'Edge ; un chargement de
+  `logo.png` d'hCaptcha avorté (`ERR_ABORTED`, tiers de Stripe). Aucune erreur applicative.
+- **Effets de bord sur la base de test** (branche `preview`, aucune donnée réelle) : trois
+  commandes `@example.test` créées par les passages de vérification, dont **deux restées
+  `pending` avec stock réservé** (`S3D-MUOQCSH3PHXM`, coupée avant le paiement par le passage
+  précédent ; `S3D-MUPI78C0HZLA`, première tentative de ce passage, arrêtée devant
+  l'accordéon) et la commande payée `S3D-MUPI90LS1WN1`. Le drainage de l'outbox lancé par la
+  page de succès a aussi écarté (disponibilité repoussée de 365 jours, journal « intervention
+  nécessaire ») des lignes de devis et de commandes plus anciennes de la même base, laissées
+  par d'anciens essais (plus de 23 h, plusieurs tentatives). Rien n'a été envoyé. Ce qui
+  libérera le stock réservé des deux commandes en attente n'a pas été vérifié (le code de
+  libération est dans `orders.ts` et `stock.ts` ; le cron de `maintenance.ts` ne s'en charge
+  pas) : à purger à la main si le propriétaire veut un catalogue de démo propre. Aucune
+  écriture manuelle n'a été faite (la lecture de la base passe par un client `SELECT`
+  seulement).

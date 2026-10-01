@@ -9,8 +9,12 @@
 # sont dans wrangler.jsonc.
 # ---------------------------------------------------------------------------
 
-# Stripe — mode TEST en local (clé publiable correspondante dans .env.development)
+# Stripe — mode TEST en local. La clé publiable est à poser ICI aussi : sous
+# `next dev`, `env.STRIPE_PUBLISHABLE_KEY` vient de wrangler.jsonc (clé LIVE) et
+# prime sur le repli NEXT_PUBLIC_… de .env.development, donc sans cette ligne le
+# Payment Element reçoit une clé live avec un secret de test (incohérent).
 STRIPE_SECRET_KEY="sk_test_..."
+STRIPE_PUBLISHABLE_KEY="pk_test_..."
 STRIPE_WEBHOOK_SECRET="whsec_..."
 
 # Better Auth
