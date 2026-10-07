@@ -963,10 +963,15 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
       const cx = (box[0] + box[3]) / 2;
       const cy = (box[1] + box[4]) / 2;
       const planBlend = planMode ? 1 : clamp(1 - polar / POLAR_START, 0, 1);
+      // Le haut de la vue recouvert par des commandes DOM (mobile) : l'objet est
+      // cadré dans la partie libre, puis l'image descend de la moitié du retrait.
+      const inset = clamp(props.insetTop ?? 0, 0, rect.height * 0.4);
+      const usable = 1 - inset / Math.max(1, rect.height);
       const distance =
         (planBlend > 0.5
           ? fitDistancePlan({ width, depth, aspect })
-          : fitDistance({ height, radius, aspect })) / zoom;
+          : fitDistance({ height, radius, aspect })) /
+        (zoom * usable);
       target.set(cx, planBlend > 0.5 ? 0 : height / 2, -cy);
       const [px, py, pz] = orbitPosition(
         [target.x, target.y, target.z],
@@ -979,6 +984,16 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
       camera.far = distance * 12;
       camera.position.set(px, py, pz);
       camera.lookAt(target);
+      if (inset > 0)
+        camera.setViewOffset(
+          rect.width,
+          rect.height,
+          0,
+          -inset / 2,
+          rect.width,
+          rect.height,
+        );
+      else if (camera.view?.enabled) camera.clearViewOffset();
       camera.updateProjectionMatrix();
       camera.updateMatrixWorld();
 

@@ -58,6 +58,12 @@ export interface StudioSceneProps extends StudioObjectViewProps {
    * ne dessine plus rien (aucun coût GPU derrière un dessin opaque).
    */
   hidden?: boolean;
+  /**
+   * Hauteur (px CSS) du haut de la vue que des commandes DOM recouvrent (mobile,
+   * rangée des vues) : la scène cadre l'objet dans ce qui reste dessous, au lieu
+   * de le laisser passer derrière elles. 0 par défaut (bureau, accueil).
+   */
+  insetTop?: number;
   onStatus?: (status: StudioSceneStatus) => void;
   onSimulate?: (simulation: StudioSimulation) => void;
   /** Éclaté : position de chaque bande, pour les étiquettes DOM. */

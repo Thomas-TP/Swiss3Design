@@ -1,6 +1,5 @@
 "use client";
 
-import { ChevronDown, ChevronUp } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   useCallback,
@@ -518,6 +517,7 @@ export function StudioApp({
               bands={bands}
               reprint={reprint}
               compact={compact}
+              onCompactChange={setCompact}
               t={t}
               core={core}
               className="w-full max-lg:h-full lg:aspect-square lg:max-h-[calc(100svh-14rem)]"
@@ -538,21 +538,6 @@ export function StudioApp({
               className="mt-3 max-lg:hidden"
             />
           </div>
-          {/* Mobile : la poignée qui réduit l'aperçu en bandeau (et le rend).
-              Hors de la scène, donc jamais sur l'objet ni sur ses boutons. */}
-          <button
-            type="button"
-            aria-expanded={!compact}
-            onClick={() => setCompact((value) => !value)}
-            className="hidden h-8 w-full shrink-0 items-center justify-center gap-1.5 border-b border-line text-xs font-medium text-soft transition-colors duration-150 ease-strate hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink group-data-[js]/studio:max-lg:flex"
-          >
-            {compact ? (
-              <ChevronDown size={14} aria-hidden="true" />
-            ) : (
-              <ChevronUp size={14} aria-hidden="true" />
-            )}
-            {compact ? t("scene.expand") : t("scene.collapse")}
-          </button>
         </div>
 
         <div
