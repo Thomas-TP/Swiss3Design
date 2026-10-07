@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import { ChipRadio } from "@/components/ui/chip";
 import { cx } from "@/components/ui/cx";
 import { textFieldsFor } from "./objects";
@@ -114,7 +114,11 @@ function Section({
 
 type Issue = Extract<Printability, { issues: unknown }>["issues"][number];
 
-export function StudioSections({
+// Mémorisé : tous les contrôles d'un objet sont dans le DOM (bureau : toutes les
+// sections se suivent), un rendu complet coûte donc cher. Les rendus qui ne
+// changent ni la configuration, ni les textes, ni l'onglet (fin d'un geste :
+// l'historique seul bouge) le laissent tel quel.
+export const StudioSections = memo(function StudioSections({
   ctl,
   sections,
   tab,
@@ -245,4 +249,4 @@ export function StudioSections({
       ))}
     </div>
   );
-}
+});

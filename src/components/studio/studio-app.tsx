@@ -197,22 +197,42 @@ export function StudioApp({
     [dispatch, object],
   );
 
-  const ctl: Ctl = {
-    object,
-    config,
-    texts,
-    examples,
-    stats,
-    bands,
-    locale,
-    t,
-    core,
-    uid,
-    change,
-    commit,
-    setText,
-    newSeed,
-  };
+  // Mémorisé : un rendu qui ne change ni la configuration ni les textes (la fin
+  // d'un geste ne touche que l'historique) garde les mêmes contrôles, qui ne se
+  // redessinent pas (StudioSections et ScenePanel sont mémorisés).
+  const ctl: Ctl = useMemo(
+    () => ({
+      object,
+      config,
+      texts,
+      examples,
+      stats,
+      bands,
+      locale,
+      t,
+      core,
+      uid,
+      change,
+      commit,
+      setText,
+      newSeed,
+    }),
+    [
+      object,
+      config,
+      texts,
+      examples,
+      stats,
+      bands,
+      locale,
+      t,
+      core,
+      uid,
+      change,
+      commit,
+      setText,
+    ],
+  );
 
   const issueText = useCallback(
     (issue: Issue) =>
@@ -399,61 +419,90 @@ export function StudioApp({
     ? formatChfRange(stats.estimate.lowCents, stats.estimate.highCents, locale)
     : null;
 
-  const sendButton = (
-    <div className="flex flex-col items-start gap-3">
-      {/* Sans JavaScript : le lien de devis. Avec : le bouton qui ouvre le tiroir. */}
-      <ButtonLink
-        href="/custom#demande"
-        variant="primary"
-        size="lg"
-        className="group-data-[js]/studio:hidden"
-      >
-        {t("send.noscript")}
-      </ButtonLink>
-      {/* Le conteneur porte l'affichage conditionnel : le bouton a son propre
-          `inline-flex`, que `hidden` ne battrait pas (même spécificité), et un
-          bouton sans effet sans JavaScript serait trompeur. */}
-      <div className="hidden group-data-[js]/studio:max-lg:hidden group-data-[js]/studio:block">
-        <Button
+  // Mémorisés avec le bloc de réglage qui les porte : sans changement de
+  // l'envoi (bloqué, motif du blocage), ils ne se redessinent pas à chaque cran.
+  const sendButton = useMemo(
+    () => (
+      <div className="flex flex-col items-start gap-3">
+        {/* Sans JavaScript : le lien de devis. Avec : le bouton qui ouvre le tiroir. */}
+        <ButtonLink
+          href="/custom#demande"
           variant="primary"
           size="lg"
-          disabled={blocked}
-          onClick={openSend}
-          aria-describedby={reason ? reasonId : undefined}
+          className="group-data-[js]/studio:hidden"
         >
-          {t("send.cta")}
-        </Button>
-      </div>
-      {reason ? (
-        <p
-          id={reasonId}
-          className="max-w-[46ch] text-sm font-medium text-accent-text"
-        >
-          {reason}
+          {t("send.noscript")}
+        </ButtonLink>
+        {/* Le conteneur porte l'affichage conditionnel : le bouton a son propre
+          `inline-flex`, que `hidden` ne battrait pas (même spécificité), et un
+          bouton sans effet sans JavaScript serait trompeur. */}
+        <div className="hidden group-data-[js]/studio:max-lg:hidden group-data-[js]/studio:block">
+          <Button
+            variant="primary"
+            size="lg"
+            disabled={blocked}
+            onClick={openSend}
+            aria-describedby={reason ? reasonId : undefined}
+          >
+            {t("send.cta")}
+          </Button>
+        </div>
+        {reason ? (
+          <p
+            id={reasonId}
+            className="max-w-[46ch] text-sm font-medium text-accent-text"
+          >
+            {reason}
+          </p>
+        ) : null}
+        <p className="max-w-[52ch] text-sm text-soft">
+          {t("send.estimateNote")}
         </p>
-      ) : null}
-      <p className="max-w-[52ch] text-sm text-soft">{t("send.estimateNote")}</p>
-    </div>
+      </div>
+    ),
+    [blocked, openSend, reason, reasonId, t],
   );
 
-  const noscriptNote = (
-    <div className="flex flex-col gap-3 group-data-[js]/studio:hidden">
-      {/* Avec JavaScript, le même constat est un toast (§6.7 « États »). */}
-      {initialInvalid ? (
-        <output className="block text-sm font-medium text-accent-text">
-          {t("toast.invalidLink")}
-        </output>
-      ) : null}
-      <p className="text-sm text-soft">{t("send.noscriptNote")}</p>
-      <details className="rounded-card border border-line p-3 text-sm">
-        <summary className="cursor-pointer text-ink">
-          {t("send.machineLine")}
-        </summary>
-        <pre className="s3d-num mt-3 whitespace-pre-wrap break-all text-xs text-soft">
-          {machineLine(config)}
-        </pre>
-      </details>
-    </div>
+  const noscriptNote = useMemo(
+    () => (
+      <div className="flex flex-col gap-3 group-data-[js]/studio:hidden">
+        {/* Avec JavaScript, le même constat est un toast (§6.7 « États »). */}
+        {initialInvalid ? (
+          <output className="block text-sm font-medium text-accent-text">
+            {t("toast.invalidLink")}
+          </output>
+        ) : null}
+        <p className="text-sm text-soft">{t("send.noscriptNote")}</p>
+        <details className="rounded-card border border-line p-3 text-sm">
+          <summary className="cursor-pointer text-ink">
+            {t("send.machineLine")}
+          </summary>
+          <pre className="s3d-num mt-3 whitespace-pre-wrap break-all text-xs text-soft">
+            {machineLine(config)}
+          </pre>
+        </details>
+      </div>
+    ),
+    [initialInvalid, config, t],
+  );
+
+  // Les rappels et éléments passés aux enfants mémorisés : stables d'un rendu à
+  // l'autre tant que leur contenu ne change pas.
+  const sectionLabel = useCallback(
+    (section: SectionId) => t(`sections.${section}`),
+    [t],
+  );
+  const bandBar = useMemo(
+    () =>
+      config.object === "lavaux" || config.object === "relief" ? (
+        <AltimetricBar
+          ctl={ctl}
+          config={config}
+          orientation="vertical"
+          className="h-full"
+        />
+      ) : undefined,
+    [ctl, config],
   );
 
   return (
@@ -521,16 +570,7 @@ export function StudioApp({
               t={t}
               core={core}
               className="w-full max-lg:h-full lg:aspect-square lg:max-h-[calc(100svh-14rem)]"
-              bandBar={
-                config.object === "lavaux" || config.object === "relief" ? (
-                  <AltimetricBar
-                    ctl={ctl}
-                    config={config}
-                    orientation="vertical"
-                    className="h-full"
-                  />
-                ) : undefined
-              }
+              bandBar={bandBar}
             />
             <MeasureStrip
               items={measureItems({ config, stats, locale, core, t })}
@@ -570,13 +610,13 @@ export function StudioApp({
               sections={sections}
               value={tab}
               onChange={setTab}
-              labelOf={(section) => t(`sections.${section}`)}
+              labelOf={sectionLabel}
             />
             <StudioSections
               ctl={ctl}
               sections={sections}
               tab={tab}
-              titleOf={(section) => t(`sections.${section}`)}
+              titleOf={sectionLabel}
               issueText={issueText}
               onFix={fix}
               actions={sendButton}
