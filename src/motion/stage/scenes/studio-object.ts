@@ -573,7 +573,13 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
     const mine = generation;
     try {
       const built = await getStudioWorker().build(job);
-      if (disposed || mine !== generation || props.exploded) return;
+      // L'envoi au GPU (premier dessin) attend un moment calme du fil principal.
+      await new Promise<void>((resolve) => {
+        if (typeof window.requestIdleCallback === "function")
+          window.requestIdleCallback(() => resolve(), { timeout: 1000 });
+        else window.setTimeout(resolve, 0);
+      });
+      if (disposed || mine !== generation || !props || props.exploded) return;
       attachFine(built);
       ctx.invalidate();
       report(
