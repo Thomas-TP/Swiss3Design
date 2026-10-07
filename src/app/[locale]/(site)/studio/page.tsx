@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { JsonLd } from "@/components/json-ld";
 import { PageHeader } from "@/components/page-header";
-import { ObjectPoster } from "@/components/studio/object-poster";
+import { ObjectCard } from "@/components/studio/object-card";
 import { ButtonLink } from "@/components/ui/button";
 import { PageCut } from "@/components/ui/page-cut";
-import { SiteLink } from "@/components/ui/site-link";
 import type { Locale } from "@/i18n/routing";
 import {
   breadcrumbJsonLd,
@@ -24,14 +23,14 @@ import { DEFAULT_CONFIGS } from "@/lib/studio/presets";
 import { computeStats } from "@/lib/studio/stats";
 import { OBJECT_TEXT_FIELDS } from "@/lib/studio/text/fields";
 import { STUDIO_OBJECT_IDS, type StudioTexts } from "@/lib/studio/types";
-import { StrataIcon } from "@/components/ui/icons";
 
 // Index du Studio (brief « Strates », §6.12, §7.6) : h1 « Le Studio », chapeau
-// « Réglez-le. On l'imprime. », quatre cartes (une ligne, les chiffres de
-// l'objet par défaut, « Sur devis » ou la fourchette, poster SSR), comment ça
-// marche en quatre étapes, FAQ, lien vers /custom. Aucune vue WebGL ni
-// composant client : la page reste légère, les chiffres sortent de la même
-// fonction pure que le Studio (computeStats).
+// « Personnalisez-le. On l'imprime. », quatre cartes (l'aperçu de l'objet dans
+// ses couleurs, une ligne, les chiffres de l'objet par défaut, « Sur devis » ou
+// la fourchette), comment ça marche en quatre étapes (numérotées, sans
+// pictogramme), FAQ, lien vers /custom. Aucune vue WebGL ni composant client :
+// la page reste légère, les chiffres sortent de la même fonction pure que le
+// Studio (computeStats).
 
 export const dynamic = "force-dynamic";
 
@@ -89,7 +88,6 @@ export default async function StudioIndexPage({
           });
     return {
       object,
-      config,
       texts,
       name: core(`objects.${object}.name`),
       tagline: core(`objects.${object}.tagline`),
@@ -134,32 +132,21 @@ export default async function StudioIndexPage({
           {cards.map((card) => (
             <li
               key={card.object}
-              className="col-span-full sm:col-span-4 lg:col-span-3"
+              // Deux cartes par rangée de 640 px à 1279 px (grille à 8 puis 12
+              // colonnes), quatre au-delà : des aperçus en grand, jamais en vignette.
+              className="col-span-full sm:col-span-4 lg:col-span-6 xl:col-span-3"
             >
-              <div className="relative flex h-full flex-col rounded-card border border-line bg-surface p-5">
-                <ObjectPoster
-                  config={card.config}
-                  texts={card.texts}
-                  locale={locale}
-                  className="mx-auto aspect-square w-full max-w-[16rem] p-4"
-                />
-                <h2 className="mt-4 font-display text-[1.0625rem] font-bold leading-snug tracking-tight text-ink">
-                  <SiteLink
-                    href={`/studio/${card.object}`}
-                    className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ink"
-                  >
-                    {card.name}
-                  </SiteLink>
-                </h2>
-                <p className="mt-2 flex-1 text-sm text-soft">{card.tagline}</p>
-                <p className="s3d-label mt-4 normal-case text-ink">
-                  {card.figures}
-                </p>
-                <p className="s3d-label mt-2 flex items-center justify-between normal-case text-ink">
-                  <span>{card.price}</span>
-                  <span className="text-soft">{t("index.adjust")} →</span>
-                </p>
-              </div>
+              <ObjectCard
+                object={card.object}
+                locale={locale}
+                texts={card.texts}
+                name={card.name}
+                tagline={card.tagline}
+                figures={card.figures}
+                price={card.price}
+                cta={t("index.adjust")}
+                level={2}
+              />
             </li>
           ))}
         </ul>
@@ -174,11 +161,8 @@ export default async function StudioIndexPage({
                 key={key}
                 className="col-span-full flex flex-col gap-2 border-t border-line pt-4 sm:col-span-4 lg:col-span-3"
               >
-                <p className="s3d-label flex items-center gap-2 text-soft">
-                  <StrataIcon size={18} className="text-iso-index" />
-                  <span className="text-ink">
-                    {String(index + 1).padStart(2, "0")}
-                  </span>
+                <p className="s3d-label text-iso-index">
+                  {String(index + 1).padStart(2, "0")}
                 </p>
                 <h3 className="font-display text-[1.0625rem] font-bold text-ink">
                   {t(`how.steps.${key}.title`)}

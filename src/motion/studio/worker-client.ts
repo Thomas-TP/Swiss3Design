@@ -1,17 +1,25 @@
 // Client du Worker de géométrie du Studio (brief « Strates », §6.11, §9.2) :
-// UN Worker pour la page, partagé par la scène `studio-object` (affichage) et le
-// moteur (export STL). Chaque appel reçoit un `id` ; la réponse correspondante
+// les Workers de la page, partagés par la scène `studio-object` (affichage) et
+// le moteur (export STL). Chaque appel reçoit un `id` ; la réponse correspondante
 // résout la promesse. Le client ne décide pas de ce qui est périmé : la scène le
-// fait (un seul calcul en vol, le plus récent après lui), ici on ne perd rien.
+// fait (un seul calcul en vol par voie, le plus récent après lui), ici on ne
+// perd rien.
 //
-// Le singleton est posé sur `globalThis` : la scène et le moteur sont deux
-// chunks, et un bundler qui dupliquerait ce module ferait démarrer deux Workers
-// (deux fois les glyphes, deux fois la mémoire).
+// Deux voies, deux Workers : la voie `main` sert les gestes (basse définition,
+// définition d'affichage) et l'export ; la voie `fine` ne sert que le maillage
+// fin du repos (jusqu'à ≈ 200 k triangles, 30 à 300 ms selon la machine). Un
+// seul Worker ferait attendre le geste suivant derrière ce calcul ; deux, il ne
+// l'attend jamais. Le second ne démarre qu'à la première demande fine.
+//
+// Les singletons sont posés sur `globalThis` : la scène et le moteur sont deux
+// chunks, et un bundler qui dupliquerait ce module ferait démarrer deux fois
+// chaque Worker (deux fois les glyphes, deux fois la mémoire).
 //
 // Repli : si un Worker ne peut pas démarrer (script bloqué, navigateur
 // ancien), les mêmes fonctions tournent sur le fil principal (geometry-core).
 // Plus lent (le glissé saccade), mais le Studio, l'export et le devis restent
-// utilisables : la 3D n'est pas la seule voie vers la commande.
+// utilisables : la 3D n'est pas la seule voie vers la commande. Le maillage
+// fin, lui, n'a pas de repli : sans second Worker on garde l'affichage.
 import { GLYPH_URL } from "@/lib/studio/text/glyphs";
 import type { StudioLocale } from "@/components/studio/scene-props";
 import type { StudioConfig, StudioTexts } from "@/lib/studio/types";
@@ -36,7 +44,15 @@ export interface StudioWorkerClient {
   preloadGlyphs(): void;
 }
 
+type LaneName = "main" | "fine";
+
+interface Lane {
+  worker: Worker | null;
+  failed: boolean;
+}
+
 interface Pending {
+  lane: LaneName;
   resolve(value: BuiltMesh | ExportedFile): void;
   reject(error: unknown): void;
 }
@@ -44,18 +60,50 @@ interface Pending {
 const KEY = "__s3dStudioWorkerClient";
 
 function create(): StudioWorkerClient {
-  let worker: Worker | null = null;
-  let failed = false;
+  const lanes: Record<LaneName, Lane> = {
+    main: { worker: null, failed: false },
+    fine: { worker: null, failed: false },
+  };
   let seq = 0;
   const pending = new Map<number, Pending>();
 
-  function failAll(error: StudioWorkerError) {
-    for (const entry of pending.values()) entry.reject(error);
-    pending.clear();
+  function failLane(lane: LaneName, error: StudioWorkerError) {
+    for (const [id, entry] of Array.from(pending)) {
+      if (entry.lane !== lane) continue;
+      pending.delete(id);
+      entry.reject(error);
+    }
   }
 
-  function start(): Worker | null {
-    if (worker || failed) return worker;
+  function onMessage(event: MessageEvent<FromWorker>) {
+    const message = event.data;
+    if (message.t === "glyphs") return;
+    const entry = pending.get(message.id);
+    if (!entry) return;
+    pending.delete(message.id);
+    if (message.t === "error")
+      entry.reject(new StudioWorkerError(message.code, message.message));
+    else if (message.t === "mesh")
+      entry.resolve({
+        mesh: message.mesh,
+        ms: message.ms,
+        bands: message.bands,
+        heightMm: message.heightMm,
+      });
+    else
+      entry.resolve({
+        buffer: message.buffer,
+        triangles: message.triangles,
+        bytes: message.bytes,
+        ms: message.ms,
+        hash: message.hash,
+        fileName: message.fileName,
+      });
+  }
+
+  function start(name: LaneName): Worker | null {
+    const lane = lanes[name];
+    if (lane.worker || lane.failed) return lane.worker;
     try {
       const next = new Worker(
         new URL("./geometry.worker.ts", import.meta.url),
@@ -63,54 +111,32 @@ function create(): StudioWorkerClient {
           type: "module",
         },
       );
-      next.onmessage = (event: MessageEvent<FromWorker>) => {
-        const message = event.data;
-        if (message.t === "glyphs") return;
-        const entry = pending.get(message.id);
-        if (!entry) return;
-        pending.delete(message.id);
-        if (message.t === "error")
-          entry.reject(new StudioWorkerError(message.code, message.message));
-        else if (message.t === "mesh")
-          entry.resolve({
-            mesh: message.mesh,
-            ms: message.ms,
-            bands: message.bands,
-            heightMm: message.heightMm,
-          });
-        else
-          entry.resolve({
-            buffer: message.buffer,
-            triangles: message.triangles,
-            bytes: message.bytes,
-            ms: message.ms,
-            hash: message.hash,
-            fileName: message.fileName,
-          });
-      };
+      next.onmessage = onMessage;
       next.onerror = (event) => {
-        // Script introuvable ou bloqué : on bascule sur le fil principal.
+        // Script introuvable ou bloqué : cette voie bascule sur le fil principal.
         event.preventDefault?.();
-        failed = true;
-        worker = null;
+        lane.failed = true;
+        lane.worker = null;
         next.terminate();
-        failAll(new StudioWorkerError("build", "worker-unavailable"));
+        failLane(name, new StudioWorkerError("build", "worker-unavailable"));
       };
-      worker = next;
+      lane.worker = next;
     } catch {
-      failed = true;
+      lane.failed = true;
     }
-    return worker;
+    return lane.worker;
   }
 
   function post<T extends BuiltMesh | ExportedFile>(
+    name: LaneName,
     make: (id: number) => ToWorker,
   ): Promise<T> | null {
-    const target = start();
+    const target = start(name);
     if (!target) return null;
     const id = ++seq;
     return new Promise<T>((resolve, reject) => {
       pending.set(id, {
+        lane: name,
         resolve: resolve as Pending["resolve"],
         reject,
       });
@@ -125,6 +151,7 @@ function create(): StudioWorkerClient {
 
   /** Une requête déjà en vol quand le Worker meurt : on la rejoue sur le fil principal. */
   async function withFallback<T extends BuiltMesh | ExportedFile>(
+    name: LaneName,
     viaWorker: () => Promise<T> | null,
     inline: () => Promise<T>,
   ): Promise<T> {
@@ -134,7 +161,7 @@ function create(): StudioWorkerClient {
       return await first;
     } catch (error) {
       if (
-        failed &&
+        lanes[name].failed &&
         error instanceof StudioWorkerError &&
         error.message === "worker-unavailable"
       )
@@ -145,15 +172,23 @@ function create(): StudioWorkerClient {
 
   return {
     build(job) {
+      const lane: LaneName = job.lod === "fine" ? "fine" : "main";
       return withFallback<BuiltMesh>(
-        () => post<BuiltMesh>((id) => ({ t: "build", id, ...job })),
-        async () => (await import("./geometry-core")).runBuild(job),
+        lane,
+        () => post<BuiltMesh>(lane, (id) => ({ t: "build", id, ...job })),
+        async () => {
+          // Le fil principal ne calcule jamais le maillage fin : on garde l'affichage.
+          if (lane === "fine")
+            throw new StudioWorkerError("build", "fine-unavailable");
+          return (await import("./geometry-core")).runBuild(job);
+        },
       );
     },
     exportStl(config, texts, name, locale) {
       return withFallback<ExportedFile>(
+        "main",
         () =>
-          post<ExportedFile>((id) => ({
+          post<ExportedFile>("main", (id) => ({
             t: "export",
             id,
             config,
@@ -166,7 +201,7 @@ function create(): StudioWorkerClient {
       );
     },
     preloadGlyphs() {
-      const target = start();
+      const target = start("main");
       if (target)
         target.postMessage({ t: "glyphs", url: GLYPH_URL } satisfies ToWorker);
       else

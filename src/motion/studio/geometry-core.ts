@@ -55,14 +55,31 @@ const needsGlyphs = (config: StudioConfig, texts: StudioTexts) =>
 const now = () =>
   typeof performance !== "undefined" ? performance.now() : Date.now();
 
+/**
+ * Niveau de détail du générateur pour une construction d'affichage. `fine` en
+ * C2 prend le maillage d'export (arêtes lisses : jusqu'à 360 segments et des
+ * anneaux resserrés là où le motif change vite) ; en C1 il monte seulement à la
+ * définition C2, que la mémoire d'un mobile supporte sans souci.
+ */
+export function generatorLevel(job: Pick<BuildJob, "lod" | "tier">): {
+  lod: "drag" | "display" | "export";
+  tier: 1 | 2;
+} {
+  if (job.lod !== "fine") return { lod: job.lod, tier: job.tier };
+  return job.tier === 2
+    ? { lod: "export", tier: 2 }
+    : { lod: "display", tier: 2 };
+}
+
 export async function runBuild(job: BuildJob): Promise<BuiltMesh> {
   const texts = sanitizeTexts(job.config.object, job.texts);
   if (needsGlyphs(job.config, texts)) await ensureGlyphs();
   const start = now();
   try {
+    const level = generatorLevel(job);
     const mesh = buildStudioMesh(job.config, texts, {
-      lod: job.lod,
-      tier: job.tier,
+      lod: level.lod,
+      tier: level.tier,
       separateBands: job.separate,
       locale: job.locale,
     });

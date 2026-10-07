@@ -45,6 +45,8 @@ export function StudioToolbar({
     <fieldset
       className={cx(
         "m-0 hidden min-w-0 flex-wrap items-center gap-2 border-0 p-0 group-data-[js]/studio:flex",
+        // Mobile : une seule rangée qui défile (deux rangées volaient 44 px aux réglages).
+        "max-lg:flex-nowrap max-lg:overflow-x-auto max-lg:[scrollbar-width:none] max-lg:[&>button]:shrink-0",
         className,
       )}
     >

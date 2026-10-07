@@ -6,17 +6,17 @@
   },
   "seo": {
     "index": {
-      "title": "The Studio: adjust your 3D object",
-      "description": "Four objects to adjust in 3D: vase, business card, coaster, name tag. Up to four colors, printed in Switzerland, firm price within 48 hours."
+      "title": "The Studio: customise your 3D object",
+      "description": "Four objects to customise in 3D: vase, business card, coaster, name tag. Up to four colors, printed in Switzerland, firm price within 48 hours."
     },
     "objects": {
       "lavaux": {
         "title": "Custom Lavaux vase, in 3D",
-        "description": "Adjust the profile, pattern and up to four colors of your Lavaux vase, check it in 3D and send it: printed in Switzerland, firm price within 48 hours."
+        "description": "Customise the profile, pattern and up to four colors of your Lavaux vase, check it in 3D and send it: printed in Switzerland, firm price within 48 hours."
       },
       "cartouche": {
         "title": "Cartouche 3D business card",
-        "description": "Your 85 × 55 mm business card, embossed or engraved, two colors, your own text: adjust it in 3D, printed in Switzerland, firm price within 48 hours."
+        "description": "Your 85 × 55 mm business card, embossed or engraved, two colors, your own text: customise it in 3D, printed in Switzerland, firm price within 48 hours."
       },
       "relief": {
         "title": "Relief coaster, a custom mountain range",
@@ -24,22 +24,22 @@
       },
       "borne": {
         "title": "Borne two-color name tag",
-        "description": "A two-color name tag with your own text, embossed or engraved, ring on the left or right. Adjusted in 3D, printed in Switzerland, firm price within 48 hours."
+        "description": "A two-color name tag with your own text, embossed or engraved, ring on the left or right. Customised in 3D, printed in Switzerland, firm price within 48 hours."
       }
     }
   },
   "index": {
     "eyebrow": "3D configurator",
     "title": "The Studio",
-    "intro": "Adjust it. We print it.",
-    "lead": "Four objects designed by the workshop, limited so they print on our machines. Adjust the shape, the colors and the text, check the numbers, then send it: the workshop reviews every request and replies within 48 hours with a firm price.",
-    "adjust": "Adjust"
+    "intro": "Customise it. We print it.",
+    "lead": "Four objects designed by the workshop, limited so they print on our machines. Customise the shape, the colors and the text, check the numbers, then send it: the workshop reviews every request and replies within 48 hours with a firm price.",
+    "adjust": "Customise"
   },
   "how": {
     "title": "How it works",
     "steps": {
       "adjust": {
-        "title": "Adjust",
+        "title": "Customise",
         "text": "Shape, pattern, up to four colors, your text: the 3D view follows every move."
       },
       "check": {
@@ -48,7 +48,7 @@
       },
       "send": {
         "title": "Send",
-        "text": "Your settings go to the workshop with their print file. Nothing is paid at this stage."
+        "text": "Your customisation goes to the workshop with its print file. Nothing is paid at this stage."
       },
       "receive": {
         "title": "Receive",
@@ -60,7 +60,7 @@
     "title": "Frequently asked questions",
     "items": {
       "printable": {
-        "q": "Is what I adjust really printable?",
+        "q": "Is what I customise really printable?",
         "a": "Every object is limited so that it prints on the workshop's machines (250 mm build plate, PLA, 0.4 mm nozzle). A badge says “Printable”, “Check needed” or “Not printable”, with the first issue in plain words and a “Fix it” button when a fix exists."
       },
       "price": {
@@ -101,14 +101,14 @@
     }
   },
   "sections": {
-    "legend": "Adjustment sections",
+    "legend": "Customisation sections",
     "shape": "Shape",
     "pattern": "Pattern",
     "colors": "Colors",
     "text": "Text",
     "sheet": "Specs"
   },
-  "apply": "Apply settings",
+  "apply": "Apply customisation",
   "tools": {
     "group": "Studio tools",
     "undo": "Undo",
@@ -121,12 +121,12 @@
     "linkCopied": "Link copied: the text is not included.",
     "kept": "Design kept: find it in Favorites.",
     "keepFailed": "Cannot keep this design: browser storage is unavailable.",
-    "invalidLink": "This link is not readable: default settings."
+    "invalidLink": "This link is not readable: default values."
   },
   "scene": {
     "viewsLegend": "View of the object",
     "view": {
-      "orbit": "3/4",
+      "orbit": "3D",
       "plan": "Plan",
       "elevation": "Elevation",
       "layers": "Layers"
@@ -134,7 +134,9 @@
     "explode": "Explode",
     "preparing": "Preparing the Studio…",
     "error": "The 3D view could not be calculated.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "collapse": "Collapse preview",
+    "expand": "Expand preview"
   },
   "layers": {
     "slider": "Displayed layer",
@@ -271,8 +273,8 @@
     "intro": "The workshop reviews your piece and replies within 48 hours with a firm price. Nothing is paid now.",
     "cta": "Send to the workshop",
     "noscript": "Request a quote",
-    "noscriptNote": "Without JavaScript, apply your settings then copy them into your quote request: the workshop prepares the file for you.",
-    "machineLine": "Settings to paste into the request",
+    "noscriptNote": "Without JavaScript, apply your customisation then copy it into your quote request: the workshop prepares the file for you.",
+    "machineLine": "Customisation to paste into the request",
     "blocked": "Fix the points flagged in the specs first.",
     "needText": "Enter at least one character: {field}.",
     "estimateNote": "Estimate · firm price confirmed by the workshop within 48 hours.",

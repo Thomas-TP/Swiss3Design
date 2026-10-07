@@ -1,18 +1,28 @@
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { ButtonLink } from "@/components/ui/button";
-import { SiteLink } from "@/components/ui/site-link";
-import { StrataIcon } from "@/components/ui/icons";
+import { ObjectCard } from "@/components/studio/object-card";
+import { OBJECT_TEXT_FIELDS } from "@/lib/studio/text/fields";
+import type { StudioObjectId, StudioTexts } from "@/lib/studio/types";
 
-// Rangée « À régler au Studio » (brief « Strates », §7.8) : les quatre objets
-// originaux de l'atelier, réglables en 3D puis envoyés pour un devis. Ce ne sont
-// PAS des produits de la boutique : aucun prix fixe (« Sur devis », une
-// fourchette le jour où le propriétaire valide les coefficients), aucun JSON-LD
-// produit, aucune carte d'achat. Chaque carte mène à `/studio/<objet>` ; les
-// slugs sont des noms propres, identiques dans les 4 langues (§1.6).
-const OBJECTS = ["lavaux", "cartouche", "relief", "borne"] as const;
+// Rangée « À personnaliser au Studio » (brief « Strates », §7.8) : les quatre
+// objets originaux de l'atelier, personnalisables en 3D puis envoyés pour un
+// devis. Ce ne sont PAS des produits de la boutique : aucun prix ferme (« Sur
+// devis », une fourchette le jour où le propriétaire valide les coefficients),
+// aucun JSON-LD produit, aucune carte d'achat. Chaque carte montre l'objet dans
+// ses couleurs (le même aperçu que l'index du Studio) et mène à
+// `/studio/<objet>` ; les slugs sont des noms propres, identiques dans les 4
+// langues (§1.6).
+const OBJECTS: readonly StudioObjectId[] = [
+  "lavaux",
+  "cartouche",
+  "relief",
+  "borne",
+];
 
 export function StudioRow({ className }: { className?: string }) {
   const t = useTranslations("catalog.shop.studio");
+  const core = useTranslations("studioCore");
+  const locale = useLocale();
 
   return (
     <section aria-labelledby="shop-studio-title" className={className}>
@@ -27,32 +37,31 @@ export function StudioRow({ className }: { className?: string }) {
           <p className="mt-3 text-soft">{t("intro")}</p>
         </div>
       </div>
-      <ul className="s3d-grid mt-8 gap-y-4">
-        {OBJECTS.map((object) => (
-          <li
-            key={object}
-            className="col-span-full sm:col-span-4 lg:col-span-3"
-          >
-            <div className="relative flex h-full flex-col rounded-card border border-line bg-surface p-5">
-              <StrataIcon size={22} className="text-iso-index" />
-              <h3 className="mt-4 font-display text-[1.0625rem] font-bold leading-snug tracking-tight text-ink">
-                <SiteLink
-                  href={`/studio/${object}`}
-                  className="after:absolute after:inset-0 focus-visible:outline-none focus-visible:after:outline-2 focus-visible:after:outline-offset-2 focus-visible:after:outline-ink"
-                >
-                  {t(`objects.${object}.name`)}
-                </SiteLink>
-              </h3>
-              <p className="mt-2 flex-1 text-sm text-soft">
-                {t(`objects.${object}.line`)}
-              </p>
-              <p className="s3d-label mt-4 flex items-center justify-between normal-case text-ink">
-                <span>{t("quote")}</span>
-                <span className="text-soft">{t("adjust")} →</span>
-              </p>
-            </div>
-          </li>
-        ))}
+      <ul className="s3d-grid mt-8 gap-y-6">
+        {OBJECTS.map((object) => {
+          // Les textes d'exemple de la langue : la taille des lignes de l'aperçu.
+          const texts: StudioTexts = {};
+          for (const field of OBJECT_TEXT_FIELDS[object])
+            texts[field] = core(`examples.${field}`);
+          return (
+            <li
+              key={object}
+              // Deux cartes par rangée de 640 px à 1279 px (grille à 8 puis 12
+              // colonnes), quatre au-delà : des aperçus en grand, jamais en vignette.
+              className="col-span-full sm:col-span-4 lg:col-span-6 xl:col-span-3"
+            >
+              <ObjectCard
+                object={object}
+                locale={locale}
+                texts={texts}
+                name={t(`objects.${object}.name`)}
+                tagline={t(`objects.${object}.line`)}
+                price={t("quote")}
+                cta={t("adjust")}
+              />
+            </li>
+          );
+        })}
       </ul>
     </section>
   );

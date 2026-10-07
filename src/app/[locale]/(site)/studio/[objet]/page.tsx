@@ -93,7 +93,9 @@ export default async function StudioObjectPage({
 
   return (
     <PageCut>
-      <div className="s3d-page pb-section pt-6 md:pt-10">
+      {/* Mobile : le formulaire est un écran d'application, collé sous l'en-tête
+          (sa hauteur retranche cet air, voir studio-app.tsx). */}
+      <div className="s3d-page pb-section pt-2 lg:pt-10">
         <JsonLd
           data={webPageJsonLd({
             type: "WebPage",
@@ -141,10 +143,12 @@ export default async function StudioObjectPage({
           }
           intro={
             <div>
-              <h1 className="font-display text-title font-extrabold break-words text-ink lg:text-[clamp(2.25rem,3.1vw,3.5rem)] lg:leading-[0.98] lg:tracking-[-0.03em]">
+              <h1 className="font-display text-title font-extrabold break-words text-ink max-lg:text-[1.625rem] max-lg:leading-tight lg:text-[clamp(2.25rem,3.1vw,3.5rem)] lg:leading-[0.98] lg:tracking-[-0.03em]">
                 {withDot(name)}
               </h1>
-              <p className="mt-4 max-w-[46ch] text-lead text-soft">
+              {/* Mobile : le chapeau reste dans la page (lecteurs d'écran,
+                  moteurs) mais ne prend plus de place aux réglages. */}
+              <p className="mt-4 max-w-[46ch] text-lead text-soft max-lg:sr-only">
                 {t(`objects.${object}.lead`)}
               </p>
             </div>

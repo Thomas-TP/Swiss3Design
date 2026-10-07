@@ -79,6 +79,65 @@ describe("client du Worker de géométrie", () => {
     expect(settled).toBe("pending");
   });
 
+  it("le maillage fin passe par un second Worker : un geste n'attend jamais derrière lui", async () => {
+    const workers: FakeLaneWorker[] = [];
+    class FakeLaneWorker {
+      onmessage: ((event: MessageEvent) => void) | null = null;
+      onerror: ((event: ErrorEvent) => void) | null = null;
+      sent: ToWorker[] = [];
+      constructor() {
+        workers.push(this);
+      }
+      postMessage(message: ToWorker) {
+        this.sent.push(message);
+      }
+      terminate() {}
+    }
+    vi.stubGlobal("Worker", FakeLaneWorker);
+    const client = getStudioWorker();
+    void client.build(job);
+    void client.build({ ...job, lod: "display" });
+    expect(workers).toHaveLength(1);
+    void client.build({ ...job, lod: "fine", tier: 2 });
+    // Un second Worker, ses propres requêtes : le premier ne voit jamais la fine.
+    expect(workers).toHaveLength(2);
+    expect(workers[0].sent.map((m) => (m.t === "build" ? m.lod : m.t))).toEqual(
+      ["drag", "display"],
+    );
+    expect(workers[1].sent.map((m) => (m.t === "build" ? m.lod : m.t))).toEqual(
+      ["fine"],
+    );
+    // L'export et les glyphes restent sur la première voie.
+    void client.exportStl(HERO_CONFIG, {}, "s3d.stl", "fr");
+    client.preloadGlyphs();
+    expect(workers).toHaveLength(2);
+    expect(workers[0].sent.map((m) => m.t)).toEqual([
+      "build",
+      "build",
+      "export",
+      "glyphs",
+    ]);
+  });
+
+  it("sans second Worker, le maillage fin est refusé (jamais calculé sur le fil principal), le reste continue", async () => {
+    let count = 0;
+    class OneWorker {
+      onmessage: ((event: MessageEvent) => void) | null = null;
+      onerror: ((event: ErrorEvent) => void) | null = null;
+      constructor() {
+        if (++count > 1) throw new Error("un seul Worker");
+      }
+      postMessage() {}
+      terminate() {}
+    }
+    vi.stubGlobal("Worker", OneWorker);
+    const client = getStudioWorker();
+    void client.build(job);
+    await expect(
+      client.build({ ...job, lod: "fine", tier: 2 }),
+    ).rejects.toMatchObject({ code: "build", message: "fine-unavailable" });
+  });
+
   it("un échec du script du Worker bascule sur le fil principal, y compris pour la requête en vol", async () => {
     class BrokenWorker {
       onmessage: ((event: MessageEvent) => void) | null = null;

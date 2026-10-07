@@ -16,7 +16,7 @@ import {
 
 export { OBJECT_TEXT_FIELDS, STUDIO_OBJECT_IDS };
 
-/** Les vues de la scène : 3/4 (orbite), Plan, Élévation (2D exacte) et Couches. */
+/** Les vues de la scène : 3D (orbite), Plan, Élévation (2D exacte) et Couches. */
 export type StudioViewMode = "orbit" | "plan" | "elevation" | "layers";
 
 /**
@@ -34,7 +34,7 @@ export function flatViewOf(object: StudioObjectId): "elevation" | "plan" {
   return object === "lavaux" ? "elevation" : "plan";
 }
 
-/** Vue de départ : le 3/4 avec WebGL, sinon le dessin 2D exact. */
+/** Vue de départ : la 3D avec WebGL, sinon le dessin 2D exact. */
 export function defaultView(
   object: StudioObjectId,
   has3d: boolean,

@@ -6,17 +6,17 @@
   },
   "seo": {
     "index": {
-      "title": "Lo Studio: regoli il Suo oggetto in 3D",
-      "description": "Quattro oggetti da regolare in 3D: vaso, biglietto da visita, sottobicchiere, portanome. Fino a quattro colori, stampati in Svizzera, prezzo fermo in 48 ore."
+      "title": "Lo Studio: personalizzi il Suo oggetto in 3D",
+      "description": "Quattro oggetti da personalizzare in 3D: vaso, biglietto da visita, sottobicchiere, portanome. Fino a quattro colori, stampati in Svizzera, prezzo fermo in 48 ore."
     },
     "objects": {
       "lavaux": {
         "title": "Vaso Lavaux su misura, in 3D",
-        "description": "Regoli profilo, motivo e fino a quattro colori del Suo vaso Lavaux, lo controlli in 3D e lo invii: stampa in Svizzera, prezzo fermo in 48 ore."
+        "description": "Personalizzi profilo, motivo e fino a quattro colori del Suo vaso Lavaux, lo controlli in 3D e lo invii: stampa in Svizzera, prezzo fermo in 48 ore."
       },
       "cartouche": {
         "title": "Biglietto da visita 3D Cartouche",
-        "description": "Il Suo biglietto da visita da 85 × 55 mm, in rilievo o inciso, due colori e il Suo testo: lo regoli in 3D, lo stampiamo in Svizzera, prezzo fermo in 48 ore."
+        "description": "Il Suo biglietto da visita da 85 × 55 mm, in rilievo o inciso, due colori e il Suo testo: lo personalizzi in 3D, lo stampiamo in Svizzera, prezzo fermo in 48 ore."
       },
       "relief": {
         "title": "Sottobicchiere Relief, massiccio su misura",
@@ -24,22 +24,22 @@
       },
       "borne": {
         "title": "Portanome Borne in due colori",
-        "description": "Un portanome in due colori con il Suo testo, in rilievo o inciso, anello a sinistra o a destra. Regolato in 3D, stampato in Svizzera, prezzo fermo in 48 ore."
+        "description": "Un portanome in due colori con il Suo testo, in rilievo o inciso, anello a sinistra o a destra. Personalizzato in 3D, stampato in Svizzera, prezzo fermo in 48 ore."
       }
     }
   },
   "index": {
     "eyebrow": "Configuratore 3D",
     "title": "Lo Studio",
-    "intro": "Lo regoli. Lo stampiamo.",
-    "lead": "Quattro oggetti creati dal laboratorio, con limiti pensati per le nostre macchine. Regoli forma, colori e testo, controlli i numeri, poi lo invii: il laboratorio rilegge ogni richiesta e risponde entro 48 ore con un prezzo fermo.",
-    "adjust": "Regola"
+    "intro": "Lo personalizzi. Lo stampiamo.",
+    "lead": "Quattro oggetti creati dal laboratorio, con limiti pensati per le nostre macchine. Personalizzi forma, colori e testo, controlli i numeri, poi lo invii: il laboratorio rilegge ogni richiesta e risponde entro 48 ore con un prezzo fermo.",
+    "adjust": "Personalizza"
   },
   "how": {
     "title": "Come funziona",
     "steps": {
       "adjust": {
-        "title": "Regoli",
+        "title": "Personalizzi",
         "text": "Forma, motivo, fino a quattro colori, il Suo testo: la 3D segue ogni gesto."
       },
       "check": {
@@ -48,7 +48,7 @@
       },
       "send": {
         "title": "Invii",
-        "text": "La Sua regolazione parte per il laboratorio con il suo file di stampa. Per ora non si paga nulla."
+        "text": "La Sua personalizzazione parte per il laboratorio con il suo file di stampa. Per ora non si paga nulla."
       },
       "receive": {
         "title": "Riceva",
@@ -60,7 +60,7 @@
     "title": "Domande frequenti",
     "items": {
       "printable": {
-        "q": "Quello che regolo è davvero stampabile?",
+        "q": "Quello che personalizzo è davvero stampabile?",
         "a": "Ogni oggetto ha limiti pensati per le macchine del laboratorio (piatto da 250 mm, PLA, ugello da 0,4 mm). Un'indicazione dice «Stampabile», «Da verificare» o «Non stampabile», con la prima anomalia in chiaro e un pulsante «Correggi» quando esiste una correzione."
       },
       "price": {
@@ -101,14 +101,14 @@
     }
   },
   "sections": {
-    "legend": "Sezioni di regolazione",
+    "legend": "Sezioni di personalizzazione",
     "shape": "Forma",
     "pattern": "Motivo",
     "colors": "Colori",
     "text": "Testo",
     "sheet": "Scheda"
   },
-  "apply": "Applica le regolazioni",
+  "apply": "Applica la personalizzazione",
   "tools": {
     "group": "Strumenti dello Studio",
     "undo": "Annulla",
@@ -121,12 +121,12 @@
     "linkCopied": "Link copiato: il testo non è incluso.",
     "kept": "Creazione conservata: la ritrova nei Preferiti.",
     "keepFailed": "Impossibile conservare questa creazione: la memoria del browser non è disponibile.",
-    "invalidLink": "Questo link non è leggibile: regolazioni predefinite."
+    "invalidLink": "Questo link non è leggibile: valori predefiniti."
   },
   "scene": {
     "viewsLegend": "Vista dell'oggetto",
     "view": {
-      "orbit": "3/4",
+      "orbit": "3D",
       "plan": "Pianta",
       "elevation": "Prospetto",
       "layers": "Strati"
@@ -134,7 +134,9 @@
     "explode": "Scomponi",
     "preparing": "Preparazione dello Studio…",
     "error": "Non è stato possibile calcolare la vista 3D.",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "collapse": "Riduci l'anteprima",
+    "expand": "Ingrandisci l'anteprima"
   },
   "layers": {
     "slider": "Strato visualizzato",
@@ -271,8 +273,8 @@
     "intro": "Il laboratorio rilegge il Suo pezzo e risponde entro 48 ore con un prezzo fermo. Per ora non si paga nulla.",
     "cta": "Invia al laboratorio",
     "noscript": "Chiedere un preventivo",
-    "noscriptNote": "Senza JavaScript, applichi le regolazioni poi le copi nella richiesta di preventivo: il laboratorio prepara il file per Lei.",
-    "machineLine": "Regolazioni da incollare nella richiesta",
+    "noscriptNote": "Senza JavaScript, applichi la personalizzazione poi la copi nella richiesta di preventivo: il laboratorio prepara il file per Lei.",
+    "machineLine": "Personalizzazione da incollare nella richiesta",
     "blocked": "Corregga prima i punti segnalati nella scheda.",
     "needText": "Inserisca almeno un carattere: {field}.",
     "estimateNote": "Stima · prezzo fermo confermato dal laboratorio entro 48 ore.",
@@ -326,9 +328,9 @@
     },
     "settings": {
       "lavaux": "Motivo: {pattern}",
-      "cartouche": "Regolazioni: {mode} ({depth}) · impaginazione {layout} · angoli {corner}",
-      "relief": "Regolazioni: {levels} strati · lago {lake} % · massiccio {seed} · etichetta della vetta: {label}",
-      "borne": "Regolazioni: forma {shape} · lettere {cap} · anello {ring} · modalità {mode}"
+      "cartouche": "Parametri: {mode} ({depth}) · impaginazione {layout} · angoli {corner}",
+      "relief": "Parametri: {levels} strati · lago {lake} % · massiccio {seed} · etichetta della vetta: {label}",
+      "borne": "Parametri: forma {shape} · lettere {cap} · anello {ring} · modalità {mode}"
     }
   }
 }

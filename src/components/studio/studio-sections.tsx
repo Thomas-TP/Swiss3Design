@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import { memo, type ReactNode } from "react";
 import { ChipRadio } from "@/components/ui/chip";
 import { cx } from "@/components/ui/cx";
 import { textFieldsFor } from "./objects";
@@ -51,9 +51,11 @@ export function SectionTabs({
 }) {
   return (
     // Onglets de mobile : natifs, et seulement quand JavaScript les fait fonctionner.
+    // Collés en haut de la zone qui défile : on change de section sans remonter.
     <fieldset
       className={cx(
         "m-0 hidden min-w-0 border-0 p-0 group-data-[js]/studio:max-lg:block",
+        "max-lg:sticky max-lg:top-0 max-lg:z-20 max-lg:bg-paper max-lg:py-1.5",
         className,
       )}
     >
@@ -112,7 +114,11 @@ function Section({
 
 type Issue = Extract<Printability, { issues: unknown }>["issues"][number];
 
-export function StudioSections({
+// Mémorisé : tous les contrôles d'un objet sont dans le DOM (bureau : toutes les
+// sections se suivent), un rendu complet coûte donc cher. Les rendus qui ne
+// changent ni la configuration, ni les textes, ni l'onglet (fin d'un geste :
+// l'historique seul bouge) le laissent tel quel.
+export const StudioSections = memo(function StudioSections({
   ctl,
   sections,
   tab,
@@ -243,4 +249,4 @@ export function StudioSections({
       ))}
     </div>
   );
-}
+});

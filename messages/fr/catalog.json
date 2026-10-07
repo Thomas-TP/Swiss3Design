@@ -2,7 +2,7 @@
   "shop": {
     "eyebrow": "Imprimé à la commande, à Gland et à Pully",
     "title": "Boutique.",
-    "emptyCatalog": "Aucun objet en boutique pour le moment. Réglez le vôtre au Studio ou envoyez-nous un fichier.",
+    "emptyCatalog": "Aucun objet en boutique pour le moment. Personnalisez le vôtre au Studio ou envoyez-nous un fichier.",
     "view": {
       "label": "Affichage",
       "grid": "Grille",
@@ -16,10 +16,10 @@
       "price": "Prix"
     },
     "studio": {
-      "title": "À régler au Studio.",
-      "intro": "Quatre objets dessinés par l'atelier, que vous réglez en 3D avant de nous les envoyer. Ce ne sont pas des articles de la boutique : le prix ferme est confirmé sur devis sous 48 h.",
+      "title": "À personnaliser au Studio.",
+      "intro": "Quatre objets dessinés par l'atelier, que vous personnalisez en 3D avant de nous les envoyer. Ce ne sont pas des articles de la boutique : le prix ferme est confirmé sur devis sous 48 h.",
       "quote": "Sur devis",
-      "adjust": "Régler",
+      "adjust": "Personnaliser",
       "objects": {
         "lavaux": {
           "name": "Vase « Lavaux »",
@@ -105,6 +105,6 @@
   "cross": {
     "title": "Un vase à vos couleurs ?",
     "body": "Ce vase reste tel que {author} l'a dessiné. Pour un vase à vos couleurs, le Studio propose nos propres modèles paramétriques.",
-    "cta": "Régler un vase"
+    "cta": "Personnaliser un vase"
   }
 }

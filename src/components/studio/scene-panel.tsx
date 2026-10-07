@@ -1,8 +1,10 @@
 "use client";
 
 import {
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
+  ChevronUp,
   Home,
   RotateCcw,
   ZoomIn,
@@ -10,10 +12,11 @@ import {
 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import {
+  memo,
   useCallback,
   useMemo,
+  useRef,
   useState,
-  type MouseEvent,
   type ReactNode,
 } from "react";
 import { Button } from "@/components/ui/button";
@@ -35,7 +38,7 @@ import type {
   StudioStats,
   StudioTexts,
 } from "@/lib/studio/types";
-import { ElevationView } from "./elevation-view";
+import { DeferredElevation, ElevationView } from "./elevation-view";
 import { layerTop, spreadVertically } from "./layers";
 import { LayerSlider, SimulationControls } from "./layer-panel";
 import {
@@ -57,7 +60,7 @@ import { mm, num, type Translate } from "./summary";
 import { useStageAvailability } from "./use-stage-availability";
 import { ViewSwitch } from "./view-switch";
 
-// Colonne de la scène (brief « Strates », §6.7) : la vue (3/4, Plan, Élévation,
+// Colonne de la scène (brief « Strates », §6.7) : la vue (3D, Plan, Élévation,
 // Couches), « Éclater », les boutons de l'orbite, la réglette Z et la
 // simulation, les étiquettes de l'éclaté, et les états (préparation, erreur du
 // Worker avec « Réessayer », 3D indisponible). L'état de la scène (vue, éclaté,
@@ -69,7 +72,97 @@ import { ViewSwitch } from "./view-switch";
 // Le canvas est décoratif pour les lecteurs d'écran : le résumé vivant du
 // Studio dit la même chose.
 
-export function ScenePanel({
+/** Rangée des vues (32 px) et ses 12 px d'air, en px CSS, sur l'aperçu de mobile. */
+const MOBILE_INSET_TOP = 44;
+
+const BUTTON =
+  "grid place-items-center rounded-field border border-ink bg-paper/85 text-ink transition-colors duration-150 ease-strate hover:bg-ink hover:text-paper";
+
+interface OrbitLabels {
+  rotateLeft: string;
+  rotateRight: string;
+  front: string;
+  reset: string;
+  zoomIn: string;
+  zoomOut: string;
+}
+
+/**
+ * Les boutons de l'orbite : en surimpression sur bureau, dans la rangée sous
+ * l'aperçu sur mobile. Un composant à part, mémorisé : ses neuf icônes ne sont
+ * pas recréées à chaque cran d'un curseur.
+ */
+const OrbitButtons = memo(function OrbitButtons({
+  size,
+  plan,
+  send,
+  labels,
+}: {
+  size: string;
+  plan: boolean;
+  send: (cmd: StudioViewCommand) => void;
+  labels: OrbitLabels;
+}) {
+  const cls = cx(BUTTON, size);
+  return (
+    <>
+      {!plan ? (
+        <>
+          <button
+            type="button"
+            onClick={() => send({ type: "turn", step: -1 })}
+            aria-label={labels.rotateLeft}
+            className={cls}
+          >
+            <ChevronLeft size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => send({ type: "turn", step: 1 })}
+            aria-label={labels.rotateRight}
+            className={cls}
+          >
+            <ChevronRight size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => send({ type: "front" })}
+            aria-label={labels.front}
+            className={cls}
+          >
+            <Home size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => send({ type: "reset" })}
+            aria-label={labels.reset}
+            className={cls}
+          >
+            <RotateCcw size={18} aria-hidden="true" />
+          </button>
+        </>
+      ) : null}
+      <button
+        type="button"
+        onClick={() => send({ type: "zoom", step: 1 })}
+        aria-label={labels.zoomIn}
+        className={cls}
+      >
+        <ZoomIn size={18} aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        onClick={() => send({ type: "zoom", step: -1 })}
+        aria-label={labels.zoomOut}
+        className={cls}
+      >
+        <ZoomOut size={18} aria-hidden="true" />
+      </button>
+    </>
+  );
+});
+
+export const ScenePanel = memo(function ScenePanel({
   object,
   config,
   texts,
@@ -78,6 +171,8 @@ export function ScenePanel({
   bands,
   reprint,
   bandBar,
+  compact = false,
+  onCompactChange,
   className,
   t,
   core,
@@ -92,11 +187,19 @@ export function ScenePanel({
   reprint: number;
   /** Barre altimétrique verticale (bureau), posée au bord droit de la vue. */
   bandBar?: ReactNode;
+  /**
+   * Mobile : l'aperçu est réduit en bandeau, l'objet seul reste (les vues, les
+   * boutons de l'orbite et la simulation reviennent avec l'aperçu entier).
+   */
+  compact?: boolean;
+  /** Mobile : la poignée sous l'aperçu réduit ou rend l'aperçu. */
+  onCompactChange?: (compact: boolean) => void;
   className?: string;
   t: Translate;
   core: Translate;
 }) {
   const shell = useTranslations("shell.stage");
+  const rootRef = useRef<HTMLDivElement>(null);
   const availability = useStageAvailability();
   const stageOn = availability === "on";
   const views = stageOn ? viewsFor(object) : [flatViewOf(object)];
@@ -116,6 +219,9 @@ export function ScenePanel({
       typeof window !== "undefined" &&
       window.matchMedia("(min-width: 1024px)").matches,
   );
+
+  // Mobile, aperçu entier : la hauteur que la rangée des vues prend en haut de la scène.
+  const insetTop = !liveRect && !compact ? MOBILE_INSET_TOP : 0;
 
   const current: StudioViewMode =
     stageOn && view && views.includes(view)
@@ -162,6 +268,7 @@ export function ScenePanel({
       reprint,
       printMinutes: stats.minutes,
       hidden: elevationShown,
+      insetTop,
       onStatus,
       onSimulate,
       onAnchors,
@@ -178,24 +285,49 @@ export function ScenePanel({
       reprint,
       stats.minutes,
       elevationShown,
+      insetTop,
       onStatus,
       onSimulate,
       onAnchors,
     ],
   );
 
+  // Mobile : les vues et l'éclaté flottent sur le haut de l'aperçu ; la scène
+  // cadre l'objet dessous plutôt que derrière eux.
+  const posterClass = cx(
+    "absolute inset-0 p-6 sm:p-8",
+    !compact && "max-lg:pt-14",
+  );
   const poster = (
-    <ElevationView
+    <DeferredElevation
       config={config}
       texts={texts}
       locale={locale}
-      className="absolute inset-0 p-6 sm:p-8"
+      className={posterClass}
     />
   );
 
-  const command =
-    (cmd: StudioViewCommand) => (event: MouseEvent<HTMLButtonElement>) =>
-      sendViewCommand(event.currentTarget, cmd);
+  // Les boutons peuvent vivre hors de la vue (rangée de mobile) : la commande
+  // part vers l'élément de la vue, pas vers un ancêtre du bouton.
+  const send = useCallback(
+    (cmd: StudioViewCommand) =>
+      sendViewCommand(
+        rootRef.current?.querySelector("[data-stage-view]") ?? null,
+        cmd,
+      ),
+    [],
+  );
+  const orbitLabels = useMemo(
+    () => ({
+      rotateLeft: shell("rotateLeft"),
+      rotateRight: shell("rotateRight"),
+      front: shell("front"),
+      reset: shell("reset"),
+      zoomIn: shell("zoomIn"),
+      zoomOut: shell("zoomOut"),
+    }),
+    [shell],
+  );
 
   const filamentName = (id: string) => core(`filaments.${id}`);
   const bandNow =
@@ -219,11 +351,29 @@ export function ScenePanel({
       })
     : core("duration.real", { duration: real });
 
-  const buttonClass =
-    "grid size-11 place-items-center rounded-field border border-ink bg-paper/85 text-ink transition-colors duration-150 ease-strate hover:bg-ink hover:text-paper";
+  // Réduit en bandeau (mobile) : seul l'objet reste sur la vue.
+  const hideWhenCompact = compact ? "max-lg:hidden" : undefined;
+
+  // Les boutons de l'orbite : en surimpression sur bureau, dans la rangée
+  // sous l'aperçu sur mobile (rien devant un objet de 240 px de haut).
+  const orbitButtons = (size: string) => (
+    <OrbitButtons
+      size={size}
+      plan={effective === "plan"}
+      send={send}
+      labels={orbitLabels}
+    />
+  );
 
   return (
-    <div className={cx("relative", className)}>
+    <div
+      ref={rootRef}
+      // Maillage affiché (définition et nombre de triangles) : lu par les
+      // essais de navigateur et la console, sans effet sur la page.
+      data-mesh-lod={status?.lod}
+      data-mesh-triangles={status?.triangles || undefined}
+      className={cx("relative max-lg:flex max-lg:flex-col", className)}
+    >
       <StageView
         scene="studio-object"
         props={sceneProps}
@@ -231,14 +381,14 @@ export function ScenePanel({
         interactive={stageOn && !elevationShown}
         liveRect={liveRect}
         poster={poster}
-        className="h-full w-full select-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-ink"
+        className="w-full select-none focus-visible:outline-2 focus-visible:-outline-offset-4 focus-visible:outline-ink max-lg:min-h-0 max-lg:flex-1 lg:h-full"
       >
         {elevationShown ? (
           <ElevationView
             config={config}
             texts={texts}
             locale={locale}
-            className="absolute inset-0 bg-paper p-6 sm:p-8"
+            className={cx(posterClass, "bg-paper")}
           />
         ) : null}
 
@@ -246,7 +396,10 @@ export function ScenePanel({
         {views.length > 1 || stageOn ? (
           <div
             data-no-orbit=""
-            className="absolute left-3 top-3 z-10 sm:left-4 sm:top-4"
+            className={cx(
+              "absolute left-3 top-3 z-10 sm:left-4 sm:top-4",
+              hideWhenCompact,
+            )}
           >
             <ViewSwitch
               legend={t("scene.viewsLegend")}
@@ -271,7 +424,10 @@ export function ScenePanel({
         {sceneProps.exploded && !elevationShown && anchors.length > 0 ? (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-3 z-10 w-[min(15rem,52%)] lg:right-[4.75rem]"
+            className={cx(
+              "pointer-events-none absolute inset-y-0 right-3 z-10 w-[min(15rem,52%)] lg:right-[4.75rem]",
+              hideWhenCompact,
+            )}
           >
             {spreadVertically(
               anchors.map((anchor) => anchor.y),
@@ -309,7 +465,12 @@ export function ScenePanel({
 
         {/* Réglette Z de la vue « Couches », au bord gauche. */}
         {stageOn && layersView ? (
-          <div className="absolute inset-y-16 left-3 z-10 w-11 sm:left-4">
+          <div
+            className={cx(
+              "absolute inset-y-16 left-3 z-10 w-11 sm:left-4",
+              hideWhenCompact,
+            )}
+          >
             <LayerSlider
               layer={layerNow}
               total={total}
@@ -332,61 +493,11 @@ export function ScenePanel({
               "absolute inset-x-3 bottom-3 z-10 flex flex-wrap items-end justify-between gap-2 sm:inset-x-4 sm:bottom-4",
               // La barre altimétrique occupe le bord droit (bureau) : la simulation s'arrête avant elle.
               bandBar ? "lg:pr-[5.75rem]" : null,
+              hideWhenCompact,
             )}
           >
-            <div className="flex flex-wrap gap-1.5">
-              {effective !== "plan" ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={command({ type: "turn", step: -1 })}
-                    aria-label={shell("rotateLeft")}
-                    className={buttonClass}
-                  >
-                    <ChevronLeft size={18} aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={command({ type: "turn", step: 1 })}
-                    aria-label={shell("rotateRight")}
-                    className={buttonClass}
-                  >
-                    <ChevronRight size={18} aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={command({ type: "front" })}
-                    aria-label={shell("front")}
-                    className={buttonClass}
-                  >
-                    <Home size={18} aria-hidden="true" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={command({ type: "reset" })}
-                    aria-label={shell("reset")}
-                    className={buttonClass}
-                  >
-                    <RotateCcw size={18} aria-hidden="true" />
-                  </button>
-                </>
-              ) : null}
-              <button
-                type="button"
-                onClick={command({ type: "zoom", step: 1 })}
-                aria-label={shell("zoomIn")}
-                className={buttonClass}
-              >
-                <ZoomIn size={18} aria-hidden="true" />
-              </button>
-              <button
-                type="button"
-                onClick={command({ type: "zoom", step: -1 })}
-                aria-label={shell("zoomOut")}
-                className={buttonClass}
-              >
-                <ZoomOut size={18} aria-hidden="true" />
-              </button>
+            <div className="flex flex-wrap gap-1.5 max-lg:hidden">
+              {orbitButtons("size-11")}
             </div>
             {layersView ? (
               <SimulationControls
@@ -448,10 +559,36 @@ export function ScenePanel({
         ) : null}
       </StageView>
       {availability === "off" ? (
-        <p className="mt-3 max-w-[60ch] text-sm text-soft">
+        <p className="max-w-[60ch] text-sm text-soft lg:mt-3 max-lg:py-1 max-lg:text-xs max-lg:leading-snug">
           {shell("unavailable")}
         </p>
       ) : null}
+      {/* Mobile : la rangée sous l'aperçu. À gauche les boutons de l'orbite
+          (hors de l'objet), à droite la poignée qui réduit l'aperçu en bandeau
+          et le rend : l'objet reste visible dans les deux états. Sans
+          JavaScript il n'y a rien à réduire. */}
+      <div className="hidden shrink-0 items-center gap-1.5 pt-1 group-data-[js]/studio:max-lg:flex">
+        {stageOn && !elevationShown && !compact ? (
+          <div className="flex gap-1.5">{orbitButtons("size-8")}</div>
+        ) : null}
+        <button
+          type="button"
+          aria-expanded={!compact}
+          aria-label={compact ? t("scene.expand") : t("scene.collapse")}
+          title={compact ? t("scene.expand") : t("scene.collapse")}
+          onClick={() => onCompactChange?.(!compact)}
+          className={cx(
+            BUTTON,
+            "ml-auto size-8 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
+          )}
+        >
+          {compact ? (
+            <ChevronDown size={18} aria-hidden="true" />
+          ) : (
+            <ChevronUp size={18} aria-hidden="true" />
+          )}
+        </button>
+      </div>
     </div>
   );
-}
+});

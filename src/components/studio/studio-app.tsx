@@ -144,6 +144,8 @@ export function StudioApp({
 
   const [reprint, setReprint] = useState(0);
   const [tab, setTab] = useState<SectionId>("shape");
+  // Mobile : l'aperçu réduit en bandeau pour laisser la place aux réglages.
+  const [compact, setCompact] = useState(false);
   // Le tiroir d'envoi s'ouvre sans redessiner ce composant (voir send-drawer.tsx).
   const sendState = useMemo(() => createOpenState(), []);
 
@@ -195,22 +197,42 @@ export function StudioApp({
     [dispatch, object],
   );
 
-  const ctl: Ctl = {
-    object,
-    config,
-    texts,
-    examples,
-    stats,
-    bands,
-    locale,
-    t,
-    core,
-    uid,
-    change,
-    commit,
-    setText,
-    newSeed,
-  };
+  // Mémorisé : un rendu qui ne change ni la configuration ni les textes (la fin
+  // d'un geste ne touche que l'historique) garde les mêmes contrôles, qui ne se
+  // redessinent pas (StudioSections et ScenePanel sont mémorisés).
+  const ctl: Ctl = useMemo(
+    () => ({
+      object,
+      config,
+      texts,
+      examples,
+      stats,
+      bands,
+      locale,
+      t,
+      core,
+      uid,
+      change,
+      commit,
+      setText,
+      newSeed,
+    }),
+    [
+      object,
+      config,
+      texts,
+      examples,
+      stats,
+      bands,
+      locale,
+      t,
+      core,
+      uid,
+      change,
+      commit,
+      setText,
+    ],
+  );
 
   const issueText = useCallback(
     (issue: Issue) =>
@@ -397,61 +419,90 @@ export function StudioApp({
     ? formatChfRange(stats.estimate.lowCents, stats.estimate.highCents, locale)
     : null;
 
-  const sendButton = (
-    <div className="flex flex-col items-start gap-3">
-      {/* Sans JavaScript : le lien de devis. Avec : le bouton qui ouvre le tiroir. */}
-      <ButtonLink
-        href="/custom#demande"
-        variant="primary"
-        size="lg"
-        className="group-data-[js]/studio:hidden"
-      >
-        {t("send.noscript")}
-      </ButtonLink>
-      {/* Le conteneur porte l'affichage conditionnel : le bouton a son propre
-          `inline-flex`, que `hidden` ne battrait pas (même spécificité), et un
-          bouton sans effet sans JavaScript serait trompeur. */}
-      <div className="hidden group-data-[js]/studio:max-lg:hidden group-data-[js]/studio:block">
-        <Button
+  // Mémorisés avec le bloc de réglage qui les porte : sans changement de
+  // l'envoi (bloqué, motif du blocage), ils ne se redessinent pas à chaque cran.
+  const sendButton = useMemo(
+    () => (
+      <div className="flex flex-col items-start gap-3">
+        {/* Sans JavaScript : le lien de devis. Avec : le bouton qui ouvre le tiroir. */}
+        <ButtonLink
+          href="/custom#demande"
           variant="primary"
           size="lg"
-          disabled={blocked}
-          onClick={openSend}
-          aria-describedby={reason ? reasonId : undefined}
+          className="group-data-[js]/studio:hidden"
         >
-          {t("send.cta")}
-        </Button>
-      </div>
-      {reason ? (
-        <p
-          id={reasonId}
-          className="max-w-[46ch] text-sm font-medium text-accent-text"
-        >
-          {reason}
+          {t("send.noscript")}
+        </ButtonLink>
+        {/* Le conteneur porte l'affichage conditionnel : le bouton a son propre
+          `inline-flex`, que `hidden` ne battrait pas (même spécificité), et un
+          bouton sans effet sans JavaScript serait trompeur. */}
+        <div className="hidden group-data-[js]/studio:max-lg:hidden group-data-[js]/studio:block">
+          <Button
+            variant="primary"
+            size="lg"
+            disabled={blocked}
+            onClick={openSend}
+            aria-describedby={reason ? reasonId : undefined}
+          >
+            {t("send.cta")}
+          </Button>
+        </div>
+        {reason ? (
+          <p
+            id={reasonId}
+            className="max-w-[46ch] text-sm font-medium text-accent-text"
+          >
+            {reason}
+          </p>
+        ) : null}
+        <p className="max-w-[52ch] text-sm text-soft">
+          {t("send.estimateNote")}
         </p>
-      ) : null}
-      <p className="max-w-[52ch] text-sm text-soft">{t("send.estimateNote")}</p>
-    </div>
+      </div>
+    ),
+    [blocked, openSend, reason, reasonId, t],
   );
 
-  const noscriptNote = (
-    <div className="flex flex-col gap-3 group-data-[js]/studio:hidden">
-      {/* Avec JavaScript, le même constat est un toast (§6.7 « États »). */}
-      {initialInvalid ? (
-        <output className="block text-sm font-medium text-accent-text">
-          {t("toast.invalidLink")}
-        </output>
-      ) : null}
-      <p className="text-sm text-soft">{t("send.noscriptNote")}</p>
-      <details className="rounded-card border border-line p-3 text-sm">
-        <summary className="cursor-pointer text-ink">
-          {t("send.machineLine")}
-        </summary>
-        <pre className="s3d-num mt-3 whitespace-pre-wrap break-all text-xs text-soft">
-          {machineLine(config)}
-        </pre>
-      </details>
-    </div>
+  const noscriptNote = useMemo(
+    () => (
+      <div className="flex flex-col gap-3 group-data-[js]/studio:hidden">
+        {/* Avec JavaScript, le même constat est un toast (§6.7 « États »). */}
+        {initialInvalid ? (
+          <output className="block text-sm font-medium text-accent-text">
+            {t("toast.invalidLink")}
+          </output>
+        ) : null}
+        <p className="text-sm text-soft">{t("send.noscriptNote")}</p>
+        <details className="rounded-card border border-line p-3 text-sm">
+          <summary className="cursor-pointer text-ink">
+            {t("send.machineLine")}
+          </summary>
+          <pre className="s3d-num mt-3 whitespace-pre-wrap break-all text-xs text-soft">
+            {machineLine(config)}
+          </pre>
+        </details>
+      </div>
+    ),
+    [initialInvalid, config, t],
+  );
+
+  // Les rappels et éléments passés aux enfants mémorisés : stables d'un rendu à
+  // l'autre tant que leur contenu ne change pas.
+  const sectionLabel = useCallback(
+    (section: SectionId) => t(`sections.${section}`),
+    [t],
+  );
+  const bandBar = useMemo(
+    () =>
+      config.object === "lavaux" || config.object === "relief" ? (
+        <AltimetricBar
+          ctl={ctl}
+          config={config}
+          orientation="vertical"
+          className="h-full"
+        />
+      ) : undefined,
+    [ctl, config],
   );
 
   return (
@@ -487,13 +538,25 @@ export function StudioApp({
         action={action}
         onSubmit={onGetSubmit}
         className={cx(
-          // Mobile : la scène en haut, les réglages défilent dessous, la barre d'action en bas.
-          "max-lg:flex max-lg:h-[calc(100svh-8.5rem-env(safe-area-inset-bottom))] max-lg:min-h-[28rem] max-lg:flex-col",
+          // Mobile : un écran d'application. L'aperçu occupe 40 % de la
+          // hauteur (un bandeau de 8 rem une fois réduit), les réglages
+          // défilent dans le reste, la barre d'action est dessous. La hauteur
+          // retranche l'en-tête (65 px), l'air au-dessus du formulaire (0,5 rem)
+          // et la barre (3,5 rem + son filet + la zone sûre).
+          "max-lg:flex max-lg:h-[calc(100svh-4.0625rem-0.5rem-3.5625rem-env(safe-area-inset-bottom))] max-lg:min-h-[26rem] max-lg:flex-col",
           "lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-gutter",
         )}
       >
-        <div className="max-lg:shrink-0 lg:col-span-7">
-          <div className="lg:sticky lg:top-[88px]">
+        {/* Bureau : la colonne s'étire sur toute la hauteur des réglages (sans
+            quoi elle n'a pas la place de coller), et l'aperçu qu'elle porte reste
+            sous l'en-tête pendant qu'on fait défiler les réglages. */}
+        <div
+          className={cx(
+            "max-lg:flex max-lg:shrink-0 max-lg:flex-col lg:col-span-7 lg:self-stretch",
+            compact ? "max-lg:h-32" : "max-lg:h-[40%]",
+          )}
+        >
+          <div className="max-lg:min-h-0 max-lg:flex-1 lg:sticky lg:top-[88px]">
             <ScenePanel
               object={object}
               config={config}
@@ -502,19 +565,12 @@ export function StudioApp({
               stats={stats}
               bands={bands}
               reprint={reprint}
+              compact={compact}
+              onCompactChange={setCompact}
               t={t}
               core={core}
-              className="h-[min(46svh,24rem)] min-h-56 w-full lg:aspect-square lg:h-auto lg:max-h-[calc(100svh-14rem)]"
-              bandBar={
-                config.object === "lavaux" || config.object === "relief" ? (
-                  <AltimetricBar
-                    ctl={ctl}
-                    config={config}
-                    orientation="vertical"
-                    className="h-full"
-                  />
-                ) : undefined
-              }
+              className="w-full max-lg:h-full lg:aspect-square lg:max-h-[calc(100svh-14rem)]"
+              bandBar={bandBar}
             />
             <MeasureStrip
               items={measureItems({ config, stats, locale, core, t })}
@@ -526,9 +582,9 @@ export function StudioApp({
 
         <div
           data-lenis-prevent=""
-          className="max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:pb-6 max-lg:pt-4 lg:col-span-5"
+          className="max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:pb-6 max-lg:pt-3 lg:col-span-5"
         >
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-8 max-lg:gap-3">
             {intro}
             <div className="lg:hidden">
               <StudioToolbar
@@ -554,13 +610,13 @@ export function StudioApp({
               sections={sections}
               value={tab}
               onChange={setTab}
-              labelOf={(section) => t(`sections.${section}`)}
+              labelOf={sectionLabel}
             />
             <StudioSections
               ctl={ctl}
               sections={sections}
               tab={tab}
-              titleOf={(section) => t(`sections.${section}`)}
+              titleOf={sectionLabel}
               issueText={issueText}
               onFix={fix}
               actions={sendButton}
@@ -592,7 +648,7 @@ export function StudioApp({
           viewTransitionName: "site-bottom-nav",
         }}
       >
-        <div className="flex h-16 items-center justify-between gap-3 px-[var(--spacing-margin)]">
+        <div className="flex h-14 items-center justify-between gap-3 px-[var(--spacing-margin)]">
           <p className="s3d-label ph-no-capture min-w-0 normal-case text-ink">
             {priceText ??
               `≈ ${formatGrams(stats.grams, locale)} · ≈ ${formatDuration(stats.minutes, locale)}`}
