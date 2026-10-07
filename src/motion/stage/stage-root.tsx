@@ -27,7 +27,7 @@ import { useEffect } from "react";
 import { motionBridge } from "@/lib/motion-bridge/store";
 import { lowerDetectedCapability } from "@/lib/motion-bridge/tier";
 import { Stage } from "./stage";
-import { setCanvasAnchor, type CanvasAnchor } from "./ticker";
+import { anchorPlacement, setCanvasAnchor, type CanvasAnchor } from "./ticker";
 
 function createCanvas(): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
@@ -151,12 +151,14 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
         offset = 0;
         return;
       }
-      // Haut du canvas dans le document : une marge au-dessus de la fenêtre,
-      // arrondi au pixel physique (un décalage fractionnaire rééchantillonne
-      // le canvas et le rend flou).
-      const dpr = window.devicePixelRatio || 1;
-      const top = Math.round((scrollY - margin) * dpr) / dpr;
-      offset = scrollY - top;
+      // Haut du canvas dans le document : une marge au-dessus de la fenêtre.
+      const placed = anchorPlacement(
+        scrollY,
+        margin,
+        window.devicePixelRatio || 1,
+      );
+      const top = placed.top;
+      offset = placed.offset;
       if (top === lastTop) return;
       lastTop = top;
       s.transform = `translate3d(0, ${top}px, 0)`;

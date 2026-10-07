@@ -71,6 +71,24 @@ export function onFrameDriverChange(cb: () => void): () => void {
   return () => driverListeners.delete(cb);
 }
 
+/**
+ * Place le haut du canvas ancré dans le document pour un défilement donné :
+ * `margin` px au-dessus du haut de la fenêtre, arrondi au pixel physique (un
+ * décalage fractionnaire rééchantillonne le canvas et le rend flou). `offset`
+ * est ce qui sépare alors le haut de la fenêtre du haut du canvas (`margin` à
+ * un demi-pixel physique près) : un rectangle de la fenêtre se dessine à
+ * `top + offset`.
+ */
+export function anchorPlacement(
+  scrollY: number,
+  margin: number,
+  dpr: number,
+): { top: number; offset: number } {
+  const ratio = dpr > 0 ? dpr : 1;
+  const top = Math.round((scrollY - margin) * ratio) / ratio;
+  return { top, offset: scrollY - top };
+}
+
 /** stage-root.tsx installe (ou retire, null) le canvas ancré au document. */
 export function setCanvasAnchor(next: CanvasAnchor | null) {
   anchor = next;
