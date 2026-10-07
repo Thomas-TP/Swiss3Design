@@ -323,12 +323,7 @@ function EmptyState({
           {labels.creationsTitle}
         </h2>
         <p className="mt-3 text-lead text-soft">{labels.creationsText}</p>
-        <ButtonLink
-          href="/studio"
-          variant="primary"
-          size="lg"
-          className="mt-6"
-        >
+        <ButtonLink href="/studio" variant="primary" size="lg" className="mt-6">
           <StrataIcon size={20} />
           {labels.studio}
         </ButtonLink>

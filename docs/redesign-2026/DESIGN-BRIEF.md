@@ -83,13 +83,13 @@
 La direction est **« Strates »** (82, 79 et 79 points chez les trois juges, premier partout),
 avec les greffes exigées par les juges. Le tableau dit d'où vient chaque pièce.
 
-| Pièce                                                                                                                                                                                                                                                                                                                                                                                                                                                                              | Provenance      |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
-| Thèse « une couche = une courbe de niveau ; le multicolore = une teinte hypsométrique » ; bascule élévation → plan ; poster d'isolignes calé sous le canvas (« le dessin devient matière ») ; ease quantifiée `s3d.pas` ; transition de page « Coupe » ; cadre de carte, coordonnées, cartouche, point rouge ; voix (« Point non coté ») ; physique juste (multicolore en mode standard, spirale seulement en monochrome) ; générateur pur TS partagé ; test de variété (manifold) | Strates         |
-| Personnalisation **dans** le héros (gestes Palette et Motif) ; « Votre nom » hors pin ; vague de couleur le long des couches ; outils du configurateur (Annuler/Rétablir, « Surprenez-moi », badge Imprimable avec correction, Copier le lien, Garder) ; Studio en disque rouge au centre de la BottomNav ; silhouette du Vase spirale interdite par test ; STL écrit dans un Web Worker ; outil WebMCP `studio_configure` ; Studio livré avant le héros                           | Studio          |
-| Aucun texte personnel dans l'URL ; tiroir « Envoyer à l'atelier » sur la même Server Action ; tour de purge et commande « Éclater » ; formulaire Studio SSR fonctionnel sans JS (GET) ; simulation ×1/×10/×100 et réglette Z verticale ; LOD de régénération en Worker ; aucun pin sous 768 px de haut ; groupe de routes `(site)` ; vue « Registre » de la boutique ; attribution en données structurées ; aucun CHF avant validation des coefficients                            | G1 (Atelier)    |
-| Correctifs d'ingénierie : jamais d'axe `wdth` lié au scroll ; 4 scènes + un service au lieu de 8 scènes ; champ de courbes WebGL réservé à l'accueil (SVG ailleurs) ; relief du champ précalculé en texture ; polices 3D en instances statiques sans chevauchement ; pas vertical adaptatif (STL de 1 à 3 Mo) ; budget INP mesuré                                                                                                                                                  | Juge ingénierie |
-| Correctifs commerce : surtitre SSR explicite ; zone d'achat collante au chapitre 01 de la fiche ; métaphore bornée (l'unité réelle d'abord) ; modération humaine des textes ; gestion du 429 ; fourchette ±15 % avant calibration                                                                                                                                                                                                                                                  | Juge commerce   |
+| Pièce                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               | Provenance      |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| Thèse « une couche = une courbe de niveau ; le multicolore = une teinte hypsométrique » ; bascule élévation → plan ; poster d'isolignes calé sous le canvas (« le dessin devient matière ») ; ease quantifiée `s3d.pas` (abandonnée le 07.10.2026, §3.1) ; transition de page « Coupe » ; cadre de carte, coordonnées, cartouche, point rouge ; voix (« Point non coté ») ; physique juste (multicolore en mode standard, spirale seulement en monochrome) ; générateur pur TS partagé ; test de variété (manifold) | Strates         |
+| Personnalisation **dans** le héros (gestes Palette et Motif) ; « Votre nom » hors pin ; vague de couleur le long des couches ; outils du configurateur (Annuler/Rétablir, « Surprenez-moi », badge Imprimable avec correction, Copier le lien, Garder) ; Studio en disque rouge au centre de la BottomNav ; silhouette du Vase spirale interdite par test ; STL écrit dans un Web Worker ; outil WebMCP `studio_configure` ; Studio livré avant le héros                                                            | Studio          |
+| Aucun texte personnel dans l'URL ; tiroir « Envoyer à l'atelier » sur la même Server Action ; tour de purge et commande « Éclater » ; formulaire Studio SSR fonctionnel sans JS (GET) ; simulation ×1/×10/×100 et réglette Z verticale ; LOD de régénération en Worker ; aucun pin sous 768 px de haut ; groupe de routes `(site)` ; vue « Registre » de la boutique ; attribution en données structurées ; aucun CHF avant validation des coefficients                                                             | G1 (Atelier)    |
+| Correctifs d'ingénierie : jamais d'axe `wdth` lié au scroll ; 4 scènes + un service au lieu de 8 scènes ; champ de courbes WebGL réservé à l'accueil (SVG ailleurs) ; relief du champ précalculé en texture ; polices 3D en instances statiques sans chevauchement ; pas vertical adaptatif (STL de 1 à 3 Mo) ; budget INP mesuré                                                                                                                                                                                   | Juge ingénierie |
+| Correctifs commerce : surtitre SSR explicite ; zone d'achat collante au chapitre 01 de la fiche ; métaphore bornée (l'unité réelle d'abord) ; modération humaine des textes ; gestion du 429 ; fourchette ±15 % avant calibration                                                                                                                                                                                                                                                                                   | Juge commerce   |
 
 ### 1.2 Thèse
 
@@ -105,7 +105,9 @@ donc le modèle le plus honnête et le moins cher.
 **Six principes, applicables à chaque écran :**
 
 1. **Addition.** Tout naît de bas en haut, par couches. Rien ne se dissout, rien ne flotte.
-2. **Quantification.** Les grands mouvements avancent par paliers (couches), jamais en glissé mou.
+2. **Quantification** (_abandonnée en tant que minutage le 07.10.2026, retours R06/R07 : voir
+   §3.1, 3_). La couche reste dans les **chiffres** (mm, couches comptées) et dans des détails
+   statiques ; les mouvements, eux, glissent sur une courbe continue.
 3. **Unités vraies.** Tout scrub et tout compteur s'expriment en mm, en couches, en grammes, en
    minutes. Un chiffre affiché est calculé, jamais décoratif.
 4. **Le trait avant la matière.** On dessine (isolignes) avant de remplir (matière).
@@ -129,7 +131,7 @@ réimpression, réglette Z) sert ensuite **telle quelle** dans le Studio.
 
 | Motif                              | Où il vit                                                                                                                                                                                                          | Règle                                                                                                                           |
 | ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
-| **M1 · Isolignes et coupe**        | Poster SSR du héros, bascule en plan, champ de courbes (accueil seulement, WebGL), isolignes SVG statiques (footer, 404, contact), transition de page « Coupe » (8 paliers), révélations `s3d-print`               | Trois moments de champ plein écran au plus (fin du héros, footer, 404). Jamais en papier peint sur les pages transactionnelles. |
+| **M1 · Isolignes et coupe**        | Poster SSR du héros, bascule en plan, champ de courbes (accueil seulement, WebGL), isolignes SVG statiques (footer, 404, contact), transition de page « Coupe » (découpe continue), révélations `s3d-print`        | Trois moments de champ plein écran au plus (fin du héros, footer, 404). Jamais en papier peint sur les pages transactionnelles. |
 | **M2 · La buse et le point rouge** | Liseré chaud à la ligne de coupe, point rouge final des titres, filet de progression sous le header, buse d'attente pendant le TTFB, soulignement actif de la nav, disque Studio de la BottomNav, bouton principal | Un seul bouton rouge par écran. Le rouge ne remplit jamais une grande surface décorative.                                       |
 | **M3 · La bande de mesure**        | Télémétrie mono du héros et du Studio (« 150,0 mm · 750 couches · ≈ 80 g · ≈ 2 h 45 · 2 changements »), réglettes graduées, fiches techniques `<dl>`, étiquettes de l'éclaté                                       | Toujours `Intl.NumberFormat` ; unité réelle d'abord, clin d'œil ensuite.                                                        |
 
@@ -697,8 +699,9 @@ p {
     animation-timeline: view();
     animation-range: entry 5% cover 28%;
   }
+  /* Courbe continue, jamais par paliers (retour R06, 07.10.2026, §3.2). */
   html[data-motion="full"] .s3d-print {
-    animation: s3d-print steps(8, end) both;
+    animation: s3d-print var(--ease-strate) both;
     animation-timeline: view();
     animation-range: entry 10% cover 35%;
   }
@@ -713,7 +716,8 @@ p {
     translate: 0 0;
   }
 }
-/* « S'imprime » de bas en haut en 8 couches. */
+/* « S'imprime » de bas en haut : le bord de la découpe monte d'un geste continu
+   (la courbe est posée par l'appelant). */
 @keyframes s3d-print {
   from {
     clip-path: inset(100% 0 0 0);
@@ -806,7 +810,7 @@ p {
   z-index: 2;
 }
 ::view-transition-new(.s3d-coupe) {
-  animation: s3d-print var(--dur-page) steps(8, end) both;
+  animation: s3d-print var(--dur-page) var(--ease-strate) both;
 }
 ::view-transition-old(.s3d-coupe-out) {
   animation: none;
@@ -869,7 +873,13 @@ utilisé aujourd'hui). Les styles propres à un package vont dans des **CSS Modu
    pas de texte qui roule au survol.
 2. **Un seul plan continu** : chaque état naît du précédent (réimpression, vague, bascule). Jamais
    de fondu enchaîné générique, de flou d'entrée, de flip 3D ni de particules.
-3. **Quantifié** : les apparitions avancent par paliers (`steps(8)`, `s3d.pas`).
+3. ~~**Quantifié** : les apparitions avancent par paliers (`steps(8)`, `s3d.pas`).~~
+   **Abandonné le 07.10.2026** (retours R06/R07 du propriétaire, décision contraignante) : plus
+   aucune animation par paliers sur le site. Le propriétaire n'a constaté aucun ralentissement ;
+   la saccade venait des `steps(8, end)` eux-mêmes (huit sauts visibles au lieu d'un glissement).
+   Les apparitions glissent sur `s3d.strate` / `--ease-strate`. L'idée des couches ne survit que
+   dans des détails **statiques** (bord de découpe doux, filets de couche fixes), jamais dans un
+   minutage en marches.
 4. **Le mouvement ne retient jamais le contenu** : texte et posters sont visibles au premier
    paint, le mouvement enrichit un DOM déjà complet. Jamais `opacity: 0` sur un élément SSR en
    attendant le JS, jamais sur le h1.
@@ -881,13 +891,22 @@ utilisé aujourd'hui). Les styles propres à un package vont dans des **CSS Modu
 
 ### 3.2 Courbes, durées, décalages
 
-| Nom          | CustomEase (GSAP)                              | CSS                                                       | Usage                                                              | Durée                   |
-| ------------ | ---------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------ | ----------------------- |
-| `s3d.strate` | `M0,0 C0.16,0.84 0.3,1 1,1`                    | `var(--ease-strate)` = `cubic-bezier(0.16, 0.84, 0.3, 1)` | révélations de lignes et de blocs, soulignements, tiroirs          | 0,7–0,9 s (UI : 280 ms) |
-| `s3d.buse`   | `M0,0 C0.45,0 0.55,1 1,1`                      | `var(--ease-buse)`                                        | déplacements de caméra et de buse, éclaté                          | 1,2–1,6 s               |
-| `s3d.purge`  | `M0,0 C0.3,1.35 0.6,1 1,1` (léger dépassement) | `var(--ease-purge)`                                       | pastille choisie, flash de changement de filament, ajout au panier | 320 ms                  |
-| `s3d.carte`  | `M0,0 C0.7,0 0.2,1 1,1`                        | `var(--ease-carte)`                                       | bascule élévation → plan, grands changements d'état                | 1,4 s                   |
-| `s3d.pas`    | fonction `pas(n, k)` (ci-dessous)              | `steps(8, end)`                                           | compteurs, scrubs quantifiés, « Coupe », `.s3d-print`              | selon contexte          |
+| Nom           | CustomEase (GSAP)                              | CSS                                                       | Usage                                                                                        | Durée                   |
+| ------------- | ---------------------------------------------- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------- | ----------------------- |
+| `s3d.strate`  | `M0,0 C0.16,0.84 0.3,1 1,1`                    | `var(--ease-strate)` = `cubic-bezier(0.16, 0.84, 0.3, 1)` | révélations de lignes et de blocs, soulignements, tiroirs                                    | 0,7–0,9 s (UI : 280 ms) |
+| `s3d.buse`    | `M0,0 C0.45,0 0.55,1 1,1`                      | `var(--ease-buse)`                                        | déplacements de caméra et de buse, éclaté                                                    | 1,2–1,6 s               |
+| `s3d.purge`   | `M0,0 C0.3,1.35 0.6,1 1,1` (léger dépassement) | `var(--ease-purge)`                                       | pastille choisie, flash de changement de filament, ajout au panier                           | 320 ms                  |
+| `s3d.carte`   | `M0,0 C0.7,0 0.2,1 1,1`                        | `var(--ease-carte)`                                       | bascule élévation → plan, grands changements d'état                                          | 1,4 s                   |
+| ~~`s3d.pas`~~ | ~~fonction `pas(n, k)` (ci-dessous)~~          | ~~`steps(8, end)`~~                                       | **abandonnée le 07.10.2026** (ci-dessous) ; « Coupe » et `.s3d-print` passent à `s3d.strate` | 480 ms (« Coupe »)      |
+
+**Note du 07.10.2026 (retours R06/R07, §3.1, 3).** Aucune animation visible n'avance plus par
+paliers : `.s3d-print` (révélation au défilement, `animation-timeline: view()`), la transition
+de page « Coupe » (`::view-transition-new(.s3d-coupe)`, 480 ms) et le survol des cartes produit
+(`clip-path`) utilisent `var(--ease-strate)`. Dans `src/motion/gsap.ts`, le nom `s3d.pas` reste
+enregistré pour que les chorégraphies qui l'appellent encore (dessin des schémas de l'Atelier)
+ne plantent pas, mais il désigne désormais la courbe continue `s3d.strate` ; la fonction `pas()`
+subsiste pour les tests, jamais pour un mouvement visible. Le mouvement réduit ne change pas
+(déjà sans animation).
 
 **Durées** : micro 120–180 ms (`--dur-micro` 150), UI 240–320 ms (`--dur-ui` 280), révélations
 700–900 ms (`--dur-reveal` 800), chapitres 1,2–1,6 s (`--dur-chapter` 1400), page 480 ms
@@ -948,6 +967,12 @@ dans la chorégraphie qui les utilise (`src/motion/choreo/about.tsx`), jamais ai
   fragments). **Jamais sur le h1** ni sur un élément au-dessus de la ligne de flottaison.
 - **Compteurs** : tweens quantifiés (`s3d.pas`), écritures DOM limitées à 10 Hz, nœuds marqués
   `ph-no-capture`.
+- **Arrivée en haut de page (R15, 07.10.2026).** Une navigation vers un nouveau chemin (hors
+  ancre) arrive à `scrollY = 0`, dans les trois modes (Lenis, natif, mouvement réduit) ; le
+  retour arrière du navigateur garde sa restauration native. Next remonte la page
+  (`scrollTop = 0`), mais ScrollTrigger gardait en cache la position d'avant la navigation et la
+  restaurait à chaque `refresh()` : `MotionRuntime.onRoute()` invalide ce cache
+  (`resyncScroll`) et coupe l'interpolation de Lenis avant de rafraîchir.
 - Pas de snap, pas de section horizontale, pas de détournement de la molette hors Lenis.
 - `ScrollTrigger.refresh()` après le montage de chaque page, après `document.fonts.ready` et après
   le chargement des images au-dessus de la ligne de flottaison. Hauteurs mobiles en `svh`.
@@ -962,7 +987,8 @@ dans la chorégraphie qui les utilise (`src/motion/choreo/about.tsx`), jamais ai
   `enter={{ "s3d-coupe": "s3d-coupe", default: "none" }}`,
   `exit={{ "s3d-coupe": "s3d-coupe-out", default: "none" }}`, `default="none"`. Les liens de
   navigation principaux (`SiteLink`) portent `transitionTypes={["s3d-coupe"]}`. La nouvelle page
-  « s'imprime » de bas en haut en **8 paliers** de `clip-path` (480 ms) par-dessus l'ancienne,
+  monte de bas en haut en une découpe de `clip-path` **continue** (480 ms, `--ease-strate`,
+  jamais par paliers depuis le 07.10.2026, retour R07) par-dessus l'ancienne,
   qui ne bouge pas ; le header est ancré (`view-transition-name: site-header`). Sans type
   (bouton retour du navigateur, Firefox qui ignore les types) : pas d'animation. Mouvement
   réduit : durée 0. CSS au §2.5. Le canvas du Stage n'a **pas** de `view-transition-name` : il
@@ -987,7 +1013,7 @@ dans la chorégraphie qui les utilise (`src/motion/choreo/about.tsx`), jamais ai
 | --------------------------- | ---------------------------------------------- | -------------------------------------------------------------------------- | ----------------------------------------------------- |
 | Soulignement d'un lien      | se trace de gauche à droite (280 ms)           | déjà tracé à l'état actif                                                  | déjà tracé au focus                                   |
 | Pastille de filament        | aperçu de la vague au survol (desktop Studio)  | vague au tap                                                               | flèches dans le groupe radio                          |
-| Carte produit               | la 2ᵉ image « s'imprime » en `steps(8)`        | balayage unique à l'entrée dans la vue                                     | rien (focus visible)                                  |
+| Carte produit               | la 2ᵉ image monte d'un geste continu           | balayage unique à l'entrée dans la vue                                     | rien (focus visible)                                  |
 | Rotation 3D (Studio, fiche) | glisser                                        | glisser à un doigt dans la vue (`touch-action: none` sur la vue seulement) | flèches quand la vue a le focus + boutons « Tourner » |
 | Zoom 3D                     | boutons +/− (la molette fait défiler la page)  | pincer                                                                     | boutons                                               |
 | Réglages Studio             | curseurs natifs, Maj + flèche = ×10            | curseurs de 44 px, réglette Z verticale au pouce                           | idem                                                  |
@@ -1179,6 +1205,26 @@ contenu par la version ci-dessous (thème inchangé + mouvement) :
   une vraie image, sans décalage. Le moindre changement de props ou `pointerdown` la réveille.
   Les vues collantes (Studio) n'en ont pas besoin. Sur desktop, Lenis et le Stage partagent la
   même frame : pas de décalage.
+- **Canvas ancré au document (C1, 07.10.2026, retour R16 « les objets 3D sautent au
+  défilement »).** Mesuré (compositeur d'Edge avec GPU, marqueurs peints dans le canvas, écart
+  DOM ↔ canvas par image) : en C2 le défilement est celui de Lenis, mené par le fil principal
+  dans la même frame que le dessin, donc l'écart est de 0,4 à 0,6 px ; mais dès que le
+  compositeur défile seul (tactile, clavier, barre de défilement) un canvas `fixed` montre
+  l'objet une ou deux frames en retard : jusqu'à 16 px au clavier, y compris pour une vue
+  qui se redessine (non figée). Au palier C1 (défilement tactile natif), `StageRoot` monte donc
+  le canvas dans un calque absolu de la hauteur de la page, rogné (`overflow: clip`, pour ne
+  jamais allonger la page), derrière le contenu : un canvas de **deux fenêtres de haut** (une
+  demi-fenêtre de marge de chaque côté) que la boucle recale à chaque frame
+  (`CanvasAnchor.follow`, `stage/ticker.ts`, `translate3d` arrondi au pixel physique), dans la
+  même tâche que le dessin. Entre deux frames du fil principal le canvas défile avec le DOM, côté
+  compositeur : il reste collé à son conteneur (mesuré à 0,3 px au tactile et à la molette,
+  0,8 px au clavier, contre 16,4 px avec le canvas fixe). `ViewTracker.rect()` rend des
+  rectangles **relatifs au canvas** (fenêtre décalée de `offsetY()`), le Stage n'en sait rien. Si
+  une vue est « live » (`liveRect` : Studio collant, héros épinglé), le calque redevient fixe, de
+  la fenêtre : un élément collant reste en place pendant que le compositeur défile le document.
+  C2 garde le canvas fixe (antialiasing multiéchantillonné : un canvas de deux fenêtres y
+  coûterait, par estimation, ~170 Mo de GPU contre ~105 Mo à 1440 × 900 en DPR 2, sans mesure) ;
+  le clavier et la barre de défilement y gardent donc l'écart natif, limite connue.
 - **Vignettes** : service `bake(scene, props, { width, height }) → Promise<Blob>` (render target,
   `readRenderTargetPixels`, canvas 2D, `toBlob("image/webp", 0.86)`), exposé au DOM par
   `bridge.stage.bake` (« Mes créations », pièce jointe du devis).
@@ -2655,7 +2701,8 @@ mobile. i18n : `studio`, `studioCore`.
   `localStorage["s3d-shop-view"]` (aucun nouveau paramètre d'URL).
 - **Cartes** : image, nom (h2 + lien étiré), prix, ligne mono « Hauteur 209 mm · PLA · 3 j »
   (l'unité réelle d'abord), pastilles, favori, ajout rapide ; la 2ᵉ image « s'imprime » au survol
-  (`steps(8)`) ; `<ViewTransition name={`product-${slug}`} share="morph" default="none">` sur
+  (clip-path continu, `--ease-strate`, depuis le 07.10.2026) ;
+  `<ViewTransition name={`product-${slug}`} share="morph" default="none">` sur
   l'image.
 - **À préserver** : `searchParams` (`category`, `material`, `color`, `multicolor=1`,
   `sort=new|price_asc|price_desc`, `q`), `getUsedFilters(locale)`, `getProducts(locale, {…})`,
@@ -2857,9 +2904,15 @@ order_id`, `revenue` port compris), `AttributionQuestion`, conversion invité �
 
 ### 7.17 Favoris `/[locale]/favorites` (WP-UTILITY)
 
-- Onglets **Objets** (existant) et **Mes créations** (Studio : vignette, objet, stats, « Rouvrir »
-  → `/studio/<objet>#c=…`, « Supprimer ») ; état vide « Rien de gardé pour l'instant. Réglez un
-  objet au Studio et cliquez sur Garder. »
+- **Une seule liste** (retour R13 du propriétaire, 07.10.2026 : l'ancienne page séparait objets
+  et créations par des onglets) avec un filtre **Tout · Objets · Mes créations** en puces du
+  site (`ChipRadio`, radios natives : flèches et annonce « 2 sur 3 » gérées par le navigateur ;
+  le filtre ne s'écrit pas dans l'URL). Les cartes des deux sortes partagent la même grille
+  (2 colonnes, 3 dès `lg`) ; une création porte une étiquette « Création » sur sa vignette :
+  vignette, objet, libellé, date, « Rouvrir » → `/studio/<objet>#c=…`, « Supprimer ». « Tout
+  ajouter au panier » (objets) n'apparaît que dans « Objets », ou dans « Tout » quand il n'y a
+  aucune création. États vides par filtre ; « Rien de gardé pour l'instant. Personnalisez un
+  objet au Studio et cliquez sur Garder. » pour les créations.
 - **À préserver** : `localStorage s3d-favorites-v1`, « tout ajouter au panier »,
   `Product Added to Wishlist` / `Product Removed from Wishlist` (émis par `FavoritesProvider`),
   NOINDEX. **Corriger** `src/lib/favorites.tsx` : `setItem` en try/catch, pas d'écriture de `[]`
