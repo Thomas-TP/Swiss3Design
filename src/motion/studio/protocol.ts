@@ -12,7 +12,14 @@ import type {
   StudioTexts,
 } from "@/lib/studio/types";
 
-export type BuildLod = "drag" | "display";
+/**
+ * `drag` : basse définition, au fil d'un geste. `display` : définition
+ * d'affichage, au repos. `fine` : le maillage du fichier d'impression (celui de
+ * l'export, jusqu'à ≈ 200 k triangles) en C2, la définition C2 en C1, calculé
+ * par un second Worker pour ne jamais retarder un geste : il remplace
+ * `display` quand le visiteur ne touche plus à rien (arêtes lisses).
+ */
+export type BuildLod = "drag" | "display" | "fine";
 
 /** Une construction d'affichage : ce que la scène demande au Worker. */
 export interface BuildJob {

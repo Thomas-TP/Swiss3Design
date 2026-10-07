@@ -21,8 +21,8 @@ export interface StudioSceneStatus {
   triangles: number;
   /** Durée du dernier calcul du Worker (ms). */
   ms: number;
-  /** Niveau de détail du maillage affiché. */
-  lod?: "drag" | "display";
+  /** Niveau de détail du maillage affiché (`fine` : celui du fichier d'impression, au repos). */
+  lod?: "drag" | "display" | "fine";
   /** Message technique (console, jamais affiché tel quel). */
   message?: string;
 }

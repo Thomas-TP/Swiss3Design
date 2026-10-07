@@ -93,6 +93,12 @@ const STATUS_INTERVAL_MS = 100;
 const SIM_INTERVAL_MS = 100;
 const ANCHOR_INTERVAL_MS = 100;
 const SLOW_BUILD_MS = 300;
+/**
+ * Repos après lequel part le maillage fin (ms) : plus long que la
+ * réimpression (0,8 s) et la vague de couleur (0,7 s), qui ne sont donc jamais
+ * interrompues par l'échange, et qu'un geste enchaîné n'atteint pas.
+ */
+const FINE_DELAY_MS = 900;
 /** Pas d'effet en cours / effet à démarrer à la prochaine frame (son horloge). */
 const NONE = -1;
 const PENDING = -2;
@@ -111,9 +117,18 @@ interface Display {
   /** Porteuse des tampons partagés des parts (éclaté). */
   carrier: BufferGeometry | null;
   material: PrintMaterial;
+  /** Le maillage d'affichage : il cadre l'objet, porte les bandes et reste dessiné pendant les gestes. */
   built: BuiltMesh;
   separate: boolean;
   bands: PrintBand[];
+  /**
+   * Le même objet au maillage fin (celui du fichier d'impression), calculé au
+   * repos : jamais pour l'éclaté. Il ne remplace `whole` que le temps où la
+   * scène est calme (voir `showFine`) : tant qu'on tire sur l'objet ou sur un
+   * curseur, c'est le maillage d'affichage qui est dessiné.
+   */
+  fine: BufferGeometry | null;
+  fineShown: boolean;
 }
 
 function plateGrid() {
@@ -247,6 +262,8 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
   let zoomTarget = 1;
   let planMode = false;
   let dragging = false;
+  /** La caméra n'a pas fini de se poser (amortissement) : le maillage fin attend. */
+  let cameraMoving = false;
   let lastX = 0;
   let lastY = 0;
   let lastInteractionAt = Number.NEGATIVE_INFINITY;
@@ -262,6 +279,10 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
   let lastChangeAt = Number.NEGATIVE_INFINITY;
   let settleTimer = 0;
   let slowTimer = 0;
+  // Maillage fin (voie du second Worker) : minuteur de repos, et compteur de
+  // demandes d'affichage (un résultat fin d'avant la dernière est périmé).
+  let fineTimer = 0;
+  let generation = 0;
   let resolveFirst: (() => void) | null = null;
   const firstMesh = new Promise<void>((resolve) => {
     resolveFirst = resolve;
@@ -318,7 +339,38 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
     for (const part of d.parts) part.dispose();
     d.carrier?.dispose();
     d.whole?.dispose();
+    d.fine?.dispose();
     d.material.dispose();
+  }
+
+  /** Dessine la géométrie fine (calme) ou celle d'affichage (geste) ; sans effet si elle n'existe pas. */
+  function showFine(d: Display, shown: boolean) {
+    const wanted = shown && d.fine !== null;
+    if (wanted === d.fineShown || !d.whole) return;
+    const geometry = wanted ? d.fine! : d.whole;
+    for (const mesh of d.meshes) mesh.geometry = geometry;
+    d.fineShown = wanted;
+  }
+
+  /**
+   * Le maillage fin est celui de l'ancienne configuration : on le jette et on
+   * revient à l'affichage (déjà en mémoire GPU, l'échange est instantané).
+   */
+  function dropFine() {
+    const d = display;
+    if (!d?.fine) return;
+    showFine(d, false);
+    d.fine.dispose();
+    d.fine = null;
+  }
+
+  /** Le maillage fin d'un objet entier (non éclaté) : attaché, dessiné quand la scène sera calme. */
+  function attachFine(built: BuiltMesh) {
+    const d = display;
+    if (!d || d.separate || !d.whole) return;
+    d.fine?.dispose();
+    d.fine = meshToGeometry(built.mesh);
+    d.fineShown = false;
   }
 
   function buildDisplay(
@@ -370,6 +422,8 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
       built,
       separate,
       bands: toPrintBands(built),
+      fine: null,
+      fineShown: false,
     };
   }
 
@@ -479,11 +533,57 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
     };
   }
 
-  function request(lod: BuildJob["lod"]) {
+  function request(lod: Exclude<BuildJob["lod"], "fine">) {
     const job = jobFor(lod);
     if (!job) return;
+    // Une nouvelle demande périme le maillage fin, en route, en attente ou déjà prêt.
+    generation++;
+    window.clearTimeout(fineTimer);
+    dropFine();
     wanted = job;
     void pump();
+  }
+
+  // ── Maillage fin au repos ──
+
+  function scheduleFine() {
+    window.clearTimeout(fineTimer);
+    if (disposed) return;
+    fineTimer = window.setTimeout(() => void buildFine(), FINE_DELAY_MS);
+  }
+
+  /**
+   * Le maillage du fichier d'impression, calculé par le second Worker une fois
+   * le visiteur au repos, remplace celui d'affichage tant que la scène est
+   * calme : arêtes des cellules de Voronoï, ressauts des gradins et arcs des
+   * objets plats sans facettes. Il ne retarde jamais un geste (autre voie, autre
+   * Worker) ; un résultat périmé est jeté, une erreur (pas de second Worker,
+   * mémoire) laisse l'affichage tel quel. Jamais pour l'éclaté (coques fermées
+   * par bande : seulement en affichage).
+   */
+  async function buildFine() {
+    if (disposed || !props || !display || display.separate || props.exploded)
+      return;
+    if (busy || wanted) {
+      scheduleFine();
+      return;
+    }
+    const job = jobFor("fine");
+    if (!job) return;
+    const mine = generation;
+    try {
+      const built = await getStudioWorker().build(job);
+      if (disposed || mine !== generation || props.exploded) return;
+      attachFine(built);
+      ctx.invalidate();
+      report(
+        "ready",
+        { lod: "fine", triangles: built.mesh.triangles, ms: built.ms },
+        true,
+      );
+    } catch {
+      // L'affichage reste : le maillage fin est un plus, jamais une condition.
+    }
   }
 
   async function pump() {
@@ -509,6 +609,8 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
             setBuilt(built, job.separate);
             ctx.invalidate();
             report("ready", { lod: job.lod }, job.lod === "display");
+            // Un maillage d'affichage (donc un visiteur au repos) appelle le fin.
+            if (job.lod === "display") scheduleFine();
           }
           resolveFirst?.();
         } catch (error) {
@@ -920,12 +1022,11 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
         azimuth += angleGap(azimuth, azimuthTarget) * k;
         polar += (polarTarget - polar) * k;
         zoom += (zoomTarget - zoom) * k;
-        if (
+        cameraMoving =
           Math.abs(angleGap(azimuth, azimuthTarget)) > 0.0005 ||
           Math.abs(polarTarget - polar) > 0.0005 ||
-          Math.abs(zoomTarget - zoom) > 0.0005
-        )
-          again = true;
+          Math.abs(zoomTarget - zoom) > 0.0005;
+        if (cameraMoving) again = true;
         else {
           azimuth = azimuthTarget;
           polar = polarTarget;
@@ -945,10 +1046,16 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
           again = true;
         }
       } else {
+        cameraMoving = false;
         azimuth = azimuthTarget;
         polar = polarTarget;
         zoom = zoomTarget;
       }
+
+      // Le maillage fin ne se dessine que scène calme : un geste (orbite,
+      // pincement, boutons, flèches) garde le maillage d'affichage, plus léger,
+      // jusqu'à ce que la caméra se soit posée.
+      showFine(d, !dragging && pointers.size === 0 && !cameraMoving);
 
       // Cadrage : l'objet (éclaté compris) dans 74 % de la hauteur de la vue.
       const rect = frame.rect;
@@ -966,7 +1073,8 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
       // Le haut de la vue recouvert par des commandes DOM (mobile) : l'objet est
       // cadré dans la partie libre, puis l'image descend de la moitié du retrait.
       const inset = clamp(props.insetTop ?? 0, 0, rect.height * 0.4);
-      const usable = 1 - inset / Math.max(1, rect.height);
+      const usable =
+        (1 - inset / Math.max(1, rect.height)) * (inset > 0 ? 1.12 : 1);
       const distance =
         (planBlend > 0.5
           ? fitDistancePlan({ width, depth, aspect })
@@ -1006,6 +1114,7 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
       disposed = true;
       window.clearTimeout(settleTimer);
       window.clearTimeout(slowTimer);
+      window.clearTimeout(fineTimer);
       resolveFirst?.();
       for (const off of disposers.splice(0)) off();
       if (display) disposeDisplay(display);

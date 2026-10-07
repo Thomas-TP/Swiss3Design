@@ -313,6 +313,10 @@ export function ScenePanel({
   return (
     <div
       ref={rootRef}
+      // Maillage affiché (définition et nombre de triangles) : lu par les
+      // essais de navigateur et la console, sans effet sur la page.
+      data-mesh-lod={status?.lod}
+      data-mesh-triangles={status?.triangles || undefined}
       className={cx("relative max-lg:flex max-lg:flex-col", className)}
     >
       <StageView
