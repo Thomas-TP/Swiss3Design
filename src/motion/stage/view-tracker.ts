@@ -57,6 +57,7 @@ export class ViewTracker {
     if (previous && previous.element !== element) this.remove(id);
     if (previous?.element === element) {
       previous.liveRect = liveRect;
+      this.syncAnchor();
       return;
     }
     const view: Tracked = {
@@ -73,6 +74,7 @@ export class ViewTracker {
     this.measure(view);
     this.resize.observe(element);
     this.intersect.observe(element);
+    this.syncAnchor();
   }
 
   remove(id: string) {
@@ -82,6 +84,14 @@ export class ViewTracker {
     this.byElement.delete(view.element);
     this.resize.unobserve(view.element);
     this.intersect.unobserve(view.element);
+    this.syncAnchor();
+  }
+
+  /** Une vue « live » (collante, épinglée) veut un canvas fixe, pas ancré. */
+  private syncAnchor() {
+    let live = false;
+    for (const view of this.views.values()) live ||= view.liveRect;
+    getCanvasAnchor()?.setLive(live);
   }
 
   private measure(view: Tracked) {

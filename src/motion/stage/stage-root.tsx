@@ -67,17 +67,22 @@ interface Anchored {
  * la fenêtre visible) que `follow` cale sur le défilement. La marge couvre
  * l'avance du compositeur sur le fil principal (au pire quelques dizaines de
  * pixels par frame, même en lancer rapide).
+ *
+ * Quand une vue est « live » (collante ou épinglée : le Studio sur grand
+ * écran), le calque devient fixe, de la taille de la fenêtre, et le canvas
+ * n'est plus décalé : un élément collant reste en place dans la fenêtre
+ * pendant que le compositeur fait défiler le document, c'est un canvas fixe
+ * qu'il lui faut. Le canvas garde sa taille dans les deux modes, donc le
+ * changement ne redimensionne pas le rendu.
  */
 function mountAnchored(canvas: HTMLCanvasElement): Anchored {
   const wrapper = document.createElement("div");
   wrapper.setAttribute("aria-hidden", "true");
   wrapper.className = "s3d-stage-anchor";
   const w = wrapper.style;
-  w.position = "absolute";
-  w.top = "0";
   w.left = "0";
   w.width = "100%";
-  w.height = `${documentHeight()}px`;
+  w.top = "0";
   // `hidden` d'abord : un navigateur sans overflow: clip (Safari < 16) garde
   // cette valeur, la page ne s'allonge pas non plus.
   w.overflow = "hidden";
@@ -96,6 +101,22 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
   s.zIndex = "auto";
   s.willChange = "transform";
 
+  let live = false;
+  let appliedLive: boolean | null = null;
+  const applyMode = () => {
+    appliedLive = live;
+    if (live) {
+      w.position = "fixed";
+      w.height = "100vh";
+      w.height = "100lvh";
+      s.transform = "none";
+    } else {
+      w.position = "absolute";
+      w.height = `${documentHeight()}px`;
+    }
+  };
+  applyMode();
+
   wrapper.appendChild(canvas);
   document.body.appendChild(wrapper);
 
@@ -113,12 +134,23 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
   // La page grandit ou rétrécit (images, polices, accordéons) : le calque la
   // suit, sinon le canvas serait rogné trop tôt ou allongerait le défilement.
   const docObserver = new ResizeObserver(() => {
-    w.height = `${documentHeight()}px`;
+    if (!live) w.height = `${documentHeight()}px`;
   });
   docObserver.observe(document.body);
 
   const anchor: CanvasAnchor = {
+    setLive(next) {
+      live = next;
+    },
     follow(scrollY) {
+      if (live !== appliedLive) {
+        applyMode();
+        lastTop = Number.NaN;
+      }
+      if (live) {
+        offset = 0;
+        return;
+      }
       // Haut du canvas dans le document : une marge au-dessus de la fenêtre,
       // arrondi au pixel physique (un décalage fractionnaire rééchantillonne
       // le canvas et le rend flou).

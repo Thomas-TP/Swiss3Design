@@ -34,6 +34,12 @@ export interface FrameDriver {
  * dessin, donc dans le même commit.
  */
 export interface CanvasAnchor {
+  /**
+   * Une vue au moins est « live » (collante, épinglée : elle bouge dans la
+   * fenêtre sans que le document la porte). Le canvas redevient alors fixe :
+   * ancré, il défilerait à contresens d'un élément collant.
+   */
+  setLive(live: boolean): void;
   /** Cale le canvas sur le document pour la frame qui va être dessinée. */
   follow(scrollY: number): void;
   /**
