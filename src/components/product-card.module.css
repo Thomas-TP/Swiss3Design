@@ -1,9 +1,11 @@
 /* Carte produit (brief « Strates », §3.5, §7.8) : la 2ᵉ photo « s'imprime » de
-   bas en haut en 8 couches (steps(8)) au survol ou au focus ; au toucher, un
-   balayage unique qui suit l'entrée de la carte dans l'écran. Rien ne bouge
-   ailleurs : pas de soulèvement, pas de zoom (aucun transform animé, §3.1).
-   Le mouvement réduit coupe les transitions (globals.css) : la 2ᵉ photo
-   apparaît alors d'un coup, sans animation. */
+   bas en haut au survol ou au focus, d'un geste continu (--ease-strate), sans
+   paliers : l'ancien steps(8) sautait en huit marches visibles (retour du
+   propriétaire R06, 07.10.2026). Au toucher, un balayage unique qui suit
+   l'entrée de la carte dans l'écran. Rien ne bouge ailleurs : pas de
+   soulèvement, pas de zoom (aucun transform animé, §3.1). Le mouvement réduit
+   coupe les transitions (globals.css) : la 2ᵉ photo apparaît alors d'un coup,
+   sans animation. */
 .second {
   position: absolute;
   inset: 0;
@@ -11,7 +13,7 @@
   height: 100%;
   object-fit: cover;
   clip-path: inset(100% 0 0 0);
-  transition: clip-path var(--dur-page) steps(8, end);
+  transition: clip-path var(--dur-page) var(--ease-strate);
   pointer-events: none;
 }
 

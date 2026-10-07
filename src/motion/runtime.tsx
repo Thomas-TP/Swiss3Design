@@ -189,6 +189,27 @@ class Runtime {
   }
 
   /**
+   * Retour du propriétaire R15 (07.10.2026) : une navigation ne remettait pas
+   * la page en haut. Next remonte bien à 0 (`scrollTop = 0` dans son effet de
+   * mise en page), mais ScrollTrigger ne le sait pas : il garde en cache la
+   * position lue au dernier défilement (Lenis, 4 769 px par exemple) tant que
+   * l'événement « scroll » n'est pas arrivé, et enregistre ce chiffre périmé
+   * (`rec`) quand la chorégraphie de la nouvelle page se monte ; chaque
+   * refresh() la RESTAURE alors en fin de course (mesuré : scrollTo(0, 4769) à
+   * chaque refresh, la page d'arrivée s'ouvrait en bas, bornée à sa hauteur).
+   * Ici : cache invalidé, relecture réelle de window.scrollY, puis mémoire
+   * oubliée. La restauration native du retour arrière reste intacte (le
+   * navigateur positionne la page, ScrollTrigger relit cette position).
+   */
+  private resyncScroll() {
+    ScrollTrigger.update();
+    // Sans argument, la fonction de défilement LIT la position (les types de
+    // GSAP ne décrivent que l'écriture).
+    (ScrollTrigger.getScrollFunc(window) as unknown as () => number)();
+    ScrollTrigger.clearScrollMemory();
+  }
+
+  /**
    * Nouvelle page (ou premier montage) : dimensions de Lenis, puis
    * ScrollTrigger.refresh() à la frame suivante, après les polices, et après
    * le chargement des images au-dessus de la ligne de flottaison (§3.3).
@@ -198,7 +219,19 @@ class Runtime {
     this.route?.abort();
     const route = new AbortController();
     this.route = route;
+    // Lenis arrête son interpolation en cours (sinon il continuerait vers
+    // l'ancienne cible, après un router.push() par exemple) et se recale sur la
+    // position réelle ; ScrollTrigger en fait autant (resyncScroll).
+    // stop() puis start() : reset() est privé dans les types de Lenis, mais
+    // ces deux appels publics y passent (interpolation coupée, cible =
+    // position réelle). Pas pendant un tiroir ouvert : Lenis est déjà arrêté,
+    // et start() le rendrait au défilement.
+    if (this.lenis && !this.locked) {
+      this.lenis.stop();
+      this.lenis.start();
+    }
     this.lenis?.resize();
+    this.resyncScroll();
     requestAnimationFrame(() => {
       if (route.signal.aborted) return;
       this.refresh();

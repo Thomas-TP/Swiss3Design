@@ -9,8 +9,9 @@ import { motionBridge, useMotionBridge } from "@/lib/motion-bridge/store";
 // Deux rôles en plus de Link (@/i18n/navigation, prefetch coupé par défaut) :
 //
 // 1. Transition « Coupe » : il porte le type "s3d-coupe", que les <PageCut>
-//    des pages vitrine traduisent en animation (la nouvelle page s'imprime en
-//    8 paliers par-dessus l'ancienne). Le type n'est posé qu'entre deux pages
+//    des pages vitrine traduisent en animation (la nouvelle page monte de
+//    bas en haut par-dessus l'ancienne, en une découpe continue, sans
+//    paliers). Le type n'est posé qu'entre deux pages
 //    DIFFÉRENTES du groupe (site) : vers le panier, le compte ou le légal,
 //    l'ancienne page resterait figée par-dessus la nouvelle pendant que le
 //    soulignement de la nav glisse. En mouvement réduit, aucun type : React

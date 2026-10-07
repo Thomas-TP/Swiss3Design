@@ -25,11 +25,18 @@ CustomEase.create("s3d.buse", "M0,0 C0.45,0 0.55,1 1,1");
 CustomEase.create("s3d.purge", "M0,0 C0.3,1.35 0.6,1 1,1");
 CustomEase.create("s3d.carte", "M0,0 C0.7,0 0.2,1 1,1");
 
-/** Ease quantifiée : avance par paliers de 1/n (une « couche »), adoucie par k. Monotone. */
+/** Ease quantifiée : avance par paliers de 1/n (une « couche »), adoucie par k. Monotone.
+ *  Plus aucune animation du site ne l'utilise (07.10.2026) : conservée pour
+ *  d'éventuels tests, jamais pour un mouvement visible. */
 export function pas(n = 12, k = 0.85) {
   return (p: number) => p + (Math.round(p * n) / n - p) * k;
 }
-gsap.registerEase("s3d.pas", pas(12));
+// Le propriétaire n'accepte aucune animation par paliers (retours R06/R07,
+// 07.10.2026) : l'ancien nom « s3d.pas » reste enregistré, car les
+// chorégraphies qui l'appellent encore ne doivent pas planter, mais il
+// désigne désormais la courbe continue s3d.strate. Les appelants passeront à
+// « s3d.strate » à leur prochaine retouche.
+gsap.registerEase("s3d.pas", gsap.parseEase("s3d.strate"));
 
 gsap.defaults({ ease: "s3d.strate", duration: 0.8 });
 // La barre d'adresse mobile qui apparaît ou disparaît ne relance pas tous

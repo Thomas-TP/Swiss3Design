@@ -14,7 +14,7 @@
   },
   "pending": "Chargement de la page…",
   "footer": {
-    "motto": "Réglez-le. On l'imprime.",
+    "motto": "Personnalisez-le. On l'imprime.",
     "legend": "Équidistance 0,2 mm · Échelle 1:1",
     "gland": "46°25′N 6°16′E · Gland",
     "pully": "46°31′N 6°40′E · Pully",
@@ -37,7 +37,7 @@
     "zoomOut": "Zoom arrière"
   },
   "cta": {
-    "studio": "Régler un objet",
+    "studio": "Personnaliser un objet",
     "shop": "Voir la boutique",
     "file": "Envoyer un fichier"
   },

@@ -4,8 +4,9 @@ import { ViewTransition, type ReactNode } from "react";
 // page du groupe (site) enveloppe son contenu dans <PageCut>, au niveau de la
 // page et non du layout (un layout persiste d'une navigation à l'autre : ni
 // enter ni exit n'y partiraient jamais). Seul le type "s3d-coupe", posé par
-// SiteLink entre deux pages vitrine, anime : la nouvelle page s'imprime de bas
-// en haut en 8 paliers de clip-path (480 ms) par-dessus l'ancienne, qui ne
+// SiteLink entre deux pages vitrine, anime : la nouvelle page monte de bas
+// en haut en une découpe de clip-path continue (480 ms, --ease-strate, jamais
+// par paliers) par-dessus l'ancienne, qui ne
 // bouge pas ; le header reste ancré (site-header). Sans type (bouton retour,
 // router.refresh(), Suspense, Firefox qui ignore les types) : rien. En
 // mouvement réduit : SiteLink ne pose pas de type, et le CSS ramène de toute

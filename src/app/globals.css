@@ -293,8 +293,11 @@ body {
     animation-timeline: view();
     animation-range: entry 5% cover 28%;
   }
+  /* Courbe continue (--ease-strate), jamais par paliers : la révélation glisse
+     avec le défilement au lieu de sauter en huit marches (retour du
+     propriétaire R06, 07.10.2026 ; brief §3.2). */
   html[data-motion="full"] .s3d-print {
-    animation: s3d-print steps(8, end) both;
+    animation: s3d-print var(--ease-strate) both;
     animation-timeline: view();
     animation-range: entry 10% cover 35%;
   }
@@ -309,7 +312,9 @@ body {
     translate: 0 0;
   }
 }
-/* « S'imprime » de bas en haut en 8 couches. */
+/* « S'imprime » de bas en haut : le bord de la découpe monte d'un seul geste
+   continu (la courbe est posée par l'appelant : révélation au défilement,
+   transition de page « Coupe »). */
 @keyframes s3d-print {
   from {
     clip-path: inset(100% 0 0 0);
@@ -428,8 +433,11 @@ html.lenis body {
 ::view-transition-group(.s3d-coupe) {
   z-index: 2;
 }
+/* La nouvelle page monte de bas en haut par-dessus l'ancienne en une découpe
+   continue (--ease-strate, 480 ms) : plus de paliers (retour R07, 07.10.2026).
+   Pas de fondu : l'ancienne page ne bouge ni ne s'efface (brief §3.1, 2). */
 ::view-transition-new(.s3d-coupe) {
-  animation: s3d-print var(--dur-page) steps(8, end) both;
+  animation: s3d-print var(--dur-page) var(--ease-strate) both;
 }
 ::view-transition-old(.s3d-coupe-out) {
   animation: none;
