@@ -574,12 +574,19 @@ const create = (
     const plateSurface = new MeshStandardMaterial({ roughness: 0.9 });
     plate.add(new Mesh(plateGeometry, plateSurface));
     const grid = canvasTexture(512, () => {});
+    // Le plateau est vu à 22° : sans filtrage anisotrope, les mips lissent les
+    // traits au tiers de leur finesse et le quadrillage paraît 2 à 3 fois plus
+    // épais que le trait de 1 px du poster SSR (même couleur, même pas).
+    grid.texture.anisotropy = Math.min(
+      8,
+      ctx.renderer.capabilities.getMaxAnisotropy(),
+    );
     drawGrid = (t) => {
       const g = grid.canvas.getContext("2d")!;
       const cell = grid.canvas.width / (PLATE_MM / PLATE_GRID_MM);
       g.clearRect(0, 0, grid.canvas.width, grid.canvas.height);
       g.strokeStyle = t.iso;
-      g.lineWidth = 2;
+      g.lineWidth = 1.5;
       g.beginPath();
       for (let i = 0; i <= PLATE_MM / PLATE_GRID_MM; i++) {
         const p = Math.min(grid.canvas.width - 1, Math.round(i * cell));
