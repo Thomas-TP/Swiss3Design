@@ -368,9 +368,9 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
   function attachFine(built: BuiltMesh) {
     const d = display;
     if (!d || d.separate || !d.whole) return;
+    showFine(d, false); // les maillages ne pointent plus vers celle qu'on jette
     d.fine?.dispose();
     d.fine = meshToGeometry(built.mesh);
-    d.fineShown = false;
   }
 
   function buildDisplay(

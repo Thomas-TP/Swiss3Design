@@ -33,7 +33,7 @@ describe("objets du Studio : ce que l'interface en sait", () => {
     expect(flatViewOf("lavaux")).toBe("elevation");
   });
 
-  it("sans WebGL on démarre sur le dessin 2D exact, avec WebGL sur le 3/4", () => {
+  it("sans WebGL on démarre sur le dessin 2D exact, avec WebGL sur la 3D", () => {
     expect(defaultView("lavaux", true)).toBe("orbit");
     expect(defaultView("lavaux", false)).toBe("elevation");
     expect(defaultView("borne", false)).toBe("plan");

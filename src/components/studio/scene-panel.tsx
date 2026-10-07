@@ -53,7 +53,7 @@ import { mm, num, type Translate } from "./summary";
 import { useStageAvailability } from "./use-stage-availability";
 import { ViewSwitch } from "./view-switch";
 
-// Colonne de la scène (brief « Strates », §6.7) : la vue (3/4, Plan, Élévation,
+// Colonne de la scène (brief « Strates », §6.7) : la vue (3D, Plan, Élévation,
 // Couches), « Éclater », les boutons de l'orbite, la réglette Z et la
 // simulation, les étiquettes de l'éclaté, et les états (préparation, erreur du
 // Worker avec « Réessayer », 3D indisponible). L'état de la scène (vue, éclaté,

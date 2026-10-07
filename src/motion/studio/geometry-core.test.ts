@@ -10,7 +10,12 @@ import {
   RELIEF_DEFAULT,
 } from "@/lib/studio/presets";
 import { setGlyphFont } from "@/lib/studio/text/glyphs";
-import { ensureGlyphs, runBuild, runExport } from "./geometry-core";
+import {
+  ensureGlyphs,
+  generatorLevel,
+  runBuild,
+  runExport,
+} from "./geometry-core";
 import { StudioWorkerError } from "./protocol";
 
 const GLYPH_FILE = fileURLToPath(
@@ -72,6 +77,61 @@ describe("construction d'affichage (Worker)", () => {
     expect(c1.mesh.triangles).toBeLessThan(c2.mesh.triangles);
     expect(drag.mesh.triangles).toBeLessThan(c1.mesh.triangles);
     expect(c1.mesh.triangles).toBeLessThan(45_000);
+  });
+
+  it("maillage fin (repos) : celui de l'export en C2, la définition C2 en C1 ; mêmes bandes et même hauteur", async () => {
+    // Un motif à arêtes vives : c'est lui que la finesse sert (cellules de Voronoï).
+    const voronoi = {
+      ...HERO_CONFIG,
+      pattern: { kind: "voronoi" as const, cells: 48, relief: 1.2, seed: 4812 },
+    };
+    const run = (lod: "display" | "fine", tier: 1 | 2) =>
+      runBuild({
+        config: voronoi,
+        texts: {},
+        lod,
+        tier,
+        separate: false,
+        locale: "fr",
+      });
+    const [display, fineC2, fineC1, displayC1] = await Promise.all([
+      run("display", 2),
+      run("fine", 2),
+      run("fine", 1),
+      run("display", 1),
+    ]);
+    expect(fineC2.mesh.triangles).toBeGreaterThan(display.mesh.triangles * 1.4);
+    expect(fineC2.mesh.triangles).toBeLessThanOrEqual(205_000);
+    // C1 ne dépasse pas la définition C2 : un mobile n'a pas à porter 200 k triangles.
+    expect(fineC1.mesh.triangles).toBe(display.mesh.triangles);
+    expect(fineC1.mesh.triangles).toBeGreaterThan(displayC1.mesh.triangles);
+    expect(fineC2.bands).toEqual(display.bands);
+    expect(fineC2.heightMm).toBe(display.heightMm);
+    expect(generatorLevel({ lod: "fine", tier: 2 })).toEqual({
+      lod: "export",
+      tier: 2,
+    });
+    expect(generatorLevel({ lod: "drag", tier: 1 })).toEqual({
+      lod: "drag",
+      tier: 1,
+    });
+  });
+
+  it("maillage fin des objets plats : arcs et disque plus fins que l'affichage, mêmes bandes", async () => {
+    serveGlyphs();
+    const run = (lod: "display" | "fine") =>
+      runBuild({
+        config: CARTOUCHE_DEFAULT,
+        texts: { name: "Zoé" },
+        lod,
+        tier: 2,
+        separate: false,
+        locale: "fr",
+      });
+    const [display, fine] = await Promise.all([run("display"), run("fine")]);
+    expect(fine.mesh.triangles).toBeGreaterThan(display.mesh.triangles);
+    expect(fine.bands).toEqual(display.bands);
+    expect(fine.heightMm).toBeCloseTo(display.heightMm, 6);
   });
 
   it("éclaté : une coque par bande, groupes numérotés par bande", async () => {
