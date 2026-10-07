@@ -160,25 +160,26 @@ Frontière du bundle (règle d'or 11 d'`AGENTS.md`) : gsap, lenis et three ne
 s'importent que sous `src/motion/**`, atteint uniquement par un gate
 `src/gates/*.tsx` (`next/dynamic`, `ssr: false`). Le DOM ne parle qu'au pont.
 
-| Fichier                                                                | Rôle                                                                                                   |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `components/site-shell.tsx` · `app/[locale]/(site)/layout.tsx`         | Coquille des pages vitrine : décide du montage du runtime et du Stage (`useMotionShell`)               |
-| `gates/runtime.tsx`                                                    | Seul chemin vers `@/motion/runtime` et `@/motion/stage/stage-root` (un gate par package ensuite)       |
-| `gates/boundary.test.ts`                                               | Test de la frontière (imports statiques, `dynamic(…, { ssr: false })`, `"use client"`)                 |
-| `motion/gsap.ts`                                                       | GSAP, ScrollTrigger, `useGSAP`, courbes de la marque ; jamais les plugins d'une chorégraphie           |
-| `motion/runtime.tsx`                                                   | Lenis sur `gsap.ticker`, `--s3d-progress`, `bridge.scroll`                                             |
-| `motion/stage/stage.ts`                                                | Renderer WebGL unique : vues en scissor, rendu à la demande, bake au repos, perte de contexte, paliers |
-| `motion/stage/scenes/index.ts`                                         | Registre des 4 scènes (`print-hero`, `contour-field`, `studio-object`, `product-viewer`) ; stubs WP-00 |
-| `motion/stage/bake.ts`                                                 | Rendu en image WebP (`bridge.stage.bake`, vignettes) et bake au repos des vues C1                      |
-| `motion/stage/materials/print-material.ts` · `glsl/`                   | Matériau d'impression (coupe, bandes, lignes fantômes)                                                 |
-| `motion/stage/controllers.ts`                                          | Contrôleurs animables d'une vue, pour les chorégraphies                                                |
-| `lib/motion-bridge/store.ts` · `types.ts`                              | Pont DOM ↔ côté lourd : état (`useMotionBridge`), registre des vues, contrats figés                    |
-| `lib/motion-bridge/use-stage-view.ts` · `components/ui/stage-view.tsx` | Déclarer une vue 3D dans une page (poster SSR en enfant)                                               |
-| `lib/motion-bridge/tier.ts`                                            | Capacité C0–C2, déclassement, `s3d-webgl-lost`                                                         |
-| `lib/motion-bridge/motion-pref.ts` · `use-reduced-motion.ts`           | Préférence de mouvement (`data-motion`), hook React `useReducedMotionPreference`                       |
-| `components/motion-toggle.tsx` · `reduced-motion-config.tsx`           | Interrupteur du footer ; `<MotionConfig>` de motion/react piloté par la préférence                     |
-| `components/ui/page-cut.tsx` · `site-link.tsx`                         | Transition « Coupe » entre pages vitrine (chaque `page.tsx` de `(site)` enveloppe son contenu)         |
-| `lib/studio/{types,creations,texts-store}.ts` · `lib/quote-handoff.ts` | Contrats du Studio : types, « Mes créations », textes saisis, passage Studio → `/custom`               |
+| Fichier                                                                     | Rôle                                                                                                      |
+| --------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `components/site-shell.tsx` · `app/[locale]/(site)/layout.tsx`              | Coquille des pages vitrine : décide du montage du runtime et du Stage (`useMotionShell`)                  |
+| `gates/runtime.tsx`                                                         | Seul chemin vers `@/motion/runtime` et `@/motion/stage/stage-root` (un gate par package ensuite)          |
+| `gates/boundary.test.ts`                                                    | Test de la frontière (imports statiques, `dynamic(…, { ssr: false })`, `"use client"`)                    |
+| `motion/gsap.ts`                                                            | GSAP, ScrollTrigger, `useGSAP`, courbes de la marque ; jamais les plugins d'une chorégraphie              |
+| `motion/runtime.tsx`                                                        | Lenis sur `gsap.ticker`, `--s3d-progress`, `bridge.scroll`, retour en haut de page à la navigation        |
+| `motion/stage/stage-root.tsx` · `ticker.ts` · `loop.ts` · `view-tracker.ts` | Montage du canvas (fixe en C2, ancré au document en C1), horloge, recalage par frame, rectangles des vues |
+| `motion/stage/stage.ts`                                                     | Renderer WebGL unique : vues en scissor, rendu à la demande, bake au repos, perte de contexte, paliers    |
+| `motion/stage/scenes/index.ts`                                              | Registre des 4 scènes (`print-hero`, `contour-field`, `studio-object`, `product-viewer`) ; stubs WP-00    |
+| `motion/stage/bake.ts`                                                      | Rendu en image WebP (`bridge.stage.bake`, vignettes) et bake au repos des vues C1                         |
+| `motion/stage/materials/print-material.ts` · `glsl/`                        | Matériau d'impression (coupe, bandes, lignes fantômes)                                                    |
+| `motion/stage/controllers.ts`                                               | Contrôleurs animables d'une vue, pour les chorégraphies                                                   |
+| `lib/motion-bridge/store.ts` · `types.ts`                                   | Pont DOM ↔ côté lourd : état (`useMotionBridge`), registre des vues, contrats figés                       |
+| `lib/motion-bridge/use-stage-view.ts` · `components/ui/stage-view.tsx`      | Déclarer une vue 3D dans une page (poster SSR en enfant)                                                  |
+| `lib/motion-bridge/tier.ts`                                                 | Capacité C0–C2, déclassement, `s3d-webgl-lost`                                                            |
+| `lib/motion-bridge/motion-pref.ts` · `use-reduced-motion.ts`                | Préférence de mouvement (`data-motion`), hook React `useReducedMotionPreference`                          |
+| `components/motion-toggle.tsx` · `reduced-motion-config.tsx`                | Interrupteur du footer ; `<MotionConfig>` de motion/react piloté par la préférence                        |
+| `components/ui/page-cut.tsx` · `site-link.tsx`                              | Transition « Coupe » entre pages vitrine (chaque `page.tsx` de `(site)` enveloppe son contenu)            |
+| `lib/studio/{types,creations,texts-store}.ts` · `lib/quote-handoff.ts`      | Contrats du Studio : types, « Mes créations », textes saisis, passage Studio → `/custom`                  |
 
 ## Studio (`src/lib/studio`, pur TypeScript, WP-01 et WP-02)
 
