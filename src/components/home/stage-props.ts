@@ -8,7 +8,7 @@ import type { HeroPaletteKey, HeroPatternKey } from "./hero-data";
 
 /** Props de la scène `print-hero` : le héros (impression) ou l'éclaté du chapitre 01. */
 export interface PrintHeroProps {
-  /** « hero » : plateau, buse, tour de purge ; « exploded » : les bandes écartées. */
+  /** « hero » : plateau, tête d'impression, silhouette de la forme finale ; « exploded » : les bandes écartées. */
   mode: "hero" | "exploded";
   /** La scène réagit à un changement de palette (vague) ou de motif (réimpression). */
   palette: HeroPaletteKey;

@@ -22,7 +22,6 @@ import {
   HOME,
   HOME_VIEW_ATTR,
   homeSelector,
-  type HeroChangeDetail,
   type HeroLayerDetail,
   type HeroScrubDetail,
   type HomeViewName,
@@ -145,12 +144,6 @@ export function HomeChoreo() {
                 total,
                 z,
                 band,
-              });
-            c.onBandCross = (band, layer, filament) =>
-              emit<HeroChangeDetail>(HERO_EVENTS.change, {
-                band,
-                layer,
-                filament,
               });
             apply();
           }),

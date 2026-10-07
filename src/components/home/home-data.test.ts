@@ -39,8 +39,8 @@ describe("données précalculées de l'accueil", () => {
 
   it("trois posters d'exemple dans le budget du brief (§5.7)", () => {
     const size = (poster: unknown) => JSON.stringify(poster).length;
-    expect(HOME_DATA.posters.ghost.ghost).toHaveLength(75);
-    expect(size(HOME_DATA.posters.ghost)).toBeLessThan(6 * 1024);
+    expect(HOME_DATA.posters.plate.plate).toBeTruthy();
+    expect(size(HOME_DATA.posters.plate)).toBeLessThan(2 * 1024);
     expect(size(HOME_DATA.posters.final)).toBeLessThan(8 * 1024);
   });
 });

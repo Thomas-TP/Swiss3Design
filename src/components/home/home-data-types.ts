@@ -26,7 +26,7 @@ export interface HomeData {
   /** Les douze variantes du héros : configuration, chiffres, bandes. */
   hero: HeroData;
   /** Les trois posters de la configuration d'exemple (§5.7). */
-  posters: { ghost: HeroPoster; final: HeroPoster; exploded: HeroPoster };
+  posters: { plate: HeroPoster; final: HeroPoster; exploded: HeroPoster };
   /** Étiquette et chiffres du sous-verre pour le sommet d'exemple, par langue. */
   summit: Record<HomeLocale, { label: string; stats: StatsFigures }>;
   reliefConfig: ReliefConfig;

@@ -5,31 +5,33 @@ import { useMemo, useRef, type ReactNode } from "react";
 import { cx } from "@/components/ui/cx";
 import { HOME_VIEW_ATTR } from "./contract";
 import { useHomeConfig } from "./home-config-context";
-import { HeroChange, HeroRuler } from "./hero-telemetry";
+import { HeroRuler } from "./hero-telemetry";
 import type { PrintHeroProps } from "./stage-props";
 import { useHomeMotion, useHomeView } from "./use-home-motion";
 import { useStaticPoster } from "./use-static-poster";
 import styles from "./home.module.css";
 
 // La boîte visuelle du héros (brief « Strates », §5.1, §5.5, §5.7) : une vue du
-// Stage (`print-hero`) dont les enfants sont les deux posters SSR (le dessin,
-// puis la matière), l'étiquette d'honnêteté et, sur mobile, la réglette Z.
+// Stage (`print-hero`) dont les enfants sont les deux posters SSR (le plateau
+// vide, puis la matière), l'étiquette d'honnêteté et, sur mobile, la réglette Z.
 //
 // Trois états, un seul DOM :
-//  - premier paint, ou capacité C0 en mouvement complet : le poster « dessin »
-//    (anneaux fantômes), qui devient « matière » en 240 ms une fois la
+//  - premier paint, ou capacité C0 en mouvement complet : le poster « plateau »
+//    (le plateau d'impression vide, sans silhouette : elle naît avec les
+//    premières couches), qui devient « matière » en 240 ms une fois la
 //    détection faite (appareil sans WebGL) ;
 //  - mouvement réduit : le poster « matière », tout de suite, sans vue du Stage
 //    (three n'est jamais téléchargé pour le héros) ;
 //  - WebGL : la vue s'enregistre, le Stage rend une première frame identique au
-//    poster, le poster s'efface, la chorégraphie joue l'impression.
+//    poster (le plateau, plus la tête), le poster s'efface en fondu, la
+//    chorégraphie joue l'impression.
 // Les contrôles de palette et de motif changent les props de la vue (vague,
 // réimpression) ou, en 2D, recolorent le poster recalculé côté client.
 export function HeroVisual({
-  ghost,
+  plate,
   final,
 }: {
-  ghost: ReactNode;
+  plate: ReactNode;
   final: ReactNode;
 }) {
   const t = useTranslations("landing.hero");
@@ -68,14 +70,13 @@ export function HeroVisual({
     >
       <figcaption className="sr-only">{t("visual")}</figcaption>
       <div className="s3d-poster absolute inset-0" aria-hidden="true">
-        <div className={styles.ghost}>{ghost}</div>
+        <div className={styles.plateLayer}>{plate}</div>
         <div className={styles.final}>{custom ?? final}</div>
       </div>
       {/* Desktop : étiquette posée sur la boîte ; mobile : sous la boîte (télémétrie). */}
       <p className={cx("s3d-label hidden normal-case lg:block", styles.label)}>
         {t("label")}
       </p>
-      <HeroChange />
       {capability === 1 ? <HeroRuler /> : null}
       {engine}
     </figure>

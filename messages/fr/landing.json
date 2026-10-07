@@ -1,7 +1,7 @@
 {
   "seo": {
     "title": "Swiss3Design · Impression 3D multicolore en Suisse",
-    "description": "Réglez un vase, une carte ou un sous-verre en 3D, puis laissez l'atelier l'imprimer en jusqu'à quatre couleurs, à Gland et à Pully. Livré partout en Suisse.",
+    "description": "Personnalisez un vase, une carte ou un sous-verre en 3D, l'atelier l'imprime en jusqu'à quatre couleurs, à Gland et à Pully. Livré partout en Suisse.",
     "imageAlt": "Swiss3Design : un vase imprimé couche par couche en trois couleurs"
   },
   "rail": {
@@ -17,17 +17,17 @@
   "hero": {
     "kicker": "Impression 3D multicolore · Gland & Pully (VD)",
     "title": "Tout relief commence par une couche.",
-    "lead": "Des objets dessinés par notre atelier, que vous réglez en direct : forme, motif, jusqu'à quatre couleurs. Vous réglez, on imprime, à Gland et à Pully.",
-    "ctaStudio": "Régler un objet",
+    "lead": "Des objets dessinés par notre atelier, que vous personnalisez en direct : forme, motif, jusqu'à quatre couleurs. Vous personnalisez, on imprime, à Gland et à Pully.",
+    "ctaStudio": "Personnaliser un objet",
     "ctaShop": "Boutique",
     "ctaFile": "J'ai un fichier",
     "label": "Objet Studio · configuration d'exemple · rendu temps réel",
     "skip": "Passer l'animation",
     "palette": "Palette",
     "pattern": "Motif",
-    "controls": "Régler le vase du héros",
+    "controls": "Personnaliser le vase du héros",
     "coords": "46°25′N 6°16′E · Gland — 46°31′N 6°40′E · Pully",
-    "visual": "Vase « Lavaux » imprimé couche par couche : l'impression se règle avec la palette et le motif.",
+    "visual": "Vase « Lavaux » imprimé couche par couche : l'impression suit la palette et le motif choisis.",
     "ruler": "Couche imprimée",
     "measures": "Mesures du vase",
     "rulerValue": "Couche {layer} sur {total}, {height} imprimés"
@@ -40,11 +40,11 @@
   "map": {
     "eyebrow": "La carte",
     "title": "Une couleur par altitude.",
-    "intro": "Une imprimante FDM n'a que des altitudes à empiler. À 0,2 mm par couche, ce vase de {height} est un relief de {layers} courbes de niveau, et chaque bande de couleur y joue la teinte d'une carte.",
-    "figure": "Le même vase, éclaté : une bande par couleur, du plateau au sommet.",
+    "intro": "Une imprimante 3D ne fait qu'empiler des altitudes. À 0,2 mm par couche, ce vase de {height} est un relief de {layers} courbes de niveau, et chaque bande de couleur y joue la teinte d'une carte.",
+    "figure": "Le même vase, séparé en bandes : une par couleur, du plateau au sommet.",
     "bands": "Bandes de couleur, du sommet au plateau",
     "purgeLine": "{purge} : c'est tout ce que coûte la couleur, et on vous le montre.",
-    "cta": "Régler les bandes dans le Studio"
+    "cta": "Personnaliser les bandes dans le Studio"
   },
   "summit": {
     "eyebrow": "Votre sommet",
@@ -58,14 +58,14 @@
   },
   "studio": {
     "eyebrow": "Le Studio",
-    "title": "Réglez-le. On l'imprime.",
-    "intro": "Quatre objets originaux, que vous réglez en 3D avant de nous les envoyer. Le prix ferme est confirmé sur devis, sous 48 h.",
-    "adjust": "Régler",
+    "title": "Personnalisez-le. On l'imprime.",
+    "intro": "Quatre objets originaux, que vous personnalisez en 3D avant de nous les envoyer. Le prix ferme est confirmé sur devis, sous 48 h.",
+    "adjust": "Personnaliser",
     "stepsTitle": "Comment ça marche",
     "steps": {
       "set": {
-        "title": "Réglez",
-        "text": "Forme, motif, couleurs, texte : l'objet se règle en 3D, et les grammes et la durée suivent chaque geste."
+        "title": "Personnalisez",
+        "text": "Forme, motif, couleurs, texte : l'objet se personnalise en 3D, et les grammes et la durée suivent chaque geste."
       },
       "send": {
         "title": "Envoyez",
@@ -86,11 +86,11 @@
     "title": "Des objets choisis, imprimés à la commande.",
     "intro": "Des modèles retenus pour leur dessin, lancés à la commande dans nos ateliers.",
     "all": "Tout voir",
-    "empty": "Aucun objet en boutique pour le moment. Réglez le vôtre au Studio ou envoyez-nous un fichier."
+    "empty": "Aucun objet en boutique pour le moment. Personnalisez le vôtre au Studio ou envoyez-nous un fichier."
   },
   "atelier": {
     "eyebrow": "L'atelier",
-    "title": "Imprimé à Gland et à Pully. Livré de Genève à Romanshorn.",
+    "title": "Imprimé à Gland et à Pully. Livré partout en Suisse.",
     "intro": "Chaque pièce est lancée, contrôlée et emballée dans l'un de nos deux ateliers vaudois, puis expédiée par la Poste suisse.",
     "gland": "Gland",
     "glandMachine": "Bambu Lab P1S · AMS 2 Pro",

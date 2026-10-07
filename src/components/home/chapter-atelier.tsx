@@ -2,8 +2,9 @@ import { useTranslations } from "next-intl";
 import { ButtonLink } from "@/components/ui/button";
 import { Chapter } from "@/components/ui/chapter";
 
-// Chapitre 05 « Imprimé à Gland et à Pully. Livré de Genève à Romanshorn. »
-// (brief « Strates », §7.5) : deux ateliers, leurs machines, leurs coordonnées
+// Chapitre 05 « Imprimé à Gland et à Pully. Livré partout en Suisse. » (brief
+// « Strates », §7.5 ; titre simplifié le 07.10.2026 : « Romanshorn » ne disait
+// rien à un lecteur romand) : deux ateliers, leurs machines, leurs coordonnées
 // (villes seulement, jamais d'adresse de rue), la livraison offerte dès le
 // seuil des réglages (formaté par la page, jamais écrit en dur) et les moyens
 // de paiement. C'est aussi l'accès mobile à l'Atelier (lien « Visiter

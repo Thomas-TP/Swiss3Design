@@ -13,7 +13,6 @@ import {
 } from "@/lib/studio/format";
 import {
   HERO_EVENTS,
-  type HeroChangeDetail,
   type HeroLayerDetail,
   type HeroScrubDetail,
 } from "./contract";
@@ -22,11 +21,11 @@ import styles from "./home.module.css";
 
 // Télémétrie du héros (brief « Strates », §5.5, motif M3) : la bande de mesure
 // (calculée par computeStats sur le serveur, jamais décorative), la lecture de
-// couche en direct, l'étiquette de changement de filament et la réglette Z du
-// héros mobile. La chorégraphie parle à ces composants par des événements
-// (contract.ts) : des nombres et des identifiants de filament, jamais de texte
-// saisi. Tout est `ph-no-capture` : une télémétrie qui change à 10 Hz gonflerait
-// les replays (§4.10).
+// couche en direct et la réglette Z du héros mobile. (L'étiquette « Changement
+// de filament » du brief a été retirée le 07.10.2026 : le propriétaire la juge
+// inutile.) La chorégraphie parle à ces composants par des événements
+// (contract.ts) : des nombres, jamais de texte saisi. Tout est `ph-no-capture` :
+// une télémétrie qui change à 10 Hz gonflerait les replays (§4.10).
 
 function useWindowEvent<T>(name: string, handler: (detail: T) => void) {
   const latest = useRef(handler);
@@ -115,37 +114,6 @@ export function HeroTelemetry() {
         )}
       </p>
     </div>
-  );
-}
-
-/** « Changement de filament → Vert Lavaux · couche 0211 », 1,6 s (§5.5). */
-export function HeroChange() {
-  const tb = useTranslations("studioCore.bands");
-  const tf = useTranslations("studioCore.filaments");
-  const [change, setChange] = useState<HeroChangeDetail | null>(null);
-  const [visible, setVisible] = useState(false);
-  const timer = useRef(0);
-
-  useWindowEvent<HeroChangeDetail>(HERO_EVENTS.change, (detail) => {
-    setChange(detail);
-    setVisible(true);
-    window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(() => setVisible(false), 1600);
-  });
-  useEffect(() => () => window.clearTimeout(timer.current), []);
-
-  return (
-    <output
-      data-visible={visible}
-      className={cx("s3d-label ph-no-capture normal-case", styles.change)}
-    >
-      {change
-        ? tb("change", {
-            filament: tf(change.filament as Parameters<typeof tf>[0]),
-            layer: formatLayerIndex(change.layer),
-          })
-        : null}
-    </output>
   );
 }
 

@@ -6,7 +6,7 @@ import { HOME } from "./contract";
 import { FieldView } from "./field-view";
 import { HeroCtas } from "./hero-cta";
 import { HeroControls } from "./hero-controls";
-import { HeroFinalPoster, HeroGhostPoster } from "./hero-poster";
+import { HeroFinalPoster, HeroPlatePoster } from "./hero-poster";
 import { HeroTelemetry } from "./hero-telemetry";
 import { HeroVisual } from "./hero-visual";
 import styles from "./home.module.css";
@@ -76,7 +76,7 @@ export function Hero() {
             styles.visualColumn,
           )}
         >
-          <HeroVisual ghost={<HeroGhostPoster />} final={<HeroFinalPoster />} />
+          <HeroVisual plate={<HeroPlatePoster />} final={<HeroFinalPoster />} />
           <HeroTelemetry />
         </div>
       </div>

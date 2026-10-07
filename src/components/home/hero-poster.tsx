@@ -16,10 +16,10 @@ export function getHeroPoster(variant: HeroPoster["variant"]): HeroPoster {
   return HOME_DATA.posters[variant];
 }
 
-/** Le dessin (anneaux fantômes tous les 2 mm), avant que le visiteur ne joue. */
-export function HeroGhostPoster() {
+/** Le plateau vide, avant la première couche (la première frame du Stage est identique). */
+export function HeroPlatePoster() {
   return (
-    <PosterSvg poster={getHeroPoster("ghost")} className={styles.poster} />
+    <PosterSvg poster={getHeroPoster("plate")} className={styles.poster} />
   );
 }
 
