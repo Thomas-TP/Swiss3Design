@@ -11,6 +11,7 @@
 //     (props, thème, défilement natif signalé par l'événement scroll) ou si la
 //     frame précédente en redemande une.
 import {
+  getCanvasAnchor,
   getFrameDriver,
   onFrameDriverChange,
   type FrameDriver,
@@ -38,6 +39,12 @@ export function createLoop(onFrame: (nowMs: number) => boolean): StageLoop {
 
   const run = (now: number) => {
     requested = false;
+    // Canvas ancré au document (C1) : calé sur le défilement de CETTE frame
+    // avant le dessin, dans la même tâche, donc dans le même commit que lui.
+    // Le défilement est relu ici comme onFrame le relit (même tâche, même
+    // valeur) ; si onFrame ne dessine pas, rien n'a bougé depuis le dernier
+    // dessin et le recalage ne change rien.
+    getCanvasAnchor()?.follow(window.scrollY);
     if (onFrame(now)) requested = true;
   };
 

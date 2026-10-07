@@ -8,7 +8,7 @@
 // pinnée ou transformée), relue par frame, pour une ou deux vues au plus.
 // La visibilité vient d'un IntersectionObserver avec 25 % de marge : une vue
 // proche de l'écran est déjà prête quand elle y entre.
-import { onLayout } from "./ticker";
+import { getCanvasAnchor, onLayout } from "./ticker";
 
 interface Tracked {
   element: HTMLElement;
@@ -112,18 +112,26 @@ export class ViewTracker {
     return false;
   }
 
-  /** Rectangle dans la fenêtre (px CSS), ou null si la vue est vide ou inconnue. */
+  /**
+   * Rectangle dans le canvas (px CSS), ou null si la vue est vide ou inconnue.
+   * Canvas fixe : c'est la fenêtre. Canvas ancré au document (C1, ticker.ts) :
+   * la fenêtre décalée de `offsetY()`, le décalage que loop.ts vient de poser.
+   */
   rect(id: string, scrollX: number, scrollY: number): DOMRectReadOnly | null {
     const view = this.views.get(id);
     if (!view) return null;
+    const dy = getCanvasAnchor()?.offsetY() ?? 0;
     if (view.liveRect) {
       const r = view.element.getBoundingClientRect();
-      return r.width > 0 && r.height > 0 ? r : null;
+      if (r.width <= 0 || r.height <= 0) return null;
+      return dy === 0
+        ? r
+        : new DOMRectReadOnly(r.left, r.top + dy, r.width, r.height);
     }
     if (view.width <= 0 || view.height <= 0) return null;
     return new DOMRectReadOnly(
       view.docLeft - scrollX,
-      view.docTop - scrollY,
+      view.docTop - scrollY + dy,
       view.width,
       view.height,
     );
