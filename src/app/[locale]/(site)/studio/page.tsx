@@ -132,7 +132,9 @@ export default async function StudioIndexPage({
           {cards.map((card) => (
             <li
               key={card.object}
-              className="col-span-full sm:col-span-6 lg:col-span-3"
+              // Deux cartes par rangée de 640 px à 1279 px (grille à 8 puis 12
+              // colonnes), quatre au-delà : des aperçus en grand, jamais en vignette.
+              className="col-span-full sm:col-span-4 lg:col-span-6 xl:col-span-3"
             >
               <ObjectCard
                 object={card.object}
