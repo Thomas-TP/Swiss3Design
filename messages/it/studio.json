@@ -134,7 +134,9 @@
     "explode": "Scomponi",
     "preparing": "Preparazione dello Studio…",
     "error": "Non è stato possibile calcolare la vista 3D.",
-    "retry": "Riprova"
+    "retry": "Riprova",
+    "collapse": "Riduci l'anteprima",
+    "expand": "Ingrandisci l'anteprima"
   },
   "layers": {
     "slider": "Strato visualizzato",

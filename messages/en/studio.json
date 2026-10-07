@@ -134,7 +134,9 @@
     "explode": "Explode",
     "preparing": "Preparing the Studio…",
     "error": "The 3D view could not be calculated.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "collapse": "Collapse preview",
+    "expand": "Expand preview"
   },
   "layers": {
     "slider": "Displayed layer",

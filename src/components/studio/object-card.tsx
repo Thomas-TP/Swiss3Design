@@ -51,7 +51,7 @@ export function ObjectCard({
         object={object}
         texts={texts}
         locale={locale}
-        className="aspect-[5/4] border-b border-line bg-paper p-4"
+        className="aspect-[5/4] border-b border-line bg-paper"
       />
       <div className="flex flex-1 flex-col p-5">
         <Heading className="font-display text-[1.125rem] font-bold leading-snug tracking-tight text-ink">

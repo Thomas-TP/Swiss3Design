@@ -78,6 +78,7 @@ export function ScenePanel({
   bands,
   reprint,
   bandBar,
+  compact = false,
   className,
   t,
   core,
@@ -92,6 +93,11 @@ export function ScenePanel({
   reprint: number;
   /** Barre altimétrique verticale (bureau), posée au bord droit de la vue. */
   bandBar?: ReactNode;
+  /**
+   * Mobile : l'aperçu est réduit en bandeau, l'objet seul reste (les vues, les
+   * boutons de l'orbite et la simulation reviennent avec l'aperçu entier).
+   */
+  compact?: boolean;
   className?: string;
   t: Translate;
   core: Translate;
@@ -219,8 +225,11 @@ export function ScenePanel({
       })
     : core("duration.real", { duration: real });
 
+  // 36 px sur mobile (six boutons tiennent sous l'objet), 44 px sur bureau.
   const buttonClass =
-    "grid size-11 place-items-center rounded-field border border-ink bg-paper/85 text-ink transition-colors duration-150 ease-strate hover:bg-ink hover:text-paper";
+    "grid size-9 place-items-center rounded-field border border-ink bg-paper/85 text-ink transition-colors duration-150 ease-strate hover:bg-ink hover:text-paper lg:size-11";
+  // Réduit en bandeau (mobile) : seul l'objet reste sur la vue.
+  const hideWhenCompact = compact ? "max-lg:hidden" : undefined;
 
   return (
     <div className={cx("relative", className)}>
@@ -246,7 +255,10 @@ export function ScenePanel({
         {views.length > 1 || stageOn ? (
           <div
             data-no-orbit=""
-            className="absolute left-3 top-3 z-10 sm:left-4 sm:top-4"
+            className={cx(
+              "absolute left-3 top-3 z-10 sm:left-4 sm:top-4",
+              hideWhenCompact,
+            )}
           >
             <ViewSwitch
               legend={t("scene.viewsLegend")}
@@ -271,7 +283,10 @@ export function ScenePanel({
         {sceneProps.exploded && !elevationShown && anchors.length > 0 ? (
           <div
             aria-hidden="true"
-            className="pointer-events-none absolute inset-y-0 right-3 z-10 w-[min(15rem,52%)] lg:right-[4.75rem]"
+            className={cx(
+              "pointer-events-none absolute inset-y-0 right-3 z-10 w-[min(15rem,52%)] lg:right-[4.75rem]",
+              hideWhenCompact,
+            )}
           >
             {spreadVertically(
               anchors.map((anchor) => anchor.y),
@@ -309,7 +324,12 @@ export function ScenePanel({
 
         {/* Réglette Z de la vue « Couches », au bord gauche. */}
         {stageOn && layersView ? (
-          <div className="absolute inset-y-16 left-3 z-10 w-11 sm:left-4">
+          <div
+            className={cx(
+              "absolute inset-y-16 left-3 z-10 w-11 sm:left-4",
+              hideWhenCompact,
+            )}
+          >
             <LayerSlider
               layer={layerNow}
               total={total}
@@ -332,6 +352,7 @@ export function ScenePanel({
               "absolute inset-x-3 bottom-3 z-10 flex flex-wrap items-end justify-between gap-2 sm:inset-x-4 sm:bottom-4",
               // La barre altimétrique occupe le bord droit (bureau) : la simulation s'arrête avant elle.
               bandBar ? "lg:pr-[5.75rem]" : null,
+              hideWhenCompact,
             )}
           >
             <div className="flex flex-wrap gap-1.5">
@@ -448,7 +469,14 @@ export function ScenePanel({
         ) : null}
       </StageView>
       {availability === "off" ? (
-        <p className="mt-3 max-w-[60ch] text-sm text-soft">
+        // Bureau : sous la vue. Mobile : sur le bas de la vue (la hauteur est comptée).
+        <p
+          className={cx(
+            "max-w-[60ch] text-sm text-soft lg:mt-3",
+            "max-lg:absolute max-lg:inset-x-3 max-lg:bottom-2 max-lg:rounded-hair max-lg:bg-paper/85 max-lg:px-2 max-lg:py-1 max-lg:text-xs",
+            hideWhenCompact,
+          )}
+        >
           {shell("unavailable")}
         </p>
       ) : null}

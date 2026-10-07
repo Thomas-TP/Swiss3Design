@@ -134,7 +134,9 @@
     "explode": "Auseinanderziehen",
     "preparing": "Studio wird vorbereitet…",
     "error": "Die 3D-Ansicht konnte nicht berechnet werden.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "collapse": "Vorschau verkleinern",
+    "expand": "Vorschau vergrössern"
   },
   "layers": {
     "slider": "Angezeigte Schicht",

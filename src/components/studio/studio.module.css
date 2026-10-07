@@ -1,5 +1,5 @@
 /* Styles du Studio qui ne s'écrivent pas en utilitaires (globals.css est figé
-   après WP-00) : curseurs natifs habillés, barre altimétrique, onglets mobiles.
+   après WP-00) : curseurs natifs habillés, barre altimétrique, réglette Z.
    Jetons uniquement (jamais de valeur hexadécimale en dur). */
 
 /* ── Curseur horizontal : piste fine, pouce rond de 22 px, hauteur de prise de
@@ -192,19 +192,4 @@
 .zRange:focus-visible::-moz-range-thumb {
   outline: 2px solid var(--color-ink);
   outline-offset: 3px;
-}
-
-/* ── Vues et « Éclater » en surimpression : sur mobile, des puces compactes pour
-   tenir sur une seule ligne (344 px) sans masquer l'objet. ───────────────── */
-@media (max-width: 1023px) {
-  .viewChips label > span {
-    min-height: 2rem;
-    padding: 0.25rem 0.5rem;
-    font-size: 0.75rem;
-  }
-  .viewChips button {
-    height: 2rem;
-    padding: 0 0.625rem;
-    font-size: 0.75rem;
-  }
 }

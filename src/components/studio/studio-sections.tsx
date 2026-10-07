@@ -51,9 +51,11 @@ export function SectionTabs({
 }) {
   return (
     // Onglets de mobile : natifs, et seulement quand JavaScript les fait fonctionner.
+    // Collés en haut de la zone qui défile : on change de section sans remonter.
     <fieldset
       className={cx(
         "m-0 hidden min-w-0 border-0 p-0 group-data-[js]/studio:max-lg:block",
+        "max-lg:sticky max-lg:top-0 max-lg:z-20 max-lg:bg-paper max-lg:py-1.5",
         className,
       )}
     >

@@ -134,7 +134,9 @@
     "explode": "Éclater",
     "preparing": "Préparation du Studio…",
     "error": "La vue 3D n'a pas pu être calculée.",
-    "retry": "Réessayer"
+    "retry": "Réessayer",
+    "collapse": "Réduire l'aperçu",
+    "expand": "Agrandir l'aperçu"
   },
   "layers": {
     "slider": "Couche affichée",

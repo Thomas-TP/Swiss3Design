@@ -1,5 +1,6 @@
 "use client";
 
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   useCallback,
@@ -144,6 +145,8 @@ export function StudioApp({
 
   const [reprint, setReprint] = useState(0);
   const [tab, setTab] = useState<SectionId>("shape");
+  // Mobile : l'aperçu réduit en bandeau pour laisser la place aux réglages.
+  const [compact, setCompact] = useState(false);
   // Le tiroir d'envoi s'ouvre sans redessiner ce composant (voir send-drawer.tsx).
   const sendState = useMemo(() => createOpenState(), []);
 
@@ -487,13 +490,25 @@ export function StudioApp({
         action={action}
         onSubmit={onGetSubmit}
         className={cx(
-          // Mobile : la scène en haut, les réglages défilent dessous, la barre d'action en bas.
-          "max-lg:flex max-lg:h-[calc(100svh-8.5rem-env(safe-area-inset-bottom))] max-lg:min-h-[28rem] max-lg:flex-col",
+          // Mobile : un écran d'application. L'aperçu occupe 40 % de la
+          // hauteur (un bandeau de 8 rem une fois réduit), les réglages
+          // défilent dans le reste, la barre d'action est dessous. La hauteur
+          // retranche l'en-tête (65 px), l'air au-dessus du formulaire (0,5 rem)
+          // et la barre (3,5 rem + son filet + la zone sûre).
+          "max-lg:flex max-lg:h-[calc(100svh-4.0625rem-0.5rem-3.5625rem-env(safe-area-inset-bottom))] max-lg:min-h-[26rem] max-lg:flex-col",
           "lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-gutter",
         )}
       >
-        <div className="max-lg:shrink-0 lg:col-span-7">
-          <div className="lg:sticky lg:top-[88px]">
+        {/* Bureau : la colonne s'étire sur toute la hauteur des réglages (sans
+            quoi elle n'a pas la place de coller), et l'aperçu qu'elle porte reste
+            sous l'en-tête pendant qu'on fait défiler les réglages. */}
+        <div
+          className={cx(
+            "max-lg:flex max-lg:shrink-0 max-lg:flex-col lg:col-span-7 lg:self-stretch",
+            compact ? "max-lg:h-32" : "max-lg:h-[40%]",
+          )}
+        >
+          <div className="max-lg:min-h-0 max-lg:flex-1 lg:sticky lg:top-[88px]">
             <ScenePanel
               object={object}
               config={config}
@@ -502,9 +517,10 @@ export function StudioApp({
               stats={stats}
               bands={bands}
               reprint={reprint}
+              compact={compact}
               t={t}
               core={core}
-              className="h-[min(46svh,24rem)] min-h-56 w-full lg:aspect-square lg:h-auto lg:max-h-[calc(100svh-14rem)]"
+              className="w-full max-lg:h-full lg:aspect-square lg:max-h-[calc(100svh-14rem)]"
               bandBar={
                 config.object === "lavaux" || config.object === "relief" ? (
                   <AltimetricBar
@@ -522,13 +538,28 @@ export function StudioApp({
               className="mt-3 max-lg:hidden"
             />
           </div>
+          {/* Mobile : la poignée qui réduit l'aperçu en bandeau (et le rend).
+              Hors de la scène, donc jamais sur l'objet ni sur ses boutons. */}
+          <button
+            type="button"
+            aria-expanded={!compact}
+            onClick={() => setCompact((value) => !value)}
+            className="hidden h-8 w-full shrink-0 items-center justify-center gap-1.5 border-b border-line text-xs font-medium text-soft transition-colors duration-150 ease-strate hover:text-ink focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ink group-data-[js]/studio:max-lg:flex"
+          >
+            {compact ? (
+              <ChevronDown size={14} aria-hidden="true" />
+            ) : (
+              <ChevronUp size={14} aria-hidden="true" />
+            )}
+            {compact ? t("scene.expand") : t("scene.collapse")}
+          </button>
         </div>
 
         <div
           data-lenis-prevent=""
-          className="max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:pb-6 max-lg:pt-4 lg:col-span-5"
+          className="max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:pb-6 max-lg:pt-3 lg:col-span-5"
         >
-          <div className="flex flex-col gap-8">
+          <div className="flex flex-col gap-8 max-lg:gap-3">
             {intro}
             <div className="lg:hidden">
               <StudioToolbar
@@ -592,7 +623,7 @@ export function StudioApp({
           viewTransitionName: "site-bottom-nav",
         }}
       >
-        <div className="flex h-16 items-center justify-between gap-3 px-[var(--spacing-margin)]">
+        <div className="flex h-14 items-center justify-between gap-3 px-[var(--spacing-margin)]">
           <p className="s3d-label ph-no-capture min-w-0 normal-case text-ink">
             {priceText ??
               `≈ ${formatGrams(stats.grams, locale)} · ≈ ${formatDuration(stats.minutes, locale)}`}
