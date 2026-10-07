@@ -14,7 +14,7 @@
   },
   "pending": "Seite wird geladen…",
   "footer": {
-    "motto": "Sie stellen ein. Wir drucken.",
+    "motto": "Sie personalisieren. Wir drucken.",
     "legend": "Äquidistanz 0.2 mm · Massstab 1:1",
     "gland": "46°25′N 6°16′O · Gland",
     "pully": "46°31′N 6°40′O · Pully",
@@ -37,7 +37,7 @@
     "zoomOut": "Verkleinern"
   },
   "cta": {
-    "studio": "Objekt einstellen",
+    "studio": "Objekt personalisieren",
     "shop": "Zum Shop",
     "file": "Datei senden"
   },

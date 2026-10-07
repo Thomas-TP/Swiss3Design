@@ -9,7 +9,7 @@
     "freeReached": "Gratisversand.",
     "emptyKicker": "Unberührtes Gelände",
     "emptyTitle": "Ihr Warenkorb ist leer.",
-    "emptyText": "Hier wurde noch nichts aufgeschichtet. Stellen Sie im Studio ein Objekt ein, wählen Sie im Shop aus oder senden Sie uns Ihre Datei."
+    "emptyText": "Hier wurde noch nichts aufgeschichtet. Personalisieren Sie im Studio ein Objekt, wählen Sie im Shop aus oder senden Sie uns Ihre Datei."
   },
   "checkout": {
     "title": "Bestellung.",
@@ -58,7 +58,7 @@
     "objectsCount": "{count, plural, one {# Objekt} other {# Objekte}}",
     "creationsCount": "{count, plural, one {# gespeicherte Kreation} other {# gespeicherte Kreationen}}",
     "creationsEmptyTitle": "Noch nichts gespeichert.",
-    "creationsEmptyText": "Stellen Sie im Studio ein Objekt ein und klicken Sie auf Behalten.",
+    "creationsEmptyText": "Personalisieren Sie im Studio ein Objekt und klicken Sie auf Behalten.",
     "creationsNote": "Diese Kreationen bleiben in diesem Browser. Ans Atelier geht nichts, bevor Sie eine Anfrage senden.",
     "savedOn": "Gespeichert am {date}",
     "reopen": "Wieder öffnen",

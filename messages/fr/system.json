@@ -9,7 +9,7 @@
     "freeReached": "Livraison offerte.",
     "emptyKicker": "Terrain vierge",
     "emptyTitle": "Votre panier est vide.",
-    "emptyText": "Rien n'a encore été empilé ici. Réglez un objet au Studio, choisissez en boutique ou envoyez-nous votre fichier."
+    "emptyText": "Rien n'a encore été empilé ici. Personnalisez un objet au Studio, choisissez en boutique ou envoyez-nous votre fichier."
   },
   "checkout": {
     "title": "Commande.",
@@ -58,7 +58,7 @@
     "objectsCount": "{count, plural, one {# objet} other {# objets}}",
     "creationsCount": "{count, plural, one {# création gardée} other {# créations gardées}}",
     "creationsEmptyTitle": "Rien de gardé pour l'instant.",
-    "creationsEmptyText": "Réglez un objet au Studio et cliquez sur Garder.",
+    "creationsEmptyText": "Personnalisez un objet au Studio et cliquez sur Garder.",
     "creationsNote": "Ces créations restent dans ce navigateur. Rien n'est envoyé à l'atelier avant votre demande.",
     "savedOn": "Gardée le {date}",
     "reopen": "Rouvrir",

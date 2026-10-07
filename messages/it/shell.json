@@ -14,7 +14,7 @@
   },
   "pending": "Caricamento della pagina…",
   "footer": {
-    "motto": "Lei regola. Noi stampiamo.",
+    "motto": "Lei personalizza. Noi stampiamo.",
     "legend": "Equidistanza 0.2 mm · Scala 1:1",
     "gland": "46°25′N 6°16′E · Gland",
     "pully": "46°31′N 6°40′E · Pully",
@@ -37,7 +37,7 @@
     "zoomOut": "Riduci"
   },
   "cta": {
-    "studio": "Regola un oggetto",
+    "studio": "Personalizza un oggetto",
     "shop": "Vai al negozio",
     "file": "Invia un file"
   },

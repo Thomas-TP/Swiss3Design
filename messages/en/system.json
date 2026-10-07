@@ -9,7 +9,7 @@
     "freeReached": "Free shipping.",
     "emptyKicker": "Blank terrain",
     "emptyTitle": "Your cart is empty.",
-    "emptyText": "Nothing has been stacked here yet. Set up an object in the Studio, pick from the shop or send us your file."
+    "emptyText": "Nothing has been stacked here yet. Customise an object in the Studio, pick from the shop or send us your file."
   },
   "checkout": {
     "title": "Checkout.",
@@ -58,7 +58,7 @@
     "objectsCount": "{count, plural, one {# object} other {# objects}}",
     "creationsCount": "{count, plural, one {# saved creation} other {# saved creations}}",
     "creationsEmptyTitle": "Nothing saved yet.",
-    "creationsEmptyText": "Set up an object in the Studio and click Keep.",
+    "creationsEmptyText": "Customise an object in the Studio and click Keep.",
     "creationsNote": "These creations stay in this browser. Nothing is sent to the workshop until you make a request.",
     "savedOn": "Saved on {date}",
     "reopen": "Reopen",

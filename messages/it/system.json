@@ -9,7 +9,7 @@
     "freeReached": "Spedizione gratuita.",
     "emptyKicker": "Terreno vergine",
     "emptyTitle": "Il carrello è vuoto.",
-    "emptyText": "Qui non è ancora stato impilato nulla. Regoli un oggetto nello Studio, scelga in negozio o ci invii il Suo file."
+    "emptyText": "Qui non è ancora stato impilato nulla. Personalizzi un oggetto nello Studio, scelga in negozio o ci invii il Suo file."
   },
   "checkout": {
     "title": "Ordine.",
@@ -58,7 +58,7 @@
     "objectsCount": "{count, plural, one {# oggetto} other {# oggetti}}",
     "creationsCount": "{count, plural, one {# creazione salvata} other {# creazioni salvate}}",
     "creationsEmptyTitle": "Ancora nulla di salvato.",
-    "creationsEmptyText": "Regoli un oggetto nello Studio e clicchi su Conserva.",
+    "creationsEmptyText": "Personalizzi un oggetto nello Studio e clicchi su Conserva.",
     "creationsNote": "Queste creazioni restano in questo browser. All'atelier non viene inviato nulla prima della Sua richiesta.",
     "savedOn": "Salvata il {date}",
     "reopen": "Riapri",
