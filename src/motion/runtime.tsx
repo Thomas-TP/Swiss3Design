@@ -203,7 +203,9 @@ class Runtime {
    */
   private resyncScroll() {
     ScrollTrigger.update();
-    ScrollTrigger.getScrollFunc(window)();
+    // Sans argument, la fonction de défilement LIT la position (les types de
+    // GSAP ne décrivent que l'écriture).
+    (ScrollTrigger.getScrollFunc(window) as unknown as () => number)();
     ScrollTrigger.clearScrollMemory();
   }
 
@@ -220,7 +222,14 @@ class Runtime {
     // Lenis arrête son interpolation en cours (sinon il continuerait vers
     // l'ancienne cible, après un router.push() par exemple) et se recale sur la
     // position réelle ; ScrollTrigger en fait autant (resyncScroll).
-    this.lenis?.reset();
+    // stop() puis start() : reset() est privé dans les types de Lenis, mais
+    // ces deux appels publics y passent (interpolation coupée, cible =
+    // position réelle). Pas pendant un tiroir ouvert : Lenis est déjà arrêté,
+    // et start() le rendrait au défilement.
+    if (this.lenis && !this.locked) {
+      this.lenis.stop();
+      this.lenis.start();
+    }
     this.lenis?.resize();
     this.resyncScroll();
     requestAnimationFrame(() => {
