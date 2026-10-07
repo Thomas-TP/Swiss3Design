@@ -177,7 +177,7 @@ export function buildHomeData(): HomeData {
   return {
     hero: buildHeroData(),
     posters: {
-      ghost: heroPoster(HERO_CONFIG, "ghost"),
+      plate: heroPoster(HERO_CONFIG, "plate"),
       final: heroPoster(HERO_CONFIG, "final"),
       exploded: heroPoster(HERO_CONFIG, "exploded"),
     },

@@ -1,31 +1,40 @@
 import { PerspectiveCamera, Vector3 } from "three";
 import { describe, expect, it } from "vitest";
 import { cameraEye, heroCamera, toThreeWorld } from "@/lib/studio/camera";
-import { createLavauxModel } from "@/lib/studio/objects/lavaux-model";
-import { heroPoster } from "@/lib/studio/poster";
+import {
+  PLATE_MM,
+  PLATE_RADIUS_MM,
+  PLATE_THICKNESS_MM,
+  heroPoster,
+} from "@/lib/studio/poster";
 import { HERO_CONFIG } from "@/lib/studio/presets";
 import {
   bandOfCut,
   cameraAt,
   easeBuse,
+  easeVague,
   expandBands,
-  pas,
-  towerHeight,
+  ghostRise,
 } from "./print-hero";
 
 // La logique pure de la scène du héros (la partie WebGL se vérifie dans le
-// navigateur) : paliers de la vague, frontières de bande, bascule en plan,
-// tour de purge.
+// navigateur) : vague de couleur, frontières de bande, bascule en plan,
+// montée de la silhouette, raccord du plateau du poster.
 describe("print-hero · logique pure", () => {
-  it("la vague avance par paliers de 1/30, monotone, de 0 à 1", () => {
+  it("la vague de couleur glisse (aucun palier), monotone, de 0 à 1", () => {
     let previous = -1;
+    let largest = 0;
     for (let i = 0; i <= 300; i++) {
-      const value = pas(i / 300);
+      const value = easeVague(i / 300);
       expect(value).toBeGreaterThanOrEqual(previous - 1e-12);
+      if (i > 0) largest = Math.max(largest, value - previous);
       previous = value;
     }
-    expect(pas(0)).toBe(0);
-    expect(pas(1)).toBeCloseTo(1, 12);
+    expect(easeVague(0)).toBe(0);
+    expect(easeVague(1)).toBeCloseTo(1, 12);
+    // Un pas de 1/300 du temps ne fait jamais avancer le front de plus de 1 % :
+    // l'ancienne quantification en 30 paliers sautait de 3,3 % d'un coup.
+    expect(largest).toBeLessThan(0.011);
   });
 
   it("la réimpression s'adoucit aux deux bouts", () => {
@@ -57,23 +66,27 @@ describe("print-hero · logique pure", () => {
     expect(bandOfCut(150, bounds)).toBe(2);
   });
 
-  it("la tour de purge suit la coupe jusqu'à 1 mm après le dernier changement", () => {
-    const bounds = [42, 108, 150];
-    const leman = ["bleu-leman", "vert-lavaux", "blanc-neve"] as const;
-    expect(towerHeight(30, leman, bounds)).toBe(30);
-    expect(towerHeight(150, leman, bounds)).toBe(109);
-    // Sans changement de filament, pas de tour.
-    expect(towerHeight(150, ["blanc-neve"], bounds)).toBe(0);
-    // Deux bandes de même filament : le dernier vrai changement compte.
-    expect(
-      towerHeight(150, ["encre", "blanc-neve", "blanc-neve"], bounds),
-    ).toBe(43);
+  it("la silhouette de la forme finale naît avec les premières couches, jamais avant", () => {
+    // Rien avant la première couche : le poster du plateau n'en montre aucune.
+    expect(ghostRise(0)).toBe(0);
+    expect(ghostRise(-1)).toBe(0);
+    // Pleine à 12 mm (60 couches), et continue : aucun saut.
+    expect(ghostRise(12)).toBe(1);
+    expect(ghostRise(150)).toBe(1);
+    let previous = 0;
+    for (let z = 0; z <= 12; z += 0.2) {
+      const value = ghostRise(z);
+      expect(value).toBeGreaterThanOrEqual(previous);
+      expect(value - previous).toBeLessThan(0.06); // une couche : ≤ 6 % de la montée
+      previous = value;
+    }
   });
 
-  it("les anneaux du poster SSR tombent sur ceux de la scène, au dixième de pixel", () => {
+  it("le plateau du poster SSR tombe sur celui de la scène, au dixième de pixel", () => {
     // Même caméra, même projection : la première frame WebGL se superpose au
-    // poster (« raccord au pixel », §5.7). On projette l'anneau de la scène avec
-    // three, tel que print-hero le fait, et on le compare à l'ellipse du poster.
+    // poster (« raccord au pixel », §5.7). On projette le contour du plateau de
+    // la scène avec three, tel que print-hero le fait, et on le compare aux
+    // sommets du chemin du poster.
     const W = 541;
     const H = 676;
     const spec = heroCamera();
@@ -84,37 +97,52 @@ describe("print-hero · logique pure", () => {
     camera.lookAt(new Vector3(target[0], target[1], target[2]));
     camera.updateMatrixWorld();
     camera.updateProjectionMatrix();
-    const model = createLavauxModel(HERO_CONFIG);
-    const poster = heroPoster(HERO_CONFIG, "ghost");
+    const poster = heroPoster(HERO_CONFIG, "plate");
     const scale = W / poster.width;
-    const out = new Float64Array(3);
-    for (const k of [75, 40, 5]) {
-      const z = k * 2;
-      let x0 = Infinity;
-      let x1 = -Infinity;
-      let y0 = Infinity;
-      let y1 = -Infinity;
-      for (let i = 0; i < 360; i++) {
-        const theta = (i * 2 * Math.PI) / 360;
-        model.outer(theta, z, -1, out);
-        const p = new Vector3(
-          out[0] * Math.cos(theta),
-          z,
-          -out[0] * Math.sin(theta),
-        ).project(camera);
-        const px = ((p.x + 1) / 2) * W;
-        const py = ((1 - p.y) / 2) * H;
-        x0 = Math.min(x0, px);
-        x1 = Math.max(x1, px);
-        y0 = Math.min(y0, py);
-        y1 = Math.max(y1, py);
-      }
-      const e = poster.ghost![k - 1];
-      expect(Math.abs(x0 - (e.cx - e.rx) * scale)).toBeLessThan(0.3);
-      expect(Math.abs(x1 - (e.cx + e.rx) * scale)).toBeLessThan(0.3);
-      expect(Math.abs(y0 - (e.cy - e.ry) * scale)).toBeLessThan(0.4);
-      expect(Math.abs(y1 - (e.cy + e.ry) * scale)).toBeLessThan(0.4);
+    const half = PLATE_MM / 2;
+    const r = PLATE_RADIUS_MM;
+    const corners = [
+      [half - r, -half + r, -90],
+      [half - r, half - r, 0],
+      [-half + r, half - r, 90],
+      [-half + r, -half + r, 180],
+    ];
+    const pairs = (d: string) => {
+      const v = (d.match(/-?\d+(\.\d+)?/g) ?? []).map(Number);
+      return Array.from({ length: v.length / 2 }, (_, i) => [
+        v[2 * i],
+        v[2 * i + 1],
+      ]);
+    };
+    // Dessus (y = 0 en monde three) puis épaisseur (−1 mm) ; axes du modèle (x, y) → three (x, −y).
+    for (const [path, y] of [
+      [poster.plate!.top, 0],
+      [poster.plate!.base, -PLATE_THICKNESS_MM],
+    ] as const) {
+      const drawn = pairs(path);
+      expect(drawn).toHaveLength(36);
+      let k = 0;
+      for (const [cx, cy, start] of corners)
+        for (let i = 0; i <= 8; i++) {
+          const a = ((start + (i * 90) / 8) * Math.PI) / 180;
+          const p = new Vector3(
+            cx + r * Math.cos(a),
+            y,
+            -(cy + r * Math.sin(a)),
+          ).project(camera);
+          const px = ((p.x + 1) / 2) * W;
+          const py = ((1 - p.y) / 2) * H;
+          expect(Math.abs(px - drawn[k][0] * scale)).toBeLessThan(0.5);
+          expect(Math.abs(py - drawn[k][1] * scale)).toBeLessThan(0.5);
+          k++;
+        }
     }
+    // Quadrillage : les extrémités de la ligne centrale (x = 0).
+    const grid = pairs(poster.plate!.grid);
+    const [gx0, gy0] = grid[24]; // ligne x = 0 : 6e des 13 lignes, 4 points par ligne
+    const a = new Vector3(0, 0.02, half).project(camera);
+    expect(Math.abs(((a.x + 1) / 2) * W - gx0 * scale)).toBeLessThan(0.3);
+    expect(Math.abs(((1 - a.y) / 2) * H - gy0 * scale)).toBeLessThan(0.3);
   });
 
   it("la bascule va de la caméra du héros à la vue de plan, fov 20° → 12°", () => {

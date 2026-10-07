@@ -1,12 +1,14 @@
 import type { HeroPoster } from "@/lib/studio/poster";
+import styles from "./home.module.css";
 
 // Rend en JSX les données d'un poster du héros (brief « Strates », §5.7) :
-// `ghost` (les anneaux fantômes du vase, tous les 2 mm), `final` (les strates
-// colorées) ou `exploded` (les bandes écartées du chapitre 01). Composant pur,
-// sans hook, sans import de bibliothèque : le serveur l'utilise pour le premier
-// paint, le client pour recalculer le poster d'une variante (mouvement réduit,
-// C0). Décoratif : `aria-hidden`, le texte qui compte est ailleurs. Les
-// contours suivent les jetons (`--color-iso`) : corrects dans les deux thèmes.
+// `plate` (le plateau d'impression vide, avant la première couche), `final` (les
+// strates colorées) ou `exploded` (les bandes écartées du chapitre 01).
+// Composant pur, sans hook, sans import de bibliothèque : le serveur l'utilise
+// pour le premier paint, le client pour recalculer le poster d'une variante
+// (mouvement réduit, C0). Décoratif : `aria-hidden`, le texte qui compte est
+// ailleurs. Les teintes suivent les jetons (`--color-paper`, `--color-iso`) :
+// correctes dans les deux thèmes.
 
 export function PosterSvg({
   poster,
@@ -23,21 +25,19 @@ export function PosterSvg({
       aria-hidden="true"
       focusable="false"
     >
-      {poster.ghost && (
-        // Un trait d'un pixel à toute échelle (vector-effect) : le poster est
-        // un dessin au trait, comme le cadre de la carte.
-        <g fill="none" stroke="var(--color-iso)" strokeWidth={1}>
-          {poster.ghost.map((e, i) => (
-            <ellipse
-              key={i}
-              cx={e.cx}
-              cy={e.cy}
-              rx={e.rx}
-              ry={e.ry}
-              vectorEffect="non-scaling-stroke"
-            />
-          ))}
-        </g>
+      {poster.plate && (
+        // Le plateau vide : épaisseur, dessus, puis quadrillage d'un pixel à
+        // toute échelle (vector-effect). Les teintes viennent des jetons du
+        // thème (home.module.css), comme la première frame du Stage.
+        <>
+          <path className={styles.plateBase} d={poster.plate.base} />
+          <path className={styles.plateTop} d={poster.plate.top} />
+          <path
+            className={styles.plateGrid}
+            d={poster.plate.grid}
+            vectorEffect="non-scaling-stroke"
+          />
+        </>
       )}
       {poster.layers?.map((layer) => (
         <g key={layer.band}>

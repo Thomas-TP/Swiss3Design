@@ -1,8 +1,11 @@
 // Posters SVG du Studio (brief « Strates », §5.7 et §6.7) : le dessin du héros
 // AVANT le JavaScript, et l'Élévation exacte du vase.
 //
-//  - `ghost` : 75 ellipses, trait `var(--color-iso)`, anneaux fantômes du vase
-//    tous les 2 mm (≤ 6 Ko) ;
+//  - `plate` : le plateau d'impression vide (carré arrondi de 120 mm, son
+//    épaisseur et son quadrillage de 10 mm), tel que la première frame du Stage
+//    le dessine avant la première couche (≤ 2 Ko) ; plus aucune ligne fantôme :
+//    la silhouette de la forme finale ne naît qu'avec les premières couches,
+//    dans la scène seulement ;
 //  - `final` : 75 ellipses pleines empilées de bas en haut aux teintes des
 //    bandes, filet plus sombre (≤ 8 Ko) ;
 //  - `exploded` : bandes écartées de 12 mm (chapitre 01 de l'accueil) ;
@@ -38,8 +41,13 @@ import type { LavauxConfig } from "./types";
 
 /** Boîte visuelle 4:5 du héros (unités arbitraires ; seul le rapport compte). */
 export const POSTER_VIEWBOX = { width: 400, height: 500 } as const;
-/** Espacement des anneaux fantômes (mm) : le même `uGhostStep` que le matériau d'impression. */
-export const GHOST_STEP_MM = 2;
+/** Espacement des ellipses de strates des posters `final` et `exploded` (mm). */
+export const STRATE_STEP_MM = 2;
+/** Plateau d'impression du héros : carré de 120 mm (coins de 8 mm), épais d'1 mm, quadrillé tous les 10 mm. */
+export const PLATE_MM = 120;
+export const PLATE_RADIUS_MM = 8;
+export const PLATE_THICKNESS_MM = 1;
+export const PLATE_GRID_MM = 10;
 /** Écartement des bandes de l'éclaté (mm). */
 export const EXPLODE_GAP_MM = 12;
 
@@ -66,14 +74,24 @@ export interface PosterLayer {
   };
 }
 
+/** Le plateau vide, en chemins SVG (unités du viewBox). */
+export interface PosterPlate {
+  /** Dessus (carré arrondi), chemin fermé. */
+  top: string;
+  /** Même contour 1 mm plus bas : l'épaisseur du plateau, vue de côté. */
+  base: string;
+  /** Quadrillage : un segment par ligne tous les 10 mm. */
+  grid: string;
+}
+
 export interface HeroPoster {
-  variant: "ghost" | "final" | "exploded";
+  variant: "plate" | "final" | "exploded";
   viewBox: string;
   width: number;
   height: number;
   camera: CameraSpec;
-  /** `ghost` : une seule série d'ellipses au trait. */
-  ghost?: PosterEllipse[];
+  /** `plate` : le plateau vide. */
+  plate?: PosterPlate;
   /** `final` et `exploded` : une couche par bande. */
   layers?: PosterLayer[];
   /** `final` : ouverture du vase (ellipse sombre au sommet). */
@@ -119,6 +137,58 @@ function project(
   };
 }
 
+const npath = (x: number) => String(Math.round(x * 10) / 10);
+
+/**
+ * Plateau vide, projeté avec la caméra du Stage. Le contour est celui de la
+ * scène (`roundedPlate`, print-hero.ts) : quatre côtés droits et quatre arcs de
+ * 8 mm, ici en 8 segments chacun (flèche 0,04 mm, 0,1 px). Le plateau est
+ * symétrique : ses coordonnées de modèle sont celles de la forme extrudée.
+ */
+function platePoster(spec: CameraSpec, aspect: number): PosterPlate {
+  const m = cameraMatrix(spec, aspect);
+  const { width: W, height: H } = POSTER_VIEWBOX;
+  const at = (x: number, y: number, z: number) => {
+    const [nx, ny] = projectPoint(m, [x, y, z]);
+    return [W / 2 + (nx * W) / 2, H / 2 - (ny * H) / 2] as const;
+  };
+  const half = PLATE_MM / 2;
+  const r = PLATE_RADIUS_MM;
+  const outline = (z: number) => {
+    const points: (readonly [number, number])[] = [];
+    // Les quatre coins, dans l'ordre trigonométrique à partir du bas à droite.
+    const corners = [
+      [half - r, -half + r, -90],
+      [half - r, half - r, 0],
+      [-half + r, half - r, 90],
+      [-half + r, -half + r, 180],
+    ] as const;
+    for (const [cx, cy, start] of corners)
+      for (let i = 0; i <= 8; i++) {
+        const a = ((start + (i * 90) / 8) * Math.PI) / 180;
+        points.push(at(cx + r * Math.cos(a), cy + r * Math.sin(a), z));
+      }
+    return (
+      points
+        .map(([x, y], i) => `${i === 0 ? "M" : "L"}${npath(x)} ${npath(y)}`)
+        .join("") + "Z"
+    );
+  };
+  // Quadrillage : les lignes de la texture de la scène, bords compris.
+  let grid = "";
+  for (let k = 0; k <= PLATE_MM / PLATE_GRID_MM; k++) {
+    const v = -half + k * PLATE_GRID_MM;
+    const [ax, ay] = at(v, -half, 0);
+    const [bx, by] = at(v, half, 0);
+    const [cx, cy] = at(-half, v, 0);
+    const [dx, dy] = at(half, v, 0);
+    grid +=
+      `M${npath(ax)} ${npath(ay)}L${npath(bx)} ${npath(by)}` +
+      `M${npath(cx)} ${npath(cy)}L${npath(dx)} ${npath(dy)}`;
+  }
+  return { top: outline(0), base: outline(-PLATE_THICKNESS_MM), grid };
+}
+
 function ringTools(config: LavauxConfig) {
   const model = createLavauxModel(config);
   const tmp = new Float64Array(3);
@@ -162,9 +232,9 @@ export function heroPoster(
         : heroCameraFor(config)
       : heroCamera();
   const { outer, mouth } = ringTools(config);
-  const count = Math.floor(config.h / GHOST_STEP_MM + 1e-9);
+  const count = Math.floor(config.h / STRATE_STEP_MM + 1e-9);
   const zs: number[] = [];
-  for (let k = 1; k <= count; k++) zs.push(k * GHOST_STEP_MM);
+  for (let k = 1; k <= count; k++) zs.push(k * STRATE_STEP_MM);
   const base = {
     variant,
     viewBox: `0 0 ${W} ${H}`,
@@ -173,12 +243,8 @@ export function heroPoster(
     camera,
   } as const;
 
-  if (variant === "ghost") {
-    return {
-      ...base,
-      ghost: zs.map((z) => project(camera, aspect, z, outer(z, -1), 0)),
-    };
-  }
+  if (variant === "plate")
+    return { ...base, plate: platePoster(camera, aspect) };
 
   const bands = config.bands;
   const layers: PosterLayer[] = bands.map((band, k) => {
@@ -186,7 +252,7 @@ export function heroPoster(
     return { band: k, fill, stroke: shade(fill, 0.38), ellipses: [] };
   });
   for (const z of zs) {
-    const k = bandIndexAt(bands, z - GHOST_STEP_MM / 2);
+    const k = bandIndexAt(bands, z - STRATE_STEP_MM / 2);
     layers[k].ellipses.push(
       project(
         camera,
@@ -243,11 +309,12 @@ export function posterToSvg(
 ): string {
   const cls = options.className ?? "s3d-poster-svg";
   const head = `<svg xmlns="http://www.w3.org/2000/svg" class="${cls}" viewBox="${poster.viewBox}" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">`;
-  if (poster.ghost) {
-    // Le trait suit le jeton `iso` du thème ; `vector-effect` garde 1 px à toute échelle.
+  if (poster.plate) {
+    // Le quadrillage suit le jeton `iso` du thème ; `vector-effect` garde 1 px à toute échelle.
+    const { base, top, grid } = poster.plate;
     return (
-      `${head}<style>.s3d-pg ellipse{fill:none;stroke:var(--color-iso);stroke-width:1;vector-effect:non-scaling-stroke}</style>` +
-      `<g class="s3d-pg">${poster.ghost.map((e) => ell(e)).join("")}</g></svg>`
+      `${head}<style>.s3d-pp-b{fill:color-mix(in srgb,var(--color-paper),#000 14%)}.s3d-pp-t{fill:color-mix(in srgb,var(--color-paper),#fff 25%)}.s3d-pp-g{fill:none;stroke:var(--color-iso);stroke-width:1;vector-effect:non-scaling-stroke}</style>` +
+      `<path class="s3d-pp-b" d="${base}"/><path class="s3d-pp-t" d="${top}"/><path class="s3d-pp-g" d="${grid}"/></svg>`
     );
   }
   const body = (poster.layers ?? [])

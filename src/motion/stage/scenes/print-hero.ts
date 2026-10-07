@@ -7,7 +7,10 @@
 // les propriétés du contrôleur) :
 //  - hauteur imprimée quantifiée à la couche (`progress`), liseré chaud de la
 //    buse, flash à chaque changement de filament (320 ms) ;
-//  - vague de couleur (`ripple`, 0,9 s en 30 paliers) quand la palette change ;
+//  - au-dessus de la coupe, la silhouette pleine et très discrète de la forme
+//    finale (jamais un trait) : elle naît avec les premières couches (12 mm),
+//    jamais avant que l'impression ne commence, et suit la hauteur imprimée ;
+//  - vague de couleur (`ripple`, 0,9 s, front continu) quand la palette change ;
 //  - réimpression (`reprint`, 1,2 s) quand le motif change : l'ancien maillage
 //    garde le dessus, le nouveau « sort » du plateau, la buse suit le front ;
 //  - bascule en vue de plan (`tilt`) : la caméra monte à 90° et le champ se
@@ -17,7 +20,6 @@
 // calcul de forme ici) ; les trois motifs sont générés au repos après la
 // première frame.
 import {
-  AdditiveBlending,
   BufferAttribute,
   BufferGeometry,
   CanvasTexture,
@@ -25,6 +27,7 @@ import {
   CylinderGeometry,
   DirectionalLight,
   ExtrudeGeometry,
+  FrontSide,
   Group,
   Mesh,
   MeshBasicMaterial,
@@ -34,8 +37,6 @@ import {
   Scene,
   Shape,
   SRGBColorSpace,
-  Sprite,
-  SpriteMaterial,
   Vector3,
   BoxGeometry,
 } from "three";
@@ -50,6 +51,12 @@ import {
   type CameraSpec,
 } from "@/lib/studio/camera";
 import { filamentHex } from "@/lib/studio/filaments";
+import {
+  PLATE_GRID_MM,
+  PLATE_MM,
+  PLATE_RADIUS_MM,
+  PLATE_THICKNESS_MM,
+} from "@/lib/studio/poster";
 import { buildLavaux } from "@/lib/studio/objects/lavaux";
 import {
   bandIndexAt,
@@ -78,7 +85,7 @@ export interface PrintHeroController {
   tilt: number;
   /** 0–1 : écartement des bandes (12 mm au plus), mode « éclaté ». */
   explode: number;
-  /** Lignes fantômes au-dessus de la coupe. */
+  /** Silhouette discrète de la forme finale au-dessus de la coupe (1 = permise). */
   ghost: 0 | 1;
   /** Vague de couleur vers la palette donnée (une teinte par bande), 0,9 s. */
   ripple(palette: readonly FilamentId[]): void;
@@ -86,8 +93,6 @@ export interface PrintHeroController {
   reprint(pattern: LavauxPattern): void;
   /** Couche courante (≤ 10 Hz). */
   onLayer?: (layer: number, zMm: number, band: number) => void;
-  /** Un changement de filament vient d'être franchi en imprimant. */
-  onBandCross?: (band: number, layer: number, filament: FilamentId) => void;
 }
 
 const RIPPLE_S = 0.9;
@@ -96,13 +101,23 @@ const FLASH_S = 0.32;
 const PARK_S = 0.8;
 const NOZZLE_RATE = 2.4; // rad/s pendant l'impression
 const EXPLODE_GAP_MM = 12;
-// Plateau : 120 mm au lieu des 180 mm du brief. À 78 % de la hauteur de la
-// vue (fov 20°, azimut −28°), la boîte 4:5 ne montre que ≈ 168 mm de large :
-// un plateau de 180 mm serait coupé net par le bord de la vue. 120 mm tient
-// entier (carré tourné de 28° : 162 mm de large), et le grillage garde 10 mm.
-const PLATE_MM = 120;
-const TOWER = { x: 44, y: -34, size: 16 } as const;
+// Plateau : 120 mm au lieu des 180 mm du brief (constantes partagées avec le
+// poster SSR, src/lib/studio/poster.ts : même contour, même quadrillage). À 78 %
+// de la hauteur de la vue (fov 20°, azimut −28°), la boîte 4:5 ne montre que
+// ≈ 168 mm de large : un plateau de 180 mm serait coupé net par le bord de la
+// vue. 120 mm tient entier (carré tourné de 28° : 162 mm de large), et le
+// grillage garde 10 mm.
 const PARK = { x: 50, lift: 10 } as const;
+// Silhouette de la forme finale : elle apparaît sur les 12 premiers millimètres
+// imprimés (60 couches, ≈ 0,7 s d'intro) et s'efface en 0,25 s si la
+// réimpression la rend caduque. Opacité de pleine silhouette : « presque
+// transparente », un cran plus marquée sur fond sombre où l'encre est claire.
+const GHOST_RISE_MM = 12;
+const GHOST_GATE_RATE = 12;
+const GHOST_ALPHA = { light: 0.075, dark: 0.1 } as const;
+// L'ombre de contact grandit avec le premier centimètre imprimé : un plateau nu
+// n'a pas d'ombre (et le poster SSR du plateau n'en dessine pas).
+const SHADOW_RISE_MM = 15;
 const ABOVE_ALL_MM = 1e6;
 const PLAN = { fov: 12, elevation: 89.5, fraction: 0.6 } as const;
 const RAD = Math.PI / 180;
@@ -110,9 +125,15 @@ const RAD = Math.PI / 180;
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 
-/** Ease quantifiée de la vague (`pas(30)` du brief) : monotone, par paliers de 1/30. */
-export function pas(p: number, n = 30, k = 0.85): number {
-  return p + (Math.round(p * n) / n - p) * k;
+/**
+ * Ease de la vague de couleur : continue (entrée et sortie douces), monotone.
+ * Le brief la voulait quantifiée en 30 paliers (`pas(30)`) ; le propriétaire a
+ * décidé le 01.10.2026 qu'aucune animation du site n'avance par paliers : le
+ * front de la vague glisse, il ne saute plus de 5 mm toutes les 30 ms.
+ */
+export function easeVague(p: number): number {
+  const t = clamp01(p);
+  return t * t * (3 - 2 * t);
 }
 
 /** Ease `s3d.buse` de la réimpression : entrée et sortie douces. */
@@ -164,17 +185,117 @@ export function cameraAt(
   };
 }
 
-/** Hauteur de la tour de purge : celle de la coupe, jusqu'à 1 mm après le dernier changement. */
-export function towerHeight(
-  cutMm: number,
-  filaments: readonly FilamentId[],
-  boundaries: readonly number[],
-): number {
-  let last = -1;
-  for (let k = 1; k < filaments.length; k++)
-    if (filaments[k] !== filaments[k - 1]) last = k;
-  if (last < 0) return 0;
-  return Math.min(cutMm, boundaries[last - 1] + 1);
+/** Montée en douceur (0 → 1) de la silhouette avec les premiers millimètres imprimés. */
+export function ghostRise(cutMm: number): number {
+  const t = clamp01(cutMm / GHOST_RISE_MM);
+  return t * t * (3 - 2 * t);
+}
+
+/**
+ * Silhouette pleine de la forme finale, au-dessus de la coupe : un aplat de la
+ * teinte de l'encre du thème, d'une opacité de quelques pour cent, sans trait ni
+ * anneau (l'ouverture du col se remplit comme le reste). Deux matériaux de base de
+ * three, étendus au lieu du matériau d'impression (qui sert aussi le Studio) :
+ *  - `depth` pose la profondeur seule (colorWrite à false, décalée d'un cran) ;
+ *  - `fill` dessine la couleur uniquement là où il touche cette profondeur : une
+ *    seule couche de matière à l'écran, sans les surimpressions sombres aux
+ *    gradins où deux parois se chevauchent.
+ * Les deux partagent les mêmes uniforms (coupe, opacité) et le même programme.
+ */
+function createGhostMaterials() {
+  const uniforms = {
+    uGhostCut: { value: 0 },
+    uGhostAlpha: { value: 0 },
+  };
+  const make = (visible: boolean) => {
+    const material = new MeshBasicMaterial({
+      color: 0x000000,
+      transparent: true,
+      side: FrontSide,
+      depthWrite: !visible,
+      colorWrite: visible,
+      toneMapped: false,
+      polygonOffset: !visible,
+      polygonOffsetFactor: 1,
+      polygonOffsetUnits: 1,
+    });
+    material.onBeforeCompile = (shader) => {
+      Object.assign(shader.uniforms, uniforms);
+      shader.vertexShader = shader.vertexShader
+        .replace(
+          "#include <common>",
+          `#include <common>
+varying float vGhostZ;`,
+        )
+        .replace(
+          "#include <begin_vertex>",
+          `#include <begin_vertex>
+vGhostZ = position.z;`,
+        );
+      shader.fragmentShader = shader.fragmentShader
+        .replace(
+          "#include <common>",
+          `#include <common>
+uniform float uGhostCut, uGhostAlpha;
+varying float vGhostZ;`,
+        )
+        .replace(
+          "#include <color_fragment>",
+          `#include <color_fragment>
+if (vGhostZ <= uGhostCut + 1e-4) discard;
+diffuseColor.a *= uGhostAlpha;`,
+        );
+    };
+    material.customProgramCacheKey = () => "s3d-print-ghost-v2";
+    return material;
+  };
+  return { fill: make(true), depth: make(false), uniforms };
+}
+
+/**
+ * Tête d'impression : bloc de chauffe mat, buse conique, deux ailettes, et un
+ * seul détail rouge de la marque (le liseré du bloc). Origine à la pointe de la
+ * buse, Y vers le haut ; 9,5 mm de large pour ≈ 14 mm de haut. Aucune lueur : le
+ * liseré chaud du front d'impression, sur le vase, suffit.
+ */
+function createPrintHead(): {
+  group: Group;
+  materials: MeshStandardMaterial[];
+  disposables: { dispose(): void }[];
+} {
+  const group = new Group();
+  const materials: MeshStandardMaterial[] = [];
+  const disposables: { dispose(): void }[] = [];
+  const matte = (color: number, metalness = 0, roughness = 0.82) => {
+    const material = new MeshStandardMaterial({ color, metalness, roughness });
+    materials.push(material);
+    disposables.push(material);
+    return material;
+  };
+  const metal = matte(0x8f8b84, 0.25, 0.7);
+  const graphite = matte(0x35312c);
+  const red = matte(0xe5231c, 0, 0.6);
+  const add = (
+    geometry: BufferGeometry,
+    material: MeshStandardMaterial,
+    y: number,
+  ) => {
+    const mesh = new Mesh(geometry, material);
+    mesh.position.y = y;
+    group.add(mesh);
+    disposables.push(geometry);
+  };
+  // Buse : cône Ø 4,2 → 0,8 mm sur 2,8 mm.
+  add(new CylinderGeometry(2.1, 0.4, 2.8, 32), metal, 1.4);
+  // Écrou hexagonal, puis bloc de chauffe graphite et son liseré rouge.
+  add(new CylinderGeometry(3, 3, 1.4, 6), metal, 2.8 + 0.7);
+  add(new BoxGeometry(9.5, 6.4, 8.2), graphite, 4.2 + 3.2);
+  add(new BoxGeometry(9.7, 1, 8.4), red, 4.2 + 1.5);
+  // Col, puis deux ailettes de refroidissement.
+  add(new CylinderGeometry(1.5, 1.5, 1.4, 24), metal, 10.6 + 0.7);
+  add(new CylinderGeometry(4, 4, 0.5, 32), metal, 12 + 0.25);
+  add(new CylinderGeometry(4, 4, 0.5, 32), metal, 13.4 + 0.25);
+  return { group, materials, disposables };
 }
 
 function roundedPlate(size: number, radius: number, depth: number) {
@@ -314,15 +435,19 @@ const create = (
   const textures: CanvasTexture[] = [];
   const disposables: { dispose(): void }[] = [];
 
-  // Hero : plateau, maillage courant et entrant (réimpression), tour, buse.
+  // Hero : plateau, maillage courant et entrant (réimpression), silhouette, buse.
   let vase: Mesh | null = null;
   let vaseNext: Mesh | null = null;
   let vaseMaterial: PrintMaterial | null = null;
   let nextMaterial: PrintMaterial | null = null;
-  let towerMaterial: PrintMaterial | null = null;
-  let tower: Group | null = null;
+  let ghostMeshes: Mesh[] = [];
+  let ghostFill: MeshBasicMaterial | null = null;
+  let ghostUniforms:
+    | ReturnType<typeof createGhostMaterials>["uniforms"]
+    | null = null;
+  let ghostGate = 1;
   let nozzle: Group | null = null;
-  let glow: Sprite | null = null;
+  let headMaterials: MeshStandardMaterial[] = [];
   let plate: Group | null = null;
   let plateMaterials: (MeshBasicMaterial | MeshStandardMaterial)[] = [];
   let drawGrid: ((t: StageTheme) => void) | null = null;
@@ -410,38 +535,53 @@ const create = (
     pattern = props.pattern;
     models.set(pattern, modelFor(pattern));
 
+    // Le matériau d'impression ne dessine que le déjà imprimé : le reste est la
+    // silhouette (uGhost reste à 0, plus de lignes fantômes).
     vaseMaterial = track(
       createPrintMaterial({ heightMm: height, bands: bandsNow }),
     );
     nextMaterial = track(
       createPrintMaterial({ heightMm: height, bands: bandsNow }),
     );
-    towerMaterial = track(
-      createPrintMaterial({ heightMm: height, bands: bandsNow }),
-    );
-    vaseMaterial.uniforms.uGhost.value = 1;
-    nextMaterial.uniforms.uGhost.value = 0;
     vase = new Mesh(geometryFor(pattern), vaseMaterial.material);
     vaseNext = new Mesh(geometryFor(pattern), nextMaterial.material);
     vaseNext.visible = false;
     object.add(vase, vaseNext);
 
+    // Silhouette : après tout le reste (transparente), sur la même géométrie.
+    // La profondeur d'abord (ordre 9), la couleur ensuite (ordre 10).
+    const ghost3d = createGhostMaterials();
+    ghostUniforms = ghost3d.uniforms;
+    ghostFill = ghost3d.fill;
+    ghostMeshes = [ghost3d.depth, ghost3d.fill].map((material, k) => {
+      const mesh = new Mesh(geometryFor(pattern), material);
+      mesh.renderOrder = 9 + k;
+      mesh.visible = false;
+      object.add(mesh);
+      return mesh;
+    });
+    disposables.push(ghost3d.fill, ghost3d.depth);
+
     // Plateau : carré arrondi 180 × 180 × 1 mm, quadrillage tous les 10 mm,
     // ombre de contact précalculée (dégradé radial).
     plate = new Group();
     root.add(plate);
-    const plateGeometry = roundedPlate(PLATE_MM, 8, 1);
+    const plateGeometry = roundedPlate(
+      PLATE_MM,
+      PLATE_RADIUS_MM,
+      PLATE_THICKNESS_MM,
+    );
     const plateSurface = new MeshStandardMaterial({ roughness: 0.9 });
     plate.add(new Mesh(plateGeometry, plateSurface));
     const grid = canvasTexture(512, () => {});
     drawGrid = (t) => {
       const g = grid.canvas.getContext("2d")!;
-      const cell = grid.canvas.width / (PLATE_MM / 10);
+      const cell = grid.canvas.width / (PLATE_MM / PLATE_GRID_MM);
       g.clearRect(0, 0, grid.canvas.width, grid.canvas.height);
       g.strokeStyle = t.iso;
       g.lineWidth = 2;
       g.beginPath();
-      for (let i = 0; i <= PLATE_MM / 10; i++) {
+      for (let i = 0; i <= PLATE_MM / PLATE_GRID_MM; i++) {
         const p = Math.min(grid.canvas.width - 1, Math.round(i * cell));
         g.moveTo(p, 0);
         g.lineTo(p, grid.canvas.height);
@@ -494,66 +634,12 @@ const create = (
       shadowPlane.geometry,
     );
 
-    // Tour de purge : même matériau, mêmes teintes aux mêmes hauteurs.
-    tower = new Group();
-    tower.position.set(TOWER.x, 0, -TOWER.y);
-    const towerObject = new Group();
-    towerObject.rotation.x = -Math.PI / 2;
-    const towerGeometry = new BoxGeometry(
-      TOWER.size,
-      TOWER.size,
-      height,
-    ).translate(0, 0, height / 2);
-    towerObject.add(new Mesh(towerGeometry, towerMaterial.material));
-    tower.add(towerObject);
-    root.add(tower);
-    disposables.push(towerGeometry);
-
-    // Buse : cône Ø 4,4 → 0,8 mm sur 5 mm, bloc de chauffe encre, pointe rouge.
-    nozzle = new Group();
-    const cone = new Mesh(
-      new CylinderGeometry(2.2, 0.4, 5, 24),
-      new MeshStandardMaterial({
-        color: 0x8c8a85,
-        metalness: 0.6,
-        roughness: 0.4,
-      }),
-    );
-    cone.position.y = 2.5;
-    const block = new Mesh(
-      new BoxGeometry(14, 9, 10),
-      new MeshStandardMaterial({ color: 0x1c1917, roughness: 0.6 }),
-    );
-    block.position.y = 5 + 4.5;
-    const spot = canvasTexture(64, (g) => {
-      const radial = g.createRadialGradient(32, 32, 0, 32, 32, 32);
-      radial.addColorStop(0, "rgba(255,255,255,1)");
-      radial.addColorStop(0.3, "rgba(255,255,255,0.55)");
-      radial.addColorStop(1, "rgba(255,255,255,0)");
-      g.fillStyle = radial;
-      g.fillRect(0, 0, 64, 64);
-    });
-    glow = new Sprite(
-      new SpriteMaterial({
-        map: spot.texture,
-        color: 0xe5231c,
-        blending: AdditiveBlending,
-        depthWrite: false,
-        transparent: true,
-        toneMapped: false,
-      }),
-    );
-    glow.scale.setScalar(6);
-    nozzle.add(cone, block, glow);
+    // Tête d'impression : un bloc de chauffe et une buse, sans lueur.
+    const head = createPrintHead();
+    nozzle = head.group;
+    headMaterials = head.materials;
     root.add(nozzle);
-    textures.push(spot.texture);
-    disposables.push(
-      cone.geometry,
-      cone.material,
-      block.geometry,
-      block.material,
-      glow.material,
-    );
+    disposables.push(...head.disposables);
   }
 
   function buildShells() {
@@ -756,7 +842,7 @@ const create = (
         rippleT += dt / RIPPLE_S;
         if (rippleT >= 1) finishRipple();
         else {
-          setRipple(pas(rippleT) * (height + 1), true);
+          setRipple(easeVague(rippleT) * (height + 1), true);
           busy = true;
         }
       }
@@ -787,18 +873,22 @@ const create = (
 
       const cut = quantizeToLayer(progress * height);
       const printing = cut > 0 && cut < height - 1e-6;
+      // Plateau nu tant qu'aucune couche n'est posée : le pied du vase est à
+      // z = 0 et le matériau garde ce qui est sous la coupe, il apparaîtrait
+      // sinon en disque dès la première frame (le poster, lui, n'a que le plateau).
+      vase!.visible = cut > 1e-6;
       if (Math.abs(cut - lastCut) > 1e-6 || front >= 0) lastMoveAt = frame.time;
       const moving = frame.time - lastMoveAt < 0.25 && (printing || front >= 0);
 
-      // Flash au franchissement d'une frontière de bande, en imprimant.
+      // Flash du liseré chaud au franchissement d'une frontière de bande, en imprimant.
       const band = bandOfCut(cut, boundaries);
-      if (lastCut >= 0 && cut > lastCut && band > lastBand) {
-        const layer = Math.round(cut / 0.2);
-        if (filaments[band] !== filaments[band - 1]) {
-          flash = 1;
-          controller.onBandCross?.(band, layer, filaments[band]);
-        }
-      }
+      if (
+        lastCut >= 0 &&
+        cut > lastCut &&
+        band > lastBand &&
+        filaments[band] !== filaments[band - 1]
+      )
+        flash = 1;
       lastBand = band;
       lastCut = cut;
       if (flash > 0) {
@@ -826,9 +916,28 @@ const create = (
         material.uniforms.uFlash.value = flash;
         material.uniforms.uIsoMode.value = tilt;
       }
-      vaseMaterial!.uniforms.uGhost.value = ghost && front < 0 ? 1 : 0;
-      towerMaterial!.setCut(towerHeight(cut, filaments, boundaries));
-      towerMaterial!.uniforms.uIsoMode.value = tilt;
+
+      // Silhouette de la forme finale : montée avec les premiers millimètres
+      // imprimés (donc jamais avant le début de l'impression), éteinte pendant
+      // une réimpression (l'ancien motif n'est plus la forme finale) et quand
+      // tout est imprimé. Des fondus continus, aucune apparition d'un coup.
+      const gateTarget = ghost && front < 0 ? 1 : 0;
+      ghostGate +=
+        (gateTarget - ghostGate) * (1 - Math.exp(-dt * GHOST_GATE_RATE));
+      if (Math.abs(ghostGate - gateTarget) < 0.005) ghostGate = gateTarget;
+      else busy = true;
+      const ghostAlpha =
+        ghostRise(cut) *
+        ghostGate *
+        (theme?.dark ? GHOST_ALPHA.dark : GHOST_ALPHA.light);
+      ghostUniforms!.uGhostCut.value = cut;
+      ghostUniforms!.uGhostAlpha.value = ghostAlpha;
+      const ghostShown = ghostAlpha > 0.001 && cut < height - 1e-6;
+      for (const mesh of ghostMeshes) {
+        mesh.geometry = vase!.geometry;
+        mesh.visible = ghostShown;
+      }
+      ghostFill!.color.set(theme?.ink ?? "#1a1614");
 
       // Buse : suit le front d'impression, tourne pendant l'impression, se
       // lève de 10 mm et se range à droite en fin d'impression.
@@ -851,19 +960,24 @@ const create = (
         lerp(z + 0.25, height + PARK.lift, parked),
         lerp(-r * Math.sin(nozzleTheta), 0, parked),
       );
-      glow!.material.opacity = hot * (1 - parked) * 0.9;
 
-      // Bascule en vue de plan : plateau, buse et tour s'effacent, le vase seul
-      // devient la carte.
+      // Bascule en vue de plan : plateau et tête s'effacent en fondu (jamais
+      // d'un coup), le vase seul devient la carte. L'ombre de contact grandit
+      // avec la matière : pas d'ombre sous un plateau nu.
       const fade = 1 - clamp01((tilt - 0.05) / 0.45);
       plate!.visible = fade > 0.01;
       const [surface, grid, shadow] = plateMaterials;
       surface.transparent = fade < 1;
       surface.opacity = fade;
       grid.opacity = fade;
-      shadow.opacity = 0.5 * fade;
-      nozzle!.visible = tilt < 0.3;
-      tower!.visible = tilt < 0.3 && towerMaterial!.uniforms.uCutZ.value > 0;
+      const shadowRise = clamp01(cut / SHADOW_RISE_MM);
+      shadow.opacity =
+        0.5 * fade * shadowRise * shadowRise * (3 - 2 * shadowRise);
+      nozzle!.visible = fade > 0.01;
+      for (const material of headMaterials) {
+        material.transparent = fade < 1;
+        material.opacity = fade;
+      }
 
       placeCamera(frame.rect);
       c.renderer.render(scene, camera);

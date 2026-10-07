@@ -6,8 +6,9 @@ import { filamentHex } from "./filaments";
 import { createLavauxModel } from "./objects/lavaux-model";
 import {
   EXPLODE_GAP_MM,
-  GHOST_STEP_MM,
+  PLATE_MM,
   POSTER_VIEWBOX,
+  STRATE_STEP_MM,
   elevationToSvg,
   heroPoster,
   lavauxElevation,
@@ -18,15 +19,20 @@ import { HERO_CONFIG, LAVAUX_PRESETS, heroVariant } from "./presets";
 const bytes = (s: string) => new TextEncoder().encode(s).length;
 
 describe("poster du héros : poids et structure", () => {
-  it("ghost : 75 ellipses, ≤ 6 Ko, trait sur le jeton iso, non-scaling-stroke", () => {
-    const poster = heroPoster(HERO_CONFIG, "ghost");
-    expect(poster.ghost).toHaveLength(75); // 150 mm / 2 mm
+  it("plate : le plateau vide seul (aucune ellipse, aucune ligne fantôme), ≤ 2 Ko, quadrillage sur le jeton iso", () => {
+    const poster = heroPoster(HERO_CONFIG, "plate");
+    expect(poster.plate).toBeTruthy();
+    expect(poster.layers).toBeUndefined();
     const svg = posterToSvg(poster);
-    expect(bytes(svg)).toBeLessThanOrEqual(6 * 1024);
+    expect(bytes(svg)).toBeLessThanOrEqual(2 * 1024);
     expect(svg).toContain("var(--color-iso)");
     expect(svg).toContain("vector-effect:non-scaling-stroke");
     expect(svg).toContain('aria-hidden="true"');
-    expect(svg.match(/<ellipse/g)).toHaveLength(75);
+    expect(svg).not.toContain("<ellipse");
+    // 13 lignes dans chaque sens (tous les 10 mm, bords compris).
+    expect(poster.plate!.grid.match(/M/g)).toHaveLength(26);
+    expect(poster.plate!.top.startsWith("M")).toBe(true);
+    expect(poster.plate!.top.endsWith("Z")).toBe(true);
   });
 
   it("final : 75 ellipses pleines aux teintes des bandes, filet plus sombre, ≤ 8 Ko", () => {
@@ -59,8 +65,8 @@ describe("poster du héros : poids et structure", () => {
     for (const pattern of ["gradins", "vagues", "voronoi"] as const) {
       for (const palette of ["leman", "molasse", "signal", "uni"] as const) {
         const c = heroVariant(palette, pattern);
-        expect(bytes(posterToSvg(heroPoster(c, "ghost")))).toBeLessThanOrEqual(
-          6 * 1024,
+        expect(bytes(posterToSvg(heroPoster(c, "plate")))).toBeLessThanOrEqual(
+          2 * 1024,
         );
         expect(bytes(posterToSvg(heroPoster(c, "final")))).toBeLessThanOrEqual(
           8 * 1024,
@@ -73,25 +79,28 @@ describe("poster du héros : poids et structure", () => {
     expect(posterToSvg(heroPoster(HERO_CONFIG, "final"))).toBe(
       posterToSvg(heroPoster(structuredClone(HERO_CONFIG), "final")),
     );
-    expect(posterToSvg(heroPoster(HERO_CONFIG, "ghost"))).toBe(
-      posterToSvg(heroPoster(HERO_CONFIG, "ghost")),
+    expect(posterToSvg(heroPoster(HERO_CONFIG, "plate"))).toBe(
+      posterToSvg(heroPoster(HERO_CONFIG, "plate")),
     );
   });
 });
 
 describe("raccord au pixel avec la caméra du Stage", () => {
   const { width: W, height: H } = POSTER_VIEWBOX;
-  const poster = heroPoster(HERO_CONFIG, "ghost");
+  const poster = heroPoster(HERO_CONFIG, "final");
+  const plate = heroPoster(HERO_CONFIG, "plate");
 
   it("viewBox 4:5 partagé, caméra du héros", () => {
     expect(poster.viewBox).toBe("0 0 400 500");
+    expect(plate.viewBox).toBe("0 0 400 500");
     expect(W / H).toBeCloseTo(0.8, 12);
     expect(poster.camera).toEqual(heroCamera());
+    expect(plate.camera).toEqual(heroCamera());
   });
 
-  it("l'anneau du sommet se projette exactement là où le Stage le dessinerait", () => {
-    // Anneau fantôme à z = 150 (le dernier) : on le reprojette point par point
-    // avec la matrice partagée et on retrouve son ellipse englobante à 0,1 px.
+  it("l'ellipse du sommet se projette exactement là où le Stage le dessinerait", () => {
+    // Strate à z = 150 (la dernière) : on la reprojette point par point avec la
+    // matrice partagée et on retrouve son ellipse englobante à 0,1 px.
     const m = cameraMatrix(heroCamera(), W / H);
     const model = createLavauxModel(HERO_CONFIG);
     const tmp = new Float64Array(3);
@@ -112,7 +121,8 @@ describe("raccord au pixel avec la caméra du Stage", () => {
       y0 = Math.min(y0, y);
       y1 = Math.max(y1, y);
     }
-    const top = poster.ghost![poster.ghost!.length - 1];
+    const ellipses = poster.layers!.flatMap((l) => l.ellipses);
+    const top = ellipses[ellipses.length - 1];
     expect(top.cx).toBeCloseTo((x0 + x1) / 2, 0);
     expect(top.cy).toBeCloseTo((y0 + y1) / 2, 0);
     expect(top.rx).toBeCloseTo((x1 - x0) / 2, 0);
@@ -120,20 +130,39 @@ describe("raccord au pixel avec la caméra du Stage", () => {
   });
 
   it("l'objet occupe ≈ 78 % de la hauteur de la boîte, centré sur l'axe", () => {
-    const ys = poster.ghost!.flatMap((e) => [e.cy - e.ry, e.cy + e.ry]);
+    const ellipses = poster.layers!.flatMap((l) => l.ellipses);
+    const ys = ellipses.flatMap((e) => [e.cy - e.ry, e.cy + e.ry]);
     const fraction = (Math.max(...ys) - Math.min(...ys)) / H;
     expect(fraction).toBeGreaterThan(0.7);
     expect(fraction).toBeLessThan(0.82);
-    for (const e of poster.ghost!) expect(e.cx).toBeCloseTo(W / 2, 1);
-    // Les anneaux montent à l'écran : cy décroît avec z.
-    for (let i = 1; i < poster.ghost!.length; i++) {
-      expect(poster.ghost![i].cy).toBeLessThan(poster.ghost![i - 1].cy);
+    for (const e of ellipses) expect(e.cx).toBeCloseTo(W / 2, 1);
+    // Les strates montent à l'écran : cy décroît avec z.
+    for (let i = 1; i < ellipses.length; i++) {
+      expect(ellipses[i].cy).toBeLessThan(ellipses[i - 1].cy);
     }
-    expect(GHOST_STEP_MM).toBe(2);
+    expect(STRATE_STEP_MM).toBe(2);
+  });
+
+  it("le plateau est centré sous l'objet et ne déborde de la boîte que par son coin avant", () => {
+    expect(PLATE_MM).toBe(120);
+    const numbers = (d: string) =>
+      (d.match(/-?\d+(\.\d+)?/g) ?? []).map(Number);
+    const v = numbers(plate.plate!.top);
+    const xs = v.filter((_, i) => i % 2 === 0);
+    const ys = v.filter((_, i) => i % 2 === 1);
+    // Entier en largeur et vers le haut ; le coin le plus proche de la caméra
+    // sort de quelques unités par le bas, comme dans la vue du Stage.
+    expect(Math.min(...xs)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...xs)).toBeLessThanOrEqual(W);
+    expect(Math.min(...ys)).toBeGreaterThanOrEqual(0);
+    expect(Math.max(...ys)).toBeLessThanOrEqual(H + 10);
+    // Il entoure l'axe du vase (le milieu de la boîte).
+    expect(Math.min(...xs)).toBeLessThan(W / 2);
+    expect(Math.max(...xs)).toBeGreaterThan(W / 2);
   });
 
   it("dans la boîte visuelle : rien ne déborde du viewBox", () => {
-    for (const e of poster.ghost!) {
+    for (const e of poster.layers!.flatMap((l) => l.ellipses)) {
       expect(e.cx - e.rx).toBeGreaterThanOrEqual(0);
       expect(e.cx + e.rx).toBeLessThanOrEqual(W);
       expect(e.cy - e.ry).toBeGreaterThanOrEqual(0);

@@ -141,7 +141,7 @@
   width: 100%;
   height: 100%;
 }
-.ghost,
+.plateLayer,
 .final {
   position: absolute;
   inset: 0;
@@ -153,16 +153,31 @@
 .static .final {
   opacity: 1;
 }
-.static .ghost {
+.static .plateLayer {
   opacity: 0;
   transition: opacity 240ms var(--ease-strate);
 }
-:global(html[data-motion="reduce"]) .ghost {
+:global(html[data-motion="reduce"]) .plateLayer {
   display: none;
 }
 :global(html[data-motion="reduce"]) .final {
   opacity: 1;
   transition: none;
+}
+
+/* Poster « plateau » : les mêmes teintes que la première frame du Stage
+   (dessus ≈ papier éclairci d'un quart, mesuré sur le rendu clair et sombre ;
+   épaisseur plus sombre ; quadrillage = jeton iso). */
+.plateBase {
+  fill: color-mix(in srgb, var(--color-paper), black 14%);
+}
+.plateTop {
+  fill: color-mix(in srgb, var(--color-paper), white 25%);
+}
+.plateGrid {
+  fill: none;
+  stroke: var(--color-iso);
+  stroke-width: 1;
 }
 
 .label {
@@ -175,24 +190,6 @@
   background: color-mix(in srgb, var(--color-paper) 82%, transparent);
   color: var(--color-soft);
   pointer-events: none;
-}
-
-/* « Changement de filament → Vert Lavaux · couche 0211 » : 1,6 s. */
-.change {
-  position: absolute;
-  inset-inline: 0.75rem;
-  top: 0.75rem;
-  width: fit-content;
-  padding: 0.25rem 0.5rem;
-  border-radius: 2px;
-  background: var(--color-ink);
-  color: var(--color-paper);
-  opacity: 0;
-  transition: opacity 240ms var(--ease-strate);
-  pointer-events: none;
-}
-.change[data-visible="true"] {
-  opacity: 1;
 }
 
 /* Réglette Z du héros mobile (C1) : sur le bord droit de la boîte visuelle,
