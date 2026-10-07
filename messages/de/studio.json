@@ -6,17 +6,17 @@
   },
   "seo": {
     "index": {
-      "title": "Das Studio: Ihr Objekt in 3D einstellen",
-      "description": "Vier Objekte in 3D einstellen: Vase, Visitenkarte, Untersetzer, Namensschild. Bis zu vier Farben, gedruckt in der Schweiz, Festpreis innert 48 Stunden."
+      "title": "Das Studio: Ihr Objekt in 3D personalisieren",
+      "description": "Vier Objekte in 3D personalisieren: Vase, Visitenkarte, Untersetzer, Namensschild. Bis zu vier Farben, gedruckt in der Schweiz, Festpreis innert 48 Stunden."
     },
     "objects": {
       "lavaux": {
         "title": "Vase Lavaux nach Mass, in 3D",
-        "description": "Profil, Muster und bis zu vier Farben Ihrer Vase Lavaux einstellen, in 3D prüfen und senden: gedruckt in der Schweiz, Festpreis innert 48 Stunden."
+        "description": "Profil, Muster und bis zu vier Farben Ihrer Vase Lavaux personalisieren, in 3D prüfen und senden: gedruckt in der Schweiz, Festpreis innert 48 Stunden."
       },
       "cartouche": {
         "title": "3D-Visitenkarte Cartouche",
-        "description": "Ihre Visitenkarte von 85 × 55 mm, erhaben oder graviert, zwei Farben, Ihr Text: in 3D einstellen, in der Schweiz gedruckt, Festpreis innert 48 Stunden."
+        "description": "Ihre Visitenkarte von 85 × 55 mm, erhaben oder graviert, zwei Farben, Ihr Text: in 3D personalisieren, in der Schweiz gedruckt, Festpreis innert 48 Stunden."
       },
       "relief": {
         "title": "Untersetzer Relief, Massiv nach Mass",
@@ -24,22 +24,22 @@
       },
       "borne": {
         "title": "Namensschild Borne in zwei Farben",
-        "description": "Ein zweifarbiges Namensschild mit Ihrem Text, erhaben oder graviert, Ring links oder rechts. In 3D eingestellt, in der Schweiz gedruckt, Festpreis innert 48 h."
+        "description": "Ein zweifarbiges Namensschild mit Ihrem Text, erhaben oder graviert, Ring links oder rechts. In 3D personalisiert, in der Schweiz gedruckt, Festpreis innert 48 h."
       }
     }
   },
   "index": {
     "eyebrow": "3D-Konfigurator",
     "title": "Das Studio",
-    "intro": "Einstellen. Wir drucken.",
-    "lead": "Vier Objekte aus der Werkstatt, so begrenzt, dass sie sich auf unseren Maschinen drucken lassen. Stellen Sie Form, Farben und Text ein, prüfen Sie die Zahlen und senden Sie das Objekt: Die Werkstatt liest jede Anfrage durch und antwortet innert 48 Stunden mit einem Festpreis.",
-    "adjust": "Einstellen"
+    "intro": "Personalisieren. Wir drucken.",
+    "lead": "Vier Objekte aus der Werkstatt, so begrenzt, dass sie sich auf unseren Maschinen drucken lassen. Personalisieren Sie Form, Farben und Text, prüfen Sie die Zahlen und senden Sie das Objekt: Die Werkstatt liest jede Anfrage durch und antwortet innert 48 Stunden mit einem Festpreis.",
+    "adjust": "Personalisieren"
   },
   "how": {
     "title": "So funktioniert es",
     "steps": {
       "adjust": {
-        "title": "Einstellen",
+        "title": "Personalisieren",
         "text": "Form, Muster, bis zu vier Farben, Ihr Text: Die 3D-Ansicht folgt jeder Bewegung."
       },
       "check": {
@@ -48,7 +48,7 @@
       },
       "send": {
         "title": "Senden",
-        "text": "Ihre Einstellung geht mit ihrer Druckdatei an die Werkstatt. Bezahlt wird jetzt noch nichts."
+        "text": "Ihre Personalisierung geht mit ihrer Druckdatei an die Werkstatt. Bezahlt wird jetzt noch nichts."
       },
       "receive": {
         "title": "Erhalten",
@@ -60,7 +60,7 @@
     "title": "Häufige Fragen",
     "items": {
       "printable": {
-        "q": "Ist das, was ich einstelle, wirklich druckbar?",
+        "q": "Ist das, was ich personalisiere, wirklich druckbar?",
         "a": "Jedes Objekt ist so begrenzt, dass es auf den Maschinen der Werkstatt gedruckt werden kann (250 mm Druckplatte, PLA, Düse von 0,4 mm). Ein Hinweis zeigt «Druckbar», «Zu prüfen» oder «Nicht druckbar», mit der ersten Auffälligkeit im Klartext und einer Schaltfläche «Korrigieren», wenn es eine Korrektur gibt."
       },
       "price": {
@@ -73,7 +73,7 @@
       },
       "colors": {
         "q": "Wie werden die Farben gedruckt?",
-        "a": "Durch Filamentwechsel auf bestimmten Höhen, bis zu vier Filamente: Das stellt die Werkstatt in ihrer Slicer-Software ein. Die angezeigten Farbtöne sind unverbindlich, die endgültige Farbe hängt von der vorrätigen Spule ab."
+        "a": "Durch Filamentwechsel auf bestimmten Höhen, bis zu vier Filamente: Das programmiert die Werkstatt in ihrer Slicer-Software. Die angezeigten Farbtöne sind unverbindlich, die endgültige Farbe hängt von der vorrätigen Spule ab."
       },
       "after": {
         "q": "Was passiert nach dem Senden?",
@@ -101,14 +101,14 @@
     }
   },
   "sections": {
-    "legend": "Einstellbereiche",
+    "legend": "Bereiche der Personalisierung",
     "shape": "Form",
     "pattern": "Muster",
     "colors": "Farben",
     "text": "Text",
     "sheet": "Datenblatt"
   },
-  "apply": "Einstellungen anwenden",
+  "apply": "Personalisierung anwenden",
   "tools": {
     "group": "Werkzeuge des Studios",
     "undo": "Rückgängig",
@@ -121,12 +121,12 @@
     "linkCopied": "Link kopiert: Der Text ist nicht enthalten.",
     "kept": "Entwurf gespeichert: Sie finden ihn unter Favoriten.",
     "keepFailed": "Dieser Entwurf kann nicht gespeichert werden: Der Browser-Speicher ist nicht verfügbar.",
-    "invalidLink": "Dieser Link ist nicht lesbar: Standardeinstellungen."
+    "invalidLink": "Dieser Link ist nicht lesbar: Standardwerte."
   },
   "scene": {
     "viewsLegend": "Ansicht des Objekts",
     "view": {
-      "orbit": "3/4",
+      "orbit": "3D",
       "plan": "Grundriss",
       "elevation": "Aufriss",
       "layers": "Schichten"
@@ -271,8 +271,8 @@
     "intro": "Die Werkstatt prüft Ihr Stück und antwortet innert 48 Stunden mit einem Festpreis. Jetzt wird nichts bezahlt.",
     "cta": "An die Werkstatt senden",
     "noscript": "Offerte anfragen",
-    "noscriptNote": "Ohne JavaScript wenden Sie Ihre Einstellungen an und kopieren sie in Ihre Offertanfrage: Die Werkstatt bereitet die Datei für Sie vor.",
-    "machineLine": "Einstellungen zum Einfügen in die Anfrage",
+    "noscriptNote": "Ohne JavaScript wenden Sie Ihre Personalisierung an und kopieren sie in Ihre Offertanfrage: Die Werkstatt bereitet die Datei für Sie vor.",
+    "machineLine": "Personalisierung zum Einfügen in die Anfrage",
     "blocked": "Korrigieren Sie zuerst die im Datenblatt gemeldeten Punkte.",
     "needText": "Geben Sie mindestens ein Zeichen ein: {field}.",
     "estimateNote": "Schätzung · Festpreis von der Werkstatt innert 48 Stunden bestätigt.",
@@ -326,9 +326,9 @@
     },
     "settings": {
       "lavaux": "Muster: {pattern}",
-      "cartouche": "Einstellungen: {mode} ({depth}) · Layout {layout} · Ecken {corner}",
-      "relief": "Einstellungen: {levels} Schichten · See {lake} % · Massiv {seed} · Gipfelbeschriftung: {label}",
-      "borne": "Einstellungen: Form {shape} · Buchstaben {cap} · Ring {ring} · Modus {mode}"
+      "cartouche": "Parameter: {mode} ({depth}) · Layout {layout} · Ecken {corner}",
+      "relief": "Parameter: {levels} Schichten · See {lake} % · Massiv {seed} · Gipfelbeschriftung: {label}",
+      "borne": "Parameter: Form {shape} · Buchstaben {cap} · Ring {ring} · Modus {mode}"
     }
   }
 }

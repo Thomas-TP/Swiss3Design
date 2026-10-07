@@ -6,17 +6,17 @@
   },
   "seo": {
     "index": {
-      "title": "Le Studio : réglez votre objet 3D",
-      "description": "Quatre objets à régler en 3D : vase, carte de visite, sous-verre, porte-nom. Jusqu'à quatre couleurs, imprimés en Suisse, prix ferme sous 48 h."
+      "title": "Le Studio : personnalisez votre objet 3D",
+      "description": "Quatre objets à personnaliser en 3D : vase, carte de visite, sous-verre, porte-nom. Jusqu'à quatre couleurs, imprimés en Suisse, prix ferme sous 48 h."
     },
     "objects": {
       "lavaux": {
         "title": "Vase Lavaux sur mesure, en 3D",
-        "description": "Réglez le profil, le motif et jusqu'à quatre couleurs de votre vase Lavaux, vérifiez-le en 3D puis envoyez-le : impression en Suisse, prix ferme sous 48 h."
+        "description": "Personnalisez le profil, le motif et jusqu'à quatre couleurs de votre vase Lavaux, vérifiez-le en 3D puis envoyez-le : impression en Suisse, prix ferme sous 48 h."
       },
       "cartouche": {
         "title": "Carte de visite 3D Cartouche",
-        "description": "Votre carte de visite de 85 × 55 mm en relief ou gravée, deux couleurs, texte à vous : réglez-la en 3D, l'atelier l'imprime en Suisse, prix ferme sous 48 h."
+        "description": "Votre carte de visite de 85 × 55 mm en relief ou gravée, deux couleurs, texte à vous : personnalisez-la en 3D, l'atelier l'imprime en Suisse, prix ferme sous 48 h."
       },
       "relief": {
         "title": "Sous-verre Relief, massif sur mesure",
@@ -24,22 +24,22 @@
       },
       "borne": {
         "title": "Porte-nom Borne en deux couleurs",
-        "description": "Un porte-nom imprimé en deux couleurs avec votre texte, en relief ou gravé, anneau à gauche ou à droite. Réglé en 3D, imprimé en Suisse, prix ferme sous 48 h."
+        "description": "Un porte-nom imprimé en deux couleurs avec votre texte, en relief ou gravé, anneau à gauche ou à droite. Personnalisé en 3D, imprimé en Suisse, prix ferme sous 48 h."
       }
     }
   },
   "index": {
     "eyebrow": "Configurateur 3D",
     "title": "Le Studio",
-    "intro": "Réglez-le. On l'imprime.",
-    "lead": "Quatre objets conçus par l'atelier, bornés pour s'imprimer sur nos machines. Réglez la forme, les couleurs et le texte, vérifiez les chiffres, puis envoyez-le : l'atelier relit chaque demande et répond sous 48 h avec un prix ferme.",
-    "adjust": "Régler"
+    "intro": "Personnalisez-le. On l'imprime.",
+    "lead": "Quatre objets conçus par l'atelier, bornés pour s'imprimer sur nos machines. Personnalisez la forme, les couleurs et le texte, vérifiez les chiffres, puis envoyez-le : l'atelier relit chaque demande et répond sous 48 h avec un prix ferme.",
+    "adjust": "Personnaliser"
   },
   "how": {
     "title": "Comment ça marche",
     "steps": {
       "adjust": {
-        "title": "Réglez",
+        "title": "Personnalisez",
         "text": "Forme, motif, jusqu'à quatre couleurs, votre texte : la 3D suit chaque geste."
       },
       "check": {
@@ -48,7 +48,7 @@
       },
       "send": {
         "title": "Envoyez",
-        "text": "Votre réglage part à l'atelier avec son fichier d'impression. Rien n'est payé à ce stade."
+        "text": "Votre personnalisation part à l'atelier avec son fichier d'impression. Rien n'est payé à ce stade."
       },
       "receive": {
         "title": "Recevez",
@@ -60,7 +60,7 @@
     "title": "Questions fréquentes",
     "items": {
       "printable": {
-        "q": "Ce que je règle est-il vraiment imprimable ?",
+        "q": "Ce que je personnalise est-il vraiment imprimable ?",
         "a": "Chaque objet est borné pour s'imprimer sur les machines de l'atelier (256 mm de plateau, PLA, buse de 0,4 mm). Un badge dit « Imprimable », « À vérifier » ou « Non imprimable », avec la première anomalie en clair et un bouton « Corriger » quand une correction existe."
       },
       "price": {
@@ -73,7 +73,7 @@
       },
       "colors": {
         "q": "Comment les couleurs sont-elles imprimées ?",
-        "a": "Par des changements de filament à des hauteurs données, jusqu'à quatre filaments : c'est ce que l'atelier règle dans son logiciel de tranchage. Les teintes affichées sont indicatives, la couleur finale dépend de la bobine en stock."
+        "a": "Par des changements de filament à des hauteurs données, jusqu'à quatre filaments : c'est ce que l'atelier programme dans son logiciel de tranchage. Les teintes affichées sont indicatives, la couleur finale dépend de la bobine en stock."
       },
       "after": {
         "q": "Que se passe-t-il après l'envoi ?",
@@ -101,14 +101,14 @@
     }
   },
   "sections": {
-    "legend": "Sections de réglage",
+    "legend": "Sections de personnalisation",
     "shape": "Forme",
     "pattern": "Motif",
     "colors": "Couleurs",
     "text": "Texte",
     "sheet": "Fiche"
   },
-  "apply": "Appliquer les réglages",
+  "apply": "Appliquer la personnalisation",
   "tools": {
     "group": "Outils du Studio",
     "undo": "Annuler",
@@ -121,12 +121,12 @@
     "linkCopied": "Lien copié : le texte n'est pas inclus.",
     "kept": "Création gardée : retrouvez-la dans Favoris.",
     "keepFailed": "Impossible de garder cette création : le stockage du navigateur est indisponible.",
-    "invalidLink": "Ce lien n'est pas lisible : réglages par défaut."
+    "invalidLink": "Ce lien n'est pas lisible : valeurs par défaut."
   },
   "scene": {
     "viewsLegend": "Vue de l'objet",
     "view": {
-      "orbit": "3/4",
+      "orbit": "3D",
       "plan": "Plan",
       "elevation": "Élévation",
       "layers": "Couches"
@@ -271,8 +271,8 @@
     "intro": "L'atelier relit votre pièce et vous répond sous 48 h avec un prix ferme. Rien n'est payé maintenant.",
     "cta": "Envoyer à l'atelier",
     "noscript": "Demander un devis",
-    "noscriptNote": "Sans JavaScript, appliquez vos réglages puis copiez-les dans votre demande de devis : l'atelier prépare le fichier pour vous.",
-    "machineLine": "Réglages à coller dans la demande",
+    "noscriptNote": "Sans JavaScript, appliquez votre personnalisation puis copiez-la dans votre demande de devis : l'atelier prépare le fichier pour vous.",
+    "machineLine": "Personnalisation à coller dans la demande",
     "blocked": "Corrigez d'abord les points signalés dans la fiche.",
     "needText": "Saisissez au moins un caractère : {field}.",
     "estimateNote": "Estimation · prix ferme confirmé par l'atelier sous 48 h.",
@@ -326,9 +326,9 @@
     },
     "settings": {
       "lavaux": "Motif : {pattern}",
-      "cartouche": "Réglages : {mode} ({depth}) · mise en page {layout} · coins {corner}",
-      "relief": "Réglages : {levels} strates · lac {lake} % · massif {seed} · étiquette du sommet : {label}",
-      "borne": "Réglages : forme {shape} · lettres {cap} · anneau {ring} · mode {mode}"
+      "cartouche": "Paramètres : {mode} ({depth}) · mise en page {layout} · coins {corner}",
+      "relief": "Paramètres : {levels} strates · lac {lake} % · massif {seed} · étiquette du sommet : {label}",
+      "borne": "Paramètres : forme {shape} · lettres {cap} · anneau {ring} · mode {mode}"
     }
   }
 }

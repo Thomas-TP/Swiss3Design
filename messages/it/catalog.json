@@ -2,7 +2,7 @@
   "shop": {
     "eyebrow": "Stampato su ordinazione, a Gland e Pully",
     "title": "Negozio.",
-    "emptyCatalog": "Nessun oggetto in negozio per il momento. Regoli il Suo nello Studio o ci invii un file.",
+    "emptyCatalog": "Nessun oggetto in negozio per il momento. Personalizzi il Suo nello Studio o ci invii un file.",
     "view": {
       "label": "Visualizzazione",
       "grid": "Griglia",
@@ -16,10 +16,10 @@
       "price": "Prezzo"
     },
     "studio": {
-      "title": "Da regolare nello Studio.",
-      "intro": "Quattro oggetti disegnati dall'atelier, che Lei regola in 3D prima di inviarceli. Non sono articoli del negozio: il prezzo definitivo è confermato su preventivo entro 48 ore.",
+      "title": "Da personalizzare nello Studio.",
+      "intro": "Quattro oggetti disegnati dall'atelier, che Lei personalizza in 3D prima di inviarceli. Non sono articoli del negozio: il prezzo definitivo è confermato su preventivo entro 48 ore.",
       "quote": "Su preventivo",
-      "adjust": "Regola",
+      "adjust": "Personalizza",
       "objects": {
         "lavaux": {
           "name": "Vaso «Lavaux»",
@@ -105,6 +105,6 @@
   "cross": {
     "title": "Un vaso nei Suoi colori?",
     "body": "Questo vaso resta com'è stato disegnato da {author}. Per un vaso nei Suoi colori, lo Studio propone i nostri modelli parametrici.",
-    "cta": "Regola un vaso"
+    "cta": "Personalizza un vaso"
   }
 }

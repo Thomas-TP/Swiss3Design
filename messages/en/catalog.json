@@ -2,7 +2,7 @@
   "shop": {
     "eyebrow": "Printed to order, in Gland and Pully",
     "title": "Shop.",
-    "emptyCatalog": "No items in the shop right now. Adjust your own in the Studio or send us a file.",
+    "emptyCatalog": "No items in the shop right now. Customise your own in the Studio or send us a file.",
     "view": {
       "label": "View",
       "grid": "Grid",
@@ -16,10 +16,10 @@
       "price": "Price"
     },
     "studio": {
-      "title": "To adjust in the Studio.",
-      "intro": "Four objects designed by the workshop that you adjust in 3D before sending them to us. They are not shop items: the firm price is confirmed on quote within 48 hours.",
+      "title": "To customise in the Studio.",
+      "intro": "Four objects designed by the workshop that you customise in 3D before sending them to us. They are not shop items: the firm price is confirmed on quote within 48 hours.",
       "quote": "On quote",
-      "adjust": "Adjust",
+      "adjust": "Customise",
       "objects": {
         "lavaux": {
           "name": "\"Lavaux\" vase",
@@ -105,6 +105,6 @@
   "cross": {
     "title": "A vase in your colors?",
     "body": "This vase stays exactly as {author} drew it. For a vase in your colors, the Studio offers our own parametric models.",
-    "cta": "Adjust a vase"
+    "cta": "Customise a vase"
   }
 }

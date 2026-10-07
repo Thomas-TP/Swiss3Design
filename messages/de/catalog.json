@@ -2,7 +2,7 @@
   "shop": {
     "eyebrow": "Auf Bestellung gedruckt, in Gland und Pully",
     "title": "Shop.",
-    "emptyCatalog": "Zurzeit ist kein Objekt im Shop. Stellen Sie Ihr eigenes im Studio ein oder senden Sie uns eine Datei.",
+    "emptyCatalog": "Zurzeit ist kein Objekt im Shop. Personalisieren Sie Ihr eigenes im Studio oder senden Sie uns eine Datei.",
     "view": {
       "label": "Ansicht",
       "grid": "Raster",
@@ -16,10 +16,10 @@
       "price": "Preis"
     },
     "studio": {
-      "title": "Im Studio einzustellen.",
-      "intro": "Vier Objekte aus unserem Atelier, die Sie in 3D einstellen, bevor Sie sie uns senden. Es sind keine Shop-Artikel: Den verbindlichen Preis bestätigen wir auf Offerte innert 48 Stunden.",
+      "title": "Im Studio zu personalisieren.",
+      "intro": "Vier Objekte aus unserem Atelier, die Sie in 3D personalisieren, bevor Sie sie uns senden. Es sind keine Shop-Artikel: Den verbindlichen Preis bestätigen wir auf Offerte innert 48 Stunden.",
       "quote": "Auf Offerte",
-      "adjust": "Einstellen",
+      "adjust": "Personalisieren",
       "objects": {
         "lavaux": {
           "name": "Vase «Lavaux»",
@@ -105,6 +105,6 @@
   "cross": {
     "title": "Eine Vase in Ihren Farben?",
     "body": "Diese Vase bleibt, wie {author} sie gezeichnet hat. Für eine Vase in Ihren Farben bietet das Studio unsere eigenen parametrischen Modelle.",
-    "cta": "Vase einstellen"
+    "cta": "Vase personalisieren"
   }
 }
