@@ -1,6 +1,6 @@
 /* ── « Coupe » : ancrage du chrome fixe (complément de globals.css, §3.4) ──
-   globals.css anime la page (::view-transition-new(.s3d-coupe) s'imprime en
-   8 paliers) et ancre le header (site-header). Il manque les autres pièces
+   globals.css anime la page (::view-transition-new(.s3d-coupe) monte en une
+   découpe continue) et ancre le header (site-header). Il manque les autres pièces
    fixes du chrome : sans nom de transition, la BottomNav et le bandeau de
    consentement font partie de l'instantané racine, que l'ancienne page (à
    plat par-dessus) et la nouvelle (z-index 2) recouvrent pendant 480 ms :
