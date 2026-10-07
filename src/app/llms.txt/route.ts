@@ -69,7 +69,7 @@ ${productLines.join("\n")}
 
 ## Studio
 
-- [Studio](${url(PAGES.studio)}): four original objects designed by the workshop, adjustable in 3D and sent for a quote. Pick the shape, the pattern, up to four colors (filament changes at set heights) and, for cards, coasters and name tags, your own text. Every figure on the page (dimensions, grams, print time, printability) is computed; the workshop reviews every request and answers within 48 hours with a firm price. Nothing is paid in the Studio.
+- [Studio](${url(PAGES.studio)}): four original objects designed by the workshop, customisable in 3D and sent for a quote. Pick the shape, the pattern, up to four colors (filament changes at set heights) and, for cards, coasters and name tags, your own text. Every figure on the page (dimensions, grams, print time, printability) is computed; the workshop reviews every request and answers within 48 hours with a firm price. Nothing is paid in the Studio.
 - [Lavaux vase](${url("/studio/lavaux")}): a vase with five profiles, five patterns and up to four colors
 - [Cartouche business card](${url("/studio/cartouche")}): 85 × 55 mm, embossed or engraved text, two colors
 - [Relief coaster](${url("/studio/relief")}): a 100 mm coaster shaped like a layered mountain range, with your name on the summit

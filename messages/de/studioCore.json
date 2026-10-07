@@ -122,7 +122,6 @@
     "label": "{filament} · Schichten {from}–{to} · {fromMm}–{toMm} · ≈ {grams}",
     "range": "{filament} {from}–{to}",
     "layerReadout": "Schicht {layer} / {total} · z {z} · {filament}",
-    "change": "Filamentwechsel → {filament} · Schicht {layer}",
     "boundary": "Wechsel {index} bei {z}, Schicht {layer}",
     "purge": "{changes} · Spülmenge ≈ {grams} · + ≈ {duration}",
     "single": "Eine einzige Farbe: kein Filamentwechsel, keine Spülmenge."

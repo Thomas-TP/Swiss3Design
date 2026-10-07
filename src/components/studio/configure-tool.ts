@@ -255,6 +255,6 @@ export function describeConfiguration(
     },
     printable: stats.printable.status,
     issues,
-    note: "Open the link to adjust the object in 3D and add any text yourself; the workshop reviews every request and answers within 48 hours with a firm price. Texts are never part of the link.",
+    note: "Open the link to customise the object in 3D and add any text yourself; the workshop reviews every request and answers within 48 hours with a firm price. Texts are never part of the link.",
   };
 }

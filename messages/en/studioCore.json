@@ -122,7 +122,6 @@
     "label": "{filament} · layers {from}–{to} · {fromMm}–{toMm} · ≈ {grams}",
     "range": "{filament} {from}–{to}",
     "layerReadout": "Layer {layer} / {total} · z {z} · {filament}",
-    "change": "Filament change → {filament} · layer {layer}",
     "boundary": "Change {index} at {z}, layer {layer}",
     "purge": "{changes} · purge ≈ {grams} · + ≈ {duration}",
     "single": "A single color: no filament change, no purge."

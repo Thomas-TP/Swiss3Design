@@ -95,7 +95,6 @@ describe("studioCore : couverture du code", () => {
         "label",
         "range",
         "layerReadout",
-        "change",
         "boundary",
         "purge",
         "single",

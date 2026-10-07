@@ -122,7 +122,6 @@
     "label": "{filament} · strati {from}–{to} · {fromMm}–{toMm} · ≈ {grams}",
     "range": "{filament} {from}–{to}",
     "layerReadout": "Strato {layer} / {total} · z {z} · {filament}",
-    "change": "Cambio di filamento → {filament} · strato {layer}",
     "boundary": "Cambio {index} a {z}, strato {layer}",
     "purge": "{changes} · spurgo ≈ {grams} · + ≈ {duration}",
     "single": "Un solo colore: nessun cambio di filamento, nessuno spurgo."
