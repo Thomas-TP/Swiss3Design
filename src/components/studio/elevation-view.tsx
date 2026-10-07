@@ -1,6 +1,6 @@
 "use client";
 
-import { useId, useMemo } from "react";
+import { memo, useDeferredValue, useId, useMemo } from "react";
 import { useIsDark } from "@/lib/theme";
 import { lavauxElevation, type ElevationData } from "@/lib/studio/poster";
 import {
@@ -150,3 +150,35 @@ export function ElevationView({
     </div>
   );
 }
+
+/**
+ * Le poster du Stage, qui suit la configuration avec un temps de retard. Une fois
+ * la scène 3D prête, ce dessin est recouvert : le recalculer à chaque cran d'un
+ * curseur (la silhouette du vase, le relief de la carte, jusqu'à quelques
+ * dizaines de millisecondes sur un mobile) volait du temps au glissé pour un
+ * dessin que personne ne voit. `useDeferredValue` le recalcule dans un rendu de
+ * faible priorité, interrompu par le cran suivant : il rattrape dès que la main
+ * se pose. Sans WebGL (C0) il est la vue : même dessin, une image plus tard.
+ */
+export const DeferredElevation = memo(function DeferredElevation({
+  config,
+  texts,
+  locale,
+  className,
+}: {
+  config: StudioConfig;
+  texts: StudioTexts;
+  locale: StudioLocale;
+  className?: string;
+}) {
+  const lateConfig = useDeferredValue(config);
+  const lateTexts = useDeferredValue(texts);
+  return (
+    <ElevationView
+      config={lateConfig}
+      texts={lateTexts}
+      locale={locale}
+      className={className}
+    />
+  );
+});

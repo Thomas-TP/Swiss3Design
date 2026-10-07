@@ -11,7 +11,14 @@ import {
   ZoomOut,
 } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { useCallback, useMemo, useRef, useState, type ReactNode } from "react";
+import {
+  memo,
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
 import { StageView } from "@/components/ui/stage-view";
@@ -31,7 +38,7 @@ import type {
   StudioStats,
   StudioTexts,
 } from "@/lib/studio/types";
-import { ElevationView } from "./elevation-view";
+import { DeferredElevation, ElevationView } from "./elevation-view";
 import { layerTop, spreadVertically } from "./layers";
 import { LayerSlider, SimulationControls } from "./layer-panel";
 import {
@@ -68,7 +75,94 @@ import { ViewSwitch } from "./view-switch";
 /** Rangée des vues (32 px) et ses 12 px d'air, en px CSS, sur l'aperçu de mobile. */
 const MOBILE_INSET_TOP = 44;
 
-export function ScenePanel({
+const BUTTON =
+  "grid place-items-center rounded-field border border-ink bg-paper/85 text-ink transition-colors duration-150 ease-strate hover:bg-ink hover:text-paper";
+
+interface OrbitLabels {
+  rotateLeft: string;
+  rotateRight: string;
+  front: string;
+  reset: string;
+  zoomIn: string;
+  zoomOut: string;
+}
+
+/**
+ * Les boutons de l'orbite : en surimpression sur bureau, dans la rangée sous
+ * l'aperçu sur mobile. Un composant à part, mémorisé : ses neuf icônes ne sont
+ * pas recréées à chaque cran d'un curseur.
+ */
+const OrbitButtons = memo(function OrbitButtons({
+  size,
+  plan,
+  send,
+  labels,
+}: {
+  size: string;
+  plan: boolean;
+  send: (cmd: StudioViewCommand) => void;
+  labels: OrbitLabels;
+}) {
+  const cls = cx(BUTTON, size);
+  return (
+    <>
+      {!plan ? (
+        <>
+          <button
+            type="button"
+            onClick={() => send({ type: "turn", step: -1 })}
+            aria-label={labels.rotateLeft}
+            className={cls}
+          >
+            <ChevronLeft size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => send({ type: "turn", step: 1 })}
+            aria-label={labels.rotateRight}
+            className={cls}
+          >
+            <ChevronRight size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => send({ type: "front" })}
+            aria-label={labels.front}
+            className={cls}
+          >
+            <Home size={18} aria-hidden="true" />
+          </button>
+          <button
+            type="button"
+            onClick={() => send({ type: "reset" })}
+            aria-label={labels.reset}
+            className={cls}
+          >
+            <RotateCcw size={18} aria-hidden="true" />
+          </button>
+        </>
+      ) : null}
+      <button
+        type="button"
+        onClick={() => send({ type: "zoom", step: 1 })}
+        aria-label={labels.zoomIn}
+        className={cls}
+      >
+        <ZoomIn size={18} aria-hidden="true" />
+      </button>
+      <button
+        type="button"
+        onClick={() => send({ type: "zoom", step: -1 })}
+        aria-label={labels.zoomOut}
+        className={cls}
+      >
+        <ZoomOut size={18} aria-hidden="true" />
+      </button>
+    </>
+  );
+});
+
+export const ScenePanel = memo(function ScenePanel({
   object,
   config,
   texts,
@@ -205,7 +299,7 @@ export function ScenePanel({
     !compact && "max-lg:pt-14",
   );
   const poster = (
-    <ElevationView
+    <DeferredElevation
       config={config}
       texts={texts}
       locale={locale}
@@ -215,11 +309,25 @@ export function ScenePanel({
 
   // Les boutons peuvent vivre hors de la vue (rangée de mobile) : la commande
   // part vers l'élément de la vue, pas vers un ancêtre du bouton.
-  const command = (cmd: StudioViewCommand) => () =>
-    sendViewCommand(
-      rootRef.current?.querySelector("[data-stage-view]") ?? null,
-      cmd,
-    );
+  const send = useCallback(
+    (cmd: StudioViewCommand) =>
+      sendViewCommand(
+        rootRef.current?.querySelector("[data-stage-view]") ?? null,
+        cmd,
+      ),
+    [],
+  );
+  const orbitLabels = useMemo(
+    () => ({
+      rotateLeft: shell("rotateLeft"),
+      rotateRight: shell("rotateRight"),
+      front: shell("front"),
+      reset: shell("reset"),
+      zoomIn: shell("zoomIn"),
+      zoomOut: shell("zoomOut"),
+    }),
+    [shell],
+  );
 
   const filamentName = (id: string) => core(`filaments.${id}`);
   const bandNow =
@@ -243,72 +351,19 @@ export function ScenePanel({
       })
     : core("duration.real", { duration: real });
 
-  const buttonClass =
-    "grid place-items-center rounded-field border border-ink bg-paper/85 text-ink transition-colors duration-150 ease-strate hover:bg-ink hover:text-paper";
   // Réduit en bandeau (mobile) : seul l'objet reste sur la vue.
   const hideWhenCompact = compact ? "max-lg:hidden" : undefined;
 
   // Les boutons de l'orbite : en surimpression sur bureau, dans la rangée
   // sous l'aperçu sur mobile (rien devant un objet de 240 px de haut).
-  const orbitButtons = (size: string) => {
-    const cls = cx(buttonClass, size);
-    return (
-      <>
-        {effective !== "plan" ? (
-          <>
-            <button
-              type="button"
-              onClick={command({ type: "turn", step: -1 })}
-              aria-label={shell("rotateLeft")}
-              className={cls}
-            >
-              <ChevronLeft size={18} aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              onClick={command({ type: "turn", step: 1 })}
-              aria-label={shell("rotateRight")}
-              className={cls}
-            >
-              <ChevronRight size={18} aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              onClick={command({ type: "front" })}
-              aria-label={shell("front")}
-              className={cls}
-            >
-              <Home size={18} aria-hidden="true" />
-            </button>
-            <button
-              type="button"
-              onClick={command({ type: "reset" })}
-              aria-label={shell("reset")}
-              className={cls}
-            >
-              <RotateCcw size={18} aria-hidden="true" />
-            </button>
-          </>
-        ) : null}
-        <button
-          type="button"
-          onClick={command({ type: "zoom", step: 1 })}
-          aria-label={shell("zoomIn")}
-          className={cls}
-        >
-          <ZoomIn size={18} aria-hidden="true" />
-        </button>
-        <button
-          type="button"
-          onClick={command({ type: "zoom", step: -1 })}
-          aria-label={shell("zoomOut")}
-          className={cls}
-        >
-          <ZoomOut size={18} aria-hidden="true" />
-        </button>
-      </>
-    );
-  };
+  const orbitButtons = (size: string) => (
+    <OrbitButtons
+      size={size}
+      plan={effective === "plan"}
+      send={send}
+      labels={orbitLabels}
+    />
+  );
 
   return (
     <div
@@ -523,7 +578,7 @@ export function ScenePanel({
           title={compact ? t("scene.expand") : t("scene.collapse")}
           onClick={() => onCompactChange?.(!compact)}
           className={cx(
-            buttonClass,
+            BUTTON,
             "ml-auto size-8 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink",
           )}
         >
@@ -536,4 +591,4 @@ export function ScenePanel({
       </div>
     </div>
   );
-}
+});
