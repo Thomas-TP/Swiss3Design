@@ -282,7 +282,24 @@ live in `src/motion/**` and are reached only through `src/gates/**`
   otherwise jump natively with `behavior: "auto"` in reduced motion. A nested
   scroll container gets `data-lenis-prevent`; drawers and dialogs use
   [`<Drawer>`](../src/components/ui/drawer.tsx) (native `<dialog>` +
-  `showModal()`, top layer), which stops Lenis while open.
+  `showModal()`, top layer), which stops Lenis while open. A navigation to a
+  new path lands at `scrollY = 0` (Next scrolls up, `MotionRuntime.onRoute()`
+  makes ScrollTrigger forget the pre-navigation position it would otherwise
+  restore at every `refresh()`); the back button keeps native restoration.
+- **No stepped animation.** Nothing on the site advances in `steps()` (owner
+  decision of 07.10.2026, R06/R07): use `var(--ease-strate)` / `s3d.strate`.
+  The layers idea may live in a **static** detail, never in a timing. The
+  `s3d.pas` GSAP ease survives only as an alias of `s3d.strate`.
+- **Stage canvas and native scroll.** With Lenis (wheel, trackpad) the DOM and
+  the canvas share one frame (measured ≤ 0.6 px apart). Native scroll
+  (touch, keyboard, scrollbar) is moved by the compositor ahead of the main
+  thread, so a `fixed` canvas lags 1–2 frames behind its container. At C1
+  `StageRoot` therefore anchors the canvas to the document (absolute wrapper
+  clipped to the page height, canvas two windows tall, recentred each frame by
+  the loop: `CanvasAnchor` in `stage/ticker.ts`); `ViewTracker.rect()` returns
+  canvas-relative rectangles, so scenes and `stage.ts` don't know. A `liveRect`
+  view (sticky or pinned) turns it back into a fixed canvas. Don't read a
+  view's rect from outside the tracker.
 - **Stacking** (z-index): Stage canvas −1 (portaled into `<body>`), content
   `auto`, favorite on a card 10, menus 20, chapter rail 30, header 40, consent
   banner 40, mobile Studio bar 45, BottomNav and skip links 50, toasts 55,
