@@ -33,8 +33,6 @@ export const homeSelector = (name: string) => `[data-home="${name}"]`;
 export const HERO_EVENTS = {
   /** Chorégraphie → DOM. detail : HeroLayerDetail (≤ 10 Hz). */
   layer: "s3d:hero-layer",
-  /** Chorégraphie → DOM. detail : HeroChangeDetail (changement de filament franchi). */
-  change: "s3d:hero-change",
   /** DOM → chorégraphie. detail : HeroScrubDetail (réglette Z du héros mobile). */
   scrub: "s3d:hero-scrub",
 } as const;
@@ -47,13 +45,6 @@ export interface HeroLayerDetail {
   z: number;
   /** Indice de bande (0 à 2 : le matériau a toujours trois bandes). */
   band: number;
-}
-
-export interface HeroChangeDetail {
-  band: number;
-  layer: number;
-  /** Identifiant du filament qui prend la suite (FilamentId). */
-  filament: string;
 }
 
 export interface HeroScrubDetail {
