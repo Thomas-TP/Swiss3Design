@@ -12,17 +12,23 @@
 // du StrictMode (développement) doit pouvoir recréer le Stage sur un canvas
 // neuf. Ne rend rien dans l'arbre React.
 //
-// Deux montages selon le palier :
-//   - C2 (bureau) : canvas `fixed` de la taille de la fenêtre. Le défilement y
-//     est celui de Lenis, mené par le fil principal dans la même frame que le
-//     dessin : DOM et canvas ne se séparent jamais (mesuré : 0,4 px au plus).
-//   - C1 (mobile, petit écran, machine modeste) : canvas ANCRÉ AU DOCUMENT.
-//     Le défilement tactile reste natif, donc mené par le compositeur, qui
-//     avance le DOM sans attendre le fil principal : un canvas fixe montrerait
-//     l'objet une ou deux frames en retard sur son conteneur (retour R16 :
-//     « les objets 3D sautent au défilement »). Ancré, le canvas défile avec
-//     le DOM, côté compositeur, et reste collé à son conteneur ; la boucle le
-//     recale à chaque frame sur la position du fil principal (ticker.ts).
+// Un seul montage, aux deux paliers (C1 et C2) : le canvas est ANCRÉ AU
+// DOCUMENT (retour R16 : « les objets 3D sautent au défilement » ; décision du
+// propriétaire du 08.10.2026 : en C2 aussi, avec un rapport de pixels plafonné à
+// 1,5, pixel-ratio.ts). Un canvas `fixed` ne bouge pas avec la page : dès que
+// le défilement est natif, donc mené par le compositeur, qui avance le DOM sans
+// attendre le fil principal (tactile, clavier : flèches, Espace, Pages, Début et
+// Fin ; barre de défilement), il montre l'objet une ou deux frames en retard sur
+// son conteneur (mesuré en C2 au clavier : jusqu'à 10 px d'écart). Ancré, le
+// canvas défile avec le DOM, côté compositeur, et reste collé à son conteneur ;
+// la boucle le recale à chaque frame sur la position du fil principal
+// (ticker.ts). Le défilement de Lenis (molette, trackpad) est mené par le fil
+// principal dans la même frame que le dessin : lui aussi reste collé, c'est le
+// même recalage, sans rien à gérer. Le clavier reste natif (accessibilité) :
+// Lenis n'en intercepte aucune touche.
+//
+// Déclassement C2 → C1 en cours de session : le montage ne change pas (seul le
+// Stage s'ajuste), il n'y a plus de cas où le canvas resterait fixe.
 import { useEffect } from "react";
 import { motionBridge } from "@/lib/motion-bridge/store";
 import { lowerDetectedCapability } from "@/lib/motion-bridge/tier";
@@ -33,17 +39,10 @@ function createCanvas(): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.className = "s3d-stage";
   canvas.setAttribute("aria-hidden", "true");
-  // Mêmes règles que .s3d-stage (globals.css), posées aussi ici pour que le
-  // calque reste juste quel que soit l'ordre de chargement des styles. 100lvh
-  // (grande fenêtre mobile) : la barre d'adresse qui bouge ne redimensionne
-  // pas le canvas ; repli 100vh là où lvh n'existe pas.
+  // La géométrie (absolue, de deux fenêtres de haut, ou fixe en mode « live »)
+  // est posée par mountAnchored : elle l'emporte sur la règle .s3d-stage de
+  // globals.css, quel que soit l'ordre de chargement des styles.
   const style = canvas.style;
-  style.position = "fixed";
-  style.inset = "0";
-  style.width = "100vw";
-  style.height = "100vh";
-  style.height = "100lvh";
-  style.zIndex = "-1";
   style.pointerEvents = "none";
   style.display = "block";
   return canvas;
@@ -68,12 +67,14 @@ interface Anchored {
  * l'avance du compositeur sur le fil principal (au pire quelques dizaines de
  * pixels par frame, même en lancer rapide).
  *
- * Quand une vue est « live » (collante ou épinglée : le Studio sur grand
- * écran), le calque devient fixe, de la taille de la fenêtre, et le canvas
- * n'est plus décalé : un élément collant reste en place dans la fenêtre
- * pendant que le compositeur fait défiler le document, c'est un canvas fixe
- * qu'il lui faut. Le canvas garde sa taille dans les deux modes, donc le
- * changement ne redimensionne pas le rendu.
+ * Quand une vue « live » est proche de la fenêtre (collante ou épinglée : le
+ * Studio sur grand écran, le héros épinglé de l'accueil en C2), le calque
+ * devient fixe, de la taille de la fenêtre, et le canvas n'est plus décalé :
+ * un élément collant ou épinglé reste en place dans la fenêtre pendant que le
+ * compositeur fait défiler le document, c'est un canvas fixe qu'il lui faut. Le
+ * canvas garde sa taille dans les deux modes, donc le changement ne
+ * redimensionne pas le rendu. Dès que cette vue s'éloigne (le héros, passé),
+ * le calque redevient ancré au document : view-tracker.ts, syncAnchor().
  */
 function mountAnchored(canvas: HTMLCanvasElement): Anchored {
   const wrapper = document.createElement("div");
@@ -181,11 +182,8 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
 export function StageRoot() {
   useEffect(() => {
     const canvas = createCanvas();
-    // Palier lu au montage : un déclassement C2 → C1 en cours de session garde
-    // le canvas fixe (le Stage redimensionne son rendu, pas son montage).
-    const anchored =
-      motionBridge.get().capability === 1 ? mountAnchored(canvas) : null;
-    if (!anchored) document.body.appendChild(canvas);
+    // La SiteShell ne monte StageRoot qu'à partir de C1 : toujours ancré.
+    const anchored = mountAnchored(canvas);
     let stage: Stage | null = null;
     try {
       stage = new Stage(canvas);
@@ -196,7 +194,7 @@ export function StageRoot() {
     }
     return () => {
       stage?.dispose();
-      anchored?.dispose();
+      anchored.dispose();
       canvas.remove();
     };
   }, []);

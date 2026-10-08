@@ -7,7 +7,7 @@
 //     en mouvement réduit, il vit sans le chunk du runtime.
 //   - la mise en page : le runtime signale chaque ScrollTrigger.refresh() pour
 //     que le Stage recalcule le cache des rectangles de ses vues.
-//   - le canvas ancré au document (C1, R16) : stage-root.tsx l'installe, la
+//   - le canvas ancré au document (C1 et C2, R16) : stage-root.tsx l'installe, la
 //     boucle (loop.ts) le cale avant chaque frame, le tracker (view-tracker.ts)
 //     en tient compte dans les rectangles qu'il rend. Le Stage lui-même
 //     (stage.ts) n'en sait rien : il croit dessiner dans une fenêtre.
@@ -23,7 +23,7 @@ export interface FrameDriver {
 }
 
 /**
- * Canvas ancré au document plutôt que fixe dans la fenêtre (palier C1,
+ * Canvas ancré au document plutôt que fixe dans la fenêtre (paliers C1 et C2,
  * retour R16). Un canvas `fixed` ne bouge pas avec la page : quand le
  * défilement est natif (tactile, clavier, barre de défilement), le
  * compositeur déplace le DOM sans attendre le fil principal, et le canvas
@@ -35,9 +35,10 @@ export interface FrameDriver {
  */
 export interface CanvasAnchor {
   /**
-   * Une vue au moins est « live » (collante, épinglée : elle bouge dans la
-   * fenêtre sans que le document la porte). Le canvas redevient alors fixe :
-   * ancré, il défilerait à contresens d'un élément collant.
+   * Une vue « live » est proche de la fenêtre (collante, épinglée : elle bouge
+   * dans la fenêtre sans que le document la porte). Le canvas redevient alors
+   * fixe : ancré, il défilerait à contresens d'un élément collant. Faux dès
+   * qu'aucune vue « live » n'est plus proche : retour à l'ancrage.
    */
   setLive(live: boolean): void;
   /** Cale le canvas sur le document pour la frame qui va être dessinée. */

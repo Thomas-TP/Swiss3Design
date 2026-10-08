@@ -46,6 +46,12 @@ export interface ViewFrame {
   time: number;
   /** Secondes depuis la frame précédente de cette vue (0 à la première). */
   dt: number;
+  /**
+   * Position, dans le document, du haut du canvas (px CSS) : le défilement de
+   * la fenêtre quand le canvas est fixe, ce défilement moins le décalage du
+   * canvas quand il est ancré au document. `rect` étant relatif au canvas,
+   * `rect.top + scrollY` est toujours la position de la vue dans la page.
+   */
   scrollY: number;
   /** px/frame lissée (runtime) ; 0 sans runtime. */
   velocity: number;

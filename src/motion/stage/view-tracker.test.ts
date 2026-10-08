@@ -31,6 +31,21 @@ class FakeObserver {
   disconnect() {}
 }
 
+// IntersectionObserver pilotable : le test décide quand une vue devient proche.
+type IntersectionCallback = (
+  entries: { target: unknown; isIntersecting: boolean }[],
+) => void;
+class FakeIntersectionObserver extends FakeObserver {
+  static callback: IntersectionCallback | null = null;
+  constructor(callback: IntersectionCallback) {
+    super();
+    FakeIntersectionObserver.callback = callback;
+  }
+}
+function setNear(element: unknown, isIntersecting: boolean) {
+  FakeIntersectionObserver.callback?.([{ target: element, isIntersecting }]);
+}
+
 function fakeElement(rect: {
   left: number;
   top: number;
@@ -88,7 +103,7 @@ describe("ViewTracker · rectangles et canvas ancré", () => {
     });
     vi.stubGlobal("document", { documentElement: {}, fonts: undefined });
     vi.stubGlobal("ResizeObserver", FakeObserver);
-    vi.stubGlobal("IntersectionObserver", FakeObserver);
+    vi.stubGlobal("IntersectionObserver", FakeIntersectionObserver);
     vi.stubGlobal("DOMRectReadOnly", FakeRect);
     vi.stubGlobal("queueMicrotask", (cb: () => void) => cb());
   });
@@ -138,17 +153,41 @@ describe("ViewTracker · rectangles et canvas ancré", () => {
     expect(tracker.rect("inconnue", 0, 0)).toBeNull();
   });
 
-  it("signale au canvas qu'une vue live existe, puis qu'il n'y en a plus", () => {
+  it("une vue live lointaine ne fixe pas le canvas : il reste ancré (C2, héros passé)", () => {
     const fake = anchor(0);
     setCanvasAnchor(fake);
     const tracker = new ViewTracker(() => {});
     const a = fakeElement({ left: 0, top: 0, w: 10, h: 10 });
-    const b = fakeElement({ left: 0, top: 0, w: 10, h: 10 });
+    const hero = fakeElement({ left: 0, top: 0, w: 10, h: 10 });
     tracker.add("a", a, false);
-    tracker.add("b", b, true);
-    tracker.remove("b");
-    tracker.remove("a");
-    expect(fake.live).toEqual([false, true, false, false]);
+    tracker.add("hero", hero, true);
+    // Aucune vue n'est encore signalée proche : toujours ancré.
+    expect(fake.live.at(-1)).toBe(false);
+    // Le héros épinglé est dans la fenêtre : canvas fixe.
+    setNear(hero, true);
+    expect(fake.live.at(-1)).toBe(true);
+    // Une vue ordinaire proche ne change rien tant que le héros est là.
+    setNear(a, true);
+    expect(fake.live.at(-1)).toBe(true);
+    // Le héros est passé : le calque redevient ancré, même si une autre vue
+    // reste proche, pour tout le reste de la page.
+    setNear(hero, false);
+    expect(fake.live.at(-1)).toBe(false);
+    // Et il se fixe de nouveau quand on remonte vers lui.
+    setNear(hero, true);
+    expect(fake.live.at(-1)).toBe(true);
+  });
+
+  it("une vue live retirée rend le canvas au document", () => {
+    const fake = anchor(0);
+    setCanvasAnchor(fake);
+    const tracker = new ViewTracker(() => {});
+    const sticky = fakeElement({ left: 0, top: 0, w: 10, h: 10 });
+    tracker.add("sticky", sticky, true);
+    setNear(sticky, true);
+    expect(fake.live.at(-1)).toBe(true);
+    tracker.remove("sticky");
+    expect(fake.live.at(-1)).toBe(false);
     expect(getCanvasAnchor()).toBe(fake);
   });
 });

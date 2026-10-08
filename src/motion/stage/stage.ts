@@ -1,8 +1,9 @@
 // Le Stage (brief « Strates », §4.4) : UN renderer WebGL persistant pour
 // toutes les vues 3D des pages vitrine, derrière le contenu. Chaque vue
 // (<StageView>, useStageView) est un rectangle du DOM où sa scène se dessine
-// par viewport + scissor sur l'unique canvas fixe ; le DOM reste au-dessus,
-// les titres peuvent chevaucher un objet.
+// par viewport + scissor sur l'unique canvas (ancré au document, ou fixe pour
+// une vue collante ou épinglée : stage-root.tsx) ; le DOM reste au-dessus, les
+// titres peuvent chevaucher un objet.
 //
 // Rendu à la demande : une frame n'est dessinée que si une vue a bougé
 // (défilement, mise en page), si ses props ou le thème ont changé, ou si sa
@@ -10,9 +11,12 @@
 // conservé (preserveDrawingBuffer: false), chaque frame dessinée redessine
 // toutes les vues visibles. Pause quand l'onglet est masqué (loop.ts).
 //
-// Paliers (§3.6) : DPR ≤ 2 en C2, ≤ 1,5 en C1 ; médiane des 60 premières
+// Paliers (§3.6) : DPR ≤ 1,5 aux deux paliers (le canvas ancré au document
+// fait deux fenêtres de haut, pixel-ratio.ts) ; médiane des 60 premières
 // frames animées > 22 ms ⇒ déclassement (C2 → C1, C1 → C0 : la SiteShell
-// démonte alors le Stage et les posters reviennent). En C1, une vue
+// démonte alors le Stage et les posters reviennent ; C2 → C1 ne change plus le
+// rapport de pixels : l'antialiasing, fixé à la création du contexte, reste, et
+// seuls disparaissent les vues réservées à C2, comme le champ de courbes). En C1, une vue
 // `bakeWhenIdle` au repos depuis 800 ms est figée en image dans son élément
 // (le défilement natif mobile déplace alors une vraie image, sans décalage
 // d'une frame) ; le moindre changement de props ou pointerdown la réveille.
@@ -41,7 +45,9 @@ import { Baker } from "./bake";
 import { publishController, withdrawController } from "./controllers";
 import { clearGeometryCache } from "./geometry";
 import { createLoop, type StageLoop } from "./loop";
+import { stagePixelRatio } from "./pixel-ratio";
 import { loadScene } from "./scenes";
+import { getCanvasAnchor } from "./ticker";
 import {
   onThemeChange,
   readStageTheme,
@@ -75,8 +81,9 @@ interface ViewState {
   unbake: boolean;
 }
 
-const pixelRatioFor = (capability: Capability) =>
-  Math.min(window.devicePixelRatio || 1, capability === 2 ? 2 : 1.5);
+// Même plafond aux deux paliers : le canvas ancré fait deux fenêtres de haut
+// (pixel-ratio.ts).
+const currentPixelRatio = () => stagePixelRatio(window.devicePixelRatio);
 
 function intersects(rect: DOMRectReadOnly, width: number, height: number) {
   return (
@@ -118,7 +125,7 @@ export class Stage {
       stencil: false,
     });
     const renderer = this.renderer;
-    renderer.setPixelRatio(pixelRatioFor(capability));
+    renderer.setPixelRatio(currentPixelRatio());
     renderer.autoClear = false;
     renderer.setScissorTest(true);
     renderer.outputColorSpace = SRGBColorSpace;
@@ -328,7 +335,7 @@ export class Stage {
     const width = Math.max(1, this.canvas.clientWidth);
     const height = Math.max(1, this.canvas.clientHeight);
     // Zoom du navigateur ou fenêtre passée sur un autre écran : nouveau DPR.
-    const ratio = pixelRatioFor(this.ctx.capability);
+    const ratio = currentPixelRatio();
     const ratioChanged = ratio !== this.renderer.getPixelRatio();
     if (width === this.width && height === this.height && !ratioChanged) return;
     if (ratioChanged) this.renderer.setPixelRatio(ratio);
@@ -357,8 +364,10 @@ export class Stage {
       if (!rect || !intersects(rect, this.width, this.height)) continue;
       visible.push([state, rect]);
       wanted ||= state.wantsFrame || state.unbake || !state.ready;
-      // Vue pinnée ou transformée : elle bouge sans que la page défile.
-      wanted ||= state.descriptor.liveRect === true;
+      // Vue pinnée ou transformée : elle bouge sans que la page défile. Pas
+      // quand elle est loin de la fenêtre (canvas ancré : elle peut se trouver
+      // dans la marge, hors de vue, et ne doit pas faire redessiner au repos).
+      wanted ||= state.descriptor.liveRect === true && this.tracker.isNear(id);
     }
     const needed =
       this.dirty ||
@@ -378,6 +387,12 @@ export class Stage {
     const dpr = renderer.getPixelRatio();
     const time = (now - this.startedAt) / 1000;
     const velocity = motionBridge.get().velocity;
+    // Position, dans le document, du haut du canvas : le défilement quand le
+    // canvas est fixe, ce défilement moins le décalage du canvas quand il est
+    // ancré. Une scène qui dessine « en coordonnées page » (le champ de
+    // courbes) lit cette valeur : sans le décalage, son motif sauterait d'une
+    // demi-fenêtre au passage d'un mode à l'autre (vue épinglée qui s'éloigne).
+    const canvasTop = scrollY - (getCanvasAnchor()?.offsetY() ?? 0);
 
     renderer.setRenderTarget(null);
     renderer.setViewport(0, 0, this.width, this.height);
@@ -408,7 +423,7 @@ export class Stage {
         dpr,
         time,
         dt: state.lastRenderAt < 0 ? 0 : (now - state.lastRenderAt) / 1000,
-        scrollY,
+        scrollY: canvasTop,
         velocity,
       };
       let wants = false;
@@ -596,8 +611,11 @@ export class Stage {
       this.release();
       return;
     }
-    this.renderer.setPixelRatio(pixelRatioFor(capability));
-    this.renderer.setSize(this.width, this.height, false);
+    // Même plafond aux deux paliers : C2 → C1 ne touche pas au tampon de dessin
+    // (setPixelRatio le réalloue, même à taille égale).
+    const ratio = currentPixelRatio();
+    if (ratio !== this.renderer.getPixelRatio())
+      this.renderer.setPixelRatio(ratio);
     for (const state of this.views.values()) this.scheduleIdle(state);
     this.invalidate();
   }

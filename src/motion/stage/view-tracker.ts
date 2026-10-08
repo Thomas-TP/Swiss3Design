@@ -39,6 +39,9 @@ export class ViewTracker {
           const view = id ? this.views.get(id) : undefined;
           if (view) view.near = entry.isIntersecting;
         }
+        // Une vue « live » qui s'éloigne (le héros épinglé, passé) rend le
+        // canvas au document ; qui s'approche, le fixe de nouveau.
+        this.syncAnchor();
         this.onChange();
       },
       { rootMargin: "25% 0px" },
@@ -87,10 +90,16 @@ export class ViewTracker {
     this.syncAnchor();
   }
 
-  /** Une vue « live » (collante, épinglée) veut un canvas fixe, pas ancré. */
+  /**
+   * Une vue « live » (collante, épinglée) PROCHE de la fenêtre veut un canvas
+   * fixe, pas ancré. Proche seulement : en C2 le héros de l'accueil reste
+   * « live » (épinglé) tant que la page vit, mais une fois passé il ne doit pas
+   * retenir le canvas en mode fixe pour tout le reste de la page, où le
+   * défilement du clavier et de la barre ne demande qu'un canvas ancré.
+   */
   private syncAnchor() {
     let live = false;
-    for (const view of this.views.values()) live ||= view.liveRect;
+    for (const view of this.views.values()) live ||= view.liveRect && view.near;
     getCanvasAnchor()?.setLive(live);
   }
 
@@ -124,8 +133,9 @@ export class ViewTracker {
 
   /**
    * Rectangle dans le canvas (px CSS), ou null si la vue est vide ou inconnue.
-   * Canvas fixe : c'est la fenêtre. Canvas ancré au document (C1, ticker.ts) :
-   * la fenêtre décalée de `offsetY()`, le décalage que loop.ts vient de poser.
+   * Canvas fixe (vue « live » proche) : c'est la fenêtre. Canvas ancré au
+   * document (C1 et C2, ticker.ts) : la fenêtre décalée de `offsetY()`, le
+   * décalage que loop.ts vient de poser.
    */
   rect(id: string, scrollX: number, scrollY: number): DOMRectReadOnly | null {
     const view = this.views.get(id);
