@@ -32,10 +32,10 @@ export function pas(n = 12, k = 0.85) {
   return (p: number) => p + (Math.round(p * n) / n - p) * k;
 }
 // Le propriétaire n'accepte aucune animation par paliers (retours R06/R07,
-// 07.10.2026) : l'ancien nom « s3d.pas » reste enregistré, car les
-// chorégraphies qui l'appellent encore ne doivent pas planter, mais il
-// désigne désormais la courbe continue s3d.strate. Les appelants passeront à
-// « s3d.strate » à leur prochaine retouche.
+// 07.10.2026) : l'ancien nom « s3d.pas » reste enregistré, car une
+// chorégraphie qui l'appellerait encore ne doit pas planter, mais il désigne
+// la courbe continue s3d.strate. Plus aucun appelant depuis la vérification
+// R1 (08.10.2026) : « s3d.strate » partout.
 gsap.registerEase("s3d.pas", gsap.parseEase("s3d.strate"));
 
 gsap.defaults({ ease: "s3d.strate", duration: 0.8 });

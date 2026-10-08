@@ -73,7 +73,7 @@ export const dynamic = "force-dynamic";
 
 // Confirmation de commande (brief « Strates » §7.15). Hors groupe (site) : ni
 // Lenis ni canvas. Seul mouvement : la carte « s'imprime » une fois en CSS
-// (`.s3d-print`, 8 paliers, coupé en mouvement réduit). La logique — lecture
+// (`.s3d-print`, courbe continue, coupé en mouvement réduit). La logique — lecture
 // de la session Stripe, `settleSession` idempotent, panier vidé, « Order
 // Completed » émis une fois — est celle d'avant la refonte.
 export default async function CheckoutSuccessPage({

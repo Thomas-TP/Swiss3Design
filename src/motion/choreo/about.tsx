@@ -118,7 +118,7 @@ export function SchematicDraw({
           timeline.fromTo(
             el,
             { drawSVG: "0%" },
-            { drawSVG: "100%", duration: DRAW_DURATION, ease: "s3d.pas" },
+            { drawSVG: "100%", duration: DRAW_DURATION, ease: "s3d.strate" },
             at,
           );
         timeline.fromTo(
