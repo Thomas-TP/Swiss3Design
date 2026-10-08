@@ -146,8 +146,11 @@ put` on an environment with real users without `--env <name>` explicitly
    **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
-10. **Keep the Worker bundle lean: 3 326 KiB gzip (2026-10-01 measurement,
-    redesign with the Studio, see
+10. **Keep the Worker bundle lean: 3 333 KiB gzip (2026-10-08 measurement
+    after the R1 fixes, 41-character checkout; 3 326 KiB on 2026-10-01 with
+    the Studio, see
+    [`docs/redesign-2026/measures-r1.md`](docs/redesign-2026/measures-r1.md)
+    and
     [`docs/redesign-2026/measures-wave2b.md`](docs/redesign-2026/measures-wave2b.md)).
     The Studio's full server rendering (no-JS form, stats, posters) pushed it
     past the 3 185 KiB cap of 2026-09-30; the owner accepted the overrun on
