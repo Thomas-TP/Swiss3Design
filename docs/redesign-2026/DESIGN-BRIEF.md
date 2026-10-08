@@ -1028,7 +1028,8 @@ dans la chorégraphie qui les utilise (`src/motion/choreo/about.tsx`), jamais ai
 - **C1** si : `(pointer: coarse)`, ou largeur < 1024 px, ou `hardwareConcurrency ≤ 4`.
 - **C2** sinon.
 - **Déclassement automatique** : médiane des 60 premières frames rendues > 22 ms → C2 devient C1
-  (DPR 1,5, LOD mobile, champ WebGL coupé) ou C1 devient C0 (Stage libéré, posters).
+  (LOD mobile, champ WebGL coupé ; le DPR est plafonné à 1,5 aux deux paliers depuis le
+  08.10.2026, donc inchangé) ou C1 devient C0 (Stage libéré, posters).
 - La détection vit dans `src/lib/motion-bridge/tier.ts` (léger, sans import lourd), après
   l'hydratation. Côté serveur, tout le monde reçoit les posters (état C0).
 
@@ -1203,28 +1204,40 @@ contenu par la version ci-dessous (thème inchangé + mouvement) :
   donc rendue une fois dans un render target, copiée en image (`blob:` URL, autorisé par
   `img-src`) dans l'élément (`<img class="s3d-baked">`) puis mise en sommeil : le scroll déplace
   une vraie image, sans décalage. Le moindre changement de props ou `pointerdown` la réveille.
-  Les vues collantes (Studio) n'en ont pas besoin. Sur desktop, Lenis et le Stage partagent la
-  même frame : pas de décalage.
-- **Canvas ancré au document (C1, 07.10.2026, retour R16 « les objets 3D sautent au
-  défilement »).** Mesuré (compositeur d'Edge avec GPU, marqueurs peints dans le canvas, écart
-  DOM ↔ canvas par image) : en C2 le défilement est celui de Lenis, mené par le fil principal
-  dans la même frame que le dessin, donc l'écart est de 0,4 à 0,6 px ; mais dès que le
-  compositeur défile seul (tactile, clavier, barre de défilement) un canvas `fixed` montre
-  l'objet une ou deux frames en retard : jusqu'à 16 px au clavier, y compris pour une vue
-  qui se redessine (non figée). Au palier C1 (défilement tactile natif), `StageRoot` monte donc
-  le canvas dans un calque absolu de la hauteur de la page, rogné (`overflow: clip`, pour ne
-  jamais allonger la page), derrière le contenu : un canvas de **deux fenêtres de haut** (une
-  demi-fenêtre de marge de chaque côté) que la boucle recale à chaque frame
-  (`CanvasAnchor.follow`, `stage/ticker.ts`, `translate3d` arrondi au pixel physique), dans la
-  même tâche que le dessin. Entre deux frames du fil principal le canvas défile avec le DOM, côté
-  compositeur : il reste collé à son conteneur (mesuré à 0,3 px au tactile et à la molette,
-  0,8 px au clavier, contre 16,4 px avec le canvas fixe). `ViewTracker.rect()` rend des
-  rectangles **relatifs au canvas** (fenêtre décalée de `offsetY()`), le Stage n'en sait rien. Si
-  une vue est « live » (`liveRect` : Studio collant, héros épinglé), le calque redevient fixe, de
-  la fenêtre : un élément collant reste en place pendant que le compositeur défile le document.
-  C2 garde le canvas fixe (antialiasing multiéchantillonné : un canvas de deux fenêtres y
-  coûterait, par estimation, ~170 Mo de GPU contre ~105 Mo à 1440 × 900 en DPR 2, sans mesure) ;
-  le clavier et la barre de défilement y gardent donc l'écart natif, limite connue.
+  Les vues collantes (Studio) n'en ont pas besoin. Sur desktop, c'est le canvas ancré (point
+  suivant) qui règle le décalage, au clavier et à la barre de défilement comme à la molette.
+- **Canvas ancré au document (C1 le 07.10.2026, C2 le 08.10.2026, retour R16 « les objets 3D
+  sautent au défilement »).** Mesuré (compositeur d'Edge avec GPU, marqueurs peints dans le canvas,
+  écart DOM ↔ canvas par image) : le défilement de Lenis (molette, trackpad) est mené par le fil
+  principal dans la même frame que le dessin, donc l'écart est de 0,4 à 0,6 px ; mais dès que le
+  compositeur défile seul (tactile, clavier : flèches, Espace, Pages, Début et Fin ; barre de
+  défilement) un canvas `fixed` montre l'objet une ou deux frames en retard : jusqu'à 16 px au
+  clavier en C1, 10,4 px en C2 (109 images sur 127 au-dessus de 1 px), y compris pour une vue qui se
+  redessine (non figée). `StageRoot` monte donc, **aux deux paliers**, le canvas dans un calque
+  absolu de la hauteur de la page, rogné (`overflow: clip`, pour ne jamais allonger la page),
+  derrière le contenu : un canvas de **deux fenêtres de haut** (une demi-fenêtre de marge de chaque
+  côté) que la boucle recale à chaque frame (`CanvasAnchor.follow`, `stage/ticker.ts`,
+  `translate3d` arrondi au pixel physique), dans la même tâche que le dessin. Entre deux frames du
+  fil principal le canvas défile avec le DOM, côté compositeur : il reste collé à son conteneur,
+  quel que soit le geste (molette Lenis, tactile, clavier, barre de défilement). Le clavier reste
+  natif (accessibilité) : Lenis n'en intercepte aucune touche. `ViewTracker.rect()` rend des
+  rectangles **relatifs au canvas** (fenêtre décalée de `offsetY()`), le Stage n'en sait rien ;
+  `ViewFrame.scrollY` donne aux scènes la position du haut du canvas dans le document (le champ de
+  courbes dessine en coordonnées page).
+  Une vue « live » (`liveRect` : Studio collant, héros épinglé en C2) **proche de la fenêtre**
+  (IntersectionObserver, marge 25 %) redonne un calque fixe, de la fenêtre : un élément collant ou
+  épinglé reste en place pendant que le compositeur défile le document. Dès qu'elle s'éloigne (le
+  héros de l'accueil, passé), le calque redevient ancré (`ViewTracker.syncAnchor`) : le héros
+  reste « live » tant que la page vit, il aurait sinon gardé le canvas fixe pour tout le reste de
+  l'accueil et le clavier y aurait gardé l'écart natif. Un déclassement C2 → C1 en cours de session
+  ne change pas le montage.
+  **Décision du propriétaire du 08.10.2026 : ancrer aussi en C2, avec un rapport de pixels plafonné
+  à 1,5** (`stage/pixel-ratio.ts`, 1,5 aux deux paliers ; avant, 2 en C2). Un canvas de deux
+  fenêtres à 1,5 porte à peu près la même surface que l'ancien canvas fixe d'une fenêtre à 2
+  (1440 × 900 : 5,8 Mpx contre 5,2 Mpx, multiéchantillonnée en C2 : 4 échantillons). **Pas de
+  plancher** (R12 optionnel « DPR ≥ 1,5 ») : sur un écran à DPR 1 le canvas de deux fenêtres porte
+  déjà deux fois les pixels de l'ancien canvas fixe (2,6 Mpx contre 1,3 Mpx) ; un plancher à 1,5
+  les multiplierait par 4,5. Mesures, netteté comparée et limites : `measures-r16.md`.
 - **Vignettes** : service `bake(scene, props, { width, height }) → Promise<Blob>` (render target,
   `readRenderTargetPixels`, canvas 2D, `toBlob("image/webp", 0.86)`), exposé au DOM par
   `bridge.stage.bake` (« Mes créations », pièce jointe du devis).
@@ -1737,7 +1750,7 @@ retire déjà). **Stockage local ajouté** : `s3d-motion`, `s3d-creations-v1` (l
 | LCP (p75 mobile 4G)                                                                    | ≤ 2,0 s ; élément LCP = h1 ou poster SSR, visible au premier paint                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | Lighthouse mobile sur `bun run preview`, puis PostHog web vitals sur la preview                                                                |
 | INP                                                                                    | ≤ 150 ms : glissé d'un curseur, frappe dans un texte, clic « Envoyer à l'atelier », changement de palette                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | DevTools Performance, CPU ×4 + profil mobile (et un Android moyen 2023 si disponible)                                                          |
 | CLS                                                                                    | ≤ 0,05 (ratios réservés, polices avec métriques de repli)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | Lighthouse                                                                                                                                     |
-| GPU                                                                                    | 1 contexte WebGL par page ; DPR ≤ 2 (C2), ≤ 1,5 (C1) ; < 20 draw calls ; ≤ 120 k triangles (C2), ≤ 40 k (C1) visibles ; ≤ 8 ms de GPU par frame sur un iGPU 2020                                                                                                                                                                                                                                                                                                                                                                                                                                                      | Spector ou `renderer.info` en dev                                                                                                              |
+| GPU                                                                                    | 1 contexte WebGL par page ; DPR ≤ 1,5 (C1 et C2, décision du propriétaire du 08.10.2026 : canvas ancré de deux fenêtres de haut) ; < 20 draw calls ; ≤ 120 k triangles (C2), ≤ 40 k (C1) visibles ; ≤ 8 ms de GPU par frame sur un iGPU 2020                                                                                                                                                                                                                                                                                                                                                                          | Spector ou `renderer.info` en dev                                                                                                              |
 | Mémoire                                                                                | géométries du Stage ≤ 20 Mo                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           | `renderer.info.memory`                                                                                                                         |
 
 > **Note du 01.10.2026 (vérification de la vague 2a, `measures-wave2a.md`)** : **mesurer le Worker

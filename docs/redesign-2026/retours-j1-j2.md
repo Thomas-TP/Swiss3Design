@@ -151,7 +151,7 @@ dans le canvas du Stage, images du compositeur, écart DOM ↔ canvas par image)
 | R07 · transition « Coupe »                       | Fait. `::view-transition-new(.s3d-coupe)` : 480 ms, images-clés `inset(100% 0 0 0)` → `inset(0)` en `cubic-bezier(0.16, 0.84, 0.3, 1)`. Le retour arrière ne déclenche aucune View Transition ; en mouvement réduit les durées sont à 0. Abandon des paliers noté au brief §3.1, §3.2, §3.4 ; `s3d.pas` reste enregistré comme alias de `s3d.strate` (une chorégraphie de l'Atelier l'appelle encore).                                                                                                                                                                                                                                                                                               |
 | R13 · Favoris                                    | Fait. Une seule liste, filtre « Tout · Objets · Mes créations » en `ChipRadio` (puces du site), une même grille pour les deux sortes de cartes, étiquette « Création » sur la vignette, états vides par filtre. Vérifié avec des données semées (2 objets, 2 créations) dans les 4 langues, filtres et états vides compris.                                                                                                                                                                                                                                                                                                                                                                          |
 | R15 · retour en haut de page à la navigation     | Fait. Cause : Next remet bien `scrollTop` à 0, mais ScrollTrigger gardait en cache la position d'avant la navigation (4 769 px par exemple) et la RESTAURAIT à chaque `refresh()` (mesuré : `scrollTo(0, 4769)`), si bien que la page d'arrivée s'ouvrait en bas, bornée à sa hauteur (accueil → Studio « Lavaux », page de 4 321 px : arrivée à 3 521). Correctif : `MotionRuntime.onRoute()` coupe l'interpolation de Lenis et réaligne ScrollTrigger sur la position réelle avant son refresh. Vérifié en Lenis, en natif et en mouvement réduit, depuis `(site)` et depuis une page légale : arrivée à 0, retour arrière restauré à quelques pixels près (l'inertie de Lenis au moment du clic). |
-| R16 · objets 3D qui sautent au défilement        | Fait au palier C1 (tactile natif) ; limite connue au clavier et à la barre de défilement en C2. Voir ci-dessous.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| R16 · objets 3D qui sautent au défilement        | Fait aux deux paliers : C1 (tactile natif, 07.10.2026) et C2 (clavier, barre de défilement, 08.10.2026 : canvas ancré au document, DPR plafonné à 1,5). Voir ci-dessous et `measures-r16.md`.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | R18 · coût du chemin WebGL                       | Pas touché : attend la mesure sur un vrai téléphone.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
 
 **R16 en détail.** L'hypothèse du retour (« une image de retard sur Lenis ») ne se vérifie pas : à
@@ -160,14 +160,23 @@ compris, et page Studio), parce que Lenis, le tracker et le Stage partagent la m
 sépare le canvas de son conteneur, c'est le défilement **natif** (tactile, clavier, barre de
 défilement) : le compositeur avance le DOM sans attendre le fil principal, et un canvas `fixed`
 montre l'objet une ou deux frames plus tard. Mesuré au clavier, canvas fixe : jusqu'à 16 px
-d'écart, 53 images sur 56 au-dessus de 1 px. Correctif au palier C1 : le canvas est ancré au
-document (calque absolu rogné de la hauteur de la page, canvas de deux fenêtres de haut recalé à
-chaque frame, `stage/stage-root.tsx`, `ticker.ts`, `loop.ts`, `view-tracker.ts`) ; il défile avec le
-DOM côté compositeur. Mesuré : 0,8 px au clavier, 0,3 px au tactile (glissé rapide) et à la
-molette, aucune image au-dessus de 1 px. Une vue « live » (Studio collant sur grand écran) garde
-un canvas fixe. C2 ne change pas (le canvas ancré y coûterait trop de mémoire GPU avec
-l'antialiasing) : au clavier et à la barre de défilement l'écart natif y subsiste, limite à
-accepter ou à traiter par Lenis (touches) si le propriétaire le constate.
+d'écart, 53 images sur 56 au-dessus de 1 px. Correctif au palier C1 (07.10.2026) : le canvas est
+ancré au document (calque absolu rogné de la hauteur de la page, canvas de deux fenêtres de haut
+recalé à chaque frame, `stage/stage-root.tsx`, `ticker.ts`, `loop.ts`, `view-tracker.ts`) ; il
+défile avec le DOM côté compositeur. Mesuré : 0,8 px au clavier, 0,3 px au tactile (glissé rapide)
+et à la molette, aucune image au-dessus de 1 px. Une vue « live » (Studio collant sur grand écran)
+garde un canvas fixe.
+
+**R16 en C2 (08.10.2026, décision du propriétaire).** En C2 le clavier et la barre de défilement
+gardaient l'écart natif (10,4 px au clavier, 109 images sur 127 au-dessus de 1 px). Le propriétaire
+a décidé d'ancrer aussi le canvas en C2, avec un rapport de pixels plafonné à 1,5 (comme C1 ;
+`stage/pixel-ratio.ts`) : un canvas de deux fenêtres à 1,5 coûte à peu près la surface de l'ancien
+canvas fixe d'une fenêtre à 2. Le clavier reste natif (accessibilité), Lenis n'intercepte aucune
+touche, et aucun plancher de DPR n'est ajouté (R12 optionnel : il multiplierait par 4,5 le coût
+sur un écran à DPR 1). Détail : une vue « live » (héros épinglé de l'accueil en C2, Studio
+collant) ne fixe le calque que **tant qu'elle est proche de la fenêtre**, sinon le héros, « live »
+pour toute la vie de la page, l'aurait gardé fixe sur tout l'accueil. Mesures et netteté comparée :
+`measures-r16.md`.
 
 **À reprendre par d'autres paquets** (fichiers hors du socle) : `print-hero.ts` fait encore avancer
 la vague de couleur en 30 paliers (`pas(30)`, lignes 113 et 759) : c'est un minutage par paliers,

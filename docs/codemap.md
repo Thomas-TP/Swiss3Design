@@ -167,7 +167,7 @@ s'importent que sous `src/motion/**`, atteint uniquement par un gate
 | `gates/boundary.test.ts`                                                    | Test de la frontière (imports statiques, `dynamic(…, { ssr: false })`, `"use client"`)                    |
 | `motion/gsap.ts`                                                            | GSAP, ScrollTrigger, `useGSAP`, courbes de la marque ; jamais les plugins d'une chorégraphie              |
 | `motion/runtime.tsx`                                                        | Lenis sur `gsap.ticker`, `--s3d-progress`, `bridge.scroll`, retour en haut de page à la navigation        |
-| `motion/stage/stage-root.tsx` · `ticker.ts` · `loop.ts` · `view-tracker.ts` | Montage du canvas (fixe en C2, ancré au document en C1), horloge, recalage par frame, rectangles des vues |
+| `motion/stage/stage-root.tsx` · `ticker.ts` · `loop.ts` · `view-tracker.ts` | Canvas ancré au document (fixe si vue collante proche), horloge, recalages par frame, rectangles des vues |
 | `motion/stage/stage.ts`                                                     | Renderer WebGL unique : vues en scissor, rendu à la demande, bake au repos, perte de contexte, paliers    |
 | `motion/stage/scenes/index.ts`                                              | Registre des 4 scènes (`print-hero`, `contour-field`, `studio-object`, `product-viewer`) ; stubs WP-00    |
 | `motion/stage/bake.ts`                                                      | Rendu en image WebP (`bridge.stage.bake`, vignettes) et bake au repos des vues C1                         |
