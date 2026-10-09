@@ -25,13 +25,16 @@ Neon `preview`, Stripe en mode test, analytics **non mesurées** : la mesure ne 
 
 ### 1.1 Décisions encore à vous (sans réponse, le défaut du brief s'applique)
 
-| Décision                                                                                        | Défaut appliqué aujourd'hui                                                                                               | À faire                                                                                                        |
-| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| Inventaire réel des bobines (§11.2 n° 2)                                                        | Teintes **indicatives**, mention « Teintes indicatives » dans le Studio                                                   | Fournir marque, nom, hex, matière : `src/lib/studio/filaments.ts`                                              |
-| Coefficients de prix (§11.2 n° 3, `PRICING.validated`)                                          | `false` : aucun CHF affiché, seulement grammes, durée, changements                                                        | Fournir les coefficients pour activer la fourchette                                                            |
-| Mention du **stockage local du Studio** dans la politique de confidentialité (§11.2 n° 4, nLPD) | **Non faite** : la section « Cookies et stockage local » ne parle que du panier, des favoris, du paiement et de la mesure | Valider un texte (proposition ci-dessous) ; il touche `legal/privacy/content.tsx`, hors périmètre des packages |
-| Accroches de l'annexe C du brief (§11.2 n° 6)                                                   | Textes de l'annexe C                                                                                                      | Relire les 4 langues                                                                                           |
-| Nom de marque : **« Kreya »** choisi le 08.10.2026                                              | Le site s'appelle encore Swiss3Design partout                                                                             | Acheter `kreya.ch` (Infomaniak, vous), puis la bascule est un paquet à part **après J3**                       |
+| Décision                                                                                        | Défaut appliqué aujourd'hui                                                                                                  | À faire                                                                                                                                      |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| Inventaire réel des bobines (§11.2 n° 2)                                                        | Teintes **indicatives**, mention « Teintes indicatives » dans le Studio                                                      | Fournir marque, nom, hex, matière : `src/lib/studio/filaments.ts`                                                                            |
+| Coefficients de prix (§11.2 n° 3, `PRICING.validated`)                                          | `false` : aucun CHF affiché, seulement grammes, durée, changements                                                           | Fournir les coefficients pour activer la fourchette                                                                                          |
+| Mention du **stockage local du Studio** dans la politique de confidentialité (§11.2 n° 4, nLPD) | **Non faite** : la section « Cookies et stockage local » ne parle que du panier, des favoris, du paiement et de la mesure    | Valider un texte (proposition ci-dessous) ; il touche `legal/privacy/content.tsx`, hors périmètre des packages                               |
+| Accroches de l'annexe C du brief (§11.2 n° 6)                                                   | Textes de l'annexe C                                                                                                         | Relire les 4 langues                                                                                                                         |
+| Nom de marque : **« Kreya »** choisi le 08.10.2026                                              | Le site s'appelle encore Swiss3Design partout                                                                                | Acheter `kreya.ch` (Infomaniak, vous), puis la bascule est un paquet à part **après J3**                                                     |
+| Netteté du canvas 3D sur très grand écran (WP-99, `measures-wp99-canvas.md`)                    | Budget de pixels du tampon : **8 Mpx** en C2. Un 4K à 150 % et un 27 pouces Retina sont rendus à 1,17 et 1,23 au lieu de 1,5 | Regarder l'accueil sur un tel écran ; si la netteté compte plus que le gain, `STAGE_PIXEL_BUDGET[2]` à `14_000_000` (`stage/pixel-ratio.ts`) |
+| Registre de l'italien (`messages/it.json`, ≈ 150 chaînes historiques)                           | Mélange de tu (« La tua valutazione ») et de voi (« Scegliete ») ; les nouveaux textes sont au Lei, comme le brief §1.6      | Décider s'il faut unifier au Lei (changement de copie en production, pas fait par WP-99)                                                     |
+| Licence de la police Geist (OFL)                                                                | Créditée dans `LICENSE.md` et le README ; aucun fichier de licence dans le dépôt (la police vient de `next/font/google`)     | Ajouter le texte OFL de Geist dans `public/licenses/` (à récupérer sur le dépôt officiel, non inventé)                                       |
 
 Texte proposé pour la politique de confidentialité (français, à compléter dans les autres langues
 par la même mécanique que le reste du fichier) : « Le Studio garde dans le stockage local de votre
@@ -83,8 +86,10 @@ Cochez chaque ligne ; notez l'URL et le navigateur si quelque chose cloche.
       et CodeQL verts ; « Workers Builds: swiss3design-preview » vert.
 - [ ] `bunx opennextjs-cloudflare build` puis `bunx wrangler deploy --dry-run` : le **gzip** de la ligne
       `Total Upload` est celui que la règle d'or 10 d'`AGENTS.md` annonce (mesuré dans un dossier
-      de 41 caractères ; la cible acceptée est ≈ 3 250 KiB). Cette valeur n'est pas cette checklist :
-      relisez le dernier `measures-*.md`.
+      de 41 caractères ; WP-99 a mesuré **2 456 KiB** le 09.10.2026, cible ≈ 3 250 et plafond 3 185 tenus,
+      voir `measures-wp99.md`). Cette valeur n'est pas cette checklist : relisez le dernier `measures-*.md`.
+      Le hook `webpack()` de `next.config.ts` (règle d'or 10) doit rester en place : sans lui le Worker
+      repasse à ≈ 3 336 KiB.
 - [ ] `bun scripts/check-worker-bundle.ts` : **0** signature three / gsap / lenis dans le Worker.
 - [ ] `bun run preview` (CSP de production avec nonce) : 0 violation CSP et 0 erreur d'hydratation sur
       `/fr`, `/fr/studio/lavaux`, `/fr/shop`.
@@ -119,7 +124,9 @@ Cochez chaque ligne ; notez l'URL et le navigateur si quelque chose cloche.
 - [ ] Dashboard Cloudflare → Workers & Pages → **`swiss3design`** → Deployments : un déploiement tout neuf,
       `modified_on` changé, **et c'est bien le Worker de prod** (pas `swiss3design-preview`). Dans
       Claude : le connecteur Cloudflare (`workers_list`) donne le même `modified_on`.
-- [ ] Journal du build : `Total Upload: … / gzip: …` (comparez au budget de la règle d'or 10).
+- [ ] Journal du build : `Total Upload: … / gzip: …` (comparez au budget de la règle d'or 10 : environ
+      2 456 KiB attendus ; un chiffre voisin de 3 336 KiB voudrait dire que le hook `webpack()` n'a pas
+      tourné, par exemple un `next build` nu sous Turbopack au lieu de `opennextjs-cloudflare build`).
 - [ ] Rien après 10 minutes ? Repli manuel depuis une machine avec les identifiants Cloudflare :
       `$env:CLOUDFLARE_HYPERDRIVE_LOCAL_CONNECTION_STRING_HYPERDRIVE = "<chaîne de connexion de prod>"` puis,
       **dans la même commande**, `bun run deploy` (voir `docs/deploiement-cloudflare.md`).
