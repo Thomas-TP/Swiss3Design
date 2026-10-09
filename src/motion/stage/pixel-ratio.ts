@@ -10,27 +10,28 @@
 //
 // 2. Budget de pixels du tampon (WP-99, suite du problème ouvert 1 de
 //    measures-r16.md : le plafond de 1,5 laisse le coût croître avec la fenêtre,
-//    un écran 4K à 150 % aurait un tampon de plus de 12 Mpx). Au-delà du budget
-//    du palier, le rapport baisse, sans jamais passer sous 1 : rendu plus petit
-//    que sa taille CSS, le canvas serait flou à tout rapport d'écran. Le budget
-//    compte les pixels physiques du TAMPON (largeur × hauteur CSS du canvas ×
-//    rapport²), pas ceux de l'écran : il ne touche pas un écran à DPR 1, où le
-//    rapport est déjà au plancher, ni les fenêtres usuelles à DPR 1,5 ou 2
-//    (measures-wp99-canvas.md, §3).
-//    - C2 : 6 Mpx. Le tampon est multiéchantillonné (4 échantillons) : sa
-//      résolution relit quatre couleurs par pixel à chaque image dessinée, que
-//      les vues ne couvrent qu'un coin du canvas ou tout le canvas. À 6 Mpx,
-//      ≈ 96 Mo relus par image, ≈ 4 ms sur la bande passante partagée d'un iGPU
-//      de 2020 (≈ 25 Go/s) : estimation, non mesurée sur un iGPU (le banc n'a
-//      qu'un GPU de bureau), qui laisse de quoi tenir les 8 ms par frame du
-//      §4.11 avec la scène par-dessus.
-//    - C1 : 4 Mpx, pour un appareil à pointeur précis seul (ordinateur). C'est
-//      là qu'aboutit une machine déclassée en cours de session : stage.ts,
-//      applyCapability, recalcule le rapport et réalloue le tampon (l'
-//      antialiasing, fixé à la création du contexte, reste). Ne retire des pixels
-//      qu'à DPR > 1. Un appareil tactile garde le budget de C2 : son C1 est un
-//      état de départ (tablette, téléphone), pas un déclassement, et une
-//      tablette de 12,9 pouces perdrait de la netteté pour rien.
+//    un écran 4K à 150 % aurait un tampon de 16,5 Mpx, multiéchantillonné). Au-delà
+//    du budget du palier, le rapport baisse, sans jamais passer sous 1 : rendu
+//    plus petit que sa taille CSS, le canvas serait flou à tout rapport d'écran.
+//    Le budget compte les pixels physiques du TAMPON (largeur × hauteur CSS du
+//    canvas × rapport²), pas ceux de l'écran : il ne touche pas un écran à DPR 1,
+//    où le rapport est déjà au plancher, ni un portable (MacBook 14 et 16
+//    pouces : 5,3 et 6,9 Mpx), ni un 4K à 200 % (7,4 Mpx) ; il ne mord que sur
+//    les grands écrans à DPR > 1 (4K à 150 %, 27 pouces Retina). Mesures et
+//    sensibilité : measures-wp99-canvas.md, §3.
+//    - C2 : 8 Mpx, le plus gros tampon du canvas fixe d'avant R16 sur les écrans
+//      essayés (4K à 150 % : 8,3 Mpx). 6 Mpx aurait ramené un 27 pouces Retina à
+//      un rapport de 1,07 (un rendu à peu près à la résolution CSS, visiblement
+//      plus doux) pour un gain non mesuré : le banc n'a qu'un GPU de bureau, pas
+//      d'iGPU (§4.11, 8 ms par frame sur un iGPU de 2020).
+//    - C1 : 4 Mpx, pour un appareil à pointeur précis seul (ordinateur à 4 cœurs
+//      ou moins, fenêtre étroite). C'est aussi là qu'aboutit une machine déclassée
+//      en cours de session : stage.ts, applyCapability, recalcule le rapport et
+//      réalloue le tampon (l'antialiasing, fixé à la création du contexte,
+//      reste). Ne retire des pixels qu'à DPR > 1. Un appareil tactile garde le
+//      budget de C2 : son C1 est un état de départ (tablette, téléphone), pas un
+//      déclassement, et une tablette de 12,9 pouces y perdrait de la netteté
+//      pour rien.
 import type { Capability } from "@/lib/motion-bridge/types";
 
 /** Plafond du rapport de pixels du canvas du Stage. */
@@ -38,7 +39,7 @@ export const STAGE_MAX_PIXEL_RATIO = 1.5;
 
 /** Budget de pixels du tampon de dessin (largeur × hauteur × rapport²), par palier. */
 export const STAGE_PIXEL_BUDGET: Readonly<Record<1 | 2, number>> = {
-  2: 6_000_000,
+  2: 8_000_000,
   1: 4_000_000,
 };
 

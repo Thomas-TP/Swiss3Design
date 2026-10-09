@@ -41,39 +41,47 @@ describe("stagePixelRatio · budget de pixels", () => {
     expect(STAGE_PIXEL_BUDGET[1]).toBeLessThan(STAGE_PIXEL_BUDGET[2]);
   });
 
-  it("ne touche pas les fenêtres usuelles : 1440 × 900 à DPR 2, 1920 × 1080 physiques à DPR 1,5", () => {
-    const laptop = canvasOf(1425, 900, ANCHOR_MARGIN_FINE);
-    expect(stagePixelRatio(2, laptop, 2)).toBe(1.5);
-    // 1920 × 1080 physiques à 150 % : 1280 × 720 px CSS.
-    const hd = canvasOf(1265, 720, ANCHOR_MARGIN_FINE);
-    expect(stagePixelRatio(1.5, hd, 2)).toBe(1.5);
+  it("ne touche pas les fenêtres usuelles : portables, 4K à 200 %, téléphone", () => {
+    // MacBook 14 pouces (1512 × 982, DPR 2) et 16 pouces (1728 × 1117, DPR 2).
+    for (const [w, h] of [
+      [1497, 982],
+      [1713, 1117],
+    ])
+      expect(stagePixelRatio(2, canvasOf(w, h, ANCHOR_MARGIN_FINE), 2)).toBe(
+        1.5,
+      );
+    // 4K à 200 % : 1920 × 1080 px CSS, DPR 2.
+    expect(stagePixelRatio(2, canvasOf(1905, 1080, ANCHOR_MARGIN_FINE), 2)).toBe(
+      1.5,
+    );
     // Un téléphone (marge de doigt, tampon d'à peine plus d'un Mpx).
     const phone = canvasOf(390, 844, ANCHOR_MARGIN_COARSE);
     expect(stagePixelRatio(3, phone, 1)).toBe(1.5);
   });
 
   it("abaisse le rapport d'un grand écran à DPR élevé pour tenir le budget", () => {
-    // 4K à 200 % : 1905 × 1080 px CSS, DPR 2 → plafond 1,5, hors budget en C2.
-    const uhd = canvasOf(1905, 1080, ANCHOR_MARGIN_FINE);
-    const ratio = stagePixelRatio(2, uhd, 2);
+    // 4K à 150 % : 2560 × 1440 px CSS, DPR 1,5 (16,5 Mpx sans budget).
+    const uhd = canvasOf(2545, 1440, ANCHOR_MARGIN_FINE);
+    const ratio = stagePixelRatio(1.5, uhd, 2);
     expect(ratio).toBeLessThan(1.5);
     expect(ratio).toBeGreaterThan(1);
     expect(bufferMpx(uhd, ratio)).toBeCloseTo(STAGE_PIXEL_BUDGET[2] / 1e6, 6);
+    // 27 pouces Retina : 2560 × 1300 px CSS, DPR 2, plafonné à 1,5 puis budget.
+    const retina27 = canvasOf(2545, 1300, ANCHOR_MARGIN_FINE);
+    expect(stagePixelRatio(2, retina27, 2)).toBeLessThan(1.5);
   });
 
   it("ne descend jamais sous 1 : un tampon qui déborde à DPR 1 reste à 1", () => {
-    const wide = canvasOf(3425, 1440, ANCHOR_MARGIN_FINE);
+    // Écran ultralarge 5120 × 1440 à DPR 1 : 11,8 Mpx, rien à retirer.
+    const wide = canvasOf(5105, 1440, ANCHOR_MARGIN_FINE);
     expect(bufferMpx(wide, 1)).toBeGreaterThan(STAGE_PIXEL_BUDGET[2] / 1e6);
     expect(stagePixelRatio(1, wide, 2)).toBe(1);
-    // 4K à 150 % : plafonné à 1,5, le budget le ramène à 1 ou à peine plus.
-    const uhd150 = canvasOf(2545, 1440, ANCHOR_MARGIN_FINE);
-    const ratio = stagePixelRatio(1.5, uhd150, 2);
-    expect(ratio).toBeGreaterThanOrEqual(1);
-    expect(ratio).toBeLessThan(1.1);
+    // À DPR 1,25 il retombe au plancher, pas en dessous.
+    expect(stagePixelRatio(1.25, wide, 2)).toBe(1);
   });
 
   it("un DPR inférieur à 1 (page dézoomée) garde son rapport", () => {
-    const wide = canvasOf(3425, 1440, ANCHOR_MARGIN_FINE);
+    const wide = canvasOf(5105, 1440, ANCHOR_MARGIN_FINE);
     expect(stagePixelRatio(0.8, wide, 2)).toBe(0.8);
     expect(stagePixelRatio(0.8, wide, 1)).toBe(0.8);
   });
