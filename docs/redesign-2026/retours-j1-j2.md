@@ -176,7 +176,8 @@ touche, et aucun plancher de DPR n'est ajouté (R12 optionnel : il multiplierait
 sur un écran à DPR 1). Détail : une vue « live » (héros épinglé de l'accueil en C2, Studio
 collant) ne fixe le calque que **tant qu'elle est proche de la fenêtre**, sinon le héros, « live »
 pour toute la vie de la page, l'aurait gardé fixe sur tout l'accueil. Mesures et netteté comparée :
-`measures-r16.md`.
+`measures-r16.md`. **WP-99 (09.10.2026)** : canvas de 1,6 fenêtre à la souris (2 au doigt) avec
+anticipation du défilement, budget de pixels 8 Mpx (C2) / 4 Mpx (C1) ; voir `measures-wp99-canvas.md`.
 
 **À reprendre par d'autres paquets** (fichiers hors du socle) : `print-hero.ts` fait encore avancer
 la vague de couleur en 30 paliers (`pas(30)`, lignes 113 et 759) : c'est un minutage par paliers,

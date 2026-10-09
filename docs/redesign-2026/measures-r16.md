@@ -161,9 +161,11 @@ les deux vues `contour-field` (C2 seulement) sont retirées, le héros (`print-h
 erreur ; puis, le seuil restant à 1 ms, C1 → C0 à 2,0 s : canvas démonté, posters revenus, un seul contexte.
 Le montage ne dépendant plus du palier, il n'y a plus de cas « canvas resté fixe après déclassement ».
 
-**Conséquence à connaître** : C2 → C1 ne soulage plus le GPU en pixels (le plafond est le même et
-l'antialiasing est fixé à la création du contexte) ; il retire le champ de courbes et rien d'autre.
-Seul C1 → C0 libère le GPU.
+**Conséquence à connaître** : au moment de R16, C2 → C1 ne soulageait plus le GPU en pixels (le plafond
+était le même et l'antialiasing est fixé à la création du contexte) ; il retirait le champ de courbes et
+rien d'autre. **Depuis WP-99**, C2 → C1 applique le budget de pixels de C1 (4 Mpx) : à DPR > 1 le tampon
+est réalloué avec moins de pixels (1440 × 900 DPR 2 : 4,62 → 4,00 Mpx) ; à DPR 1 rien ne change ;
+l'antialiasing, fixé à la création du contexte, reste. Seul C1 → C0 libère le GPU.
 
 ## 7. Production (OpenNext + preview locale)
 
@@ -190,6 +192,10 @@ GPU, 1440 × 900.
   Mesuré seulement sur une RTX 5070 : un iGPU de bureau n'a pas été essayé. Pistes si le propriétaire le
   constate : marge de 0,25 fenêtre au lieu de 0,5 (canvas de 1,5 fenêtre, −25 % de pixels ; la marge
   observée n'a jamais été entamée de plus de 34 px), ou un plafond de pixels total.
+  **Clos par WP-99** (`measures-wp99-canvas.md`) : marge de 0,3 fenêtre à la souris + anticipation
+  (−20 % de pixels à tous les DPR) et budget de pixels de 8 Mpx (C2) / 4 Mpx (C1) : 4K à 150 %
+  16,49 → 8,00 Mpx, 1440 × 900 DPR 1 2,56 → 2,05 Mpx. Reste : les écrans à DPR 1 très grands (4K à
+  100 % : 13,2 Mpx) ne gagnent que les 20 %.
 - **Pas de plancher de DPR** (R12 optionnel) : non fait, comme décidé ; sur un écran à DPR 1 la scène du
   Studio reste à 1:1 avec MSAA.
 - **Pas d'essai hors Edge/Chromium** (Safari, Firefox : `overflow: clip`, `lvh`, `translate3d`).
