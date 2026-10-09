@@ -89,18 +89,18 @@ export function FeaturedManager({
             Enregistrement…
           </span>
         ) : saved ? (
-          <span className="flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400">
+          <span className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400">
             <Check size={13} />
             Sélection enregistrée
           </span>
         ) : (
-          <span className="text-soft/70">
+          <span className="text-soft">
             Aperçu en direct sur la page d&apos;accueil
           </span>
         )}
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-5 lg:grid-cols-2">
         {/* Sélection courante (réordonnable) */}
         <section className="rounded-card border border-line bg-surface p-4 sm:p-5">
           <div className="mb-3 flex items-center justify-between gap-2">
@@ -134,7 +134,7 @@ export function FeaturedManager({
                     value={p.id}
                     className="flex cursor-grab items-center gap-3 rounded-xl border border-line bg-paper px-3 py-2.5 active:cursor-grabbing"
                   >
-                    <GripVertical size={16} className="shrink-0 text-soft/60" />
+                    <GripVertical size={16} className="shrink-0 text-soft/80" />
                     <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-ink text-[11px] font-bold tabular-nums text-paper">
                       {i + 1}
                     </span>
@@ -155,7 +155,7 @@ export function FeaturedManager({
                   </Reorder.Item>
                 ))}
               </Reorder.Group>
-              <p className="mt-3 text-xs text-soft/80">
+              <p className="mt-3 text-xs text-soft">
                 Glissez pour réordonner · 3, 6 ou 9 produits remplissent
                 joliment la grille.
               </p>
@@ -175,7 +175,7 @@ export function FeaturedManager({
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Rechercher dans le catalogue…"
-              className="w-full rounded-xl border border-line bg-paper py-2.5 pl-9 pr-3.5 text-sm transition-colors placeholder:text-soft/60 focus:border-ink focus:outline-none"
+              className="w-full rounded-xl border border-line bg-paper py-2.5 pl-9 pr-3.5 text-sm transition-colors focus:border-ink focus:outline-none"
             />
           </div>
 

@@ -55,7 +55,7 @@ export default async function AdminDiscountsPage() {
                     <span
                       className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${
                         live
-                          ? "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                          ? "bg-emerald-500/15 text-emerald-800 dark:text-emerald-300"
                           : "bg-line text-soft"
                       }`}
                     >

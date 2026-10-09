@@ -213,7 +213,7 @@ export function ComposeForm({ products }: { products: Product[] }) {
             {testSending ? "Envoi…" : "Envoyer un test à moi-même"}
           </button>
           {testMessage && (
-            <span className="flex items-center gap-1 text-xs font-medium text-emerald-700 dark:text-emerald-300">
+            <span className="flex items-center gap-1 text-xs font-medium text-emerald-800 dark:text-emerald-300">
               <Check size={13} />
               {testMessage}
             </span>

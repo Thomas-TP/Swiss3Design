@@ -219,6 +219,28 @@ body {
   }
 }
 
+/* ── Admin (jetons seulement) ─────────────────────────────────────────────
+   Textes d'aide des champs : le défaut de Tailwind est la couleur du texte à
+   50 % (3,3:1 sur papier), trop pâle pour « N° ou e-mail… » ou « Ex. : … ».
+   Ici `soft` pleine (5,2:1 clair, 7,1:1 sombre). Limité à l'admin. */
+@layer components {
+  .s3d-admin ::placeholder {
+    color: var(--color-soft);
+    opacity: 1;
+  }
+}
+/* Rayons : l'admin porte encore `rounded-xl` (champs, lignes) à côté de
+   `rounded-card`. On redéfinit les échelles de Tailwind dans cette portée pour
+   qu'elles tombent sur les rayons de la refonte (champ 4 px, carte 6 px), sans
+   toucher aux ~100 composants. Les pastilles (`rounded-full`) ne bougent pas. */
+.s3d-admin {
+  --radius-sm: var(--radius-hair);
+  --radius-md: var(--radius-field);
+  --radius-lg: var(--radius-field);
+  --radius-xl: var(--radius-field);
+  --radius-2xl: var(--radius-card);
+}
+
 /* ── Composants CSS partagés ──────────────────────────────────────────── */
 @layer components {
   .s3d-page {

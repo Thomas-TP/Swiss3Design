@@ -77,7 +77,7 @@ export default async function AdminOrdersPage({
               }`}
             >
               {c.label}
-              <span className="ml-1.5 opacity-60 tabular-nums">{c.count}</span>
+              <span className="ml-1.5 font-normal tabular-nums">{c.count}</span>
             </Link>
           ))}
         </div>
