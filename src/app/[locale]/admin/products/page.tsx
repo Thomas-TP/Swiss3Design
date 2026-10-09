@@ -127,7 +127,7 @@ export default async function AdminProductsPage({
               }`}
             >
               {c.label}
-              <span className="ml-1.5 opacity-60 tabular-nums">{c.count}</span>
+              <span className="ml-1.5 font-normal tabular-nums">{c.count}</span>
             </Link>
           ))}
         </div>
@@ -186,7 +186,7 @@ export default async function AdminProductsPage({
                     </span>
                   )}
                   {p.featured && (
-                    <span className="ml-2 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-700 dark:text-amber-300">
+                    <span className="ml-2 rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-bold uppercase text-amber-800 dark:text-amber-300">
                       Vedette
                     </span>
                   )}

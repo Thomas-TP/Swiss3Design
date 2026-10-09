@@ -32,7 +32,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
   const close = () => setOpen(false);
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
+    <div className="s3d-admin mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:py-8">
       {/* Barre mobile : ouvre le tiroir de navigation */}
       <div className="mb-4 flex items-center justify-between lg:hidden">
         <div className="flex items-center gap-2">

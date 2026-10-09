@@ -26,7 +26,10 @@ Browser ──▶ Cloudflare Worker
               ├─ middleware.ts  (i18n routing, security headers, CSP nonce, www→apex)
               ├─ RSC / pages    src/app/[locale]/**
               ├─ route handlers src/app/api/**
-              └─ bindings: HYPERDRIVE (Postgres) · R2 (files) · KV (cache/rate-limit) · ASSETS
+              └─ bindings: HYPERDRIVE (Postgres) · R2 (files) · KV (agent idempotency) · ASSETS
+
+Browser only (never in the Worker): src/gates/** ──▶ src/motion/** (gsap, lenis, three,
+the Studio geometry Worker), talking to the DOM through src/lib/motion-bridge/**
 ```
 
 ## Data model (Postgres / Hyperdrive / Drizzle)
@@ -125,6 +128,55 @@ token stored as SHA-256 hashes, `assertion_version` for revocation). See
   (`newsletter` | `product_news` | `both`), optional featured `productIds` +
   banner/CTA, `recipientCount`, `sentBy`.
 
+## Front end: the « Strates » redesign
+
+Spec: [`redesign-2026/DESIGN-BRIEF.md`](redesign-2026/DESIGN-BRIEF.md) (binding for
+the redesign; the rules that keep production safe are golden rules 10 and 11 of
+[`AGENTS.md`](../AGENTS.md)). What exists, and why it is wired this way:
+
+- **Server first.** Every page renders its full content on the server (text,
+  SVG posters, even the Studio form, which works with a plain `GET` without
+  JavaScript). Motion and WebGL are progressive enhancement: nothing is hidden
+  waiting for them, the `h1` is never animated, there is no preloader.
+- **Route groups.** `src/app/[locale]/(site)/` holds the showcase pages (home,
+  shop, products, Studio, custom quote, Atelier, contact) and mounts `SiteShell`
+  (Lenis + the WebGL Stage). Cart, checkout, account, admin, OAuth, track, legal
+  stay outside: no Lenis, no transform, no canvas around the Stripe iframes.
+- **Three layers on the client.** (1) The light, SSR-safe bridge
+  `src/lib/motion-bridge/**` (store, motion preference `data-motion` on `<html>`,
+  capability tier C0–C2 detected after hydration). (2) The gates
+  `src/gates/*.tsx`: `next/dynamic({ ssr: false })` only, so Next strips them
+  from the server build. (3) The engines in `src/motion/**`: `runtime`
+  (Lenis + GSAP), `stage/` (one three renderer, one canvas, views in scissor,
+  render on demand, 4 scenes: print hero, contour field, Studio object, product
+  viewer), `choreo/` (per-page GSAP), `studio/` (geometry Web Worker + STL
+  export). A page declares a 3D view with `<StageView>` and a poster; the canvas
+  is anchored to the document, capped at DPR 1.5, and falls back to the posters
+  at C0, in reduced motion, or after a lost context.
+- **The Studio** (`/studio/[objet]`, four objects). `src/lib/studio/**` is pure
+  TypeScript (geometry, stats, printability guards, STL, `#c=` URL state): the
+  same code builds the SSR numbers, the posters, the Worker mesh and the exported
+  file, so a figure on screen is always computed, never copied. The UI is
+  `src/components/studio/**`. Sending is two steps, both existing endpoints:
+  `POST /api/quote-upload` with the binary STL (30 MB, 10 per hour per IP, owner
+  cookie), then the `submitQuoteRequest` Server Action of `/custom` through the
+  **shared** `components/quote/quote-request-form.tsx` (page variant on `/custom`,
+  drawer variant in the Studio). So a Studio order is an ordinary
+  `quote_requests` row (see « Quote lifecycle »); no price is collected, the
+  workshop answers within 48 h. Typed texts never leave the browser before that
+  send (see conventions, Analytics).
+- **Messages.** `messages/<locale>/<namespace>.json` per package, merged by
+  `src/i18n/request.ts`; the browser receives only what its client components
+  read (`ROOT_CLIENT_NAMESPACES` + `<ClientMessages>` per segment).
+- **Tokens and type.** Names (`paper`, `ink`, `accent`, `accent-text`…) are a
+  contract used by every page, admin included; values live in
+  `src/app/globals.css`. Fonts: Archivo SemiExpanded (self-hosted,
+  `src/fonts/`), Geist and Geist Mono (`next/font/google`, also loaded inside the
+  Stripe iframes), all OFL.
+- **Admin** keeps its layout and inherits the tokens; a scoped block in
+  `globals.css` (`.s3d-admin`) adjusts placeholders and radii. It is never measured
+  by analytics.
+
 ## Key flows
 
 ### Checkout & payment (idempotent)
@@ -147,7 +199,10 @@ token stored as SHA-256 hashes, `assertion_version` for revocation). See
 
 ### Quote lifecycle
 
-Customer submits `/custom` (file → R2 via `/api/quote-upload`). Admin prices it in
+Customer submits `/custom` (file → R2 via `/api/quote-upload`) **or sends a
+configuration from the Studio** (generated STL → R2 the same way, then the same
+Server Action; the description carries a `[Studio]` header, the configuration
+link and the figures). Admin prices it in
 `/admin/quotes` (`status: quoted`, `validUntil` +30d). Customer pays via a
 dedicated PaymentIntent (`/api/quote-checkout`); `markQuotePaid()` is idempotent
 (webhook + return page), accepting only `quoted`/`accepted` quotes.
@@ -290,8 +345,8 @@ handlers — R2 is never public. `cron/maintenance` purges orphaned files.
 Referrer-Policy / Permissions-Policy on every response, builds a strict CSP
 (**per-request nonce in prod**, relaxed in dev for HMR), redirects `www → apex`,
 and hardens the `NEXT_LOCALE` cookie. CSP violations report to `/api/csp-report`.
-Rate limiting ([`src/lib/rate-limit.ts`](../src/lib/rate-limit.ts)) is a fixed
-window on KV, per IP + route. See [conventions.md](conventions.md) for the nonce
+Rate limiting ([`src/lib/rate-limit.ts`](../src/lib/rate-limit.ts)) is an atomic
+fixed-window counter in Postgres (`request_limits`), per hashed IP + route. See [conventions.md](conventions.md) for the nonce
 contract.
 
 ### i18n
@@ -302,7 +357,8 @@ contract.
 
 ## Deployment
 
-Git-native **Cloudflare Workers Builds**: push `main` → build + deploy. No
-GitHub Actions. **Postgres schema migrations are a separate manual step**
+Git-native **Cloudflare Workers Builds**: push `main` → build + deploy.
+GitHub Actions (`quality.yml`, CodeQL) only checks and never deploys.
+**Postgres schema migrations are a separate manual step**
 (`bun run db:generate:pg` + `db:push:pg`) — not part of this pipeline, unlike
 the old D1 setup. See [`deploiement-cloudflare.md`](deploiement-cloudflare.md).

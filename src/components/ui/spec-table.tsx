@@ -27,8 +27,15 @@ export function SpecTable({
           key={index}
           className="grid grid-cols-[minmax(0,2fr)_minmax(0,3fr)] items-baseline gap-4 py-3"
         >
-          <dt className="s3d-label text-soft">{row.term}</dt>
-          <dd className="s3d-num text-sm text-ink">{row.value}</dd>
+          {/* Mots longs (allemand : « Filamenttrocknung ») : la colonne du terme
+              fait 2/5 de la largeur, soit 114 px à 375 px ; à défaut de coupure
+              possible, le mot se replie au lieu de déborder. */}
+          <dt className="s3d-label text-soft [overflow-wrap:break-word] [&:lang(de)]:hyphens-auto">
+            {row.term}
+          </dt>
+          <dd className="s3d-num text-sm text-ink [overflow-wrap:break-word]">
+            {row.value}
+          </dd>
         </div>
       ))}
     </dl>

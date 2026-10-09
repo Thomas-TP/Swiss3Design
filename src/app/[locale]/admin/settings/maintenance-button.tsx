@@ -47,7 +47,7 @@ export function MaintenanceButton() {
         {running ? "Nettoyage…" : "Lancer le nettoyage"}
       </button>
       {report && (
-        <p className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-300">
+        <p className="mt-3 flex items-center gap-2 rounded-xl bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-800 dark:text-emerald-300">
           <CheckCircle2 size={16} className="shrink-0" />
           {report.orphansDeleted} fichier(s) orphelin(s) ·{" "}
           {report.retentionFilesDeleted} fichier(s) anciens ·{" "}

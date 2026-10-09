@@ -236,7 +236,7 @@ export default async function AdminOrderDetailPage({
             </li>
           ))}
           {order.discountCents > 0 && (
-            <li className="flex justify-between gap-3 py-2.5 text-emerald-600 dark:text-emerald-400">
+            <li className="flex justify-between gap-3 py-2.5 text-emerald-700 dark:text-emerald-400">
               <span>
                 Remise{order.discountCode ? ` (${order.discountCode})` : ""}
               </span>

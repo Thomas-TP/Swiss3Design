@@ -52,7 +52,7 @@ export function SettingsForm({
         </p>
       )}
       {state.saved && (
-        <p className="rounded-xl bg-emerald-500/15 px-4 py-3 text-sm font-medium text-emerald-700 dark:text-emerald-300">
+        <p className="rounded-xl bg-emerald-500/15 px-4 py-3 text-sm font-medium text-emerald-800 dark:text-emerald-300">
           Réglages enregistrés ✓
         </p>
       )}

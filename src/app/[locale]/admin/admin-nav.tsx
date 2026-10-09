@@ -73,7 +73,7 @@ export function AdminNav({ onNavigate }: { onNavigate?: () => void }) {
       {groups.map((group, i) => (
         <div key={group.title ?? i}>
           {group.title && (
-            <p className="mb-1.5 px-3 text-[11px] font-bold uppercase tracking-wide text-soft/70">
+            <p className="mb-1.5 px-3 text-[11px] font-bold uppercase tracking-wide text-soft">
               {group.title}
             </p>
           )}

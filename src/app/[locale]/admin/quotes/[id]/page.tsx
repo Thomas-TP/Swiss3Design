@@ -97,7 +97,7 @@ export default async function AdminQuoteDetailPage({
 
       <section className="mt-5 rounded-card border border-line bg-surface p-5 text-sm">
         <h3 className="mb-2 font-semibold">Description du client</h3>
-        <p className="whitespace-pre-wrap leading-relaxed">
+        <p className="whitespace-pre-wrap leading-relaxed [overflow-wrap:anywhere]">
           {quote.description}
         </p>
         {specs.length > 0 && (
@@ -146,7 +146,11 @@ export default async function AdminQuoteDetailPage({
                         {formatChf(m.priceCents, locale)}
                       </p>
                     )}
-                    {m.body && <p className="whitespace-pre-wrap">{m.body}</p>}
+                    {m.body && (
+                      <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">
+                        {m.body}
+                      </p>
+                    )}
                     {m.fileName && (
                       <a
                         href={`/api/admin/files/${m.fileUrl}`}

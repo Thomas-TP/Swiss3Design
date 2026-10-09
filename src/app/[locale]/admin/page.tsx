@@ -186,7 +186,7 @@ export default async function AdminDashboard({
           <p className="font-semibold text-amber-800 dark:text-amber-200">
             ⚠ Stock bas
           </p>
-          <ul className="mt-1 text-amber-700 dark:text-amber-300">
+          <ul className="mt-1 text-amber-800 dark:text-amber-300">
             {lowStock.map((p) => (
               <li key={p.id}>
                 <Link href={`/admin/products/${p.id}`} className="underline">
@@ -260,10 +260,12 @@ export default async function AdminDashboard({
               >
                 <Link
                   href={`/admin/orders/${o.id}`}
-                  className="min-w-0 flex-1 hover:underline"
+                  className="flex min-w-0 flex-1 items-baseline gap-2 hover:underline"
                 >
-                  <span className="text-sm font-semibold">{o.orderNumber}</span>
-                  <span className="ml-2 truncate text-xs text-soft">
+                  <span className="shrink-0 text-sm font-semibold">
+                    {o.orderNumber}
+                  </span>
+                  <span className="min-w-0 truncate text-xs text-soft">
                     {o.email}
                   </span>
                 </Link>

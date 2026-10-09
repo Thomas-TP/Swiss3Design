@@ -105,7 +105,7 @@ export default async function QuoteDetailPage({
       {/* Récap de la demande */}
       <section className="mt-6 rounded-card border border-line bg-surface p-5">
         <h2 className="s3d-label mb-2 text-soft">{td("requestTitle")}</h2>
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-soft">
+        <p className="whitespace-pre-wrap text-sm leading-relaxed text-soft [overflow-wrap:anywhere]">
           {quote.description}
         </p>
         {specs.length > 0 && (
@@ -144,7 +144,7 @@ export default async function QuoteDetailPage({
             </p>
           )}
           {quote.adminMessage && (
-            <p className="mt-4 whitespace-pre-wrap rounded-field bg-paper px-4 py-3 text-sm leading-relaxed text-soft ring-1 ring-line">
+            <p className="mt-4 whitespace-pre-wrap rounded-field bg-paper px-4 py-3 text-sm leading-relaxed text-soft ring-1 ring-line [overflow-wrap:anywhere]">
               {quote.adminMessage}
             </p>
           )}
@@ -215,7 +215,11 @@ export default async function QuoteDetailPage({
                         {formatChf(m.priceCents, locale)}
                       </p>
                     )}
-                    {m.body && <p className="whitespace-pre-wrap">{m.body}</p>}
+                    {m.body && (
+                      <p className="whitespace-pre-wrap [overflow-wrap:anywhere]">
+                        {m.body}
+                      </p>
+                    )}
                     {m.fileName && (
                       <p className="mt-1.5 flex items-center gap-1.5 text-xs text-soft">
                         <Paperclip

@@ -20,21 +20,23 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 Every `.md` in this repo, what it's for, and who reads it:
 
-| File                                                                       | Audience          | Read it for                                                                                                               |
-| -------------------------------------------------------------------------- | ----------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| [`docs/codemap.md`](docs/codemap.md)                                       | Agents            | **Start here for any code task** — "I need to do X" → exact file(s)                                                       |
-| [`docs/architecture.md`](docs/architecture.md)                             | Agents / dev      | Data model, request flows (checkout, quotes, auth), runtime model                                                         |
-| [`docs/conventions.md`](docs/conventions.md)                               | Agents / dev      | Code patterns, CSP nonce contract, i18n, Swiss specifics, style                                                           |
-| [`docs/playbook.md`](docs/playbook.md)                                     | Human ↔ agent     | How to phrase a request well, task recipes, prompt templates                                                              |
-| [`docs/runbook.md`](docs/runbook.md)                                       | Ops               | Deploy/rollback steps, incident procedures, secrets rotation                                                              |
-| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)         | Ops               | Git ↔ Cloudflare Workers Builds wiring, preview env, PR-stack pitfall                                                     |
-| [`docs/audit-remediation-2026-09.md`](docs/audit-remediation-2026-09.md)   | Ops               | September 2026 audit report (dated snapshot): fixes shipped, incident 1102 cause, post-deploy checks — not a rulebook     |
-| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md)       | Product           | Forward-looking redesign proposal — **not implemented**, don't treat as current state                                     |
-| [`docs/redesign-2026/DESIGN-BRIEF.md`](docs/redesign-2026/DESIGN-BRIEF.md) | Agents (redesign) | Binding spec of the « Strates » redesign (branch `claude/redesign-2026`): tokens, motion, Stage, packages, file ownership |
-| [`README.md`](README.md)                                                   | Human (public)    | Project overview, stack, setup, for anyone landing on the repo                                                            |
-| [`ROADMAP.md`](ROADMAP.md)                                                 | Product           | What's shipped vs. what's next, budget                                                                                    |
-| [`SECURITY.md`](SECURITY.md)                                               | Security          | Vulnerability disclosure process                                                                                          |
-| [`LICENSE.md`](LICENSE.md)                                                 | Legal             | All-rights-reserved terms                                                                                                 |
+| File                                                                       | Audience          | Read it for                                                                                                                 |
+| -------------------------------------------------------------------------- | ----------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| [`docs/codemap.md`](docs/codemap.md)                                       | Agents            | **Start here for any code task** — "I need to do X" → exact file(s)                                                         |
+| [`docs/architecture.md`](docs/architecture.md)                             | Agents / dev      | Data model, request flows (checkout, quotes, auth), runtime model                                                           |
+| [`docs/conventions.md`](docs/conventions.md)                               | Agents / dev      | Code patterns, CSP nonce contract, i18n, Swiss specifics, style                                                             |
+| [`docs/playbook.md`](docs/playbook.md)                                     | Human ↔ agent     | How to phrase a request well, task recipes, prompt templates                                                                |
+| [`docs/runbook.md`](docs/runbook.md)                                       | Ops               | Deploy/rollback steps, incident procedures, secrets rotation                                                                |
+| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)         | Ops               | Git ↔ Cloudflare Workers Builds wiring, preview env, PR-stack pitfall                                                       |
+| [`docs/audit-remediation-2026-09.md`](docs/audit-remediation-2026-09.md)   | Ops               | September 2026 audit report (dated snapshot): fixes shipped, incident 1102 cause, post-deploy checks — not a rulebook       |
+| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md)       | Product           | Forward-looking redesign proposal — **not implemented**, don't treat as current state                                       |
+| [`docs/redesign-2026/DESIGN-BRIEF.md`](docs/redesign-2026/DESIGN-BRIEF.md) | Agents (redesign) | Binding spec of the « Strates » redesign (branch `claude/redesign-2026`): tokens, motion, Stage, packages, file ownership   |
+| [`docs/redesign-2026/checklist-j3.md`](docs/redesign-2026/checklist-j3.md) | Owner             | J3 checklist of the « Strates » redesign: what to check on the preview, the merge to `main`, post-merge checks and rollback |
+| [`docs/redesign-2026/measures-*.md`](docs/redesign-2026/)                  | Agents / ops      | Dated measurement reports of the redesign waves (Worker gzip, chunks, CSP, WebGL): history, not rules                       |
+| [`README.md`](README.md)                                                   | Human (public)    | Project overview, stack, setup, for anyone landing on the repo                                                              |
+| [`ROADMAP.md`](ROADMAP.md)                                                 | Product           | What's shipped vs. what's next, budget                                                                                      |
+| [`SECURITY.md`](SECURITY.md)                                               | Security          | Vulnerability disclosure process                                                                                            |
+| [`LICENSE.md`](LICENSE.md)                                                 | Legal             | All-rights-reserved terms                                                                                                   |
 
 `CLAUDE.md` at the repo root is a one-line `@AGENTS.md` import — this file
 _is_ the actual source of truth Claude Code loads every session.
@@ -173,11 +175,14 @@ put` on an environment with real users without `--env <name>` explicitly
     as Cloudflare **static assets**, outside the bundle and outside the cap. The
     same trap applies to `opengraph-image.*`, `twitter-image.*` and any
     `import`ed image. Measure before pushing — `bunx wrangler deploy --dry-run`
-    prints the gzip size in ~1 min without deploying. The interactive viewer
-    and the production-style 3D thumbnail renderer are both exported from
-    `product-viewer-3d.tsx` behind `next/dynamic({ ssr: false })`; importing
-    `showroom-scene.ts` directly from `product-gallery.tsx` puts Three.js back
-    into the server Worker and costs about 243 KiB gzip.
+    prints the gzip size in ~1 min without deploying. Three.js never belongs in
+    the server Worker (≈ 243 KiB gzip when it slipped in): the product viewer is
+    the Stage scene `src/motion/stage/scenes/product-viewer.ts`, declared in the
+    page by `<StageView>` (`components/catalog/product-viewer.tsx`) and loaded
+    on the client by `SiteShell` through the gates of rule 11. A static import of
+    `three` or of anything under `src/motion` from a component rendered on the
+    server (including a `"use client"` one, which is also server-rendered)
+    brings it back.
 11. **Motion boundary (redesign « Strates »): `gsap`, `lenis` and `three`
     live only under `src/motion/**`, and `src/motion` is reached only from
     `src/gates/**`.** A gate is a `"use client"` file holding nothing but
@@ -221,23 +226,24 @@ put` on an environment with real users without `--env <name>` explicitly
 
 ## Tech stack
 
-| Area                      | Choice                                                                                                                                                                                                            |
-| ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Runtime & package manager | Bun (install/scripts/dev) — deploy target is still `workerd` (Cloudflare Workers)                                                                                                                                 |
-| Framework                 | Next.js 16 (App Router, RSC) + React 19                                                                                                                                                                           |
-| Language                  | TypeScript 6 (strict). Import alias `@/* → src/*`                                                                                                                                                                 |
-| Styling                   | Tailwind CSS 4 (`src/app/globals.css`), `motion`, `lucide-react`                                                                                                                                                  |
-| DB                        | Postgres (Neon) via Cloudflare Hyperdrive + Drizzle ORM (pg dialect, `node-postgres`/`pg` driver)                                                                                                                 |
-| Auth                      | `better-auth` (+`@better-auth/passkey`) via the driver-agnostic `better-auth/adapters/drizzle` (email + Google OAuth, TOTP 2FA, passkeys) — Postgres-backed                                                       |
-| Lint/format               | Oxlint + Oxfmt (see the lint/format note under "What this is"; oxfmt is still beta)                                                                                                                               |
-| Payments                  | Stripe Payment Element + webhooks (LIVE in prod)                                                                                                                                                                  |
-| Email                     | Resend (REST) — no-op if `RESEND_API_KEY` unset                                                                                                                                                                   |
-| i18n                      | `next-intl` (fr/de/it/en, auto-detect, fr fallback)                                                                                                                                                               |
-| Files / cache             | Cloudflare R2 / KV                                                                                                                                                                                                |
-| Analytics                 | PostHog Cloud EU, cookie `ph_…` + replay, Swiss opt-out (« OK / Refuser »), via the relay `/api/relay` (middleware) — `posthog-js` only in `src/instrumentation-client.ts`; see `docs/conventions.md` → Analytics |
-| Hosting                   | Cloudflare Workers via `@opennextjs/cloudflare`                                                                                                                                                                   |
-| AI agents                 | Public MCP `/mcp`, A2A, REST `/api/v1`, WebMCP; customer-account MCP `/mcp/account` behind OAuth 2.1 (`@better-auth/oauth-provider`) + auth.md — see `docs/architecture.md` → Agents                              |
-| Agentic commerce          | Stripe Agentic Commerce Suite (catalogue feed, hooks, webhook orders) in `src/lib/commerce` — see `docs/architecture.md` → Agentic commerce                                                                       |
+| Area                      | Choice                                                                                                                                                                                                                                        |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime & package manager | Bun (install/scripts/dev) — deploy target is still `workerd` (Cloudflare Workers)                                                                                                                                                             |
+| Framework                 | Next.js 16 (App Router, RSC) + React 19                                                                                                                                                                                                       |
+| Language                  | TypeScript 6 (strict). Import alias `@/* → src/*`                                                                                                                                                                                             |
+| Styling                   | Tailwind CSS 4 (`src/app/globals.css`, tokens of the « Strates » redesign), `motion` (Framer: admin and utility pages, no new use on showcase pages), `lucide-react`                                                                          |
+| Motion & 3D               | GSAP (« Standard no-charge license »), Lenis, three (pinned `0.186.1`), d3-contour, earcut: **client-only**, under `src/motion/**` behind `src/gates/**` (rule 11). Fonts: Archivo SemiExpanded (self-hosted, OFL) + Geist / Geist Mono (OFL) |
+| DB                        | Postgres (Neon) via Cloudflare Hyperdrive + Drizzle ORM (pg dialect, `node-postgres`/`pg` driver)                                                                                                                                             |
+| Auth                      | `better-auth` (+`@better-auth/passkey`) via the driver-agnostic `better-auth/adapters/drizzle` (email + Google OAuth, TOTP 2FA, passkeys) — Postgres-backed                                                                                   |
+| Lint/format               | Oxlint + Oxfmt (see the lint/format note under "What this is"; oxfmt is still beta)                                                                                                                                                           |
+| Payments                  | Stripe Payment Element + webhooks (LIVE in prod)                                                                                                                                                                                              |
+| Email                     | Resend (REST) — no-op if `RESEND_API_KEY` unset                                                                                                                                                                                               |
+| i18n                      | `next-intl` (fr/de/it/en, auto-detect, fr fallback)                                                                                                                                                                                           |
+| Files / cache             | Cloudflare R2 / KV                                                                                                                                                                                                                            |
+| Analytics                 | PostHog Cloud EU, cookie `ph_…` + replay, Swiss opt-out (« OK / Refuser »), via the relay `/api/relay` (middleware) — `posthog-js` only in `src/instrumentation-client.ts`; see `docs/conventions.md` → Analytics                             |
+| Hosting                   | Cloudflare Workers via `@opennextjs/cloudflare`                                                                                                                                                                                               |
+| AI agents                 | Public MCP `/mcp`, A2A, REST `/api/v1`, WebMCP; customer-account MCP `/mcp/account` behind OAuth 2.1 (`@better-auth/oauth-provider`) + auth.md — see `docs/architecture.md` → Agents                                                          |
+| Agentic commerce          | Stripe Agentic Commerce Suite (catalogue feed, hooks, webhook orders) in `src/lib/commerce` — see `docs/architecture.md` → Agentic commerce                                                                                                   |
 
 ## Commands
 
@@ -308,6 +314,11 @@ src/
   components/     shared UI (product-card, add-to-cart, theme-toggle, …)
   components/ui/  « Strates » primitives: SiteLink, PageCut, Button, Field,
                   Chip, Chapter, Drawer, Toast, StageView, MeasureStrip, icons…
+  components/studio/  the Studio (configurator): controls, scene panel, send
+                  drawer; the quote form it sends through is shared with /custom
+                  (components/quote/quote-request-form.tsx)
+  fonts/          self-hosted Archivo SemiExpanded (woff2 + OFL-Archivo.txt),
+                  loaded by app/fonts.ts together with Geist / Geist Mono
   gates/          the ONLY door to src/motion: next/dynamic({ ssr: false }) (rule 11)
   motion/         client-only engines: gsap, Lenis runtime, three Stage + scenes
   db/             Drizzle (Postgres/pg-core): schema.pg.ts + index.pg.ts are the
@@ -322,6 +333,8 @@ src/
                   (store, useStageView, motion preference, capability tier)
   lib/agent/      AI-agent surfaces: MCP (public + /mcp/account), A2A, REST,
                   discovery, OAuth 2.1 resource server, auth.md agent registration
+  lib/studio/     pure TypeScript of the Studio: geometry generators, stats,
+                  guards, STL, URL state (no three; zod only in schemas.ts / url-state.ts)
   lib/commerce/   agentic commerce: Stripe catalogue feed, ACS hooks, agent
                   orders (paid before they reach us — never fail, alert instead)
   middleware.ts   Edge middleware: i18n + security headers + CSP nonce + www→apex
@@ -329,9 +342,12 @@ drizzle/          D1/SQLite migrations + snapshots (legacy, inactive DB) — NEV
 drizzle-pg/       Postgres migrations + snapshots (active DB, drizzle.config.pg.ts) — NEVER hand-edit
 messages/         next-intl translations (fr/de/it/en); <locale>/<namespace>.json
                   = one file per redesign package (rule 11), merged at load
-scripts/          seed*.sql, migrate-d1-to-pg.ts (Bun,
-                  one-off D1→Postgres data migration tool, reusable if D1 ever
-                  needs resyncing before the rollback safety net is retired)
+scripts/          seed*.sql, migrate-d1-to-pg.ts (Bun, one-off D1→Postgres data
+                  migration tool, reusable if D1 ever needs resyncing before the
+                  rollback safety net is retired); check-worker-bundle.ts (0
+                  engine signature in the Worker) and chunk-report.ts (JS per
+                  page, after an OpenNext build); gen-field-posters.ts and
+                  fonts/ (SVG posters and Studio glyphs; `--check` fails if a file is out of date)
 workers/cron/     standalone Cloudflare Cron Worker → POST /api/cron/maintenance
                   (purge R2 + cart reminders); deployed separately, excluded from
                   the app's tsconfig/oxlint/OpenNext build
