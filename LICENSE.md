@@ -66,7 +66,7 @@ fichiers concernés.
 | **d3-contour**, **earcut**                                                        | ISC                                                                                                                                                                  |
 | **opentype.js** (outil de développement uniquement)                               | MIT                                                                                                                                                                  |
 | **Archivo** (SemiExpanded) © The Archivo Project Authors                          | SIL Open Font License 1.1 — `src/fonts/OFL-Archivo.txt` ; glyphes du Studio dérivés d'Archivo : `public/studio/glyphs/OFL.txt`                                       |
-| **Geist** et **Geist Mono** © The Geist Project Authors (Vercel)                  | SIL Open Font License 1.1 — <https://github.com/vercel/geist-font/blob/main/OFL.txt>                                                                                 |
+| **Geist** et **Geist Mono** © The Geist Project Authors (Vercel)                  | SIL Open Font License 1.1 — `src/fonts/OFL-Geist.txt` (copie de <https://github.com/vercel/geist-font/blob/main/OFL.txt>)                                            |
 | **Vase spirale** (modèle 3D) par **Ian**, MakerWorld                              | CC BY-ND 4.0 — <https://makerworld.com/fr/models/1262112-vase> ; attribution affichée sur sa fiche, aucune œuvre dérivée                                             |
 
 Les autres dépendances (framework, base de données, authentification, paiement…) sont
