@@ -36,6 +36,7 @@ import {
   anchorCanvasViewports,
   anchorMargin,
   createAnchorLead,
+  hasCoarsePointer,
 } from "./anchor-margin";
 import { Stage } from "./stage";
 import { anchorPlacement, setCanvasAnchor, type CanvasAnchor } from "./ticker";
@@ -51,15 +52,6 @@ function createCanvas(): HTMLCanvasElement {
   style.pointerEvents = "none";
   style.display = "block";
   return canvas;
-}
-
-/** Un doigt est-il parmi les pointeurs de l'appareil (écran tactile, même d'un portable) ? */
-function hasCoarsePointer(): boolean {
-  try {
-    return window.matchMedia("(any-pointer: coarse)").matches;
-  } catch {
-    return false;
-  }
 }
 
 /** Hauteur du document, hors calque du Stage (qui est absolu et ne compte pas). */

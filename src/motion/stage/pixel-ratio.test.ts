@@ -91,6 +91,17 @@ describe("stagePixelRatio · budget de pixels", () => {
     expect(stagePixelRatio(1, laptop, 1)).toBe(1);
   });
 
+  it("un appareil tactile garde le budget de C2 en C1 : son C1 est un départ, pas un déclassement", () => {
+    // Tablette de 12,9 pouces : 1024 × 1366 px CSS, DPR 2, marge de doigt.
+    const tablet = canvasOf(1024, 1366, ANCHOR_MARGIN_COARSE);
+    const asC1 = stagePixelRatio(2, tablet, 1, true);
+    expect(asC1).toBe(stagePixelRatio(2, tablet, 2, true));
+    expect(asC1).toBeGreaterThan(stagePixelRatio(2, tablet, 1, false));
+    expect(bufferMpx(tablet, asC1)).toBeLessThanOrEqual(
+      STAGE_PIXEL_BUDGET[2] / 1e6 + 1e-9,
+    );
+  });
+
   it("sans taille ni palier connus (ou en C0), seul le plafond s'applique", () => {
     expect(stagePixelRatio(2)).toBe(1.5);
     expect(stagePixelRatio(2, canvasOf(9000, 5000, 0.3))).toBe(1.5);

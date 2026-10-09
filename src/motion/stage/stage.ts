@@ -43,6 +43,7 @@ import type {
   SceneId,
   StageViewDescriptor,
 } from "@/lib/motion-bridge/types";
+import { hasCoarsePointer } from "./anchor-margin";
 import { Baker } from "./bake";
 import { publishController, withdrawController } from "./controllers";
 import { clearGeometryCache } from "./geometry";
@@ -101,6 +102,8 @@ export class Stage {
   private readonly disposers: (() => void)[] = [];
   private readonly monitor = createFrameMonitor({ maxFrameMs: MAX_SAMPLE_MS });
   private readonly startedAt = performance.now();
+  /** Appareil tactile (même d'un portable) : budget de pixels de C2 quel que soit le palier. */
+  private readonly coarse = hasCoarsePointer();
   private width = 1;
   private height = 1;
   private dirty = true;
@@ -132,6 +135,7 @@ export class Stage {
           height: Math.max(1, canvas.clientHeight),
         },
         capability,
+        this.coarse,
       ),
     );
     renderer.autoClear = false;
@@ -350,6 +354,7 @@ export class Stage {
       window.devicePixelRatio,
       { width, height },
       this.ctx.capability,
+      this.coarse,
     );
   }
 
