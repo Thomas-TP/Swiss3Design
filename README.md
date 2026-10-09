@@ -102,7 +102,15 @@ Détails complets (modèle de données, auth, R2, CSP) :
 
 - 🛍️ **Boutique** — catalogue par catégories, fiches produits, choix des couleurs
   et matières, galerie d'images, **viewer 3D** interactif (Three.js).
-- 🎨 **Configurateur multicolore** — sélection jusqu'à 4 couleurs par objet.
+- 🎨 **Studio** (`/studio`) — configurateur 3D de quatre objets originaux
+  générés en code (vase « Lavaux », carte « Cartouche », sous-verre « Relief »,
+  porte-nom « Borne ») : forme, motif, texte en relief, jusqu'à 4 filaments par
+  bandes d'altitude, estimation en grammes, durée et changements de filament,
+  garde-fous d'imprimabilité, puis envoi à l'atelier (export STL, même demande
+  de devis que `/custom`).
+- 🖨️ **Accueil interactif** — un vase s'imprime couche par couche sous les yeux du
+  visiteur, dont il règle la palette et le motif (WebGL, avec repli en posters
+  SVG sans JavaScript, sur mobile et en mouvement réduit).
 - 🧾 **Devis sur mesure** — envoi de fichiers 3D (upload R2), chiffrage, puis
   paiement du devis en ligne.
 - 🛒 **Panier & paiement** — tunnel de commande avec **Stripe Payment Element**
@@ -126,26 +134,29 @@ réglages de la boutique.
 
 ## Identité visuelle
 
-L'identité suit une ligne **« Swiss business »** : neutres chauds, **rouge suisse**
-en accent, typographie nette, et un logomark géométrique.
+L'identité suit la direction **« Strates »** (refonte d'octobre 2026) : une couche
+d'impression = une courbe de niveau. Papier carte et encre chauds, le **rouge de
+la marque** réservé à la « chaleur » (boutons, point final des titres), isolignes,
+typographie nette et un logomark géométrique. Spécification complète :
+[`docs/redesign-2026/DESIGN-BRIEF.md`](docs/redesign-2026/DESIGN-BRIEF.md).
 
 <div align="center">
 
 ![#E5231C](https://img.shields.io/badge/E5231C-E5231C?style=flat-square)
 ![#1A1614](https://img.shields.io/badge/1A1614-1A1614?style=flat-square)
-![#FAFAF9](https://img.shields.io/badge/FAFAF9-FAFAF9?style=flat-square&labelColor=1A1614)
-![#0B0A09](https://img.shields.io/badge/0B0A09-0B0A09?style=flat-square)
-![#F4F1ED](https://img.shields.io/badge/F4F1ED-F4F1ED?style=flat-square&labelColor=1A1614)
+![#F4F0E8](https://img.shields.io/badge/F4F0E8-F4F0E8?style=flat-square&labelColor=1A1614)
+![#0E0D0B](https://img.shields.io/badge/0E0D0B-0E0D0B?style=flat-square)
+![#F2EDE4](https://img.shields.io/badge/F2EDE4-F2EDE4?style=flat-square&labelColor=1A1614)
 
 </div>
 
-| Élément          | Valeur                                                               |
-| ---------------- | -------------------------------------------------------------------- |
-| 🔴 Rouge marque  | `#E5231C` (accent foncé : `#C01D14`)                                 |
-| ⚫ Encre (texte) | `#1A1614` clair · `#F4F1ED` sombre                                   |
-| ⚪ Papier (fond) | `#FAFAF9` clair · `#0B0A09` sombre                                   |
-| 🔤 Police        | **Geist Sans** (`next/font`)                                         |
-| ⛰️ Logo          | Pic géométrique en couches — couches d'impression + clin d'œil alpin |
+| Élément          | Valeur                                                                                                                              |
+| ---------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| 🔴 Rouge marque  | `#E5231C` (accent foncé : `#C01D14`) ; texte rouge : `#B3170F` clair · `#FF5B4E` sombre                                             |
+| ⚫ Encre (texte) | `#1A1614` clair · `#F2EDE4` sombre                                                                                                  |
+| ⚪ Papier (fond) | `#F4F0E8` clair · `#0E0D0B` sombre                                                                                                  |
+| 🔤 Polices       | **Archivo SemiExpanded** (titres, auto-hébergée) · **Geist** (texte, interface, Stripe) · **Geist Mono** (télémétrie) — licence OFL |
+| ⛰️ Logo          | Pic géométrique en couches — couches d'impression + clin d'œil alpin                                                                |
 
 Le logo est en **rouge de marque uniquement, sur fond transparent** : ni blanc
 ni noir dans le mark, donc **un seul fichier** suffit pour le thème clair et le
@@ -176,21 +187,24 @@ Le **kit de marque** est versionné dans [`public/brand/`](public/brand) :
 
 ## Stack technique
 
-| Domaine                   | Technologie                                                                                    |
-| ------------------------- | ---------------------------------------------------------------------------------------------- |
-| Framework                 | **Next.js 16** (App Router, React Server Components)                                           |
-| UI                        | **React 19**, **Tailwind CSS 4**, [`motion`](https://motion.dev), `lucide-react`               |
-| Langage                   | **TypeScript 6** (strict)                                                                      |
-| Runtime & package manager | **Bun** (install / scripts / dev) — déploiement sur `workerd` (Cloudflare Workers)             |
-| Lint / format             | **Oxlint + Oxfmt** (remplace Biome depuis 2026-09-09, qui remplaçait ESLint depuis 2026-07-09) |
-| Base de données           | **Postgres (Neon)** via **Cloudflare Hyperdrive** + **Drizzle ORM**                            |
-| Authentification          | **better-auth** (e-mail + Google OAuth, 2FA TOTP, passkeys)                                    |
-| Paiement                  | **Stripe** (Payment Element + webhooks, **LIVE** en prod)                                      |
-| E-mails                   | **Resend** (API REST)                                                                          |
-| i18n                      | **next-intl** (fr/de/it/en)                                                                    |
-| Stockage fichiers         | **Cloudflare R2**                                                                              |
-| Cache / rate-limit        | **Cloudflare KV**                                                                              |
-| Hébergement               | **Cloudflare Workers** via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare)      |
+| Domaine                   | Technologie                                                                                                             |
+| ------------------------- | ----------------------------------------------------------------------------------------------------------------------- |
+| Framework                 | **Next.js 16** (App Router, React Server Components)                                                                    |
+| UI                        | **React 19**, **Tailwind CSS 4**, `lucide-react`, [`motion`](https://motion.dev) (admin, pages utilitaires)             |
+| Mouvement & 3D            | **GSAP**, **Lenis**, **three.js**, d3-contour, earcut — côté client uniquement (`src/motion/**`, jamais dans le Worker) |
+| Polices                   | **Archivo SemiExpanded** (auto-hébergée), **Geist**, **Geist Mono** (`next/font`)                                       |
+| Mesure d'audience         | **PostHog Cloud EU** au régime suisse (information + refus), relais `/api/relay`                                        |
+| Langage                   | **TypeScript 6** (strict)                                                                                               |
+| Runtime & package manager | **Bun** (install / scripts / dev) — déploiement sur `workerd` (Cloudflare Workers)                                      |
+| Lint / format             | **Oxlint + Oxfmt** (remplace Biome depuis 2026-09-09, qui remplaçait ESLint depuis 2026-07-09)                          |
+| Base de données           | **Postgres (Neon)** via **Cloudflare Hyperdrive** + **Drizzle ORM**                                                     |
+| Authentification          | **better-auth** (e-mail + Google OAuth, 2FA TOTP, passkeys)                                                             |
+| Paiement                  | **Stripe** (Payment Element + webhooks, **LIVE** en prod)                                                               |
+| E-mails                   | **Resend** (API REST)                                                                                                   |
+| i18n                      | **next-intl** (fr/de/it/en)                                                                                             |
+| Stockage fichiers         | **Cloudflare R2**                                                                                                       |
+| Cache / rate-limit        | **Cloudflare KV** (idempotence des protocoles d'agents) ; limitation de débit : compteur Postgres                       |
+| Hébergement               | **Cloudflare Workers** via [`@opennextjs/cloudflare`](https://opennext.js.org/cloudflare)                               |
 
 > ℹ️ Le projet a migré de D1/SQLite vers Postgres/Hyperdrive le 2026-07-09
 > (voir [`AGENTS.md`](AGENTS.md#what-this-is)). D1 reste câblé dans
@@ -220,27 +234,35 @@ Swiss3Design/
 ├─ docs/                          # Doc interne : architecture, conventions, playbook, runbook, déploiement
 ├─ drizzle-pg/                    # Migrations Postgres (drizzle-kit, actif) — NE PAS éditer à la main
 ├─ drizzle/                       # Migrations D1/SQLite legacy (filet de secours) — NE PAS éditer à la main
-├─ messages/                      # Traductions next-intl (fr, de, it, en)
+├─ messages/                      # Traductions next-intl (fr, de, it, en) + <langue>/<namespace>.json
 ├─ public/
 │  ├─ brand/                      # Kit de marque (mark, icônes, og-image) + old-logo/ archivé
 │  ├─ products/                   # Illustrations produits (SVG)
+│  ├─ posters/                    # Posters SVG d'isolignes (générés par scripts/gen-field-posters.ts)
+│  ├─ studio/glyphs/              # Glyphes du texte en relief du Studio (+ licence OFL)
 │  ├─ avatars/                    # Avatars par défaut
-│  ├─ about/                      # Photos page « À propos »
+│  ├─ about/                      # Photos page « L'Atelier »
 │  └─ .well-known/security.txt    # Contact sécurité
 ├─ scripts/                       # Outils hors-app
 │  ├─ seed.sql / seed-categories.sql  # Jeux de données D1 legacy (rollback)
-│  └─ migrate-d1-to-pg.ts         # Outil de migration D1 → Postgres (Bun)
+│  ├─ migrate-d1-to-pg.ts         # Outil de migration D1 → Postgres (Bun)
+│  ├─ check-worker-bundle.ts      # 0 signature three/gsap/lenis dans le Worker (après le build OpenNext)
+│  ├─ chunk-report.ts             # Poids du JS par page et par chunk
+│  └─ gen-field-posters.ts · fonts/  # Posters SVG et glyphes du Studio
 ├─ src/
 │  ├─ app/
-│  │  ├─ [locale]/                # Pages localisées (boutique, compte, admin, devis…)
+│  │  ├─ [locale]/                # Pages localisées ; (site)/ = vitrine (accueil, boutique, Studio…)
 │  │  ├─ api/                     # Routes API (Stripe, auth, fichiers, cron…)
 │  │  ├─ globals.css              # Thème Tailwind v4 (clair/sombre, rouge marque)
 │  │  ├─ manifest.ts              # Manifest PWA
 │  │  └─ favicon.ico · icon.svg · apple-icon.png
-│  ├─ components/                 # Composants UI (header, footer, product-card…)
+│  ├─ components/                 # Composants UI (header, footer, product-card…), ui/ = primitives « Strates », studio/ = Studio
+│  ├─ fonts/                      # Archivo SemiExpanded auto-hébergée + licence OFL
+│  ├─ gates/                      # Seule porte vers src/motion (next/dynamic, ssr: false)
+│  ├─ motion/                     # GSAP, Lenis, three : moteurs client-only (jamais dans le Worker)
 │  ├─ db/                         # Drizzle : schema.pg.ts (source de vérité), queries, client Hyperdrive
 │  ├─ i18n/                       # Config next-intl (routing, request, navigation)
-│  ├─ lib/                        # Logique métier (auth, panier, stripe, email…)
+│  ├─ lib/                        # Logique métier (auth, panier, stripe, email…) ; studio/ = géométrie pure du Studio
 │  └─ middleware.ts               # Middleware Edge (i18n + sécurité + CSP nonce)
 ├─ workers/cron/                  # Worker Cron autonome (purge R2, relances panier)
 ├─ next.config.ts                 # Next.js + next-intl + OpenNext
@@ -444,19 +466,21 @@ reflétée dans l'URL (`/fr`, `/de`, `/it`, `/en`). Les traductions vivent dans
 
 ## Documentation
 
-| Document                                                             | Pour qui     | Contenu                                                   |
-| -------------------------------------------------------------------- | ------------ | --------------------------------------------------------- |
-| [`AGENTS.md`](AGENTS.md)                                             | Agents IA    | Brief opérationnel + règles d'or (chargé via `CLAUDE.md`) |
-| [`docs/architecture.md`](docs/architecture.md)                       | Agents / dev | Modèle de données, flux, runtime                          |
-| [`docs/conventions.md`](docs/conventions.md)                         | Agents / dev | Patterns de code & pièges                                 |
-| [`docs/playbook.md`](docs/playbook.md)                               | Humain ↔ IA  | Comment demander et réaliser une tâche efficacement       |
-| [`docs/runbook.md`](docs/runbook.md)                                 | Ops          | Déploiement, rollback, incidents, secrets                 |
-| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)   | Ops          | Connexion Git ↔ Cloudflare Workers Builds                 |
-| [`docs/codemap.md`](docs/codemap.md)                                 | Agents / dev | « Je dois faire X » → fichier(s) exact(s)                 |
-| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md) | Produit      | Proposition de refonte (pas encore implémentée)           |
-| [`SECURITY.md`](SECURITY.md)                                         | Sécurité     | Signalement de vulnérabilité                              |
-| [`ROADMAP.md`](ROADMAP.md)                                           | Produit      | État du projet & suite envisagée                          |
-| [`LICENSE.md`](LICENSE.md)                                           | Légal        | Propriété & interdictions (tous droits réservés)          |
+| Document                                                                   | Pour qui     | Contenu                                                                                   |
+| -------------------------------------------------------------------------- | ------------ | ----------------------------------------------------------------------------------------- |
+| [`AGENTS.md`](AGENTS.md)                                                   | Agents IA    | Brief opérationnel + règles d'or (chargé via `CLAUDE.md`)                                 |
+| [`docs/architecture.md`](docs/architecture.md)                             | Agents / dev | Modèle de données, flux, runtime                                                          |
+| [`docs/conventions.md`](docs/conventions.md)                               | Agents / dev | Patterns de code & pièges                                                                 |
+| [`docs/playbook.md`](docs/playbook.md)                                     | Humain ↔ IA  | Comment demander et réaliser une tâche efficacement                                       |
+| [`docs/runbook.md`](docs/runbook.md)                                       | Ops          | Déploiement, rollback, incidents, secrets                                                 |
+| [`docs/deploiement-cloudflare.md`](docs/deploiement-cloudflare.md)         | Ops          | Connexion Git ↔ Cloudflare Workers Builds                                                 |
+| [`docs/codemap.md`](docs/codemap.md)                                       | Agents / dev | « Je dois faire X » → fichier(s) exact(s)                                                 |
+| [`docs/refonte-plateforme-2026.md`](docs/refonte-plateforme-2026.md)       | Produit      | Proposition « la Forge » (en partie reprise par le Studio, le reste n'est pas implémenté) |
+| [`docs/redesign-2026/DESIGN-BRIEF.md`](docs/redesign-2026/DESIGN-BRIEF.md) | Agents / dev | Spécification de la refonte « Strates » (jetons, mouvement, Studio)                       |
+| [`docs/redesign-2026/checklist-j3.md`](docs/redesign-2026/checklist-j3.md) | Propriétaire | Mise en ligne de la refonte : vérifications, fusion, retour arrière                       |
+| [`SECURITY.md`](SECURITY.md)                                               | Sécurité     | Signalement de vulnérabilité                                                              |
+| [`ROADMAP.md`](ROADMAP.md)                                                 | Produit      | État du projet & suite envisagée                                                          |
+| [`LICENSE.md`](LICENSE.md)                                                 | Légal        | Propriété & interdictions (tous droits réservés)                                          |
 
 ## Propriété & licences
 
@@ -468,6 +492,24 @@ Les modèles 3D proposés à la vente sont des **produits tiers sous licence** (
 pour un usage commercial) : ils **n'appartiennent pas** à Swiss3Design et restent
 soumis à la licence de leurs auteurs ; chacune doit autoriser la vente
 d'impressions physiques.
+
+### Logiciels et polices tiers
+
+Le code du site utilise des composants tiers sous leurs propres licences
+(la liste complète des dépendances est dans [`package.json`](package.json)) :
+
+| Composant                                                                        | Licence                                                                                                                                                                                       | Usage                                                                                             |
+| -------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| **GSAP** et `@gsap/react` (3.15 : ScrollTrigger, SplitText, DrawSVG, CustomEase) | **GreenSock « Standard no-charge license »** ([gsap.com/standard-license](https://gsap.com/standard-license)) : gratuite, y compris en usage commercial, mais **ce n'est pas la licence MIT** | chorégraphies de défilement, côté client (`src/motion/**`)                                        |
+| **Lenis**                                                                        | MIT                                                                                                                                                                                           | défilement fluide des pages vitrine                                                               |
+| **three.js**                                                                     | MIT                                                                                                                                                                                           | scène WebGL (héros, Studio, viewer produit)                                                       |
+| **d3-contour**, **earcut**                                                       | ISC                                                                                                                                                                                           | isolignes et triangulation du Studio                                                              |
+| **opentype.js** (outil de développement)                                         | MIT                                                                                                                                                                                           | génère les glyphes du texte en relief (`scripts/fonts/`)                                          |
+| **Archivo** (SemiExpanded)                                                       | SIL Open Font License 1.1 (© The Archivo Project Authors) : [`src/fonts/OFL-Archivo.txt`](src/fonts/OFL-Archivo.txt)                                                                          | titres ; glyphes dérivés : [`public/studio/glyphs/OFL.txt`](public/studio/glyphs/OFL.txt)         |
+| **Geist**, **Geist Mono**                                                        | SIL Open Font License 1.1 (© The Geist Project Authors, Vercel)                                                                                                                               | texte, interface, télémétrie ; chargées par `next/font/google` au build, sans copie dans le dépôt |
+
+Le **Vase spirale** vendu à la boutique est une œuvre de **Ian** (MakerWorld, licence
+**CC BY-ND 4.0**) : attribution affichée sur sa fiche, jamais modifié.
 
 <div align="center">
 

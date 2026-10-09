@@ -11,19 +11,19 @@
 
 ## ✅ Décisions verrouillées (et livrées)
 
-| Sujet              | Choix                                                                                                                                                                 |
-| ------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Framework          | **Next.js 16 + React 19** via **OpenNext for Cloudflare**                                                                                                             |
-| Animations / rendu | **Motion** (ex-Framer Motion) + View Transitions                                                                                                                      |
-| Comptes clients    | **Better Auth** sur Postgres/Hyperdrive (e-mail + **Google OAuth**, **2FA TOTP**, passkeys)                                                                           |
-| Auth admin         | **Rôle `admin` Better Auth**, attribué automatiquement aux adresses de `ADMIN_EMAILS` (pas de Cloudflare Access)                                                      |
-| Paiement           | **Stripe Payment Element** personnalisé (intégré) — cartes + Apple/Google Pay. **TWINT** disponible via Stripe (à activer au dashboard). PostFinance Pay : abandonné. |
-| Langues            | **FR / DE / IT / EN** avec détection auto du navigateur (repli FR) via `next-intl`                                                                                    |
-| Frais de port      | **Tarif unique Suisse** + **gratuit dès un seuil** (réglable en admin)                                                                                                |
-| Modèle de vente    | **Hybride** : stock pré-imprimé + impression à la demande (délai affiché)                                                                                             |
-| Devis sur mesure   | **Oui** : upload STL/3MF (R2) + fil de discussion client ↔ atelier + paiement du devis                                                                                |
-| Domaine            | **swiss3design.ch** (réservé, en ligne, `www` → apex)                                                                                                                 |
-| Implémentation     | **L'IA code l'intégralité**                                                                                                                                           |
+| Sujet              | Choix                                                                                                                                                                                       |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Framework          | **Next.js 16 + React 19** via **OpenNext for Cloudflare**                                                                                                                                   |
+| Animations / rendu | **GSAP + Lenis** (défilement, chorégraphies) et **three.js** (un seul canvas WebGL) côté client uniquement, **View Transitions** (« Coupe ») ; Motion (ex-Framer Motion) reste pour l'admin |
+| Comptes clients    | **Better Auth** sur Postgres/Hyperdrive (e-mail + **Google OAuth**, **2FA TOTP**, passkeys)                                                                                                 |
+| Auth admin         | **Rôle `admin` Better Auth**, attribué automatiquement aux adresses de `ADMIN_EMAILS` (pas de Cloudflare Access)                                                                            |
+| Paiement           | **Stripe Payment Element** personnalisé (intégré) — cartes + Apple/Google Pay. **TWINT** disponible via Stripe (à activer au dashboard). PostFinance Pay : abandonné.                       |
+| Langues            | **FR / DE / IT / EN** avec détection auto du navigateur (repli FR) via `next-intl`                                                                                                          |
+| Frais de port      | **Tarif unique Suisse** + **gratuit dès un seuil** (réglable en admin)                                                                                                                      |
+| Modèle de vente    | **Hybride** : stock pré-imprimé + impression à la demande (délai affiché)                                                                                                                   |
+| Devis sur mesure   | **Oui** : upload STL/3MF (R2) + fil de discussion client ↔ atelier + paiement du devis                                                                                                      |
+| Domaine            | **swiss3design.ch** (réservé, en ligne, `www` → apex)                                                                                                                                       |
+| Implémentation     | **L'IA code l'intégralité**                                                                                                                                                                 |
 
 ---
 
@@ -41,7 +41,8 @@
 | Besoin                        | Outil                                                                                                                                                                                        |
 | ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Framework                     | Next.js 16 (App Router) + React 19, déployé via **OpenNext** sur **Cloudflare Workers**                                                                                                      |
-| Animations                    | **Motion** + View Transitions API                                                                                                                                                            |
+| Animations & 3D               | **GSAP + Lenis** + **three.js** (Stage WebGL), client-only sous `src/motion/**`, derrière `src/gates/**` (règle d'or 11) ; View Transitions API ; Motion pour l'admin                        |
+| Polices                       | **Archivo SemiExpanded** (titres, auto-hébergée) + **Geist / Geist Mono** (texte, interface, Stripe) — licence OFL                                                                           |
 | Base de données               | **Postgres (Neon)** via **Cloudflare Hyperdrive** + **Drizzle ORM** — pivot 2026-07-09, D1/SQLite gardé en filet de secours inactif                                                          |
 | Outillage                     | **Bun** (install/scripts/dev) + **Oxlint + Oxfmt** (lint + format, remplace Biome depuis 2026-09-09)                                                                                         |
 | Fichiers (images, STL/3MF)    | **Cloudflare R2** (servis via route handlers, jamais publics)                                                                                                                                |
@@ -54,10 +55,10 @@
 | Emails                        | **Resend** (réponses clients vers l'alias Infomaniak `contact@swiss3design.ch`)                                                                                                              |
 | UI                            | **Tailwind CSS 4** + composants maison + **Lucide** (pas de shadcn/ui)                                                                                                                       |
 | Sécurité                      | En-têtes durcis + **CSP à nonce par requête** (prod) + rate-limiting KV                                                                                                                      |
-| Analytics                     | **Cloudflare Web Analytics** (sans cookie) — activé                                                                                                                                          |
+| Analytics                     | **PostHog Cloud EU** au régime suisse (information + refus, relais `/api/relay`) ; Cloudflare Web Analytics (sans cookie) activé avant                                                       |
 | SEO                           | sitemap/robots dynamiques, metadata + JSON-LD (Product/AggregateRating/Organization), hreflang                                                                                               |
 | Images                        | **Cloudflare Transformations** (`/cdn-cgi/image`) — resize + `format=auto`                                                                                                                   |
-| 3D                            | Viewer produit **Three.js** (`.stl`/`.glb`), chargé à la demande                                                                                                                             |
+| 3D                            | **Stage WebGL** (three.js, un seul contexte) : héros de l'accueil, objets du **Studio**, viewer produit (`.stl`/`.glb`) ; chargé à la demande, jamais dans le Worker                         |
 
 ---
 
@@ -82,8 +83,8 @@ Détail des pages, du panel admin et des flux : [`README.md`](README.md) (vue
 fonctionnelle) et [`docs/architecture.md`](docs/architecture.md) (runtime, flux
 paiement idempotent, devis, rattachement invité, sécurité). Résumé :
 
-- **Pages publiques** (préfixe langue) : accueil, catalogue, fiche produit, devis
-  sur mesure, panier → checkout Stripe → confirmation, espace client, favoris,
+- **Pages publiques** (préfixe langue) : accueil, catalogue, fiche produit, **Studio**
+  (configurateur 3D de quatre objets), devis sur mesure, l'Atelier (`/a-propos`), contact, panier → checkout Stripe → confirmation, espace client, favoris,
   suivi invité `/track`, pages légales.
 - **Navigation** : barre fixe en bas (mobile), header discret (desktop).
 - **Admin** (`/admin`, gardé par `requireAdmin()`) : dashboard, produits,
@@ -169,6 +170,49 @@ Lot SEO / perf / conversion (livré) :
   Commerce Suite, achat direct par agent IA (MPP, ACP, UCP) payé par Shared
   Payment Token, section « agents IA » des CGV et de la confidentialité.
   Paiements de test réussis de bout en bout sur les trois protocoles.
+
+Refonte « Strates » (octobre 2026, mise en ligne en une fois au jalon J3 ;
+spécification : [`docs/redesign-2026/DESIGN-BRIEF.md`](docs/redesign-2026/DESIGN-BRIEF.md),
+checklist de mise en ligne : [`docs/redesign-2026/checklist-j3.md`](docs/redesign-2026/checklist-j3.md)) :
+
+- ✅ **Direction visuelle** : une couche = une courbe de niveau. Papier carte et
+  encre chauds, le rouge de la marque réservé à la « chaleur » (boutons, point
+  final des titres), Archivo SemiExpanded + Geist, isolignes SVG, bande de
+  mesure, thème sombre sans flash blanc ; jetons conservés, valeurs changées.
+- ✅ **Accueil** : héros « L'impression personnalisable » (un vase s'imprime
+  couche par couche sous les yeux du visiteur, palette et motif réglables en
+  direct), bascule en plan, sept chapitres, trois entrées (Personnaliser,
+  Acheter, J'ai un fichier).
+- ✅ **Studio** (`/studio`) : configurateur 3D de quatre objets originaux
+  générés en code (vase « Lavaux », carte « Cartouche », sous-verre « Relief »,
+  porte-nom « Borne »), garde-fous d'imprimabilité, grammes / durée /
+  changements de filament, export STL dans un Worker, envoi à l'atelier par la
+  même Server Action de devis que `/custom` (formulaire partagé).
+- ✅ **Boutique, fiches produit, Atelier, contact, sur mesure, compte, tunnel de
+  paiement, légal, 404** : refonte visuelle et éditoriale en 4 langues, avec
+  l'attribution du Vase spirale (CC BY-ND) en données structurées.
+- ✅ **Socle technique** : Stage WebGL unique, mouvement réduit et paliers C0 à
+  C2, groupe de routes `(site)` (ni Lenis ni canvas autour de Stripe), textes
+  par namespace avec messages client à la demande, nouveaux événements de
+  mesure (`Hero Customized`, `Studio *`) sans aucun texte personnel.
+- ✅ **Admin** : revu dans les deux thèmes (contrastes, rayons, débordements),\n corrigé par les jetons et les styles propres à l'admin, sans le redessiner.
+
+Prochaines étapes (après J3) :
+
+- **Renommer la marque en « Kreya »** (choix du 08.10.2026, vérifications
+  faites) : acheter `kreya.ch` (Infomaniak, par le propriétaire), puis un
+  paquet dédié : textes des 4 langues, métadonnées et JSON-LD, e-mails,
+  logo, wordmark, domaine et redirections.
+- **Calibrer le Studio** : inventaire réel des bobines (aujourd'hui des teintes
+  indicatives) et coefficients de prix (aucun CHF affiché tant que
+  `PRICING.validated` vaut `false`), après impression et pesée de quelques
+  pièces.
+- **Politique de confidentialité** : mentionner le stockage local du Studio
+  (créations, textes saisis le temps de la session).
+- Options du brief de la refonte (§11.2 n° 8) : police suisse premium, rendus
+  Blender pour les images OG, image « Illustration » de l'Atelier. Liste
+  « plus tard » du brief (§1.3) : export 3MF, plan de bureau, commande directe
+  du Studio au panier à prix ferme, relief suisse réel, etc.
 
 En attente — à ne pas oublier :
 

@@ -51,6 +51,27 @@ distinctifs du Propriétaire et ne peuvent être utilisés sans autorisation éc
 Le Logiciel est fourni « en l'état », sans garantie d'aucune sorte. Le Propriétaire
 ne saurait être tenu responsable de tout dommage résultant de son usage.
 
-## 8. Contact
+## 8. Composants, polices et œuvres de tiers (crédits)
+
+La présente licence **ne s'applique pas** aux composants ci-dessous, qui restent
+soumis à leurs propres licences. Leur usage dans ce projet respecte ces licences ;
+les avis de droit d'auteur et textes de licence demandés sont conservés avec les
+fichiers concernés.
+
+| Composant                                                                         | Licence                                                                                                                                                              |
+| --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **GSAP** (core, ScrollTrigger, SplitText, DrawSVG, CustomEase) et **@gsap/react** | **GreenSock « Standard no-charge license »** — <https://gsap.com/standard-license>. Gratuite, y compris pour un usage commercial ; **ce n'est pas une licence MIT**. |
+| **Lenis**                                                                         | MIT                                                                                                                                                                  |
+| **three.js**                                                                      | MIT                                                                                                                                                                  |
+| **d3-contour**, **earcut**                                                        | ISC                                                                                                                                                                  |
+| **opentype.js** (outil de développement uniquement)                               | MIT                                                                                                                                                                  |
+| **Archivo** (SemiExpanded) © The Archivo Project Authors                          | SIL Open Font License 1.1 — `src/fonts/OFL-Archivo.txt` ; glyphes du Studio dérivés d'Archivo : `public/studio/glyphs/OFL.txt`                                       |
+| **Geist** et **Geist Mono** © The Geist Project Authors (Vercel)                  | SIL Open Font License 1.1 — <https://github.com/vercel/geist-font/blob/main/OFL.txt>                                                                                 |
+| **Vase spirale** (modèle 3D) par **Ian**, MakerWorld                              | CC BY-ND 4.0 — <https://makerworld.com/fr/models/1262112-vase> ; attribution affichée sur sa fiche, aucune œuvre dérivée                                             |
+
+Les autres dépendances (framework, base de données, authentification, paiement…) sont
+listées dans `package.json`, chacune sous sa licence.
+
+## 9. Contact
 
 Toute demande d'autorisation doit être adressée à : **contact@swiss3design.ch**

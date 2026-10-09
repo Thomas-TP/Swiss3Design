@@ -126,7 +126,9 @@ if (!(await rateLimit(request, "quote-upload", { limit: 5, windowS: 60 })))
   return tooManyRequests(); // 429
 ```
 
-KV-backed fixed window, per IP + route; a no-op locally (no `cf-connecting-ip`).
+Atomic fixed-window counter in Postgres (`request_limits`, shared by every isolate),
+keyed on the SHA-256 of the IP + route (never stored in clear); a no-op locally (no
+`cf-connecting-ip`).
 
 ## i18n
 
@@ -246,8 +248,9 @@ live in `src/motion/**` and are reached only through `src/gates/**`
 - **Motion never holds content back.** No `opacity: 0` on SSR content
   waiting for JS, nothing on the `h1`/LCP element, no preloader, no
   `loading.tsx` inside `(site)` (it breaks View Transition pairs). Simple
-  reveals are CSS: `.s3d-rise` (text blocks), `.s3d-print` (images, cards,
-  8 steps); they only run with `data-motion="full"`.
+  reveals are CSS: `.s3d-rise` (text blocks), `.s3d-print` (images, cards: the
+  cut edge rises along a continuous `ease-strate` curve); they only run with
+  `data-motion="full"`.
 - **One engine per property.** GSAP (core, ScrollTrigger, `useGSAP` and the
   brand eases via `@/motion/gsap`) for scroll-linked work, timelines and
   WebGL uniforms. `@/motion/gsap` sits in the runtime chunk (≤ 65 KiB gzip):
@@ -293,13 +296,17 @@ live in `src/motion/**` and are reached only through `src/gates/**`
 - **Stage canvas and native scroll.** With Lenis (wheel, trackpad) the DOM and
   the canvas share one frame (measured ≤ 0.6 px apart). Native scroll
   (touch, keyboard, scrollbar) is moved by the compositor ahead of the main
-  thread, so a `fixed` canvas lags 1–2 frames behind its container. At C1
-  `StageRoot` therefore anchors the canvas to the document (absolute wrapper
-  clipped to the page height, canvas two windows tall, recentred each frame by
-  the loop: `CanvasAnchor` in `stage/ticker.ts`); `ViewTracker.rect()` returns
+  thread, so a `fixed` canvas lags 1–2 frames behind its container.
+  `StageRoot` therefore anchors the canvas to the document at **both** C1 and
+  C2 (absolute wrapper clipped to the page height, canvas two windows tall,
+  recentred each frame by the loop: `CanvasAnchor` in `stage/ticker.ts`;
+  owner decision R16, 08.10.2026); `ViewTracker.rect()` returns
   canvas-relative rectangles, so scenes and `stage.ts` don't know. A `liveRect`
-  view (sticky or pinned) turns it back into a fixed canvas. Don't read a
-  view's rect from outside the tracker.
+  view (sticky or pinned) turns it back into a fixed canvas only while it is
+  **near** the window (25 % margin). The pixel ratio is capped at 1.5 at every
+  tier (`stage/pixel-ratio.ts`): the canvas is two windows tall, so the cap is
+  what keeps its pixel count in check. Don't read a view's rect from outside
+  the tracker.
 - **Stacking** (z-index): Stage canvas −1 (portaled into `<body>`), content
   `auto`, favorite on a card 10, menus 20, chapter rail 30, header 40, consent
   banner 40, mobile Studio bar 45, BottomNav and skip links 50, toasts 55,
@@ -350,11 +357,21 @@ live in `src/motion/**` and are reached only through `src/gates/**`
   `ease-carte` (big state changes); durations `--dur-micro` 150 ms,
   `--dur-ui` 280 ms, `--dur-reveal` 800 ms, `--dur-chapter` 1400 ms,
   `--dur-page` 480 ms.
-- **`globals.css` is frozen after WP-00.** Package styles go in colocated
-  CSS Modules (`*.module.css`). Beware: the few rules written outside
+- **`globals.css` is frozen after WP-00**, except its « Admin » block (below).
+  Package styles go in colocated CSS Modules (`*.module.css`). Beware: the few rules written outside
   `@layer` there (`.s3d-pending`, `.s3d-progress`, `.s3d-stage`) beat every
   Tailwind utility; render a different element instead of trying to override
   them.
+- **Admin** (`src/app/[locale]/admin/**`): not redesigned, it inherits the tokens.
+  Its root (`AdminShell`) carries `.s3d-admin`, and the « Admin » block of
+  `globals.css` scopes two corrections to it by token only: placeholders in
+  `soft` (the Tailwind default, text at 50 %, is 3.3:1) and the Tailwind radius
+  scales (`--radius-md/lg/xl/2xl`) remapped to the `field` / `card` radii, so
+  the ~30 `rounded-xl` of the admin follow the redesign without a diff in each
+  component. Status pills use the 800 shade of the colour in light theme
+  (`ui.ts`, `STATUS_STYLE`: 700 on a 15 % tint is 4.1–4.4:1), and never
+  `text-soft/NN` or `opacity-NN` on text (4.5:1 needed, the admin has no large
+  type). Check both themes after any admin change.
 - Reuse the primitives of [`src/components/ui/`](../src/components/ui/)
   (`Button`/`ButtonLink`, `Chip`/`ChipRadio` on native radios,
   `Field`/`fieldClass`, `SpecTable`, `MeasureStrip`, `Ruler`, `MapFrame`,
@@ -416,6 +433,19 @@ on _every_ page at once.
   `Order Completed.revenue` is the amount actually paid, shipping included (the
   Stripe figure), and PostHog revenue analytics reads that exact property.
   Renaming it breaks the project config.
+- **Redesign events** (typed contracts in `TrackedEvents`, `lib/analytics.ts`;
+  the existing events keep names and properties): `Quote Requested` gains
+  `source: "form" | "studio"` (+ `object`; `/custom` sends `form` by default),
+  and the Studio fires `Studio Viewed` (`<TrackEvent>` on `/studio/[objet]`),
+  `Studio Configured` (first adjustment per object and session, `control` =
+  short control name), `Studio Sent` (after a successful upload: object, bands,
+  triangles, bytes, estimate in CHF decimals when displayed), `Studio Link
+Copied`, `Studio Saved`; the home hero fires `Hero Customized` once per
+  session. **The PostHog actions rely on event names only** (Achat = `Order
+Completed`, Ajout au panier = `Product Added`, Demande de devis = `Quote
+Requested`, Inscription = `Signed Up`): never rename them, and fire them from
+  every journey that leads to the same outcome (shop card, product page,
+  « Acheter », favourites; `/custom` and the Studio drawer share one form).
 - **Never send personal data.** No email, name, address or payment message goes
   into a property. URLs are reduced to an allowlist of query params
   (`KEPT_PARAMS`: utm, click IDs, shop search and filters), and email-looking
@@ -445,6 +475,15 @@ on _every_ page at once.
   drop everything. The choice lives in `localStorage["s3d-consent"]`. No
   `identify()`: visitors stay random IDs, which keeps the "no profiling"
   statement of the privacy policy true.
+- **Studio and typed text.** The text a visitor engraves (name, role, summit)
+  never goes into a URL, a fragment, an event or an unmasked attribute: it
+  lives in memory and in `sessionStorage["s3d-studio-texts-v1"]` until the
+  quote is sent (the only recipient, declared purpose). The shared state of the
+  Studio is the `#c=v1.…` fragment (configuration only, stripped by
+  `sanitizeUrl`). Anything that shows that text carries `ph-mask`; decorative
+  or fast-changing readouts (telemetry strips, counters, layer readouts,
+  thumbnails of the engraved text) carry `ph-no-capture`, which keeps them out
+  of replays and autocapture (size, INP).
 - **Personal data on screen** (an email, an address) gets the `ph-mask`
   class, so it is masked in replays; inputs are always masked. `/account` and
   `/track` are excluded from recording in the project settings. Network request
