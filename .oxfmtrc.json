@@ -24,7 +24,6 @@
     "public/**",
     "workers/**",
     "cloudflare-env.d.ts",
-    "next-env.d.ts",
-    "src/app/icon.svg"
+    "next-env.d.ts"
   ]
 }
