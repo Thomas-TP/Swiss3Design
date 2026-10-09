@@ -38,7 +38,10 @@ export function classifyCapability(env: CapabilityEnv): Capability {
   return 2;
 }
 
-/** Palier suivant vers le bas : C2 → C1 (DPR 1,5, LOD mobile), C1 → C0 (posters). */
+/**
+ * Palier suivant vers le bas : C2 → C1 (DPR 1,5, budget de pixels de C1 à
+ * 4 Mpx, LOD mobile), C1 → C0 (posters).
+ */
 export function downgrade(capability: Capability): Capability {
   return capability === 2 ? 1 : 0;
 }
