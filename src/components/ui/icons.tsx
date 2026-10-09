@@ -1,11 +1,13 @@
 import type { SVGProps } from "react";
 
-// Pictos maison (brief « Strates », §2.4) : grille 24, trait 1,5, extrémités
-// carrées, couleur héritée (currentColor). lucide-react couvre le reste ; ces
-// quatre-là n'existent nulle part ailleurs parce qu'ils disent le métier :
-// une pièce qui s'empile, la buse, la couche, le point coté. Décoratifs par
-// défaut (aria-hidden) : le libellé vit à côté, jamais dans l'icône seule.
-// Aucune croix, jamais (loi sur la protection des armoiries).
+// Picto maison (brief « Strates », §2.4) : grille 24, trait 1,5, extrémités
+// carrées, couleur héritée (currentColor). lucide-react couvre le reste ; celui-ci
+// n'existe nulle part ailleurs parce qu'il dit le métier : une pièce qui
+// s'empile. Les trois autres du brief (buse, couche, point coté) n'ont jamais
+// eu d'emploi et ont été retirés par WP-99 (le triangle des cartes a été
+// abandonné au retour R09) ; un nouveau picto se redessine sur la même grille.
+// Décoratif par défaut (aria-hidden) : le libellé vit à côté, jamais dans
+// l'icône seule. Aucune croix, jamais (loi sur la protection des armoiries).
 
 type IconProps = SVGProps<SVGSVGElement> & { size?: number };
 
@@ -36,40 +38,6 @@ export function StrataIcon(props: IconProps) {
       <path d="M3.5 19.5h17l-2.2-3.8H5.7z" />
       <path d="M6.9 13.6h10.2l-2.2-3.8H9.1z" />
       <path d="M10.3 7.7h3.4L12 4.8z" />
-    </Svg>
-  );
-}
-
-/** Buse : bloc de chauffe, cône, cordon déposé sur le plateau. */
-export function NozzleIcon(props: IconProps) {
-  return (
-    <Svg {...props}>
-      <path d="M12 2.5v2" />
-      <path d="M7.5 4.5h9v5h-9z" />
-      <path d="M9.5 9.5 12 14l2.5-4.5" />
-      <path d="M4 19.5h16" />
-      <path d="M9 17h6" />
-    </Svg>
-  );
-}
-
-/** Couches : trois tranches de 0,2 mm vues de face. */
-export function LayerIcon(props: IconProps) {
-  return (
-    <Svg {...props}>
-      <path d="M4 5.5h16V9H4z" />
-      <path d="M4 10.25h16v3.5H4z" />
-      <path d="M4 15h16v3.5H4z" />
-    </Svg>
-  );
-}
-
-/** Point coté : le triangle de nivellement des cartes nationales. */
-export function SummitIcon(props: IconProps) {
-  return (
-    <Svg {...props}>
-      <path d="M12 4.5 20.5 19h-17z" />
-      <circle cx="12" cy="14" r="1.25" fill="currentColor" stroke="none" />
     </Svg>
   );
 }
