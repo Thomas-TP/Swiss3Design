@@ -70,8 +70,9 @@ export interface StageScene<P, C = unknown> {
   controller?: C;
   /**
    * Ajout au contrat : true tant que la scène ne sait pas remplacer le poster
-   * SSR (stubs de WP-00 en production). Le Stage ne la rend pas et ne pose
-   * jamais data-stage-ready : le poster reste visible.
+   * SSR (modèle du viewer pas encore prêt, objet du Studio figé en image). Le
+   * Stage ne la rend pas et ne pose jamais data-stage-ready : le poster reste
+   * visible.
    */
   holdPoster?: boolean;
   dispose(): void;

@@ -11,7 +11,7 @@ import type { StudioConfig, StudioTexts } from "@/lib/studio/types";
  */
 export type Capability = 0 | 1 | 2;
 
-/** Les quatre scènes v1 du Stage (brief §4.4) ; chaque package remplace son stub. */
+/** Les quatre scènes v1 du Stage (brief §4.4). */
 export type SceneId =
   | "print-hero"
   | "contour-field"
@@ -86,8 +86,8 @@ export interface MotionBridgeState {
 
 /**
  * Contrat de vue « objet Studio » (§9.2) : permet à l'accueil (WP-HOME)
- * d'afficher un objet du Studio sans attendre WP-STUDIO. Tant que la scène
- * `studio-object` est un stub, le poster SSR reste visible.
+ * d'afficher un objet du Studio sans passer par la page du Studio. Tant que la
+ * scène `studio-object` ne tient pas la place du poster, il reste visible.
  */
 export interface StudioObjectViewProps {
   config: StudioConfig;

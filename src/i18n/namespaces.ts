@@ -1,6 +1,7 @@
 // Refonte « Strates » (brief §4.9) : les fichiers historiques
-// messages/{fr,de,it,en}.json sont gelés ; chaque package écrit ses textes
-// dans ses propres fichiers messages/<locale>/<ns>.json, fusionnés au
+// messages/{fr,de,it,en}.json étaient gelés pendant la refonte (dégelés par
+// WP-99) ; chaque package a écrit ses textes dans ses propres fichiers
+// messages/<locale>/<ns>.json, fusionnés au
 // chargement par request.ts. Un namespace = un fichier par locale = un seul
 // package propriétaire (brief §9.2) : deux agents parallèles ne touchent donc
 // jamais le même JSON, et les conflits de fusion sur messages/*.json

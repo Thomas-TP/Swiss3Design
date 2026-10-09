@@ -1,7 +1,7 @@
 // Registre des scènes du Stage (brief « Strates », §4.4) : quatre scènes v1,
-// un chunk chacune, chargé à la première vue qui le demande. WP-00 livre un
-// stub par scène (un cube papier) ; chaque package remplace le fichier de la
-// sienne sans toucher à ce registre.
+// un chunk chacune, chargé à la première vue qui le demande. Chaque package a
+// livré le fichier de sa scène sans toucher à ce registre (la scène témoin de
+// WP-00 a été retirée par WP-99).
 import type { SceneId } from "@/lib/motion-bridge/types";
 import type { SceneModule } from "../types";
 
