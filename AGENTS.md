@@ -207,9 +207,12 @@ put` on an environment with real users without `--env <name>` explicitly
     iframes). A page that joins or leaves the group also updates
     `isSitePath()` in [`src/components/ui/site-link.tsx`](src/components/ui/site-link.tsx)
     (the « Coupe » page transition only plays between two pages of the
-    group). **i18n by namespace:** during the redesign the historical
-    `messages/{fr,de,it,en}.json` are frozen; each package writes its new text
-    in its own `messages/<locale>/<namespace>.json` (declared in
+    group). **i18n by namespace:** the historical
+    `messages/{fr,de,it,en}.json` were frozen during the redesign; WP-99
+    cleaned them (76 unread keys removed, 2026-10-09) and the freeze is
+    lifted, so they are editable again (same keys in the 4 locales). New text
+    of the redesign's areas still goes in its own
+    `messages/<locale>/<namespace>.json` (declared in
     [`src/i18n/namespaces.ts`](src/i18n/namespaces.ts), merged by
     `src/i18n/request.ts`), and `src/i18n/messages.test.ts` enforces the same
     keys and ICU arguments in the 4 locales and zero `ß` in German. **The

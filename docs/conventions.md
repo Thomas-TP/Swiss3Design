@@ -136,9 +136,11 @@ keyed on the SHA-256 of the IP + route (never stored in clear); a no-op locally 
   (`useTranslations` / `getTranslations`). **Never hardcode** user-facing text;
   add the key to **all four** locales (fr is the fallback).
 - **Namespaces (redesign « Strates »).** The historical
-  `messages/{fr,de,it,en}.json` are **frozen** during the redesign (only the
-  final clean-up package removes dead keys). New text goes into the owning
-  package's own file `messages/<locale>/<namespace>.json`: `shell` (chrome),
+  `messages/{fr,de,it,en}.json` were **frozen** during the redesign; WP-99
+  cleaned them (76 unread keys removed in the 4 locales, 2026-10-09) and the
+  freeze is **lifted**: they are editable again (same keys in the 4 locales,
+  `messages.test.ts` checks it). The redesign's new text goes into the owning
+  area's own file `messages/<locale>/<namespace>.json`: `shell` (chrome),
   `studioCore`, `landing`, `studio`, `quote`, `catalog`, `atelier`, `system`,
   `accountUi`. [`src/i18n/request.ts`](../src/i18n/request.ts) grafts each
   file at the root of the messages, so `useTranslations("shell")` reads
@@ -291,22 +293,30 @@ live in `src/motion/**` and are reached only through `src/gates/**`
   restore at every `refresh()`); the back button keeps native restoration.
 - **No stepped animation.** Nothing on the site advances in `steps()` (owner
   decision of 07.10.2026, R06/R07): use `var(--ease-strate)` / `s3d.strate`.
-  The layers idea may live in a **static** detail, never in a timing. The
-  `s3d.pas` GSAP ease survives only as an alias of `s3d.strate`.
+  The layers idea may live in a **static** detail, never in a timing. No
+  stepped ease exists any more (WP-99 removed `pas()` and the `s3d.pas`
+  alias): use `s3d.strate`.
 - **Stage canvas and native scroll.** With Lenis (wheel, trackpad) the DOM and
   the canvas share one frame (measured ≤ 0.6 px apart). Native scroll
   (touch, keyboard, scrollbar) is moved by the compositor ahead of the main
   thread, so a `fixed` canvas lags 1–2 frames behind its container.
   `StageRoot` therefore anchors the canvas to the document at **both** C1 and
-  C2 (absolute wrapper clipped to the page height, canvas two windows tall,
-  recentred each frame by the loop: `CanvasAnchor` in `stage/ticker.ts`;
-  owner decision R16, 08.10.2026); `ViewTracker.rect()` returns
-  canvas-relative rectangles, so scenes and `stage.ts` don't know. A `liveRect`
-  view (sticky or pinned) turns it back into a fixed canvas only while it is
-  **near** the window (25 % margin). The pixel ratio is capped at 1.5 at every
-  tier (`stage/pixel-ratio.ts`): the canvas is two windows tall, so the cap is
-  what keeps its pixel count in check. Don't read a view's rect from outside
-  the tracker.
+  C2 (absolute wrapper clipped to the page height, recentred each frame by the
+  loop: `CanvasAnchor` in `stage/ticker.ts`; owner decision R16, 08.10.2026);
+  `ViewTracker.rect()` returns canvas-relative rectangles, so scenes and
+  `stage.ts` don't know. Its height is the window plus a margin on each side
+  (`stage/anchor-margin.ts`, WP-99): 0.3 window with a precise pointer (1.6
+  windows tall), 0.5 as soon as `any-pointer: coarse` exists (2 windows: the
+  inertia of a fling), shifted in the
+  scroll direction by an anticipation of velocity × 0.1 s (never more than 80 %
+  of the margin). A `liveRect` view (sticky or pinned) turns it back into a
+  fixed canvas only while it is **near** the window (25 % margin). The pixel
+  ratio is capped at 1.5 at every tier **and** the buffer follows a pixel
+  budget (`stage/pixel-ratio.ts`: 8 Mpx at C2, 4 Mpx at C1 with a precise
+  pointer, never below a ratio of 1; a touch device keeps C2's budget): a 4K
+  screen at 150 % went from 16.5 to 8 Mpx. A C2 → C1 downgrade reallocates the
+  buffer with C1's budget. Don't read a view's
+  rect from outside the tracker.
 - **Stacking** (z-index): Stage canvas −1 (portaled into `<body>`), content
   `auto`, favorite on a card 10, menus 20, chapter rail 30, header 40, consent
   banner 40, mobile Studio bar 45, BottomNav and skip links 50, toasts 55,
