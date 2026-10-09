@@ -15,7 +15,7 @@
 // Un seul montage, aux deux paliers (C1 et C2) : le canvas est ANCRÉ AU
 // DOCUMENT (retour R16 : « les objets 3D sautent au défilement » ; décision du
 // propriétaire du 08.10.2026 : en C2 aussi, avec un rapport de pixels plafonné à
-// 1,5, pixel-ratio.ts). Un canvas `fixed` ne bouge pas avec la page : dès que
+// 1,5 sous un budget de pixels, pixel-ratio.ts). Un canvas `fixed` ne bouge pas avec la page : dès que
 // le défilement est natif, donc mené par le compositeur, qui avance le DOM sans
 // attendre le fil principal (tactile, clavier : flèches, Espace, Pages, Début et
 // Fin ; barre de défilement), il montre l'objet une ou deux frames en retard sur
@@ -44,7 +44,7 @@ function createCanvas(): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.className = "s3d-stage";
   canvas.setAttribute("aria-hidden", "true");
-  // La géométrie (absolue, de deux fenêtres de haut, ou fixe en mode « live »)
+  // La géométrie (absolue, la fenêtre plus ses marges de haut, ou fixe en mode « live »)
   // est posée par mountAnchored : elle l'emporte sur la règle .s3d-stage de
   // globals.css, quel que soit l'ordre de chargement des styles.
   const style = canvas.style;
@@ -75,11 +75,13 @@ interface Anchored {
 /**
  * Monte le canvas ancré au document : un calque absolu de la hauteur de la
  * page, rogné (overflow: clip, pour que le canvas, plus haut que la fenêtre,
- * n'allonge jamais la page), derrière le contenu, et dans lui un canvas de
- * deux fenêtres de haut (une demi-fenêtre de marge au-dessus et au-dessous de
- * la fenêtre visible) que `follow` cale sur le défilement. La marge couvre
- * l'avance du compositeur sur le fil principal (au pire quelques dizaines de
- * pixels par frame, même en lancer rapide).
+ * n'allonge jamais la page), derrière le contenu, et dans lui un canvas de la
+ * hauteur de la fenêtre plus une marge au-dessus et au-dessous (0,3 fenêtre à la
+ * souris, 0,5 dès qu'il y a un doigt : anchor-margin.ts) que `follow` cale sur
+ * le défilement. La marge couvre l'avance du compositeur sur le fil principal :
+ * un pas de défilement par frame, et plus quand le fil principal est chargé.
+ * Côté avant elle monte jusqu'à 1,8 fois sa valeur de base (anticipation
+ * dans le sens du défilement, aux dépens du côté arrière).
  *
  * Quand une vue « live » est proche de la fenêtre (collante ou épinglée : le
  * Studio sur grand écran, le héros épinglé de l'accueil en C2), le calque

@@ -11,12 +11,14 @@
 // conservé (preserveDrawingBuffer: false), chaque frame dessinée redessine
 // toutes les vues visibles. Pause quand l'onglet est masqué (loop.ts).
 //
-// Paliers (§3.6) : DPR ≤ 1,5 aux deux paliers (le canvas ancré au document
-// fait deux fenêtres de haut, pixel-ratio.ts) ; médiane des 60 premières
+// Paliers (§3.6) : DPR ≤ 1,5 aux deux paliers, sous un budget de pixels du
+// tampon propre à chaque palier (le canvas ancré au document déborde la
+// fenêtre : pixel-ratio.ts, anchor-margin.ts) ; médiane des 60 premières
 // frames animées > 22 ms ⇒ déclassement (C2 → C1, C1 → C0 : la SiteShell
-// démonte alors le Stage et les posters reviennent ; C2 → C1 ne change plus le
-// rapport de pixels : l'antialiasing, fixé à la création du contexte, reste, et
-// seuls disparaissent les vues réservées à C2, comme le champ de courbes). En C1, une vue
+// démonte alors le Stage et les posters reviennent). C2 → C1 retire le champ de
+// courbes et baisse le budget de pixels (le rapport est recalculé, le tampon
+// réalloué : des pixels en moins à DPR > 1, aucun à DPR 1) ; l'antialiasing,
+// fixé à la création du contexte, reste. En C1, une vue
 // `bakeWhenIdle` au repos depuis 800 ms est figée en image dans son élément
 // (le défilement natif mobile déplace alors une vraie image, sans décalage
 // d'une frame) ; le moindre changement de props ou pointerdown la réveille.

@@ -72,7 +72,15 @@ export interface PrintMaterialOptions {
   isoIndexColor?: string;
   /** Liseré chaud de la buse : rouge de la marque. */
   hotColor?: string;
-  /** DoubleSide par défaut : les anneaux fantômes font le tour complet de l'objet. */
+  /**
+   * DoubleSide par défaut : les objets imprimés (vase du héros, objets du
+   * Studio) sont des coques creuses, avec une paroi extérieure et une paroi
+   * intérieure (attribut `side`), et la coupe laisse voir l'intérieur. Les lignes
+   * fantômes (`uGhost`) restent sur la paroi extérieure, vue des deux côtés ; seuls
+   * le Studio et le cube d'essai les allument. Le héros de l'accueil ne les
+   * allume pas : sa silhouette au-dessus de la coupe est un matériau à part,
+   * plein et discret (print-hero.ts, FrontSide).
+   */
   side?: Side;
 }
 
