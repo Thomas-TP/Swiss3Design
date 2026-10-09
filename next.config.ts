@@ -26,18 +26,25 @@ function packageOf(file: string): string | undefined {
 const nextConfig: NextConfig = {
   // Taille du Worker (règle d'or 10 d'AGENTS.md, WP-99). Deux réglages du seul
   // build webpack serveur Node.js, celui d'`opennextjs-cloudflare build` qui
-  // lance `next build --webpack` (`next dev` tourne sous Turbopack et ne passe
-  // pas ici). Ils ne changent que la RÉPARTITION des modules dans
-  // `.next/server`, jamais le code exécuté : le rendu serveur de 42 URL, les
-  // routes d'API et les 37 Server Actions répondent comme avant, octet pour
-  // octet une fois neutralisés l'identifiant de build, les noms hachés des
-  // fichiers client et les identifiants d'actions, que Next change à chaque
-  // build, même à code identique.
+  // lance `next build --webpack` (`next dev` et un `next build` nu tournent
+  // sous Turbopack et ne passent pas ici ; Workers Builds exécute le même
+  // `opennextjs-cloudflare build` que `bun run deploy`). Ils ne changent que la
+  // RÉPARTITION des modules dans `.next/server`, jamais le code exécuté :
+  // contre un build sans ce bloc, 58 pages (4 langues, Studio, compte et admin
+  // sans session), 61 routes GET/POST sans effet (API, .well-known, MCP, A2A,
+  // webhook à signature invalide…) et les 37 Server Actions répondent comme
+  // avant, octet pour octet une fois neutralisés l'identifiant de build, les
+  // noms hachés des fichiers client, les identifiants d'actions et les nonces,
+  // que Next change à chaque build ou à chaque requête, même à code identique ;
+  // les parcours réels (panier, formulaires invalides, connexion refusée,
+  // Studio) aussi, sans violation de CSP ni erreur d'hydratation.
   //
   // Mesuré dans le dossier de 41 caractères (`wrangler deploy --dry-run`) :
-  // 3 333 KiB gzip avant, 2 459 après (−26 %), 16 987 KiB bruts avant,
-  // 12 895 après. En cas de doute sur un déploiement, retirer ce bloc suffit
-  // à revenir au comportement par défaut de Next.
+  // 3 336 KiB gzip avant, 2 460 après (−26 %), 16 987 KiB bruts avant,
+  // 12 895 après ; JS client inchangé (209 chunks, 1 220,3 KiB gzip). Ne pas
+  // retirer ce bloc sans remesurer : sans lui, le Worker repasse à 3 336 KiB.
+  // En cas de doute sur un déploiement, le retirer suffit à revenir au
+  // comportement par défaut de Next.
   webpack(config, { dev, isServer, nextRuntime, dir }) {
     if (dev || !isServer || nextRuntime !== "nodejs") return config;
     const src = `${unixPath(dir)}/src/`;
@@ -51,8 +58,15 @@ const nextConfig: NextConfig = {
     //    retrouvaient donc en deux exemplaires (1,2 Mo chacun pour la pile
     //    d'authentification), zod en trois. Un module demandé depuis une
     //    Server Action est placé dans la couche `rsc` : une seule copie,
-    //    partagée avec les pages (et l'état de module l'est aussi). Les
-    //    fichiers « use server » eux-mêmes restent dans leur couche.
+    //    partagée avec les pages (et l'état de module l'est aussi : pool
+    //    Postgres par requête, ensemencement OAuth, clé du cache JWKS, tous
+    //    sans dépendance à la couche). Les fichiers « use server » eux-mêmes
+    //    restent dans leur couche. Sans risque pour la résolution : webpack-
+    //    config.js applique à `rsc` et `action-browser` les mêmes conditions
+    //    d'export (`react-server`), les mêmes alias et la même chaîne de
+    //    loaders (`shouldUseReactServerCondition`) ; `next`, `react`,
+    //    `react-dom` et `scheduler`, seuls paquets liés à la couche, restent
+    //    exclus.
     config.module.rules.push({
       issuerLayer: "action-browser",
       test: (file: string) => {
@@ -63,9 +77,16 @@ const nextConfig: NextConfig = {
       },
       layer: "rsc",
     });
-    // Idem de `ssr` vers `rsc`, mais seulement pour du code pur (ni React, ni
-    // « use client ») : la bibliothèque du Studio et zod, que le serveur de
-    // pages et le rendu des composants client importaient chacun de leur côté.
+    // Idem de `ssr` vers `rsc`, mais seulement pour du code pur : la
+    // bibliothèque du Studio et zod, que le serveur de pages et le rendu des
+    // composants client importaient chacun de leur côté. Vérifié à la main :
+    // ni zod (aucune dépendance, aucune condition d'export), ni
+    // `src/lib/studio/**` (d3-contour, d3-array, internmap et earcut, dont
+    // l'export n'a pas de condition propre à la couche) n'importent React,
+    // Next, `server-only`/`client-only` ni un fichier « use client » ou
+    // « use server » ; leur état de module (caches purs du Studio,
+    // `z.config` posé sur `globalThis`) ne dépend pas de la couche. Ne pas
+    // élargir cette règle à un paquet qui touche à React.
     config.module.rules.push({
       issuerLayer: "ssr",
       test: (file: string) =>
