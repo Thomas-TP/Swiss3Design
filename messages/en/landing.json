@@ -52,7 +52,6 @@
     "lead": "The \"Relief\" coaster is a massif made of strata. Your name crowns its summit, with a fictional altitude computed from it.",
     "input": "Name your peak",
     "note": "The text stays in your browser until you send it to the workshop.",
-    "label": "Peak label",
     "cta": "Continue in the Studio",
     "poster": "\"Relief\" coaster: a massif made of strata, seen from above."
   },

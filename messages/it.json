@@ -1,46 +1,12 @@
 {
-  "common": {
-    "siteName": "Swiss3Design",
-    "loading": "Caricamento…"
-  },
   "nav": {
     "home": "Home",
-    "shop": "Catalogo",
-    "custom": "Su misura",
-    "about": "Chi siamo",
     "cart": "Carrello",
     "account": "Account",
     "favorites": "Preferiti",
     "theme": "Cambia tema",
     "language": "Lingua",
     "skipContent": "Vai al contenuto"
-  },
-  "home": {
-    "heroBadge": "Stampato nell'arco lemanico · Consegna in tutta la Svizzera",
-    "heroTitle": "La stampa 3D multicolore, pensata in Svizzera.",
-    "heroSubtitle": "Oggetti di design stampati in 3D fino a 4 colori simultanei. Realizzati pezzo per pezzo nei nostri atelier dell'arco lemanico, spediti in tutta la Svizzera.",
-    "ctaShop": "Scopri il catalogo",
-    "ctaCustom": "Progetto su misura",
-    "featuredTitle": "Selezione del momento",
-    "featuredAll": "Tutto il catalogo",
-    "multicolorTitle": "4 colori. Un unico pezzo.",
-    "multicolorText": "I nostri sistemi multifilamento stampano fino a quattro colori nello stesso oggetto, senza assemblaggio né verniciatura. Transizioni nette e dettagli precisi, direttamente dalla macchina.",
-    "trustShippingTitle": "Consegna svizzera",
-    "trustShippingText": "Spedizione con la Posta, tariffa unica. Gratuita da {amount}.",
-    "trustMadeTitle": "Fatto nell'arco lemanico",
-    "trustMadeText": "Ogni pezzo è stampato e controllato nei nostri atelier vodesi.",
-    "trustPaymentTitle": "Pagamento sicuro",
-    "trustPaymentText": "TWINT, carte e Google Pay.",
-    "processTitle": "Come funziona",
-    "processStep1Title": "Scegliete o descrivete",
-    "processStep1Text": "Un oggetto dal catalogo o la vostra idea su misura.",
-    "processStep2Title": "Stampato nell'arco lemanico",
-    "processStep2Text": "Ogni pezzo è realizzato, controllato e imballato nei nostri atelier.",
-    "processStep3Title": "Consegnato a casa vostra",
-    "processStep3Text": "Spedizione con la Posta Svizzera, gratuita da {amount}.",
-    "customBandTitle": "Un pezzo su misura in mente?",
-    "customBandText": "Inviate il vostro file 3D o descrivete il progetto: preventivo personalizzato entro 48 ore.",
-    "customBandCta": "Richiedere un preventivo"
   },
   "shop": {
     "title": "Catalogo",
@@ -49,8 +15,6 @@
     "all": "Tutti",
     "results": "{count, plural, =0 {Nessun prodotto} one {# prodotto} other {# prodotti}}",
     "empty": "Nessun prodotto corrisponde a questi filtri.",
-    "filterCategory": "Categoria",
-    "filterMaterial": "Materiale",
     "filterColor": "Colore",
     "filterMulticolor": "Multicolore",
     "sortLabel": "Ordina:",
@@ -59,7 +23,6 @@
     "sortPriceDesc": "Prezzo ↓"
   },
   "product": {
-    "relatedTitle": "Potrebbe piacerti anche",
     "addToCart": "Aggiungi al carrello",
     "buyNow": "Acquista ora",
     "added": "Aggiunto ✓",
@@ -72,16 +35,12 @@
     "material": "Materiale",
     "dimensions": "Dimensioni",
     "weight": "Peso",
-    "details": "Caratteristiche",
     "productionTime": "Tempo di produzione",
     "productionDays": "{days} giorni",
     "origin": "Provenienza",
-    "originValue": "Stampato nell'arco lemanico (VD), Svizzera",
-    "backToShop": "Torna al catalogo",
-    "notFound": "Prodotto non trovato."
+    "originValue": "Stampato nell'arco lemanico (VD), Svizzera"
   },
   "reviews": {
-    "title": "Recensioni dei clienti",
     "count": "{count, plural, one {# recensione} other {# recensioni}}",
     "rateThis": "Valuta questo prodotto",
     "ratingLabel": "La tua valutazione",
@@ -91,21 +50,12 @@
     "error": "Impossibile salvare la recensione.",
     "alreadyReviewed": "✓ Hai già valutato questo prodotto."
   },
-  "viewer": {
-    "view3d": "Vedi in 3D",
-    "close": "Chiudi",
-    "error": "Anteprima 3D non disponibile.",
-    "colorLabel": "Colore:",
-    "badge3d": "Vista 3D",
-    "dragHint": "Trascina per ruotare"
-  },
   "cartLink": {
     "added": "Gli articoli del link sono stati aggiunti al carrello.",
     "error": "Alcuni articoli del link non hanno potuto essere aggiunti (prodotto non disponibile o opzione mancante)."
   },
   "cartReminder": {
     "title": "Non hai tempo ora?",
-    "emailPlaceholder": "La tua e-mail",
     "consent": "Inviami un promemoria del carrello via e-mail. Posso annullare l'iscrizione in qualsiasi momento.",
     "cta": "Inviami un promemoria",
     "done": "Fatto — ti ricorderemo il tuo carrello.",
@@ -116,15 +66,10 @@
   },
   "cart": {
     "title": "Carrello",
-    "empty": "Il carrello è vuoto.",
-    "emptyCta": "Sfoglia il catalogo",
     "subtotal": "Subtotale",
     "shipping": "Spedizione",
     "shippingFree": "Gratuita",
     "total": "Totale",
-    "checkout": "Concludi l'ordine",
-    "freeShippingHint": "Ancora {amount} per la spedizione gratuita",
-    "freeShippingReached": "Spedizione gratuita 🎉",
     "remove": "Rimuovi",
     "quantity": "Quantità",
     "decrease": "Riduci la quantità",
@@ -159,8 +104,6 @@
     "errorGeneric": "Si è verificato un errore. Riprovate per favore.",
     "errorNpa": "NPA non valido (4 cifre)",
     "errorCanton": "Selezionate il vostro cantone.",
-    "stepDelivery": "Dati",
-    "stepPayment": "Pagamento",
     "accountBadge": "Account",
     "guestNotice": "Ordine senza account: confermate il vostro indirizzo e-mail per continuare.",
     "haveAccount": "Avete già un account?",
@@ -190,10 +133,8 @@
     "errorProductChanged": "Un articolo o un’opzione è cambiato. Selezionatelo nuovamente dalla scheda prodotto."
   },
   "orderSuccess": {
-    "title": "Grazie per il vostro ordine!",
     "processingTitle": "Pagamento in corso",
     "failedTitle": "Pagamento non riuscito",
-    "text": "Il vostro ordine {orderNumber} è confermato. Riceverete presto un'e-mail di conferma.",
     "processing": "Il pagamento è in fase di elaborazione. Riceverete una conferma per e-mail.",
     "failed": "Il pagamento non è andato a buon fine. Il carrello è stato conservato.",
     "backShop": "Continua gli acquisti",
@@ -260,13 +201,9 @@
     "dimensions": "Dimensioni approssimative",
     "dimensionsPlaceholder": "es. 12 × 8 × 5 cm",
     "optional": "facoltativo",
-    "file": "File 3D",
     "fileHint": "STL, 3MF, OBJ o STEP · max 30 MB",
-    "fileUploading": "Caricamento del file…",
-    "fileError": "Caricamento non riuscito. Riprovate o verificate il formato.",
     "submit": "Richiedi un preventivo",
     "submitting": "Invio…",
-    "success": "Richiesta ricevuta! Vi ricontattiamo per e-mail entro 48 ore.",
     "error": "Si è verificato un errore. Riprovate per favore."
   },
   "favorites": {
@@ -279,7 +216,6 @@
     "addedAll": "Aggiunto al carrello"
   },
   "account": {
-    "title": "Il mio account",
     "greeting": "Ciao {name}",
     "nav": {
       "overview": "Panoramica",
@@ -379,16 +315,6 @@
       "delivered": "Consegnato",
       "cancelled": "Annullato"
     },
-    "orderStatus": {
-      "not_fulfilled": "In preparazione",
-      "partially_fulfilled": "Parzialmente preparato",
-      "fulfilled": "Preparato",
-      "partially_shipped": "Parzialmente spedito",
-      "shipped": "Spedito",
-      "partially_delivered": "Parzialmente consegnato",
-      "delivered": "Consegnato",
-      "canceled": "Annullato"
-    },
     "quoteStatus": {
       "received": "Ricevuta",
       "quoted": "Preventivo inviato",
@@ -487,7 +413,6 @@
     },
     "quotePay": {
       "title": "Pagare il preventivo",
-      "cta": "Paga il preventivo",
       "paidTitle": "Preventivo pagato ✅",
       "paidText": "Grazie! Il pagamento è confermato. Avviamo la produzione e vi ricontattiamo per e-mail.",
       "notPayable": "Questo preventivo non è pagabile al momento.",
@@ -595,9 +520,7 @@
   },
   "errors": {
     "notFoundTitle": "Pagina non trovata",
-    "notFoundText": "Questa pagina non esiste o non è più disponibile.",
     "notFoundCta": "Torna alla home",
-    "errorTitle": "Si è verificato un errore",
     "errorText": "Qualcosa è andato storto da parte nostra. La preghiamo di riprovare.",
     "retry": "Riprova"
   },
@@ -619,7 +542,6 @@
   },
   "footer": {
     "tagline": "Stampa 3D multicolore — arco lemanico, Svizzera",
-    "about": "Chi siamo",
     "shop": "Negozio",
     "legalTitle": "Informazioni",
     "terms": "Condizioni generali",

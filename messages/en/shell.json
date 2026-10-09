@@ -26,8 +26,6 @@
   },
   "stage": {
     "unavailable": "3D view unavailable on this device: the 2D preview is accurate to a tenth of a millimeter.",
-    "loading": "Preparing the 3D view…",
-    "poster": "2D preview",
     "interactive": "3D preview: arrow keys to rotate",
     "rotateLeft": "Rotate left",
     "rotateRight": "Rotate right",
@@ -43,11 +41,6 @@
   },
   "ui": {
     "close": "Close",
-    "cancel": "Cancel",
     "dismiss": "Dismiss message"
-  },
-  "media": {
-    "illustration": "Illustration",
-    "render": "Render"
   }
 }

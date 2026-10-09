@@ -1,46 +1,12 @@
 {
-  "common": {
-    "siteName": "Swiss3Design",
-    "loading": "Chargement…"
-  },
   "nav": {
     "home": "Accueil",
-    "shop": "Catalogue",
-    "custom": "Sur mesure",
-    "about": "À propos",
     "cart": "Panier",
     "account": "Compte",
     "favorites": "Favoris",
     "theme": "Changer de thème",
     "language": "Langue",
     "skipContent": "Aller au contenu"
-  },
-  "home": {
-    "heroBadge": "Imprimé dans l'arc lémanique · Livré dans toute la Suisse",
-    "heroTitle": "L'impression 3D multicolore, pensée en Suisse.",
-    "heroSubtitle": "Objets design imprimés en 3D jusqu'à 4 couleurs simultanées. Fabriqués à la pièce dans nos ateliers de l'arc lémanique, expédiés partout en Suisse.",
-    "ctaShop": "Découvrir le catalogue",
-    "ctaCustom": "Projet sur mesure",
-    "featuredTitle": "Sélection du moment",
-    "featuredAll": "Tout le catalogue",
-    "multicolorTitle": "4 couleurs. Une seule pièce.",
-    "multicolorText": "Nos systèmes multi-filament impriment jusqu'à quatre couleurs dans un même objet, sans assemblage ni peinture. Des dégradés nets, des détails précis, directement sortis de la machine.",
-    "trustShippingTitle": "Livraison suisse",
-    "trustShippingText": "Envoi par la Poste, tarif unique. Offert dès {amount}.",
-    "trustMadeTitle": "Fabriqué dans l'arc lémanique",
-    "trustMadeText": "Chaque pièce est imprimée et contrôlée dans nos ateliers vaudois.",
-    "trustPaymentTitle": "Paiement sécurisé",
-    "trustPaymentText": "TWINT, cartes et Google Pay.",
-    "processTitle": "Comment ça marche",
-    "processStep1Title": "Choisissez ou décrivez",
-    "processStep1Text": "Un objet du catalogue, ou votre propre idée en sur mesure.",
-    "processStep2Title": "Imprimé dans l'arc lémanique",
-    "processStep2Text": "Chaque pièce est lancée, contrôlée et emballée dans l'un de nos ateliers.",
-    "processStep3Title": "Livré chez vous",
-    "processStep3Text": "Expédition par la Poste Suisse, offerte dès {amount}.",
-    "customBandTitle": "Une pièce sur mesure en tête ?",
-    "customBandText": "Envoyez votre fichier 3D ou décrivez votre projet : devis personnalisé sous 48 h.",
-    "customBandCta": "Demander un devis"
   },
   "shop": {
     "title": "Catalogue",
@@ -49,8 +15,6 @@
     "all": "Tout",
     "results": "{count, plural, =0 {Aucun produit} one {# produit} other {# produits}}",
     "empty": "Aucun produit ne correspond à ces filtres.",
-    "filterCategory": "Catégorie",
-    "filterMaterial": "Matière",
     "filterColor": "Couleur",
     "filterMulticolor": "Multicolore",
     "sortLabel": "Trier :",
@@ -59,7 +23,6 @@
     "sortPriceDesc": "Prix ↓"
   },
   "product": {
-    "relatedTitle": "Vous aimerez aussi",
     "addToCart": "Ajouter au panier",
     "buyNow": "Acheter",
     "added": "Ajouté ✓",
@@ -72,16 +35,12 @@
     "material": "Matière",
     "dimensions": "Dimensions",
     "weight": "Poids",
-    "details": "Caractéristiques",
     "productionTime": "Délai de fabrication",
     "productionDays": "{days} jours",
     "origin": "Provenance",
-    "originValue": "Imprimé dans l'arc lémanique (VD), Suisse",
-    "backToShop": "Retour au catalogue",
-    "notFound": "Produit introuvable."
+    "originValue": "Imprimé dans l'arc lémanique (VD), Suisse"
   },
   "reviews": {
-    "title": "Avis clients",
     "count": "{count, plural, one {# avis} other {# avis}}",
     "rateThis": "Noter ce produit",
     "ratingLabel": "Votre note",
@@ -91,21 +50,12 @@
     "error": "Impossible d’enregistrer votre avis.",
     "alreadyReviewed": "✓ Vous avez déjà noté ce produit."
   },
-  "viewer": {
-    "view3d": "Voir en 3D",
-    "close": "Fermer",
-    "error": "Aperçu 3D indisponible.",
-    "colorLabel": "Couleur :",
-    "badge3d": "Vue 3D",
-    "dragHint": "Glissez pour pivoter"
-  },
   "cartLink": {
     "added": "Les articles du lien ont été ajoutés à votre panier.",
     "error": "Certains articles du lien n'ont pas pu être ajoutés (produit indisponible ou option manquante)."
   },
   "cartReminder": {
     "title": "Pas le temps maintenant ?",
-    "emailPlaceholder": "Votre e-mail",
     "consent": "Envoyez-moi un rappel de mon panier par e-mail. Je peux me désinscrire à tout moment.",
     "cta": "M'envoyer un rappel",
     "done": "C'est noté — nous vous rappellerons votre panier.",
@@ -116,15 +66,10 @@
   },
   "cart": {
     "title": "Panier",
-    "empty": "Votre panier est vide.",
-    "emptyCta": "Parcourir le catalogue",
     "subtotal": "Sous-total",
     "shipping": "Livraison",
     "shippingFree": "Offerte",
     "total": "Total",
-    "checkout": "Passer commande",
-    "freeShippingHint": "Plus que {amount} pour la livraison offerte",
-    "freeShippingReached": "Livraison offerte 🎉",
     "remove": "Retirer",
     "quantity": "Quantité",
     "decrease": "Diminuer la quantité",
@@ -159,8 +104,6 @@
     "errorGeneric": "Une erreur est survenue. Merci de réessayer.",
     "errorNpa": "NPA invalide (4 chiffres)",
     "errorCanton": "Veuillez sélectionner votre canton.",
-    "stepDelivery": "Coordonnées",
-    "stepPayment": "Paiement",
     "accountBadge": "Compte",
     "guestNotice": "Commande sans compte : confirmez votre adresse e-mail pour continuer.",
     "haveAccount": "Déjà un compte ?",
@@ -190,10 +133,8 @@
     "errorProductChanged": "Un article ou une option a changé. Revenez à sa fiche pour le sélectionner de nouveau."
   },
   "orderSuccess": {
-    "title": "Merci pour votre commande !",
     "processingTitle": "Paiement en cours",
     "failedTitle": "Paiement non abouti",
-    "text": "Votre commande {orderNumber} est confirmée. Vous recevrez prochainement un e-mail de confirmation.",
     "processing": "Votre paiement est en cours de traitement. Vous recevrez une confirmation par e-mail.",
     "failed": "Le paiement n'a pas pu être finalisé. Votre panier a été conservé.",
     "backShop": "Continuer vos achats",
@@ -260,13 +201,9 @@
     "dimensions": "Dimensions approximatives",
     "dimensionsPlaceholder": "ex. 12 × 8 × 5 cm",
     "optional": "facultatif",
-    "file": "Fichier 3D",
     "fileHint": "STL, 3MF, OBJ ou STEP · 30 Mo max",
-    "fileUploading": "Envoi du fichier…",
-    "fileError": "Échec de l'envoi du fichier. Réessayez ou vérifiez le format.",
     "submit": "Demander un devis",
     "submitting": "Envoi…",
-    "success": "Demande bien reçue ! Nous revenons vers vous par e-mail sous 48 h.",
     "error": "Une erreur est survenue. Merci de réessayer."
   },
   "favorites": {
@@ -279,7 +216,6 @@
     "addedAll": "Ajouté au panier"
   },
   "account": {
-    "title": "Mon compte",
     "greeting": "Bonjour {name}",
     "nav": {
       "overview": "Vue d'ensemble",
@@ -379,16 +315,6 @@
       "delivered": "Livrée",
       "cancelled": "Annulée"
     },
-    "orderStatus": {
-      "not_fulfilled": "En préparation",
-      "partially_fulfilled": "Partiellement préparée",
-      "fulfilled": "Préparée",
-      "partially_shipped": "Partiellement expédiée",
-      "shipped": "Expédiée",
-      "partially_delivered": "Partiellement livrée",
-      "delivered": "Livrée",
-      "canceled": "Annulée"
-    },
     "quoteStatus": {
       "received": "Reçue",
       "quoted": "Devis envoyé",
@@ -487,7 +413,6 @@
     },
     "quotePay": {
       "title": "Payer votre devis",
-      "cta": "Payer ce devis",
       "paidTitle": "Devis payé ✅",
       "paidText": "Merci ! Votre paiement est confirmé. Nous lançons la production et revenons vers vous par e-mail.",
       "notPayable": "Ce devis n'est pas payable pour le moment.",
@@ -595,9 +520,7 @@
   },
   "errors": {
     "notFoundTitle": "Page introuvable",
-    "notFoundText": "Cette page n'existe pas ou n'est plus disponible.",
     "notFoundCta": "Retour à l'accueil",
-    "errorTitle": "Une erreur est survenue",
     "errorText": "Quelque chose s'est mal passé de notre côté. Merci de réessayer.",
     "retry": "Réessayer"
   },
@@ -619,7 +542,6 @@
   },
   "footer": {
     "tagline": "Impression 3D multicolore — arc lémanique, Suisse",
-    "about": "À propos",
     "shop": "Boutique",
     "legalTitle": "Informations",
     "terms": "Conditions générales",
