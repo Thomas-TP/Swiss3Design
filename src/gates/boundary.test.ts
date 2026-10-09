@@ -366,7 +366,7 @@ export const StageRoot = dynamic(() => import("@/motion/stage/root"), {
     ],
     [
       "réexport de valeur",
-      `${GOOD_GATE}export { pas } from "@/motion/gsap";\n`,
+      `${GOOD_GATE}export { gsap } from "@/motion/gsap";\n`,
       "import statique",
     ],
     [
@@ -442,7 +442,7 @@ export const StageRoot = dynamic(() => import("@/motion/stage/root"), {
     ["lenis", `import Lenis from "lenis";`],
     ["lenis/react", `import { ReactLenis } from "lenis/react";`],
     ["require()", `const three = require("three");`],
-    ["import de @/motion", `import { pas } from "@/motion/gsap";`],
+    ["import de @/motion", `import { gsap } from "@/motion/gsap";`],
     [
       "import type de @/motion",
       `import type { StageScene } from "@/motion/stage/types";`,
