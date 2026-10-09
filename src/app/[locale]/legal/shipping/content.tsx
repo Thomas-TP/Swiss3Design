@@ -240,9 +240,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Tracciamento dell'ordine",
       body: (
         <p>
-          Un numero di tracciamento vi viene inviato via e-mail al momento della
-          spedizione. Potete anche tracciare un ordine in qualsiasi momento, con
-          o senza account, dalla{" "}
+          Un numero di tracciamento Le viene inviato via e-mail al momento della
+          spedizione. Può anche tracciare un ordine in qualsiasi momento, con o
+          senza account, dalla{" "}
           <Link href="/track" className={link}>
             pagina di tracciamento
           </Link>
