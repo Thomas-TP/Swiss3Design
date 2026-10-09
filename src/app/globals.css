@@ -253,20 +253,6 @@ body {
   .s3d-num {
     font-variant-numeric: tabular-nums slashed-zero;
   }
-  /* Colonnes de la grille visibles en fond (desktop, chapitres éditoriaux) :
-     un filet au début de chaque colonne (pas = colonne + gouttière). À poser
-     sur l'élément qui porte .s3d-grid. */
-  @media (width >= 64rem) {
-    .s3d-hairlines {
-      background-image: linear-gradient(
-        to right,
-        color-mix(in srgb, var(--color-line) 60%, transparent) 1px,
-        transparent 1px
-      );
-      background-size: calc((100% + var(--spacing-gutter)) / 12) 100%;
-      background-repeat: repeat-x;
-    }
-  }
   /* Point rouge final des titres : le « . » reste dans le texte (SEO, a11y). */
   .s3d-dot {
     position: relative;

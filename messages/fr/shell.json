@@ -26,8 +26,6 @@
   },
   "stage": {
     "unavailable": "Vue 3D indisponible sur cet appareil : l'aperçu 2D est exact au dixième de millimètre.",
-    "loading": "Préparation de la vue 3D…",
-    "poster": "Aperçu 2D",
     "interactive": "Aperçu 3D : flèches pour tourner",
     "rotateLeft": "Tourner à gauche",
     "rotateRight": "Tourner à droite",
@@ -43,11 +41,6 @@
   },
   "ui": {
     "close": "Fermer",
-    "cancel": "Annuler",
     "dismiss": "Masquer le message"
-  },
-  "media": {
-    "illustration": "Illustration",
-    "render": "Rendu"
   }
 }

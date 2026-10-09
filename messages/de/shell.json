@@ -26,8 +26,6 @@
   },
   "stage": {
     "unavailable": "3D-Ansicht auf diesem Gerät nicht verfügbar: Die 2D-Vorschau ist auf den Zehntelmillimeter genau.",
-    "loading": "3D-Ansicht wird vorbereitet…",
-    "poster": "2D-Vorschau",
     "interactive": "3D-Vorschau: Pfeiltasten zum Drehen",
     "rotateLeft": "Nach links drehen",
     "rotateRight": "Nach rechts drehen",
@@ -43,11 +41,6 @@
   },
   "ui": {
     "close": "Schliessen",
-    "cancel": "Abbrechen",
     "dismiss": "Meldung ausblenden"
-  },
-  "media": {
-    "illustration": "Illustration",
-    "render": "Rendering"
   }
 }

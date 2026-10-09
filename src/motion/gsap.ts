@@ -25,18 +25,10 @@ CustomEase.create("s3d.buse", "M0,0 C0.45,0 0.55,1 1,1");
 CustomEase.create("s3d.purge", "M0,0 C0.3,1.35 0.6,1 1,1");
 CustomEase.create("s3d.carte", "M0,0 C0.7,0 0.2,1 1,1");
 
-/** Ease quantifiée : avance par paliers de 1/n (une « couche »), adoucie par k. Monotone.
- *  Plus aucune animation du site ne l'utilise (07.10.2026) : conservée pour
- *  d'éventuels tests, jamais pour un mouvement visible. */
-export function pas(n = 12, k = 0.85) {
-  return (p: number) => p + (Math.round(p * n) / n - p) * k;
-}
-// Le propriétaire n'accepte aucune animation par paliers (retours R06/R07,
-// 07.10.2026) : l'ancien nom « s3d.pas » reste enregistré, car une
-// chorégraphie qui l'appellerait encore ne doit pas planter, mais il désigne
-// la courbe continue s3d.strate. Plus aucun appelant depuis la vérification
-// R1 (08.10.2026) : « s3d.strate » partout.
-gsap.registerEase("s3d.pas", gsap.parseEase("s3d.strate"));
+// Aucune courbe par paliers (retours R06/R07, 07.10.2026) : l'ancienne ease
+// quantifiée `pas()` et son alias « s3d.pas » n'avaient plus d'appelant depuis
+// la vérification R1 (08.10.2026) et ont été retirés par WP-99 ; toute
+// animation du site avance sur « s3d.strate » (ou une autre courbe continue).
 
 gsap.defaults({ ease: "s3d.strate", duration: 0.8 });
 // La barre d'adresse mobile qui apparaît ou disparaît ne relance pas tous

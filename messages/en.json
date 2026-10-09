@@ -1,46 +1,12 @@
 {
-  "common": {
-    "siteName": "Swiss3Design",
-    "loading": "Loading…"
-  },
   "nav": {
     "home": "Home",
-    "shop": "Shop",
-    "custom": "Custom",
-    "about": "About",
     "cart": "Cart",
     "account": "Account",
     "favorites": "Favorites",
     "theme": "Toggle theme",
     "language": "Language",
     "skipContent": "Skip to content"
-  },
-  "home": {
-    "heroBadge": "Printed in the Lake Geneva region · Delivered across Switzerland",
-    "heroTitle": "Multicolor 3D printing, designed in Switzerland.",
-    "heroSubtitle": "Design objects 3D-printed in up to 4 simultaneous colors. Made to order in our Lake Geneva workshops and shipped anywhere in Switzerland.",
-    "ctaShop": "Browse the shop",
-    "ctaCustom": "Custom project",
-    "featuredTitle": "Current selection",
-    "featuredAll": "Full catalog",
-    "multicolorTitle": "4 colors. One single piece.",
-    "multicolorText": "Our multi-filament systems print up to four colors within a single object — no assembly, no painting. Crisp transitions and precise details, straight off the machine.",
-    "trustShippingTitle": "Swiss delivery",
-    "trustShippingText": "Shipped via Swiss Post, flat rate. Free from {amount}.",
-    "trustMadeTitle": "Made in the Lake Geneva region",
-    "trustMadeText": "Every piece is printed and inspected in our Vaud workshops.",
-    "trustPaymentTitle": "Secure payment",
-    "trustPaymentText": "TWINT, cards and Google Pay.",
-    "processTitle": "How it works",
-    "processStep1Title": "Choose or describe",
-    "processStep1Text": "An object from the catalogue, or your own custom idea.",
-    "processStep2Title": "Printed in the Lake Geneva region",
-    "processStep2Text": "Every piece is made, checked and packed in our workshops.",
-    "processStep3Title": "Delivered to your door",
-    "processStep3Text": "Swiss Post shipping, free from {amount}.",
-    "customBandTitle": "Have a custom piece in mind?",
-    "customBandText": "Send your 3D file or describe your project: personalised quote within 48 h.",
-    "customBandCta": "Request a quote"
   },
   "shop": {
     "title": "Shop",
@@ -49,8 +15,6 @@
     "all": "All",
     "results": "{count, plural, =0 {No products} one {# product} other {# products}}",
     "empty": "No products match these filters.",
-    "filterCategory": "Category",
-    "filterMaterial": "Material",
     "filterColor": "Color",
     "filterMulticolor": "Multicolor",
     "sortLabel": "Sort:",
@@ -59,7 +23,6 @@
     "sortPriceDesc": "Price ↓"
   },
   "product": {
-    "relatedTitle": "You may also like",
     "addToCart": "Add to cart",
     "buyNow": "Buy now",
     "added": "Added ✓",
@@ -72,16 +35,12 @@
     "material": "Material",
     "dimensions": "Dimensions",
     "weight": "Weight",
-    "details": "Specifications",
     "productionTime": "Production time",
     "productionDays": "{days} days",
     "origin": "Made in",
-    "originValue": "Printed in the Lake Geneva region (VD), Switzerland",
-    "backToShop": "Back to shop",
-    "notFound": "Product not found."
+    "originValue": "Printed in the Lake Geneva region (VD), Switzerland"
   },
   "reviews": {
-    "title": "Customer reviews",
     "count": "{count, plural, one {# review} other {# reviews}}",
     "rateThis": "Rate this product",
     "ratingLabel": "Your rating",
@@ -91,21 +50,12 @@
     "error": "Could not save your review.",
     "alreadyReviewed": "✓ You already reviewed this product."
   },
-  "viewer": {
-    "view3d": "View in 3D",
-    "close": "Close",
-    "error": "3D preview unavailable.",
-    "colorLabel": "Color:",
-    "badge3d": "3D view",
-    "dragHint": "Drag to rotate"
-  },
   "cartLink": {
     "added": "The items from the link have been added to your cart.",
     "error": "Some items from the link could not be added (product unavailable or option missing)."
   },
   "cartReminder": {
     "title": "No time right now?",
-    "emailPlaceholder": "Your email",
     "consent": "Email me a reminder of my cart. I can unsubscribe at any time.",
     "cta": "Send me a reminder",
     "done": "Done — we'll remind you about your cart.",
@@ -116,15 +66,10 @@
   },
   "cart": {
     "title": "Cart",
-    "empty": "Your cart is empty.",
-    "emptyCta": "Browse the shop",
     "subtotal": "Subtotal",
     "shipping": "Shipping",
     "shippingFree": "Free",
     "total": "Total",
-    "checkout": "Checkout",
-    "freeShippingHint": "{amount} away from free shipping",
-    "freeShippingReached": "Free shipping 🎉",
     "remove": "Remove",
     "quantity": "Quantity",
     "decrease": "Decrease quantity",
@@ -159,8 +104,6 @@
     "errorGeneric": "Something went wrong. Please try again.",
     "errorNpa": "Invalid postal code (4 digits)",
     "errorCanton": "Please select your canton.",
-    "stepDelivery": "Details",
-    "stepPayment": "Payment",
     "accountBadge": "Account",
     "guestNotice": "Ordering without an account: confirm your email address to continue.",
     "haveAccount": "Already have an account?",
@@ -190,10 +133,8 @@
     "errorProductChanged": "An item or option has changed. Select it again from the product page."
   },
   "orderSuccess": {
-    "title": "Thank you for your order!",
     "processingTitle": "Payment processing",
     "failedTitle": "Payment unsuccessful",
-    "text": "Your order {orderNumber} is confirmed. You'll receive a confirmation email shortly.",
     "processing": "Your payment is being processed. You'll receive a confirmation by email.",
     "failed": "The payment could not be completed. Your cart has been kept.",
     "backShop": "Continue shopping",
@@ -260,13 +201,9 @@
     "dimensions": "Approximate dimensions",
     "dimensionsPlaceholder": "e.g. 12 × 8 × 5 cm",
     "optional": "optional",
-    "file": "3D file",
     "fileHint": "STL, 3MF, OBJ or STEP · 30 MB max",
-    "fileUploading": "Uploading file…",
-    "fileError": "File upload failed. Try again or check the format.",
     "submit": "Request a quote",
     "submitting": "Sending…",
-    "success": "Request received! We'll reply by email within 48 hours.",
     "error": "Something went wrong. Please try again."
   },
   "favorites": {
@@ -279,7 +216,6 @@
     "addedAll": "Added to cart"
   },
   "account": {
-    "title": "My account",
     "greeting": "Hello {name}",
     "nav": {
       "overview": "Overview",
@@ -379,16 +315,6 @@
       "delivered": "Delivered",
       "cancelled": "Cancelled"
     },
-    "orderStatus": {
-      "not_fulfilled": "Preparing",
-      "partially_fulfilled": "Partially prepared",
-      "fulfilled": "Prepared",
-      "partially_shipped": "Partially shipped",
-      "shipped": "Shipped",
-      "partially_delivered": "Partially delivered",
-      "delivered": "Delivered",
-      "canceled": "Cancelled"
-    },
     "quoteStatus": {
       "received": "Received",
       "quoted": "Quote sent",
@@ -487,7 +413,6 @@
     },
     "quotePay": {
       "title": "Pay your quote",
-      "cta": "Pay this quote",
       "paidTitle": "Quote paid ✅",
       "paidText": "Thank you! Your payment is confirmed. We're starting production and will get back to you by email.",
       "notPayable": "This quote isn't payable right now.",
@@ -595,9 +520,7 @@
   },
   "errors": {
     "notFoundTitle": "Page not found",
-    "notFoundText": "This page doesn't exist or is no longer available.",
     "notFoundCta": "Back to home",
-    "errorTitle": "Something went wrong",
     "errorText": "An error occurred on our side. Please try again.",
     "retry": "Try again"
   },
@@ -619,7 +542,6 @@
   },
   "footer": {
     "tagline": "Multicolor 3D printing — Lake Geneva region, Switzerland",
-    "about": "About",
     "shop": "Shop",
     "legalTitle": "Information",
     "terms": "Terms & conditions",

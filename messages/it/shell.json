@@ -26,8 +26,6 @@
   },
   "stage": {
     "unavailable": "Vista 3D non disponibile su questo dispositivo: l'anteprima 2D è precisa al decimo di millimetro.",
-    "loading": "Preparazione della vista 3D…",
-    "poster": "Anteprima 2D",
     "interactive": "Anteprima 3D: frecce per ruotare",
     "rotateLeft": "Ruota a sinistra",
     "rotateRight": "Ruota a destra",
@@ -43,11 +41,6 @@
   },
   "ui": {
     "close": "Chiudi",
-    "cancel": "Annulla",
     "dismiss": "Nascondi il messaggio"
-  },
-  "media": {
-    "illustration": "Illustrazione",
-    "render": "Rendering"
   }
 }
