@@ -711,7 +711,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   it: {
     metaTitle: "Chi siamo: i nostri atelier di stampa 3D",
     metaDescription:
-      "Gli atelier di stampa 3D Swiss3Design nell’arco lemanico: le nostre due stampanti multicolore, il procedimento, i materiali e le risposte alle vostre domande.",
+      "Gli atelier di stampa 3D Swiss3Design nell’arco lemanico: le nostre due stampanti multicolore, il procedimento, i materiali e le risposte alle Sue domande.",
 
     badge: "Due atelier nell’arco lemanico",
     title: "Dietro ogni pezzo, due atelier svizzeri.",
@@ -720,8 +720,9 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         Swiss3Design sono due atelier di stampa 3D nell’
         <strong>arco lemanico</strong>, tra Gland e Pully. Due stampanti
         multicolore, materiali scelti con cura e ogni volta una persona che
-        controlla il pezzo a mano prima di spedirvelo. Nessuna fabbrica, nessun
-        intermediario — stampa su richiesta, pensata e realizzata in Svizzera.
+        controlla il pezzo a mano prima di spedirGlielo. Nessuna fabbrica,
+        nessun intermediario — stampa su richiesta, pensata e realizzata in
+        Svizzera.
       </>
     ),
 
@@ -729,7 +730,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       { value: "2", label: "atelier nell’arco lemanico" },
       { value: "Fino a 4", label: "colori in un solo pezzo" },
       { value: "2 anni", label: "di garanzia legale" },
-      { value: "48 h", label: "per rispondere al vostro progetto" },
+      { value: "48 h", label: "per rispondere al Suo progetto" },
     ],
 
     equipmentKicker: "Il nostro materiale",
@@ -745,8 +746,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       </>
     ),
     specsTitle: "Scheda tecnica",
-    legendHint:
-      "Passate su un punto dello schema per individuare il componente",
+    legendHint: "Passi su un punto dello schema per individuare il componente",
     printers: [
       {
         variant: "p1s",
@@ -835,11 +835,11 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     ],
 
     processKicker: "Il procedimento",
-    processTitle: "Dal vostro ordine alla vostra cassetta delle lettere.",
+    processTitle: "Dal Suo ordine alla Sua cassetta delle lettere.",
     steps: [
       {
-        title: "La vostra scelta",
-        text: "Ordinate un pezzo dal catalogo o ci affidate un progetto su misura.",
+        title: "La Sua scelta",
+        text: "Ordina un pezzo dal catalogo o ci affida un progetto su misura.",
       },
       {
         title: "Preparazione",
@@ -847,7 +847,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       },
       {
         title: "Stampa",
-        text: "Uno dei due atelier stampa il vostro pezzo strato dopo strato; il sistema multi-filamento gestisce da solo fino a 4 colori.",
+        text: "Uno dei due atelier stampa il Suo pezzo strato dopo strato; il sistema multi-filamento gestisce da solo fino a 4 colori.",
       },
       {
         title: "Finitura & controllo",
@@ -881,14 +881,14 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         Serve più resistenza, un uso esterno o a contatto con il calore? Altri
         materiali come il PETG sono disponibili su preventivo —{" "}
         <Link href="/custom" className={link}>
-          parliamo del vostro progetto
+          parliamo del Suo progetto
         </Link>
         .
       </>
     ),
 
     trustKicker: "Qualità & impegni",
-    trustTitle: "Su cosa potete contare.",
+    trustTitle: "Su cosa può contare.",
     trust: [
       {
         title: "Fabbricato nell’arco lemanico",
@@ -900,7 +900,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
       },
       {
         title: "Pagamento sicuro",
-        text: "TWINT, carte e Google Pay tramite Stripe. I vostri dati bancari non passano mai dai nostri server.",
+        text: "TWINT, carte e Google Pay tramite Stripe. I Suoi dati bancari non passano mai dai nostri server.",
       },
       {
         title: "Consegna tracciata",
@@ -909,7 +909,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     ],
 
     faqKicker: "Domande frequenti",
-    faqTitle: "Tutto quello che vi chiedete, senza giri di parole.",
+    faqTitle: "Tutto quello che Lei si chiede, senza giri di parole.",
     faq: [
       {
         q: "Quanto tempo per ricevere il mio ordine?",
@@ -917,8 +917,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
           <>
             I pezzi a magazzino vengono affidati alla Posta svizzera entro 1–3
             giorni lavorativi. I pezzi stampati su richiesta partono dopo il
-            tempo di produzione indicato nella scheda prodotto. Ricevete un
-            numero di tracciamento alla spedizione.
+            tempo di produzione indicato nella scheda prodotto. Riceve un numero
+            di tracciamento alla spedizione.
           </>
         ),
       },
@@ -935,7 +935,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         ),
       },
       {
-        q: "Quale materiale utilizzate?",
+        q: "Quale materiale viene utilizzato?",
         a: (
           <>
             Stampiamo principalmente in PLA, ideale per la decorazione e gli
@@ -955,7 +955,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
           <>
             Sì, per un normale uso interno e decorativo. Il PLA è rigido e
             preciso; semplicemente non è concepito per forti sollecitazioni
-            meccaniche o calore elevato. In quei casi vi orientiamo verso un
+            meccaniche o calore elevato. In quei casi La orientiamo verso un
             materiale adatto.
           </>
         ),
@@ -974,9 +974,9 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Il PLA teme il calore?",
         a: (
           <>
-            Il PLA si ammorbidisce intorno ai 50–60 °C. Evitate di lasciare un
+            Il PLA si ammorbidisce intorno ai 50–60 °C. Eviti di lasciare un
             pezzo in un’auto al sole o vicino a una fonte di calore. Per un
-            oggetto esposto al calore, chiedeteci il PETG.
+            oggetto esposto al calore, ci chieda il PETG.
           </>
         ),
       },
@@ -984,12 +984,12 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Posso far stampare il mio modello?",
         a: (
           <>
-            Certo. Inviateci il vostro file (STL, 3MF, OBJ o STEP) o descrivete
-            la vostra idea dalla pagina{" "}
+            Certo. Ci invii il Suo file (STL, 3MF, OBJ o STEP) o descriva la Sua
+            idea dalla pagina{" "}
             <Link href="/custom" className={link}>
               Su misura
             </Link>
-            : ricevete un preventivo personalizzato entro 48 h.
+            : riceve un preventivo personalizzato entro 48 h.
           </>
         ),
       },
@@ -998,18 +998,17 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         a: (
           <>
             Il pagamento avviene tramite Stripe: TWINT, carte e Google Pay. La
-            transazione è cifrata e i vostri dati bancari non passano mai dai
+            transazione è cifrata e i Suoi dati bancari non passano mai dai
             nostri server.
           </>
         ),
       },
       {
-        q: "Spedite fuori dalla Svizzera?",
+        q: "Si spedisce fuori dalla Svizzera?",
         a: (
           <>
-            Per ora consegniamo solo in Svizzera, tramite la Posta svizzera.
-            Avete un progetto particolare? Scriveteci, vediamo cosa possiamo
-            fare.
+            Per ora consegniamo solo in Svizzera, tramite la Posta svizzera. Ha
+            un progetto particolare? Ci scriva, vediamo cosa possiamo fare.
           </>
         ),
       },
@@ -1017,9 +1016,9 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Un articolo non mi soddisfa o arriva danneggiato?",
         a: (
           <>
-            Scriveteci subito, con delle foto. Beneficiate della garanzia legale
-            di 2 anni, e gli articoli di catalogo non personalizzati possono
-            essere restituiti entro 14 giorni. Troviamo sempre una soluzione.
+            Ci scriva subito, con delle foto. Beneficia della garanzia legale di
+            2 anni, e gli articoli di catalogo non personalizzati possono essere
+            restituiti entro 14 giorni. Troviamo sempre una soluzione.
           </>
         ),
       },
@@ -1030,7 +1029,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     contactText: (
       <>
         Un dubbio prima di ordinare, un’idea di progetto o un’osservazione su un
-        pezzo ricevuto? Scriveteci: rispondiamo di solito entro 24–48 h.
+        pezzo ricevuto? Ci scriva: rispondiamo di solito entro 24–48 h.
       </>
     ),
   },
