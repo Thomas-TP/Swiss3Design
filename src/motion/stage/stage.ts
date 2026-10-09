@@ -417,8 +417,9 @@ export class Stage {
     // Position, dans le document, du haut du canvas : le défilement quand le
     // canvas est fixe, ce défilement moins le décalage du canvas quand il est
     // ancré. Une scène qui dessine « en coordonnées page » (le champ de
-    // courbes) lit cette valeur : sans le décalage, son motif sauterait d'une
-    // demi-fenêtre au passage d'un mode à l'autre (vue épinglée qui s'éloigne).
+    // courbes) lit cette valeur : sans le décalage, son motif sauterait de la
+    // marge du canvas (0,3 à 0,5 fenêtre) au passage d'un mode à l'autre (vue
+    // épinglée qui s'éloigne).
     const canvasTop = scrollY - (getCanvasAnchor()?.offsetY() ?? 0);
 
     renderer.setRenderTarget(null);
