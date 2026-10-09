@@ -72,18 +72,3 @@ export function stagePixelRatio(
   if (area * base * base <= budget) return base;
   return Math.max(Math.min(base, 1), Math.sqrt(budget / area));
 }
-
-/** Marge du canvas ancré (fraction de la fenêtre, de chaque côté) d'un appareil à pointeur précis seul. */
-export const ANCHOR_MARGIN_FINE = 0.25;
-/** Marge dès qu'un pointeur grossier (doigt) est présent : inertie du lancer. */
-export const ANCHOR_MARGIN_COARSE = 0.5;
-
-/** Marge du canvas ancré, en fraction de la hauteur de la fenêtre, de chaque côté. */
-export function anchorMargin(coarsePointer: boolean): number {
-  return coarsePointer ? ANCHOR_MARGIN_COARSE : ANCHOR_MARGIN_FINE;
-}
-
-/** Hauteur du canvas ancré, en fenêtres : la fenêtre et sa marge au-dessus et au-dessous. */
-export function anchorCanvasViewports(margin: number): number {
-  return 1 + 2 * margin;
-}

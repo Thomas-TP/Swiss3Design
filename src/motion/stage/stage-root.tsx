@@ -32,7 +32,11 @@
 import { useEffect } from "react";
 import { motionBridge } from "@/lib/motion-bridge/store";
 import { lowerDetectedCapability } from "@/lib/motion-bridge/tier";
-import { anchorCanvasViewports, anchorMargin } from "./pixel-ratio";
+import {
+  anchorCanvasViewports,
+  anchorMargin,
+  createAnchorLead,
+} from "./anchor-margin";
 import { Stage } from "./stage";
 import { anchorPlacement, setCanvasAnchor, type CanvasAnchor } from "./ticker";
 
@@ -142,8 +146,12 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
   let offset = margin;
   let lastTop = Number.NaN;
 
+  // Anticipation dans le sens du défilement (anchor-margin.ts).
+  const lead = createAnchorLead();
+
   const sizeObserver = new ResizeObserver(() => {
     margin = canvas.clientHeight * marginShare;
+    lead.reset();
     lastTop = Number.NaN;
   });
   sizeObserver.observe(canvas);
@@ -161,17 +169,20 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
     follow(scrollY) {
       if (live !== appliedLive) {
         applyMode();
+        lead.reset();
         lastTop = Number.NaN;
       }
       if (live) {
         offset = 0;
         return;
       }
-      // Haut du canvas dans le document : une marge au-dessus de la fenêtre.
+      // Haut du canvas dans le document : une marge au-dessus de la fenêtre,
+      // moins l'anticipation (le canvas avance dans le sens du défilement).
       const placed = anchorPlacement(
         scrollY,
         margin,
         window.devicePixelRatio || 1,
+        lead.update(scrollY, margin, performance.now()),
       );
       const top = placed.top;
       offset = placed.offset;
