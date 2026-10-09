@@ -40,7 +40,7 @@
   "map": {
     "eyebrow": "La carta",
     "title": "Un colore per ogni quota.",
-    "intro": "Una stampante 3D non fa che impilare quote. Con 0,2 mm per strato, questo vaso di {height} è un rilievo di {layers} curve di livello, e ogni fascia di colore vi recita la tinta di una carta.",
+    "intro": "Una stampante 3D non fa che impilare quote. Con 0,2 mm per strato, questo vaso di {height} è un rilievo di {layers} curve di livello, e ogni fascia di colore riprende la tinta di una carta.",
     "figure": "Lo stesso vaso, diviso in fasce: una per colore, dal piatto alla vetta.",
     "bands": "Fasce di colore, dalla vetta al piatto",
     "purgeLine": "{purge}: è tutto ciò che costa il colore, e Glielo mostriamo.",
