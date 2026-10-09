@@ -407,8 +407,8 @@ Ajouter `src/fonts/OFL-Archivo.txt` (licence) à côté du woff2.
   points, avatars et le disque Studio.
 - **Filets** : 1 px `line` sur les chapitres éditoriaux, les tableaux de specs et le footer ;
   **jamais** de grille de filets sur les formulaires, le panier, le checkout ou le compte.
-  `.s3d-hairlines` dessine les colonnes de la grille en fond (desktop, accueil et Atelier
-  seulement).
+  Le style `.s3d-hairlines` (colonnes de la grille dessinées en fond, accueil et Atelier) a été
+  prévu puis jamais employé ; **retiré par WP-99** (09.10.2026).
 - **Cadre de carte** (`MapFrame`) : graduations fines en marge (repère tous les 8 px, majeur tous
   les 64 px, `iso-index`), coordonnées mono « 46°25′N 6°16′E · Gland », « 46°31′N 6°40′E ·
   Pully ». Desktop, héros de l'accueil et footer seulement.
@@ -422,9 +422,10 @@ Ajouter `src/fonts/OFL-Archivo.txt` (licence) à côté du woff2.
 
 - **Texture** : aucune texture globale (pas de grain sur `body`, qui toucherait le checkout). Un
   tramage de Bayer 4×4 à 1–2 % existe **uniquement** dans le shader du champ de courbes (accueil).
-- **Icônes** : `lucide-react`, trait 1,5 px dans les nouveaux composants. Quatre pictos maison
-  en SVG inline (grille 24, trait 1,5, extrémités carrées) : `StrataIcon` (trois strates, disque
-  Studio), `NozzleIcon`, `LayerIcon`, `SummitIcon` (triangle coté). Aucun pictogramme de croix.
+- **Icônes** : `lucide-react`, trait 1,5 px dans les nouveaux composants. Un picto maison en SVG
+  inline (grille 24, trait 1,5, extrémités carrées) : `StrataIcon` (trois strates, disque
+  Studio). `NozzleIcon`, `LayerIcon` et `SummitIcon` (le triangle coté, refusé en R09) avaient été
+  prévus ; jamais importés, **retirés par WP-99** (09.10.2026). Aucun pictogramme de croix.
 - **Rendu 3D** : longue focale (fov 18–22°), élévation 20–25°, **lumière du nord-ouest**
   (convention d'estompage suisse : en haut à gauche), `RoomEnvironment` (procédural, rien à
   télécharger) + une directionnelle NO, tone mapping `NeutralToneMapping` (fidélité des teintes
@@ -659,20 +660,8 @@ p {
   .s3d-num {
     font-variant-numeric: tabular-nums slashed-zero;
   }
-  /* Colonnes de la grille visibles en fond (desktop, chapitres éditoriaux) :
-     un filet au début de chaque colonne (pas = colonne + gouttière). À poser
-     sur l'élément qui porte .s3d-grid. */
-  @media (width >= 64rem) {
-    .s3d-hairlines {
-      background-image: linear-gradient(
-        to right,
-        color-mix(in srgb, var(--color-line) 60%, transparent) 1px,
-        transparent 1px
-      );
-      background-size: calc((100% + var(--spacing-gutter)) / 12) 100%;
-      background-repeat: repeat-x;
-    }
-  }
+  /* (`.s3d-hairlines`, colonnes de la grille en fond : jamais employé, retiré
+     par WP-99.) */
   /* Point rouge final des titres : le « . » reste dans le texte (SEO, a11y). */
   .s3d-dot {
     position: relative;
@@ -1215,8 +1204,10 @@ contenu par la version ci-dessous (thème inchangé + mouvement) :
   clavier en C1, 10,4 px en C2 (109 images sur 127 au-dessus de 1 px), y compris pour une vue qui se
   redessine (non figée). `StageRoot` monte donc, **aux deux paliers**, le canvas dans un calque
   absolu de la hauteur de la page, rogné (`overflow: clip`, pour ne jamais allonger la page),
-  derrière le contenu : un canvas de **deux fenêtres de haut** (une demi-fenêtre de marge de chaque
-  côté) que la boucle recale à chaque frame (`CanvasAnchor.follow`, `stage/ticker.ts`,
+  derrière le contenu : un canvas de **1,6 fenêtre de haut à la souris** (0,3 fenêtre de marge de
+  chaque côté ; **deux fenêtres** dès qu'un pointeur grossier existe), décalé dans le sens du
+  défilement (anticipation : vitesse × 0,1 s, jamais plus de 80 % de la marge ; WP-99,
+  `stage/anchor-margin.ts`) que la boucle recale à chaque frame (`CanvasAnchor.follow`, `stage/ticker.ts`,
   `translate3d` arrondi au pixel physique), dans la même tâche que le dessin. Entre deux frames du
   fil principal le canvas défile avec le DOM, côté compositeur : il reste collé à son conteneur,
   quel que soit le geste (molette Lenis, tactile, clavier, barre de défilement). Le clavier reste
@@ -1238,6 +1229,9 @@ contenu par la version ci-dessous (thème inchangé + mouvement) :
   plancher** (R12 optionnel « DPR ≥ 1,5 ») : sur un écran à DPR 1 le canvas de deux fenêtres porte
   déjà deux fois les pixels de l'ancien canvas fixe (2,6 Mpx contre 1,3 Mpx) ; un plancher à 1,5
   les multiplierait par 4,5. Mesures, netteté comparée et limites : `measures-r16.md`.
+  **WP-99 (09.10.2026)** : budget de pixels du tampon, 8 Mpx en C2 et 4 Mpx en C1 à pointeur
+  précis (4K à 150 % : 16,5 → 8,0 Mpx ; 1440 × 900 DPR 2 : 5,77 → 4,62 Mpx) ; C2 → C1 réalloue le
+  tampon avec le budget de C1. Mesures : `measures-wp99-canvas.md`.
 - **Vignettes** : service `bake(scene, props, { width, height }) → Promise<Blob>` (render target,
   `readRenderTargetPixels`, canvas 2D, `toBlob("image/webp", 0.86)`), exposé au DOM par
   `bridge.stage.bake` (« Mes créations », pièce jointe du devis).
@@ -1253,7 +1247,8 @@ contenu par la version ci-dessous (thème inchangé + mouvement) :
   `contour-field` (accueil, C2 seulement), `studio-object` (Studio, chapitre 02 de l'accueil),
   `product-viewer` (fiche du Vase spirale) ; service `bake`. Registre
   `src/motion/stage/scenes/index.ts` (WP-00) : `{ "print-hero": () => import("./print-hero"), … }` ;
-  WP-00 livre un module **stub** par scène (un cube papier), chaque package remplace le sien.
+  WP-00 avait livré un module **stub** par scène (un cube papier) ; chaque package a remplacé le
+  sien et WP-99 a retiré la scène témoin (`stub-cube.ts`).
 
 ### 4.5 Contrats TypeScript (figés : ajouts permis, ruptures interdites)
 
@@ -1555,14 +1550,8 @@ définis au §9.2 : ils permettent à l'accueil d'afficher un objet Studio sans 
         ],
       },
     },
-    // Temporaire : ancien viewer, supprimé par WP-SHOP ; entrée retirée par WP-99.
-    {
-      "files": [
-        "src/components/product-viewer-3d.tsx",
-        "src/components/showroom-scene.ts",
-      ],
-      "rules": { "no-restricted-imports": "off" },
-    },
+    // (Une entrée temporaire désactivait la règle pour l'ancien viewer, supprimé par
+    // WP-SHOP ; elle a été retirée par WP-99.)
   ],
   "ignorePatterns": [
     ".claude/**",
@@ -1629,8 +1618,10 @@ production par `bun run preview` (la CSP de dev autorise `unsafe-eval` et masque
 
 ### 4.9 i18n : fichiers par package, fusion au chargement
 
-**Règle** : `messages/{fr,de,it,en}.json` sont **gelés** (seul WP-00 y corrige le ß ; seul WP-99
-retire les clés devenues inutiles). Chaque package écrit ses textes dans **ses propres fichiers**
+**Règle** : `messages/{fr,de,it,en}.json` ont été **gelés** pendant la refonte (seul WP-00 y a
+corrigé le ß ; seul WP-99 a retiré les clés devenues inutiles : 76 clés dans les 4 langues,
+09.10.2026). **Le gel est levé depuis WP-99** : ces fichiers se modifient de nouveau, mêmes clés
+dans les 4 langues. Chaque package a écrit ses textes dans **ses propres fichiers**
 `messages/<locale>/<namespace>.json`, fusionnés au chargement par `src/i18n/request.ts`.
 
 ```ts
@@ -3040,14 +3031,14 @@ Nature : **SSR** = rendu serveur (Server Component ou Client Component SSR sans 
 | `SpecTable`                                                                                    | `src/components/ui/spec-table.tsx` (`<dl>` à filets)                                                                                                                                                                               | SSR            | WP-00      | fiche, Studio, Atelier                        |
 | `Drawer`                                                                                       | `src/components/ui/drawer.tsx` (`<dialog>`, verrou Lenis)                                                                                                                                                                          | client         | WP-00      | Studio, plus tard ailleurs                    |
 | `Toast`                                                                                        | `src/components/ui/toast.tsx` (`aria-live`)                                                                                                                                                                                        | client         | WP-00      | Studio, favoris                               |
-| Icônes maison                                                                                  | `src/components/ui/icons.tsx` (`StrataIcon`, `NozzleIcon`, `LayerIcon`, `SummitIcon`)                                                                                                                                              | SSR            | WP-00      | nav, Studio                                   |
+| Icônes maison                                                                                  | `src/components/ui/icons.tsx` (`StrataIcon` ; `NozzleIcon`, `LayerIcon`, `SummitIcon` retirés par WP-99)                                                                                                                           | SSR            | WP-00      | nav, Studio                                   |
 | `MotionToggle`                                                                                 | `src/components/motion-toggle.tsx`                                                                                                                                                                                                 | client         | WP-00      | footer                                        |
 | Header, Footer, BottomNav, Consent, PageHeader, BrandMark, ThemeToggle, LocaleSwitcher, Select | `src/components/*.tsx`                                                                                                                                                                                                             | SSR / client   | WP-00      | shell                                         |
 | Contrats de données                                                                            | `src/lib/studio/types.ts`, `src/lib/studio/creations.ts`, `src/lib/quote-handoff.ts`                                                                                                                                               | léger          | WP-00      | Studio, favoris, sur mesure                   |
 | Scripts de contrôle                                                                            | `scripts/check-worker-bundle.ts`, `scripts/chunk-report.ts`                                                                                                                                                                        | outil          | WP-00      | tous                                          |
 | Cœur du Stage                                                                                  | `src/motion/stage/{stage-root.tsx,view-tracker.ts,loop.ts,bake.ts,controllers.ts,types.ts,geometry.ts}`                                                                                                                            | lourd          | WP-00      | scènes                                        |
 | Matériau d'impression                                                                          | `src/motion/stage/materials/print-material.ts`, `src/motion/stage/glsl/*.ts`                                                                                                                                                       | lourd          | WP-00      | `print-hero`, `studio-object`                 |
-| Registre des scènes + stubs                                                                    | `src/motion/stage/scenes/index.ts`                                                                                                                                                                                                 | lourd          | WP-00      | Stage                                         |
+| Registre des scènes (les stubs de WP-00 ont été retirés par WP-99)                             | `src/motion/stage/scenes/index.ts`                                                                                                                                                                                                 | lourd          | WP-00      | Stage                                         |
 | GSAP, runtime                                                                                  | `src/motion/gsap.ts`, `src/motion/runtime.tsx`                                                                                                                                                                                     | lourd          | WP-00      | chorégraphies                                 |
 | Géométrie Lavaux, noyau, stats, estimation, codecs, posters, STL                               | `src/lib/studio/{kernel/*,objects/lavaux.ts,profile.ts,patterns.ts,stats.ts,estimate.ts,pricing-params.ts,guards.ts,schemas.ts,url-state.ts,presets.ts,filaments.ts,camera.ts,format.ts,poster.ts,stl.ts,band-stats.ts}`           | pur TS         | WP-01      | tous les consommateurs 3D et SSR              |
 | Posters de champ                                                                               | `scripts/gen-field-posters.ts` → `public/posters/field-*-{light,dark}.svg`                                                                                                                                                         | outil          | WP-01      | footer, 404, contact, accueil                 |
