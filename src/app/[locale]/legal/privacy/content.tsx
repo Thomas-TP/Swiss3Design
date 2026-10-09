@@ -222,6 +222,21 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Studio et fichiers déposés",
+      body: (
+        <p>
+          Le Studio garde dans le stockage local de votre navigateur les
+          créations que vous enregistrez (« Mes créations », 12 au plus) et, le
+          temps de la session, les textes que vous saisissez ainsi que la
+          configuration transmise au formulaire de devis. Ces données restent
+          sur votre appareil : elles ne nous parviennent que lorsque vous
+          envoyez votre demande à l’atelier. Quand vous déposez un fichier
+          (Studio ou demande de devis), un cookie technique de 24 heures
+          garantit que vous seul pouvez le joindre à votre demande.
+        </p>
+      ),
+    },
+    {
       title: "Durées de conservation",
       body: (
         <p>
@@ -490,6 +505,21 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           «ph_…» und nutzt den lokalen Speicher (zufällige Kennung, bis zu einem
           Jahr), was Sie ablehnen können (siehe «Reichweitenmessung»). Keine
           Werbe-Cookies und kein websiteübergreifendes Tracking.
+        </p>
+      ),
+    },
+    {
+      title: "Studio und hochgeladene Dateien",
+      body: (
+        <p>
+          Das Studio speichert im lokalen Speicher Ihres Browsers die
+          Kreationen, die Sie sichern («Meine Kreationen», höchstens 12), und
+          für die Dauer der Sitzung die Texte, die Sie eingeben, sowie die an
+          das Offertformular übergebene Konfiguration. Diese Daten bleiben auf
+          Ihrem Gerät: Sie erreichen uns erst, wenn Sie Ihre Anfrage an die
+          Werkstatt senden. Wenn Sie eine Datei hochladen (Studio oder
+          Offertanfrage), stellt ein technisches Cookie mit 24 Stunden Laufzeit
+          sicher, dass nur Sie diese Datei Ihrer Anfrage beifügen können.
         </p>
       ),
     },
@@ -770,6 +800,20 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
+      title: "Studio e file caricati",
+      body: (
+        <p>
+          Lo Studio conserva nella memoria locale del Suo browser le creazioni
+          che salva («Le mie creazioni», al massimo 12) e, per la durata della
+          sessione, i testi che inserisce e la configurazione trasmessa al
+          modulo di preventivo. Questi dati restano sul Suo dispositivo: ci
+          giungono solo quando invia la Sua richiesta al laboratorio. Quando
+          carica un file (Studio o richiesta di preventivo), un cookie tecnico
+          di 24 ore garantisce che solo Lei possa allegarlo alla Sua richiesta.
+        </p>
+      ),
+    },
+    {
       title: "Durata di conservazione",
       body: (
         <p>
@@ -1022,6 +1066,20 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           measurement also sets a “ph_…” cookie and uses local storage (random
           identifier, up to one year), which you can decline (see “Audience
           measurement”). No advertising cookies and no cross-site tracking.
+        </p>
+      ),
+    },
+    {
+      title: "Studio and uploaded files",
+      body: (
+        <p>
+          The Studio keeps the creations you save (“My creations”, 12 at most)
+          in your browser’s local storage and, for the length of the session,
+          the texts you type and the configuration passed to the quote form.
+          This data stays on your device: it only reaches us when you send your
+          request to the workshop. When you upload a file (Studio or quote
+          request), a technical cookie lasting 24 hours makes sure only you can
+          attach it to your request.
         </p>
       ),
     },

@@ -10,7 +10,7 @@ import styles from "./legal-layout.module.css";
 // reprise comme <lastmod> du sitemap (une seule source, jamais désynchronisées).
 export const LEGAL_UPDATED = {
   terms: "2026-09-27",
-  privacy: "2026-09-27",
+  privacy: "2026-10-09",
   shipping: "2026-07-10",
 } as const;
 
