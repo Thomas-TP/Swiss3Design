@@ -3363,6 +3363,20 @@ revue de l'admin dans les deux thèmes ; docs ; checklist du propriétaire (§11
 validation J3 seulement : PR vers `main`, CI verte (`quality`, « Workers Builds »), fusion,
 **vérification que le Worker de prod a bien été redéployé** (`modified_on`), repli manuel sinon.
 
+**Statut au 09.10.2026 : fait, hors la PR vers `main`** (elle attend la validation J3 du propriétaire,
+`checklist-j3.md`). Quatre lots intégrés dans `claude/redesign-2026--verify-wp99` (`measures-wp99.md`) :
+Worker **2 456 KiB gzip** (3 333 avant, −26 %, hook `webpack()` de `next.config.ts`) ; canvas (marge à la
+souris, anticipation, budget de pixels 8 / 4 Mpx) ; nettoyage (`Reveal`, scène témoin, 3 pictos,
+`.s3d-hairlines`, `pas()`, 76 clés × 4 langues) ; revue (admin clair et sombre, 4 langues, analytics,
+checklist J3, crédits). Preview de production : 21 URL × 2 gabarits, 0 CSP, 0 hydratation, 0
+`MISSING_MESSAGE`, 1 contexte WebGL au plus, Server Actions rejouées, écart DOM ↔ canvas ≤ 0,83 px.
+**Sauté, avec sa raison** : `zod/mini` (better-auth et ses greffons importent zod complet : il resterait dans le
+Worker), messages du Studio par langue (le Worker sert les 4 langues), 12 clés de `studioCore` épinglées par un
+test, exports sans référence (0 KiB), `mono.tsx` (nommé dans les conventions), registre de l'italien, licence
+Geist et mention du stockage local du Studio dans la politique de confidentialité (au propriétaire),
+`Reorder` hors du Worker (changement de comportement). Décisions restantes : netteté du canvas aux très
+grands écrans (`STAGE_PIXEL_BUDGET[2]`), R18 sur un vrai téléphone.
+
 ---
 
 ## 10. Critères d'acceptation communs (tous les packages)
