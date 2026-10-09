@@ -7,11 +7,13 @@ import { cx } from "./cx";
 // même focus (encre + halo discret, pas de rouge), même état invalide
 // (`aria-invalid`, bordure `accent-text`, 6:1 et plus sur tous les fonds).
 // Taille de texte 16 px en mobile : en dessous, iOS zoome sur le champ.
+// Placeholder en `soft` plein (WP-99) : à 70 % il tombait à 3,1:1 en clair
+// alors qu'il porte de l'information (« N° ou e-mail… »).
 
 /** Habillage seul (sans display ni largeur), pour un déclencheur en flex. */
 export const fieldSkin = cx(
   "rounded-field border border-line bg-elevated px-3.5 py-2.5 text-base text-ink sm:text-[0.9375rem]",
-  "placeholder:text-soft/70 transition-colors duration-150 hover:border-iso",
+  "placeholder:text-soft transition-colors duration-150 hover:border-iso",
   "focus:border-ink focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/15",
   "disabled:cursor-not-allowed disabled:opacity-60",
   "aria-invalid:border-accent-text",
