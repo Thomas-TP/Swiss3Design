@@ -603,20 +603,19 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           (sottoposta a hash, mai in chiaro), identificativo di accesso Google o
           chiave di accesso (passkey) — in quest’ultimo caso, sui nostri server
           sono memorizzati solo la chiave pubblica e alcuni metadati tecnici del
-          dispositivo; la vostra impronta digitale o il riconoscimento facciale
-          non lasciano mai il vostro dispositivo. <strong>Ordini</strong>:
-          indirizzo di consegna, articoli, cronologia.{" "}
-          <strong>Pagamento</strong>: trattato esclusivamente da Stripe; non
-          vediamo né memorizziamo alcun dato della carta.{" "}
-          <strong>Preventivi su misura</strong>: descrizione del progetto e file
-          3D trasmessi. <strong>Recensioni</strong>: se lasciate una recensione
-          su un prodotto acquistato, il vostro nome visualizzato, il voto e il
-          commento vengono pubblicati sulla scheda prodotto dopo moderazione.{" "}
-          <strong>Scambi</strong>: e-mail e corrispondenza.{" "}
+          dispositivo; la Sua impronta digitale o il riconoscimento facciale non
+          lasciano mai il Suo dispositivo. <strong>Ordini</strong>: indirizzo di
+          consegna, articoli, cronologia. <strong>Pagamento</strong>: trattato
+          esclusivamente da Stripe; non vediamo né memorizziamo alcun dato della
+          carta. <strong>Preventivi su misura</strong>: descrizione del progetto
+          e file 3D trasmessi. <strong>Recensioni</strong>: se lascia una
+          recensione su un prodotto acquistato, il Suo nome visualizzato, il
+          voto e il commento vengono pubblicati sulla scheda prodotto dopo
+          moderazione. <strong>Scambi</strong>: e-mail e corrispondenza.{" "}
           <strong>Dati tecnici</strong>: durante la consultazione del sito, il
-          vostro indirizzo IP, il tipo di browser e i registri di connessione
-          sono trattati automaticamente a fini di sicurezza, prevenzione degli
-          abusi e corretto funzionamento del sito.
+          Suo indirizzo IP, il tipo di browser e i registri di connessione sono
+          trattati automaticamente a fini di sicurezza, prevenzione degli abusi
+          e corretto funzionamento del sito.
         </p>
       ),
     },
@@ -629,7 +628,7 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           sicurezza del conto), rispetto degli obblighi legali (conservazione
           contabile) e prevenzione degli abusi. Nessun dato viene venduto né
           utilizzato a fini pubblicitari. Con la sola eccezione di un promemoria
-          del carrello che abbiate <strong>espressamente richiesto</strong>{" "}
+          del carrello che Lei abbia <strong>espressamente richiesto</strong>{" "}
           (vedi sotto), non inviamo alcuna e-mail pubblicitaria; le altre e-mail
           sono strettamente transazionali (ordini, conto). Misuriamo inoltre, in
           forma anonima, la frequentazione e l’utilizzo del sito per migliorarlo
@@ -641,11 +640,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Promemoria del carrello (con consenso)",
       body: (
         <p>
-          Solo se lo richiedete esplicitamente spuntando l’apposita casella nel
-          carrello, conserviamo il vostro indirizzo e-mail e il contenuto del
-          carrello per inviarvi <strong>un solo</strong> promemoria se non avete
-          completato l’ordine. La base giuridica è il vostro{" "}
-          <strong>consenso</strong>, che potete revocare in qualsiasi momento
+          Solo se lo richiede esplicitamente spuntando l’apposita casella nel
+          carrello, conserviamo il Suo indirizzo e-mail e il contenuto del
+          carrello per inviarLe <strong>un solo</strong> promemoria se non ha
+          completato l’ordine. La base giuridica è il Suo{" "}
+          <strong>consenso</strong>, che può revocare in qualsiasi momento
           tramite il link di disiscrizione presente nell’e-mail. Questi dati
           vengono eliminati al momento dell’ordine, alla disiscrizione e al più
           tardi dopo <strong>30 giorni</strong>.
@@ -656,14 +655,14 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Preferenze di comunicazione",
       body: (
         <p>
-          Se attivate la newsletter o gli avvisi sui nuovi prodotti dal vostro
-          spazio cliente (<strong>Il mio conto → Notifiche</strong>),
-          utilizziamo il vostro indirizzo e-mail per inviarvi queste
-          comunicazioni. La base giuridica è il vostro <strong>consenso</strong>
-          , che potete revocare in qualsiasi momento dal vostro conto oppure
-          tramite il link di disiscrizione con un clic presente in ogni e-mail.
-          Resend (responsabile del trattamento già citato di seguito) è
-          utilizzato per l’invio di queste e-mail.
+          Se attiva la newsletter o gli avvisi sui nuovi prodotti dal Suo spazio
+          cliente (<strong>Il mio conto → Notifiche</strong>), utilizziamo il
+          Suo indirizzo e-mail per inviarLe queste comunicazioni. La base
+          giuridica è il Suo <strong>consenso</strong>, che può revocare in
+          qualsiasi momento dal Suo conto oppure tramite il link di
+          disiscrizione con un clic presente in ogni e-mail. Resend
+          (responsabile del trattamento già citato di seguito) è utilizzato per
+          l’invio di queste e-mail.
         </p>
       ),
     },
@@ -672,19 +671,19 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <>
           <p>
-            <strong>Accesso di un agente al vostro conto</strong>: se
-            autorizzate un’applicazione o un agente di intelligenza artificiale
-            («agente IA») ad accedere al vostro conto (schermata di consenso o
-            inserimento di un codice a sei cifre), registriamo l’applicazione,
-            le autorizzazioni concesse e i token di accesso, conservati in forma
+            <strong>Accesso di un agente al Suo conto</strong>: se autorizza
+            un’applicazione o un agente di intelligenza artificiale («agente
+            IA») ad accedere al Suo conto (schermata di consenso o inserimento
+            di un codice a sei cifre), registriamo l’applicazione, le
+            autorizzazioni concesse e i token di accesso, conservati in forma
             cifrata o hash. L’agente legge soltanto i dati coperti da tali
-            autorizzazioni (profilo, ordini, preventivi); potete revocargli
+            autorizzazioni (profilo, ordini, preventivi); può revocargli
             l’accesso in qualsiasi momento in{" "}
             <strong>Il mio conto → Agenti IA</strong>. Gli accessi scaduti,
             revocati o mai utilizzati vengono eliminati automaticamente.
           </p>
           <p>
-            <strong>Acquisti tramite un agente IA</strong>: quando ordinate
+            <strong>Acquisti tramite un agente IA</strong>: quando ordina
             tramite un agente IA (per esempio un assistente conversazionale
             collegato a Stripe), riceviamo da Stripe o dalla piattaforma
             dell’agente i dati necessari all’ordine — nome, indirizzo e-mail,
@@ -694,8 +693,8 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
             catalogo (prodotti, prezzi, scorte), senza alcun dato personale,
             viene trasmesso a Stripe, che lo mette a disposizione degli agenti
             IA partner. La piattaforma dell’agente (per esempio OpenAI,
-            Microsoft, Google o Perplexity) tratta le vostre conversazioni e i
-            vostri dati sotto la propria responsabilità e secondo la propria
+            Microsoft, Google o Perplexity) tratta le Sue conversazioni e i Suoi
+            dati sotto la propria responsabilità e secondo la propria
             informativa sulla privacy; tali piattaforme possono trattare dati
             negli Stati Uniti.
           </p>
@@ -713,7 +712,7 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           <strong>PostHog</strong>, i cui dati sono ospitati nell’Unione europea
           (Francoforte). Un cookie «ph_…» contenente un identificativo casuale
           (conservato fino a un anno) permette di riconoscere un browser che
-          ritorna. Il vostro indirizzo IP non viene conservato; paese, cantone e
+          ritorna. Il Suo indirizzo IP non viene conservato; paese, cantone e
           località sono dedotti da Cloudflare al momento della visita. Non
           vengono trasmessi nome, indirizzo e-mail, indirizzo postale né dati di
           pagamento, e gli indirizzi delle pagine vengono ripuliti dai parametri
@@ -721,8 +720,8 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           PostHog (un anno con la nostra offerta attuale). Questa misurazione si
           basa sul nostro interesse legittimo a migliorare il sito.
           Conformemente all’art. 45c della legge sulle telecomunicazioni, il
-          banner mostrato alla vostra prima visita ve ne informa e potete
-          rifiutarla in qualsiasi momento, il che interrompe anche le
+          banner mostrato alla Sua prima visita La informa di questa misurazione
+          e può rifiutarla in qualsiasi momento, il che interrompe anche le
           registrazioni delle visite:
           <AnalyticsOptOut
             labels={{
@@ -743,11 +742,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           PostHog registra inoltre lo svolgimento delle visite (pagine, clic,
           scorrimento, movimenti del mouse) per aiutarci a individuare ciò che
           crea difficoltà sul sito. I campi di inserimento e i dati personali
-          visualizzati sono nascosti, le pagine del vostro conto e il
-          tracciamento degli ordini non vengono mai registrati e le
-          registrazioni vengono eliminate dopo 30 giorni. Rifiutare la
-          misurazione dell’audience (banner o pulsante qui sopra) interrompe
-          anche le registrazioni.
+          visualizzati sono nascosti, le pagine del Suo conto e il tracciamento
+          degli ordini non vengono mai registrati e le registrazioni vengono
+          eliminate dopo 30 giorni. Rifiutare la misurazione dell’audience
+          (banner o pulsante qui sopra) interrompe anche le registrazioni.
         </p>
       ),
     },
@@ -756,8 +754,8 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Non effettuiamo alcuna profilazione né alcuna decisione individuale
-          automatizzata che produca effetti giuridici nei vostri confronti o che
-          vi riguardi in modo significativo.
+          automatizzata che produca effetti giuridici nei Suoi confronti o che
+          La riguardi in modo significativo.
         </p>
       ),
     },
@@ -791,10 +789,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Il sito utilizza un cookie di sessione per restare connessi al proprio
           conto e la memoria locale del browser per il carrello, i preferiti, la
-          ripresa di un pagamento e le vostre scelte sulla misurazione
+          ripresa di un pagamento e le Sue scelte sulla misurazione
           dell’audience. La misurazione dell’audience deposita inoltre un cookie
           «ph_…» e utilizza la memoria locale (identificativo casuale, fino a un
-          anno), che potete rifiutare (vedi «Misurazione dell’audience»). Nessun
+          anno), che può rifiutare (vedi «Misurazione dell’audience»). Nessun
           cookie pubblicitario né tracciamento da un sito all’altro.
         </p>
       ),
@@ -807,9 +805,9 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           che salva («Le mie creazioni», al massimo 12) e, per la durata della
           sessione, i testi che inserisce e la configurazione trasmessa al
           modulo di preventivo. Questi dati restano sul Suo dispositivo: ci
-          giungono solo quando invia la Sua richiesta al laboratorio. Quando
-          carica un file (Studio o richiesta di preventivo), un cookie tecnico
-          di 24 ore garantisce che solo Lei possa allegarlo alla Sua richiesta.
+          giungono solo quando invia la Sua richiesta all’atelier. Quando carica
+          un file (Studio o richiesta di preventivo), un cookie tecnico di 24
+          ore garantisce che solo Lei possa allegarlo alla Sua richiesta.
         </p>
       ),
     },
@@ -825,19 +823,19 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       ),
     },
     {
-      title: "I vostri diritti",
+      title: "I Suoi diritti",
       body: (
         <p>
-          Conformemente agli art. 25 segg. nLPD, potete chiedere l’accesso ai
-          vostri dati, la loro rettifica, la loro cancellazione o la loro
-          consegna in un formato corrente. Un’esportazione immediata dei vostri
-          dati (profilo, ordini, preventivi, indirizzi) è disponibile da{" "}
+          Conformemente agli art. 25 segg. nLPD, può chiedere l’accesso ai Suoi
+          dati, la loro rettifica, la loro cancellazione o la loro consegna in
+          un formato corrente. Un’esportazione immediata dei Suoi dati (profilo,
+          ordini, preventivi, indirizzi) è disponibile da{" "}
           <strong>Il mio conto → Riservatezza</strong>; per qualsiasi altra
-          richiesta, scrivete a contact@swiss3design.ch. Potete inoltre
-          rivolgervi all’Incaricato federale della protezione dei dati e della
-          trasparenza (IFPDT). Rispondiamo in linea di principio entro 30 giorni
-          e possiamo richiedere una prova d’identità prima di dar seguito, al
-          fine di proteggere i vostri dati.
+          richiesta, scriva a contact@swiss3design.ch. Può inoltre rivolgersi
+          all’Incaricato federale della protezione dei dati e della trasparenza
+          (IFPDT). Rispondiamo in linea di principio entro 30 giorni e possiamo
+          richiedere una prova d’identità prima di dar seguito, al fine di
+          proteggere i Suoi dati.
         </p>
       ),
     },
