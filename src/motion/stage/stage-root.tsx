@@ -32,6 +32,7 @@
 import { useEffect } from "react";
 import { motionBridge } from "@/lib/motion-bridge/store";
 import { lowerDetectedCapability } from "@/lib/motion-bridge/tier";
+import { anchorCanvasViewports, anchorMargin } from "./pixel-ratio";
 import { Stage } from "./stage";
 import { anchorPlacement, setCanvasAnchor, type CanvasAnchor } from "./ticker";
 
@@ -46,6 +47,15 @@ function createCanvas(): HTMLCanvasElement {
   style.pointerEvents = "none";
   style.display = "block";
   return canvas;
+}
+
+/** Un doigt est-il parmi les pointeurs de l'appareil (écran tactile, même d'un portable) ? */
+function hasCoarsePointer(): boolean {
+  try {
+    return window.matchMedia("(any-pointer: coarse)").matches;
+  } catch {
+    return false;
+  }
 }
 
 /** Hauteur du document, hors calque du Stage (qui est absolu et ne compte pas). */
@@ -91,14 +101,18 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
   w.zIndex = "-1";
   w.pointerEvents = "none";
 
+  // Marge de chaque côté (fraction de la fenêtre) : plus petite à la souris
+  // qu'au doigt (pixel-ratio.ts). Le canvas fait la fenêtre plus deux marges.
+  const marginRatio = anchorMargin(hasCoarsePointer());
+  const heightPct = anchorCanvasViewports(marginRatio) * 100;
   const s = canvas.style;
   s.position = "absolute";
   s.inset = "auto";
   s.top = "0";
   s.left = "0";
   s.width = "100%";
-  s.height = "200vh";
-  s.height = "200lvh";
+  s.height = `${heightPct}vh`;
+  s.height = `${heightPct}lvh`;
   s.zIndex = "auto";
   s.willChange = "transform";
 
@@ -121,14 +135,15 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
   wrapper.appendChild(canvas);
   document.body.appendChild(wrapper);
 
-  // Marge = un quart de la hauteur du canvas (une demi-fenêtre). Relue quand
-  // le canvas change de taille (rotation, barre d'adresse).
-  let margin = canvas.clientHeight / 4;
+  // Marge en pixels : sa part de la hauteur du canvas (marge / (1 + 2 × marge)).
+  // Relue quand le canvas change de taille (rotation, barre d'adresse).
+  const marginShare = marginRatio / anchorCanvasViewports(marginRatio);
+  let margin = canvas.clientHeight * marginShare;
   let offset = margin;
   let lastTop = Number.NaN;
 
   const sizeObserver = new ResizeObserver(() => {
-    margin = canvas.clientHeight / 4;
+    margin = canvas.clientHeight * marginShare;
     lastTop = Number.NaN;
   });
   sizeObserver.observe(canvas);

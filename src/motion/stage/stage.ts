@@ -81,10 +81,6 @@ interface ViewState {
   unbake: boolean;
 }
 
-// Même plafond aux deux paliers : le canvas ancré fait deux fenêtres de haut
-// (pixel-ratio.ts).
-const currentPixelRatio = () => stagePixelRatio(window.devicePixelRatio);
-
 function intersects(rect: DOMRectReadOnly, width: number, height: number) {
   return (
     rect.right > 0 && rect.bottom > 0 && rect.left < width && rect.top < height
@@ -125,7 +121,17 @@ export class Stage {
       stencil: false,
     });
     const renderer = this.renderer;
-    renderer.setPixelRatio(currentPixelRatio());
+    // this.ctx n'existe pas encore : le palier vient du pont.
+    renderer.setPixelRatio(
+      stagePixelRatio(
+        window.devicePixelRatio,
+        {
+          width: Math.max(1, canvas.clientWidth),
+          height: Math.max(1, canvas.clientHeight),
+        },
+        capability,
+      ),
+    );
     renderer.autoClear = false;
     renderer.setScissorTest(true);
     renderer.outputColorSpace = SRGBColorSpace;
@@ -331,11 +337,25 @@ export class Stage {
     this.loop.invalidate();
   }
 
+  /**
+   * Rapport de pixels du canvas : le DPR plafonné à 1,5, abaissé (jamais sous
+   * 1) pour que le tampon tienne dans le budget de pixels du palier courant
+   * (pixel-ratio.ts). Le budget se partage la taille CSS du canvas, qui est
+   * celle de la fenêtre plus ses marges d'ancrage.
+   */
+  private pixelRatioFor(width: number, height: number): number {
+    return stagePixelRatio(
+      window.devicePixelRatio,
+      { width, height },
+      this.ctx.capability,
+    );
+  }
+
   private resizeCanvas() {
     const width = Math.max(1, this.canvas.clientWidth);
     const height = Math.max(1, this.canvas.clientHeight);
     // Zoom du navigateur ou fenêtre passée sur un autre écran : nouveau DPR.
-    const ratio = currentPixelRatio();
+    const ratio = this.pixelRatioFor(width, height);
     const ratioChanged = ratio !== this.renderer.getPixelRatio();
     if (width === this.width && height === this.height && !ratioChanged) return;
     if (ratioChanged) this.renderer.setPixelRatio(ratio);
@@ -611,9 +631,10 @@ export class Stage {
       this.release();
       return;
     }
-    // Même plafond aux deux paliers : C2 → C1 ne touche pas au tampon de dessin
-    // (setPixelRatio le réalloue, même à taille égale).
-    const ratio = currentPixelRatio();
+    // C2 → C1 : le budget de pixels du palier plus bas s'applique tout de suite
+    // (setPixelRatio réalloue le tampon ; sans changement de rapport, on n'y
+    // touche pas). L'antialiasing, fixé à la création du contexte, reste.
+    const ratio = this.pixelRatioFor(this.width, this.height);
     if (ratio !== this.renderer.getPixelRatio())
       this.renderer.setPixelRatio(ratio);
     for (const state of this.views.values()) this.scheduleIdle(state);
