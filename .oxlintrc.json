@@ -107,14 +107,6 @@
           }
         ]
       }
-    },
-    // Temporaire : ancien viewer, supprime par WP-SHOP ; entree retiree par WP-99.
-    {
-      "files": [
-        "src/components/product-viewer-3d.tsx",
-        "src/components/showroom-scene.ts"
-      ],
-      "rules": { "no-restricted-imports": "off" }
     }
   ],
   "ignorePatterns": [
@@ -127,7 +119,6 @@
     "public/**",
     "workers/**",
     "cloudflare-env.d.ts",
-    "next-env.d.ts",
-    "src/app/icon.svg"
+    "next-env.d.ts"
   ]
 }
