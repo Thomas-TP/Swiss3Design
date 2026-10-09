@@ -91,6 +91,27 @@ describe("anchorPlacement", () => {
   it("repasse à 1 un rapport de pixels absurde", () => {
     expect(anchorPlacement(100, 10, 0)).toEqual({ top: 90, offset: 10 });
   });
+
+  it("décale le canvas de l'anticipation : top + offset = scrollY, offset = marge − anticipation", () => {
+    // Vers le bas (anticipation positive) le canvas descend : moins de marge en haut.
+    expect(anchorPlacement(1000, 400, 1, 150)).toEqual({
+      top: 750,
+      offset: 250,
+    });
+    // Vers le haut, l'inverse.
+    expect(anchorPlacement(1000, 400, 1, -150)).toEqual({
+      top: 450,
+      offset: 550,
+    });
+    for (const dpr of [1, 1.5, 2]) {
+      const { top, offset } = anchorPlacement(1234.567, 270, dpr, 111.1);
+      expect(top * dpr).toBeCloseTo(Math.round(top * dpr), 9);
+      expect(top + offset).toBeCloseTo(1234.567, 9);
+      expect(Math.abs(offset - (270 - 111.1))).toBeLessThanOrEqual(
+        0.5 / dpr + 1e-9,
+      );
+    }
+  });
 });
 
 describe("ViewTracker · rectangles et canvas ancré", () => {

@@ -15,7 +15,7 @@
 // Un seul montage, aux deux paliers (C1 et C2) : le canvas est ANCRÉ AU
 // DOCUMENT (retour R16 : « les objets 3D sautent au défilement » ; décision du
 // propriétaire du 08.10.2026 : en C2 aussi, avec un rapport de pixels plafonné à
-// 1,5, pixel-ratio.ts). Un canvas `fixed` ne bouge pas avec la page : dès que
+// 1,5 sous un budget de pixels, pixel-ratio.ts). Un canvas `fixed` ne bouge pas avec la page : dès que
 // le défilement est natif, donc mené par le compositeur, qui avance le DOM sans
 // attendre le fil principal (tactile, clavier : flèches, Espace, Pages, Début et
 // Fin ; barre de défilement), il montre l'objet une ou deux frames en retard sur
@@ -32,6 +32,12 @@
 import { useEffect } from "react";
 import { motionBridge } from "@/lib/motion-bridge/store";
 import { lowerDetectedCapability } from "@/lib/motion-bridge/tier";
+import {
+  anchorCanvasViewports,
+  anchorMargin,
+  createAnchorLead,
+  hasCoarsePointer,
+} from "./anchor-margin";
 import { Stage } from "./stage";
 import { anchorPlacement, setCanvasAnchor, type CanvasAnchor } from "./ticker";
 
@@ -39,7 +45,7 @@ function createCanvas(): HTMLCanvasElement {
   const canvas = document.createElement("canvas");
   canvas.className = "s3d-stage";
   canvas.setAttribute("aria-hidden", "true");
-  // La géométrie (absolue, de deux fenêtres de haut, ou fixe en mode « live »)
+  // La géométrie (absolue, la fenêtre plus ses marges de haut, ou fixe en mode « live »)
   // est posée par mountAnchored : elle l'emporte sur la règle .s3d-stage de
   // globals.css, quel que soit l'ordre de chargement des styles.
   const style = canvas.style;
@@ -61,11 +67,13 @@ interface Anchored {
 /**
  * Monte le canvas ancré au document : un calque absolu de la hauteur de la
  * page, rogné (overflow: clip, pour que le canvas, plus haut que la fenêtre,
- * n'allonge jamais la page), derrière le contenu, et dans lui un canvas de
- * deux fenêtres de haut (une demi-fenêtre de marge au-dessus et au-dessous de
- * la fenêtre visible) que `follow` cale sur le défilement. La marge couvre
- * l'avance du compositeur sur le fil principal (au pire quelques dizaines de
- * pixels par frame, même en lancer rapide).
+ * n'allonge jamais la page), derrière le contenu, et dans lui un canvas de la
+ * hauteur de la fenêtre plus une marge au-dessus et au-dessous (0,3 fenêtre à la
+ * souris, 0,5 dès qu'il y a un doigt : anchor-margin.ts) que `follow` cale sur
+ * le défilement. La marge couvre l'avance du compositeur sur le fil principal :
+ * un pas de défilement par frame, et plus quand le fil principal est chargé.
+ * Côté avant elle monte jusqu'à 1,8 fois sa valeur de base (anticipation
+ * dans le sens du défilement, aux dépens du côté arrière).
  *
  * Quand une vue « live » est proche de la fenêtre (collante ou épinglée : le
  * Studio sur grand écran, le héros épinglé de l'accueil en C2), le calque
@@ -91,14 +99,18 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
   w.zIndex = "-1";
   w.pointerEvents = "none";
 
+  // Marge de chaque côté (fraction de la fenêtre) : plus petite à la souris
+  // qu'au doigt (pixel-ratio.ts). Le canvas fait la fenêtre plus deux marges.
+  const marginRatio = anchorMargin(hasCoarsePointer());
+  const heightPct = anchorCanvasViewports(marginRatio) * 100;
   const s = canvas.style;
   s.position = "absolute";
   s.inset = "auto";
   s.top = "0";
   s.left = "0";
   s.width = "100%";
-  s.height = "200vh";
-  s.height = "200lvh";
+  s.height = `${heightPct}vh`;
+  s.height = `${heightPct}lvh`;
   s.zIndex = "auto";
   s.willChange = "transform";
 
@@ -121,14 +133,19 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
   wrapper.appendChild(canvas);
   document.body.appendChild(wrapper);
 
-  // Marge = un quart de la hauteur du canvas (une demi-fenêtre). Relue quand
-  // le canvas change de taille (rotation, barre d'adresse).
-  let margin = canvas.clientHeight / 4;
+  // Marge en pixels : sa part de la hauteur du canvas (marge / (1 + 2 × marge)).
+  // Relue quand le canvas change de taille (rotation, barre d'adresse).
+  const marginShare = marginRatio / anchorCanvasViewports(marginRatio);
+  let margin = canvas.clientHeight * marginShare;
   let offset = margin;
   let lastTop = Number.NaN;
 
+  // Anticipation dans le sens du défilement (anchor-margin.ts).
+  const lead = createAnchorLead();
+
   const sizeObserver = new ResizeObserver(() => {
-    margin = canvas.clientHeight / 4;
+    margin = canvas.clientHeight * marginShare;
+    lead.reset();
     lastTop = Number.NaN;
   });
   sizeObserver.observe(canvas);
@@ -146,17 +163,20 @@ function mountAnchored(canvas: HTMLCanvasElement): Anchored {
     follow(scrollY) {
       if (live !== appliedLive) {
         applyMode();
+        lead.reset();
         lastTop = Number.NaN;
       }
       if (live) {
         offset = 0;
         return;
       }
-      // Haut du canvas dans le document : une marge au-dessus de la fenêtre.
+      // Haut du canvas dans le document : une marge au-dessus de la fenêtre,
+      // moins l'anticipation (le canvas avance dans le sens du défilement).
       const placed = anchorPlacement(
         scrollY,
         margin,
         window.devicePixelRatio || 1,
+        lead.update(scrollY, margin, performance.now()),
       );
       const top = placed.top;
       offset = placed.offset;

@@ -74,19 +74,22 @@ export function onFrameDriverChange(cb: () => void): () => void {
 
 /**
  * Place le haut du canvas ancré dans le document pour un défilement donné :
- * `margin` px au-dessus du haut de la fenêtre, arrondi au pixel physique (un
- * décalage fractionnaire rééchantillonne le canvas et le rend flou). `offset`
- * est ce qui sépare alors le haut de la fenêtre du haut du canvas (`margin` à
- * un demi-pixel physique près) : un rectangle de la fenêtre se dessine à
- * `top + offset`.
+ * `margin` px au-dessus du haut de la fenêtre, plus `lead` (anticipation dans
+ * le sens du défilement, anchor-margin.ts : positif = le canvas descend, sa
+ * marge basse grandit et sa marge haute rétrécit), arrondi au pixel physique
+ * (un décalage fractionnaire rééchantillonne le canvas et le rend flou).
+ * `offset` est ce qui sépare alors le haut de la fenêtre du haut du canvas
+ * (`margin − lead` à un demi-pixel physique près) : un rectangle de la fenêtre
+ * se dessine à `top + offset`.
  */
 export function anchorPlacement(
   scrollY: number,
   margin: number,
   dpr: number,
+  lead = 0,
 ): { top: number; offset: number } {
   const ratio = dpr > 0 ? dpr : 1;
-  const top = Math.round((scrollY - margin) * ratio) / ratio;
+  const top = Math.round((scrollY - margin + lead) * ratio) / ratio;
   return { top, offset: scrollY - top };
 }
 

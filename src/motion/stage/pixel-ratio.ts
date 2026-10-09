@@ -1,21 +1,74 @@
-// Rapport de pixels du Stage (brief « Strates », §3.6, §4.4) : plafonné à 1,5,
-// aux deux paliers (C1 et C2).
+// Rapport de pixels du Stage (brief « Strates », §3.6, §4.4, §4.11) : ce que le
+// tampon de dessin du canvas coûte au GPU, en deux règles.
 //
-// Décision du propriétaire du 08.10.2026 (retour R16) : le canvas est ancré au
-// document aussi en C2, et il fait donc DEUX fenêtres de haut (une demi-fenêtre
-// de marge au-dessus et au-dessous de la fenêtre visible, stage-root.tsx). À
-// 1,5 il coûte à peu près la même surface de pixels que l'ancien canvas fixe
-// d'une fenêtre à 2 (1440 × 900 : 5,8 Mpx contre 5,2 Mpx), multiéchantillonnée
-// en C2 : le plafond de 2 d'avant doublerait la mémoire et le remplissage du
-// GPU. Pas de plancher (« DPR ≥ 1,5 », R12 optionnel) : sur un écran à DPR 1 le
-// canvas de deux fenêtres porte déjà deux fois les pixels de l'ancien canvas
-// fixe, un plancher à 1,5 en ferait 4,5 fois plus.
+// 1. Plafond de 1,5, aux deux paliers (C1 et C2). Décision du propriétaire du
+//    08.10.2026 (retour R16) : le canvas est ancré au document aussi en C2, il
+//    fait donc plus d'une fenêtre de haut (une marge au-dessus et au-dessous de
+//    la fenêtre visible, anchor-margin.ts). Pas de plancher (« DPR ≥ 1,5 », R12
+//    optionnel) : à DPR 1 le canvas ancré porte déjà plus de pixels que l'ancien
+//    canvas fixe d'une fenêtre, un plancher à 1,5 en ferait 2,25 fois plus.
+//
+// 2. Budget de pixels du tampon (WP-99, suite du problème ouvert 1 de
+//    measures-r16.md : le plafond de 1,5 laisse le coût croître avec la fenêtre,
+//    un écran 4K à 150 % aurait un tampon de 16,5 Mpx, multiéchantillonné). Au-delà
+//    du budget du palier, le rapport baisse, sans jamais passer sous 1 : rendu
+//    plus petit que sa taille CSS, le canvas serait flou à tout rapport d'écran.
+//    Le budget compte les pixels physiques du TAMPON (largeur × hauteur CSS du
+//    canvas × rapport²), pas ceux de l'écran : il ne touche pas un écran à DPR 1,
+//    où le rapport est déjà au plancher, ni un portable (MacBook 14 et 16
+//    pouces : 5,3 et 6,9 Mpx), ni un 4K à 200 % (7,4 Mpx) ; il ne mord que sur
+//    les grands écrans à DPR > 1 (4K à 150 %, 27 pouces Retina). Mesures et
+//    sensibilité : measures-wp99-canvas.md, §3.
+//    - C2 : 8 Mpx, le plus gros tampon du canvas fixe d'avant R16 sur les écrans
+//      essayés (4K à 150 % : 8,3 Mpx). 6 Mpx aurait ramené un 27 pouces Retina à
+//      un rapport de 1,07 (un rendu à peu près à la résolution CSS, visiblement
+//      plus doux) pour un gain non mesuré : le banc n'a qu'un GPU de bureau, pas
+//      d'iGPU (§4.11, 8 ms par frame sur un iGPU de 2020).
+//    - C1 : 4 Mpx, pour un appareil à pointeur précis seul (ordinateur à 4 cœurs
+//      ou moins, fenêtre étroite). C'est aussi là qu'aboutit une machine déclassée
+//      en cours de session : stage.ts, applyCapability, recalcule le rapport et
+//      réalloue le tampon (l'antialiasing, fixé à la création du contexte,
+//      reste). Ne retire des pixels qu'à DPR > 1. Un appareil tactile garde le
+//      budget de C2 : son C1 est un état de départ (tablette, téléphone), pas un
+//      déclassement, et une tablette de 12,9 pouces y perdrait de la netteté
+//      pour rien.
+import type { Capability } from "@/lib/motion-bridge/types";
 
 /** Plafond du rapport de pixels du canvas du Stage. */
 export const STAGE_MAX_PIXEL_RATIO = 1.5;
 
-/** Rapport de pixels du canvas pour un `devicePixelRatio` donné (NaN, 0 ou négatif : 1). */
-export function stagePixelRatio(devicePixelRatio: number): number {
+/** Budget de pixels du tampon de dessin (largeur × hauteur × rapport²), par palier. */
+export const STAGE_PIXEL_BUDGET: Readonly<Record<1 | 2, number>> = {
+  2: 8_000_000,
+  1: 4_000_000,
+};
+
+/** Taille du canvas en pixels CSS : la surface sur laquelle le budget se partage. */
+export interface CanvasCssSize {
+  width: number;
+  height: number;
+}
+
+/**
+ * Rapport de pixels du canvas pour un `devicePixelRatio` donné (NaN, 0 ou
+ * négatif : 1), plafonné à 1,5, puis abaissé (jamais sous 1) pour tenir dans le
+ * budget de pixels du palier quand la taille du canvas et le palier sont connus.
+ * Un écran dézoomé (DPR < 1) garde son rapport : le plancher est `min(base, 1)`.
+ * `coarsePointer` : l'appareil a un doigt (anchor-margin.ts) ; son budget est
+ * celui de C2 quel que soit son palier.
+ */
+export function stagePixelRatio(
+  devicePixelRatio: number,
+  size?: CanvasCssSize,
+  capability?: Capability,
+  coarsePointer = false,
+): number {
   const dpr = devicePixelRatio > 0 ? devicePixelRatio : 1;
-  return Math.min(dpr, STAGE_MAX_PIXEL_RATIO);
+  const base = Math.min(dpr, STAGE_MAX_PIXEL_RATIO);
+  if (!size || capability === undefined || capability === 0) return base;
+  const area = size.width * size.height;
+  if (!(area > 0)) return base;
+  const budget = STAGE_PIXEL_BUDGET[coarsePointer ? 2 : capability];
+  if (area * base * base <= budget) return base;
+  return Math.max(Math.min(base, 1), Math.sqrt(budget / area));
 }

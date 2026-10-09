@@ -11,12 +11,14 @@
 // conservé (preserveDrawingBuffer: false), chaque frame dessinée redessine
 // toutes les vues visibles. Pause quand l'onglet est masqué (loop.ts).
 //
-// Paliers (§3.6) : DPR ≤ 1,5 aux deux paliers (le canvas ancré au document
-// fait deux fenêtres de haut, pixel-ratio.ts) ; médiane des 60 premières
+// Paliers (§3.6) : DPR ≤ 1,5 aux deux paliers, sous un budget de pixels du
+// tampon propre à chaque palier (le canvas ancré au document déborde la
+// fenêtre : pixel-ratio.ts, anchor-margin.ts) ; médiane des 60 premières
 // frames animées > 22 ms ⇒ déclassement (C2 → C1, C1 → C0 : la SiteShell
-// démonte alors le Stage et les posters reviennent ; C2 → C1 ne change plus le
-// rapport de pixels : l'antialiasing, fixé à la création du contexte, reste, et
-// seuls disparaissent les vues réservées à C2, comme le champ de courbes). En C1, une vue
+// démonte alors le Stage et les posters reviennent). C2 → C1 retire le champ de
+// courbes et baisse le budget de pixels (le rapport est recalculé, le tampon
+// réalloué : des pixels en moins à DPR > 1, aucun à DPR 1) ; l'antialiasing,
+// fixé à la création du contexte, reste. En C1, une vue
 // `bakeWhenIdle` au repos depuis 800 ms est figée en image dans son élément
 // (le défilement natif mobile déplace alors une vraie image, sans décalage
 // d'une frame) ; le moindre changement de props ou pointerdown la réveille.
@@ -41,6 +43,7 @@ import type {
   SceneId,
   StageViewDescriptor,
 } from "@/lib/motion-bridge/types";
+import { hasCoarsePointer } from "./anchor-margin";
 import { Baker } from "./bake";
 import { publishController, withdrawController } from "./controllers";
 import { clearGeometryCache } from "./geometry";
@@ -81,10 +84,6 @@ interface ViewState {
   unbake: boolean;
 }
 
-// Même plafond aux deux paliers : le canvas ancré fait deux fenêtres de haut
-// (pixel-ratio.ts).
-const currentPixelRatio = () => stagePixelRatio(window.devicePixelRatio);
-
 function intersects(rect: DOMRectReadOnly, width: number, height: number) {
   return (
     rect.right > 0 && rect.bottom > 0 && rect.left < width && rect.top < height
@@ -103,6 +102,8 @@ export class Stage {
   private readonly disposers: (() => void)[] = [];
   private readonly monitor = createFrameMonitor({ maxFrameMs: MAX_SAMPLE_MS });
   private readonly startedAt = performance.now();
+  /** Appareil tactile (même d'un portable) : budget de pixels de C2 quel que soit le palier. */
+  private readonly coarse = hasCoarsePointer();
   private width = 1;
   private height = 1;
   private dirty = true;
@@ -125,7 +126,18 @@ export class Stage {
       stencil: false,
     });
     const renderer = this.renderer;
-    renderer.setPixelRatio(currentPixelRatio());
+    // this.ctx n'existe pas encore : le palier vient du pont.
+    renderer.setPixelRatio(
+      stagePixelRatio(
+        window.devicePixelRatio,
+        {
+          width: Math.max(1, canvas.clientWidth),
+          height: Math.max(1, canvas.clientHeight),
+        },
+        capability,
+        this.coarse,
+      ),
+    );
     renderer.autoClear = false;
     renderer.setScissorTest(true);
     renderer.outputColorSpace = SRGBColorSpace;
@@ -331,11 +343,26 @@ export class Stage {
     this.loop.invalidate();
   }
 
+  /**
+   * Rapport de pixels du canvas : le DPR plafonné à 1,5, abaissé (jamais sous
+   * 1) pour que le tampon tienne dans le budget de pixels du palier courant
+   * (pixel-ratio.ts). Le budget se partage la taille CSS du canvas, qui est
+   * celle de la fenêtre plus ses marges d'ancrage.
+   */
+  private pixelRatioFor(width: number, height: number): number {
+    return stagePixelRatio(
+      window.devicePixelRatio,
+      { width, height },
+      this.ctx.capability,
+      this.coarse,
+    );
+  }
+
   private resizeCanvas() {
     const width = Math.max(1, this.canvas.clientWidth);
     const height = Math.max(1, this.canvas.clientHeight);
     // Zoom du navigateur ou fenêtre passée sur un autre écran : nouveau DPR.
-    const ratio = currentPixelRatio();
+    const ratio = this.pixelRatioFor(width, height);
     const ratioChanged = ratio !== this.renderer.getPixelRatio();
     if (width === this.width && height === this.height && !ratioChanged) return;
     if (ratioChanged) this.renderer.setPixelRatio(ratio);
@@ -390,8 +417,9 @@ export class Stage {
     // Position, dans le document, du haut du canvas : le défilement quand le
     // canvas est fixe, ce défilement moins le décalage du canvas quand il est
     // ancré. Une scène qui dessine « en coordonnées page » (le champ de
-    // courbes) lit cette valeur : sans le décalage, son motif sauterait d'une
-    // demi-fenêtre au passage d'un mode à l'autre (vue épinglée qui s'éloigne).
+    // courbes) lit cette valeur : sans le décalage, son motif sauterait de la
+    // marge du canvas (0,3 à 0,5 fenêtre) au passage d'un mode à l'autre (vue
+    // épinglée qui s'éloigne).
     const canvasTop = scrollY - (getCanvasAnchor()?.offsetY() ?? 0);
 
     renderer.setRenderTarget(null);
@@ -611,9 +639,10 @@ export class Stage {
       this.release();
       return;
     }
-    // Même plafond aux deux paliers : C2 → C1 ne touche pas au tampon de dessin
-    // (setPixelRatio le réalloue, même à taille égale).
-    const ratio = currentPixelRatio();
+    // C2 → C1 : le budget de pixels du palier plus bas s'applique tout de suite
+    // (setPixelRatio réalloue le tampon ; sans changement de rapport, on n'y
+    // touche pas). L'antialiasing, fixé à la création du contexte, reste.
+    const ratio = this.pixelRatioFor(this.width, this.height);
     if (ratio !== this.renderer.getPixelRatio())
       this.renderer.setPixelRatio(ratio);
     for (const state of this.views.values()) this.scheduleIdle(state);
