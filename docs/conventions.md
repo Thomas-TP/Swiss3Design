@@ -528,6 +528,31 @@ const nonce = (await headers()).get("x-nonce") ?? undefined;
 in dev. **Always verify CSP-affecting changes with `bun run preview`** (real
 Workers runtime + prod CSP).
 
+## Worker bundle (webpack hook of `next.config.ts`)
+
+- **Do not remove the `webpack()` hook of `next.config.ts` without
+  re-measuring** (`bunx opennextjs-cloudflare build` then
+  `bunx wrangler deploy --dry-run`, in a 41-character folder): it is worth
+  −876 KiB gzip (3 336 → 2 456 KiB, 2026-10-09) and only changes where the
+  modules sit in `.next/server`, never what runs.
+- Why: webpack compiles a module once **per layer** (`rsc`, `action-browser`,
+  `ssr`), so better-auth, kysely, drizzle, Stripe, zod and the Studio library
+  were bundled two or three times. Rule `action-browser` → `rsc`: every module
+  imported from a Server Action except `next`, `react`, `react-dom` and
+  `scheduler`. Rule `ssr` → `rsc`: **only pure code** (zod,
+  `src/lib/studio/**`); a file of `src/lib/studio/**` must therefore never
+  import React, Next, `server-only` / `client-only`, nor carry `"use client"`
+  or `"use server"`. Server `splitChunks` has no `minSize` and no request cap
+  (one copy of every shared module instead of one per page).
+- It only runs in the Node.js server build of `opennextjs-cloudflare build`
+  (`next build --webpack`, same path in Workers Builds CI). `next dev`
+  (Turbopack) ignores it; if the next-intl plugin ever stopped adding the
+  `turbopack` key, `bun run dev` would stop with Next's message about `webpack`
+  without `turbopack` (add `turbopack: {}` then).
+- After touching it, or after any change that moves modules between layers,
+  also run `bun scripts/check-worker-bundle.ts` (0 engine signature) and
+  replay the Server Actions of a few pages in `bun run preview`.
+
 ## Environment & secrets
 
 - **Secrets** (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `BETTER_AUTH_SECRET`,

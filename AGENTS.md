@@ -148,20 +148,30 @@ put` on an environment with real users without `--env <name>` explicitly
    **stacked PRs** (branch-on-branch), merging each PR with `gh pr merge` only
    updates its own base branch, not `main`, unless that PR's base literally is
    `main` — see the same doc's PR-stack section before merging a phased feature.
-10. **Keep the Worker bundle lean: 3 333 KiB gzip (2026-10-08 measurement
-    after the R1 fixes, 41-character checkout; 3 326 KiB on 2026-10-01 with
-    the Studio, see
-    [`docs/redesign-2026/measures-r1.md`](docs/redesign-2026/measures-r1.md)
+10. **Keep the Worker bundle lean: 2 456 KiB gzip (2026-10-09, WP-99,
+    41-character checkout, `wrangler deploy --dry-run`; it was 3 333 KiB on
+    2026-10-08 before the webpack hook below, −26 %, see
+    [`docs/redesign-2026/measures-wp99.md`](docs/redesign-2026/measures-wp99.md)
     and
-    [`docs/redesign-2026/measures-wave2b.md`](docs/redesign-2026/measures-wave2b.md)).
-    The Studio's full server rendering (no-JS form, stats, posters) pushed it
-    past the 3 185 KiB cap of 2026-09-30; the owner accepted the overrun on
-    2026-10-01 on the condition that WP-99 claws back what it can without
-    changing behaviour (zod/mini instead of zod, no duplicate RSC/SSR copies of
-    `src/lib/studio/**`, Studio messages per locale), target ≈ 3 250 KiB,
-    brief §4.11 — re-measure rather than trust this figure as it ages, and
-    compare two builds only from checkouts at the same path length: a long
-    worktree path alone shifts the gzip figure by up to ±6 KiB).
+    [`docs/redesign-2026/measures-wp99-worker.md`](docs/redesign-2026/measures-wp99-worker.md);
+    earlier figures: 3 326 KiB on 2026-10-01 with the Studio, see
+    [`measures-wave2b.md`](docs/redesign-2026/measures-wave2b.md)). The
+    Studio's full server rendering (no-JS form, stats, posters) had pushed it
+    past the 3 185 KiB cap of 2026-09-30; the overrun accepted on 2026-10-01
+    on condition that WP-99 claws it back (target ≈ 3 250 KiB, brief §4.11)
+    is now repaid with a wide margin. Re-measure rather than trust this figure
+    as it ages, and compare two builds only from checkouts at the same path
+    length: a long worktree path alone shifts the gzip figure by up to ±6 KiB.
+    `next.config.ts` carries a `webpack()` hook, active only in the Node.js
+    server build of `opennextjs-cloudflare build` (`next build --webpack`),
+    that compiles modules once instead of once per webpack layer: modules
+    imported from Server Actions (`action-browser` layer, except
+    next/react/react-dom/scheduler) and, from the `ssr` layer, only zod and
+    `src/lib/studio/**` go to the `rsc` layer, and the server `splitChunks`
+    has no `minSize` nor request cap. It changes where modules sit in
+    `.next/server`, never what runs. Do not remove it without re-measuring
+    (−876 KiB gzip), and never extend the `ssr` → `rsc` rule to a package that
+    touches React.
     Never add a binary asset through a Next file convention.** Since
     2026-09-26 the account is on **Workers Paid**, whose cap is 10 MiB
     **gzipped**. The **Free** plan's 3 MiB cap is what broke the deploy in
