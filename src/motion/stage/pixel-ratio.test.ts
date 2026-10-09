@@ -51,9 +51,9 @@ describe("stagePixelRatio · budget de pixels", () => {
         1.5,
       );
     // 4K à 200 % : 1920 × 1080 px CSS, DPR 2.
-    expect(stagePixelRatio(2, canvasOf(1905, 1080, ANCHOR_MARGIN_FINE), 2)).toBe(
-      1.5,
-    );
+    expect(
+      stagePixelRatio(2, canvasOf(1905, 1080, ANCHOR_MARGIN_FINE), 2),
+    ).toBe(1.5);
     // Un téléphone (marge de doigt, tampon d'à peine plus d'un Mpx).
     const phone = canvasOf(390, 844, ANCHOR_MARGIN_COARSE);
     expect(stagePixelRatio(3, phone, 1)).toBe(1.5);
