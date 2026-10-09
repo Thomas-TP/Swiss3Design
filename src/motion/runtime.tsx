@@ -29,6 +29,7 @@ import {
 // Header de 64 px + 16 px d'air : ancres et défilements vers un élément.
 const HEADER_OFFSET = -80;
 const PROGRESS_VAR = "--s3d-progress";
+const PROGRESS_BAR = ".s3d-progress";
 
 class Runtime {
   private lenis: Lenis | null = null;
@@ -36,6 +37,7 @@ class Runtime {
   private velocity = 0;
   private writtenVelocity = 0;
   private writtenProgress = -1;
+  private bar: HTMLElement | null = null;
   private readonly disposers: (() => void)[] = [];
   private readonly wrapped = new Map<FrameCallback, () => void>();
   private route: AbortController | null = null;
@@ -171,17 +173,34 @@ class Runtime {
     this.lenis?.destroy();
     this.lenis = null;
     this.writtenProgress = -1;
-    document.documentElement.style.removeProperty(PROGRESS_VAR);
+    this.progressBar()?.style.removeProperty(PROGRESS_VAR);
     motionBridge.set({ scroll: null });
+  }
+
+  /**
+   * Le filet de progression du header (`.s3d-progress`, bloc `ph-no-capture`).
+   * La variable est écrite sur lui et non sur <html> : à chaque pas de
+   * défilement (jusqu'à un millier par page) la replay de session aurait
+   * enregistré une mutation de l'attribut style de <html>. Retrouvé s'il a été
+   * remonté (changement de langue) ; un filet neuf n'a pas encore la variable,
+   * la prochaine valeur doit donc passer.
+   */
+  private progressBar() {
+    if (!this.bar?.isConnected) {
+      this.bar = document.querySelector<HTMLElement>(PROGRESS_BAR);
+      this.writtenProgress = -1;
+    }
+    return this.bar;
   }
 
   private writeProgress(progress: number) {
     const value = Number.isFinite(progress)
       ? Math.min(1, Math.max(0, progress))
       : 0;
-    if (Math.abs(value - this.writtenProgress) < 0.001) return;
+    const bar = this.progressBar();
+    if (!bar || Math.abs(value - this.writtenProgress) < 0.001) return;
     this.writtenProgress = value;
-    document.documentElement.style.setProperty(PROGRESS_VAR, value.toFixed(4));
+    bar.style.setProperty(PROGRESS_VAR, value.toFixed(4));
   }
 
   private refresh() {

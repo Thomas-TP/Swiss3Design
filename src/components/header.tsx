@@ -26,8 +26,9 @@ import "./ui/page-cut.css";
 // l'autre pendant la transition ; au survol, un soulignement encre se trace de
 // gauche à droite (280 ms). Plus de pill Framer Motion : aucun import de
 // `motion` ici. Bord inférieur : filet de progression du défilement
-// (--s3d-progress, écrit par le runtime dans les pages vitrine seulement ;
-// ailleurs la variable est absente, le filet vaut 0) et buse d'attente.
+// (--s3d-progress, écrit par le runtime sur le filet lui-même, dans les pages
+// vitrine seulement ; ailleurs la variable est absente, le filet vaut 0, et
+// `ph-no-capture` garde ses mutations hors de la replay) et buse d'attente.
 //
 // À préserver : hasSession (cookie, sans requête DB) → SessionAvatar ;
 // compteurs useCart()/useFavorites() ; aria-current="page" ; noms accessibles
@@ -151,7 +152,7 @@ export function Header({ hasSession = false }: { hasSession?: boolean }) {
           </SiteLink>
         </div>
       </div>
-      <span aria-hidden="true" className="s3d-progress" />
+      <span aria-hidden="true" className="s3d-progress ph-no-capture" />
       <NavPending />
     </header>
   );
