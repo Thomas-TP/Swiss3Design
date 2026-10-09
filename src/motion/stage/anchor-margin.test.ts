@@ -131,10 +131,10 @@ describe("anticipation et placement du canvas", () => {
     const vh = 900;
     const canvasHeight = vh * anchorCanvasViewports(ANCHOR_MARGIN_FINE);
     const scrollY = 3000;
-    for (const velocity of [0, 2000, 20_000, -20_000]) {
+    // Marges réelles, côté haut et côté bas, de la fenêtre au bord du canvas.
+    const placed = (velocity: number) => {
       const lead = anchorLead(velocity, margin);
       const { top, offset } = anchorPlacement(scrollY, margin, 1, lead);
-      // Marges réelles, côté haut et côté bas, de la fenêtre au bord du canvas.
       const above = scrollY - top;
       const below = top + canvasHeight - (scrollY + vh);
       expect(above).toBe(offset);
@@ -143,9 +143,17 @@ describe("anticipation et placement du canvas", () => {
       expect(Math.min(above, below)).toBeGreaterThanOrEqual(
         margin * ANCHOR_TRAIL_KEEP - 1e-6,
       );
-      // Vers le bas, le canvas descend : plus de marge en bas qu'en haut.
-      if (velocity > 0) expect(below).toBeGreaterThan(above);
-      if (velocity < 0) expect(above).toBeGreaterThan(below);
-    }
+      return { above, below };
+    };
+    for (const velocity of [0, 2000, 20_000, -20_000]) placed(velocity);
+    // Vers le bas, le canvas descend : plus de marge en bas qu'en haut.
+    const down = placed(20_000);
+    expect(down.below).toBeGreaterThan(down.above);
+    // Vers le haut, l'inverse.
+    const up = placed(-20_000);
+    expect(up.above).toBeGreaterThan(up.below);
+    // À l'arrêt, symétrique.
+    const still = placed(0);
+    expect(still.above).toBeCloseTo(still.below, 6);
   });
 });
