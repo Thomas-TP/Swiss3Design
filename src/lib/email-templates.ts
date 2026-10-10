@@ -95,7 +95,7 @@ function layout(title: string, body: string, footer: string): string {
 const FOOTER: Record<Locale, string> = {
   fr: "Des questions ? Répondez simplement à cet e-mail.",
   de: "Fragen? Antworten Sie einfach auf diese E-Mail.",
-  it: "Domande? Rispondete semplicemente a questa e-mail.",
+  it: "Domande? Risponda semplicemente a questa e-mail.",
   en: "Questions? Just reply to this email.",
 };
 
@@ -142,14 +142,14 @@ const CART_REMINDER_TEXTS: Record<
       "Sie erhalten diese E-Mail, weil Sie eine Erinnerung an Ihren Warenkorb angefordert haben.",
   },
   it: {
-    subject: "Il tuo carrello ti aspetta",
-    title: "Hai dimenticato qualcosa?",
-    intro: "La tua selezione è ancora qui — riprendi l'ordine quando vuoi:",
+    subject: "Il Suo carrello La aspetta",
+    title: "Ha dimenticato qualcosa?",
+    intro: "La Sua selezione è ancora qui — riprenda l'ordine quando vuole:",
     cta: "Riprendi il carrello",
     outro: "Gli articoli restano disponibili fino a esaurimento scorte.",
     unsubscribe: "Non ricevere più promemoria",
     consentNote:
-      "Ricevi questa e-mail perché hai richiesto un promemoria del carrello.",
+      "Riceve questa e-mail perché ha richiesto un promemoria del carrello.",
   },
   en: {
     subject: "Your cart is waiting",
@@ -274,16 +274,16 @@ const ORDER_TEXTS: Record<
   },
   it: {
     subject: "Ordine {n} confermato — Swiss3Design",
-    title: "Grazie per il vostro ordine! 🎉",
+    title: "Grazie per il Suo ordine! 🎉",
     intro:
-      "Abbiamo ricevuto il pagamento. Il vostro ordine <strong>{n}</strong> è in preparazione nel nostro atelier di Gland.",
+      "Abbiamo ricevuto il pagamento. Il Suo ordine <strong>{n}</strong> è in preparazione nel nostro atelier di Gland.",
     shipping: "Spedizione",
     free: "Gratuita",
     total: "Totale",
     discount: "Sconto",
     address: "Indirizzo di consegna",
     viaAgent:
-      "Ordine effettuato tramite il vostro agente IA. Per qualsiasi domanda, rispondete semplicemente a questa e-mail.",
+      "Ordine effettuato tramite il Suo agente IA. Per qualsiasi domanda, risponda semplicemente a questa e-mail.",
   },
   en: {
     subject: "Order {n} confirmed — Swiss3Design",
@@ -396,9 +396,9 @@ const SHIPPED_TEXTS: Record<
     track: "Paket verfolgen",
   },
   it: {
-    subject: "Il vostro ordine {n} è in viaggio 📦",
+    subject: "Il Suo ordine {n} è in viaggio 📦",
     title: "Si parte!",
-    body: "Il vostro ordine <strong>{n}</strong> è stato consegnato alla Posta svizzera. Arriverà entro 1–3 giorni lavorativi.",
+    body: "Il Suo ordine <strong>{n}</strong> è stato consegnato alla Posta svizzera. Arriverà entro 1–3 giorni lavorativi.",
     tracking: "Numero di tracciamento",
     track: "Seguire il pacco",
   },
@@ -456,11 +456,11 @@ const DELIVERED_TEXTS: Record<
       "Ein Problem mit einem Artikel? Eine Anmerkung? Antworten Sie einfach auf diese E-Mail — wir finden immer eine Lösung.",
   },
   it: {
-    subject: "Il vostro ordine {n} è stato consegnato ✅",
+    subject: "Il Suo ordine {n} è stato consegnato ✅",
     title: "Arrivato a destinazione!",
-    body: "Il vostro ordine <strong>{n}</strong> è stato consegnato. Speriamo che le vostre stampe vi piacciano!",
+    body: "Il Suo ordine <strong>{n}</strong> è stato consegnato. Speriamo che le Sue stampe Le piacciano!",
     feedback:
-      "Un problema con un articolo? Un'osservazione? Rispondete a questa e-mail — troviamo sempre una soluzione.",
+      "Un problema con un articolo? Un'osservazione? Risponda a questa e-mail — troviamo sempre una soluzione.",
   },
   en: {
     subject: "Your order {n} has been delivered ✅",
@@ -508,11 +508,11 @@ const CANCELLED_TEXTS: Record<
       "Falls Sie bereits bezahlt haben, bestätigen wir die Erstattung separat nach der Bearbeitung. Bei Fragen kontaktieren Sie uns.",
   },
   it: {
-    subject: "Il vostro ordine {n} è stato annullato",
+    subject: "Il Suo ordine {n} è stato annullato",
     title: "Ordine annullato",
-    body: "Il vostro ordine <strong>{n}</strong> è stato annullato.",
+    body: "Il Suo ordine <strong>{n}</strong> è stato annullato.",
     refund:
-      "Se avete già pagato, confermeremo separatamente il rimborso dopo l’elaborazione. Contattateci per qualsiasi domanda.",
+      "Se ha già pagato, confermeremo separatamente il rimborso dopo l’elaborazione. Ci contatti per qualsiasi domanda.",
   },
   en: {
     subject: "Your order {n} has been cancelled",
@@ -576,13 +576,13 @@ const QUOTE_TEXTS: Record<
     review: "Meine Offerte ansehen",
   },
   it: {
-    subject: "Il vostro preventivo Swiss3Design è pronto",
-    title: "Il vostro preventivo è pronto ✨",
-    intro: "Abbiamo esaminato il vostro progetto. Ecco la nostra proposta:",
+    subject: "Il Suo preventivo Swiss3Design è pronto",
+    title: "Il Suo preventivo è pronto ✨",
+    intro: "Abbiamo esaminato il Suo progetto. Ecco la nostra proposta:",
     price: "Prezzo proposto",
     note: "Il nostro messaggio",
     valid: "Valido fino al {date}",
-    cta: "Dal vostro account cliente potete accettare e pagare questo preventivo, chiedere una modifica o rifiutarlo — con un clic.",
+    cta: "Dal Suo account cliente può accettare e pagare questo preventivo, chiedere una modifica o rifiutarlo — con un clic.",
     review: "Vedi il mio preventivo",
   },
   en: {
@@ -677,13 +677,13 @@ const QUOTE_REJECTED_TEXTS: Record<
       "Das gilt nicht für künftige Projekte: Reichen Sie gerne eine neue Anfrage ein — wir prüfen sie mit Freude. Bei Fragen antworten Sie einfach auf diese E-Mail.",
   },
   it: {
-    subject: "La vostra richiesta di preventivo — Swiss3Design",
-    title: "Riguardo alla vostra richiesta",
+    subject: "La Sua richiesta di preventivo — Swiss3Design",
+    title: "Riguardo alla Sua richiesta",
     intro:
-      "Grazie per l'interesse verso Swiss3Design. Dopo un attento esame del vostro progetto, purtroppo non siamo in grado di realizzarlo.",
+      "Grazie per l'interesse verso Swiss3Design. Dopo un attento esame del Suo progetto, purtroppo non siamo in grado di realizzarlo.",
     reason: "Il nostro messaggio",
     outro:
-      "Questo non vale per i progetti futuri: non esitate a inviarci una nuova richiesta, la esamineremo con piacere. Per qualsiasi domanda, rispondete a questa e-mail.",
+      "Questo non vale per i progetti futuri: non esiti a inviarci una nuova richiesta, la esamineremo con piacere. Per qualsiasi domanda, risponda a questa e-mail.",
   },
   en: {
     subject: "Your quote request — Swiss3Design",
@@ -978,12 +978,12 @@ const CHECKOUT_CODE_TEXTS: Record<
       "Dieser Code läuft in 10 Minuten ab. Falls Sie das nicht angefordert haben, ignorieren Sie diese E-Mail.",
   },
   it: {
-    subject: "{code} — il vostro codice di verifica Swiss3Design",
-    title: "Il vostro codice di verifica",
+    subject: "{code} — il Suo codice di verifica Swiss3Design",
+    title: "Il Suo codice di verifica",
     intro:
-      "Inserite questo codice nella pagina dell'ordine per confermare il vostro indirizzo e-mail:",
+      "Inserisca questo codice nella pagina dell'ordine per confermare il Suo indirizzo e-mail:",
     expiry:
-      "Questo codice scade tra 10 minuti. Se non avete richiesto nulla, ignorate questa e-mail.",
+      "Questo codice scade tra 10 minuti. Se non ha richiesto nulla, ignori questa e-mail.",
   },
   en: {
     subject: "{code} — your Swiss3Design verification code",
@@ -1214,11 +1214,11 @@ const CONTACT_CONFIRM_TEXTS: Record<
     yourMessage: "Ihre Nachricht",
   },
   it: {
-    subject: "Abbiamo ricevuto il vostro messaggio — Swiss3Design",
+    subject: "Abbiamo ricevuto il Suo messaggio — Swiss3Design",
     title: "Messaggio ricevuto ✅",
     intro:
-      "Grazie per averci scritto! Abbiamo ricevuto il vostro messaggio e vi risponderemo al più presto, di solito entro 24–48 h. Ecco una copia del vostro messaggio:",
-    yourMessage: "Il vostro messaggio",
+      "Grazie per averci scritto! Abbiamo ricevuto il Suo messaggio e Le risponderemo al più presto, di solito entro 24–48 h. Ecco una copia del Suo messaggio:",
+    yourMessage: "Il Suo messaggio",
   },
   en: {
     subject: "We’ve received your message — Swiss3Design",
