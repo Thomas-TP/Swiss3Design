@@ -503,6 +503,8 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
 
   // ── Coupe, simulation ──
 
+  // Aucun liseré chaud au front d'impression (uHot reste à 0) : le propriétaire
+  // l'a jugé de trop le 10.10.2026, la couche du dessus garde sa teinte.
   function applyCut(cut: number | null = props?.cutZ ?? null) {
     if (!display) return;
     const u = display.material.uniforms;
@@ -510,13 +512,10 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
     if (cut === null) {
       display.material.setCut(height);
       u.uGhost.value = 0;
-      u.uHot.value = 0;
       return;
     }
-    const z = clamp(cut, 0, height);
-    display.material.setCut(z);
+    display.material.setCut(clamp(cut, 0, height));
     u.uGhost.value = 1;
-    u.uHot.value = z < height - 1e-3 ? 1 : 0;
   }
 
   // ── Construction demandée au Worker ──
@@ -666,10 +665,15 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
     }
   }
 
+  // `step` > 0 : l'objet tourne vers la droite (bouton ▶, flèche droite). La
+  // caméra orbite alors vers SA gauche : un azimut croissant la déplace vers sa
+  // droite (orbitPosition), ce qui ferait tourner l'objet vers la gauche à
+  // l'écran. Même sens que le glissé, où l'objet suit le doigt, et que la vue 3D
+  // des fiches produit.
   function turn(step: number) {
     if (planMode) return;
     markInteraction();
-    setOrbit(userAzimuth + step, userPolar);
+    setOrbit(userAzimuth - step, userPolar);
     if (ctx.reduced) azimuth = azimuthTarget;
     ctx.invalidate();
   }
@@ -766,7 +770,9 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
     const dy = event.clientY - lastY;
     lastX = event.clientX;
     lastY = event.clientY;
-    setOrbit(userAzimuth + dx * RAD_PER_PX, userPolar - dy * POLAR_PER_PX);
+    // L'objet suit le doigt : glisser vers la droite le tourne vers la droite
+    // (la caméra part vers sa gauche, voir turn()).
+    setOrbit(userAzimuth - dx * RAD_PER_PX, userPolar - dy * POLAR_PER_PX);
     azimuth = azimuthTarget;
     polar = polarTarget;
     markInteraction();
@@ -1008,7 +1014,6 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
           heightMm: d.built.heightMm,
         });
         applyCut(state.done ? null : state.z);
-        if (state.done) d.material.uniforms.uHot.value = 0;
         const t = performance.now();
         if (state.done || t - lastSimAt >= SIM_INTERVAL_MS) {
           lastSimAt = t;
