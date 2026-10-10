@@ -15,7 +15,7 @@ const MSG: Record<string, { title: string; body: string; home: string }> = {
   },
   it: {
     title: "Disiscrizione confermata",
-    body: "Non riceverai più promemoria del carrello. I tuoi dati di promemoria sono stati eliminati.",
+    body: "Non riceverà più promemoria del carrello. I Suoi dati di promemoria sono stati eliminati.",
     home: "Torna al negozio",
   },
   en: {
