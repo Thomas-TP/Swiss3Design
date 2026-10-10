@@ -5,8 +5,9 @@
 //
 // Ce que la scène sait faire, tout cela sans GSAP (la chorégraphie n'anime que
 // les propriétés du contrôleur) :
-//  - hauteur imprimée quantifiée à la couche (`progress`), liseré chaud de la
-//    buse, flash à chaque changement de filament (320 ms) ;
+//  - hauteur imprimée quantifiée à la couche (`progress`), sans liseré chaud
+//    ni flash au changement de filament (retirés le 10.10.2026, demande du
+//    propriétaire : la couche du dessus garde sa teinte) ;
 //  - au-dessus de la coupe, la silhouette pleine et très discrète de la forme
 //    finale (jamais un trait) : elle naît avec les premières couches (12 mm),
 //    jamais avant que l'impression ne commence, et suit la hauteur imprimée ;
@@ -97,7 +98,6 @@ export interface PrintHeroController {
 
 const RIPPLE_S = 0.9;
 const REPRINT_S = 1.2;
-const FLASH_S = 0.32;
 const PARK_S = 0.8;
 const NOZZLE_RATE = 2.4; // rad/s pendant l'impression
 const EXPLODE_GAP_MM = 12;
@@ -255,8 +255,8 @@ diffuseColor.a *= uGhostAlpha;`,
 /**
  * Tête d'impression : bloc de chauffe mat, buse conique, deux ailettes, et un
  * seul détail rouge de la marque (le liseré du bloc). Origine à la pointe de la
- * buse, Y vers le haut ; 9,5 mm de large pour ≈ 14 mm de haut. Aucune lueur : le
- * liseré chaud du front d'impression, sur le vase, suffit.
+ * buse, Y vers le haut ; 9,5 mm de large pour ≈ 14 mm de haut. Aucune lueur,
+ * ni sur la tête ni au front d'impression.
  */
 function createPrintHead(): {
   group: Group;
@@ -464,16 +464,18 @@ const create = (
   let rippleFrom: PrintBand[] = [];
   let reprintT = -1;
   let reprintPattern: HeroPatternKey | null = null;
-  let flash = 0;
   let park = 0;
   let nozzleTheta = 0;
   let omega = 0;
   let lastCut = -1;
   let lastMoveAt = -10;
-  let lastBand = 0;
   let lastLayer = -1;
   let lastEmitAt = -10;
   let idleHandle = 0;
+  // Pré-calcul des deux autres motifs (voir la fin de render()) : un motif par
+  // rappel, seulement quand la scène est au repos.
+  let pregenHandle = 0;
+  let sceneBusy = true;
 
   const tmp = new Float64Array(3);
   const radiusAt = (theta: number, z: number) => {
@@ -510,6 +512,31 @@ const create = (
       geometries.add(geometry);
     }
     return geometry;
+  }
+
+  /**
+   * Maillages des deux autres motifs, prêts avant qu'on clique sur leur puce.
+   * Chacun coûte ≈ 150 ms de calcul d'un bloc (mesuré sur un ordinateur, 3 à 5
+   * fois plus sur un téléphone) : lancé pendant l'intro ou l'autoplay, il figeait
+   * l'impression en cours (saccades). On ne le lance donc qu'au repos (aucune
+   * couche qui avance, ni vague, ni réimpression, buse rangée), un motif par
+   * rappel ; si l'animation reprend entre-temps, le rappel s'efface et le motif
+   * attend le prochain repos. Un clic sur une puce avant cela construit son motif
+   * à la demande (geometryFor), comme avant.
+   */
+  function schedulePregen() {
+    if (pregenHandle || sceneBusy || disposed) return;
+    if (!("requestIdleCallback" in window)) return;
+    const missing = (Object.keys(props.patterns) as HeroPatternKey[]).find(
+      (key) => !heroGeometry.has(key),
+    );
+    if (!missing) return;
+    pregenHandle = window.requestIdleCallback(() => {
+      pregenHandle = 0;
+      if (disposed || sceneBusy) return;
+      geometryFor(missing);
+      schedulePregen();
+    });
   }
 
   // ── Thème ────────────────────────────────────────────────────────────────
@@ -887,21 +914,8 @@ const create = (
       if (Math.abs(cut - lastCut) > 1e-6 || front >= 0) lastMoveAt = frame.time;
       const moving = frame.time - lastMoveAt < 0.25 && (printing || front >= 0);
 
-      // Flash du liseré chaud au franchissement d'une frontière de bande, en imprimant.
       const band = bandOfCut(cut, boundaries);
-      if (
-        lastCut >= 0 &&
-        cut > lastCut &&
-        band > lastBand &&
-        filaments[band] !== filaments[band - 1]
-      )
-        flash = 1;
-      lastBand = band;
       lastCut = cut;
-      if (flash > 0) {
-        flash = Math.max(0, flash - dt / FLASH_S);
-        busy ||= flash > 0;
-      }
 
       // Compteur (≤ 10 Hz).
       const layer = Math.round(cut / 0.2);
@@ -916,11 +930,8 @@ const create = (
       }
 
       // Matériaux.
-      const hot = printing || front >= 0 ? 1 : 0;
       for (const material of [vaseMaterial!, nextMaterial!]) {
         material.setCut(cut);
-        material.uniforms.uHot.value = hot;
-        material.uniforms.uFlash.value = flash;
         material.uniforms.uIsoMode.value = tilt;
       }
 
@@ -990,23 +1001,16 @@ const create = (
       c.renderer.render(scene, camera);
 
       // Maillages des deux autres motifs : au repos, après la première frame.
-      if (!idleHandle && "requestIdleCallback" in window) {
-        idleHandle = window.requestIdleCallback(
-          () => {
-            if (disposed) return;
-            for (const key of Object.keys(props.patterns) as HeroPatternKey[])
-              geometryFor(key);
-          },
-          { timeout: 3000 },
-        );
-      }
+      sceneBusy = busy;
+      schedulePregen();
       return busy;
     },
 
     dispose() {
       disposed = true;
       window.clearTimeout(idleHandle);
-      if ("cancelIdleCallback" in window) window.cancelIdleCallback(idleHandle);
+      if (pregenHandle && "cancelIdleCallback" in window)
+        window.cancelIdleCallback(pregenHandle);
       for (const geometry of geometries) geometry.dispose();
       for (const shell of shells) shell.mesh.geometry.dispose();
       for (const material of materials) material.dispose();
