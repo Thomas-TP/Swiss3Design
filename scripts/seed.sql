@@ -44,7 +44,7 @@ INSERT OR REPLACE INTO product_translations (product_id, locale, name, descripti
 
   ('p_portecles', 'fr', 'Porte-clés relief', 'Porte-clés personnalisable imprimé en quatre couleurs, texte en relief net et durable. Idéal en cadeau ou pour votre équipe.'),
   ('p_portecles', 'de', 'Relief-Schlüsselanhänger', 'Personalisierbarer Anhänger in vier Farben gedruckt, mit klarem, langlebigem Relieftext. Ideal als Geschenk oder fürs Team.'),
-  ('p_portecles', 'it', 'Portachiavi in rilievo', 'Portachiavi personalizzabile stampato in quattro colori, testo in rilievo nitido e resistente. Ideale come regalo o per il vostro team.'),
+  ('p_portecles', 'it', 'Portachiavi in rilievo', 'Portachiavi personalizzabile stampato in quattro colori, testo in rilievo nitido e resistente. Ideale come regalo o per il Suo team.'),
   ('p_portecles', 'en', 'Relief keychain', 'Customizable keychain printed in four colors with crisp, durable raised text. Great as a gift or for your team.'),
 
   ('p_casque', 'fr', 'Support de casque', 'Support audio stable au look bicolore, avec passe-câble intégré. Imprimé en PETG pour une rigidité durable.'),
