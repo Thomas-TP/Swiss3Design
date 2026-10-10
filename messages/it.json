@@ -56,8 +56,8 @@
   },
   "cartReminder": {
     "title": "Non ha tempo ora?",
-    "consent": "Mi invii un promemoria del carrello via e-mail. Posso annullare l'iscrizione in qualsiasi momento.",
-    "cta": "Mi invii un promemoria",
+    "consent": "Desidero ricevere un promemoria del carrello via e-mail. Posso annullare l'iscrizione in qualsiasi momento.",
+    "cta": "Inviami un promemoria",
     "done": "Fatto — Le ricorderemo il Suo carrello.",
     "error": "Si è verificato un errore, riprovi.",
     "verifyNotice": "Confermi la Sua e-mail per ricevere il carrello su un altro dispositivo.",
