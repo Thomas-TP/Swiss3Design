@@ -9,16 +9,19 @@
 // « Copier le lien ».
 import { FILAMENT_IDS, isFilamentId } from "@/lib/studio/filaments";
 import { PRICING } from "@/lib/studio/pricing-params";
-import { bandsForPalette, defaultConfig } from "@/lib/studio/presets";
+import {
+  bandsForPalette,
+  defaultConfig,
+  montagneBands,
+} from "@/lib/studio/presets";
 import {
   BORNE_RANGES,
   CARTOUCHE_RANGES,
   LAVAUX_RANGES,
   MAX_BANDS,
-  RELIEF_RANGES,
+  MONTAGNE_RANGES,
   clampConfig,
   clampRange,
-  snapReliefBands,
   type Range,
 } from "@/lib/studio/ranges";
 import { computeStats } from "@/lib/studio/stats";
@@ -38,7 +41,7 @@ import {
 export const STUDIO_TOOL_OBJECTS: readonly StudioObjectId[] = [
   "lavaux",
   "cartouche",
-  "relief",
+  "montagne",
   "borne",
 ];
 
@@ -76,13 +79,14 @@ const NUMERIC_RANGES: Record<StudioObjectId, Record<string, Range>> = {
     r: CARTOUCHE_RANGES.corner,
     e: CARTOUCHE_RANGES.depth,
   },
-  relief: {
-    s: RELIEF_RANGES.size,
-    ba: RELIEF_RANGES.base,
-    re: RELIEF_RANGES.relief,
-    lv: RELIEF_RANGES.levels,
-    sd: RELIEF_RANGES.seed,
-    lk: RELIEF_RANGES.lake,
+  montagne: {
+    s: MONTAGNE_RANGES.size,
+    pl: MONTAGNE_RANGES.plinth,
+    h: MONTAGNE_RANGES.height,
+    st: MONTAGNE_RANGES.steep,
+    sd: MONTAGNE_RANGES.seed,
+    lv: MONTAGNE_RANGES.levels,
+    al: MONTAGNE_RANGES.altitude,
   },
   borne: {
     c: BORNE_RANGES.cap,
@@ -111,22 +115,12 @@ function withPalette(
   switch (config.object) {
     case "lavaux":
       return { ...config, bands: bandsForPalette(palette, config.h) };
-    case "relief": {
-      const spread = palette.slice(0, MAX_BANDS).map((filament, k, list) => ({
-        filament,
-        toMm:
-          config.base + (config.relief * (k + 1)) / Math.max(1, list.length),
-      }));
+    case "montagne":
+      // Du socle vers le sommet : la première teinte est celle du socle.
       return {
         ...config,
-        bands: snapReliefBands(
-          spread,
-          config.base,
-          config.relief,
-          config.levels,
-        ),
+        bands: montagneBands(palette, config.plinth, config.height),
       };
-    }
     case "cartouche":
       return {
         ...config,

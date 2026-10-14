@@ -10,10 +10,10 @@
       "noun": "Carte de visite",
       "tagline": "Votre carte de visite de 85 × 55 mm, en relief ou gravée."
     },
-    "relief": {
-      "name": "Sous-verre « Relief »",
-      "noun": "Sous-verre",
-      "tagline": "Un sous-verre de 100 mm : un massif en strates, votre nom au sommet."
+    "montagne": {
+      "name": "Montagne",
+      "noun": "Montagne",
+      "tagline": "Une vraie petite montagne à poser sur un bureau, jusqu'à 12 cm, colorée par altitude, votre nom sur le socle."
     },
     "borne": {
       "name": "Porte-nom « Borne »",
@@ -63,11 +63,10 @@
     "cadre": "Cadre",
     "monogramme": "Monogramme",
     "incrustee": "Incrustée",
+    "cime": "Pic",
     "massif": "Massif",
-    "lac": "Lac",
     "arete": "Arête",
-    "glacier": "Glacier",
-    "plateau": "Plateau",
+    "maquette": "Maquette",
     "pilule": "Pilule",
     "etiquette": "Étiquette",
     "goutte": "Goutte",
@@ -88,10 +87,20 @@
     "shape": {
       "rond": "Rond",
       "carre": "Carré",
+      "hexagone": "Hexagone",
       "pilule": "Pilule",
       "etiquette": "Étiquette",
       "goutte": "Goutte",
       "pic": "Pic"
+    },
+    "form": {
+      "pic": "Pic",
+      "massif": "Massif",
+      "arete": "Arête"
+    },
+    "style": {
+      "lisse": "Lissé",
+      "strates": "En strates"
     },
     "ring": {
       "gauche": "Gauche",
@@ -142,20 +151,16 @@
       "textStroke": "Trait des lettres à {value} mm : 0,8 mm au minimum pour une buse de 0,4 mm.",
       "textFit": "Le texte ne tient pas à la taille minimale : raccourcissez-le.",
       "textChar": "Caractère non imprimable : {char}",
+      "tooTall": "Montagne trop haute pour sa base : {value} mm au plus, soit 1,6 fois la base.",
       "nearVase": "Cette combinaison rappelle le Vase spirale de Ian (licence sans modification). Réduisez la torsion ou le nombre de nervures."
     }
-  },
-  "relief": {
-    "peak": "Pointe {name}",
-    "summit": "{peak} · {altitude} m",
-    "fictional": "altitude fictive"
   },
   "examples": {
     "name": "Léa Dubois",
     "role": "Architecte",
     "line1": "lea@exemple.ch",
     "line2": "+41 21 000 00 00",
-    "peak": "Léa",
+    "peak": "Pointe Léa",
     "text": "Léa"
   }
 }

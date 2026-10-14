@@ -2,7 +2,7 @@
 // (src/motion/studio/geometry.worker.ts, WP-STUDIO), le SSR et les tests
 // appellent ceci, jamais un générateur d'objet directement.
 //
-// Les objets à texte (Cartouche, Relief, Borne) ont besoin des contours des
+// Les objets à texte (Cartouche, Montagne, Borne) ont besoin des contours des
 // glyphes dès qu'un texte est saisi : le Worker charge `GLYPH_URL` une fois
 // (`loadGlyphFont`, qui enregistre la police) ; sans elle, `buildStudioMesh`
 // lève `GlyphsNotLoadedError` plutôt que de rendre un objet sans ses lettres.
@@ -10,8 +10,8 @@ import type { GlyphFont } from "./text/glyphs";
 import { buildBorne } from "./objects/borne";
 import { buildCartouche } from "./objects/cartouche";
 import { buildLavaux, type LavauxBuildOptions } from "./objects/lavaux";
-import { buildRelief } from "./objects/relief";
-import type { Locale } from "./objects/relief-model";
+import { buildMontagne } from "./objects/montagne";
+import type { Locale } from "./objects/montagne-model";
 import {
   stlFileName,
   stlHeader,
@@ -24,7 +24,7 @@ import type { MeshData, StudioConfig, StudioTexts } from "./types";
 export interface BuildOptions extends LavauxBuildOptions {
   /** Police des glyphes ; défaut : celle que `loadGlyphFont` / `setGlyphFont` a enregistrée. */
   font?: GlyphFont | null;
-  /** Langue de l'étiquette du sous-verre (« POINTE » / « PIZ » / « PIZZO » / « MOUNT »), français par défaut. */
+  /** Langue de l'étiquette de la Montagne (séparateur de milliers de l'altitude), français par défaut. */
   locale?: Locale;
 }
 
@@ -39,8 +39,8 @@ export function buildStudioMesh(
       return buildLavaux(config, options);
     case "cartouche":
       return buildCartouche(config, texts, options);
-    case "relief":
-      return buildRelief(config, texts, options);
+    case "montagne":
+      return buildMontagne(config, texts, options);
     case "borne":
       return buildBorne(config, texts, options);
   }

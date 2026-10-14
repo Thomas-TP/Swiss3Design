@@ -9,7 +9,7 @@
     "studio": {
       "kicker": "Studio",
       "title": "Ich habe keine Datei",
-      "body": "Personalisieren Sie im Studio eine Vase, eine Visitenkarte, einen Untersetzer oder ein Namensschild und senden Sie es dem Atelier. Eine Idee ohne Datei? Beschreiben Sie sie im Formular."
+      "body": "Personalisieren Sie im Studio eine Vase, eine Visitenkarte, einen Berg oder ein Namensschild und senden Sie es dem Atelier. Eine Idee ohne Datei? Beschreiben Sie sie im Formular."
     }
   },
   "sheet": {
@@ -45,7 +45,7 @@
     "objects": {
       "lavaux": "Vase «Lavaux»",
       "cartouche": "Visitenkarte «Cartouche»",
-      "relief": "Untersetzer «Relief»",
+      "montagne": "Berg",
       "borne": "Namensschild «Borne»"
     },
     "fileSent": "Datei gesendet: {name} · {size}",

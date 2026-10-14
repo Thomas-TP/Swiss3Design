@@ -7,7 +7,10 @@ import { adaptBandsParam } from "./get-params";
 describe("adaptBandsParam (formulaire GET sans JavaScript)", () => {
   const bands = "bleu-leman:42,vert-lavaux:108,blanc-neve:150";
 
-  function decode(object: "lavaux" | "relief", query: Record<string, string>) {
+  function decode(
+    object: "lavaux" | "montagne",
+    query: Record<string, string>,
+  ) {
     return decodeSearchParams(
       object,
       adaptBandsParam(object, query),
@@ -66,13 +69,29 @@ describe("adaptBandsParam (formulaire GET sans JavaScript)", () => {
     expect(adaptBandsParam("cartouche", query)).toBe(query);
   });
 
-  it("le sous-verre cale ses bandes sur les sommets de strates", () => {
-    const decoded = decode("relief", {
-      ba: "3",
-      re: "3.2",
-      lv: "4",
-      bd: "bleu-leman:3,vert-lavaux:4.1,blanc-neve:6.6",
+  it("la montagne ramène ses bandes au socle et à la hauteur annoncés", () => {
+    // Socle 6 mm et montagne de 100 mm : la dernière bande finit à 106, la première à 6.
+    const decoded = decode("montagne", {
+      pl: "6",
+      h: "100",
+      bd: "encre:5,vert-lavaux:35,blanc-neve:80",
     });
     expect(decoded.ok).toBe(true);
+    if (!decoded.ok || decoded.config.object !== "montagne") return;
+    expect(decoded.config.bands.map((b) => b.toMm)).toEqual([6, 35, 106]);
+  });
+
+  it("la montagne borne la hauteur à 1,6 fois la base avant de ramener les bandes", () => {
+    // Base 60 mm : 96 mm au plus ; une hauteur de 120 est ramenée à 96 (socle 5 → total 101).
+    const decoded = decode("montagne", {
+      s: "60",
+      pl: "5",
+      h: "120",
+      bd: "encre:5,vert-lavaux:35,blanc-neve:125",
+    });
+    expect(decoded.ok).toBe(true);
+    if (!decoded.ok || decoded.config.object !== "montagne") return;
+    expect(decoded.config.height).toBe(96);
+    expect(decoded.config.bands.at(-1)?.toMm).toBe(101);
   });
 });

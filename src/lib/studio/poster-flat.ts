@@ -1,8 +1,8 @@
-// Posters « vue de dessus » des objets plats (brief « Strates », §6.12, §7.6,
-// §7.7 et fiche WP-02) : le dessin de la Cartouche, du Sous-verre « Relief » et
-// du Porte-nom « Borne » AVANT le JavaScript, en SVG calculé par le code. Comme
-// l'Élévation du vase, c'est aussi la seule vue disponible sans WebGL (C0) et
-// l'aperçu exact (au dixième de millimètre) des objets plats.
+// Posters « vue de dessus » (brief « Strates », §6.12, §7.6, §7.7 et fiche
+// WP-02) : le dessin de la Cartouche, de la Montagne et du Porte-nom « Borne »
+// AVANT le JavaScript, en SVG calculé par le code. Comme l'Élévation du vase,
+// c'est aussi la vue 2D exacte (au dixième de millimètre) de ces objets ; la
+// Montagne a en plus son Élévation (`poster-montagne.ts`).
 //
 // Les fonctions rendent des DONNÉES (chemins par couche de couleur) que le
 // composant serveur affiche en JSX, et `topViewToSvg` en donne la chaîne (poids,
@@ -11,8 +11,8 @@
 // Texte : sans `glyphs` (le Worker n'embarque pas les contours, règle d'or 10),
 // chaque ligne est tracée par une barre aux dimensions exactes du texte
 // (chasse × capitale) ; avec `glyphs`, par les contours réels des glyphes.
-// Sous-verre : le poster statique du massif exclut l'étiquette (`label: false`) :
-// elle est en DOM, mise à jour à chaque frappe (§7.5, chapitre 02).
+// Montagne : le poster statique exclut l'étiquette (`label: false`) : elle est
+// en DOM, mise à jour à chaque frappe (§7.5, chapitre 02).
 import { filamentHex, shade, tint } from "./filaments";
 import type { Polygon } from "./kernel/extrude";
 import { layoutBorne } from "./objects/borne-model";
@@ -20,18 +20,21 @@ import { layoutCartouche } from "./objects/cartouche-model";
 import type { FlatModel } from "./objects/flat-model";
 import {
   bandOfSlab,
-  layoutRelief,
-  reliefLevels,
-  reliefOutline,
-  RELIEF_GRID,
+  contourLevels,
+  GRID_ACROSS,
+  layoutMontagne,
+  LABEL_HEIGHT_MM,
+  mountainGrid,
+  plinthOutline,
+  strataThresholds,
   type Locale,
-} from "./objects/relief-model";
+} from "./objects/montagne-model";
 import { polygonRings, type Ring } from "./text/geometry";
 import { measureText, type PlacedLine } from "./text/layout";
 import type {
   BorneConfig,
   CartoucheConfig,
-  ReliefConfig,
+  MontagneConfig,
   StudioTexts,
 } from "./types";
 
@@ -51,7 +54,7 @@ export interface TopViewLayer {
 }
 
 export interface TopViewData {
-  object: "cartouche" | "relief" | "borne";
+  object: "cartouche" | "montagne" | "borne";
   /** x, y, largeur, hauteur du viewBox (unités de 0,1 mm). */
   viewBox: [number, number, number, number];
   widthMm: number;
@@ -67,9 +70,9 @@ export interface TopViewOptions {
    * est tracé par des barres.
    */
   glyphs?: (line: PlacedLine) => Polygon[];
-  /** Langue de l'étiquette du sous-verre. */
+  /** Langue de l'étiquette de la Montagne. */
   locale?: Locale;
-  /** Sous-verre : tracer l'étiquette (défaut oui) ; le poster statique du massif l'omet. */
+  /** Montagne : tracer l'étiquette (défaut oui) ; le poster statique l'omet. */
   label?: boolean;
 }
 
@@ -232,34 +235,53 @@ export function borneTopView(
   return flatTopView(layoutBorne(config, texts, "display"), options);
 }
 
+/** Écart entre deux courbes de niveau du plan lissé (mm) : une courbe maîtresse toutes les 10 couches. */
+export const CONTOUR_INTERVAL_MM = 2;
+
 /**
- * Vue de dessus du sous-verre : le socle puis chaque strate dans la teinte de
- * sa bande, de bas en haut (les strates hautes recouvrent les basses), avec le
- * filet qui dessine les courbes de niveau.
+ * Vue de dessus de la Montagne : le socle, puis chaque courbe de niveau
+ * remplie dans la teinte de sa bande, de bas en haut (les hautes recouvrent les
+ * basses), avec le filet qui dessine les courbes. Lissé : une courbe tous les 2
+ * mm d'altitude ; en strates : les contours mêmes des strates.
  */
-export function reliefTopView(
-  config: ReliefConfig,
+export function montagneTopView(
+  config: MontagneConfig,
   texts?: StudioTexts,
   options: TopViewOptions = {},
 ): TopViewData {
   const theme = options.theme ?? "light";
-  const model = layoutRelief(config, texts, options.locale);
+  const model = layoutMontagne(config, texts, options.locale);
   const bands = config.bands;
   const fillOf = (z0: number, z1: number) =>
     filamentHex(bands[bandOfSlab(bands, z0, z1)].filament);
-  const baseFill = fillOf(0, model.tops[0]);
+  const baseFill = fillOf(0, config.plinth);
   const layers: TopViewLayer[] = [
     {
       role: "plate",
       fill: baseFill,
       stroke: strokeOf(baseFill, theme),
       opacity: 1,
-      d: subpath(reliefOutline(config, "display")),
+      d: subpath(plinthOutline(config, "display")),
     },
   ];
-  reliefLevels(config, RELIEF_GRID.display).forEach((polygons, k) => {
+  const grid = mountainGrid(config, GRID_ACROSS.poster);
+  // Seuils (normalisés) et altitude de chaque courbe, du pied au sommet.
+  let thresholds: number[];
+  let altitudes: number[];
+  if (config.style === "strates") {
+    thresholds = strataThresholds(config);
+    altitudes = thresholds.map((_, k) => model.tops[k]);
+  } else {
+    const count = Math.max(1, Math.floor(config.height / CONTOUR_INTERVAL_MM));
+    thresholds = Array.from({ length: count }, (_, k) =>
+      Math.max((k * CONTOUR_INTERVAL_MM) / config.height, 1e-3),
+    );
+    altitudes = thresholds.map((t) => config.plinth + t * config.height);
+  }
+  contourLevels(grid, thresholds, 0.12).forEach((polygons, k) => {
     if (polygons.length === 0) return;
-    const fill = fillOf(model.tops[k], model.tops[k + 1]);
+    // La courbe k est dans la bande de l'altitude qu'elle commence (juste au-dessus).
+    const fill = fillOf(altitudes[k] + 0.01, altitudes[k] + 0.02);
     layers.push({
       role: "level",
       fill,
@@ -269,7 +291,7 @@ export function reliefTopView(
     });
   });
   if (options.label !== false && model.lines.length > 0) {
-    const labelFill = fillOf(model.tops[0], model.tops[0] + 0.6);
+    const labelFill = fillOf(config.plinth, config.plinth + LABEL_HEIGHT_MM);
     if (options.glyphs) {
       layers.push({
         role: "ink",
@@ -288,12 +310,11 @@ export function reliefTopView(
       });
     }
   }
-  const R = config.size / 2;
   return {
-    object: "relief",
-    viewBox: viewBoxOf([-R, -R, R, R]),
-    widthMm: config.size,
-    depthMm: config.size,
+    object: "montagne",
+    viewBox: viewBoxOf(box([plinthOutline(config, "display")])),
+    widthMm: model.widthMm,
+    depthMm: model.depthMm,
     layers,
   };
 }

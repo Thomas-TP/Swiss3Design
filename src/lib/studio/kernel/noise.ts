@@ -3,7 +3,7 @@
 //
 // - createSimplex(seed) : bruit simplex 2D et 3D de Gustavson, table de
 //   permutation mélangée par mulberry32 (mêmes valeurs partout pour une même
-//   graine). Sortie dans [-1, 1]. Sert au relief du sous-verre (WP-02).
+//   graine). Sortie dans [-1, 1]. Sert à la carte d'altitude de la Montagne (WP-02).
 // - createPeriodicNoise2(seed) : bruit de gradient 2D dont le réseau est
 //   replié sur des périodes entières. Le simplex n'est pas périodique sans
 //   réseau tourné (psrdnoise) ; un bruit de gradient à réseau carré l'est

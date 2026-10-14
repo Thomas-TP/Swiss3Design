@@ -17,7 +17,7 @@ describe("données précalculées de l'accueil", () => {
   it("couvre les quatre langues et les quatre objets", () => {
     for (const locale of ["fr", "de", "it", "en"] as const) {
       expect(HOME_DATA.summit[locale].label).toMatch(/·/);
-      for (const id of ["lavaux", "cartouche", "relief", "borne"] as const) {
+      for (const id of ["lavaux", "cartouche", "montagne", "borne"] as const) {
         const card = HOME_DATA.objects[locale][id];
         expect(card.stats.grams).toBeGreaterThan(0);
         expect(card.stats.minutes).toBeGreaterThan(0);
@@ -27,13 +27,13 @@ describe("données précalculées de l'accueil", () => {
 
   it("aucun prix tant que le barème n'est pas validé (« Sur devis »)", () => {
     for (const locale of ["fr", "de", "it", "en"] as const)
-      for (const id of ["lavaux", "cartouche", "relief", "borne"] as const)
+      for (const id of ["lavaux", "cartouche", "montagne", "borne"] as const)
         expect(HOME_DATA.objects[locale][id].estimate).toBeNull();
   });
 
   it("le lien du sous-verre porte la configuration, jamais un texte", () => {
-    expect(HOME_DATA.reliefHref).toMatch(
-      /^\/studio\/relief#c=v1\.[A-Za-z0-9_-]+$/,
+    expect(HOME_DATA.montagneHref).toMatch(
+      /^\/studio\/montagne#c=v1\.[A-Za-z0-9_-]+$/,
     );
   });
 

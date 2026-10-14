@@ -1,6 +1,6 @@
 // Empreintes du Studio (brief « Strates », §6.8 et §6.9) : FNV-1a.
 //
-// - fnv1a32 : altitude fictive du sommet du sous-verre (annexe B) ;
+// - fnv1a32 : altitude fictive de l'étiquette de la Montagne (annexe B) ;
 // - fnv1a64 : clé de cache d'un envoi (`s3d-studio-upload-v1`, JSON canonique
 //   de la configuration + des textes) et « hash8 » du nom de fichier et de
 //   l'en-tête STL.

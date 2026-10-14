@@ -10,7 +10,7 @@
 // Objets plats (WP-02) : aires EXACTES des polygones (plaque, disque, cadre,
 // contours des strates) et, pour le texte, la table de métriques des glyphes
 // (aire et chasse de chaque caractère) : pas de contour de glyphe, donc le même
-// chiffre en SSR et côté client. Le Relief et la Borne, pleins et de plus de
+// chiffre en SSR et côté client. La Montagne et la Borne, pleines et de plus de
 // 3 mm, s'impriment en coque de 0,8 mm + remplissage à 15 % (§6.5) ; la
 // Cartouche, mince, est pleine.
 import { estimate } from "./estimate";
@@ -18,7 +18,7 @@ import {
   borneStrokeFix,
   checkFlatWith,
   checkLavauxWith,
-  checkReliefWith,
+  checkMontagneWith,
 } from "./guards";
 import { layoutBorne } from "./objects/borne-model";
 import { layoutCartouche } from "./objects/cartouche-model";
@@ -31,16 +31,16 @@ import {
 import { analyzeLavaux } from "./objects/lavaux-analysis";
 import { LAYER_HEIGHT } from "./objects/lavaux-model";
 import {
-  analyzeRelief,
-  layoutRelief,
+  analyzeMontagne,
+  layoutMontagne,
   type Locale,
-} from "./objects/relief-model";
+} from "./objects/montagne-model";
 import { PRICING, type PricingParams } from "./pricing-params";
 import type {
   Band,
   LavauxConfig,
+  MontagneConfig,
   Printability,
-  ReliefConfig,
   StudioConfig,
   StudioStats,
   StudioTexts,
@@ -173,23 +173,23 @@ function flatStats(
   );
 }
 
-function reliefStats(
-  config: ReliefConfig,
+function montagneStats(
+  config: MontagneConfig,
   texts: StudioTexts | undefined,
   locale: Locale | undefined,
   params: PricingParams,
 ): StudioStats {
-  const model = layoutRelief(config, texts, locale);
-  const analysis = analyzeRelief(model);
+  const model = layoutMontagne(config, texts, locale);
+  const analysis = analyzeMontagne(model);
   return finish(
     {
-      heightMm: model.heightMm,
-      widthMm: config.size,
-      depthMm: config.size,
-      layers: layerCount(model.heightMm),
+      heightMm: model.total,
+      widthMm: model.widthMm,
+      depthMm: model.depthMm,
+      layers: layerCount(model.total),
       volumeCm3: Math.round(analysis.volumeMm3) / 1000,
       changes: countChanges(config.bands),
-      printable: checkReliefWith(config, model),
+      printable: checkMontagneWith(config, model),
       printVolumeMm3: solidPrintVolume(analysis.volumeMm3, analysis.surfaceMm2),
     },
     params,
@@ -198,8 +198,8 @@ function reliefStats(
 
 /**
  * Statistiques d'une configuration. `texts` n'influe que sur les objets à
- * texte (Cartouche, Relief, Borne) ; `locale` seulement sur l'étiquette du
- * sous-verre. `params` permet de tester un barème validé sans toucher à
+ * texte (Cartouche, Montagne, Borne) ; `locale` seulement sur l'étiquette de la
+ * Montagne. `params` permet de tester un barème validé sans toucher à
  * PRICING (aucun CHF tant que `PRICING.validated` vaut false).
  */
 export function computeStats(
@@ -220,7 +220,7 @@ export function computeStats(
       const printable = checkFlatWith(model, () => borneStrokeFix(config));
       return flatStats(model, printable, true, params);
     }
-    case "relief":
-      return reliefStats(config, texts, locale, params);
+    case "montagne":
+      return montagneStats(config, texts, locale, params);
   }
 }

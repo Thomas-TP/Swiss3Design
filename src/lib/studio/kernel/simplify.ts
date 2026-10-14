@@ -1,5 +1,5 @@
 // Douglas–Peucker (brief « Strates », §6.3.2 : `kernel/simplify.ts`). Sert à
-// alléger les contours de strates (0,15 mm, sous-verre Relief, WP-02) et les
+// alléger les contours de strates (0,15 mm, Montagne en strates, WP-02) et les
 // silhouettes SVG de l'Élévation. Itératif (pile explicite) : aucun risque de
 // dépassement de pile sur un contour de plusieurs milliers de points.
 

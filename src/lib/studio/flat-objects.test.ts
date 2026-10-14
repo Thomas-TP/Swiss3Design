@@ -1,7 +1,8 @@
 // Objets plats (brief « Strates », §6.3.4, §6.5, §6.6 et fiche WP-02) :
-// Cartouche, Relief, Borne : mises en page, gravure sans chevauchement,
-// statistiques, garde-fous, préréglages, étiquette du sommet, export STL,
-// budgets de temps. Les maillages sont vérifiés dans manifold.test.ts.
+// Cartouche, Montagne, Borne : mises en page, gravure sans chevauchement,
+// statistiques, garde-fous, préréglages, export STL, budgets de temps. Les
+// maillages sont vérifiés dans manifold.test.ts ; le modèle de la Montagne
+// (carte d'altitude, étiquette, bandes, lissé et strates) dans montagne.test.ts.
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -27,41 +28,31 @@ import {
   type FlatModel,
 } from "./objects/flat-model";
 import {
-  analyzeRelief,
-  labelZone,
-  layoutLabel,
-  layoutRelief,
-  peakAltitude,
-  peakLabel,
-  peakLabelParts,
-  reliefGrid,
-  reliefLevels,
-  RELIEF_GRID,
-  startsWithPeakWord,
-  strataThresholds,
+  analyzeMontagne,
+  layoutMontagne,
   type Locale,
-} from "./objects/relief-model";
+} from "./objects/montagne-model";
 import {
   BORNE_DEFAULT,
   BORNE_PRESETS,
   CARTOUCHE_DEFAULT,
   CARTOUCHE_PRESETS,
   HERO_CONFIG,
+  MONTAGNE_DEFAULT,
+  MONTAGNE_PRESETS,
   PRESETS,
-  RELIEF_DEFAULT,
-  RELIEF_PRESETS,
   surpriseBorne,
   surpriseCartouche,
-  surpriseRelief,
+  surpriseMontagne,
 } from "./presets";
 import { PRICING } from "./pricing-params";
-import { clampConfig, parseConfig, strataTops } from "./schemas";
+import { clampConfig, parseConfig } from "./schemas";
 import { computeStats } from "./stats";
 import {
   loadTestFont,
   randomBorne,
   randomCartouche,
-  randomRelief,
+  randomMontagne,
   randomTexts,
 } from "./testing";
 import { DEFAULT_TEXTS } from "./text/fields";
@@ -72,7 +63,6 @@ import { linePolygons, linesPolygons } from "./text/shapes";
 import type {
   BorneConfig,
   CartoucheConfig,
-  ReliefConfig,
   StudioConfig,
   StudioObjectId,
   StudioTexts,
@@ -610,226 +600,6 @@ describe("Borne : contour, anneau et texte", () => {
   });
 });
 
-describe("Relief : étiquette du sommet, massif, strates", () => {
-  it("altitude fictive : 1800 + fnv1a(nom en minuscules, espaces fusionnés) mod 2600, déterministe", () => {
-    expect(peakAltitude("Léa")).toBe(peakAltitude(" léa "));
-    expect(peakAltitude("Léa")).toBe(peakAltitude("LÉA".toLowerCase()));
-    expect(peakAltitude("Léa")).toBe(2566);
-    for (const name of ["Léa", "Zoé", "Piz", "Mont Blanc", "Å", "a"]) {
-      const alt = peakAltitude(name);
-      expect(alt).toBeGreaterThanOrEqual(1800);
-      expect(alt).toBeLessThan(1800 + 2600);
-    }
-    expect(peakAltitude("Léa")).not.toBe(peakAltitude("Léo"));
-    // Normalisation Unicode : é précomposé et e + accent combinant sont le même nom.
-    expect(peakAltitude("Léa")).toBe(peakAltitude("Léa"));
-  });
-
-  it("étiquette selon la langue : POINTE / PIZ / PIZZO / MOUNT, capitales, séparateur de milliers du jeu", () => {
-    expect(peakLabel("Léa", "fr")).toBe("POINTE LÉA · 2 566 M");
-    expect(peakLabel("Léa", "de")).toBe("PIZ LÉA · 2’566 M");
-    expect(peakLabel("Léa", "it")).toBe("PIZZO LÉA · 2’566 M");
-    expect(peakLabel("Léa", "en")).toBe("MOUNT LÉA · 2’566 M");
-    expect(peakLabel("Léa")).toBe(peakLabel("Léa", "fr"));
-    const parts = peakLabelParts("Léa", "fr");
-    expect(parts).toEqual({ peak: "POINTE LÉA", altitude: "2 566 M" });
-    // Toute l'étiquette est imprimable (dans le jeu de glyphes) dans les quatre langues.
-    for (const locale of LOCALES) {
-      for (const name of ["Léa", "Ödön", "Œuvre", "Łukasz", "ß"]) {
-        const model = layoutRelief(RELIEF_DEFAULT, { peak: name }, locale);
-        expect(
-          model.issues.map((i) => i.code),
-          `${locale} ${name}`,
-        ).toEqual([]);
-      }
-    }
-  });
-
-  it("le préfixe n'est pas doublé quand le nom le porte déjà (casse et accents sans effet)", () => {
-    // Le mot de préfixe de CHAQUE langue, tapé tel quel ou presque.
-    expect(peakLabelParts("Pointe Zorgl", "fr").peak).toBe("POINTE ZORGL");
-    expect(peakLabelParts("pointe zorgl", "fr").peak).toBe("POINTE ZORGL");
-    expect(peakLabelParts("POINTÉ Zorgl", "fr").peak).toBe("POINTÉ ZORGL");
-    expect(peakLabelParts("Piz Bernina", "de").peak).toBe("PIZ BERNINA");
-    expect(peakLabelParts("pizzo Rotondo", "it").peak).toBe("PIZZO ROTONDO");
-    expect(peakLabelParts("Mount Everest", "en").peak).toBe("MOUNT EVEREST");
-    expect(peakLabel("Pointe Zorgl", "fr")).toBe(
-      `POINTE ZORGL · ${peakLabelParts("Pointe Zorgl", "fr").altitude}`,
-    );
-    // Espaces superflus : le nom nettoyé commence bien par le mot.
-    expect(peakLabelParts("  Pointe   Zorgl ", "fr").peak).toBe("POINTE ZORGL");
-    // Trait d'union : « Pointe-Noire » est un nom qui commence par le mot.
-    expect(peakLabelParts("Pointe-Noire", "fr").peak).toBe("POINTE-NOIRE");
-    // Le mot seul : aucun doublon non plus.
-    expect(peakLabelParts("Pointe", "fr").peak).toBe("POINTE");
-    // L'altitude reste celle du nom saisi (déterministe, jamais celle d'un nom préfixé à part).
-    expect(peakLabelParts("Pointe Zorgl", "fr").altitude).toBe(
-      peakLabelParts("pointe  zorgl", "fr").altitude,
-    );
-  });
-
-  it("le préfixe est ajouté quand le nom ne le porte pas (mot entier seulement, langue de la page)", () => {
-    expect(peakLabelParts("Pointer", "fr").peak).toBe("POINTE POINTER");
-    expect(peakLabelParts("Mountain", "en").peak).toBe("MOUNT MOUNTAIN");
-    expect(peakLabelParts("Pizzaiolo", "it").peak).toBe("PIZZO PIZZAIOLO");
-    // Le mot d'une autre langue n'est pas celui de la page : « Piz » sous /fr garde « Pointe ».
-    expect(peakLabelParts("Piz Bernina", "fr").peak).toBe("POINTE PIZ BERNINA");
-    expect(peakLabelParts("Pointe Zorgl", "de").peak).toBe("PIZ POINTE ZORGL");
-    expect(peakLabelParts("Zorgl", "fr").peak).toBe("POINTE ZORGL");
-    expect(startsWithPeakWord("Mount", "en")).toBe(true);
-    expect(startsWithPeakWord("Mountain", "en")).toBe(false);
-    expect(startsWithPeakWord("", "fr")).toBe(false);
-  });
-
-  it("l'étiquette gravée du Relief suit la même règle que le texte affiché", () => {
-    // layoutLabel (gravure) et peakLabel (accueil, Studio) partagent peakLabelParts.
-    for (const locale of LOCALES) {
-      const word = peakLabelParts("x", locale).peak.split(" ")[0];
-      const typed = `${word.charAt(0)}${word.slice(1).toLowerCase()} Zorgl`;
-      const { lines } = layoutLabel(RELIEF_DEFAULT, { peak: typed }, locale);
-      const engraved = lines.map((line) => line.text).join(" ");
-      expect(engraved, `${locale}`).not.toContain(`${word} ${word}`);
-      expect(engraved, `${locale}`).toContain(`${word} ZORGL`);
-    }
-  });
-
-  it("une ligne quand elle tient à 3,6 mm au moins, deux sinon, `text-fit` au-delà ; capitale jamais au-dessus de 4,2 mm", () => {
-    const short = layoutLabel(RELIEF_DEFAULT, { peak: "I" });
-    expect(short.lines).toHaveLength(1);
-    expect(short.lines[0].capMm).toBeLessThanOrEqual(4.2);
-    const medium = layoutLabel(RELIEF_DEFAULT, { peak: "Léa" });
-    expect(medium.lines.length).toBeGreaterThanOrEqual(1);
-    const two = layoutLabel(RELIEF_DEFAULT, { peak: "Alpes" });
-    expect(two.lines).toHaveLength(2);
-    expect(two.lines[0].y).toBeGreaterThan(two.lines[1].y);
-    expect(two.issues).toEqual([]);
-    const zone = labelZone(RELIEF_DEFAULT);
-    for (const line of [...short.lines, ...medium.lines, ...two.lines]) {
-      const m = linePolygons(line, "export", font);
-      const xs = m.flatMap((p) => p.outer.map((pt) => pt[0]));
-      expect(Math.min(...xs)).toBeGreaterThanOrEqual(
-        zone.cx - zone.width / 2 - 0.5,
-      );
-      expect(Math.max(...xs)).toBeLessThanOrEqual(
-        zone.cx + zone.width / 2 + 0.5,
-      );
-    }
-    const huge = layoutLabel(RELIEF_DEFAULT, { peak: "WWWWWWWWWWWW" });
-    expect(huge.issues.map((i) => i.code)).toContain("text-fit");
-    // Sans étiquette ou sans nom : aucune ligne, aucun souci.
-    expect(
-      layoutLabel({ ...RELIEF_DEFAULT, label: false }, { peak: "Léa" }),
-    ).toEqual({
-      lines: [],
-      issues: [],
-    });
-    expect(layoutLabel(RELIEF_DEFAULT, {})).toEqual({ lines: [], issues: [] });
-  });
-
-  it("l'étiquette est en relief de 0,6 mm sur une zone plate : aucune strate dans la zone", () => {
-    const grid = reliefGrid(RELIEF_DEFAULT, RELIEF_GRID.export);
-    const zone = labelZone(RELIEF_DEFAULT);
-    const { n, cell, values } = grid;
-    let inZone = 0;
-    let highest = 0;
-    for (let j = 0; j < n; j++) {
-      const y = (n / 2 - (j + 0.5)) * cell;
-      for (let i = 0; i < n; i++) {
-        const x = (i + 0.5 - n / 2) * cell;
-        if (
-          Math.abs(x - zone.cx) <= zone.width / 2 &&
-          Math.abs(y - zone.cy) <= zone.height / 2
-        ) {
-          inZone++;
-          highest = Math.max(highest, values[j * n + i]);
-        }
-      }
-    }
-    expect(inZone).toBeGreaterThan(100);
-    // Sous le premier seuil des strates (lac 18 %) : la zone est plate.
-    expect(highest).toBeLessThan(strataThresholds(RELIEF_DEFAULT)[0]);
-  });
-
-  it("strates emboîtées : chaque strate est plus petite que celle du dessous, la dernière est le sommet", () => {
-    for (const config of RELIEF_PRESETS.map((p) => p.config)) {
-      const model = layoutRelief(config, DEFAULT_TEXTS.relief);
-      const analysis = analyzeRelief(model);
-      expect(analysis.levelAreas).toHaveLength(config.levels);
-      for (let k = 1; k < config.levels; k++) {
-        expect(
-          analysis.levelAreas[k],
-          `${config.seed} strate ${k + 1}`,
-        ).toBeLessThan(analysis.levelAreas[k - 1]);
-      }
-      // Toutes les strates existent (aucune ne disparaît sous le seuil d'îlot).
-      expect(
-        Math.min(...analysis.levelAreas),
-        `${config.seed}`,
-      ).toBeGreaterThan(5);
-      const tops = strataTops(config.base, config.relief, config.levels);
-      expect(model.tops).toEqual(tops);
-      expect(model.heightMm).toBe(tops[config.levels]);
-      expect(reliefLevels(config, RELIEF_GRID.display)).toHaveLength(
-        config.levels,
-      );
-    }
-  });
-
-  it("le bord de 3 mm reste plat : aucune strate n'atteint le pourtour (rond et carré)", () => {
-    for (const shape of ["rond", "carre"] as const) {
-      const config: ReliefConfig = { ...RELIEF_DEFAULT, shape, lake: 0 };
-      const R = config.size / 2;
-      for (const polygons of reliefLevels(config, RELIEF_GRID.export)) {
-        for (const polygon of polygons) {
-          for (const [x, y] of polygon.outer) {
-            const edge =
-              shape === "rond"
-                ? R - Math.hypot(x, y)
-                : R - Math.max(Math.abs(x), Math.abs(y));
-            // 3 mm moins une cellule de la carte (0,8 mm) : le contour est interpolé entre deux cellules.
-            expect(edge, `${shape}`).toBeGreaterThan(2.5);
-          }
-        }
-      }
-    }
-  });
-
-  it("le même massif se dessine à l'identique : graine et carte déterministes", () => {
-    const a = reliefLevels(RELIEF_DEFAULT, 128);
-    const b = reliefLevels({ ...RELIEF_DEFAULT }, 128);
-    expect(JSON.stringify(a)).toBe(JSON.stringify(b));
-    const c = reliefLevels({ ...RELIEF_DEFAULT, seed: 1292 }, 128);
-    expect(JSON.stringify(c)).not.toBe(JSON.stringify(a));
-  });
-
-  it("le défaut : 100 × 100 × 6,2 mm, 31 couches, 3 changements, imprimable, sans CHF", () => {
-    const stats = computeStats(RELIEF_DEFAULT, DEFAULT_TEXTS.relief);
-    expect(stats.heightMm).toBe(6.2);
-    expect(stats.widthMm).toBe(100);
-    expect(stats.depthMm).toBe(100);
-    expect(stats.layers).toBe(31);
-    expect(stats.changes).toBe(3);
-    expect(stats.purgeGrams).toBe(2.4);
-    expect(stats.printable).toEqual({ status: "ok" });
-    expect(stats.estimate).toBeNull();
-    // Masse d'un sous-verre de 100 mm : quelques dizaines de grammes.
-    expect(stats.grams).toBeGreaterThan(10);
-    expect(stats.grams).toBeLessThan(40);
-  });
-
-  it("bandes du sous-verre calées sur les sommets de strates (défaut et préréglages)", () => {
-    for (const { config } of RELIEF_PRESETS) {
-      const tops = strataTops(config.base, config.relief, config.levels);
-      for (const band of config.bands) {
-        expect(tops, `${config.seed} ${band.toMm}`).toContain(band.toMm);
-      }
-      expect(config.bands.at(-1)!.toMm).toBe(tops[config.levels]);
-      expect(config.bands.length).toBeGreaterThanOrEqual(2);
-      expect(config.bands.length).toBeLessThanOrEqual(4);
-    }
-  });
-});
-
 describe("Gravure sans chevauchement : formes d'encre disjointes sur 200 configurations par objet", () => {
   function sample<C extends StudioConfig>(
     seed: number,
@@ -891,10 +661,10 @@ describe("Gravure sans chevauchement : formes d'encre disjointes sur 200 configu
     }
   });
 
-  it("Relief : les lettres de l'étiquette ne se touchent jamais", () => {
-    for (const { config, texts } of sample(33, "relief", randomRelief)) {
+  it("Montagne : les lettres de l'étiquette ne se touchent jamais", () => {
+    for (const { config, texts } of sample(33, "montagne", randomMontagne)) {
       const locale = LOCALES[(config.seed + config.levels) % LOCALES.length];
-      const model = layoutRelief(config, texts, locale);
+      const model = layoutMontagne(config, texts, locale);
       const glyphs = linesPolygons(model.lines, "export", font);
       expect(
         findOverlaps(glyphs),
@@ -908,7 +678,7 @@ describe("Statistiques des objets plats", () => {
   const cases: [StudioObjectId, StudioConfig, number][] = [
     ["cartouche", CARTOUCHE_DEFAULT, 0.015],
     ["borne", BORNE_DEFAULT, 0.015],
-    ["relief", RELIEF_DEFAULT, 0.06],
+    ["montagne", MONTAGNE_DEFAULT, 0.03],
   ];
 
   it("le volume analytique est celui du maillage d'export (aires exactes, épaisseurs des dalles)", () => {
@@ -926,13 +696,13 @@ describe("Statistiques des objets plats", () => {
   it("le volume analytique suit le maillage sur des configurations aléatoires (gravure comprise)", () => {
     const rng = mulberry32(4242);
     for (let i = 0; i < 40; i++) {
-      const object = pick(rng, ["cartouche", "borne", "relief"] as const);
+      const object = pick(rng, ["cartouche", "borne", "montagne"] as const);
       const config =
         object === "cartouche"
           ? randomCartouche(rng)
           : object === "borne"
             ? randomBorne(rng)
-            : randomRelief(rng);
+            : randomMontagne(rng);
       const texts = randomTexts(rng, object);
       if (checkPrintability(config, texts).status === "error") continue;
       const stats = computeStats(config, texts);
@@ -941,14 +711,14 @@ describe("Statistiques des objets plats", () => {
       expect(
         Math.abs(stats.volumeCm3 - real) / real,
         `${object} #${i} ${JSON.stringify(config)}`,
-      ).toBeLessThan(object === "relief" ? 0.08 : 0.02);
+      ).toBeLessThan(object === "montagne" ? 0.06 : 0.02);
       expect(stats.heightMm).toBeCloseTo(mesh.bbox[5], 4);
       expect(stats.grams).toBeGreaterThan(0);
       expect(stats.minutes).toBeGreaterThan(6);
     }
   });
 
-  it("les objets épais (Relief, Borne) sont comptés en coque de 0,8 mm + remplissage 15 %, la Cartouche mince est pleine", () => {
+  it("les objets épais (Montagne, Borne) sont comptés en coque de 0,8 mm + remplissage 15 %, la Cartouche mince est pleine", () => {
     const card = computeStats(CARTOUCHE_DEFAULT, DEFAULT_TEXTS.cartouche);
     expect(card.grams).toBeCloseTo(card.volumeCm3 * 1.24 + card.purgeGrams, 0);
     const tag = computeStats(BORNE_DEFAULT, DEFAULT_TEXTS.borne);
@@ -971,7 +741,7 @@ describe("Statistiques des objets plats", () => {
     }
   });
 
-  it("budgets : statistiques ≤ 2 ms à froid pour Cartouche et Borne, ≤ 5 ms pour un nouveau massif ; maillage d'affichage de la Cartouche ≤ 25 ms", () => {
+  it("budgets : statistiques ≤ 2 ms à froid pour Cartouche et Borne, ≤ 8 ms pour une nouvelle montagne ; maillage d'affichage de la Cartouche ≤ 25 ms", () => {
     const SLACK = 2; // marge ×2 contre la charge d'une CI qui lance tous les fichiers en parallèle
     let k = 0;
     const cardStats = measure(() =>
@@ -988,8 +758,8 @@ describe("Statistiques des objets plats", () => {
     );
     const massifStats = measure(() =>
       computeStats(
-        { ...RELIEF_DEFAULT, seed: 100 + (k++ % 500) },
-        DEFAULT_TEXTS.relief,
+        { ...MONTAGNE_DEFAULT, seed: 100 + (k++ % 500) },
+        DEFAULT_TEXTS.montagne,
       ),
     );
     const display = measure(() =>
@@ -1006,18 +776,18 @@ describe("Statistiques des objets plats", () => {
       ),
     );
     console.log(
-      `[perf] statistiques : cartouche ${cardStats.toFixed(3)} ms · borne ${tagStats.toFixed(3)} ms · massif neuf ${massifStats.toFixed(2)} ms ; cartouche display ${display.toFixed(1)} ms (gravure ${displayGravure.toFixed(1)} ms)`,
+      `[perf] statistiques : cartouche ${cardStats.toFixed(3)} ms · borne ${tagStats.toFixed(3)} ms · montagne neuve ${massifStats.toFixed(2)} ms ; cartouche display ${display.toFixed(1)} ms (gravure ${displayGravure.toFixed(1)} ms)`,
     );
     expect(cardStats).toBeLessThanOrEqual(2 * SLACK);
     expect(tagStats).toBeLessThanOrEqual(2 * SLACK);
-    expect(massifStats).toBeLessThanOrEqual(5 * SLACK);
+    expect(massifStats).toBeLessThanOrEqual(8 * SLACK);
     expect(display).toBeLessThanOrEqual(25 * SLACK);
     expect(displayGravure).toBeLessThanOrEqual(25 * SLACK);
   });
 });
 
 describe("Statistiques par bande (éclaté) des objets plats", () => {
-  const objects = ["cartouche", "relief", "borne"] as const;
+  const objects = ["cartouche", "montagne", "borne"] as const;
 
   it("couches contiguës de la première à la dernière, changements et masses cohérents avec computeStats", () => {
     for (const object of objects) {
@@ -1090,7 +860,7 @@ describe("Garde-fous des objets plats", () => {
     // Dans les trois objets et dans le champ saisi.
     for (const [config, field] of [
       [BORNE_DEFAULT, "text"],
-      [RELIEF_DEFAULT, "peak"],
+      [MONTAGNE_DEFAULT, "peak"],
     ] as const) {
       const p = checkPrintability(config, { [field]: "Ж" });
       expect(p.status, `${field}`).toBe("error");
@@ -1197,7 +967,7 @@ describe("Garde-fous des objets plats", () => {
   });
 
   it("les codes d'anomalie ont tous un message, et `near-vase-spirale` ne vise que le vase", () => {
-    for (const config of [CARTOUCHE_DEFAULT, RELIEF_DEFAULT, BORNE_DEFAULT]) {
+    for (const config of [CARTOUCHE_DEFAULT, MONTAGNE_DEFAULT, BORNE_DEFAULT]) {
       const p = checkPrintability(config, { name: "✦", peak: "✦", text: "✦" });
       if (p.status === "ok") continue;
       for (const issue of p.issues) {
@@ -1210,7 +980,7 @@ describe("Garde-fous des objets plats", () => {
 
 describe("Préréglages des objets plats", () => {
   it("chaque préréglage est une configuration valide et stable (bornage, schéma), imprimable avec les textes d'exemple dans les quatre langues", () => {
-    for (const object of ["cartouche", "relief", "borne"] as const) {
+    for (const object of ["cartouche", "montagne", "borne"] as const) {
       expect(PRESETS[object].length).toBeGreaterThanOrEqual(4);
       for (const { id, config } of PRESETS[object]) {
         expect(config.object).toBe(object);
@@ -1227,22 +997,22 @@ describe("Préréglages des objets plats", () => {
     }
   });
 
-  it("le premier préréglage de chaque objet est son défaut ; RELIEF_DEFAULT est le massif du brief", () => {
+  it("le premier préréglage de chaque objet est son défaut ; MONTAGNE_DEFAULT est le pic de 75 mm sur un socle rond de 90 mm", () => {
     expect(CARTOUCHE_PRESETS[0].config).toEqual(CARTOUCHE_DEFAULT);
-    expect(RELIEF_PRESETS[0].config).toEqual(RELIEF_DEFAULT);
+    expect(MONTAGNE_PRESETS[0].config).toEqual(MONTAGNE_DEFAULT);
     expect(BORNE_PRESETS[0].config).toEqual(BORNE_DEFAULT);
-    expect(RELIEF_DEFAULT).toMatchObject({
+    expect(MONTAGNE_DEFAULT).toMatchObject({
       shape: "rond",
-      size: 100,
-      base: 3,
-      relief: 3.2,
-      levels: 8,
-      seed: 1291,
-      lake: 18,
+      size: 90,
+      plinth: 5,
+      height: 75,
+      form: "pic",
+      style: "lisse",
       label: true,
+      altMode: "fictive",
     });
-    expect(RELIEF_DEFAULT.bands.map((b) => b.filament)).toEqual([
-      "bleu-leman",
+    expect(MONTAGNE_DEFAULT.bands.map((b) => b.filament)).toEqual([
+      "encre",
       "vert-lavaux",
       "gris-molasse",
       "blanc-neve",
@@ -1250,14 +1020,14 @@ describe("Préréglages des objets plats", () => {
   });
 
   it("les préréglages se distinguent : pas deux fois la même configuration", () => {
-    for (const object of ["cartouche", "relief", "borne"] as const) {
+    for (const object of ["cartouche", "montagne", "borne"] as const) {
       const all = PRESETS[object].map((p) => JSON.stringify(p.config));
       expect(new Set(all).size).toBe(all.length);
     }
   });
 
   it("aucun préréglage ne porte de texte", () => {
-    for (const object of ["cartouche", "relief", "borne"] as const) {
+    for (const object of ["cartouche", "montagne", "borne"] as const) {
       for (const { config } of PRESETS[object]) {
         expect(Object.keys(config)).not.toContain("name");
         expect(Object.keys(config)).not.toContain("text");
@@ -1270,7 +1040,7 @@ describe("Préréglages des objets plats", () => {
 describe("« Surprenez-moi » des objets plats", () => {
   const draws = [
     ["cartouche", surpriseCartouche, CARTOUCHE_PRESETS],
-    ["relief", surpriseRelief, RELIEF_PRESETS],
+    ["montagne", surpriseMontagne, MONTAGNE_PRESETS],
     ["borne", surpriseBorne, BORNE_PRESETS],
   ] as const;
 
@@ -1304,7 +1074,7 @@ describe("« Surprenez-moi » des objets plats", () => {
     }
   });
 
-  it("le texte reste lisible : plaque et encre contrastées ; le massif garde toutes ses strates", () => {
+  it("le texte reste lisible : plaque et encre contrastées ; la montagne garde un pied d'au moins 9 cm²", () => {
     for (let seed = 0; seed < 200; seed++) {
       for (const config of [surpriseCartouche(seed), surpriseBorne(seed)]) {
         const [a, b] =
@@ -1313,18 +1083,18 @@ describe("« Surprenez-moi » des objets plats", () => {
             : [(config as BorneConfig).base, (config as BorneConfig).ink];
         expect(a, `${config.object} ${seed}`).not.toBe(b);
       }
-      const relief = surpriseRelief(seed);
-      const areas = analyzeRelief(
-        layoutRelief(relief, DEFAULT_TEXTS.relief),
-      ).levelAreas;
-      expect(Math.min(...areas), `relief ${seed}`).toBeGreaterThan(5);
+      const montagne = surpriseMontagne(seed);
+      const { footMm2 } = analyzeMontagne(
+        layoutMontagne(montagne, DEFAULT_TEXTS.montagne),
+      );
+      expect(footMm2, `montagne ${seed}`).toBeGreaterThanOrEqual(900);
     }
   });
 });
 
 describe("Groupes de triangles des objets plats (une couleur par bande)", () => {
   it("les groupes recouvrent tous les index, dans l'ordre des bandes, avec des normales unitaires", () => {
-    for (const object of ["cartouche", "relief", "borne"] as const) {
+    for (const object of ["cartouche", "montagne", "borne"] as const) {
       for (const { id, config } of PRESETS[object]) {
         const texts = DEFAULT_TEXTS[object];
         const mesh = buildStudioMesh(config, texts, { lod: "display", font });
@@ -1388,7 +1158,7 @@ describe("Groupes de triangles des objets plats (une couleur par bande)", () => 
 
 describe("Export STL des objets plats", () => {
   it("84 + 50 × n octets, en-tête « Swiss3Design Studio v1 <objet> <empreinte> », déterministe, sensible au texte", () => {
-    for (const object of ["cartouche", "relief", "borne"] as const) {
+    for (const object of ["cartouche", "montagne", "borne"] as const) {
       const config = PRESETS[object][0].config;
       const texts = DEFAULT_TEXTS[object];
       const a = exportStl(config, texts, { font });

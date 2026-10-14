@@ -15,7 +15,7 @@ import type { StudioObjectId, StudioTexts } from "@/lib/studio/types";
 const OBJECTS: readonly StudioObjectId[] = [
   "lavaux",
   "cartouche",
-  "relief",
+  "montagne",
   "borne",
 ];
 

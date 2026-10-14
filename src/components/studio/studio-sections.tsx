@@ -11,9 +11,9 @@ import {
   CartoucheShape,
   LavauxPatternSection,
   LavauxShape,
+  MontagneShape,
   PlateInkSection,
   PresetsRow,
-  ReliefShape,
   SheetSection,
   TextSection,
   type Ctl,
@@ -152,8 +152,8 @@ export const StudioSections = memo(function StudioSections({
               <LavauxShape ctl={ctl} config={config} />
             ) : config.object === "cartouche" ? (
               <CartoucheShape ctl={ctl} config={config} />
-            ) : config.object === "relief" ? (
-              <ReliefShape ctl={ctl} config={config} />
+            ) : config.object === "montagne" ? (
+              <MontagneShape ctl={ctl} config={config} />
             ) : (
               <BorneShape ctl={ctl} config={config} />
             )}
@@ -164,7 +164,7 @@ export const StudioSections = memo(function StudioSections({
           <LavauxPatternSection ctl={ctl} config={config} />
         ) : null;
       case "colors":
-        return config.object === "lavaux" || config.object === "relief" ? (
+        return config.object === "lavaux" || config.object === "montagne" ? (
           <div className="flex flex-col gap-6">
             {/* Mobile : la barre altimétrique est horizontale, dans cet onglet. */}
             <AltimetricBar

@@ -10,10 +10,10 @@
       "noun": "Biglietto da visita",
       "tagline": "Il Suo biglietto da visita da 85 × 55 mm, in rilievo o inciso."
     },
-    "relief": {
-      "name": "Sottobicchiere «Relief»",
-      "noun": "Sottobicchiere",
-      "tagline": "Un sottobicchiere da 100 mm: un massiccio a strati, il Suo nome in vetta."
+    "montagne": {
+      "name": "Montagna",
+      "noun": "Montagna",
+      "tagline": "Una vera piccola montagna da appoggiare su una scrivania, fino a 12 cm, colorata per quota, con il Suo nome sul basamento."
     },
     "borne": {
       "name": "Portanome «Borne»",
@@ -63,11 +63,10 @@
     "cadre": "Cornice",
     "monogramme": "Monogramma",
     "incrustee": "Intarsiato",
+    "cime": "Picco",
     "massif": "Massiccio",
-    "lac": "Lago",
     "arete": "Cresta",
-    "glacier": "Ghiacciaio",
-    "plateau": "Altopiano",
+    "maquette": "Modello",
     "pilule": "Pillola",
     "etiquette": "Etichetta",
     "goutte": "Goccia",
@@ -88,10 +87,20 @@
     "shape": {
       "rond": "Tondo",
       "carre": "Quadrato",
+      "hexagone": "Esagono",
       "pilule": "Pillola",
       "etiquette": "Etichetta",
       "goutte": "Goccia",
       "pic": "Punta"
+    },
+    "form": {
+      "pic": "Picco",
+      "massif": "Massiccio",
+      "arete": "Cresta"
+    },
+    "style": {
+      "lisse": "Liscio",
+      "strates": "A strati"
     },
     "ring": {
       "gauche": "Sinistra",
@@ -142,20 +151,16 @@
       "textStroke": "Tratto delle lettere a {value} mm: almeno 0,8 mm con un ugello da 0,4 mm.",
       "textFit": "Il testo non sta nella dimensione minima: lo accorci.",
       "textChar": "Carattere non stampabile: {char}",
+      "tooTall": "Montagna troppo alta per la sua base: al massimo {value} mm, cioè 1,6 volte la base.",
       "nearVase": "Questa combinazione ricorda il Vase spirale di Ian (licenza senza modifiche). Riduca la torsione o il numero di nervature."
     }
-  },
-  "relief": {
-    "peak": "Pizzo {name}",
-    "summit": "{peak} · {altitude} m",
-    "fictional": "quota immaginaria"
   },
   "examples": {
     "name": "Léa Dubois",
     "role": "Architetta",
     "line1": "lea@esempio.ch",
     "line2": "+41 21 000 00 00",
-    "peak": "Léa",
+    "peak": "Pizzo Léa",
     "text": "Léa"
   }
 }

@@ -110,13 +110,18 @@ describe("outil WebMCP studio_configure (§6.13)", () => {
       base: "glacier",
       ink: "blanc-neve",
     });
-    const relief = configureFromTool({
-      object: "relief",
-      palette: ["bleu-leman", "blanc-neve"],
+    const montagne = configureFromTool({
+      object: "montagne",
+      palette: ["encre", "gris-molasse", "blanc-neve"],
     });
-    expect(
-      relief.ok && relief.config.object === "relief" && relief.config.bands,
-    ).toHaveLength(2);
+    expect(montagne.ok && montagne.config).toMatchObject({
+      object: "montagne",
+      bands: [
+        { filament: "encre", toMm: 5 },
+        { filament: "gris-molasse" },
+        { filament: "blanc-neve", toMm: 80 },
+      ],
+    });
   });
 
   it("une combinaison proche du Vase spirale est signalée non imprimable, jamais fabriquée en silence", () => {

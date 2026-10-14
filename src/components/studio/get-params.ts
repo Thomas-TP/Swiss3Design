@@ -1,20 +1,21 @@
 // Paramètres GET du formulaire sans JavaScript (brief « Strates », §6.8 et §6.12).
 //
-// Sans JavaScript, le visiteur change UN champ (la hauteur du vase, l'épaisseur
-// des strates du sous-verre) et valide : les bandes, elles, restent celles de
+// Sans JavaScript, le visiteur change UN champ (la hauteur du vase, le socle ou
+// la hauteur de la montagne) et valide : les bandes, elles, restent celles de
 // la page précédente (`bd`), et ne tombent plus sur la nouvelle hauteur. Le
 // décodeur strict refuserait la requête et la page repartirait des réglages
 // par défaut, en silence : le changement demandé serait perdu. Avec JavaScript,
 // `clampConfig` fait ce travail à chaque geste ; ici, les mêmes fonctions du
-// noyau (`normalizeBands`, `snapReliefBands`) ramènent les bandes à la forme
+// noyau (`normalizeBands`, `normalizeMontagneBands`) ramènent les bandes à la forme
 // annoncée avant le décodage. Une requête qui reste illisible donne toujours
 // les réglages par défaut et un mot (« Ce lien n'est pas lisible »).
 import {
   LAVAUX_RANGES,
-  RELIEF_RANGES,
+  MONTAGNE_RANGES,
   clampRange,
+  montagneHeightMax,
   normalizeBands,
-  snapReliefBands,
+  normalizeMontagneBands,
 } from "@/lib/studio/ranges";
 import type { Band, FilamentId, StudioObjectId } from "@/lib/studio/types";
 
@@ -51,7 +52,7 @@ function formatBands(bands: readonly Band[]): string {
 
 /**
  * Ramène `bd` à la géométrie annoncée par le reste de la requête (hauteur du
- * vase, strates du sous-verre). Sans `bd`, ou avec une valeur illisible, ou
+ * vase, socle et hauteur de la montagne). Sans `bd`, ou avec une valeur illisible, ou
  * pour les objets sans bandes : la requête est rendue telle quelle.
  */
 export function adaptBandsParam(object: StudioObjectId, query: Query): Query {
@@ -65,19 +66,22 @@ export function adaptBandsParam(object: StudioObjectId, query: Query): Query {
     const next = normalizeBands(bands, clampRange(h, LAVAUX_RANGES.h));
     return { ...query, bd: formatBands(next) };
   }
-  if (object === "relief") {
-    const base = numberOf(query.ba);
-    const relief = numberOf(query.re);
-    const levels = numberOf(query.lv);
-    if (base === null || relief === null || levels === null) return query;
-    const R = RELIEF_RANGES;
-    const next = snapReliefBands(
-      bands,
-      clampRange(base, R.base),
-      clampRange(relief, R.relief),
-      Math.round(clampRange(levels, R.levels)),
+  if (object === "montagne") {
+    const size = numberOf(query.s);
+    const plinth = numberOf(query.pl);
+    const height = numberOf(query.h);
+    if (plinth === null || height === null) return query;
+    const R = MONTAGNE_RANGES;
+    // La hauteur est bornée par la base (1,6 ×) comme le fera `clampConfig`.
+    const wide = size === null ? R.size.default : clampRange(size, R.size);
+    const plinthMm = clampRange(plinth, R.plinth);
+    const heightMm = Math.min(
+      clampRange(height, R.height),
+      montagneHeightMax(wide),
     );
-    return { ...query, bd: formatBands(next) };
+    const next = normalizeMontagneBands(bands, plinthMm, heightMm);
+    // `h` suit : le schéma compare la dernière bande à socle + hauteur.
+    return { ...query, h: String(heightMm), bd: formatBands(next) };
   }
   return query;
 }

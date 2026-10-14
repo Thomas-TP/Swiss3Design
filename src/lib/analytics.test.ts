@@ -69,7 +69,9 @@ describe("sanitizeUrl", () => {
     expect(
       sanitizeUrl("https://swiss3design.ch/fr/studio/lavaux#c=v1.eyJoIjoxNTB9"),
     ).toBe("https://swiss3design.ch/fr/studio/lavaux");
-    expect(sanitizeUrl("/de/studio/relief#c=v1.e30")).toBe("/de/studio/relief");
+    expect(sanitizeUrl("/de/studio/montagne#c=v1.e30")).toBe(
+      "/de/studio/montagne",
+    );
     expect(sanitizeUrl("/fr/studio/borne#vue=plan&c=v1.e30")).toBe(
       "/fr/studio/borne",
     );

@@ -1,7 +1,7 @@
 // Protocole du Worker de géométrie du Studio (brief « Strates », §6.11). Types
 // seulement : lus par le Worker, par son client (worker-client.ts), par la scène
 // `studio-object` et par le moteur (engine.tsx). Ajouts au brief, permis : la
-// langue (étiquette du sous-verre), `separate` (éclaté), le palier d'affichage,
+// langue (étiquette de la Montagne), `separate` (éclaté), le palier d'affichage,
 // les hauteurs de bandes renvoyées avec le maillage (la scène colore sans
 // embarquer les générateurs de texte) et le message d'état des glyphes.
 import type { StudioLocale } from "@/components/studio/scene-props";

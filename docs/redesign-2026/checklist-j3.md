@@ -135,18 +135,18 @@ Cochez chaque ligne ; notez l'URL et le navigateur si quelque chose cloche.
 
 ### 3.2 Fumée (cinq minutes, navigateur privé, hors admin)
 
-| URL                                                                                                | Attendu                                                             |
-| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
-| `https://swiss3design.ch/` → `/fr`                                                                 | redirige vers la langue du navigateur, héros affiché, pas de 5xx    |
-| `/fr`, `/de`, `/it`, `/en`                                                                         | 200, un seul `h1`, texte lisible                                    |
-| `/fr/shop`, `/fr/products/vase-spirale`                                                            | produit, prix en CHF, ajout au panier, vue 3D                       |
-| `/fr/studio`, `/fr/studio/lavaux`, `/fr/studio/cartouche`, `/fr/studio/relief`, `/fr/studio/borne` | objet réglable, estimation en grammes et durée, aucun CHF           |
-| `/fr/custom`, `/fr/a-propos`, `/fr/contact`, `/fr/legal/terms`                                     | 200                                                                 |
-| `/fr/n-importe-quoi`                                                                               | 404 habillée, statut 404                                            |
-| `/fr/cart`, `/fr/checkout` (avec un article au panier)                                             | le formulaire Stripe en mode **live** s'affiche (ne rien payer ici) |
-| `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/manifest.webmanifest`                                | 200                                                                 |
-| `/mcp`, `/.well-known/ucp`, `/.well-known/acp.json` (surfaces agents)                              | 200 comme avant                                                     |
-| En-têtes d'une page (`curl -sI https://swiss3design.ch/fr`)                                        | `content-security-policy` avec un `nonce-`, HSTS, `x-frame-options` |
+| URL                                                                                                  | Attendu                                                             |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| `https://swiss3design.ch/` → `/fr`                                                                   | redirige vers la langue du navigateur, héros affiché, pas de 5xx    |
+| `/fr`, `/de`, `/it`, `/en`                                                                           | 200, un seul `h1`, texte lisible                                    |
+| `/fr/shop`, `/fr/products/vase-spirale`                                                              | produit, prix en CHF, ajout au panier, vue 3D                       |
+| `/fr/studio`, `/fr/studio/lavaux`, `/fr/studio/cartouche`, `/fr/studio/montagne`, `/fr/studio/borne` | objet réglable, estimation en grammes et durée, aucun CHF           |
+| `/fr/custom`, `/fr/a-propos`, `/fr/contact`, `/fr/legal/terms`                                       | 200                                                                 |
+| `/fr/n-importe-quoi`                                                                                 | 404 habillée, statut 404                                            |
+| `/fr/cart`, `/fr/checkout` (avec un article au panier)                                               | le formulaire Stripe en mode **live** s'affiche (ne rien payer ici) |
+| `/sitemap.xml`, `/robots.txt`, `/llms.txt`, `/manifest.webmanifest`                                  | 200                                                                 |
+| `/mcp`, `/.well-known/ucp`, `/.well-known/acp.json` (surfaces agents)                                | 200 comme avant                                                     |
+| En-têtes d'une page (`curl -sI https://swiss3design.ch/fr`)                                          | `content-security-policy` avec un `nonce-`, HSTS, `x-frame-options` |
 
 Console du navigateur sur `/fr` et le Studio : 0 violation CSP (la règle d'or 4 : le nonce ne se voit
 qu'en production).
@@ -184,7 +184,7 @@ Testez dans une fenêtre privée où vous n'êtes jamais allé dans l'admin, et 
 - [ ] Vérifier que les **quatre actions** comptent bien ces événements (elles reposent sur des noms
       d'événements, pas sur des sélecteurs : le nouveau DOM ne les casse pas).
 - [ ] Aucune propriété ni URL ne contient de texte saisi (un nom, une adresse) : ouvrir un `Studio Sent` et un
-      `$pageview` de `/studio/relief`.
+      `$pageview` de `/studio/montagne`.
 - [ ] Web vitals : LCP, INP et CLS de `/fr` (budgets du brief §4.11 : LCP ≤ 2,0 s, INP ≤ 150 ms, CLS ≤ 0,05).
 - [ ] Trois replays (accueil, Studio, boutique) : poids raisonnable, textes saisis masqués (champs et
       `.ph-mask`), compteurs décoratifs absents (`ph-no-capture`).

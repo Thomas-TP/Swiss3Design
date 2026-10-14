@@ -1,99 +1,75 @@
-// Opérations sur les bandes du SOUS-VERRE (brief « Strates », §6.4 : « pour
-// Relief, [les bandes] se calent sur les sommets de strates »). Le vase a les
-// siennes dans src/lib/studio/bands.ts (0,2 mm, 2 mm minimum) ; ici une frontière
-// ne peut tomber que sur un sommet de strate (`strataTops`), strictement entre
-// ses voisines. Pures et testées (band-ops.test.ts) : la barre altimétrique ne
-// fait que les appeler.
+// Opérations sur les bandes de la MONTAGNE (brief « Strates », §6.4). Le vase a
+// les siennes dans src/lib/studio/bands.ts (0,2 mm, 2 mm minimum, toutes les
+// bandes libres) ; la montagne en diffère sur un point : sa PREMIÈRE bande est le
+// socle, et sa frontière est le dessus du socle, qui ne bouge pas (c'est elle
+// qui fait ressortir l'étiquette posée dessus, et le socle a sa propre teinte).
+// Les autres frontières (de 2 à 4 bandes en tout) se déplacent à la couche près,
+// 2 mm d'épaisseur au moins. Pures et testées (band-ops.test.ts) : la barre
+// altimétrique ne fait que les appeler.
 import { FILAMENT_IDS } from "@/lib/studio/filaments";
-import {
-  MAX_BANDS,
-  snapReliefBands,
-  strataThickness,
-  strataTops,
-} from "@/lib/studio/ranges";
-import type { Band, FilamentId, ReliefConfig } from "@/lib/studio/types";
+import { MAX_BANDS, MIN_BAND_MM, quantizeMm } from "@/lib/studio/ranges";
+import { moveBoundary, removeBand } from "@/lib/studio/bands";
+import type { Band, FilamentId } from "@/lib/studio/types";
 
-export const MIN_RELIEF_BANDS = 2;
+export const MIN_MONTAGNE_BANDS = 2;
+/** Nombre de frontières du bas qui ne se déplacent pas : le dessus du socle. */
+export const LOCKED_BOUNDARIES = 1;
 
-type Geometry = Pick<ReliefConfig, "base" | "relief" | "levels">;
+/** Cran d'une flèche du clavier (mm) : une couche. */
+export const MONTAGNE_STEP_MM = 0.2;
 
-/** Indice de strate (0 = le socle) du sommet le plus proche de `z`. */
-function strataIndex(tops: readonly number[], z: number): number {
-  let best = 0;
-  for (let k = 1; k < tops.length; k++) {
-    if (Math.abs(tops[k] - z) < Math.abs(tops[best] - z)) best = k;
-  }
-  return best;
-}
-
-/** Cran d'une flèche du clavier pour ce sous-verre (mm) : une strate. */
-export function reliefStep(g: Geometry): number {
-  return strataThickness(g.levels, g.relief);
-}
+const copy = (bands: readonly Band[]): Band[] => bands.map((b) => ({ ...b }));
 
 /**
- * Déplace la frontière haute de la bande `index` vers `rawMm` : ramenée au
- * sommet de strate le plus proche, sans dépasser ses voisines (la bande d'en
- * dessous garde une strate au moins, celle d'au-dessus aussi).
+ * Déplace la frontière haute de la bande `index` vers `rawMm` : jamais celle
+ * du socle (la bande 0), à la couche près, à 2 mm au moins de ses voisines.
  */
-export function moveReliefBoundary(
+export function moveMontagneBoundary(
   bands: readonly Band[],
   index: number,
   rawMm: number,
-  g: Geometry,
 ): Band[] {
-  if (index < 0 || index >= bands.length - 1)
-    return bands.map((b) => ({ ...b }));
-  const tops = strataTops(g.base, g.relief, g.levels);
-  const floor = index === 0 ? 0 : strataIndex(tops, bands[index - 1].toMm) + 1;
-  const ceiling = strataIndex(tops, bands[index + 1].toMm) - 1;
-  const wanted = strataIndex(tops, rawMm);
-  const k = Math.min(Math.max(wanted, floor), Math.max(floor, ceiling));
-  return bands.map((b, i) =>
-    i === index ? { ...b, toMm: tops[k] } : { ...b },
-  );
+  if (index < LOCKED_BOUNDARIES || index >= bands.length - 1)
+    return copy(bands);
+  return moveBoundary(bands, index, rawMm);
 }
 
-export function canAddReliefBand(bands: readonly Band[], g: Geometry): boolean {
+/** Vrai s'il reste de la place pour une bande de plus dans la montagne (une bande de 4 mm au moins à couper). */
+export function canAddMontagneBand(bands: readonly Band[]): boolean {
   if (bands.length >= MAX_BANDS) return false;
-  const tops = strataTops(g.base, g.relief, g.levels);
-  let from = -1;
-  return bands.some((band, i) => {
-    const to = i === bands.length - 1 ? g.levels : strataIndex(tops, band.toMm);
-    const room = to - from >= 2;
-    from = to;
-    return room;
-  });
+  return bands.some(
+    (band, k) =>
+      k >= 1 && band.toMm - bands[k - 1].toMm >= 2 * MIN_BAND_MM - 1e-9,
+  );
 }
 
 /**
- * Coupe en deux la bande la plus épaisse (en strates ; la plus basse en cas
- * d'égalité) : la moitié basse garde son filament, la moitié haute prend le
- * premier filament différent de ses voisines.
+ * Coupe en deux la bande la plus épaisse de la MONTAGNE (la plus basse en cas
+ * d'égalité ; jamais le socle) : la moitié basse garde son filament, la moitié
+ * haute prend `filament`, ou à défaut le premier filament différent de ses
+ * deux voisines.
  */
-export function addReliefBand(
+export function addMontagneBand(
   bands: readonly Band[],
-  g: Geometry,
   filament?: FilamentId,
 ): Band[] {
-  if (!canAddReliefBand(bands, g)) return bands.map((b) => ({ ...b }));
-  const tops = strataTops(g.base, g.relief, g.levels);
-  const ends = bands.map((band, i) =>
-    i === bands.length - 1 ? g.levels : strataIndex(tops, band.toMm),
-  );
+  if (!canAddMontagneBand(bands)) return copy(bands);
   let target = -1;
-  let widest = 1;
-  let from = -1;
-  ends.forEach((end, i) => {
-    const size = end - from;
-    if (size > widest) {
-      widest = size;
-      target = i;
+  let widest = -1;
+  bands.forEach((band, k) => {
+    if (k < 1) return;
+    const thickness = band.toMm - bands[k - 1].toMm;
+    if (thickness >= 2 * MIN_BAND_MM - 1e-9 && thickness > widest + 1e-9) {
+      widest = thickness;
+      target = k;
     }
-    from = end;
   });
-  const start = target === 0 ? -1 : ends[target - 1];
-  const mid = start + Math.floor((ends[target] - start) / 2);
+  const from = bands[target - 1].toMm;
+  const to = bands[target].toMm;
+  const mid = Math.min(
+    Math.max(quantizeMm(from + (to - from) / 2), from + MIN_BAND_MM),
+    to - MIN_BAND_MM,
+  );
   const below = bands[target].filament;
   const above = bands[target + 1]?.filament;
   const chosen =
@@ -101,33 +77,37 @@ export function addReliefBand(
     FILAMENT_IDS.find((id) => id !== below && id !== above) ??
     FILAMENT_IDS[0];
   const out: Band[] = [];
-  bands.forEach((band, i) => {
-    if (i === target) {
-      out.push(
-        { filament: below, toMm: tops[Math.max(mid, 0)] },
-        { filament: chosen, toMm: band.toMm },
-      );
+  bands.forEach((band, k) => {
+    if (k === target) {
+      out.push({ filament: below, toMm: mid }, { filament: chosen, toMm: to });
     } else out.push({ ...band });
   });
-  return snapReliefBands(out, g.base, g.relief, g.levels);
+  return out;
 }
 
-export function canRemoveReliefBand(bands: readonly Band[]): boolean {
-  return bands.length > MIN_RELIEF_BANDS;
-}
-
-/** Retire la bande `index` : celle du dessous absorbe son épaisseur (la première : celle du dessus descend). */
-export function removeReliefBand(
+/** Une bande de la montagne se retire s'il en reste au moins deux après (le socle ne se retire pas). */
+export function canRemoveMontagneBand(
   bands: readonly Band[],
   index: number,
-  g: Geometry,
+): boolean {
+  return (
+    bands.length > MIN_MONTAGNE_BANDS &&
+    index >= LOCKED_BOUNDARIES &&
+    index < bands.length
+  );
+}
+
+/**
+ * Retire la bande `index` de la montagne. Celle du DESSUS absorbe son épaisseur
+ * (elle descend jusqu'à la bande du dessous), sauf pour la dernière, dont la
+ * voisine du dessous monte jusqu'au sommet : la frontière du socle, elle, ne
+ * bouge jamais (le `removeBand` du vase ferait absorber la bande 1 par le socle).
+ */
+export function removeMontagneBand(
+  bands: readonly Band[],
+  index: number,
 ): Band[] {
-  if (!canRemoveReliefBand(bands) || index < 0 || index >= bands.length)
-    return bands.map((b) => ({ ...b }));
-  if (index === 0)
-    return snapReliefBands(bands.slice(1), g.base, g.relief, g.levels);
-  const out = bands.map((b) => ({ ...b }));
-  out[index - 1].toMm = bands[index].toMm;
-  out.splice(index, 1);
-  return snapReliefBands(out, g.base, g.relief, g.levels);
+  if (!canRemoveMontagneBand(bands, index)) return copy(bands);
+  if (index === bands.length - 1) return removeBand(bands, index);
+  return bands.filter((_, k) => k !== index).map((b) => ({ ...b }));
 }

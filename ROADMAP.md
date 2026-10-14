@@ -184,8 +184,8 @@ checklist de mise en ligne : [`docs/redesign-2026/checklist-j3.md`](docs/redesig
   direct), bascule en plan, sept chapitres, trois entrées (Personnaliser,
   Acheter, J'ai un fichier).
 - ✅ **Studio** (`/studio`) : configurateur 3D de quatre objets originaux
-  générés en code (vase « Lavaux », carte « Cartouche », sous-verre « Relief »,
-  porte-nom « Borne »), garde-fous d'imprimabilité, grammes / durée /
+  générés en code (vase « Lavaux », carte « Cartouche », « Montagne » de bureau
+  jusqu'à 12 cm, porte-nom « Borne »), garde-fous d'imprimabilité, grammes / durée /
   changements de filament, export STL dans un Worker, envoi à l'atelier par la
   même Server Action de devis que `/custom` (formulaire partagé).
 - ✅ **Boutique, fiches produit, Atelier, contact, sur mesure, compte, tunnel de

@@ -3,17 +3,18 @@
 // « Surprenez-moi »). Les textes d'exemple (« Léa Dubois », …) ne vivent PAS
 // ici : ils sont des StudioTexts, jamais dans une configuration ni dans l'URL.
 //
-// WP-02 complète ce fichier pour Cartouche, Relief et Borne : préréglages de
-// chaque objet (`CARTOUCHE_PRESETS`, `RELIEF_PRESETS`, `BORNE_PRESETS`) et
-// `RELIEF_DEFAULT` définitif (graine 1291, 8 strates, lac 18 %).
+// WP-02 complète ce fichier pour Cartouche, Montagne et Borne : préréglages de
+// chaque objet (`CARTOUCHE_PRESETS`, `MONTAGNE_PRESETS`, `BORNE_PRESETS`) et
+// `MONTAGNE_DEFAULT` (le pic de 75 mm sur un socle rond de 90 mm).
 import { between, intBetween, mulberry32, pick, type Rng } from "./kernel/rng";
 import { checkLavaux, checkPrintability, nearVaseSpirale } from "./guards";
-import { analyzeRelief, layoutRelief } from "./objects/relief-model";
+import { analyzeMontagne, layoutMontagne } from "./objects/montagne-model";
 import {
   clampBorne,
   clampCartouche,
-  clampRelief,
+  clampMontagne,
   gradinsDepthMax,
+  montagneHeightMax,
   quantizeMm,
 } from "./ranges";
 import { DEFAULT_TEXTS } from "./text/fields";
@@ -24,7 +25,7 @@ import type {
   FilamentId,
   LavauxConfig,
   LavauxPattern,
-  ReliefConfig,
+  MontagneConfig,
   StudioConfig,
   StudioObjectId,
 } from "./types";
@@ -125,26 +126,55 @@ export const CARTOUCHE_DEFAULT: CartoucheConfig = {
 };
 
 /**
- * Sous-verre : épaisseur de strate Δ = max(0,4 ; round(relief / strates / 0,2) × 0,2) ;
- * chaque bande monte jusqu'à un sommet de strate, la première (lac) couvre le socle.
- * Valeurs par défaut (8 strates de 0,4 mm sur un socle de 3 mm).
+ * Bandes d'une Montagne à partir de ses filaments, du bas (le socle) vers le
+ * haut : la première finit au dessus du socle, les autres se répartissent sur la
+ * hauteur de la montagne (40 % et 75 % à quatre teintes : prairie, roche,
+ * neige ; 55 % à trois), la dernière au sommet.
  */
-export const RELIEF_DEFAULT: ReliefConfig = {
-  object: "relief",
+export function montagneBands(
+  filaments: readonly FilamentId[],
+  plinth: number,
+  height: number,
+): Band[] {
+  const total = quantizeMm(plinth + height);
+  const fractions =
+    filaments.length <= 2 ? [] : filaments.length === 3 ? [0.55] : [0.4, 0.75];
+  return filaments.slice(0, 4).map((filament, k, list) => ({
+    filament,
+    toMm:
+      k === 0
+        ? plinth
+        : k === list.length - 1
+          ? total
+          : quantizeMm(plinth + height * fractions[k - 1]),
+  }));
+}
+
+/**
+ * Montagne : un pic de 75 mm sur un socle rond de 90 mm (5 mm), lissé, avec son
+ * étiquette à altitude fictive. Quatre couleurs par altitude : socle encre,
+ * prairie vert Lavaux jusqu'à 40 % de la montagne, roche gris molasse jusqu'à
+ * 75 %, neige blanc névé.
+ */
+export const MONTAGNE_DEFAULT: MontagneConfig = {
+  object: "montagne",
   shape: "rond",
-  size: 100,
-  base: 3,
-  relief: 3.2,
-  levels: 8,
-  seed: 1291,
-  lake: 18,
-  bands: [
-    { filament: "bleu-leman", toMm: 3 },
-    { filament: "vert-lavaux", toMm: 4.2 },
-    { filament: "gris-molasse", toMm: 5.4 },
-    { filament: "blanc-neve", toMm: 6.2 },
-  ],
+  size: 90,
+  plinth: 5,
+  height: 75,
+  form: "pic",
+  steep: 0.55,
+  seed: 2204,
+  style: "lisse",
+  levels: 24,
+  bands: montagneBands(
+    ["encre", "vert-lavaux", "gris-molasse", "blanc-neve"],
+    5,
+    75,
+  ),
   label: true,
+  altMode: "fictive",
+  altitude: 4000,
 };
 
 export const BORNE_DEFAULT: BorneConfig = {
@@ -162,7 +192,7 @@ export const BORNE_DEFAULT: BorneConfig = {
 export const DEFAULT_CONFIGS: { [K in StudioObjectId]: StudioConfig } = {
   lavaux: LAVAUX_DEFAULT,
   cartouche: CARTOUCHE_DEFAULT,
-  relief: RELIEF_DEFAULT,
+  montagne: MONTAGNE_DEFAULT,
   borne: BORNE_DEFAULT,
 };
 
@@ -267,9 +297,9 @@ export const LAVAUX_PRESETS: readonly LavauxPreset[] = [
 //
 // Un préréglage est une configuration complète, sans texte (les textes ne sont
 // jamais dans une configuration) ; son nom est `studioCore.presets.<id>`. Les
-// identifiants sont uniques sur les quatre objets (test). Les bandes du
-// sous-verre sont calées sur les sommets de strates : `snapReliefBands` ne les
-// modifie pas (test de point fixe).
+// identifiants sont uniques sur les quatre objets (test). Les bandes de la
+// Montagne respectent ses règles (la première finit au dessus du socle) :
+// `clampMontagne` ne les modifie pas (test de point fixe).
 
 export interface ObjectPreset<C extends StudioConfig> {
   /** Clé de traduction : studioCore.presets.<id>. */
@@ -333,82 +363,57 @@ export const CARTOUCHE_PRESETS: readonly ObjectPreset<CartoucheConfig>[] = [
   },
 ];
 
-export const RELIEF_PRESETS: readonly ObjectPreset<ReliefConfig>[] = [
-  { id: "massif", config: RELIEF_DEFAULT },
+/**
+ * Préréglages de la Montagne : les trois formes (un pic, un massif, une arête) et
+ * une maquette en strates, chacune avec ses teintes et sa base. Les identifiants
+ * sont ceux de `studioCore.presets` : « cime » (la forme « Pic »), « massif »,
+ * « arete », « maquette ».
+ */
+export const MONTAGNE_PRESETS: readonly ObjectPreset<MontagneConfig>[] = [
+  { id: "cime", config: MONTAGNE_DEFAULT },
   {
-    id: "lac",
+    id: "massif",
     config: {
-      object: "relief",
-      shape: "rond",
+      ...MONTAGNE_DEFAULT,
       size: 100,
-      base: 3,
-      relief: 2.4,
-      levels: 6,
-      seed: 1048,
-      lake: 36,
-      bands: [
-        { filament: "bleu-leman", toMm: 3 },
-        { filament: "vert-lavaux", toMm: 4.2 },
-        { filament: "blanc-neve", toMm: 5.4 },
-      ],
-      label: true,
+      height: 66,
+      form: "massif",
+      steep: 0.5,
+      seed: 3187,
+      bands: montagneBands(
+        ["encre", "vert-lavaux", "gris-molasse", "blanc-neve"],
+        5,
+        66,
+      ),
     },
   },
   {
     id: "arete",
     config: {
-      object: "relief",
+      ...MONTAGNE_DEFAULT,
       shape: "carre",
-      size: 100,
-      base: 3.4,
-      relief: 4,
-      levels: 12,
-      seed: 3655,
-      lake: 12,
-      bands: [
-        { filament: "encre", toMm: 5 },
-        { filament: "gris-molasse", toMm: 7 },
-        { filament: "blanc-neve", toMm: 8.2 },
-      ],
-      label: true,
+      size: 110,
+      height: 56,
+      form: "arete",
+      steep: 0.6,
+      seed: 905,
+      bands: montagneBands(["encre", "gris-molasse", "blanc-neve"], 5, 56),
     },
   },
   {
-    id: "glacier",
+    id: "maquette",
     config: {
-      object: "relief",
-      shape: "carre",
+      ...MONTAGNE_DEFAULT,
+      shape: "hexagone",
       size: 100,
-      base: 3,
-      relief: 3.2,
-      levels: 8,
-      seed: 3892,
-      lake: 8,
-      bands: [
-        { filament: "glacier", toMm: 3.8 },
-        { filament: "gris-molasse", toMm: 5.4 },
-        { filament: "blanc-neve", toMm: 6.2 },
-      ],
-      label: true,
-    },
-  },
-  {
-    id: "plateau",
-    config: {
-      object: "relief",
-      shape: "rond",
-      size: 100,
-      base: 2.4,
-      relief: 1.6,
-      levels: 4,
-      seed: 2470,
-      lake: 24,
-      bands: [
-        { filament: "vert-lavaux", toMm: 2.8 },
-        { filament: "ambre", toMm: 3.6 },
-        { filament: "blanc-neve", toMm: 4 },
-      ],
-      label: true,
+      plinth: 6,
+      height: 60,
+      form: "massif",
+      steep: 0.45,
+      seed: 1771,
+      style: "strates",
+      levels: 20,
+      bands: montagneBands(["gris-molasse", "glacier", "blanc-neve"], 6, 60),
     },
   },
 ];
@@ -481,7 +486,7 @@ export const PRESETS: {
 } = {
   lavaux: LAVAUX_PRESETS.map((p) => ({ id: p.id, config: p.config })),
   cartouche: CARTOUCHE_PRESETS,
-  relief: RELIEF_PRESETS,
+  montagne: MONTAGNE_PRESETS,
   borne: BORNE_PRESETS,
 };
 
@@ -655,57 +660,57 @@ export function surpriseCartouche(seed: number): CartoucheConfig {
   return structuredClone(pick(rng, CARTOUCHE_PRESETS).config);
 }
 
-/** Palettes du sous-verre : lac, prairie, roche, neige (2 à 4 bandes, du bas vers le haut). */
-const RELIEF_PALETTES: readonly (readonly FilamentId[])[] = [
-  ["bleu-leman", "vert-lavaux", "gris-molasse", "blanc-neve"],
-  ["bleu-leman", "vert-lavaux", "blanc-neve"],
-  ["glacier", "gris-molasse", "blanc-neve"],
-  ["vert-lavaux", "ambre", "blanc-neve"],
+/** Palettes de la Montagne : socle, puis prairie ou eau, roche, neige (2 à 4 teintes, du bas vers le haut). */
+const MONTAGNE_PALETTES: readonly (readonly FilamentId[])[] = [
+  ["encre", "vert-lavaux", "gris-molasse", "blanc-neve"],
+  ["encre", "vert-lavaux", "blanc-neve"],
+  ["gris-molasse", "glacier", "blanc-neve"],
   ["encre", "gris-molasse", "blanc-neve"],
-  ["bleu-leman", "glacier", "blanc-neve"],
-  ["rouge-signal", "ambre", "blanc-neve"],
+  ["encre", "ambre", "gris-molasse", "blanc-neve"],
+  ["bleu-leman", "vert-lavaux", "gris-molasse", "blanc-neve"],
+  ["rouge-signal", "gris-molasse", "blanc-neve"],
 ];
 
-/** Massif au hasard : graine, forme, relief, strates, lac, palette, bandes calées sur les strates. */
-export function surpriseRelief(seed: number): ReliefConfig {
+/**
+ * Montagne au hasard : socle, base, forme, raideur, hauteur (sous 1,6 × la base),
+ * graine, style, palette ; garde-fous vérifiés avec le texte d'exemple (10
+ * essais), un préréglage sûr à défaut.
+ */
+export function surpriseMontagne(seed: number): MontagneConfig {
   const rng = mulberry32(seed);
   for (let attempt = 0; attempt < 10; attempt++) {
-    const palette = pick(rng, RELIEF_PALETTES);
-    const base = pick(rng, [2.6, 3, 3.4] as const);
-    const relief = pick(rng, [2.4, 2.8, 3.2, 3.6, 4] as const);
-    const levels = intBetween(rng, 6, 10);
-    // Frontières à peu près également réparties sur la hauteur ; `clampRelief` les cale sur les strates.
-    const bands: Band[] = palette.map((filament, k) => ({
-      filament,
-      toMm:
-        k === palette.length - 1
-          ? base + relief
-          : base + (relief * (k + 0.6)) / palette.length,
-    }));
-    const config = clampRelief({
-      object: "relief",
-      shape: pick(rng, ["rond", "rond", "carre"] as const),
-      size: 100,
-      base,
-      relief,
-      levels,
+    const palette = pick(rng, MONTAGNE_PALETTES);
+    const size = intBetween(rng, 80, 118);
+    const plinth = pick(rng, [4.4, 5, 5.6, 6.2] as const);
+    const height = intBetween(rng, 45, Math.min(100, montagneHeightMax(size)));
+    const config = clampMontagne({
+      object: "montagne",
+      shape: pick(rng, ["rond", "rond", "carre", "hexagone"] as const),
+      size,
+      plinth,
+      height,
+      form: pick(rng, ["pic", "massif", "arete"] as const),
+      steep: Math.round(between(rng, 0.3, 0.8) * 100) / 100,
       seed: intBetween(rng, 0, 9999),
-      lake: intBetween(rng, 10, 30),
-      bands,
+      style: pick(rng, ["lisse", "lisse", "lisse", "strates"] as const),
+      levels: intBetween(rng, 12, 30),
+      bands: montagneBands(palette, plinth, height),
       label: true,
+      altMode: "fictive",
+      altitude: MONTAGNE_DEFAULT.altitude,
     });
-    // Un massif dont une strate disparaît (sommet trop pointu) n'est pas « beau ».
-    const areas = analyzeRelief(
-      layoutRelief(config, DEFAULT_TEXTS.relief),
-    ).levelAreas;
+    // Une montagne dont le pied est minuscule n'est pas « belle ».
+    const analysis = analyzeMontagne(
+      layoutMontagne(config, DEFAULT_TEXTS.montagne),
+    );
     if (
-      Math.min(...areas) >= 5 &&
-      checkPrintability(config, DEFAULT_TEXTS.relief).status === "ok"
+      analysis.footMm2 >= 900 &&
+      checkPrintability(config, DEFAULT_TEXTS.montagne).status === "ok"
     ) {
       return config;
     }
   }
-  return structuredClone(pick(rng, RELIEF_PRESETS).config);
+  return structuredClone(pick(rng, MONTAGNE_PRESETS).config);
 }
 
 /** Porte-nom au hasard : forme, taille, anneau, mode, couleurs contrastées. */

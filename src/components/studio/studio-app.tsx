@@ -36,7 +36,7 @@ import {
   surpriseBorne,
   surpriseCartouche,
   surpriseLavaux,
-  surpriseRelief,
+  surpriseMontagne,
 } from "@/lib/studio/presets";
 import { configFragment, machineLine } from "@/lib/studio/url-state";
 import type { TextField } from "@/lib/studio/text/fields";
@@ -102,8 +102,8 @@ function surprise(object: StudioObjectId, seed: number): StudioConfig {
       return surpriseLavaux(seed);
     case "cartouche":
       return surpriseCartouche(seed);
-    case "relief":
-      return surpriseRelief(seed);
+    case "montagne":
+      return surpriseMontagne(seed);
     case "borne":
       return surpriseBorne(seed);
   }
@@ -494,7 +494,7 @@ export function StudioApp({
   );
   const bandBar = useMemo(
     () =>
-      config.object === "lavaux" || config.object === "relief" ? (
+      config.object === "lavaux" || config.object === "montagne" ? (
         <AltimetricBar
           ctl={ctl}
           config={config}

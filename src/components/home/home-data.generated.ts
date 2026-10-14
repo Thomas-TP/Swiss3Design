@@ -1488,81 +1488,85 @@ export const HOME_DATA: HomeData = {
   },
   summit: {
     fr: {
-      label: "POINTE LÉA · 2 566 M",
+      label: "POINTE LÉA · 3 667 M",
       stats: {
-        widthMm: 100,
-        depthMm: 100,
-        heightMm: 6.2,
-        grams: 22.9,
-        minutes: 47,
+        widthMm: 90,
+        depthMm: 90,
+        heightMm: 80,
+        grams: 37.6,
+        minutes: 81,
         changes: 3,
       },
     },
     de: {
-      label: "PIZ LÉA · 2’566 M",
+      label: "PIZ LÉA · 4’295 M",
       stats: {
-        widthMm: 100,
-        depthMm: 100,
-        heightMm: 6.2,
-        grams: 22.9,
-        minutes: 47,
+        widthMm: 90,
+        depthMm: 90,
+        heightMm: 80,
+        grams: 37.5,
+        minutes: 80,
         changes: 3,
       },
     },
     it: {
-      label: "PIZZO LÉA · 2’566 M",
+      label: "PIZZO LÉA · 2’962 M",
       stats: {
-        widthMm: 100,
-        depthMm: 100,
-        heightMm: 6.2,
-        grams: 22.9,
-        minutes: 47,
+        widthMm: 90,
+        depthMm: 90,
+        heightMm: 80,
+        grams: 37.5,
+        minutes: 81,
         changes: 3,
       },
     },
     en: {
-      label: "MOUNT LÉA · 2’566 M",
+      label: "MOUNT LÉA · 2’705 M",
       stats: {
-        widthMm: 100,
-        depthMm: 100,
-        heightMm: 6.2,
-        grams: 22.9,
-        minutes: 47,
+        widthMm: 90,
+        depthMm: 90,
+        heightMm: 80,
+        grams: 37.6,
+        minutes: 81,
         changes: 3,
       },
     },
   },
-  reliefConfig: {
-    object: "relief",
+  montagneConfig: {
+    object: "montagne",
     shape: "rond",
-    size: 100,
-    base: 3,
-    relief: 3.2,
-    levels: 8,
-    seed: 1291,
-    lake: 18,
+    size: 90,
+    plinth: 5,
+    height: 75,
+    form: "pic",
+    steep: 0.55,
+    seed: 2204,
+    style: "lisse",
+    levels: 24,
     bands: [
       {
-        filament: "bleu-leman",
-        toMm: 3,
+        filament: "encre",
+        toMm: 5,
       },
       {
         filament: "vert-lavaux",
-        toMm: 4.2,
+        toMm: 35,
       },
       {
         filament: "gris-molasse",
-        toMm: 5.4,
+        toMm: 61.2,
       },
       {
         filament: "blanc-neve",
-        toMm: 6.2,
+        toMm: 80,
       },
     ],
     label: true,
+    altMode: "fictive",
+    altitude: 4000,
   },
-  reliefHref:
-    "/studio/relief#c=v1.eyJzaCI6InJvbmQiLCJzIjoxMDAsImJhIjozLCJyZSI6My4yLCJsdiI6OCwic2QiOjEyOTEsImxrIjoxOCwiYmQiOltbImJsZXUtbGVtYW4iLDNdLFsidmVydC1sYXZhdXgiLDQuMl0sWyJncmlzLW1vbGFzc2UiLDUuNF0sWyJibGFuYy1uZXZlIiw2LjJdXSwibGIiOjF9",
+  montagneHref:
+    "/studio/montagne#c=v1.eyJzaCI6InJvbmQiLCJzIjo5MCwicGwiOjUsImgiOjc1LCJmIjoicGljIiwic3QiOjAuNTUsInNkIjoyMjA0LCJzeSI6Imxpc3NlIiwibHYiOjI0LCJiZCI6W1siZW5jcmUiLDVdLFsidmVydC1sYXZhdXgiLDM1XSxbImdyaXMtbW9sYXNzZSIsNjEuMl0sWyJibGFuYy1uZXZlIiw4MF1dLCJsYiI6MSwiYW0iOiJmaWN0aXZlIiwiYWwiOjQwMDB9",
   objects: {
     fr: {
       lavaux: {
@@ -1594,18 +1598,18 @@ export const HOME_DATA: HomeData = {
           svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F5F5F4" stroke="#939392" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#1C1917" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
         },
       },
-      relief: {
+      montagne: {
         stats: {
-          widthMm: 100,
-          depthMm: 100,
-          heightMm: 6.2,
-          grams: 22.9,
-          minutes: 47,
+          widthMm: 90,
+          depthMm: 90,
+          heightMm: 80,
+          grams: 37.6,
+          minutes: 81,
           changes: 3,
         },
         estimate: null,
         poster: {
-          kind: "relief",
+          kind: "montagne",
         },
       },
       borne: {
@@ -1654,18 +1658,18 @@ export const HOME_DATA: HomeData = {
           svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F5F5F4" stroke="#939392" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#1C1917" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
         },
       },
-      relief: {
+      montagne: {
         stats: {
-          widthMm: 100,
-          depthMm: 100,
-          heightMm: 6.2,
-          grams: 22.9,
-          minutes: 47,
+          widthMm: 90,
+          depthMm: 90,
+          heightMm: 80,
+          grams: 37.5,
+          minutes: 80,
           changes: 3,
         },
         estimate: null,
         poster: {
-          kind: "relief",
+          kind: "montagne",
         },
       },
       borne: {
@@ -1714,18 +1718,18 @@ export const HOME_DATA: HomeData = {
           svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F5F5F4" stroke="#939392" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#1C1917" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
         },
       },
-      relief: {
+      montagne: {
         stats: {
-          widthMm: 100,
-          depthMm: 100,
-          heightMm: 6.2,
-          grams: 22.9,
-          minutes: 47,
+          widthMm: 90,
+          depthMm: 90,
+          heightMm: 80,
+          grams: 37.5,
+          minutes: 81,
           changes: 3,
         },
         estimate: null,
         poster: {
-          kind: "relief",
+          kind: "montagne",
         },
       },
       borne: {
@@ -1774,18 +1778,18 @@ export const HOME_DATA: HomeData = {
           svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F5F5F4" stroke="#939392" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#1C1917" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
         },
       },
-      relief: {
+      montagne: {
         stats: {
-          widthMm: 100,
-          depthMm: 100,
-          heightMm: 6.2,
-          grams: 22.9,
-          minutes: 47,
+          widthMm: 90,
+          depthMm: 90,
+          heightMm: 80,
+          grams: 37.6,
+          minutes: 81,
           changes: 3,
         },
         estimate: null,
         poster: {
-          kind: "relief",
+          kind: "montagne",
         },
       },
       borne: {

@@ -19,10 +19,10 @@ import {
 } from "./objects/flat-model";
 import { analyzeLavaux } from "./objects/lavaux-analysis";
 import {
-  analyzeRelief,
-  layoutRelief,
+  analyzeMontagne,
+  layoutMontagne,
   type Locale,
-} from "./objects/relief-model";
+} from "./objects/montagne-model";
 import { PRICING, type PricingParams } from "./pricing-params";
 import type {
   Band,
@@ -136,7 +136,8 @@ function flatBandStats(
  * Résumé par bande d'une configuration quelconque (étiquettes de l'éclaté et
  * ligne de purge, §6.4) : le vase lit ses bandes, la Cartouche et le porte-nom
  * les déduisent de la plaque et du texte (relief : plaque puis encre ; gravure :
- * encre puis plaque), le sous-verre les cale sur les sommets de strates. La somme
+ * encre puis plaque), la montagne lit les siennes (la première finit au dessus
+ * du socle, la dernière au sommet). La somme
  * des masses de bandes plus la purge est la masse de `computeStats`.
  */
 export function bandStatsFor(
@@ -152,13 +153,13 @@ export function bandStatsFor(
       return flatBandStats(layoutCartouche(config, texts), false, params);
     case "borne":
       return flatBandStats(layoutBorne(config, texts), true, params);
-    case "relief": {
-      const model = layoutRelief(config, texts, locale);
-      const analysis = analyzeRelief(model);
+    case "montagne": {
+      const model = layoutMontagne(config, texts, locale);
+      const analysis = analyzeMontagne(model);
       const scale = solidPrintVolume(analysis.volumeMm3, analysis.surfaceMm2);
       return summarize(
         config,
-        model.heightMm,
+        model.total,
         analysis.bandVolumesMm3,
         params,
         scale / analysis.volumeMm3,

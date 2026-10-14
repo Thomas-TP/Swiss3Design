@@ -7,7 +7,7 @@
   "seo": {
     "index": {
       "title": "The Studio: customise your 3D object",
-      "description": "Four objects to customise in 3D: vase, business card, coaster, name tag. Up to four colors, printed in Switzerland, firm price within 48 hours."
+      "description": "Four objects to customise in 3D: vase, business card, mountain, name tag. Up to four colors, printed in Switzerland, firm price within 48 hours."
     },
     "objects": {
       "lavaux": {
@@ -18,9 +18,9 @@
         "title": "Cartouche 3D business card",
         "description": "Your 85 × 55 mm business card, embossed or engraved, two colors, your own text: customise it in 3D, printed in Switzerland, firm price within 48 hours."
       },
-      "relief": {
-        "title": "Relief coaster, a custom mountain range",
-        "description": "A 100 mm layered coaster: pick the mountain range, lake, colors by altitude and summit name. Printed in Switzerland, firm price within 48 hours."
+      "montagne": {
+        "title": "Custom mountain, colored by altitude",
+        "description": "A small mountain for your desk, up to 12 cm tall, colored by altitude, with your name on the plinth. Printed in Switzerland, firm price within 48 hours."
       },
       "borne": {
         "title": "Borne two-color name tag",
@@ -93,8 +93,8 @@
     "cartouche": {
       "lead": "85 × 55 mm, the Swiss format. Four layouts, embossed or engraved text, two colors."
     },
-    "relief": {
-      "lead": "A layered mountain range on 100 mm, from the lake to the snow. Your name on the summit, at a fictional altitude."
+    "montagne": {
+      "lead": "A mountain from 30 to 120 mm: a peak, a massif or a ridge, smooth or terraced, from the plinth to the snow. Your name and its altitude on the front."
     },
     "borne": {
       "lead": "A text of 1 to 14 characters, four shapes, a ring if you want to hang it."
@@ -155,6 +155,7 @@
     "count": "{count}",
     "degrees": "{value} degrees",
     "percent": "{value} percent",
+    "altitude": "{value} meters",
     "seed": "seed {value}"
   },
   "ctl": {
@@ -202,16 +203,26 @@
       "corner": "Corners",
       "layout": "Layout"
     },
-    "relief": {
-      "shape": "Shape",
-      "diameter": "Diameter",
-      "side": "Side",
-      "base": "Base",
-      "relief": "Relief",
-      "levels": "Layers",
-      "seed": "Mountain range (seed)",
-      "lake": "Lake level",
-      "label": "Summit label"
+    "montagne": {
+      "form": "Mountain shape",
+      "style": "Surface",
+      "height": "Mountain height",
+      "heightHint": "Above the plinth; 1.6 times the base at most.",
+      "steep": "Steepness",
+      "steepHint": "Gentle: a rounded hill. Steep: a peak with hollowed flanks.",
+      "levels": "Terraces",
+      "seed": "Mountain (seed)",
+      "shape": "Plinth shape",
+      "diameter": "Base diameter",
+      "side": "Base side",
+      "acrossFlats": "Base width (flat to flat)",
+      "plinth": "Plinth height",
+      "label": "Label on the plinth",
+      "altMode": "Altitude shown",
+      "altFictive": "Fictional",
+      "altTyped": "Typed",
+      "altitude": "Altitude",
+      "altitudeHint": "Computed from the name: a fictional altitude, never measured."
     },
     "borne": {
       "shape": "Shape",
@@ -226,7 +237,7 @@
       "role": "Job title",
       "line1": "Line 1",
       "line2": "Line 2",
-      "peak": "Name on the summit",
+      "peak": "Mountain name",
       "text": "Text",
       "counter": "{count} / {max} characters",
       "moderation": "A person at the workshop reads every text before printing. We refuse third-party brands, insults and unlawful content."
@@ -246,6 +257,7 @@
     "filamentLegend": "Color of band {index}",
     "boundaryLabel": "Color change {index}",
     "hint": "Each color change happens at a precise height: at least 2 mm per band, up to four filaments.",
+    "plinthHint": "The first band is the plinth: set its height under shape, its color here.",
     "noscript": "Without JavaScript, enter the bands below: filament, colon, height in millimeters, separated by commas.",
     "field": "Bands (filament:height, separated by commas)"
   },
@@ -294,6 +306,8 @@
     "yes": "yes",
     "no": "no",
     "none": "—",
+    "labelFictive": "yes, fictional altitude",
+    "labelTyped": "yes, typed altitude: {value} m",
     "indicative": "indicative",
     "title": "[Studio] {object} · configuration v1",
     "link": "Link: {link}",
@@ -310,13 +324,13 @@
       "role": "job title",
       "line1": "line 1",
       "line2": "line 2",
-      "peak": "summit",
+      "peak": "mountain name",
       "text": "text"
     },
     "detail": {
       "lavaux": "wall {wall} · profile {profile}",
       "cartouche": "thickness {thickness}",
-      "relief": "base {base} · relief {relief} · shape {shape}",
+      "montagne": "plinth {plinth} · mountain {height} · shape {shape}",
       "borne": "thickness {thickness}"
     },
     "pattern": {
@@ -329,7 +343,7 @@
     "settings": {
       "lavaux": "Pattern: {pattern}",
       "cartouche": "Settings: {mode} ({depth}) · layout {layout} · corners {corner}",
-      "relief": "Settings: {levels} layers · lake {lake} % · mountain range {seed} · summit label: {label}",
+      "montagne": "Settings: {form} · {style} · steepness {steep} % · seed {seed} · label: {label}",
       "borne": "Settings: shape {shape} · letters {cap} · ring {ring} · mode {mode}"
     }
   }

@@ -21,7 +21,7 @@ import type {
   FilamentId,
   LavauxConfig,
   LavauxPattern,
-  ReliefConfig,
+  MontagneConfig,
   StudioConfig,
 } from "./types";
 
@@ -85,14 +85,38 @@ export const CARTOUCHE_RANGES = {
   depth: r(0.4, 1.2, 0.2, 0.6),
 } as const;
 
-export const RELIEF_RANGES = {
-  size: r(90, 110, 1, 100),
-  base: r(2.4, 4, 0.2, 3),
-  relief: r(1.2, 4, 0.2, 3.2),
-  levels: r(4, 12, 1, 8),
-  seed: r(0, 9999, 1, 1291),
-  lake: r(0, 40, 1, 18),
+export const MONTAGNE_SHAPES = ["rond", "carre", "hexagone"] as const;
+export const MONTAGNE_FORMS = ["pic", "massif", "arete"] as const;
+export const MONTAGNE_STYLES = ["lisse", "strates"] as const;
+export const MONTAGNE_ALT_MODES = ["fictive", "saisie"] as const;
+
+/**
+ * Plages de la Montagne : base 60–120 mm, socle 4–8 mm, hauteur de la montagne
+ * 30–120 mm (au-dessus du socle), raideur, graine, strates 8–40, altitude saisie
+ * 0–8 848 m (le mont Everest : au-delà, aucune altitude n'est plausible).
+ */
+export const MONTAGNE_RANGES = {
+  size: r(60, 120, 1, 90),
+  plinth: r(4, 8, 0.2, 5),
+  height: r(30, 120, 1, 75),
+  steep: r(0, 1, 0.01, 0.55),
+  seed: r(0, 9999, 1, 2204),
+  levels: r(8, 40, 1, 24),
+  altitude: r(0, 8848, 1, 4000),
 } as const;
+
+/** Rapport maximal hauteur de la montagne / taille de la base : au-delà, une aiguille fragile. */
+export const MONTAGNE_MAX_ASPECT = 1.6;
+/** Bord plat minimal tout autour de la montagne (mm). */
+export const MONTAGNE_MARGIN_MM = 3;
+
+/** Hauteur maximale de la montagne pour une base donnée (mm, entier) : 1,6 × la base, 120 mm au plus. */
+export function montagneHeightMax(size: number): number {
+  return Math.min(
+    MONTAGNE_RANGES.height.max,
+    Math.floor(MONTAGNE_MAX_ASPECT * size + 1e-9),
+  );
+}
 
 export const BORNE_RANGES = {
   cap: r(5, 10, 0.5, 7),
@@ -130,7 +154,7 @@ export function quantizeMm(mm: number): number {
 
 const toLayer = quantizeMm;
 
-// ── Objets plats (WP-02) : couplages de la Cartouche et du Relief ───────────
+// ── Objets à texte (WP-02) : couplages de la Cartouche et de la Montagne ────
 
 /**
  * Profondeur maximale (mm) d'une Cartouche : 1,2 mm en relief ; en gravure le
@@ -150,78 +174,94 @@ export function cartoucheDepthMax(
   );
 }
 
-/**
- * Épaisseur d'une strate du sous-verre (mm) : Δ = max(0,4 ; round(relief /
- * strates / 0,2) × 0,2) (§6.3.4) ; le relief réel est `strates × Δ`, qui peut
- * dépasser le `relief` demandé quand les strates sont nombreuses.
- */
-export function strataThickness(levels: number, relief: number): number {
-  return Math.max(
-    0.4,
-    Number((Math.round(relief / levels / 0.2) * 0.2).toFixed(1)),
-  );
+/** Hauteur totale de la Montagne (mm, à la couche) : le socle plus la montagne. */
+export function montagneTotal(plinth: number, height: number): number {
+  return quantizeMm(plinth + height);
 }
 
-/** Sommets de strates (mm) : `base + k × Δ`, k = 0 (le socle) à `levels` (le sommet). */
-export function strataTops(
-  base: number,
-  relief: number,
+/**
+ * Sommets de strates (mm) du style « En strates » : `socle + k × hauteur /
+ * strates`, ramenés à la couche (0,2 mm), k = 0 (le dessus du socle) à `levels`
+ * (le sommet : exactement la hauteur choisie). Chaque strate fait au moins une
+ * couche ; deux voisines diffèrent d'une couche au plus.
+ */
+export function montagneStrataTops(
+  plinth: number,
+  height: number,
   levels: number,
 ): number[] {
-  const delta = strataThickness(levels, relief);
   return Array.from({ length: levels + 1 }, (_, k) =>
-    quantizeMm(base + k * delta),
+    quantizeMm(plinth + (k * height) / levels),
   );
 }
 
-/** Hauteur réelle du sous-verre (mm) : le sommet de la dernière strate. */
-export function reliefTop(
-  base: number,
-  relief: number,
-  levels: number,
-): number {
-  return strataTops(base, relief, levels)[levels];
-}
-
 /**
- * Bandes du sous-verre « calées sur les sommets de strates » (§6.4) : chaque
- * frontière rejoint le sommet de strate le plus proche, strictement croissant,
- * la première au plus bas sur le socle (la bande « lac » couvre le socle), la
- * dernière au sommet. 2 à 4 bandes ; une liste trop courte est complétée.
+ * Bandes valides d'une Montagne : 2 à 4, la première finit EXACTEMENT au dessus
+ * du socle (le socle est sa propre couleur ; avec l'étiquette en relief de
+ * 0,8 mm posée sur ce dessus, elle sort dans la teinte de la bande 2 : c'est
+ * ce qui la fait ressortir sur le socle), la dernière au sommet, les autres
+ * à la couche, 2 mm d'épaisseur au moins. Une liste trop courte est complétée
+ * (socle encre, montagne blanc névé).
  */
-export function snapReliefBands(
+export function normalizeMontagneBands(
   bands: readonly Band[],
-  base: number,
-  relief: number,
-  levels: number,
+  plinth: number,
+  height: number,
 ): Band[] {
-  const tops = strataTops(base, relief, levels);
+  const total = montagneTotal(plinth, height);
   const list = bands.slice(0, MAX_BANDS);
   while (list.length < 2) {
     list.push({
-      filament: list.length === 0 ? "bleu-leman" : "vert-lavaux",
-      toMm: tops[levels],
+      filament: list.length === 0 ? "encre" : "blanc-neve",
+      toMm: total,
     });
   }
-  const delta = strataThickness(levels, relief);
   const out: Band[] = [];
-  let prev = -1;
-  list.forEach((band, i) => {
-    const last = i === list.length - 1;
-    if (last) {
-      out.push({ filament: band.filament, toMm: tops[levels] });
+  let prev = plinth;
+  list.forEach((band, k) => {
+    if (k === 0) {
+      out.push({ filament: band.filament, toMm: plinth });
       return;
     }
-    // Indice de strate voulu, borné pour laisser un cran à chaque bande suivante.
-    const wanted = Math.round((band.toMm - base) / delta);
-    const k = Math.min(
-      Math.max(wanted, prev + 1, 0),
-      levels - (list.length - 1 - i),
+    if (k === list.length - 1) {
+      out.push({ filament: band.filament, toMm: total });
+      return;
+    }
+    const remaining = list.length - 1 - k;
+    const toMm = quantizeMm(
+      Math.min(
+        Math.max(band.toMm, prev + MIN_BAND_MM),
+        total - remaining * MIN_BAND_MM,
+      ),
     );
-    out.push({ filament: band.filament, toMm: tops[k] });
-    prev = k;
+    out.push({ filament: band.filament, toMm });
+    prev = toMm;
   });
   return out;
+}
+
+/**
+ * Bandes d'une Montagne dont le socle ou la hauteur change : chaque frontière de
+ * la montagne garde sa position RELATIVE (40 % de la hauteur reste 40 % quand
+ * on grandit la montagne), puis `normalizeMontagneBands` rétablit les règles.
+ */
+export function rescaleMontagneBands(
+  bands: readonly Band[],
+  from: { plinth: number; height: number },
+  to: { plinth: number; height: number },
+): Band[] {
+  const last = bands.length - 1;
+  const scaled = bands.map((band, k) =>
+    k === 0 || k === last
+      ? { ...band }
+      : {
+          filament: band.filament,
+          toMm: quantizeMm(
+            to.plinth + ((band.toMm - from.plinth) / from.height) * to.height,
+          ),
+        },
+  );
+  return normalizeMontagneBands(scaled, to.plinth, to.height);
 }
 
 /**
@@ -375,25 +415,52 @@ export function clampCartouche(config: CartoucheConfig): CartoucheConfig {
   };
 }
 
-export function clampRelief(config: ReliefConfig): ReliefConfig {
-  const R = RELIEF_RANGES;
-  const base = clampRange(config.base, R.base);
-  const relief = clampRange(config.relief, R.relief);
-  const levels = clampRange(config.levels, R.levels);
+export function clampMontagne(config: MontagneConfig): MontagneConfig {
+  const R = MONTAGNE_RANGES;
+  const size = clampRange(config.size, R.size);
+  const plinth = clampRange(config.plinth, R.plinth);
+  // Couplage : la hauteur de la montagne reste sous 1,6 × la base (la garde
+  // `too-tall` ne signale que ce que ce bornage ne rattrape pas).
+  const height = Math.min(
+    clampRange(config.height, R.height),
+    montagneHeightMax(size),
+  );
   return {
-    object: "relief",
-    shape: oneOf(config.shape, ["rond", "carre"], "rond"),
-    size: clampRange(config.size, R.size),
-    base,
-    relief,
-    levels,
+    object: "montagne",
+    shape: oneOf(config.shape, MONTAGNE_SHAPES, "rond"),
+    size,
+    plinth,
+    height,
+    form: oneOf(config.form, MONTAGNE_FORMS, "pic"),
+    steep: clampRange(config.steep, R.steep),
     seed: clampRange(config.seed, R.seed),
-    lake: clampRange(config.lake, R.lake),
-    // Bandes : 2 à 4, calées sur les sommets de strates (la première couvre le
-    // socle, la dernière finit au sommet) : la barre altimétrique ne propose
-    // que ces crans, un lien décodé y est ramené.
-    bands: snapReliefBands(config.bands, base, relief, levels),
+    style: oneOf(config.style, MONTAGNE_STYLES, "lisse"),
+    levels: clampRange(config.levels, R.levels),
+    bands: normalizeMontagneBands(config.bands, plinth, height),
     label: Boolean(config.label),
+    altMode: oneOf(config.altMode, MONTAGNE_ALT_MODES, "fictive"),
+    altitude: clampRange(config.altitude, R.altitude),
+  };
+}
+
+/**
+ * Applique un changement de base, de socle ou de hauteur à une Montagne : les
+ * frontières de couleur de la montagne suivent (positions relatives). Les
+ * curseurs de la forme l'appellent ; le bornage seul garderait les frontières
+ * à leur altitude absolue.
+ */
+export function withMontagneGeometry(
+  config: MontagneConfig,
+  patch: Partial<Pick<MontagneConfig, "size" | "plinth" | "height">>,
+): MontagneConfig {
+  const next = clampMontagne({ ...config, ...patch });
+  return {
+    ...next,
+    bands: rescaleMontagneBands(
+      config.bands,
+      { plinth: config.plinth, height: config.height },
+      { plinth: next.plinth, height: next.height },
+    ),
   };
 }
 
@@ -423,8 +490,8 @@ export function clampConfig<T extends StudioConfig>(config: T): T {
       return clampLavaux(config) as T;
     case "cartouche":
       return clampCartouche(config) as T;
-    case "relief":
-      return clampRelief(config) as T;
+    case "montagne":
+      return clampMontagne(config) as T;
     case "borne":
       return clampBorne(config) as T;
   }

@@ -34,13 +34,23 @@ import {
   LAVAUX_PROFILES,
   LAVAUX_RANGES,
   LAVAUX_WALLS,
-  RELIEF_RANGES,
+  MONTAGNE_FORMS,
+  MONTAGNE_RANGES,
+  MONTAGNE_SHAPES,
+  MONTAGNE_STYLES,
   cartoucheDepthMax,
   gradinsDepthMax,
+  montagneHeightMax,
   vaguesWavelengthMin,
+  withMontagneGeometry,
 } from "@/lib/studio/ranges";
+import { labelAltitude } from "@/lib/studio/objects/montagne-model";
 import { boundaryLayer } from "@/lib/studio/stats";
-import { TEXT_LIMITS, type TextField } from "@/lib/studio/text/fields";
+import {
+  TEXT_LIMITS,
+  cleanText,
+  type TextField,
+} from "@/lib/studio/text/fields";
 import { codePoints } from "@/lib/studio/text/layout";
 import type {
   BorneConfig,
@@ -48,8 +58,8 @@ import type {
   FilamentId,
   LavauxConfig,
   LavauxPattern,
+  MontagneConfig,
   Printability,
-  ReliefConfig,
   StudioConfig,
   StudioObjectId,
   StudioStats,
@@ -57,12 +67,13 @@ import type {
 } from "@/lib/studio/types";
 import type { BandSummary } from "@/lib/studio/band-stats";
 import {
-  addReliefBand,
-  canAddReliefBand,
-  canRemoveReliefBand,
-  moveReliefBoundary,
-  reliefStep,
-  removeReliefBand,
+  LOCKED_BOUNDARIES,
+  MONTAGNE_STEP_MM,
+  addMontagneBand,
+  canAddMontagneBand,
+  canRemoveMontagneBand,
+  moveMontagneBoundary,
+  removeMontagneBand,
 } from "./band-ops";
 import { BandBar, BandList } from "./band-editor";
 import { ParamSlider } from "./param-slider";
@@ -468,19 +479,16 @@ const R_KINDS = ["lisse", "gradins", "vagues", "voronoi", "nervures"] as const;
 
 // ── Couleurs ────────────────────────────────────────────────────────────────
 
-/** Liste des bandes (filaments, ajouter, retirer) du vase ou du sous-verre. */
+/** Liste des bandes (filaments, ajouter, retirer) du vase ou de la montagne. */
 export function BandsSection({
   ctl,
   config,
 }: {
   ctl: Ctl;
-  config: LavauxConfig | ReliefConfig;
+  config: LavauxConfig | MontagneConfig;
 }) {
   const { t, core, locale, change } = ctl;
-  const relief = config.object === "relief" ? config : null;
-  const geometry = relief
-    ? { base: relief.base, relief: relief.relief, levels: relief.levels }
-    : null;
+  const montagne = config.object === "montagne";
   const bands = config.bands;
   const apply = (next: typeof bands, control: string, commit = true) =>
     change({ ...config, bands: next } as StudioConfig, control, { commit });
@@ -520,23 +528,21 @@ export function BandsSection({
       ) : null}
       <BandList
         bands={bands}
-        canAdd={
-          geometry ? canAddReliefBand(bands, geometry) : canAddBand(bands)
+        canAdd={montagne ? canAddMontagneBand(bands) : canAddBand(bands)}
+        canRemove={montagne ? bands.length > 2 : canRemoveBand(bands)}
+        removable={
+          montagne ? (index) => canRemoveMontagneBand(bands, index) : undefined
         }
-        canRemove={geometry ? canRemoveReliefBand(bands) : canRemoveBand(bands)}
         onFilament={(index, filament) =>
           apply(setBandFilament(bands, index, filament), "palette")
         }
         onAdd={() =>
-          apply(
-            geometry ? addReliefBand(bands, geometry) : addBand(bands),
-            "bands",
-          )
+          apply(montagne ? addMontagneBand(bands) : addBand(bands), "bands")
         }
         onRemove={(index) =>
           apply(
-            geometry
-              ? removeReliefBand(bands, index, geometry)
+            montagne
+              ? removeMontagneBand(bands, index)
               : removeBand(bands, index),
             "bands",
           )
@@ -550,6 +556,9 @@ export function BandsSection({
         removeLabelOf={(index) => t("bands.removeBand", { index })}
       />
       <p className="text-sm text-soft">{t("bands.hint")}</p>
+      {montagne ? (
+        <p className="text-sm text-soft">{t("bands.plinthHint")}</p>
+      ) : null}
       {/* Sans JavaScript : les bandes se règlent dans ce champ (formulaire GET). */}
       <noscript>
         <p className="text-sm text-soft">{t("bands.noscript")}</p>
@@ -565,7 +574,7 @@ export function BandsSection({
   );
 }
 
-/** Barre altimétrique (frontières glissables) du vase ou du sous-verre. */
+/** Barre altimétrique (frontières glissables) du vase ou de la montagne. */
 export function AltimetricBar({
   ctl,
   config,
@@ -573,21 +582,20 @@ export function AltimetricBar({
   className,
 }: {
   ctl: Ctl;
-  config: LavauxConfig | ReliefConfig;
+  config: LavauxConfig | MontagneConfig;
   orientation: "vertical" | "horizontal";
   className?: string;
 }) {
   const { t, core, locale, change, commit } = ctl;
-  const height =
-    config.object === "relief"
-      ? config.bands[config.bands.length - 1].toMm
-      : config.h;
-  const stepMm = config.object === "relief" ? reliefStep(config) : 0.2;
+  const montagne = config.object === "montagne";
+  const height = montagne
+    ? config.bands[config.bands.length - 1].toMm
+    : config.h;
+  const stepMm = montagne ? MONTAGNE_STEP_MM : 0.2;
   const onBoundary = (index: number, raw: number) => {
-    const bands =
-      config.object === "relief"
-        ? moveReliefBoundary(config.bands, index, raw, config)
-        : moveBoundary(config.bands, index, raw);
+    const bands = montagne
+      ? moveMontagneBoundary(config.bands, index, raw)
+      : moveBoundary(config.bands, index, raw);
     change({ ...config, bands } as StudioConfig, "bd");
   };
   return (
@@ -595,6 +603,7 @@ export function AltimetricBar({
       bands={config.bands}
       height={height}
       orientation={orientation}
+      locked={montagne ? LOCKED_BOUNDARIES : 0}
       stepMm={stepMm}
       onBoundary={onBoundary}
       onCommit={commit}
@@ -741,88 +750,100 @@ export function CartoucheShape({
   );
 }
 
-// ── Sous-verre « Relief » ───────────────────────────────────────────────────
+// ── Montagne ────────────────────────────────────────────────────────────────
 
-export function ReliefShape({
+export function MontagneShape({
   ctl,
   config,
 }: {
   ctl: Ctl;
-  config: ReliefConfig;
+  config: MontagneConfig;
 }) {
   const { t, locale, uid, change, commit } = ctl;
-  const R = RELIEF_RANGES;
+  const R = MONTAGNE_RANGES;
   const set = (
-    patch: Partial<ReliefConfig>,
+    patch: Partial<MontagneConfig>,
     control: string,
     reprint = false,
   ) => change({ ...config, ...patch }, control, { reprint });
+  // Base, socle et hauteur changent les frontières de couleur de la montagne
+  // (positions relatives) : `withMontagneGeometry` s'en charge.
+  const geometry = (
+    patch: Partial<Pick<MontagneConfig, "size" | "plinth" | "height">>,
+    control: string,
+  ) => change(withMontagneGeometry(config, patch), control);
+  const heightMax = montagneHeightMax(config.size);
   return (
     <div className="flex flex-col gap-6">
       <RadioGroup
-        legend={t("ctl.relief.shape")}
-        name="sh"
-        value={config.shape}
-        options={(["rond", "carre"] as const).map((shape) => ({
-          value: shape,
-          label: ctl.core(`options.shape.${shape}`),
+        legend={t("ctl.montagne.form")}
+        name="f"
+        value={config.form}
+        options={MONTAGNE_FORMS.map((form) => ({
+          value: form,
+          label: ctl.core(`options.form.${form}`),
         }))}
-        onChange={(shape) =>
-          change({ ...config, shape }, "sh", { commit: true })
+        onChange={(form) =>
+          change({ ...config, form }, "f", { commit: true, reprint: true })
+        }
+      />
+      <RadioGroup
+        legend={t("ctl.montagne.style")}
+        name="sy"
+        value={config.style}
+        options={MONTAGNE_STYLES.map((style) => ({
+          value: style,
+          label: ctl.core(`options.style.${style}`),
+        }))}
+        onChange={(style) =>
+          change({ ...config, style }, "sy", { commit: true, reprint: true })
         }
       />
       <ParamSlider
-        id={`${uid}-s`}
-        name="s"
-        label={
-          config.shape === "rond"
-            ? t("ctl.relief.diameter")
-            : t("ctl.relief.side")
+        id={`${uid}-h`}
+        name="h"
+        label={t("ctl.montagne.height")}
+        hint={t("ctl.montagne.heightHint")}
+        value={config.height}
+        range={{ min: R.height.min, max: heightMax, step: R.height.step }}
+        unit="mm"
+        valueText={(v) =>
+          t("value.height", {
+            mm: num(v, locale),
+            layers: Math.ceil((v + config.plinth) / 0.2 - 1e-6),
+          })
         }
-        value={config.size}
-        range={R.size}
-        unit="mm"
-        valueText={(v) => t("value.mm", { value: num(v, locale) })}
-        onChange={(v) => set({ size: v }, "s")}
+        onChange={(v) => geometry({ height: v }, "h")}
         onCommit={commit}
       />
       <ParamSlider
-        id={`${uid}-ba`}
-        name="ba"
-        label={t("ctl.relief.base")}
-        value={config.base}
-        range={R.base}
-        unit="mm"
-        valueText={(v) => t("value.mm", { value: num(v, locale) })}
-        onChange={(v) => set({ base: v }, "ba")}
+        id={`${uid}-st`}
+        name="st"
+        label={t("ctl.montagne.steep")}
+        hint={t("ctl.montagne.steepHint")}
+        value={config.steep}
+        range={R.steep}
+        valueText={(v) => formatNumber(v, locale, 2)}
+        onChange={(v) => set({ steep: v }, "st")}
         onCommit={commit}
       />
-      <ParamSlider
-        id={`${uid}-re`}
-        name="re"
-        label={t("ctl.relief.relief")}
-        value={config.relief}
-        range={R.relief}
-        unit="mm"
-        valueText={(v) => t("value.mm", { value: num(v, locale) })}
-        onChange={(v) => set({ relief: v }, "re")}
-        onCommit={commit}
-      />
-      <ParamSlider
-        id={`${uid}-lv`}
-        name="lv"
-        label={t("ctl.relief.levels")}
-        value={config.levels}
-        range={R.levels}
-        valueText={(v) => t("value.count", { count: v })}
-        onChange={(v) => set({ levels: v }, "lv", true)}
-        onCommit={commit}
-      />
+      {config.style === "strates" ? (
+        <ParamSlider
+          id={`${uid}-lv`}
+          name="lv"
+          label={t("ctl.montagne.levels")}
+          value={config.levels}
+          range={R.levels}
+          valueText={(v) => t("value.count", { count: v })}
+          onChange={(v) => set({ levels: v }, "lv", true)}
+          onCommit={commit}
+        />
+      ) : null}
       <div className="flex flex-col gap-3">
         <ParamSlider
           id={`${uid}-sd`}
           name="sd"
-          label={t("ctl.relief.seed")}
+          label={t("ctl.montagne.seed")}
           value={config.seed}
           range={R.seed}
           valueText={(v) => t("value.seed", { value: v })}
@@ -844,15 +865,44 @@ export function ReliefShape({
           </Button>
         </div>
       </div>
+      <RadioGroup
+        legend={t("ctl.montagne.shape")}
+        name="sh"
+        value={config.shape}
+        options={MONTAGNE_SHAPES.map((shape) => ({
+          value: shape,
+          label: ctl.core(`options.shape.${shape}`),
+        }))}
+        onChange={(shape) =>
+          change({ ...config, shape }, "sh", { commit: true })
+        }
+      />
       <ParamSlider
-        id={`${uid}-lk`}
-        name="lk"
-        label={t("ctl.relief.lake")}
-        value={config.lake}
-        range={R.lake}
-        unit="%"
-        valueText={(v) => t("value.percent", { value: num(v, locale) })}
-        onChange={(v) => set({ lake: v }, "lk")}
+        id={`${uid}-s`}
+        name="s"
+        label={t(
+          config.shape === "rond"
+            ? "ctl.montagne.diameter"
+            : config.shape === "carre"
+              ? "ctl.montagne.side"
+              : "ctl.montagne.acrossFlats",
+        )}
+        value={config.size}
+        range={R.size}
+        unit="mm"
+        valueText={(v) => t("value.mm", { value: num(v, locale) })}
+        onChange={(v) => geometry({ size: v }, "s")}
+        onCommit={commit}
+      />
+      <ParamSlider
+        id={`${uid}-pl`}
+        name="pl"
+        label={t("ctl.montagne.plinth")}
+        value={config.plinth}
+        range={R.plinth}
+        unit="mm"
+        valueText={(v) => t("value.mm", { value: num(v, locale) })}
+        onChange={(v) => geometry({ plinth: v }, "pl")}
         onCommit={commit}
       />
     </div>
@@ -964,21 +1014,25 @@ export function TextSection({
 }) {
   const { t, uid, texts, examples, stats, commit, setText } = ctl;
   const issues = stats.printable.status === "ok" ? [] : stats.printable.issues;
-  const relief = config.object === "relief" ? config : null;
+  const montagne = config.object === "montagne" ? config : null;
+  // Altitude affichée : saisie, ou celle que le nom (saisi, sinon l'exemple) donne.
+  const peakName = cleanText(texts.peak) || cleanText(examples.peak);
+  const fictive = montagne ? labelAltitude(montagne, peakName) : 0;
   return (
     <div className="flex flex-col gap-6">
-      {relief ? (
+      {montagne ? (
         <RadioGroup
-          legend={t("ctl.relief.label")}
+          legend={t("ctl.montagne.label")}
           name="lb"
-          value={relief.label ? 1 : 0}
+          value={montagne.label ? 1 : 0}
           options={[
             { value: 1, label: t("ctl.yes") },
             { value: 0, label: t("ctl.no") },
           ]}
           onChange={(value) =>
-            ctl.change({ ...relief, label: value === 1 }, "lb", {
+            ctl.change({ ...montagne, label: value === 1 }, "lb", {
               commit: true,
+              reprint: true,
             })
           }
         />
@@ -1021,6 +1075,50 @@ export function TextSection({
           </Field>
         );
       })}
+      {montagne && montagne.label ? (
+        <>
+          <RadioGroup
+            legend={t("ctl.montagne.altMode")}
+            name="am"
+            value={montagne.altMode}
+            options={[
+              { value: "fictive", label: t("ctl.montagne.altFictive") },
+              { value: "saisie", label: t("ctl.montagne.altTyped") },
+            ]}
+            onChange={(altMode) =>
+              ctl.change(
+                {
+                  ...montagne,
+                  altMode,
+                  // La saisie part de l'altitude que l'étiquette montrait.
+                  altitude: altMode === "saisie" ? fictive : montagne.altitude,
+                },
+                "am",
+                { commit: true },
+              )
+            }
+          />
+          <ParamSlider
+            id={`${uid}-al`}
+            name="al"
+            label={t("ctl.montagne.altitude")}
+            hint={
+              montagne.altMode === "fictive"
+                ? t("ctl.montagne.altitudeHint")
+                : undefined
+            }
+            value={montagne.altMode === "saisie" ? montagne.altitude : fictive}
+            range={MONTAGNE_RANGES.altitude}
+            unit="m"
+            disabled={montagne.altMode !== "saisie"}
+            // Sans séparateur de milliers : `Intl` du serveur et du navigateur
+            // n'écrivent pas le même (hydratation).
+            valueText={(v) => t("value.altitude", { value: v })}
+            onChange={(v) => ctl.change({ ...montagne, altitude: v }, "al")}
+            onCommit={commit}
+          />
+        </>
+      ) : null}
       <p className="max-w-[60ch] text-sm text-soft">
         {t("ctl.text.moderation")}
       </p>

@@ -19,14 +19,14 @@ import {
   topViewToSvg,
 } from "@/lib/studio/poster-flat";
 import { heroPoster } from "@/lib/studio/poster";
-import { peakLabel } from "@/lib/studio/objects/relief-model";
+import { peakLabel } from "@/lib/studio/objects/montagne-model";
 import {
   BORNE_DEFAULT,
   CARTOUCHE_DEFAULT,
   DEFAULT_CONFIGS,
   HERO_CONFIG,
   HERO_PATTERNS,
-  RELIEF_DEFAULT,
+  MONTAGNE_DEFAULT,
   heroVariant,
 } from "@/lib/studio/presets";
 import { computeStats } from "@/lib/studio/stats";
@@ -50,7 +50,7 @@ const LOCALES: readonly HomeLocale[] = ["fr", "de", "it", "en"];
 const OBJECTS: readonly StudioObjectId[] = [
   "lavaux",
   "cartouche",
-  "relief",
+  "montagne",
   "borne",
 ];
 
@@ -149,7 +149,7 @@ export function buildHomeData(): HomeData {
   const posters: Record<StudioObjectId, ObjectPoster> = {
     lavaux: { kind: "hero" },
     cartouche: flat("cartouche"),
-    relief: { kind: "relief" },
+    montagne: { kind: "montagne" },
     borne: flat("borne"),
   };
 
@@ -160,7 +160,7 @@ export function buildHomeData(): HomeData {
     summit[locale] = {
       label: peakLabel(texts.peak ?? "", locale),
       stats: figuresOf(
-        computeStats(RELIEF_DEFAULT, { peak: texts.peak }, undefined, locale),
+        computeStats(MONTAGNE_DEFAULT, { peak: texts.peak }, undefined, locale),
       ),
     };
     objects[locale] = {} as Record<StudioObjectId, ObjectCard>;
@@ -182,8 +182,8 @@ export function buildHomeData(): HomeData {
       exploded: heroPoster(HERO_CONFIG, "exploded"),
     },
     summit,
-    reliefConfig: RELIEF_DEFAULT,
-    reliefHref: `/studio/relief${configFragment(RELIEF_DEFAULT)}`,
+    montagneConfig: MONTAGNE_DEFAULT,
+    montagneHref: `/studio/montagne${configFragment(MONTAGNE_DEFAULT)}`,
     objects,
   };
 }

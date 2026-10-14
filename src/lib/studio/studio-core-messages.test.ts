@@ -75,8 +75,18 @@ describe("studioCore : couverture du code", () => {
       for (const v of ["relief", "gravure"]) has(`options.mode.${v}`);
       for (const v of ["classique", "centree", "cartouche", "monogramme"])
         has(`options.layout.${v}`);
-      for (const v of ["rond", "carre", "pilule", "etiquette", "goutte", "pic"])
+      for (const v of [
+        "rond",
+        "carre",
+        "hexagone",
+        "pilule",
+        "etiquette",
+        "goutte",
+        "pic",
+      ])
         has(`options.shape.${v}`);
+      for (const v of ["pic", "massif", "arete"]) has(`options.form.${v}`);
+      for (const v of ["lisse", "strates"]) has(`options.style.${v}`);
       for (const v of ["gauche", "droite", "aucun"]) has(`options.ring.${v}`);
       for (const v of [
         "layers",
@@ -101,14 +111,13 @@ describe("studioCore : couverture du code", () => {
       ]) {
         has(`bands.${v}`);
       }
-      for (const v of ["peak", "summit", "fictional"]) has(`relief.${v}`);
       expect(missing).toEqual([]);
     });
 
     it(`${locale} : un message par code d'anomalie et par état d'imprimabilité`, () => {
       missing.length = 0;
       const codes = Object.keys(ISSUE_MESSAGE_KEYS) as IssueCode[];
-      expect(codes).toHaveLength(9);
+      expect(codes).toHaveLength(10);
       for (const code of codes) has(ISSUE_MESSAGE_KEYS[code]);
       for (const status of ["ok", "warn", "error"])
         has(`guard.status.${status}`);
@@ -171,7 +180,13 @@ describe("studioCore : couverture du code", () => {
       "Visitenkarte «Cartouche»",
     );
     expect(lookup(load("fr"), "objects.lavaux.name")).toBe("Vase « Lavaux »");
-    expect(lookup(load("en"), "relief.peak")).toBe("Mount {name}");
-    expect(lookup(load("de"), "relief.peak")).toBe("Piz {name}");
+    // La Montagne : « Berg », « Montagna », « Mountain » (10.10.2026).
+    expect(lookup(load("fr"), "objects.montagne.name")).toBe("Montagne");
+    expect(lookup(load("de"), "objects.montagne.name")).toBe("Berg");
+    expect(lookup(load("it"), "objects.montagne.name")).toBe("Montagna");
+    expect(lookup(load("en"), "objects.montagne.name")).toBe("Mountain");
+    // Le nom d'exemple porte le mot de sommet de la langue (aucun préfixe automatique).
+    expect(lookup(load("en"), "examples.peak")).toBe("Mount Léa");
+    expect(lookup(load("de"), "examples.peak")).toBe("Piz Léa");
   });
 });

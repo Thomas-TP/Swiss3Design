@@ -29,9 +29,9 @@
           "name": "Visitenkarte «Cartouche»",
           "line": "Eine Visitenkarte von 85 × 55 mm, Ihr Name erhaben oder graviert."
         },
-        "relief": {
-          "name": "Untersetzer «Relief»",
-          "line": "Ein topografischer Untersetzer von 90 bis 110 mm, mit Ihrem Gipfel im Relief."
+        "montagne": {
+          "name": "Berg",
+          "line": "Ein kleiner Berg für den Schreibtisch, bis 12 cm hoch, nach Höhe eingefärbt, mit Ihrem Namen auf dem Sockel."
         },
         "borne": {
           "name": "Namensschild «Borne»",

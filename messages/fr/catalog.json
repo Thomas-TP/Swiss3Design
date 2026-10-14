@@ -29,9 +29,9 @@
           "name": "Carte « Cartouche »",
           "line": "Une carte de visite de 85 × 55 mm, votre nom en relief ou gravé."
         },
-        "relief": {
-          "name": "Sous-verre « Relief »",
-          "line": "Un sous-verre topographique de 90 à 110 mm, avec votre sommet en relief."
+        "montagne": {
+          "name": "Montagne",
+          "line": "Une petite montagne à poser sur un bureau, jusqu'à 12 cm, colorée par altitude, avec votre nom sur le socle."
         },
         "borne": {
           "name": "Porte-nom « Borne »",

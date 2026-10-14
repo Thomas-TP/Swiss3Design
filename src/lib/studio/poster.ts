@@ -296,6 +296,8 @@ export interface SvgOptions {
   className?: string;
   /** Préfixe des identifiants (plusieurs posters dans une même page). */
   idPrefix?: string;
+  /** Couleur des filets de l'élévation (défaut `currentColor` : un fichier `<img>` doit donner la sienne). */
+  stroke?: string;
 }
 
 const n = (x: number) => String(Math.round(x * 10) / 10);
@@ -345,6 +347,8 @@ export interface ElevationData {
   baseY: number;
   heightMm: number;
   widthMm: number;
+  /** Lignes de couche (y en mm), tracées en filet dans la silhouette : la Montagne en porte une toutes les 10 couches. */
+  courses?: number[];
 }
 
 const ELEVATION_PAD_MM = 6;
@@ -431,6 +435,7 @@ export function elevationToSvg(
 ): string {
   const cls = options.className ?? "s3d-elevation-svg";
   const id = `${options.idPrefix ?? "s3d-el"}-sil`;
+  const ink = options.stroke ?? "currentColor";
   const [x, y, w, h] = data.viewBox;
   const rects = data.bands
     .map(
@@ -438,12 +443,16 @@ export function elevationToSvg(
         `<rect x="${n(x)}" y="${n(b.y)}" width="${n(w)}" height="${n(b.height)}" fill="${b.hex}"/>`,
     )
     .join("");
+  const courses =
+    data.courses && data.courses.length > 0
+      ? `<path d="${data.courses.map((cy) => `M${n(x)} ${n(cy)}H${n(x + w)}`).join("")}" stroke="${ink}" stroke-opacity="0.2" stroke-width="0.5" vector-effect="non-scaling-stroke"/>`
+      : "";
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" class="${cls}" viewBox="${n(x)} ${n(y)} ${n(w)} ${n(h)}" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false">` +
     `<defs><clipPath id="${id}"><path d="${data.outline}"/></clipPath></defs>` +
-    `<g clip-path="url(#${id})">${rects}</g>` +
-    `<path d="${data.outline}" fill="none" stroke="currentColor" stroke-width="0.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>` +
-    `<path d="M${n(x)} ${n(data.baseY)}H${n(x + w)}" stroke="currentColor" stroke-width="0.5" vector-effect="non-scaling-stroke"/>` +
+    `<g clip-path="url(#${id})">${rects}${courses}</g>` +
+    `<path d="${data.outline}" fill="none" stroke="${ink}" stroke-width="0.5" stroke-linejoin="round" vector-effect="non-scaling-stroke"/>` +
+    `<path d="M${n(x)} ${n(data.baseY)}H${n(x + w)}" stroke="${ink}" stroke-width="0.5" vector-effect="non-scaling-stroke"/>` +
     `</svg>`
   );
 }

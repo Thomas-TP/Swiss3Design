@@ -1,7 +1,7 @@
 {
   "seo": {
     "title": "Swiss3Design · Mehrfarbiger 3D-Druck in der Schweiz",
-    "description": "Personalisieren Sie Vase, Karte oder Untersetzer in 3D, das Atelier druckt sie in bis zu vier Farben, in Gland und Pully. Lieferung in die ganze Schweiz.",
+    "description": "Personalisieren Sie Vase, Karte oder Berg in 3D, das Atelier druckt Ihr Stück in bis zu vier Farben, in Gland und Pully. Lieferung in die ganze Schweiz.",
     "imageAlt": "Swiss3Design: eine Vase, Schicht für Schicht in drei Farben gedruckt"
   },
   "rail": {
@@ -49,11 +49,11 @@
   "summit": {
     "eyebrow": "Ihr Gipfel",
     "title": "Ihr Name, im Relief. Wörtlich.",
-    "lead": "Der Untersetzer «Relief» ist ein Massiv aus Schichten. Ihr Name krönt den Gipfel, mit einer fiktiven Höhe, die aus ihm berechnet wird.",
+    "lead": "Der Berg ist ein richtiger kleiner Berg für den Schreibtisch, nach Höhe eingefärbt. Ihr Name steht erhaben auf dem Sockel, mit einer fiktiven Höhe, die aus ihm berechnet wird.",
     "input": "Benennen Sie Ihren Gipfel",
     "note": "Der Text bleibt in Ihrem Browser, bis Sie ihn ans Atelier senden.",
     "cta": "Im Studio weitermachen",
-    "poster": "Untersetzer «Relief»: ein Massiv aus Schichten, von oben gesehen."
+    "poster": "Berg: ein kleiner Berg, nach Höhe eingefärbt, von vorne gesehen."
   },
   "studio": {
     "eyebrow": "Das Studio",

@@ -19,7 +19,7 @@ import {
   CARTOUCHE_PRESETS,
   HERO_CONFIG,
   LAVAUX_PRESETS,
-  RELIEF_PRESETS,
+  MONTAGNE_PRESETS,
   heroVariant,
 } from "./presets";
 import { computeStats } from "./stats";
@@ -28,7 +28,7 @@ import {
   randomBorne,
   randomCartouche,
   randomLavaux,
-  randomRelief,
+  randomMontagne,
   randomTexts,
 } from "./testing";
 import { DEFAULT_TEXTS } from "./text/fields";
@@ -324,7 +324,7 @@ describe("Lavaux : déterminisme", () => {
   });
 });
 
-// ── Objets plats (WP-02) : Cartouche, Relief, Borne ─────────────────────────
+// ── Objets plats (WP-02) : Cartouche, Montagne, Borne ───────────────────────
 
 const LOCALES = ["fr", "de", "it", "en"] as const;
 
@@ -415,25 +415,28 @@ describe("Objets plats : variété du maillage d'export (200 configurations par 
     expect(engraved).toBeGreaterThan(50);
   }, 240_000);
 
-  it("Relief : 200 configurations, coques fermées et orientées", () => {
+  it("Montagne : 200 configurations, coques fermées et orientées (lissé et strates, trois formes, trois socles)", () => {
     let count = 0;
     let labelled = 0;
+    let smooth = 0;
     for (const { config, texts, locale, index } of valid(
       20260931,
-      "relief",
-      randomRelief,
+      "montagne",
+      randomMontagne,
       200,
     )) {
-      const label = `relief #${index} ${JSON.stringify(config)} ${JSON.stringify(texts)} ${locale}`;
+      const label = `montagne #${index} ${JSON.stringify(config)} ${JSON.stringify(texts)} ${locale}`;
       const mesh = buildStudioMesh(config, texts, { lod: "export", locale });
-      const strata = computeStats(config, texts, undefined, locale).heightMm;
-      expectShells(mesh, label, strata);
+      const total = computeStats(config, texts, undefined, locale).heightMm;
+      expectShells(mesh, label, total);
       count++;
       if (config.label && texts.peak) labelled++;
+      if (config.style === "lisse") smooth++;
     }
     expect(count).toBe(200);
     expect(labelled).toBeGreaterThan(50);
-  }, 240_000);
+    expect(smooth).toBeGreaterThan(50);
+  }, 480_000);
 
   it("Borne : 200 configurations, coques fermées et orientées", () => {
     let count = 0;
@@ -467,7 +470,7 @@ describe("Objets plats : variété du maillage d'export (200 configurations par 
   it("les trois niveaux de détail et tous les préréglages sont des coques fermées", () => {
     const presets: (readonly [StudioObjectId, StudioConfig])[] = [
       ...CARTOUCHE_PRESETS.map((p) => ["cartouche", p.config] as const),
-      ...RELIEF_PRESETS.map((p) => ["relief", p.config] as const),
+      ...MONTAGNE_PRESETS.map((p) => ["montagne", p.config] as const),
       ...BORNE_PRESETS.map((p) => ["borne", p.config] as const),
     ];
     let checked = 0;
@@ -487,12 +490,12 @@ describe("Objets plats : variété du maillage d'export (200 configurations par 
   it("un texte qui déborde ne plante pas le maillage (erreur text-fit signalée, jamais d'exception)", () => {
     const rng = mulberry32(77);
     for (let i = 0; i < 40; i++) {
-      const object = pick(rng, ["cartouche", "relief", "borne"] as const);
+      const object = pick(rng, ["cartouche", "montagne", "borne"] as const);
       const config =
         object === "cartouche"
           ? randomCartouche(rng)
-          : object === "relief"
-            ? { ...randomRelief(rng), label: true }
+          : object === "montagne"
+            ? { ...randomMontagne(rng), label: true }
             : randomBorne(rng);
       // Au-delà de toutes les longueurs saisissables (et parfois du plafond dur de 64).
       const long = "W".repeat(intBetween(rng, 45, 80));

@@ -4,7 +4,7 @@
 // le Worker du Studio et le Stage (qui ne fait qu'envelopper les Float32Array
 // dans des BufferGeometry). Unités : mm, Z vers le haut.
 
-export type StudioObjectId = "lavaux" | "cartouche" | "relief" | "borne";
+export type StudioObjectId = "lavaux" | "cartouche" | "montagne" | "borne";
 
 export type FilamentId =
   | "blanc-neve"
@@ -89,19 +89,38 @@ export interface CartoucheConfig {
   ink: FilamentId;
 }
 
-export interface ReliefConfig {
-  object: "relief";
-  shape: "rond" | "carre";
+/**
+ * « Montagne » (remplace le sous-verre « Relief », 10.10.2026) : une petite
+ * montagne posée sur un socle, imprimée sans support (une carte d'altitude ne
+ * surplombe jamais) et colorée par altitude. Longueurs en mm.
+ */
+export interface MontagneConfig {
+  object: "montagne";
+  /** Forme du socle : disque, carré aux coins arrondis, hexagone (un côté plat à l'avant). */
+  shape: "rond" | "carre" | "hexagone";
+  /** Diamètre du disque, côté du carré ou distance entre côtés plats de l'hexagone. */
   size: number;
-  base: number;
-  relief: number;
-  levels: number;
+  /** Hauteur du socle, dessus plat compris. */
+  plinth: number;
+  /** Hauteur de la montagne AU-DESSUS du socle ; la pièce mesure `plinth + height`. */
+  height: number;
+  /** Disposition des sommets : un pic dominant, un massif, une arête. */
+  form: "pic" | "massif" | "arete";
+  /** Raideur 0 (douce) à 1 (raide). */
+  steep: number;
   seed: number;
-  lake: number;
-  /** 2 à 4, calées sur les sommets de strates. */
+  /** Lissé : surface continue ; En strates : terrasses empilées, comme une maquette en courbes de niveau. */
+  style: "lisse" | "strates";
+  /** Nombre de strates (style « En strates » ; conservé en style lissé). */
+  levels: number;
+  /** 2 à 4 bandes ; la première finit toujours au sommet du socle. */
   bands: Band[];
-  /** Texte : StudioTexts.peak. */
+  /** Étiquette (nom et altitude) sur le devant du socle. Texte : StudioTexts.peak. */
   label: boolean;
+  /** Altitude de l'étiquette : calculée à partir du nom (fictive) ou saisie. */
+  altMode: "fictive" | "saisie";
+  /** Altitude saisie (m), lue seulement si `altMode` vaut « saisie ». */
+  altitude: number;
 }
 
 export interface BorneConfig {
@@ -120,7 +139,7 @@ export interface BorneConfig {
 export type StudioConfig =
   | LavauxConfig
   | CartoucheConfig
-  | ReliefConfig
+  | MontagneConfig
   | BorneConfig;
 
 export type IssueCode =
@@ -132,6 +151,7 @@ export type IssueCode =
   | "text-stroke"
   | "text-fit"
   | "text-char"
+  | "too-tall"
   | "near-vase-spirale";
 
 // ── Statistiques et imprimabilité (§6.5 ; calcul dans stats.ts, WP-01) ──────
@@ -172,7 +192,7 @@ export interface StudioStats {
 export const STUDIO_OBJECT_IDS: readonly StudioObjectId[] = [
   "lavaux",
   "cartouche",
-  "relief",
+  "montagne",
   "borne",
 ];
 

@@ -157,26 +157,26 @@ export function WebMcpTools() {
         title: "Configure a Studio object",
         description:
           "Builds a shareable Studio link for one of Swiss3Design's own configurable objects " +
-          "(lavaux vase, cartouche business card, relief coaster, borne name tag) and returns its stats. " +
+          "(lavaux vase, cartouche business card, montagne mountain, borne name tag) and returns its stats. " +
           "Personal texts (names, contacts) are never accepted here: the human types them on the page.",
         inputSchema: {
           type: "object",
           properties: {
             object: {
-              enum: ["lavaux", "cartouche", "relief", "borne"],
+              enum: ["lavaux", "cartouche", "montagne", "borne"],
               description: "Which Studio object to configure",
             },
             params: {
               type: "object",
               description:
-                "Numeric or enum parameters using the link keys (lavaux: h, d, p, b, n, l, m, gs, gd, wl, wa, wk, vc, va, vs, rn, ra, rt, w; cartouche: t, r, mo, e, ly, fp, ft; relief: sh, s, ba, re, lv, sd, lk, lb; borne: sh, c, t, rg, rd, mo, fb, ft); clamped to valid ranges.",
+                "Numeric or enum parameters using the link keys (lavaux: h, d, p, b, n, l, m, gs, gd, wl, wa, wk, vc, va, vs, rn, ra, rt, w; cartouche: t, r, mo, e, ly, fp, ft; montagne: sh, s, pl, h, f, st, sd, sy, lv, lb, am, al; borne: sh, c, t, rg, rd, mo, fb, ft); clamped to valid ranges.",
             },
             palette: {
               type: "array",
               items: { enum: [...FILAMENT_IDS] },
               maxItems: 4,
               description:
-                "Filament ids, bottom to top for vases and coasters; plate then text for cards and name tags.",
+                "Filament ids, bottom to top for vases and mountains (the first one is the plinth); plate then text for cards and name tags.",
             },
             open: {
               type: "boolean",

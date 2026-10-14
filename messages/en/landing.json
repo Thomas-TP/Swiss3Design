@@ -1,7 +1,7 @@
 {
   "seo": {
     "title": "Swiss3Design · Multicolor 3D printing in Switzerland",
-    "description": "Customise a vase, a card or a coaster in 3D, then let the workshop print it in up to four colors, in Gland and Pully. Delivered across Switzerland.",
+    "description": "Customise a vase, a card or a mountain in 3D, then let the workshop print it in up to four colors, in Gland and Pully. Delivered across Switzerland.",
     "imageAlt": "Swiss3Design: a vase printed layer by layer in three colors"
   },
   "rail": {
@@ -49,11 +49,11 @@
   "summit": {
     "eyebrow": "Your peak",
     "title": "Your name, in relief. Literally.",
-    "lead": "The \"Relief\" coaster is a massif made of strata. Your name crowns its summit, with a fictional altitude computed from it.",
+    "lead": "The Mountain is a real little mountain for your desk, colored by altitude. Your name sits embossed on the plinth, with a fictional altitude computed from it.",
     "input": "Name your peak",
     "note": "The text stays in your browser until you send it to the workshop.",
     "cta": "Continue in the Studio",
-    "poster": "\"Relief\" coaster: a massif made of strata, seen from above."
+    "poster": "Mountain: a small mountain colored by altitude, seen from the front."
   },
   "studio": {
     "eyebrow": "The Studio",

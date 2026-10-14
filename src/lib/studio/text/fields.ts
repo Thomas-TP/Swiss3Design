@@ -11,7 +11,7 @@ export const TEXT_LIMITS = {
   role: 30,
   line1: 30,
   line2: 30,
-  peak: 12,
+  peak: 16,
   text: 14,
 } as const satisfies Record<keyof StudioTexts, number>;
 
@@ -25,7 +25,7 @@ export const OBJECT_TEXT_FIELDS: Record<StudioObjectId, readonly TextField[]> =
   {
     lavaux: [],
     cartouche: ["name", "role", "line1", "line2"],
-    relief: ["peak"],
+    montagne: ["peak"],
     borne: ["text"],
   };
 
@@ -43,7 +43,7 @@ export const DEFAULT_TEXTS: Readonly<Record<StudioObjectId, StudioTexts>> = {
     line1: "lea@exemple.ch",
     line2: "+41 21 000 00 00",
   },
-  relief: { peak: "Léa" },
+  montagne: { peak: "Pointe Léa" },
   borne: { text: "Léa" },
 };
 

@@ -26,9 +26,9 @@ describe("schemas : aucune compilation à la volée", () => {
     });
     try {
       const { parseConfig } = await import("./schemas");
-      const { HERO_CONFIG, RELIEF_DEFAULT } = await import("./presets");
+      const { HERO_CONFIG, MONTAGNE_DEFAULT } = await import("./presets");
       expect(parseConfig("lavaux", HERO_CONFIG).ok).toBe(true);
-      expect(parseConfig("relief", RELIEF_DEFAULT).ok).toBe(true);
+      expect(parseConfig("montagne", MONTAGNE_DEFAULT).ok).toBe(true);
       expect(parseConfig("lavaux", { object: "lavaux", h: -1 }).ok).toBe(false);
     } finally {
       globalThis.Function = original;

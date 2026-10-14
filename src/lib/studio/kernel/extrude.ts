@@ -532,6 +532,29 @@ export function capPolygon(
   return builder.triangleCount - before;
 }
 
+/**
+ * Face plane d'un contour (avec trous) déjà net, SANS le retoucher : tous ses
+ * sommets sont utilisés tels quels (`capPolygon` retire les sommets alignés et
+ * les arêtes courtes, ce qui ouvrirait une jonction en T contre une surface
+ * qui les garde). Sert au dessous plat de la montagne lissée, dont le contour
+ * est la ligne de niveau du maillage : mêmes sommets, coque fermée. Le contour
+ * extérieur est en sens trigonométrique, les trous dans l'autre ; l'orientation
+ * est de toute façon corrigée par `earcut`.
+ */
+export function capRingsExact(
+  builder: MeshBuilder,
+  outer: readonly Vec2[],
+  holes: readonly (readonly Vec2[])[],
+  z: number,
+  up: boolean,
+  { band = 0, side = 0 }: Pick<ExtrudeOptions, "band" | "side"> = {},
+): number {
+  const before = builder.triangleCount;
+  const { points, triangles } = triangulate(outer, holes);
+  addCap(builder, points, triangles, z, up, band, side);
+  return builder.triangleCount - before;
+}
+
 /** Plusieurs polygones d'un coup (mêmes bornes en Z). */
 export function extrudePolygons(
   builder: MeshBuilder,

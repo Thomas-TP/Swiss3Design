@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from "vitest";
 import {
   CARTOUCHE_DEFAULT,
   LAVAUX_DEFAULT,
-  RELIEF_DEFAULT,
+  MONTAGNE_DEFAULT,
 } from "@/lib/studio/presets";
 import { installFakeSession } from "./testing";
 import {
@@ -48,11 +48,11 @@ describe("mémoire des envois (§6.8)", () => {
     expect(uploadHash(LAVAUX_DEFAULT, {}, "fr")).toBe(
       uploadHash(LAVAUX_DEFAULT, {}, "de"),
     );
-    expect(uploadHash(RELIEF_DEFAULT, { peak: "Léa" }, "fr")).not.toBe(
-      uploadHash(RELIEF_DEFAULT, { peak: "Léa" }, "de"),
+    expect(uploadHash(MONTAGNE_DEFAULT, { peak: "Léa" }, "fr")).not.toBe(
+      uploadHash(MONTAGNE_DEFAULT, { peak: "Léa" }, "de"),
     );
-    expect(uploadHash(RELIEF_DEFAULT, {}, "fr")).toBe(
-      uploadHash(RELIEF_DEFAULT, {}, "de"),
+    expect(uploadHash(MONTAGNE_DEFAULT, {}, "fr")).toBe(
+      uploadHash(MONTAGNE_DEFAULT, {}, "de"),
     );
   });
 

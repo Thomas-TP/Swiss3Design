@@ -12,7 +12,12 @@
 // Décodage : forme validée par le schéma zod de l'objet (schemas.ts), puis
 // ramenée à sa forme canonique (pas, couplages) pour que l'aller-retour soit
 // stable et que le hachage d'une configuration ne dépende pas de l'écriture.
-import { clampConfig, LAVAUX_RANGES, parseConfig } from "./schemas";
+import {
+  clampConfig,
+  LAVAUX_RANGES,
+  parseConfig,
+  rescaleMontagneBands,
+} from "./schemas";
 import type {
   Band,
   FilamentId,
@@ -67,7 +72,21 @@ const ALL_PATTERN_KEYS: readonly string[] = Object.values(PATTERN_KEYS).flat();
 const BASE_KEYS: Record<StudioObjectId, readonly string[]> = {
   lavaux: ["h", "d", "p", "b", "n", "l", "m", "w", "bd"],
   cartouche: ["t", "r", "mo", "e", "ly", "fp", "ft"],
-  relief: ["sh", "s", "ba", "re", "lv", "sd", "lk", "bd", "lb"],
+  montagne: [
+    "sh",
+    "s",
+    "pl",
+    "h",
+    "f",
+    "st",
+    "sd",
+    "sy",
+    "lv",
+    "bd",
+    "lb",
+    "am",
+    "al",
+  ],
   borne: ["sh", "c", "t", "rg", "rd", "mo", "fb", "ft"],
 };
 
@@ -123,17 +142,21 @@ export function toShortKeys(config: StudioConfig): Json {
         fp: config.plate,
         ft: config.ink,
       };
-    case "relief":
+    case "montagne":
       return {
         sh: config.shape,
         s: config.size,
-        ba: config.base,
-        re: config.relief,
-        lv: config.levels,
+        pl: config.plinth,
+        h: config.height,
+        f: config.form,
+        st: config.steep,
         sd: config.seed,
-        lk: config.lake,
+        sy: config.style,
+        lv: config.levels,
         bd: bandsToShort(config.bands),
         lb: config.label ? 1 : 0,
+        am: config.altMode,
+        al: config.altitude,
       };
     case "borne":
       return {
@@ -274,22 +297,39 @@ function longConfig(
         ink: pick("ft", d.ink),
       };
     }
-    case "relief": {
-      const d = defaults as Extract<StudioConfig, { object: "relief" }>;
+    case "montagne": {
+      const d = defaults as Extract<StudioConfig, { object: "montagne" }>;
+      const plinth = pick("pl", d.plinth);
+      const height = pick("h", d.height);
+      // Sans `bd`, les bandes du défaut suivent le socle et la hauteur (mêmes
+      // proportions) : un lien « h=100 » reste valide.
       const bands = Object.hasOwn(short, "bd")
         ? bandsFromShort(short.bd)
-        : d.bands;
+        : typeof plinth === "number" &&
+            typeof height === "number" &&
+            height > 0 &&
+            plinth > 0
+          ? rescaleMontagneBands(
+              d.bands,
+              { plinth: d.plinth, height: d.height },
+              { plinth, height },
+            )
+          : d.bands;
       const lb = pick("lb", d.label ? 1 : 0);
       return {
         object,
         shape: pick("sh", d.shape),
         size: pick("s", d.size),
-        base: pick("ba", d.base),
-        relief: pick("re", d.relief),
-        levels: pick("lv", d.levels),
+        plinth,
+        height,
+        form: pick("f", d.form),
+        steep: pick("st", d.steep),
         seed: pick("sd", d.seed),
-        lake: pick("lk", d.lake),
+        style: pick("sy", d.style),
+        levels: pick("lv", d.levels),
         bands,
+        altMode: pick("am", d.altMode),
+        altitude: pick("al", d.altitude),
         label:
           lb === 1 || lb === true
             ? true

@@ -6,7 +6,7 @@ import {
   BORNE_DEFAULT,
   CARTOUCHE_DEFAULT,
   HERO_CONFIG,
-  RELIEF_DEFAULT,
+  MONTAGNE_DEFAULT,
   LAVAUX_PRESETS,
   defaultConfig,
   heroVariant,
@@ -49,7 +49,7 @@ function lavauxOf(result: DecodeResult, label: string): LavauxConfig {
 const DEFAULTS: Record<StudioObjectId, StudioConfig> = {
   lavaux: HERO_CONFIG,
   cartouche: CARTOUCHE_DEFAULT,
-  relief: RELIEF_DEFAULT,
+  montagne: MONTAGNE_DEFAULT,
   borne: BORNE_DEFAULT,
 };
 
@@ -81,7 +81,12 @@ describe("fragment : aller-retour", () => {
   });
 
   it("les 4 objets par défaut et tous les préréglages font l'aller-retour", () => {
-    for (const object of ["lavaux", "cartouche", "relief", "borne"] as const) {
+    for (const object of [
+      "lavaux",
+      "cartouche",
+      "montagne",
+      "borne",
+    ] as const) {
       const config = defaultConfig(object);
       const decoded = decodeConfig(
         object,
@@ -169,7 +174,7 @@ describe("fragment : rejets", () => {
       for (const object of [
         "lavaux",
         "cartouche",
-        "relief",
+        "montagne",
         "borne",
       ] as const) {
         const result = decode(b64({ [key]: "Léa Dubois" }), object);
@@ -197,7 +202,12 @@ describe("fragment : rejets", () => {
   });
 
   it("aucun texte ne sort jamais d'une configuration encodée", () => {
-    for (const object of ["lavaux", "cartouche", "relief", "borne"] as const) {
+    for (const object of [
+      "lavaux",
+      "cartouche",
+      "montagne",
+      "borne",
+    ] as const) {
       const encoded = encodeConfig(defaultConfig(object));
       const json = Buffer.from(encoded.slice(3), "base64url").toString();
       for (const key of TEXT_KEYS) expect(json).not.toContain(`"${key}"`);
@@ -288,7 +298,7 @@ describe("paramètres GET (formulaire sans JavaScript)", () => {
   });
 
   it("aller-retour des quatre objets et de 50 vases aléatoires", () => {
-    for (const object of ["cartouche", "relief", "borne"] as const) {
+    for (const object of ["cartouche", "montagne", "borne"] as const) {
       const c = defaultConfig(object);
       expect(
         decodeSearchParams(
@@ -370,7 +380,12 @@ describe("paramètres GET (formulaire sans JavaScript)", () => {
 
 describe("schémas et bornage", () => {
   it("parseConfig : le héros et les défauts passent, une clé en trop non", () => {
-    for (const object of ["lavaux", "cartouche", "relief", "borne"] as const) {
+    for (const object of [
+      "lavaux",
+      "cartouche",
+      "montagne",
+      "borne",
+    ] as const) {
       expect(parseConfig(object, defaultConfig(object)).ok, `${object}`).toBe(
         true,
       );
@@ -396,7 +411,12 @@ describe("schémas et bornage", () => {
   });
 
   it("aucun schéma n'a de champ de texte", () => {
-    for (const object of ["lavaux", "cartouche", "relief", "borne"] as const) {
+    for (const object of [
+      "lavaux",
+      "cartouche",
+      "montagne",
+      "borne",
+    ] as const) {
       const keys = Object.keys(defaultConfig(object));
       for (const k of TEXT_KEYS) expect(keys).not.toContain(k);
     }
@@ -465,7 +485,12 @@ describe("ligne machine du devis", () => {
   });
 
   it("aucun texte, pas de saut de ligne, tous les objets", () => {
-    for (const object of ["lavaux", "cartouche", "relief", "borne"] as const) {
+    for (const object of [
+      "lavaux",
+      "cartouche",
+      "montagne",
+      "borne",
+    ] as const) {
       const line = machineLine(defaultConfig(object));
       expect(line.startsWith(`S3D-STUDIO v1 ${object} `)).toBe(true);
       expect(line).not.toMatch(/[\n\r]/);

@@ -15,7 +15,12 @@ import {
   LAVAUX_PROFILES,
   LAVAUX_RANGES,
   MAX_BANDS,
-  RELIEF_RANGES,
+  MONTAGNE_ALT_MODES,
+  MONTAGNE_FORMS,
+  MONTAGNE_RANGES,
+  MONTAGNE_SHAPES,
+  MONTAGNE_STYLES,
+  montagneTotal,
   type Range,
 } from "./ranges";
 import type { Band, FilamentId, StudioConfig, StudioObjectId } from "./types";
@@ -119,25 +124,36 @@ export const cartoucheSchema = z.strictObject({
   ink: filament,
 });
 
-export const reliefSchema = z
+export const montagneSchema = z
   .strictObject({
-    object: z.literal("relief"),
-    shape: z.enum(["rond", "carre"]),
-    size: num(RELIEF_RANGES.size),
-    base: num(RELIEF_RANGES.base),
-    relief: num(RELIEF_RANGES.relief),
-    levels: int(RELIEF_RANGES.levels),
-    seed: int(RELIEF_RANGES.seed),
-    lake: num(RELIEF_RANGES.lake),
+    object: z.literal("montagne"),
+    shape: z.enum(MONTAGNE_SHAPES),
+    size: num(MONTAGNE_RANGES.size),
+    plinth: num(MONTAGNE_RANGES.plinth),
+    height: num(MONTAGNE_RANGES.height),
+    form: z.enum(MONTAGNE_FORMS),
+    steep: num(MONTAGNE_RANGES.steep),
+    seed: int(MONTAGNE_RANGES.seed),
+    style: z.enum(MONTAGNE_STYLES),
+    levels: int(MONTAGNE_RANGES.levels),
     bands: bandsSchema(2, MAX_BANDS),
     label: z.boolean(),
+    altMode: z.enum(MONTAGNE_ALT_MODES),
+    altitude: int(MONTAGNE_RANGES.altitude),
   })
-  // Le sommet réel (`base + strates × Δ`) dépend des strates : le schéma ne
-  // vérifie que l'ordre, le bornage ramène ensuite chaque frontière au cran.
-  .refine((c) => increasingTo(c.bands, c.bands[c.bands.length - 1].toMm), {
-    message: "les bandes doivent être croissantes",
-    path: ["bands"],
-  });
+  // La première frontière est le dessus du socle et la dernière le sommet : le
+  // schéma ne vérifie que la forme et l'ordre, le bornage (`clampMontagne`)
+  // rétablit les règles (socle, épaisseurs, couplage avec la hauteur).
+  .refine(
+    (c) =>
+      increasingTo(c.bands, montagneTotal(c.plinth, c.height), 0.2) &&
+      Math.abs(c.bands[0].toMm - c.plinth) <= 0.2,
+    {
+      message:
+        "les bandes doivent être croissantes, la première finir au dessus du socle et la dernière au sommet",
+      path: ["bands"],
+    },
+  );
 
 export const borneSchema = z.strictObject({
   object: z.literal("borne"),
@@ -154,7 +170,7 @@ export const borneSchema = z.strictObject({
 export const SCHEMAS = {
   lavaux: lavauxSchema,
   cartouche: cartoucheSchema,
-  relief: reliefSchema,
+  montagne: montagneSchema,
   borne: borneSchema,
 } as const;
 

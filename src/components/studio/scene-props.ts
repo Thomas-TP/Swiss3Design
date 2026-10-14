@@ -6,7 +6,7 @@
 // Le contrat figé du brief, `StudioObjectViewProps` (config, textes, vue, coupe,
 // éclaté, simulation, autorotation), suffit à l'accueil : WP-HOME n'en passe pas
 // d'autre. Le Studio y AJOUTE des champs facultatifs (ajouts permis, ruptures
-// interdites) : la langue (étiquette du sous-verre), un compteur de
+// interdites) : la langue (étiquette de la Montagne), un compteur de
 // « réimpression », la durée réelle d'impression (simulation) et des rappels
 // d'état que la scène appelle à 10 Hz au plus. Sans eux, la scène fonctionne.
 import type { StudioObjectViewProps } from "@/lib/motion-bridge/types";
@@ -43,7 +43,7 @@ export interface StudioBandAnchor {
 }
 
 export interface StudioSceneProps extends StudioObjectViewProps {
-  /** Langue de l'étiquette du sous-verre (« POINTE » / « PIZ » / « PIZZO » / « MOUNT »). */
+  /** Langue de l'étiquette de la Montagne (séparateur de milliers de l'altitude). */
   locale?: StudioLocale;
   /**
    * Compteur : chaque incrément rejoue la « réimpression » (front qui monte de

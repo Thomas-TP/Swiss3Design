@@ -20,17 +20,17 @@ import {
   readStudioTexts,
   writeStudioTexts,
 } from "@/lib/studio/texts-store";
-import type { ReliefConfig } from "@/lib/studio/types";
+import type { MontagneConfig } from "@/lib/studio/types";
 import { SummitEngine } from "@/gates/home";
 import { HOME_VIEW_ATTR } from "./contract";
 import type { HomeLocale } from "./home-data-types";
-import type { ReliefTools } from "./summit-tools";
+import type { MontagneTools } from "./summit-tools";
 import { statsItems } from "./stats-items";
 import { useHomeMotion, useHomeView } from "./use-home-motion";
 import styles from "./home.module.css";
 
 // Chapitre 02 « Votre nom, en relief. Littéralement. » (brief « Strates »,
-// §7.5) : le visiteur nomme son sommet, l'étiquette du sous-verre « Relief » se
+// §7.5) : le visiteur nomme son sommet, l'étiquette de la Montagne se
 // réécrit à chaque frappe (debounce 120 ms), la bande de mesure suit, et le
 // texte arrive au Studio par sessionStorage, jamais par l'URL.
 //
@@ -41,7 +41,7 @@ import styles from "./home.module.css";
 // store) jusqu'à l'envoi à l'atelier. Le champ est hors de toute section
 // épinglée (un seul pin sur le site : le héros).
 //
-// L'étiquette et les chiffres exacts viennent du modèle du sous-verre
+// L'étiquette et les chiffres exacts viennent du modèle de la Montagne
 // (`peakLabel`, `computeStats`), trop lourd pour le JavaScript initial : il
 // n'est chargé (import asynchrone) que lorsque la section approche (marge
 // 150 %). Avant lui, et tant que le champ est vide, la page montre ceux de
@@ -54,7 +54,7 @@ interface SummitValue {
   peak: string;
   label: string;
   items: string[];
-  config: ReliefConfig;
+  config: MontagneConfig;
 }
 
 const SummitContext = createContext<SummitValue | null>(null);
@@ -74,7 +74,7 @@ export function SummitProvider({
   initialItems,
   children,
 }: {
-  config: ReliefConfig;
+  config: MontagneConfig;
   example: string;
   initialLabel: string;
   initialItems: string[];
@@ -84,7 +84,7 @@ export function SummitProvider({
   const tu = useTranslations("studioCore.units");
   const [raw, setRawState] = useState("");
   const [debounced, setDebounced] = useState("");
-  const [tools, setTools] = useState<ReliefTools | null>(null);
+  const [tools, setTools] = useState<MontagneTools | null>(null);
   const [near, setNear] = useState(false);
   const touched = useRef(false);
 
@@ -97,7 +97,7 @@ export function SummitProvider({
   // sessionStorage n'existe qu'après l'hydratation, on le lit donc ici.
   // oxlint-disable set-state-in-effect -- lecture d'un stockage externe, une fois
   useEffect(() => {
-    const saved = readStudioTexts("relief").peak;
+    const saved = readStudioTexts("montagne").peak;
     if (!saved) return;
     setRawState(saved);
     setDebounced(saved);
@@ -113,11 +113,11 @@ export function SummitProvider({
   useEffect(() => {
     if (!touched.current) return;
     const clean = debounced.trim();
-    if (clean) writeStudioTexts("relief", { peak: clean });
-    else clearStudioTexts("relief");
+    if (clean) writeStudioTexts("montagne", { peak: clean });
+    else clearStudioTexts("montagne");
   }, [debounced]);
 
-  // Modèle du sous-verre : le moteur (gate de l'accueil, chunk à part) n'est
+  // Modèle de la Montagne : le moteur (gate de l'accueil, chunk à part) n'est
   // monté que lorsque la section approche (marge 150 %).
   useEffect(() => {
     const section = document.getElementById("sommet");
@@ -208,7 +208,7 @@ export function SummitInput({
  * La moitié « vue » : une vue du Stage (`studio-object`, la scène de
  * WP-STUDIO) dont le conteneur est le fils direct d'un bloc « encre » : quand la
  * vue est prête, ce bloc devient transparent et la vue peint elle-même le fond
- * encre. Poster SSR : le massif en strates, vu de dessus. Étiquette en DOM,
+ * encre. Poster SSR : la montagne et ses couleurs. Étiquette en DOM,
  * mise à jour en direct (c'est aussi tout ce que voient mouvement réduit et C0).
  */
 export function SummitStage({ poster }: { poster: ReactNode }) {

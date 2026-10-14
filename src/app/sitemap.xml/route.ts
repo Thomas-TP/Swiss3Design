@@ -22,7 +22,7 @@ const STATIC_PAGES: { path: string; lastModified?: string }[] = [
   { path: "/studio" },
   { path: "/studio/lavaux" },
   { path: "/studio/cartouche" },
-  { path: "/studio/relief" },
+  { path: "/studio/montagne" },
   { path: "/studio/borne" },
   { path: "/custom" },
   { path: "/a-propos" },

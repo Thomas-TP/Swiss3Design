@@ -103,8 +103,8 @@ Détails complets (modèle de données, auth, R2, CSP) :
 - 🛍️ **Boutique** — catalogue par catégories, fiches produits, choix des couleurs
   et matières, galerie d'images, **viewer 3D** interactif (Three.js).
 - 🎨 **Studio** (`/studio`) — configurateur 3D de quatre objets originaux
-  générés en code (vase « Lavaux », carte « Cartouche », sous-verre « Relief »,
-  porte-nom « Borne ») : forme, motif, texte en relief, jusqu'à 4 filaments par
+  générés en code (vase « Lavaux », carte « Cartouche », « Montagne » de bureau
+  jusqu'à 12 cm, porte-nom « Borne ») : forme, motif, texte en relief, jusqu'à 4 filaments par
   bandes d'altitude, estimation en grammes, durée et changements de filament,
   garde-fous d'imprimabilité, puis envoi à l'atelier (export STL, même demande
   de devis que `/custom`).

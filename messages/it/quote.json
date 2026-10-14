@@ -9,7 +9,7 @@
     "studio": {
       "kicker": "Studio",
       "title": "Non ho un file",
-      "body": "Personalizzi nello Studio un vaso, un biglietto da visita, un sottobicchiere o un portanome, poi lo invii all'atelier. Un'idea senza file? La descriva nel modulo."
+      "body": "Personalizzi nello Studio un vaso, un biglietto da visita, una montagna o un portanome, poi lo invii all'atelier. Un'idea senza file? La descriva nel modulo."
     }
   },
   "sheet": {
@@ -45,7 +45,7 @@
     "objects": {
       "lavaux": "Vaso «Lavaux»",
       "cartouche": "Biglietto «Cartouche»",
-      "relief": "Sottobicchiere «Relief»",
+      "montagne": "Montagna",
       "borne": "Portanome «Borne»"
     },
     "fileSent": "File inviato: {name} · {size}",

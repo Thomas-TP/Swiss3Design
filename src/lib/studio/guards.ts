@@ -9,6 +9,7 @@
 // | band-thin         | bande ≥ 2 mm                                                   |
 // | pattern-coupling  | gradins gd ≤ 0,5 gs ET gd ≤ paroi − 0,2 ; vagues wl ≥ 4 wa ; voronoï w ≥ 1,2 va |
 // | near-vase-spirale | BLOQUANT : nervures 28–56, |torsion| ≥ 45°, col ≤ 0,6         |
+// | too-tall          | Montagne : hauteur ≤ 1,6 × la base (avertissement)             |
 //
 // Sévérités (le brief ne fixe que celle du trait des textes) : `error` bloque
 // « Envoyer à l'atelier » ; `warn` affiche « À vérifier ». Surplomb entre 45°
@@ -23,15 +24,17 @@ import { layoutCartouche } from "./objects/cartouche-model";
 import type { FlatModel } from "./objects/flat-model";
 import { analyzeLavaux, type LavauxAnalysis } from "./objects/lavaux-analysis";
 import {
-  layoutRelief,
+  layoutMontagne,
   type Locale,
-  type ReliefModel,
-} from "./objects/relief-model";
+  type MontagneModel,
+} from "./objects/montagne-model";
 import {
   clampLavaux,
   gradinsDepthMax,
   MIN_BAND_MM,
+  montagneHeightMax,
   vaguesWavelengthMin,
+  withMontagneGeometry,
 } from "./ranges";
 import { strokeLevel, type TextIssue } from "./text/check";
 import { capForStroke, STROKE_WARN_MM } from "./text/layout";
@@ -40,6 +43,7 @@ import type {
   BorneConfig,
   IssueCode,
   LavauxConfig,
+  MontagneConfig,
   Printability,
   StudioConfig,
   StudioTexts,
@@ -76,6 +80,7 @@ export const ISSUE_MESSAGE_KEYS: Record<IssueCode, string> = {
   "text-stroke": "guard.issue.textStroke",
   "text-fit": "guard.issue.textFit",
   "text-char": "guard.issue.textChar",
+  "too-tall": "guard.issue.tooTall",
   "near-vase-spirale": "guard.issue.nearVase",
 };
 
@@ -379,7 +384,7 @@ export function checkLavaux(config: LavauxConfig): Printability {
 // qui ne tient pas à la capitale minimale est une ERREUR (`text-fit`,
 // « raccourcissez-le ») ; un trait sous 0,8 mm est un AVERTISSEMENT, sous
 // 0,6 mm une ERREUR (`text-stroke`, agrandissez les lettres). Le porte-nom
-// propose la correction (la hauteur de ses lettres) ; la carte et le sous-verre
+// propose la correction (la hauteur de ses lettres) ; la carte et la montagne
 // n'ont pas de réglage de taille de texte : pas de correction automatique.
 
 type Found = { issue: Issue; level: "warn" | "error" };
@@ -448,15 +453,35 @@ export function checkFlatWith(
   ]);
 }
 
-/** Garde-fous du sous-verre : le plateau et le texte de l'étiquette. */
-export function checkReliefWith(
-  config: { size: number },
-  model: ReliefModel,
+/**
+ * Garde-fous de la Montagne : le plateau, le texte de l'étiquette et la hauteur.
+ * Aucun surplomb possible (une carte d'altitude n'en a pas), donc pas de garde
+ * de pente. `too-tall` : au-delà de 1,6 × la base, la montagne devient une
+ * aiguille qui se décolle et casse (le bornage des curseurs et des liens
+ * l'empêche : ce garde ne signale que ce qu'il laisse passer) ; la correction
+ * ramène la hauteur à la limite, bandes comprises.
+ */
+export function checkMontagneWith(
+  config: MontagneConfig,
+  model: MontagneModel,
 ): Printability {
-  return toPrintability([
-    ...plateIssue(config.size, config.size, model.heightMm),
+  const found: Found[] = [
+    ...plateIssue(model.widthMm, model.depthMm, model.total),
     ...textIssues(model.issues),
-  ]);
+  ];
+  const max = montagneHeightMax(config.size);
+  if (config.height > max + 1e-9) {
+    const fixed = withMontagneGeometry(config, { height: max });
+    found.push({
+      level: "warn",
+      issue: {
+        code: "too-tall",
+        value: max,
+        fix: { height: fixed.height, bands: fixed.bands },
+      },
+    });
+  }
+  return toPrintability(found);
 }
 
 /** Correction du trait du porte-nom : la plus petite hauteur de lettres (0,5 mm près) qui donne 0,8 mm. */
@@ -469,8 +494,8 @@ export function borneStrokeFix(
 
 /**
  * Garde-fous d'une configuration quelconque. Les objets à texte lisent `texts` ;
- * `locale` ne compte que pour l'étiquette du sous-verre (sa longueur varie avec
- * « POINTE » / « PIZ » / « PIZZO » / « MOUNT »).
+ * `locale` ne compte que pour l'étiquette de la Montagne (le séparateur de
+ * milliers de l'altitude change sa largeur).
  */
 export function checkPrintability(
   config: StudioConfig,
@@ -486,7 +511,7 @@ export function checkPrintability(
       return checkFlatWith(layoutBorne(config, texts), () =>
         borneStrokeFix(config),
       );
-    case "relief":
-      return checkReliefWith(config, layoutRelief(config, texts, locale));
+    case "montagne":
+      return checkMontagneWith(config, layoutMontagne(config, texts, locale));
   }
 }

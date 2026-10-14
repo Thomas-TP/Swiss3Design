@@ -362,7 +362,7 @@ describe("mise en page : ajustement automatique et trait", () => {
   it("dépasser la longueur saisissable est un `text-fit` même si le texte tient", () => {
     const check = checkLine({
       field: "peak",
-      text: "iiiiiiiiiiiiiii", // 15 caractères > 12, étroits
+      text: "iiiiiiiiiiiiiiiii", // 17 caractères > 16, étroits
       capMm: 4.2,
       minCapMm: MIN_CAP_MM,
       maxWidthMm: 200,

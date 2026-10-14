@@ -3,7 +3,7 @@
 // valides dans TOUTES les plages du §6.2, extrêmes compris, avec les couplages
 // du §6.6 appliqués par `clampLavaux`. Utilisées par manifold.test.ts,
 // stats.test.ts, guards.test.ts et url-state.test.ts ; WP-02 y ajoute les
-// tirages de Cartouche, Relief et Borne, leurs textes, et le chargement des
+// tirages de Cartouche, Montagne et Borne, leurs textes, et le chargement des
 // glyphes depuis `public/` (les tests tournent dans Node : pas de `fetch`).
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
@@ -15,10 +15,10 @@ import {
   clampBorne,
   clampCartouche,
   clampLavaux,
-  clampRelief,
+  clampMontagne,
   LAVAUX_RANGES,
   LAVAUX_WALLS,
-  RELIEF_RANGES,
+  MONTAGNE_RANGES,
 } from "./schemas";
 import { TEXT_LIMITS } from "./text/fields";
 import { parseGlyphFont, setGlyphFont, type GlyphFont } from "./text/glyphs";
@@ -28,7 +28,7 @@ import type {
   CartoucheConfig,
   LavauxConfig,
   LavauxPattern,
-  ReliefConfig,
+  MontagneConfig,
   StudioObjectId,
   StudioTexts,
 } from "./types";
@@ -124,29 +124,37 @@ export function randomCartouche(rng: Rng): CartoucheConfig {
   });
 }
 
-/** Sous-verre valide tiré dans toutes les plages : graine, lac, strates, 2 à 4 bandes. */
-export function randomRelief(rng: Rng): ReliefConfig {
-  const R = RELIEF_RANGES;
+/**
+ * Montagne valide tirée dans toutes les plages : base, socle, hauteur (couplée à
+ * la base), forme, raideur, graine, style, strates, 2 à 4 bandes, étiquette,
+ * altitude saisie ou fictive. `clampMontagne` rétablit les couplages.
+ */
+export function randomMontagne(rng: Rng): MontagneConfig {
+  const R = MONTAGNE_RANGES;
   const bands: Band[] = [];
   const count = intBetween(rng, 2, 4);
   for (let k = 0; k < count; k++) {
     bands.push({
       filament: pick(rng, FILAMENT_IDS),
-      toMm: between(rng, 1, 10),
+      toMm: between(rng, 8, 120),
     });
   }
-  bands.sort((a, b) => a.toMm - b.toMm);
-  return clampRelief({
-    object: "relief",
-    shape: pick(rng, ["rond", "carre"] as const),
+  bands.sort((x, y) => x.toMm - y.toMm);
+  return clampMontagne({
+    object: "montagne",
+    shape: pick(rng, ["rond", "carre", "hexagone"] as const),
     size: intBetween(rng, R.size.min, R.size.max),
-    base: between(rng, R.base.min, R.base.max),
-    relief: between(rng, R.relief.min, R.relief.max),
-    levels: intBetween(rng, R.levels.min, R.levels.max),
+    plinth: between(rng, R.plinth.min, R.plinth.max),
+    height: intBetween(rng, R.height.min, R.height.max),
+    form: pick(rng, ["pic", "massif", "arete"] as const),
+    steep: between(rng, R.steep.min, R.steep.max),
     seed: intBetween(rng, R.seed.min, R.seed.max),
-    lake: intBetween(rng, R.lake.min, R.lake.max),
+    style: pick(rng, ["lisse", "strates"] as const),
+    levels: intBetween(rng, R.levels.min, R.levels.max),
     bands,
     label: rng() < 0.75,
+    altMode: pick(rng, ["fictive", "saisie"] as const),
+    altitude: intBetween(rng, R.altitude.min, R.altitude.max),
   });
 }
 
@@ -232,7 +240,7 @@ export function randomTexts(rng: Rng, object: StudioObjectId): StudioTexts {
         line2:
           rng() < 0.6 ? randomText(rng, randomLength(rng, L.line2)) : undefined,
       };
-    case "relief":
+    case "montagne":
       return { peak: randomText(rng, randomLength(rng, L.peak)) };
     case "borne":
       return { text: randomText(rng, randomLength(rng, L.text)) };

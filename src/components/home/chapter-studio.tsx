@@ -19,24 +19,24 @@ import styles from "./home.module.css";
 // les textes d'exemple de chaque langue et figés dans home-data.generated.ts ;
 // un prix n'est affiché que si `PRICING.validated` l'a rendu possible
 // (`estimate`), sinon « Sur devis ».
-const OBJECTS: StudioObjectId[] = ["lavaux", "cartouche", "relief", "borne"];
+const OBJECTS: StudioObjectId[] = ["lavaux", "cartouche", "montagne", "borne"];
 const STEPS = ["set", "send", "check", "print"] as const;
 
 function Poster({ poster }: { poster: ObjectPoster }) {
   if (poster.kind === "hero")
     return <PosterSvg poster={getHeroPoster("final")} />;
-  if (poster.kind === "relief")
+  if (poster.kind === "montagne")
     return (
       <>
         <img
-          src="/posters/relief-default-light.svg"
+          src="/posters/montagne-default-light.svg"
           alt=""
           loading="lazy"
           decoding="async"
           className={styles.lightOnly}
         />
         <img
-          src="/posters/relief-default-dark.svg"
+          src="/posters/montagne-default-dark.svg"
           alt=""
           loading="lazy"
           decoding="async"

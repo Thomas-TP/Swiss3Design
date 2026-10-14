@@ -5,7 +5,7 @@ import {
   BORNE_DEFAULT,
   CARTOUCHE_DEFAULT,
   LAVAUX_DEFAULT,
-  RELIEF_DEFAULT,
+  MONTAGNE_DEFAULT,
 } from "@/lib/studio/presets";
 import { computeStats } from "@/lib/studio/stats";
 import type { StudioConfig, StudioTexts } from "@/lib/studio/types";
@@ -114,7 +114,7 @@ describe("demande de devis du Studio (§6.9)", () => {
       for (const config of [
         LAVAUX_DEFAULT,
         CARTOUCHE_DEFAULT,
-        RELIEF_DEFAULT,
+        MONTAGNE_DEFAULT,
         BORNE_DEFAULT,
       ]) {
         const i = input(config, texts, locale);

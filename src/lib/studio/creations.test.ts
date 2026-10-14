@@ -137,10 +137,10 @@ describe("Mes créations", () => {
     env.store.set(
       CREATIONS_KEY,
       JSON.stringify([
-        { id: "ok", object: "relief", fragment: "", label: "R", savedAt: 1 },
+        { id: "ok", object: "montagne", fragment: "", label: "R", savedAt: 1 },
         {
           id: "ok",
-          object: "relief",
+          object: "montagne",
           fragment: "",
           label: "doublon",
           savedAt: 2,

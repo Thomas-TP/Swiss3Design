@@ -7,7 +7,7 @@ import {
   BORNE_DEFAULT,
   CARTOUCHE_DEFAULT,
   HERO_CONFIG,
-  RELIEF_DEFAULT,
+  MONTAGNE_DEFAULT,
 } from "@/lib/studio/presets";
 import { setGlyphFont } from "@/lib/studio/text/glyphs";
 import {
@@ -172,11 +172,11 @@ describe("construction d'affichage (Worker)", () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
   });
 
-  it("sous-verre : l'étiquette change avec la langue (POINTE / MOUNT)", async () => {
+  it("montagne : l'étiquette change avec la langue (séparateur de milliers de l'altitude)", async () => {
     serveGlyphs();
     const run = (locale: "fr" | "en") =>
       runBuild({
-        config: RELIEF_DEFAULT,
+        config: MONTAGNE_DEFAULT,
         texts: { peak: "Zoé" },
         lod: "display",
         tier: 1,

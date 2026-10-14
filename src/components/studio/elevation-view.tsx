@@ -6,15 +6,16 @@ import { lavauxElevation, type ElevationData } from "@/lib/studio/poster";
 import {
   borneTopView,
   cartoucheTopView,
-  reliefTopView,
   type TopViewData,
 } from "@/lib/studio/poster-flat";
+import { montagneElevation } from "@/lib/studio/poster-montagne";
 import type { StudioConfig, StudioTexts } from "@/lib/studio/types";
 import type { StudioLocale } from "./scene-props";
 
 // Vue 2D exacte du Studio (brief « Strates », §6.7 : « Élévation (SVG 2D exact,
-// seule vue en C0) » et §6.12 : « poster Élévation SSR »). Le vase montre sa
-// silhouette latérale au dixième de millimètre, les objets plats leur plan : ce
+// seule vue en C0) » et §6.12 : « poster Élévation SSR »). Le vase et la montagne
+// montrent leur silhouette latérale au dixième de millimètre, les objets plats
+// leur plan : ce
 // sont des données calculées par le code (poster.ts, poster-flat.ts), jamais une
 // image. Rendu en JSX (pas de HTML injecté), identique côté serveur et côté
 // client : c'est le poster du Stage avant le premier rendu WebGL, et l'unique vue
@@ -50,6 +51,16 @@ function ElevationSvg({ data, id }: { data: ElevationData; id: string }) {
             fill={band.hex}
           />
         ))}
+        {data.courses && data.courses.length > 0 ? (
+          // Une ligne de couche toutes les 10 couches : le filet des strates.
+          <path
+            d={data.courses.map((cy) => `M${x} ${cy}H${x + w}`).join("")}
+            stroke="currentColor"
+            strokeOpacity={0.2}
+            strokeWidth={0.5}
+            vectorEffect="non-scaling-stroke"
+          />
+        ) : null}
       </g>
       <path
         d={data.outline}
@@ -115,11 +126,8 @@ export function flatViewData(
       };
     case "borne":
       return { kind: "top", data: borneTopView(config, texts, { theme }) };
-    case "relief":
-      return {
-        kind: "top",
-        data: reliefTopView(config, texts, { theme, locale }),
-      };
+    case "montagne":
+      return { kind: "elevation", data: montagneElevation(config) };
   }
 }
 

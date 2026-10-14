@@ -14,7 +14,7 @@ import type { StudioObjectId, StudioTexts } from "@/lib/studio/types";
 // Aperçu d'un objet du Studio dans ses couleurs (cartes de la boutique et de
 // l'index du Studio) : le dessin que le code calcule, rendu par le serveur sans
 // composant client ni JavaScript. Le vase est le poster 3/4 du héros (les
-// strates aux teintes des bandes, déjà figé pour l'accueil), le sous-verre
+// strates aux teintes des bandes, déjà figé pour l'accueil), la montagne
 // l'affiche statique de `public/posters` (hors du Worker), la carte et le
 // porte-nom leur vue de dessus (une variante par thème, l'une des deux est
 // masquée par la classe `.dark` de <html>).
@@ -104,18 +104,18 @@ export function ObjectPreview({
       <PosterSvg poster={vasePoster()} className="block h-full w-full" />,
     );
 
-  if (object === "relief")
+  if (object === "montagne")
     return frame(
       <>
         <img
-          src="/posters/relief-default-light.svg"
+          src="/posters/montagne-default-light.svg"
           alt=""
           loading="lazy"
           decoding="async"
           className="block h-full w-full object-contain dark:hidden"
         />
         <img
-          src="/posters/relief-default-dark.svg"
+          src="/posters/montagne-default-dark.svg"
           alt=""
           loading="lazy"
           decoding="async"

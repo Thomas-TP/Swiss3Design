@@ -10,10 +10,10 @@
       "noun": "Business card",
       "tagline": "Your 85 × 55 mm business card, embossed or engraved."
     },
-    "relief": {
-      "name": "“Relief” coaster",
-      "noun": "Coaster",
-      "tagline": "A 100 mm coaster: a layered mountain range, your name on the summit."
+    "montagne": {
+      "name": "Mountain",
+      "noun": "Mountain",
+      "tagline": "A real little mountain for a desk or shelf, up to 12 cm tall, colored by altitude, with your name on the plinth."
     },
     "borne": {
       "name": "“Borne” name tag",
@@ -63,11 +63,10 @@
     "cadre": "Frame",
     "monogramme": "Monogram",
     "incrustee": "Inlaid",
+    "cime": "Peak",
     "massif": "Massif",
-    "lac": "Lake",
     "arete": "Ridge",
-    "glacier": "Glacier",
-    "plateau": "Plateau",
+    "maquette": "Model",
     "pilule": "Pill",
     "etiquette": "Tag",
     "goutte": "Drop",
@@ -88,10 +87,20 @@
     "shape": {
       "rond": "Round",
       "carre": "Square",
+      "hexagone": "Hexagon",
       "pilule": "Pill",
       "etiquette": "Label",
       "goutte": "Drop",
       "pic": "Peak"
+    },
+    "form": {
+      "pic": "Peak",
+      "massif": "Massif",
+      "arete": "Ridge"
+    },
+    "style": {
+      "lisse": "Smooth",
+      "strates": "Terraced"
     },
     "ring": {
       "gauche": "Left",
@@ -142,20 +151,16 @@
       "textStroke": "Letter stroke at {value} mm: at least 0.8 mm for a 0.4 mm nozzle.",
       "textFit": "The text does not fit at the minimum size: shorten it.",
       "textChar": "Unprintable character: {char}",
+      "tooTall": "Mountain too tall for its base: {value} mm at most, which is 1.6 times the base.",
       "nearVase": "This combination resembles Ian's Vase spirale (no-derivatives license). Reduce the twist or the number of ribs."
     }
-  },
-  "relief": {
-    "peak": "Mount {name}",
-    "summit": "{peak} · {altitude} m",
-    "fictional": "fictional altitude"
   },
   "examples": {
     "name": "Léa Dubois",
     "role": "Architect",
     "line1": "lea@example.ch",
     "line2": "+41 21 000 00 00",
-    "peak": "Léa",
+    "peak": "Mount Léa",
     "text": "Léa"
   }
 }

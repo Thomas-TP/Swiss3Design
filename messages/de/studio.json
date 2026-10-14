@@ -7,7 +7,7 @@
   "seo": {
     "index": {
       "title": "Das Studio: Ihr Objekt in 3D personalisieren",
-      "description": "Vier Objekte in 3D personalisieren: Vase, Visitenkarte, Untersetzer, Namensschild. Bis zu vier Farben, gedruckt in der Schweiz, Festpreis innert 48 Stunden."
+      "description": "Vier Objekte in 3D personalisieren: Vase, Visitenkarte, Berg, Namensschild. Bis zu vier Farben, gedruckt in der Schweiz, Festpreis innert 48 Stunden."
     },
     "objects": {
       "lavaux": {
@@ -18,9 +18,9 @@
         "title": "3D-Visitenkarte Cartouche",
         "description": "Ihre Visitenkarte von 85 × 55 mm, erhaben oder graviert, zwei Farben, Ihr Text: in 3D personalisieren, in der Schweiz gedruckt, Festpreis innert 48 Stunden."
       },
-      "relief": {
-        "title": "Untersetzer Relief, Massiv nach Mass",
-        "description": "Ein Untersetzer von 100 mm in Schichten: Massiv, See, Farben nach Höhe und Gipfelname wählen. Gedruckt in der Schweiz, Festpreis innert 48 Stunden."
+      "montagne": {
+        "title": "Berg nach Mass, nach Höhe eingefärbt",
+        "description": "Ein kleiner Berg für den Schreibtisch, bis 12 cm hoch, nach Höhe eingefärbt, Ihr Name auf dem Sockel. Gedruckt in der Schweiz, Festpreis innert 48 Stunden."
       },
       "borne": {
         "title": "Namensschild Borne in zwei Farben",
@@ -93,8 +93,8 @@
     "cartouche": {
       "lead": "85 × 55 mm, das Schweizer Format. Vier Layouts, Text erhaben oder graviert, zwei Farben."
     },
-    "relief": {
-      "lead": "Ein Bergmassiv in Schichten auf 100 mm, vom See bis zum Schnee. Ihr Name auf dem Gipfel, auf einer fiktiven Höhe."
+    "montagne": {
+      "lead": "Ein Berg von 30 bis 120 mm: Spitze, Massiv oder Grat, glatt oder in Schichten, vom Sockel bis zum Schnee. Ihr Name und seine Höhe auf der Vorderseite."
     },
     "borne": {
       "lead": "Ein Text von 1 bis 14 Zeichen, vier Formen, ein Ring, wenn Sie das Schild aufhängen möchten."
@@ -155,6 +155,7 @@
     "count": "{count}",
     "degrees": "{value} Grad",
     "percent": "{value} Prozent",
+    "altitude": "{value} Meter",
     "seed": "Startwert {value}"
   },
   "ctl": {
@@ -202,16 +203,26 @@
       "corner": "Ecken",
       "layout": "Layout"
     },
-    "relief": {
-      "shape": "Form",
-      "diameter": "Durchmesser",
-      "side": "Seitenlänge",
-      "base": "Sockel",
-      "relief": "Relief",
+    "montagne": {
+      "form": "Form des Bergs",
+      "style": "Oberfläche",
+      "height": "Höhe des Bergs",
+      "heightHint": "Über dem Sockel; höchstens das 1,6-Fache der Basis.",
+      "steep": "Steilheit",
+      "steepHint": "Sanft: ein runder Hügel. Steil: eine Spitze mit ausgehöhlten Flanken.",
       "levels": "Schichten",
-      "seed": "Massiv (Startwert)",
-      "lake": "Seespiegel",
-      "label": "Gipfelbeschriftung"
+      "seed": "Berg (Startwert)",
+      "shape": "Form des Sockels",
+      "diameter": "Durchmesser der Basis",
+      "side": "Seite der Basis",
+      "acrossFlats": "Breite der Basis (zwischen den Seiten)",
+      "plinth": "Höhe des Sockels",
+      "label": "Beschriftung auf dem Sockel",
+      "altMode": "Angezeigte Höhe",
+      "altFictive": "Fiktiv",
+      "altTyped": "Eingegeben",
+      "altitude": "Höhe über Meer",
+      "altitudeHint": "Aus dem Namen berechnet: eine fiktive Höhe, nie gemessen."
     },
     "borne": {
       "shape": "Form",
@@ -226,7 +237,7 @@
       "role": "Funktion",
       "line1": "Zeile 1",
       "line2": "Zeile 2",
-      "peak": "Name auf dem Gipfel",
+      "peak": "Name des Bergs",
       "text": "Text",
       "counter": "{count} / {max} Zeichen",
       "moderation": "Ein Mensch der Werkstatt liest jeden Text vor dem Druck durch. Wir lehnen Marken Dritter, Beleidigungen und rechtswidrige Inhalte ab."
@@ -246,6 +257,7 @@
     "filamentLegend": "Farbe der Farbzone {index}",
     "boundaryLabel": "Farbwechsel {index}",
     "hint": "Jeder Farbwechsel geschieht auf einer genauen Höhe: mindestens 2 mm pro Farbzone, bis zu vier Filamente.",
+    "plinthHint": "Die erste Farbzone ist der Sockel: Seine Höhe stellen Sie bei der Form ein, seine Farbe hier.",
     "noscript": "Ohne JavaScript geben Sie die Farbzonen unten ein: Filament, Doppelpunkt, Höhe in Millimetern, durch Kommas getrennt.",
     "field": "Farbzonen (Filament:Höhe, durch Kommas getrennt)"
   },
@@ -294,6 +306,8 @@
     "yes": "ja",
     "no": "nein",
     "none": "—",
+    "labelFictive": "ja, fiktive Höhe",
+    "labelTyped": "ja, eingegebene Höhe: {value} m",
     "indicative": "unverbindlich",
     "title": "[Studio] {object} · Konfiguration v1",
     "link": "Link: {link}",
@@ -310,13 +324,13 @@
       "role": "Funktion",
       "line1": "Zeile 1",
       "line2": "Zeile 2",
-      "peak": "Gipfel",
+      "peak": "Name des Bergs",
       "text": "Text"
     },
     "detail": {
       "lavaux": "Wand {wall} · Profil {profile}",
       "cartouche": "Dicke {thickness}",
-      "relief": "Sockel {base} · Relief {relief} · Form {shape}",
+      "montagne": "Sockel {plinth} · Berg {height} · Form {shape}",
       "borne": "Dicke {thickness}"
     },
     "pattern": {
@@ -329,7 +343,7 @@
     "settings": {
       "lavaux": "Muster: {pattern}",
       "cartouche": "Parameter: {mode} ({depth}) · Layout {layout} · Ecken {corner}",
-      "relief": "Parameter: {levels} Schichten · See {lake} % · Massiv {seed} · Gipfelbeschriftung: {label}",
+      "montagne": "Parameter: {form} · {style} · Steilheit {steep} % · Startwert {seed} · Beschriftung: {label}",
       "borne": "Parameter: Form {shape} · Buchstaben {cap} · Ring {ring} · Modus {mode}"
     }
   }

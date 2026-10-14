@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 import { initOpenNextCloudflareForDev } from "@opennextjs/cloudflare";
+import { LEGACY_STUDIO_REDIRECTS } from "./src/lib/studio/legacy-redirects";
 
 // Donne accès aux bindings Cloudflare (D1, R2, KV) pendant `next dev`
 initOpenNextCloudflareForDev();
@@ -110,6 +111,10 @@ const nextConfig: NextConfig = {
     return config;
   },
   poweredByHeader: false,
+  // Anciennes adresses du Studio (/studio/relief → /studio/montagne), en 308.
+  async redirects() {
+    return LEGACY_STUDIO_REDIRECTS.map((redirect) => ({ ...redirect }));
+  },
   images: {
     // Optimisation déléguée à Cloudflare Images au déploiement
     unoptimized: true,

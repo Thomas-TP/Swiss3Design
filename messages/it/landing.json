@@ -1,7 +1,7 @@
 {
   "seo": {
     "title": "Swiss3Design · Stampa 3D multicolore in Svizzera",
-    "description": "Personalizzi in 3D un vaso, un biglietto o un sottobicchiere, poi l'atelier lo stampa fino a quattro colori, a Gland e Pully. Consegna in tutta la Svizzera.",
+    "description": "Personalizzi in 3D un vaso, un biglietto o una montagna, poi l'atelier lo stampa fino a quattro colori, a Gland e Pully. Consegna in tutta la Svizzera.",
     "imageAlt": "Swiss3Design: un vaso stampato strato dopo strato in tre colori"
   },
   "rail": {
@@ -49,11 +49,11 @@
   "summit": {
     "eyebrow": "La Sua vetta",
     "title": "Il Suo nome, in rilievo. Letteralmente.",
-    "lead": "Il sottobicchiere «Relief» è un massiccio a strati. Il Suo nome ne corona la vetta, con una quota immaginaria calcolata a partire da esso.",
+    "lead": "La Montagna è una vera piccola montagna da appoggiare su una scrivania, colorata per quota. Il Suo nome compare in rilievo sul basamento, con una quota immaginaria calcolata a partire da esso.",
     "input": "Dia un nome alla Sua vetta",
     "note": "Il testo resta nel Suo browser fino all'invio all'atelier.",
     "cta": "Continua nello Studio",
-    "poster": "Sottobicchiere «Relief»: un massiccio a strati, visto dall'alto."
+    "poster": "Montagna: una piccola montagna colorata per quota, vista di fronte."
   },
   "studio": {
     "eyebrow": "Lo Studio",

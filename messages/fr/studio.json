@@ -7,7 +7,7 @@
   "seo": {
     "index": {
       "title": "Le Studio : personnalisez votre objet 3D",
-      "description": "Quatre objets à personnaliser en 3D : vase, carte de visite, sous-verre, porte-nom. Jusqu'à quatre couleurs, imprimés en Suisse, prix ferme sous 48 h."
+      "description": "Quatre objets à personnaliser en 3D : vase, carte de visite, montagne, porte-nom. Jusqu'à quatre couleurs, imprimés en Suisse, prix ferme sous 48 h."
     },
     "objects": {
       "lavaux": {
@@ -18,9 +18,9 @@
         "title": "Carte de visite 3D Cartouche",
         "description": "Votre carte de visite de 85 × 55 mm en relief ou gravée, deux couleurs, texte à vous : personnalisez-la en 3D, l'atelier l'imprime en Suisse, prix ferme sous 48 h."
       },
-      "relief": {
-        "title": "Sous-verre Relief, massif sur mesure",
-        "description": "Un sous-verre de 100 mm en strates : choisissez le massif, le lac, les teintes par altitude et le nom au sommet. Imprimé en Suisse, prix ferme sous 48 h."
+      "montagne": {
+        "title": "Montagne sur mesure, colorée par altitude",
+        "description": "Une petite montagne à poser sur un bureau, jusqu'à 12 cm, colorée par altitude, votre nom sur le socle. Imprimée en Suisse, prix ferme sous 48 h."
       },
       "borne": {
         "title": "Porte-nom Borne en deux couleurs",
@@ -93,8 +93,8 @@
     "cartouche": {
       "lead": "85 × 55 mm, le format suisse. Quatre mises en page, texte en relief ou gravé, deux couleurs."
     },
-    "relief": {
-      "lead": "Un massif en strates sur 100 mm, du lac aux neiges. Votre nom au sommet, à une altitude fictive."
+    "montagne": {
+      "lead": "Une montagne de 30 à 120 mm : un pic, un massif ou une arête, lissée ou en strates, du socle aux neiges. Votre nom et son altitude sur le devant."
     },
     "borne": {
       "lead": "Un texte de 1 à 14 caractères, quatre formes, un anneau si vous voulez le suspendre."
@@ -155,6 +155,7 @@
     "count": "{count}",
     "degrees": "{value} degrés",
     "percent": "{value} pour cent",
+    "altitude": "{value} mètres",
     "seed": "graine {value}"
   },
   "ctl": {
@@ -202,16 +203,26 @@
       "corner": "Coins",
       "layout": "Mise en page"
     },
-    "relief": {
-      "shape": "Forme",
-      "diameter": "Diamètre",
-      "side": "Côté",
-      "base": "Socle",
-      "relief": "Relief",
+    "montagne": {
+      "form": "Forme de la montagne",
+      "style": "Surface",
+      "height": "Hauteur de la montagne",
+      "heightHint": "Au-dessus du socle ; 1,6 fois la base au plus.",
+      "steep": "Raideur",
+      "steepHint": "Douce : un relief arrondi. Raide : un pic aux flancs creusés.",
       "levels": "Strates",
-      "seed": "Massif (graine)",
-      "lake": "Niveau du lac",
-      "label": "Étiquette du sommet"
+      "seed": "Montagne (graine)",
+      "shape": "Forme du socle",
+      "diameter": "Diamètre de la base",
+      "side": "Côté de la base",
+      "acrossFlats": "Largeur de la base (entre côtés)",
+      "plinth": "Hauteur du socle",
+      "label": "Étiquette sur le socle",
+      "altMode": "Altitude affichée",
+      "altFictive": "Fictive",
+      "altTyped": "Saisie",
+      "altitude": "Altitude",
+      "altitudeHint": "Calculée à partir du nom : une altitude fictive, jamais mesurée."
     },
     "borne": {
       "shape": "Forme",
@@ -226,7 +237,7 @@
       "role": "Fonction",
       "line1": "Ligne 1",
       "line2": "Ligne 2",
-      "peak": "Nom au sommet",
+      "peak": "Nom de la montagne",
       "text": "Texte",
       "counter": "{count} / {max} caractères",
       "moderation": "Un humain de l'atelier relit chaque texte avant l'impression. Nous refusons les marques de tiers, les injures et les contenus illicites."
@@ -246,6 +257,7 @@
     "filamentLegend": "Couleur de la bande {index}",
     "boundaryLabel": "Changement de couleur {index}",
     "hint": "Chaque changement de couleur se fait à une hauteur précise : 2 mm au moins par bande, jusqu'à quatre filaments.",
+    "plinthHint": "La première bande est le socle : sa hauteur se règle dans la forme, sa couleur ici.",
     "noscript": "Sans JavaScript, saisissez les bandes ci-dessous : filament, deux-points, hauteur en millimètres, séparés par des virgules.",
     "field": "Bandes (filament:hauteur, séparées par des virgules)"
   },
@@ -294,6 +306,8 @@
     "yes": "oui",
     "no": "non",
     "none": "—",
+    "labelFictive": "oui, altitude fictive",
+    "labelTyped": "oui, altitude saisie : {value} m",
     "indicative": "indicatif",
     "title": "[Studio] {object} · configuration v1",
     "link": "Lien : {link}",
@@ -310,13 +324,13 @@
       "role": "fonction",
       "line1": "ligne 1",
       "line2": "ligne 2",
-      "peak": "sommet",
+      "peak": "nom de la montagne",
       "text": "texte"
     },
     "detail": {
       "lavaux": "paroi {wall} · profil {profile}",
       "cartouche": "épaisseur {thickness}",
-      "relief": "socle {base} · relief {relief} · forme {shape}",
+      "montagne": "socle {plinth} · montagne {height} · forme {shape}",
       "borne": "épaisseur {thickness}"
     },
     "pattern": {
@@ -329,7 +343,7 @@
     "settings": {
       "lavaux": "Motif : {pattern}",
       "cartouche": "Paramètres : {mode} ({depth}) · mise en page {layout} · coins {corner}",
-      "relief": "Paramètres : {levels} strates · lac {lake} % · massif {seed} · étiquette du sommet : {label}",
+      "montagne": "Paramètres : {form} · {style} · raideur {steep} % · graine {seed} · étiquette : {label}",
       "borne": "Paramètres : forme {shape} · lettres {cap} · anneau {ring} · mode {mode}"
     }
   }

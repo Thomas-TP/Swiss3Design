@@ -29,7 +29,7 @@ export interface CachedUpload {
 /**
  * Empreinte d'un envoi : FNV-1a 64 du JSON canonique de la configuration et des
  * textes (nettoyés, limités aux champs de l'objet). La langue n'entre que pour
- * l'étiquette du sous-verre, qui change avec elle (« POINTE » / « PIZ »…).
+ * l'étiquette de la Montagne, dont l'altitude s'écrit selon la langue (« 2 566 » / « 2’566 »).
  */
 export function uploadHash(
   config: StudioConfig,
@@ -37,7 +37,7 @@ export function uploadHash(
   locale: string,
 ): string {
   const clean = sanitizeTexts(config.object, texts);
-  const labelled = config.object === "relief" && config.label && clean.peak;
+  const labelled = config.object === "montagne" && config.label && clean.peak;
   return fnv1a64(
     canonicalJson({
       config,

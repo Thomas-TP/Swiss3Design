@@ -1,7 +1,7 @@
-// Posters « vue de dessus » des objets plats (brief « Strates », §6.12, §7.6,
-// §7.7 et fiche WP-02) : calculés par le code, sans JavaScript ni WebGL, dans
-// les deux thèmes ; les fichiers statiques du sous-verre par défaut (clair et
-// sombre) sont ceux que le générateur produirait aujourd'hui.
+// Posters « vue de dessus » (brief « Strates », §6.12, §7.6, §7.7 et fiche
+// WP-02) : calculés par le code, sans JavaScript ni WebGL, dans les deux
+// thèmes ; les fichiers statiques de la Montagne par défaut (clair et sombre)
+// sont ceux que le générateur produirait aujourd'hui.
 import { readFileSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { beforeAll, describe, expect, it } from "vitest";
@@ -11,18 +11,19 @@ import {
   BORNE_PRESETS,
   CARTOUCHE_DEFAULT,
   CARTOUCHE_PRESETS,
-  RELIEF_DEFAULT,
-  RELIEF_PRESETS,
+  MONTAGNE_DEFAULT,
+  MONTAGNE_PRESETS,
 } from "./presets";
 import {
   borneTopView,
   cartoucheTopView,
-  reliefTopView,
+  montagneTopView,
   TOP_VIEW_UNITS_PER_MM,
   topViewToSvg,
   type Theme,
   type TopViewData,
 } from "./poster-flat";
+import { montagnePosterSvg } from "./poster-montagne";
 import { loadTestFont } from "./testing";
 import { DEFAULT_TEXTS } from "./text/fields";
 import type { GlyphFont } from "./text/glyphs";
@@ -51,7 +52,7 @@ function expectSvg(data: TopViewData) {
 }
 
 describe("posters des objets plats : structure", () => {
-  it("Cartouche, Relief, Borne : un viewBox aux dimensions de l'objet (+ 2 mm de cadrage), une plaque, des chemins non vides", () => {
+  it("Cartouche, Montagne, Borne : un viewBox aux dimensions de l'objet (+ 2 mm de cadrage), une plaque, des chemins non vides", () => {
     const U = TOP_VIEW_UNITS_PER_MM;
     const views: [string, TopViewData][] = [
       [
@@ -61,8 +62,8 @@ describe("posters des objets plats : structure", () => {
         }),
       ],
       [
-        "relief",
-        reliefTopView(RELIEF_DEFAULT, DEFAULT_TEXTS.relief, { glyphs }),
+        "montagne",
+        montagneTopView(MONTAGNE_DEFAULT, DEFAULT_TEXTS.montagne, { glyphs }),
       ],
       ["borne", borneTopView(BORNE_DEFAULT, DEFAULT_TEXTS.borne, { glyphs })],
     ];
@@ -94,13 +95,15 @@ describe("posters des objets plats : structure", () => {
     const tag = borneTopView(BORNE_DEFAULT, DEFAULT_TEXTS.borne, { glyphs });
     expect(tag.layers[0].fill).toBe(filamentHex(BORNE_DEFAULT.base));
     expect(tag.layers.at(-1)!.fill).toBe(filamentHex(BORNE_DEFAULT.ink));
-    const relief = reliefTopView(RELIEF_DEFAULT, undefined, { label: false });
-    // Le socle est dans la bande du lac ; les strates suivantes montent en teintes.
-    expect(relief.layers[0].fill).toBe(
-      filamentHex(RELIEF_DEFAULT.bands[0].filament),
+    const montagne = montagneTopView(MONTAGNE_DEFAULT, undefined, {
+      label: false,
+    });
+    // Le socle est dans la première bande ; les courbes suivantes montent en teintes.
+    expect(montagne.layers[0].fill).toBe(
+      filamentHex(MONTAGNE_DEFAULT.bands[0].filament),
     );
-    const fills = new Set(relief.layers.map((l) => l.fill));
-    for (const band of RELIEF_DEFAULT.bands) {
+    const fills = new Set(montagne.layers.map((l) => l.fill));
+    for (const band of MONTAGNE_DEFAULT.bands) {
       expect(fills.has(filamentHex(band.filament)), `${band.filament}`).toBe(
         true,
       );
@@ -135,12 +138,15 @@ describe("posters des objets plats : structure", () => {
   it("déterministe : même entrée, même chaîne SVG (SSR et client)", () => {
     for (const theme of THEMES) {
       const a = topViewToSvg(
-        reliefTopView(RELIEF_DEFAULT, DEFAULT_TEXTS.relief, { theme, glyphs }),
+        montagneTopView(MONTAGNE_DEFAULT, DEFAULT_TEXTS.montagne, {
+          theme,
+          glyphs,
+        }),
       );
       const b = topViewToSvg(
-        reliefTopView(
-          structuredClone(RELIEF_DEFAULT),
-          { peak: "Léa" },
+        montagneTopView(
+          structuredClone(MONTAGNE_DEFAULT),
+          { peak: "Pointe Léa" },
           { theme, glyphs },
         ),
       );
@@ -210,14 +216,20 @@ describe("posters avec glyphes", () => {
       for (const { config } of BORNE_PRESETS) {
         expectSvg(borneTopView(config, DEFAULT_TEXTS.borne, { theme, glyphs }));
       }
-      for (const { config } of RELIEF_PRESETS) {
-        const view = reliefTopView(config, DEFAULT_TEXTS.relief, {
+      for (const { config } of MONTAGNE_PRESETS) {
+        const view = montagneTopView(config, DEFAULT_TEXTS.montagne, {
           theme,
           glyphs,
         });
         expectSvg(view);
-        // Socle + une strate par niveau (toutes existent) + l'étiquette.
-        expect(view.layers.length).toBe(1 + config.levels + 1);
+        // Socle + courbes de niveau (une par strate en strates, une tous les
+        // 2 mm en lissé) + l'étiquette.
+        expect(view.layers.length).toBeGreaterThanOrEqual(8);
+        expect(
+          config.style === "strates"
+            ? view.layers.length
+            : 1 + config.levels + 1,
+        ).toBe(1 + config.levels + 1);
       }
     }
   });
@@ -275,32 +287,30 @@ function pathBounds(d: string) {
   return { minX, maxX, minY, maxY };
 }
 
-describe("sous-verre par défaut : fichiers statiques clair et sombre", () => {
+describe("Montagne par défaut : fichiers statiques clair et sombre", () => {
   const dir = fileURLToPath(
     new URL("../../../public/posters/", import.meta.url),
   );
 
   for (const theme of THEMES) {
-    it(`relief-default-${theme}.svg est celui que le code produit (graine 1291, sans étiquette)`, () => {
-      const file = readFileSync(`${dir}relief-default-${theme}.svg`, "utf8");
-      const svg = topViewToSvg(
-        reliefTopView(RELIEF_DEFAULT, undefined, { theme, label: false }),
-        { className: "s3d-relief-poster" },
-      );
-      expect(file).toBe(svg);
+    it(`montagne-default-${theme}.svg est celui que le code produit (élévation, sans étiquette)`, () => {
+      const file = readFileSync(`${dir}montagne-default-${theme}.svg`, "utf8");
+      expect(file).toBe(montagnePosterSvg(theme));
       expect(file.length).toBeLessThan(40 * 1024);
-      expect(file).toContain('class="s3d-relief-poster"');
-      // La zone plate de l'étiquette reste libre : aucune ligne « ink » ni « placeholder ».
-      expect(file).not.toContain('fill-opacity="0.85"');
+      expect(file).toContain('class="s3d-montagne-poster"');
+      // Aucun texte du visiteur : ni ligne « placeholder », ni image, ni script.
+      expect(file).not.toMatch(/<script|<image|<foreignObject|<text/i);
     });
   }
 
-  it("les fichiers clair et sombre ne diffèrent que par leurs filets", () => {
-    const light = readFileSync(`${dir}relief-default-light.svg`, "utf8");
-    const dark = readFileSync(`${dir}relief-default-dark.svg`, "utf8");
+  it("les fichiers clair et sombre ne diffèrent que par leurs filets et leurs identifiants", () => {
+    const light = readFileSync(`${dir}montagne-default-light.svg`, "utf8");
+    const dark = readFileSync(`${dir}montagne-default-dark.svg`, "utf8");
     expect(light).not.toBe(dark);
     const strip = (s: string) =>
-      s.replace(/stroke="#[0-9A-F]{6}"/gi, 'stroke=""');
+      s
+        .replace(/stroke="#[0-9A-F]{6}"/gi, 'stroke=""')
+        .replace(/s3d-mp-(light|dark)/g, "s3d-mp");
     expect(strip(light)).toBe(strip(dark));
   });
 });

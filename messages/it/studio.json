@@ -7,7 +7,7 @@
   "seo": {
     "index": {
       "title": "Lo Studio: personalizzi il Suo oggetto in 3D",
-      "description": "Quattro oggetti da personalizzare in 3D: vaso, biglietto da visita, sottobicchiere, portanome. Fino a quattro colori, stampati in Svizzera, prezzo fermo in 48 ore."
+      "description": "Quattro oggetti da personalizzare in 3D: vaso, biglietto da visita, montagna, portanome. Fino a quattro colori, stampati in Svizzera, prezzo fermo in 48 ore."
     },
     "objects": {
       "lavaux": {
@@ -18,9 +18,9 @@
         "title": "Biglietto da visita 3D Cartouche",
         "description": "Il Suo biglietto da visita da 85 × 55 mm, in rilievo o inciso, due colori e il Suo testo: lo personalizzi in 3D, lo stampiamo in Svizzera, prezzo fermo in 48 ore."
       },
-      "relief": {
-        "title": "Sottobicchiere Relief, massiccio su misura",
-        "description": "Un sottobicchiere da 100 mm a strati: scelga il massiccio, il lago, i colori per quota e il nome in vetta. Stampato in Svizzera, prezzo fermo in 48 ore."
+      "montagne": {
+        "title": "Montagna su misura, colorata per quota",
+        "description": "Una piccola montagna da scrivania, fino a 12 cm, colorata per quota, con il Suo nome sul basamento. Stampata in Svizzera, prezzo fermo in 48 ore."
       },
       "borne": {
         "title": "Portanome Borne in due colori",
@@ -93,8 +93,8 @@
     "cartouche": {
       "lead": "85 × 55 mm, il formato svizzero. Quattro impaginazioni, testo in rilievo o inciso, due colori."
     },
-    "relief": {
-      "lead": "Un massiccio a strati su 100 mm, dal lago alle nevi. Il Suo nome in vetta, a una quota immaginaria."
+    "montagne": {
+      "lead": "Una montagna da 30 a 120 mm: un picco, un massiccio o una cresta, liscia o a strati, dal basamento alle nevi. Il Suo nome e la sua quota sul davanti."
     },
     "borne": {
       "lead": "Un testo da 1 a 14 caratteri, quattro forme, un anello se vuole appenderlo."
@@ -155,6 +155,7 @@
     "count": "{count}",
     "degrees": "{value} gradi",
     "percent": "{value} per cento",
+    "altitude": "{value} metri",
     "seed": "seme {value}"
   },
   "ctl": {
@@ -202,16 +203,26 @@
       "corner": "Angoli",
       "layout": "Impaginazione"
     },
-    "relief": {
-      "shape": "Forma",
-      "diameter": "Diametro",
-      "side": "Lato",
-      "base": "Base",
-      "relief": "Rilievo",
+    "montagne": {
+      "form": "Forma della montagna",
+      "style": "Superficie",
+      "height": "Altezza della montagna",
+      "heightHint": "Sopra il basamento; al massimo 1,6 volte la base.",
+      "steep": "Pendenza",
+      "steepHint": "Dolce: un rilievo arrotondato. Ripida: un picco dai fianchi incavati.",
       "levels": "Strati",
-      "seed": "Massiccio (seme)",
-      "lake": "Livello del lago",
-      "label": "Etichetta della vetta"
+      "seed": "Montagna (seme)",
+      "shape": "Forma del basamento",
+      "diameter": "Diametro della base",
+      "side": "Lato della base",
+      "acrossFlats": "Larghezza della base (tra i lati)",
+      "plinth": "Altezza del basamento",
+      "label": "Etichetta sul basamento",
+      "altMode": "Quota mostrata",
+      "altFictive": "Immaginaria",
+      "altTyped": "Inserita",
+      "altitude": "Quota",
+      "altitudeHint": "Calcolata dal nome: una quota immaginaria, mai misurata."
     },
     "borne": {
       "shape": "Forma",
@@ -226,7 +237,7 @@
       "role": "Funzione",
       "line1": "Riga 1",
       "line2": "Riga 2",
-      "peak": "Nome in vetta",
+      "peak": "Nome della montagna",
       "text": "Testo",
       "counter": "{count} / {max} caratteri",
       "moderation": "Una persona dell'atelier rilegge ogni testo prima della stampa. Rifiutiamo i marchi di terzi, gli insulti e i contenuti illeciti."
@@ -246,6 +257,7 @@
     "filamentLegend": "Colore della fascia {index}",
     "boundaryLabel": "Cambio di colore {index}",
     "hint": "Ogni cambio di colore avviene a un'altezza precisa: almeno 2 mm per fascia, fino a quattro filamenti.",
+    "plinthHint": "La prima fascia è il basamento: l'altezza si regola nella forma, il colore qui.",
     "noscript": "Senza JavaScript, inserisca le fasce qui sotto: filamento, due punti, altezza in millimetri, separati da virgole.",
     "field": "Fasce (filamento:altezza, separate da virgole)"
   },
@@ -294,6 +306,8 @@
     "yes": "sì",
     "no": "no",
     "none": "—",
+    "labelFictive": "sì, quota immaginaria",
+    "labelTyped": "sì, quota inserita: {value} m",
     "indicative": "indicativo",
     "title": "[Studio] {object} · configurazione v1",
     "link": "Link: {link}",
@@ -310,13 +324,13 @@
       "role": "funzione",
       "line1": "riga 1",
       "line2": "riga 2",
-      "peak": "vetta",
+      "peak": "nome della montagna",
       "text": "testo"
     },
     "detail": {
       "lavaux": "parete {wall} · profilo {profile}",
       "cartouche": "spessore {thickness}",
-      "relief": "base {base} · rilievo {relief} · forma {shape}",
+      "montagne": "basamento {plinth} · montagna {height} · forma {shape}",
       "borne": "spessore {thickness}"
     },
     "pattern": {
@@ -329,7 +343,7 @@
     "settings": {
       "lavaux": "Motivo: {pattern}",
       "cartouche": "Parametri: {mode} ({depth}) · impaginazione {layout} · angoli {corner}",
-      "relief": "Parametri: {levels} strati · lago {lake} % · massiccio {seed} · etichetta della vetta: {label}",
+      "montagne": "Parametri: {form} · {style} · pendenza {steep} % · seme {seed} · etichetta: {label}",
       "borne": "Parametri: forma {shape} · lettere {cap} · anello {ring} · modalità {mode}"
     }
   }

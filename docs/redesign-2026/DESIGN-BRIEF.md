@@ -137,7 +137,7 @@ réimpression, réglette Z) sert ensuite **telle quelle** dans le Studio.
 
 **Plus tard (hors v1, ne pas construire)** : son génératif ; plaque de bureau « Signal » ;
 abat-jour « Lumen » ; export 3MF multi-objets (fflate) ; QR code sur la carte ; relief suisse
-réel swisstopo pour le sous-verre ; commande directe au panier à prix ferme recalculé par le
+réel swisstopo pour la Montagne ; commande directe au panier à prix ferme recalculé par le
 serveur (colonne `studio_config jsonb`) ; « plateau vivant » à 4 objets sur l'index du Studio ;
 vue en coupe avec bouchons (stencil) ; rayon X sur le remplissage ; particules ; voxel drop ;
 boutique en plateau déplaçable ; alcôves par collection ; diorama de suivi de colis ; Rive ;
@@ -172,8 +172,9 @@ géométrie que nous connaissons et dont nous garantissons qu'elle s'imprime.
 ### 1.5 Décisions du propriétaire (contraignantes) et faits durs
 
 1. **La personnalisation est l'axe central.** Quatre objets originaux Swiss3Design, générés en
-   code, réglables en direct en 3D : vase « Lavaux », carte de visite « Cartouche », sous-verre
-   topographique « Relief », porte-nom « Borne ». Une configuration finie débouche sur une vraie
+   code, réglables en direct en 3D : vase « Lavaux », carte de visite « Cartouche », petite
+   montagne de bureau « Montagne » (qui a remplacé le sous-verre « Relief » le 10.10.2026, voir la
+   note du §6.3.4), porte-nom « Borne ». Une configuration finie débouche sur une vraie
    commande : export STL côté client, envoi par `/api/quote-upload`, puis la Server Action de
    devis existante avec les paramètres. Une fourchette de prix s'affiche une fois les
    coefficients validés. La simulation d'impression couche par couche s'applique à ces objets.
@@ -201,16 +202,16 @@ chaîne en 4 langues (de-CH sans ß).
 
 **Noms publics.**
 
-| Élément         | FR                           | DE                       | IT                      | EN                        | URL                          |
-| --------------- | ---------------------------- | ------------------------ | ----------------------- | ------------------------- | ---------------------------- |
-| Boutique        | Boutique                     | Shop                     | Negozio                 | Shop                      | `/shop` (inchangée)          |
-| Configurateur   | Studio                       | Studio                   | Studio                  | Studio                    | `/studio` (nouvelle)         |
-| Sur mesure      | Sur mesure                   | Nach Mass                | Su misura               | Custom                    | `/custom` (inchangée)        |
-| À propos        | **Atelier** (libellé de nav) | Atelier                  | Atelier                 | Workshop                  | `/a-propos` (inchangée, SEO) |
-| Vase            | Vase « Lavaux »              | Vase «Lavaux»            | Vaso «Lavaux»           | "Lavaux" vase             | `/studio/lavaux`             |
-| Carte de visite | Carte « Cartouche »          | Visitenkarte «Cartouche» | Biglietto «Cartouche»   | "Cartouche" business card | `/studio/cartouche`          |
-| Sous-verre      | Sous-verre « Relief »        | Untersetzer «Relief»     | Sottobicchiere «Relief» | "Relief" coaster          | `/studio/relief`             |
-| Porte-nom       | Porte-nom « Borne »          | Namensschild «Borne»     | Portanome «Borne»       | "Borne" name tag          | `/studio/borne`              |
+| Élément         | FR                           | DE                       | IT                    | EN                        | URL                          |
+| --------------- | ---------------------------- | ------------------------ | --------------------- | ------------------------- | ---------------------------- |
+| Boutique        | Boutique                     | Shop                     | Negozio               | Shop                      | `/shop` (inchangée)          |
+| Configurateur   | Studio                       | Studio                   | Studio                | Studio                    | `/studio` (nouvelle)         |
+| Sur mesure      | Sur mesure                   | Nach Mass                | Su misura             | Custom                    | `/custom` (inchangée)        |
+| À propos        | **Atelier** (libellé de nav) | Atelier                  | Atelier               | Workshop                  | `/a-propos` (inchangée, SEO) |
+| Vase            | Vase « Lavaux »              | Vase «Lavaux»            | Vaso «Lavaux»         | "Lavaux" vase             | `/studio/lavaux`             |
+| Carte de visite | Carte « Cartouche »          | Visitenkarte «Cartouche» | Biglietto «Cartouche» | "Cartouche" business card | `/studio/cartouche`          |
+| Montagne        | Montagne                     | Berg                     | Montagna              | Mountain                  | `/studio/montagne`           |
+| Porte-nom       | Porte-nom « Borne »          | Namensschild «Borne»     | Portanome «Borne»     | "Borne" name tag          | `/studio/borne`              |
 
 Les slugs d'objet sont des noms propres, identiques dans les 4 langues. Palettes : **Léman**,
 **Molasse**, **Signal**, **Uni**. Motifs : **Gradins**, **Vagues**, **Voronoï**, **Nervures**,
@@ -1188,7 +1189,7 @@ contenu par la version ci-dessous (thème inchangé + mouvement) :
   changé, ou si sa scène demande une frame (animation). Pause sur `document.hidden`.
 - **Mobile (C1) : « bake » au repos** : sur mobile, le scroll natif est composité hors du fil
   principal, alors que le canvas fixe se redessine une frame plus tard : une vue qui défile
-  « nage » légèrement. Une vue marquée `bakeWhenIdle` (héros mobile après l'autoplay, sous-verre du
+  « nage » légèrement. Une vue marquée `bakeWhenIdle` (héros mobile après l'autoplay, Montagne du
   chapitre 02, viewer de la fiche) et sans interaction ni changement de props depuis 800 ms est
   donc rendue une fois dans un render target, copiée en image (`blob:` URL, autorisé par
   `img-src`) dans l'élément (`<img class="s3d-baked">`) puis mise en sommeil : le scroll déplace
@@ -1367,7 +1368,7 @@ utilisés par plusieurs packages) :
 
 ```ts
 // src/lib/studio/types.ts (WP-00 crée le contrat ; WP-01 et WP-02 l'étendent sans rupture)
-export type StudioObjectId = "lavaux" | "cartouche" | "relief" | "borne";
+export type StudioObjectId = "lavaux" | "cartouche" | "montagne" | "borne";
 export type FilamentId =
   | "blanc-neve"
   | "encre"
@@ -1398,7 +1399,7 @@ export interface MeshData {
   bbox: [number, number, number, number, number, number]; // mm, Z vers le haut
   triangles: number;
 }
-// Les unions LavauxConfig | CartoucheConfig | ReliefConfig | BorneConfig (§6.2.1), StudioStats et Printability (§6.5) complètent ce fichier.
+// Les unions LavauxConfig | CartoucheConfig | MontagneConfig | BorneConfig (§6.2.1), StudioStats et Printability (§6.5) complètent ce fichier.
 
 // src/lib/studio/creations.ts (WP-00) — « Mes créations », localStorage, try/catch partout
 export interface Creation {
@@ -2000,19 +2001,26 @@ Les contrôles sont natifs : `range` couplé à un `number` avec unité, `radio`
 | Fonction                                   | texte       | ≤ 30                                                                       | exemple « Architecte »                            | champ                     |
 | Ligne 1, ligne 2                           | texte       | ≤ 30 chacune                                                               | exemples « lea@exemple.ch », « +41 21 000 00 00 » | champs                    |
 
-**Sous-verre « Relief »** (`relief`)
+**Montagne** (`montagne`), remplace le sous-verre « Relief » (10.10.2026)
 
-| Paramètre            | Clé          | Plage                                   | Défaut                                               | Contrôle                    |
-| -------------------- | ------------ | --------------------------------------- | ---------------------------------------------------- | --------------------------- |
-| Forme                | `sh`         | rond, carre                             | rond                                                 | radios                      |
-| Diamètre ou côté     | `s`          | 90–110 mm                               | 100                                                  | curseur                     |
-| Socle                | `ba`         | 2,4–4 mm (pas 0,2)                      | 3                                                    | curseur                     |
-| Relief               | `re`         | 1,2–4 mm (pas 0,2)                      | 3,2                                                  | curseur                     |
-| Strates              | `lv`         | 4–12                                    | 8                                                    | curseur                     |
-| Massif (graine)      | `sd`         | 0–9999                                  | 1291                                                 | curseur + « Surprenez-moi » |
-| Niveau du lac        | `lk`         | 0–40 %                                  | 18                                                   | curseur                     |
-| Teintes par altitude | `bd`         | 2–4 bandes (lac, prairie, roche, neige) | bleu-leman / vert-lavaux / gris-molasse / blanc-neve | barre altimétrique          |
-| Étiquette du sommet  | `lb` + texte | oui/non ; nom ≤ 12 caractères           | oui, exemple « Léa »                                 | interrupteur + champ        |
+Une vraie petite montagne à poser sur un bureau ou une étagère, jusqu'à 12 cm : un socle (rond,
+carré ou hexagone) et, dessus, une surface d'altitude (aucun surplomb, donc aucun support),
+colorée par altitude, lissée ou en strates. Étiquette facultative sur le devant du socle.
+
+| Paramètre                                                        | Clé          | Plage                                                      | Défaut                                                        | Contrôle                    |
+| ---------------------------------------------------------------- | ------------ | ---------------------------------------------------------- | ------------------------------------------------------------- | --------------------------- |
+| Forme de la montagne                                             | `f`          | pic, massif, arete                                         | pic                                                           | radios                      |
+| Surface                                                          | `sy`         | lisse, strates                                             | lisse                                                         | radios                      |
+| Hauteur de la montagne (au-dessus du socle)                      | `h`          | 30–120 mm (pas 1) ; ≤ 1,6 × la base                        | 75                                                            | curseur                     |
+| Raideur                                                          | `st`         | 0–1 (pas 0,01)                                             | 0,55                                                          | curseur                     |
+| Strates (style « En strates »)                                   | `lv`         | 8–40                                                       | 24                                                            | curseur                     |
+| Montagne (graine)                                                | `sd`         | 0–9999                                                     | 2204                                                          | curseur + « Surprenez-moi » |
+| Forme du socle                                                   | `sh`         | rond, carre, hexagone                                      | rond                                                          | radios                      |
+| Taille de la base (diamètre, côté, ou largeur entre côtés plats) | `s`          | 60–120 mm (pas 1)                                          | 90                                                            | curseur                     |
+| Hauteur du socle                                                 | `pl`         | 4–8 mm (pas 0,2)                                           | 5                                                             | curseur                     |
+| Teintes par altitude                                             | `bd`         | 2–4 bandes ; la 1re finit au dessus du socle (verrouillée) | encre / vert-lavaux (40 %) / gris-molasse (75 %) / blanc-neve | barre altimétrique          |
+| Étiquette                                                        | `lb` + texte | oui/non ; nom ≤ 16 caractères                              | oui, exemple « Pointe Léa »                                   | interrupteur + champ        |
+| Altitude affichée                                                | `am` / `al`  | fictive, saisie / 0–8 848 m                                | fictive / 4000                                                | radios + curseur            |
 
 **Porte-nom « Borne »** (`borne`)
 
@@ -2064,17 +2072,21 @@ export interface CartoucheConfig {
   plate: FilamentId;
   ink: FilamentId; // texte : StudioTexts.name, role, line1, line2
 }
-export interface ReliefConfig {
-  object: "relief";
-  shape: "rond" | "carre";
+export interface MontagneConfig {
+  object: "montagne";
+  shape: "rond" | "carre" | "hexagone";
   size: number;
-  base: number;
-  relief: number;
-  levels: number;
+  plinth: number;
+  height: number; // au-dessus du socle ; pièce = plinth + height
+  form: "pic" | "massif" | "arete";
+  steep: number;
   seed: number;
-  lake: number;
-  bands: Band[]; // 2 à 4, calées sur les sommets de strates
+  style: "lisse" | "strates";
+  levels: number;
+  bands: Band[]; // 2 à 4 ; la première finit au dessus du socle
   label: boolean; // texte : StudioTexts.peak
+  altMode: "fictive" | "saisie";
+  altitude: number;
 }
 export interface BorneConfig {
   object: "borne";
@@ -2088,7 +2100,7 @@ export interface BorneConfig {
   ink: FilamentId; // texte : StudioTexts.text
 }
 export type StudioConfig =
-  LavauxConfig | CartoucheConfig | ReliefConfig | BorneConfig;
+  LavauxConfig | CartoucheConfig | MontagneConfig | BorneConfig;
 
 export type IssueCode =
   | "overhang"
@@ -2210,7 +2222,7 @@ glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0�
 > 322 × 322 paires (`text/text.test.ts`, outil `text/overlap.ts`) : aucun chevauchement, écart
 > minimal positif.
 
-#### 6.3.4 Cartouche, Relief, Borne (WP-02)
+#### 6.3.4 Cartouche, Montagne, Borne (WP-02)
 
 - **Cartouche** : plaque = rectangle arrondi extrudé ; **relief** : glyphes extrudés de `e` sur la
   plaque (coques séparées posées sur la plaque, que les trancheurs unissent) ; **gravure sans CSG** :
@@ -2221,14 +2233,35 @@ glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0�
   du bord + filet sous le nom ; monogramme = initiales (capitale 18 mm) à gauche, texte à droite.
   Bandes : relief → `[{fp, t}, {ft, t + e}]` ; gravure → `[{ft, t − e}, {fp, t}]` (les lettres
   gravées révèlent la couleur du dessous : incrustation par changement de hauteur).
-- **Relief** : carte d'altitude 128² sur le disque (bord de 3 mm), FBM (5 octaves, persistance 0,5,
-  lacunarité 2) + terme de crête `0,35 × (1 − |bruit|)²` + chute radiale `1 − (ρ/R)^2.2`, normalisée ;
-  sous le lac (`lk`) : 0 ; zone d'étiquette plate de 60 × 10 mm en bas si `lb`. Seuils
-  `t_k = lk + (1 − lk) × k / lv` ; contours par `d3-contour` (polygones avec trous), convertis en mm,
-  simplifiés à 0,15 mm ; épaisseur de strate `Δ = max(0.4, round(re / lv / 0.2) × 0.2)` ; chaque
-  niveau k extrudé de `ba + (k − 1)Δ` à `ba + kΔ`. Bande 1 (lac) couvre le socle ; l'étiquette
-  « POINTE LÉA · 3 107 M » est en relief de 0,6 mm dans la zone plate, donc dans la teinte de la
-  bande 2. **Altitude fictive** = `1800 + (fnv1a(nom normalisé) mod 2600)` m, affichée comme telle.
+- **Montagne** (10.10.2026, remplace le « Relief » ; `objects/montagne-{field,model}.ts`,
+  `objects/montagne.ts`) : une carte d'altitude normalisée `Hn(x, y) ∈ [0, 1]` sur le disque d'emprise,
+  nulle ailleurs (bord plat de 3 mm au moins), donc `Z = socle + h × Hn`. **Enveloppe** : des
+  sommets (cônes à sommet arrondi, profil tabulé d'exposant `0,55 + 0,95 × raideur`) à arêtes radiales
+  `(u + iv)^n`, raccordés par un maximum lissé ; « Pic » = un pic dominant dissymétrique et deux
+  épaules, « Massif » = un sommet principal décentré et 2–3 secondaires, « Arête » = 5–6 sommets
+  allongés le long d'un axe, un seul domine. **Roche** : bruit simplex « ridged multifractal »
+  (4 octaves, `(1 − |n|)²` pondéré par l'octave précédente) sur un domaine déformé, en facteur
+  (le pied reste lisse). **Chute** `smoothstep` vers 0 au bord de l'emprise. **Calotte** : tout ce qui
+  dépasse le niveau où la région connexe du sommet atteint l'aire d'un disque de 1,5 mm est ramené à
+  1 : le sommet est plat sur 1,5 mm au moins (jamais une aiguille) et la hauteur choisie est
+  atteinte exactement. Déterministe (graine) ; sans trigonométrie ni `pow` par point.
+  **Socle et tablier** : rond (Ø), carré (côté, coins de 3 mm) ou hexagone (largeur entre côtés plats,
+  côté plat à l'avant). Sans étiquette l'emprise est centrée (rayon = base/2 − 3 mm) ; avec, elle est
+  repoussée vers l'arrière de 19,5 mm (5 mm de bord + 11,5 mm de zone de texte + 3 mm de pied).
+  **Étiquette** : nom (≤ 16 caractères) et altitude en relief de 0,8 mm sur le tablier : une ligne
+  « NOM · 2 566 M » si la capitale y reste ≥ 3,6 mm (4,2 mm au plus), sinon deux lignes (nom puis
+  altitude) à la plus grande capitale commune qui tienne dans la corde du socle, sinon `text-fit`.
+  Aucun préfixe automatique (POINTE / PIZ…) : le nom d'exemple de chaque langue le porte (« Pointe
+  Léa », « Piz Léa », « Pizzo Léa », « Mount Léa »). **Altitude** fictive = `1800 + (fnv1a(nom
+normalisé) mod 2600)` m, ou saisie (0–8 848 m). **Style lissé** : grille régulière (diagonale sur
+  la plus faible différence d'altitude), coupée EXACTEMENT aux frontières de bande (sommets de coupe
+  calculés une fois par arête de grille), dessous plat refermé par les lignes de niveau (même
+  sommets : coque fermée sans jonction en T) ; hauteurs à 0,02 mm d'une frontière ramenées dessus ;
+  éclaté : une coque fermée par bande. **Style en strates** : `d3-contour` sur la grille, une coque
+  par polygone, extrudée de `socle + quantifié(k × h / lv)` au suivant (la strate k est la région
+  au-dessus du seuil de sa base). Triangles : lissé drag 56 cellules en travers du disque, C1 96, C2
+  144, export 240 (côté ≥ 0,5 mm) ; strates : grille de contours 64 / 112 / 160 / 224, tolérance
+  0,4 / 0,25 / 0,15 / 0,1 mm. Bandes : voir §6.4.
 - **Borne** : contour (pilule = rectangle à rayons h/2 ; etiquette = rectangle à coin coupé ; goutte ;
   pic = triangle arrondi générique) dimensionné sur le texte, trou d'anneau (`Shape.holes` au sens
   earcut), extrusion `t`, texte en relief ou gravé de 0,8 mm. **Jamais de croix suisse ni
@@ -2236,7 +2269,7 @@ glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0�
 
 > **Note du 01.10.2026 (WP-02, écarts assumés au brief)** :
 >
-> 1. **Strates du Relief** : la strate k (k = 1 à `lv`) est la zone au-dessus du seuil `t_{k−1}`
+> 1. **Strates de l'ancien Relief (remplacé par la Montagne)** : la strate k (k = 1 à `lv`) est la zone au-dessus du seuil `t_{k−1}`
 >    (et non au-dessus de `t_k`), sinon la strate du sommet (seuil 1) serait vide.
 > 2. **Cartouche** : les lignes sont empilées d'après l'**encre réelle** (plafonds d'accents 1,29 de
 >    capitale, queues 0,31, écart 0,8 mm, filet à 1,2 mm) et non sur la grille fixe ci-dessus ; les
@@ -2254,11 +2287,33 @@ glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0�
 > 6. **Étiquette du massif** : « POINTE LÉA · 3 107 M » est **illustrative**. L'altitude réelle est
 >    `peakAltitude(nom)` ; pour « Léa » elle vaut **2 566 m** (le libellé produit est
 >    « POINTE LÉA · 2 566 M », contrôlé le 01.10.2026). **WP-HOME (chapitre 02) doit appeler
->    `peakLabel(name, locale)`** (ré-exporté par `objects/relief.ts`) et ne jamais figer le texte.
+>    `peakLabel(name, locale)`** (ré-exporté par `objects/montagne.ts` : `peakLabel`, `peakAltitude`) et ne jamais figer le texte.
 > 7. **`ranges.ts`** (nouveau) : plages, bornage et aides de strates sortis de `schemas.ts`, qui les
 >    ré-exporte en entier (aucun importeur à changer). Les générateurs, les statistiques, les
 >    garde-fous et `poster-flat` n'embarquent plus zod (Worker de géométrie : 26,7 Kio gzip au lieu de
 >    48,5 ; budget du brief : 60).
+
+> **Note du 10.10.2026 (la Montagne remplace le sous-verre « Relief », choix assumés)** :
+>
+> 1. **Pourquoi** : un verre ne se pose pas sur un sommet en terrasses ; l'objet devient une vraie petite
+>    montagne de bureau (30 à 120 mm), colorée par altitude. Identifiant `montagne` partout (types,
+>    URL, analytics, agents, catalogue, devis) ; `/studio/relief` redirige en 308.
+> 2. **Deux coques** : le socle (prisme) et la montagne (coque fermée, dessous plat) s'empilent face à
+>    face, comme les lettres sur une plaque ; l'étiquette est une troisième famille de coques. Chaque
+>    coque est fermée (test de variété sur 200 configurations aléatoires).
+> 3. **Bande 1 = socle, verrouillée**, avec ou sans étiquette (règle plus simple que « verrouillée
+>    seulement avec étiquette » et qui garde la première couleur du socle). Coût : une bande sur
+>    quatre.
+> 4. **Pas de préfixe automatique** (POINTE / PIZ / PIZZO / MOUNT de l'ancien sous-verre) : 5 à 6
+>    caractères perdus sur 16, « Mont » doublé par un nom saisi (« Mont Blanc »), mise en page qui
+>    change d'une langue à l'autre. Le nom d'exemple de chaque langue le porte.
+> 5. **Hauteur ≤ 1,6 × la base** : bornée par les curseurs et les liens (`clampMontagne`) ; la garde
+>    `too-tall` (avertissement) ne signale que ce que le bornage laisserait passer, avec sa correction.
+> 6. **Calotte** mesurée par l'aire (région connexe de 1,5 mm de diamètre) et non par une pente : une
+>    pointe très raide n'est pas rabotée plus qu'il ne faut.
+> 7. **Plan** : la vue de dessus 3D porte une courbe maîtresse toutes les 10 couches (`uIsoMode`) pour
+>    la Montagne seule ; l'**Élévation** (silhouette exacte) est le poster du Stage et la seule vue
+>    sans WebGL.
 
 #### 6.3.5 Test de variété (WP-01 pour Lavaux, WP-02 pour les autres)
 
@@ -2276,8 +2331,11 @@ Plus : `writeBinaryStl` produit exactement `84 + 50 × n` octets, un en-tête qu
   (paramètre atelier, défaut 0,8 g) et du temps (défaut 110 s) ; la tour de purge est affichée.
 - L'**éclaté** écarte les bandes de 12 mm, chacune étiquetée : « Vert Lavaux · couches 211–540 ·
   42,0–108,0 mm · ≈ 31 g ».
-- Pour Cartouche et Borne, les bandes découlent de la plaque et du texte ; pour Relief, elles se
-  calent sur les sommets de strates.
+- Pour Cartouche et Borne, les bandes découlent de la plaque et du texte ; pour la Montagne, la
+  première bande est le socle et sa frontière est le dessus du socle (verrouillée : l'étiquette,
+  0,8 mm au-dessus, sort ainsi dans la teinte de la bande 2 et se détache du socle) ; les autres
+  frontières se déplacent à la couche près, 2 mm d'épaisseur au moins, et gardent leur position
+  relative quand la base, le socle ou la hauteur changent.
 - Palette = inventaire réel quand le propriétaire l'a fourni ; sinon « teintes indicatives ».
 
 ### 6.5 Statistiques et estimation (`stats.ts`, `estimate.ts`, `pricing-params.ts`, WP-01)
@@ -2314,7 +2372,7 @@ export type Printability =
 ```
 
 - **Volume** : Lavaux = ∫∫ (r_o² − r_i²) / 2 dθ dz + fond ; plats = somme des aires × épaisseurs ;
-  objets pleins de plus de 3 mm (Relief, Borne) : coque de 0,8 mm pleine + remplissage 15 %
+  objets pleins de plus de 3 mm (Montagne, Borne) : coque de 0,8 mm pleine + remplissage 15 %
   (`V_coque = min(V, A × 0,8)`, `V = V_coque + 0,15 × (V − V_coque)`).
 - **Masse** = `V × 1,24 g/cm³ (PLA) + changes × purgeGrams`.
 - **Durée** = `V(mm³) / 8 mm³/s + layers × 1,5 s + changes × 110 s + 6 min`.
@@ -2570,7 +2628,7 @@ type FromWorker =
   une ligne, stats du défaut, « Sur devis » ou fourchette, poster SSR), comment ça marche en 4
   étapes, FAQ SSR (`<details>`), lien vers `/custom`. JSON-LD `webPageJsonLd` + `faqJsonLd` +
   `breadcrumbJsonLd`.
-- `/[locale]/studio/[objet]` (`lavaux`, `cartouche`, `relief`, `borne` ; autre → `notFound()` avant
+- `/[locale]/studio/[objet]` (`lavaux`, `cartouche`, `montagne`, `borne` ; autre → `notFound()` avant
   tout) : h1, description, **formulaire SSR complet en GET** (contrôles natifs, valeurs par défaut
   ou issues de la requête), poster Élévation SSR, bande de mesure SSR (`computeStats`), `<dl>` des
   paramètres, FAQ, JSON-LD comme l'index. Pas de JSON-LD `Product` (pas de prix fixe, pas de fiche
@@ -2578,7 +2636,8 @@ type FromWorker =
 - Métadonnées : `pageMetadata({ path: "/studio" })` et `pageMetadata({ path: `/studio/${objet}` })`,
   titres ≤ 60 caractères avec le gabarit, descriptions 110–160, textes dans le namespace `studio`.
 - `src/app/sitemap.xml/route.ts` : ajouter `/studio`, `/studio/lavaux`, `/studio/cartouche`,
-  `/studio/relief`, `/studio/borne` à `STATIC_PAGES`. `robots.txt` : `Disallow: /*/studio/*?`.
+  `/studio/montagne`, `/studio/borne` à `STATIC_PAGES` (`/studio/relief` redirige en 308 vers
+  `/studio/montagne`, `next.config.ts`). `robots.txt` : `Disallow: /*/studio/*?`.
   `llms.txt` : section « Studio » (4 objets, principe, lien vers `/custom`).
 
 ### 6.13 WebMCP `studio_configure` (WP-STUDIO, dans `src/components/webmcp-tools.tsx`)
@@ -2588,12 +2647,12 @@ type FromWorker =
   name: "studio_configure",
   title: "Configure a Studio object",
   description: "Builds a shareable Studio link for one of Swiss3Design's own configurable objects " +
-    "(lavaux vase, cartouche business card, relief coaster, borne name tag) and returns its stats. " +
+    "(lavaux vase, cartouche business card, montagne mountain, borne name tag) and returns its stats. " +
     "Personal texts (names, contacts) are never accepted here: the human types them on the page.",
   inputSchema: {
     type: "object",
     properties: {
-      object: { enum: ["lavaux", "cartouche", "relief", "borne"] },
+      object: { enum: ["lavaux", "cartouche", "montagne", "borne"] },
       params: { type: "object", description: "Numeric or enum parameters using the fragment keys; clamped to valid ranges." },
       palette: { type: "array", items: { enum: [/* ids de filaments */] }, maxItems: 4 },
       open: { type: "boolean", description: "Navigate the tab to the link." }
@@ -2670,15 +2729,15 @@ nav-mark`) ; survol = soulignement qui se trace. À droite : thème, langue, fav
   Acheter / J'ai un fichier).
 - **Chapitres** (desktop : `ChapterRail` ≥ 1536 px ; note du 30.09.2026 : 1280 px à l'origine, le rail recouvrait le cœur des favoris sous 1536 px, la marge droite de la page ne le contenant pas) :
 
-| #   | Titre (FR)                                                | Contenu                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | Mouvement (complet)                                                                                   | Réduit / C0                                                     |
-| --- | --------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
-| 00  | Tout relief commence par une couche.                      | Héros (§5), puis bande de réassurance                                                                                                                                                                                                                                                                                                                                                                                                                                                  | §5.5                                                                                                  | poster final                                                    |
-| 01  | Une couleur par altitude.                                 | Le même vase **éclaté** (`print-hero` en mode `exploded`), une étiquette par bande calculée par `bandStats(config)` (« Bleu Léman · couches 1–210 · 0–42,0 mm · ≈ 21 g »), ligne de purge (« 2 changements · purge ≈ 1,6 g · + ≈ 4 min : c'est tout ce que coûte la couleur, et on vous le montre »), texte sur la teinte hypsométrique. Fond : champ de courbes. Suit la palette et le motif choisis dans le héros (contexte client `HomeConfig`).                                    | éclatement de 1,2 s à l'entrée (`s3d.buse`), étiquettes en `.s3d-rise` ; champ WebGL en C2, SVG sinon | poster « éclaté » SVG                                           |
-| 02  | Votre nom, en relief. Littéralement.                      | Ton **encre**. Sous-verre « Relief » (`studio-object`) ; champ SSR « Nommez votre sommet » (12 caractères, **hors de toute section pinnée**), note « Le texte reste dans votre navigateur jusqu'à l'envoi à l'atelier. » ; l'étiquette « POINTE LÉA · 3 107 M » se réimprime à chaque frappe (debounce 120 ms) ; bande de mesure ; CTA rouge « Continuer dans le Studio » (`/studio/relief#c=…`, texte via `sessionStorage`). Glyphes chargés quand la section approche (marge 150 %). | réimpression de l'étiquette                                                                           | SVG statique du relief + étiquette en DOM mise à jour en direct |
-| 03  | Réglez-le. On l'imprime.                                  | Quatre cartes d'objet (poster SSR, h3, une ligne, stats du défaut, « Sur devis » ou fourchette), puis « Comment ça marche » en `<ol>` : Réglez · Envoyez · L'atelier vérifie (48 h) · Imprimé et livré                                                                                                                                                                                                                                                                                 | `.s3d-print` sur les cartes                                                                           | statique                                                        |
-| 04  | Des objets choisis, imprimés à la commande.               | N = 1 : grande `ProductCard` du Vase spirale + légende d'attribution courte (« Design : Ian · CC BY-ND 4.0 ») ; N = 2–3 : rangée ; N ≥ 4 : grille + « Tout voir »                                                                                                                                                                                                                                                                                                                      | `.s3d-print`                                                                                          | statique                                                        |
-| 05  | Imprimé à Gland et à Pully. Livré de Genève à Romanshorn. | Deux colonnes (Gland : Bambu Lab P1S + AMS 2 Pro ; Pully : Creality K2 + CFS), coordonnées, livraison offerte dès `formatChf(freeOverCents)`, moyens de paiement, lien « Visiter l'atelier » ; illustration ChatGPT facultative (étiquetée « Illustration »)                                                                                                                                                                                                                           | `.s3d-rise`                                                                                           | statique                                                        |
-| 06  | Vous avez déjà un fichier ?                               | « STL, 3MF, OBJ ou STEP : envoyez-le, l'atelier vous répond sous 48 h avec un devis. » CTA rouge « Envoyer un fichier » (`/custom`)                                                                                                                                                                                                                                                                                                                                                    | —                                                                                                     | —                                                               |
+| #   | Titre (FR)                                                | Contenu                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Mouvement (complet)                                                                                   | Réduit / C0                                                     |
+| --- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| 00  | Tout relief commence par une couche.                      | Héros (§5), puis bande de réassurance                                                                                                                                                                                                                                                                                                                                                                                                                                     | §5.5                                                                                                  | poster final                                                    |
+| 01  | Une couleur par altitude.                                 | Le même vase **éclaté** (`print-hero` en mode `exploded`), une étiquette par bande calculée par `bandStats(config)` (« Bleu Léman · couches 1–210 · 0–42,0 mm · ≈ 21 g »), ligne de purge (« 2 changements · purge ≈ 1,6 g · + ≈ 4 min : c'est tout ce que coûte la couleur, et on vous le montre »), texte sur la teinte hypsométrique. Fond : champ de courbes. Suit la palette et le motif choisis dans le héros (contexte client `HomeConfig`).                       | éclatement de 1,2 s à l'entrée (`s3d.buse`), étiquettes en `.s3d-rise` ; champ WebGL en C2, SVG sinon | poster « éclaté » SVG                                           |
+| 02  | Votre nom, en relief. Littéralement.                      | Ton **encre**. Montagne (`studio-object`) ; champ SSR « Nommez votre sommet » (16 caractères, **hors de toute section pinnée**), note « Le texte reste dans votre navigateur jusqu'à l'envoi à l'atelier. » ; l'étiquette « POINTE LÉA · 3 107 M » se réimprime à chaque frappe (debounce 120 ms) ; bande de mesure ; CTA rouge « Continuer dans le Studio » (`/studio/relief#c=…`, texte via `sessionStorage`). Glyphes chargés quand la section approche (marge 150 %). | réimpression de l'étiquette                                                                           | SVG statique du relief + étiquette en DOM mise à jour en direct |
+| 03  | Réglez-le. On l'imprime.                                  | Quatre cartes d'objet (poster SSR, h3, une ligne, stats du défaut, « Sur devis » ou fourchette), puis « Comment ça marche » en `<ol>` : Réglez · Envoyez · L'atelier vérifie (48 h) · Imprimé et livré                                                                                                                                                                                                                                                                    | `.s3d-print` sur les cartes                                                                           | statique                                                        |
+| 04  | Des objets choisis, imprimés à la commande.               | N = 1 : grande `ProductCard` du Vase spirale + légende d'attribution courte (« Design : Ian · CC BY-ND 4.0 ») ; N = 2–3 : rangée ; N ≥ 4 : grille + « Tout voir »                                                                                                                                                                                                                                                                                                         | `.s3d-print`                                                                                          | statique                                                        |
+| 05  | Imprimé à Gland et à Pully. Livré de Genève à Romanshorn. | Deux colonnes (Gland : Bambu Lab P1S + AMS 2 Pro ; Pully : Creality K2 + CFS), coordonnées, livraison offerte dès `formatChf(freeOverCents)`, moyens de paiement, lien « Visiter l'atelier » ; illustration ChatGPT facultative (étiquetée « Illustration »)                                                                                                                                                                                                              | `.s3d-rise`                                                                                           | statique                                                        |
+| 06  | Vous avez déjà un fichier ?                               | « STL, 3MF, OBJ ou STEP : envoyez-le, l'atelier vous répond sous 48 h avec un devis. » CTA rouge « Envoyer un fichier » (`/custom`)                                                                                                                                                                                                                                                                                                                                       | —                                                                                                     | —                                                               |
 
 - **À préserver** : `export const dynamic = "force-dynamic"` ; `generateMetadata` via
   `pageMetadata({ path: "", absoluteTitle: true })` (titre et description déplacés dans
@@ -3629,8 +3688,7 @@ changements × 110 s + 360 s`.
 | `landing.summit.title`                    | Votre nom, en relief. Littéralement.                                                                                                                                                                                  | Ihr Name, im Relief. Wörtlich.                                                                                                                                                                                           | Il Suo nome, in rilievo. Letteralmente.                                                                                                                                                                                            | Your name, in relief. Literally.                                                                                                                                                                                     |
 | `landing.summit.input`                    | Nommez votre sommet                                                                                                                                                                                                   | Benennen Sie Ihren Gipfel                                                                                                                                                                                                | Dia un nome alla Sua vetta                                                                                                                                                                                                         | Name your peak                                                                                                                                                                                                       |
 | `landing.summit.note`                     | Le texte reste dans votre navigateur jusqu'à l'envoi à l'atelier.                                                                                                                                                     | Der Text bleibt in Ihrem Browser, bis Sie ihn ans Atelier senden.                                                                                                                                                        | Il testo resta nel Suo browser fino all'invio all'atelier.                                                                                                                                                                         | The text stays in your browser until you send it to the workshop.                                                                                                                                                    |
-| `studioCore.relief.peak`                  | Pointe {name}                                                                                                                                                                                                         | Piz {name}                                                                                                                                                                                                               | Pizzo {name}                                                                                                                                                                                                                       | Mount {name}                                                                                                                                                                                                         |
-| `studioCore.relief.fictional`             | altitude fictive                                                                                                                                                                                                      | fiktive Höhe                                                                                                                                                                                                             | quota immaginaria                                                                                                                                                                                                                  | fictional altitude                                                                                                                                                                                                   |
+| `studioCore.examples.peak`                | Pointe Léa (« Piz Léa », « Pizzo Léa », « Mount Léa »)                                                                                                                                                                | Piz {name}                                                                                                                                                                                                               | Pizzo {name}                                                                                                                                                                                                                       | Mount {name}                                                                                                                                                                                                         |
 | `landing.summit.cta`                      | Continuer dans le Studio                                                                                                                                                                                              | Im Studio weitermachen                                                                                                                                                                                                   | Continua nello Studio                                                                                                                                                                                                              | Continue in the Studio                                                                                                                                                                                               |
 | `landing.studio.title`                    | Réglez-le. On l'imprime.                                                                                                                                                                                              | Sie stellen ein. Wir drucken.                                                                                                                                                                                            | Lei regola. Noi stampiamo.                                                                                                                                                                                                         | You set it. We print it.                                                                                                                                                                                             |
 | `landing.shop.title`                      | Des objets choisis, imprimés à la commande.                                                                                                                                                                           | Ausgewählte Objekte, auf Bestellung gedruckt.                                                                                                                                                                            | Oggetti scelti, stampati su ordinazione.                                                                                                                                                                                           | Selected objects, printed to order.                                                                                                                                                                                  |

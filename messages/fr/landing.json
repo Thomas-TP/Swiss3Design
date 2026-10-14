@@ -1,7 +1,7 @@
 {
   "seo": {
     "title": "Swiss3Design · Impression 3D multicolore en Suisse",
-    "description": "Personnalisez un vase, une carte ou un sous-verre en 3D, l'atelier l'imprime en jusqu'à quatre couleurs, à Gland et à Pully. Livré partout en Suisse.",
+    "description": "Personnalisez un vase, une carte ou une montagne en 3D, l'atelier l'imprime en jusqu'à quatre couleurs, à Gland et à Pully. Livré partout en Suisse.",
     "imageAlt": "Swiss3Design : un vase imprimé couche par couche en trois couleurs"
   },
   "rail": {
@@ -49,11 +49,11 @@
   "summit": {
     "eyebrow": "Votre sommet",
     "title": "Votre nom, en relief. Littéralement.",
-    "lead": "Le sous-verre « Relief » est un massif en strates. Votre nom en coiffe le sommet, avec une altitude fictive calculée à partir de lui.",
+    "lead": "La Montagne est une vraie petite montagne à poser sur un bureau, colorée par altitude. Votre nom y figure en relief sur le socle, avec une altitude fictive calculée à partir de lui.",
     "input": "Nommez votre sommet",
     "note": "Le texte reste dans votre navigateur jusqu'à l'envoi à l'atelier.",
     "cta": "Continuer dans le Studio",
-    "poster": "Sous-verre « Relief » : un massif en strates, vu de dessus."
+    "poster": "Montagne : une petite montagne colorée par altitude, vue de face."
   },
   "studio": {
     "eyebrow": "Le Studio",

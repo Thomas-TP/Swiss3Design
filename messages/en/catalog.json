@@ -29,9 +29,9 @@
           "name": "\"Cartouche\" business card",
           "line": "An 85 × 55 mm business card, your name embossed or engraved."
         },
-        "relief": {
-          "name": "\"Relief\" coaster",
-          "line": "A topographic coaster from 90 to 110 mm, with your peak in relief."
+        "montagne": {
+          "name": "Mountain",
+          "line": "A small mountain for your desk, up to 12 cm tall, colored by altitude, with your name on the plinth."
         },
         "borne": {
           "name": "\"Borne\" name tag",

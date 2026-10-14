@@ -29,9 +29,9 @@
           "name": "Biglietto «Cartouche»",
           "line": "Un biglietto da visita di 85 × 55 mm, il Suo nome in rilievo o inciso."
         },
-        "relief": {
-          "name": "Sottobicchiere «Relief»",
-          "line": "Un sottobicchiere topografico da 90 a 110 mm, con la Sua vetta in rilievo."
+        "montagne": {
+          "name": "Montagna",
+          "line": "Una piccola montagna da scrivania, fino a 12 cm, colorata per quota, con il Suo nome sul basamento."
         },
         "borne": {
           "name": "Portanome «Borne»",

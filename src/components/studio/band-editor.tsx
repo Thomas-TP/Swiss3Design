@@ -22,7 +22,7 @@ import styles from "./studio.module.css";
 // hauteur totale) : la position d'un repère est donc exactement sa hauteur. Seul
 // le repère (le « pouce ») reçoit le pointeur, le reste de la piste le laisse
 // passer. Au clavier, les flèches déplacent d'un cran (une couche pour le vase,
-// une strate pour le sous-verre), Maj + flèche de dix ; la valeur brute d'un
+// une couche aussi pour la montagne), Maj + flèche de dix ; la valeur brute d'un
 // glissé est ramenée au cran valide par l'appelant.
 
 type Orientation = "vertical" | "horizontal";
@@ -37,6 +37,7 @@ export function BandBar({
   nameOf,
   labelOf,
   valueTextOf,
+  locked = 0,
   className,
 }: {
   bands: readonly Band[];
@@ -45,6 +46,8 @@ export function BandBar({
   orientation: Orientation;
   /** Cran d'une flèche (mm). */
   stepMm: number;
+  /** Frontières du bas qui ne se déplacent pas (le dessus du socle de la montagne) : pas de curseur. */
+  locked?: number;
   /** Frontière haute de la bande `index` déplacée vers `toMm` (valeur brute). */
   onBoundary: (index: number, toMm: number) => void;
   onCommit: () => void;
@@ -127,33 +130,37 @@ export function BandBar({
             />
           );
         })}
-        {bands.slice(0, -1).map((band, index) => (
-          <input
-            key={index}
-            type="range"
-            form="studio-local"
-            min={0}
-            max={height}
-            step={0.2}
-            value={band.toMm}
-            aria-label={labelOf(index + 1)}
-            aria-valuetext={valueTextOf(index + 1, band.toMm)}
-            aria-orientation={orientation}
-            onChange={(event) =>
-              onBoundary(index, Number(event.currentTarget.value))
-            }
-            onPointerUp={onCommit}
-            onKeyUp={onCommit}
-            onBlur={onCommit}
-            onKeyDown={(event) => onKeyDown(index, event)}
-            className={cx(
-              vertical ? styles.bandRangeV : styles.bandRangeH,
-              "absolute",
-              vertical ? "-inset-x-2 inset-y-0" : "-inset-y-2 inset-x-0",
-              "invisible group-data-[js]/studio:visible",
-            )}
-          />
-        ))}
+        {bands
+          .slice(0, -1)
+          .map((band, index) =>
+            index < locked ? null : (
+              <input
+                key={index}
+                type="range"
+                form="studio-local"
+                min={0}
+                max={height}
+                step={0.2}
+                value={band.toMm}
+                aria-label={labelOf(index + 1)}
+                aria-valuetext={valueTextOf(index + 1, band.toMm)}
+                aria-orientation={orientation}
+                onChange={(event) =>
+                  onBoundary(index, Number(event.currentTarget.value))
+                }
+                onPointerUp={onCommit}
+                onKeyUp={onCommit}
+                onBlur={onCommit}
+                onKeyDown={(event) => onKeyDown(index, event)}
+                className={cx(
+                  vertical ? styles.bandRangeV : styles.bandRangeH,
+                  "absolute",
+                  vertical ? "-inset-x-2 inset-y-0" : "-inset-y-2 inset-x-0",
+                  "invisible group-data-[js]/studio:visible",
+                )}
+              />
+            ),
+          )}
       </div>
       {/* Noms des filaments pour les lecteurs d'écran : la barre est graphique. */}
       <ul className="sr-only">
@@ -171,6 +178,7 @@ export function BandList({
   bands,
   canAdd,
   canRemove,
+  removable,
   onFilament,
   onAdd,
   onRemove,
@@ -186,6 +194,8 @@ export function BandList({
   bands: readonly Band[];
   canAdd: boolean;
   canRemove: boolean;
+  /** Bandes qui peuvent être retirées (défaut : toutes si `canRemove`) : le socle de la montagne ne l'est pas. */
+  removable?: (index: number) => boolean;
   onFilament: (index: number, filament: FilamentId) => void;
   onAdd: () => void;
   onRemove: (index: number) => void;
@@ -213,7 +223,7 @@ export function BandList({
                   {rangeOf(index)}
                 </span>
               </p>
-              {canRemove ? (
+              {canRemove && (removable ? removable(index) : true) ? (
                 <Button
                   variant="text"
                   size="sm"

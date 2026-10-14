@@ -206,12 +206,20 @@ export function settingsLine(input: SummaryInput): string {
         layout: core(`options.layout.${config.layout}`),
         corner: mm(config.corner, locale),
       });
-    case "relief":
-      return t("quote.settings.relief", {
-        levels: config.levels,
-        lake: num(config.lake, locale),
+    case "montagne":
+      return t("quote.settings.montagne", {
+        form: core(`options.form.${config.form}`),
+        style:
+          config.style === "strates"
+            ? `${core("options.style.strates")} (${config.levels})`
+            : core(`options.style.${config.style}`),
+        steep: num(Math.round(config.steep * 100), locale),
         seed: config.seed,
-        label: t(config.label ? "quote.yes" : "quote.no"),
+        label: !config.label
+          ? t("quote.no")
+          : config.altMode === "saisie"
+            ? t("quote.labelTyped", { value: num(config.altitude, locale) })
+            : t("quote.labelFictive"),
       });
     case "borne":
       return t("quote.settings.borne", {
@@ -236,10 +244,10 @@ export function detailLine(input: SummaryInput): string {
       return t("quote.detail.cartouche", {
         thickness: mm(config.thickness, locale),
       });
-    case "relief":
-      return t("quote.detail.relief", {
-        base: mm(config.base, locale),
-        relief: mm(config.relief, locale),
+    case "montagne":
+      return t("quote.detail.montagne", {
+        plinth: mm(config.plinth, locale),
+        height: mm(config.height, locale),
         shape: core(`options.shape.${config.shape}`),
       });
     case "borne":

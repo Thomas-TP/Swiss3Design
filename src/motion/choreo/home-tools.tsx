@@ -10,12 +10,12 @@
 //  - PosterEngine : en 2D (mouvement réduit, appareil sans WebGL), recalcule le
 //    poster du héros ou de l'éclaté quand le visiteur règle palette et motif ;
 //  - SummitEngine : à l'approche du chapitre 02, fournit l'étiquette et les
-//    chiffres exacts du sous-verre pour le sommet saisi.
+//    chiffres exacts de la Montagne pour le sommet saisi.
 // Ce module n'importe ni gsap, ni three : il ne retarde pas le mouvement réduit.
 import { useEffect } from "react";
 import type { HomeLocale } from "@/components/home/home-data-types";
-import type { ReliefTools } from "@/components/home/summit-tools";
-import { peakLabel } from "@/lib/studio/objects/relief-model";
+import type { MontagneTools } from "@/components/home/summit-tools";
+import { peakLabel } from "@/lib/studio/objects/montagne-model";
 import { heroPoster, type HeroPoster } from "@/lib/studio/poster";
 import { computeStats } from "@/lib/studio/stats";
 import type { LavauxConfig } from "@/lib/studio/types";
@@ -35,7 +35,7 @@ export function PosterEngine({
   return null;
 }
 
-const tools: ReliefTools = {
+const tools: MontagneTools = {
   peakLabel: (name, locale: HomeLocale) => peakLabel(name, locale),
   computeStats: (config, texts, params, locale) =>
     computeStats(config, texts, params, locale),
@@ -44,7 +44,7 @@ const tools: ReliefTools = {
 export function SummitEngine({
   onReady,
 }: {
-  onReady: (tools: ReliefTools) => void;
+  onReady: (tools: MontagneTools) => void;
 }) {
   useEffect(() => {
     onReady(tools);

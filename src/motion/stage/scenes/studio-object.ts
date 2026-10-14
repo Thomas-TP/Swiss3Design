@@ -213,7 +213,7 @@ function splitByBand(
 /**
  * Un cheveu au-dessus de chaque frontière de bande : une face horizontale posée
  * EXACTEMENT sur une frontière (le dessus de la plaque d'une carte, le socle d'un
- * sous-verre, un sommet de strate) a une hauteur interpolée qui flotte de
+ * montagne, un sommet de strate) a une hauteur interpolée qui flotte de
  * 1e-7 mm autour d'elle ; le shader, qui compare `vZ > frontière`, y mélangerait
  * pixel par pixel les deux teintes (un grain de poivre sur toute la face). Avec
  * 0,02 mm de marge, la face appartient franchement à la bande du dessous ; sur
@@ -1081,6 +1081,11 @@ const create = (ctx: StageContext): StageScene<StudioSceneProps> => {
       const cx = (box[0] + box[3]) / 2;
       const cy = (box[1] + box[4]) / 2;
       const planBlend = planMode ? 1 : clamp(1 - polar / POLAR_START, 0, 1);
+      // Vue « carte » : une courbe maîtresse toutes les 10 couches (2 mm) sur la
+      // montagne, dont le Plan est une carte topographique ; les autres objets
+      // gardent leur teinte unie.
+      d.material.uniforms.uIsoMode.value =
+        props.config.object === "montagne" ? planBlend : 0;
       // Le haut de la vue recouvert par des commandes DOM (mobile) : l'objet est
       // cadré dans la partie libre, puis l'image descend de la moitié du retrait.
       const inset = clamp(props.insetTop ?? 0, 0, rect.height * 0.4);

@@ -40,7 +40,7 @@ describe("textes du Studio (sessionStorage)", () => {
       name: "Léa Dubois",
       role: "Architecte",
     });
-    expect(readStudioTexts("relief")).toEqual({});
+    expect(readStudioTexts("montagne")).toEqual({});
     expect(JSON.parse(store.get(STUDIO_TEXTS_KEY)!)).toEqual({
       cartouche: { name: "Léa Dubois", role: "Architecte" },
       borne: { text: "Léa" },
@@ -54,8 +54,8 @@ describe("textes du Studio (sessionStorage)", () => {
 
   it("un champ vidé reste vide (on ne ressuscite pas l'exemple)", () => {
     installBrowser();
-    writeStudioTexts("relief", { peak: "" });
-    expect(readStudioTexts("relief")).toEqual({ peak: "" });
+    writeStudioTexts("montagne", { peak: "" });
+    expect(readStudioTexts("montagne")).toEqual({ peak: "" });
   });
 
   it("aucune clé : l'entrée de l'objet disparaît", () => {
