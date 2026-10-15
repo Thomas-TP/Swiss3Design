@@ -102,7 +102,8 @@
     "error": "3D-Ansicht nicht verfügbar. Das Foto des Stücks bleibt sichtbar.",
     "label": "3D-Ansicht von {name}: Pfeiltasten zum Drehen",
     "turnLeft": "Nach links drehen",
-    "turnRight": "Nach rechts drehen"
+    "turnRight": "Nach rechts drehen",
+    "decorCredit": "Kulisse: <source>«{title}»</source> von {author}, <deed>{license}</deed>, für das Web angepasst."
   },
   "cross": {
     "title": "Eine Vase in Ihren Farben?",

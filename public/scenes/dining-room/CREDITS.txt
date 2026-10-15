@@ -1,0 +1,3 @@
+"Dining room | Kichen baked" (https://skfb.ly/owqH6) by ChristyHsu is licensed under Creative Commons Attribution 4.0 (https://creativecommons.org/licenses/by/4.0/).
+
+Adapted for swiss3design.ch: original vase and flowers removed, small countertop objects simplified, unlit materials (lighting baked into the textures), textures re-encoded as WebP (max. 2048 px).

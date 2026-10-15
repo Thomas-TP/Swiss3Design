@@ -28,9 +28,52 @@ export interface ProductViewerProps {
   colors: readonly string[];
   /** Mouvement complet demandé ; la scène ne tourne seule qu'en capacité C2. */
   autoRotate: boolean;
+  /** Pièce où la pièce est posée (null : le fond neutre de la page). */
+  decor: ViewerDecor | null;
   /** Rappel appelé au changement d'état et pendant le chargement (≈ 4 Hz). */
   onStatus?: (status: ViewerStatus) => void;
 }
+
+/**
+ * Décor de la vue : une pièce 3D à l'éclairage précalculé (glTF, textures WebP,
+ * servie depuis `public/`), où la pièce vendue est posée sur un meuble. La pièce
+ * est montrée telle quelle, à l'échelle réelle, sans être modifiée : le décor
+ * l'entoure, il ne la transforme pas.
+ */
+export interface ViewerDecor {
+  /** glTF du décor (même origine : ses .bin et .webp se chargent à côté). */
+  url: string;
+  /** Point d'appui de la pièce dans le décor (mètres, Y vers le haut). */
+  anchor: readonly [number, number, number];
+  /** Crédit exigé par la licence du décor (rendu sous la vue). */
+  credit: {
+    title: string;
+    author: string;
+    url: string;
+    license: string;
+    licenseUrl: string;
+  };
+}
+
+/**
+ * La salle à manger de ChristyHsu (« Dining room | Kichen baked », Sketchfab,
+ * CC BY 4.0), adaptée pour le web : vase et bouquet d'origine retirés, petits
+ * objets du plan de travail simplifiés, matériaux sans éclairage (la lumière est
+ * dans les textures), textures en WebP ≤ 2048 px. 44 Mo → 3,8 Mo. Source et
+ * licence hors du dépôt (sources-3d/), script : scripts/optimize-decor.mjs.
+ * Le produit est posé au centre de la table ovale (plateau à 0,78 m).
+ */
+export const DINING_ROOM_DECOR: ViewerDecor = {
+  url: "/scenes/dining-room/dining-room.gltf",
+  anchor: [0.83, 0.78, 0.245],
+  credit: {
+    title: "Dining room | Kichen baked",
+    author: "ChristyHsu",
+    url: "https://skfb.ly/owqH6",
+    license: "CC BY 4.0",
+    licenseUrl: "https://creativecommons.org/licenses/by/4.0/",
+  },
+};
 
 /** Événement DOM des boutons « Tourner » vers la scène (sur l'élément de la vue). */
 export const VIEWER_TURN_EVENT = "s3d-viewer-turn";

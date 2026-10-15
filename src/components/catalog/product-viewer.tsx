@@ -10,6 +10,7 @@ import { useProductColor } from "@/components/product-color-context";
 import { StageView } from "@/components/ui/stage-view";
 import { cx } from "@/components/ui/cx";
 import {
+  DINING_ROOM_DECOR,
   MODEL_SIZE_HINTS,
   VIEWER_FALLBACK_COLOR,
   VIEWER_TURN_EVENT,
@@ -102,6 +103,9 @@ export function ProductViewer({
       modelUrl,
       colors: tints.split(","),
       autoRotate: !reduced,
+      // La pièce posée sur la table d'une salle à manger (décor CC BY 4.0,
+      // crédité sous la vue).
+      decor: DINING_ROOM_DECOR,
       onStatus: setStatus,
     }),
     [modelUrl, tints, reduced],
@@ -144,6 +148,7 @@ export function ProductViewer({
     );
   };
 
+  const decorCredit = DINING_ROOM_DECOR.credit;
   const caption = ready
     ? t("caption", { author })
     : failed
@@ -217,6 +222,37 @@ export function ProductViewer({
       </div>
       <figcaption className="s3d-page mt-4 text-sm text-soft">
         {caption}
+        {ready && (
+          // Attribution exigée par la licence du décor (CC BY 4.0) : titre,
+          // auteur, source, licence, et la mention de l'adaptation.
+          <span className="mt-1 block text-xs">
+            {t.rich("decorCredit", {
+              title: decorCredit.title,
+              author: decorCredit.author,
+              license: decorCredit.license,
+              source: (chunks) => (
+                <a
+                  href={decorCredit.url}
+                  rel="noopener"
+                  target="_blank"
+                  className="underline decoration-iso-index decoration-1 underline-offset-4 hover:decoration-ink"
+                >
+                  {chunks}
+                </a>
+              ),
+              deed: (chunks) => (
+                <a
+                  href={`${decorCredit.licenseUrl}deed.${locale}`}
+                  rel="noopener license"
+                  target="_blank"
+                  className="underline decoration-iso-index decoration-1 underline-offset-4 hover:decoration-ink"
+                >
+                  {chunks}
+                </a>
+              ),
+            })}
+          </span>
+        )}
       </figcaption>
     </figure>
   );

@@ -40,9 +40,13 @@ import {
   Object3D,
   PerspectiveCamera,
   PlaneGeometry,
+  PMREMGenerator,
   Scene,
   SRGBColorSpace,
   Vector3,
+  type Material,
+  type Texture,
+  type WebGLRenderTarget,
 } from "three";
 import { STLLoader } from "three/addons/loaders/STLLoader.js";
 import { toCreasedNormals } from "three/addons/utils/BufferGeometryUtils.js";
@@ -86,6 +90,27 @@ const FILL_HEIGHT = 0.74;
 const FILL_WIDTH = 0.66;
 const PROGRESS_INTERVAL_MS = 250;
 
+// ── Décor : une pièce meublée, la pièce vendue posée sur la table ─────────────
+// La caméra tourne AUTOUR de la pièce (on voit la salle défiler), la pièce reste
+// posée. Tout est à l'échelle réelle (salle « scaled to real world » : plateau à
+// 0,78 m, dossiers à 1 m, plan de travail à 0,86 m ; le vase fait 21 cm) : on ne
+// grossit jamais la pièce, ce serait mentir sur sa taille. Pour qu'elle domine
+// l'image, la caméra s'en approche au grand angle : la salle s'éloigne derrière.
+const DECOR_FOV = 50;
+/** Première vue : depuis le bout de la table, vers la cuisine (fenêtre à gauche). */
+const DECOR_AZIMUTH_START = rad(70);
+/**
+ * Polaire en décor : de 40° (plongée) à 84° (presque à hauteur de plateau). Plus
+ * bas, la caméra traverserait le plateau ou les dossiers des chaises.
+ */
+const DECOR_POLAR_MIN = rad(40);
+const DECOR_POLAR_MAX = rad(84);
+const DECOR_POLAR_START = rad(78);
+/** En décor, la pièce occupe 52 % de la hauteur de la vue (la salle autour). */
+const DECOR_FILL = 0.52;
+/** Lumière d'appoint côté fenêtre (le décor a ses baies vers −Z). */
+const DECOR_SUN = new Vector3(0.25, 1.1, -1);
+
 // ── Fonctions pures (testées : product-viewer.test.ts) ────────────────────────
 
 export type UpAxis = "x" | "y" | "z";
@@ -107,8 +132,32 @@ export function upAxisFor(size: { x: number; y: number; z: number }): UpAxis {
   return longest[1] > second[1] * 1.25 ? longest[0] : "z";
 }
 
-export function clampPolar(polar: number): number {
-  return Math.min(POLAR_MAX, Math.max(POLAR_MIN, polar));
+export function clampPolar(polar: number, decor = false): number {
+  return decor
+    ? Math.min(DECOR_POLAR_MAX, Math.max(DECOR_POLAR_MIN, polar))
+    : Math.min(POLAR_MAX, Math.max(POLAR_MIN, polar));
+}
+
+/**
+ * Échelle du fichier vers les mètres du décor : un STL de trancheur est en
+ * millimètres (une pièce de plus de 5 « mètres » de haut l'est forcément), un
+ * glTF en mètres.
+ */
+export function unitScaleFor(height: number): number {
+  return height > 5 ? 0.001 : 1;
+}
+
+/** Distance de la caméra en décor : la pièce occupe DECOR_FILL de la hauteur. */
+export function decorDistance(o: {
+  height: number;
+  radius: number;
+  aspect: number;
+  fovDeg: number;
+}): number {
+  const tan = Math.tan(rad(o.fovDeg) / 2);
+  const byHeight = o.height / DECOR_FILL / 2 / tan;
+  const byWidth = (o.radius * 2) / 0.5 / 2 / (tan * Math.max(0.2, o.aspect));
+  return Math.max(byHeight, byWidth);
 }
 
 /**
@@ -229,6 +278,13 @@ const create = (
   const meshes: Mesh[] = [];
   /** Teintes déjà peintes en couleurs de sommets (clé), pour ne pas repeindre. */
   let paintedKey: string | null = null;
+  /** Décor chargé (la pièce y est posée), ou null : fond neutre de la page. */
+  let decor: Object3D | null = null;
+  const decorMaterials = new Set<Material>();
+  const decorTextures = new Set<Texture>();
+  let decorEnv: WebGLRenderTarget | null = null;
+  /** Mètres par unité du fichier de la pièce (STL en mm : 0,001). */
+  let unitScale = 1;
   const target = new Vector3();
   let modelHeight = 1;
   let modelRadius = 1;
@@ -409,6 +465,80 @@ const create = (
     return place(mesh, null);
   }
 
+  /**
+   * Le décor (glTF + .bin + textures WebP, même origine) : matériaux sans
+   * éclairage, la lumière est dans les textures, montrées telles quelles (pas de
+   * tone mapping). Un échec n'empêche rien : la pièce garde le fond neutre.
+   */
+  async function loadDecor(url: string): Promise<Object3D | null> {
+    try {
+      const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
+      const gltf = await new GLTFLoader().loadAsync(url);
+      gltf.scene.traverse((child) => {
+        const mesh = child as Mesh;
+        if (!mesh.isMesh) return;
+        ownedGeometries.push(mesh.geometry);
+        const materials = Array.isArray(mesh.material)
+          ? mesh.material
+          : [mesh.material];
+        for (const material of materials) {
+          material.toneMapped = false;
+          // Luminosité voulue par l'auteur (l'albédo servait aussi d'émission
+          // sur Sketchfab) : scripts/optimize-decor.mjs l'écrit en extras.
+          const brightness = Number(material.userData.brightness) || 1;
+          (material as MeshBasicMaterial).color?.multiplyScalar(brightness);
+          decorMaterials.add(material);
+          const map = (material as MeshBasicMaterial).map;
+          if (map) decorTextures.add(map);
+        }
+      });
+      return gltf.scene;
+    } catch (error) {
+      console.error("[product-viewer] décor indisponible", error);
+      return null;
+    }
+  }
+
+  /** Pose la pièce sur le meuble du décor et éclaire-la avec la salle. */
+  function placeInDecor(room: Object3D, anchor: readonly number[]) {
+    decor = room;
+    scene.add(room);
+    unitScale = unitScaleFor(modelHeight);
+    pivot.position.set(anchor[0], anchor[1], anchor[2]);
+    pivot.scale.setScalar(unitScale);
+    pivot.rotation.y = 0;
+    target.set(anchor[0], anchor[1] + modelHeight * unitScale * 0.5, anchor[2]);
+    // Reflets et ambiance de la salle elle-même, vue depuis la pièce : la
+    // teinte du produit prend la lumière du décor, pas celle d'un studio.
+    const generator = new PMREMGenerator(ctx.renderer);
+    pivot.visible = false;
+    decorEnv = generator.fromScene(scene, 0.03, 0.02, 30, {
+      position: target,
+    });
+    pivot.visible = true;
+    generator.dispose();
+    scene.environment = decorEnv.texture;
+    scene.environmentIntensity = 1;
+    sun.intensity = 1.1;
+    sun.position.copy(DECOR_SUN).normalize().multiplyScalar(20).add(target);
+    sun.target.position.copy(target);
+    scene.add(sun.target);
+    camera.fov = DECOR_FOV;
+    polar = DECOR_POLAR_START;
+    azimuth = azimuthTarget = DECOR_AZIMUTH_START;
+    floor.visible = false;
+    // Ombre de contact sur le plateau (le décor n'a pas d'ombre pour un objet
+    // qu'il ne connaissait pas).
+    const radius = modelRadius * unitScale;
+    shadow.scale.setScalar(radius * 2.9);
+    shadow.position.set(
+      anchor[0] + radius * 0.1,
+      anchor[1] + 0.002,
+      anchor[2] + radius * 0.06,
+    );
+    shadow.visible = true;
+  }
+
   async function startLoad() {
     if (loadStarted || disposed || !props) return;
     loadStarted = true;
@@ -417,22 +547,30 @@ const create = (
     received = 0;
     total = null;
     report("loading", true);
+    const decorProps = props.decor;
+    // Le décor se charge en même temps que le fichier de la pièce.
+    const room = decorProps ? loadDecor(decorProps.url) : null;
     try {
       const holder = await loadModel(props.modelUrl, signal);
+      const loadedRoom = room ? await room : null;
       if (!holder || disposed || signal.aborted) return;
       model = holder;
       pivot.add(holder);
       // Bobine co-extrudée choisie avant l'arrivée du modèle : on la peint maintenant.
       applyColor();
-      target.set(0, modelHeight * 0.5, 0);
-      // Cyclorama et ombre calés sur l'empreinte réelle de la pièce.
-      floor.scale.setScalar(modelRadius * 7);
-      shadow.scale.setScalar(modelRadius * 2.9);
-      // Ombre portée légèrement vers le sud-est : la lumière vient du nord-ouest.
-      shadow.position.set(modelRadius * 0.14, 0.02, modelRadius * 0.08);
-      floor.position.y = 0.01;
-      floor.visible = true;
-      shadow.visible = true;
+      if (loadedRoom && decorProps) {
+        placeInDecor(loadedRoom, decorProps.anchor);
+      } else {
+        target.set(0, modelHeight * 0.5, 0);
+        // Cyclorama et ombre calés sur l'empreinte réelle de la pièce.
+        floor.scale.setScalar(modelRadius * 7);
+        shadow.scale.setScalar(modelRadius * 2.9);
+        // Ombre portée légèrement vers le sud-est : la lumière vient du nord-ouest.
+        shadow.position.set(modelRadius * 0.14, 0.02, modelRadius * 0.08);
+        floor.position.y = 0.01;
+        floor.visible = true;
+        shadow.visible = true;
+      }
       report("ready", true);
       ctx.invalidate();
     } catch (error) {
@@ -495,7 +633,7 @@ const create = (
     const dAz = dx * RAD_PER_PX;
     azimuth += dAz;
     azimuthTarget = azimuth;
-    polar = clampPolar(polar - dy * POLAR_PER_PX);
+    polar = clampPolar(polar - dy * POLAR_PER_PX, decor !== null);
     const dt = Math.max(1, now - lastMoveAt) / 1000;
     // Vitesse lissée, reprise à la relâche pour l'inertie.
     spin = spin * 0.6 + (dAz / dt) * 0.4;
@@ -530,23 +668,25 @@ const create = (
         turnTo(TURN_STEP);
         break;
       case "ArrowUp":
-        polar = clampPolar(polar - POLAR_STEP);
+        polar = clampPolar(polar - POLAR_STEP, decor !== null);
         markInteraction();
         ctx.invalidate();
         break;
       case "ArrowDown":
-        polar = clampPolar(polar + POLAR_STEP);
+        polar = clampPolar(polar + POLAR_STEP, decor !== null);
         markInteraction();
         ctx.invalidate();
         break;
-      case "Home":
-        azimuthTarget = AZIMUTH_START;
-        azimuth = ctx.reduced ? AZIMUTH_START : azimuth;
-        polar = POLAR_START;
+      case "Home": {
+        const start = decor ? DECOR_AZIMUTH_START : AZIMUTH_START;
+        azimuthTarget = start;
+        azimuth = ctx.reduced ? start : azimuth;
+        polar = decor ? DECOR_POLAR_START : POLAR_START;
         spin = 0;
         markInteraction();
         ctx.invalidate();
         break;
+      }
       default:
         return;
     }
@@ -658,36 +798,50 @@ const create = (
           }
         }
       }
-      pivot.rotation.y = azimuth;
-
-      // Vue par-dessous : le sol (une tache claire) et l'ombre de contact
-      // masqueraient la pièce, ils s'effacent.
-      const below = Math.min(
-        1,
-        Math.max(
-          0,
-          (polar - FLOOR_FADE_FROM) / (FLOOR_FADE_TO - FLOOR_FADE_FROM),
-        ),
-      );
-      floorMaterial.opacity = 1 - below;
-      shadowMaterial.opacity = 1 - below;
-      floor.visible = shadow.visible = below < 1;
-
       const rect = frame.rect;
       const aspect = rect.width / Math.max(1, rect.height);
       camera.aspect = aspect;
-      const distance = fitDistance({
-        height: modelHeight,
-        radius: modelRadius,
-        aspect,
-        fovDeg: FOV,
-      });
-      camera.near = distance * 0.05;
-      camera.far = distance * 6;
+      let distance: number;
+      // Fond neutre : la pièce tourne sur elle-même devant la caméra. Décor : la
+      // pièce reste posée et la caméra tourne autour (la salle défile derrière).
+      let orbit = 0;
+      if (decor) {
+        distance = decorDistance({
+          height: modelHeight * unitScale,
+          radius: modelRadius * unitScale,
+          aspect,
+          fovDeg: DECOR_FOV,
+        });
+        orbit = azimuth;
+        camera.near = 0.02;
+        camera.far = 30;
+      } else {
+        pivot.rotation.y = azimuth;
+        // Vue par-dessous : le sol (une tache claire) et l'ombre de contact
+        // masqueraient la pièce, ils s'effacent.
+        const below = Math.min(
+          1,
+          Math.max(
+            0,
+            (polar - FLOOR_FADE_FROM) / (FLOOR_FADE_TO - FLOOR_FADE_FROM),
+          ),
+        );
+        floorMaterial.opacity = 1 - below;
+        shadowMaterial.opacity = 1 - below;
+        floor.visible = shadow.visible = below < 1;
+        distance = fitDistance({
+          height: modelHeight,
+          radius: modelRadius,
+          aspect,
+          fovDeg: FOV,
+        });
+        camera.near = distance * 0.05;
+        camera.far = distance * 6;
+      }
       camera.position.set(
-        target.x,
+        target.x + distance * Math.sin(polar) * Math.sin(-orbit),
         target.y + distance * Math.cos(polar),
-        target.z + distance * Math.sin(polar),
+        target.z + distance * Math.sin(polar) * Math.cos(-orbit),
       );
       camera.lookAt(target);
       camera.updateProjectionMatrix();
@@ -716,8 +870,15 @@ const create = (
       floorMaterial.dispose();
       shadowMaterial.dispose();
       material.dispose();
+      for (const decorMaterial of decorMaterials) decorMaterial.dispose();
+      for (const texture of decorTextures) texture.dispose();
+      decorMaterials.clear();
+      decorTextures.clear();
+      decorEnv?.dispose();
+      decorEnv = null;
       scene.clear();
       model = null;
+      decor = null;
     },
   };
 };

@@ -102,7 +102,8 @@
     "error": "3D preview unavailable. The photo of the piece stays in place.",
     "label": "3D preview of {name}: arrow keys to rotate",
     "turnLeft": "Rotate left",
-    "turnRight": "Rotate right"
+    "turnRight": "Rotate right",
+    "decorCredit": "Setting: <source>“{title}”</source> by {author}, <deed>{license}</deed>, adapted for the web."
   },
   "cross": {
     "title": "A vase in your colors?",

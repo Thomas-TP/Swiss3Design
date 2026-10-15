@@ -102,7 +102,8 @@
     "error": "Anteprima 3D non disponibile. Resta visibile la foto del pezzo.",
     "label": "Anteprima 3D di {name}: frecce per ruotare",
     "turnLeft": "Ruota verso sinistra",
-    "turnRight": "Ruota verso destra"
+    "turnRight": "Ruota verso destra",
+    "decorCredit": "Ambientazione: <source>«{title}»</source> di {author}, <deed>{license}</deed>, adattata per il web."
   },
   "cross": {
     "title": "Un vaso nei Suoi colori?",
