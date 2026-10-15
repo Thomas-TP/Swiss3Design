@@ -46,6 +46,8 @@
     }
   },
   "card": {
+    "chooseColor": "Farbe wählen",
+    "colors": "{count, plural, one {# Farbe} other {# Farben}}",
     "days": "{days} T",
     "height": "Höhe {height} mm"
   },

@@ -1,10 +1,11 @@
 import { ViewTransition } from "react";
+import { Palette } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { formatChf } from "@/lib/format";
 import { cfImage } from "@/lib/cf-image";
 import { attributionFor } from "@/lib/attribution";
 import { AddToCartMini } from "@/components/add-to-cart";
-import { chipBackground } from "@/components/filament-chip";
+import { FilamentChip, wheelOrder } from "@/components/filament-chip";
 import { FavoriteButton } from "@/components/favorite-button";
 import { MulticolorDots } from "@/components/multicolor-dots";
 import type { ProductCardItem } from "@/components/product-card";
@@ -14,17 +15,15 @@ import { SpecTable, type SpecRow } from "@/components/ui/spec-table";
 import { registryRef } from "./specs";
 import "./morph.css";
 
-/** Couleurs nommées sur la planche : les autres sont comptées (« +9 »). */
-const PLATE_COLORS = 5;
-
 // « Planche » éditoriale d'un produit (brief « Strates », §7.8) : quand le
 // catalogue ne compte qu'un ou deux articles et qu'aucun filtre n'est actif,
 // une grille de cartes aurait l'air vide. Chaque produit occupe donc une
 // planche de cartographe : grande photo, fiche d'identité `<dl>` (matière,
-// dimensions, poids, délai, provenance), prix, pastilles des couleurs vendues,
-// ajout rapide, lien vers la fiche, et la ligne d'attribution du design quand
-// le modèle n'est pas de nous. Même logique d'achat que ProductCard (ajout
-// rapide, favori, `Product Added` source `catalog`).
+// dimensions, poids, délai, provenance), prix, roue des couleurs vendues,
+// action, et la ligne d'attribution du design quand le modèle n'est pas de nous.
+// Même logique d'achat que ProductCard : un article à couleurs mène à la fiche
+// (« Choisir la couleur ») ; sans couleur, ajout rapide (`Product Added` source
+// `catalog`) et lien vers la fiche.
 export function ProductPlate({
   product,
   index,
@@ -39,6 +38,7 @@ export function ProductPlate({
   weightGrams?: number | null;
 }) {
   const t = useTranslations("product");
+  const tc = useTranslations("catalog.card");
   const tp = useTranslations("catalog.plate");
   const ta = useTranslations("catalog.attribution");
   const locale = useLocale();
@@ -57,6 +57,7 @@ export function ProductPlate({
     weightGrams: product.weightGrams,
   };
   const soldOut = product.saleType === "stock" && product.stock === 0;
+  const chooseColor = product.colors.length > 0 && !soldOut;
   const attribution = attributionFor(product.slug);
   // Premier paragraphe = le résumé (celui de la meta description).
   const summary = product.description.split(/\n\s*\n/)[0]?.trim();
@@ -130,53 +131,57 @@ export function ProductPlate({
             {formatChf(product.priceCents, locale)}
           </p>
           {product.colors.length > 0 && (
-            // Tous les articles proposent les couleurs du stock : on en montre
-            // quelques-unes, nommées, et le nombre des autres (la liste complète
-            // est sur la fiche).
-            <ul className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-              {product.colors.slice(0, PLATE_COLORS).map((c) => (
-                <li key={c.id} className="flex items-center gap-2">
-                  <span
-                    aria-hidden="true"
-                    className="h-3.5 w-3.5 rounded-full border border-swatch-ring"
-                    style={chipBackground(c.hexes.length ? c.hexes : [c.hex])}
-                  />
-                  <span className="s3d-label normal-case text-soft">
-                    {c.name}
-                  </span>
-                </li>
-              ))}
-              {product.colors.length > PLATE_COLORS && (
-                <li className="s3d-label normal-case text-soft">
-                  +{product.colors.length - PLATE_COLORS}
-                </li>
-              )}
-            </ul>
+            // Tous les articles proposent les couleurs du stock : la roue de
+            // leurs teintes et leur nombre, comme sur les cartes (le détail, avec
+            // les couleurs épuisées, est sur la fiche).
+            <p className="s3d-label flex items-center gap-2 normal-case text-soft">
+              <FilamentChip
+                hexes={wheelOrder(product.colors.map((c) => c.hex))}
+                size={18}
+              />
+              {tc("colors", { count: product.colors.length })}
+            </p>
           )}
         </div>
 
         <div className="mt-6 flex flex-wrap items-stretch gap-3">
           <div className="min-w-40 flex-1">
-            <AddToCartMini
-              item={item}
-              disabled={soldOut}
-              variant={primary ? "primary" : "secondary"}
-              size="md"
-            />
+            {chooseColor ? (
+              <ButtonLink
+                href={`/products/${product.slug}`}
+                coupe={false}
+                variant={primary ? "primary" : "secondary"}
+                size="md"
+                full
+              >
+                <Palette size={16} aria-hidden="true" />
+                {tc("chooseColor")}
+              </ButtonLink>
+            ) : (
+              <AddToCartMini
+                item={item}
+                disabled={soldOut}
+                variant={primary ? "primary" : "secondary"}
+                size="md"
+              />
+            )}
           </div>
           <FavoriteButton
             item={item}
             size={18}
             className="grid w-11 shrink-0 place-items-center rounded-field border border-line bg-surface hover:border-ink"
           />
-          <ButtonLink
-            href={`/products/${product.slug}`}
-            variant="ink"
-            size="md"
-            className="shrink-0"
-          >
-            {tp("view")}
-          </ButtonLink>
+          {/* « Choisir la couleur » mène déjà à la fiche : pas de second lien. */}
+          {!chooseColor && (
+            <ButtonLink
+              href={`/products/${product.slug}`}
+              variant="ink"
+              size="md"
+              className="shrink-0"
+            >
+              {tp("view")}
+            </ButtonLink>
+          )}
         </div>
 
         {attribution && (

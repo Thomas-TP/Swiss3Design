@@ -1,10 +1,12 @@
 import { ViewTransition } from "react";
+import { Palette } from "lucide-react";
 import { useTranslations, useLocale } from "next-intl";
 import { formatChf } from "@/lib/format";
 import { cfImage } from "@/lib/cf-image";
 import type { ProductListItem } from "@/db/queries";
 import { cx } from "@/components/ui/cx";
-import { chipBackground } from "@/components/filament-chip";
+import { FilamentChip, wheelOrder } from "@/components/filament-chip";
+import { ButtonLink } from "@/components/ui/button";
 import { SiteLink } from "@/components/ui/site-link";
 import { heightMmOf } from "@/components/catalog/specs";
 import "@/components/catalog/morph.css";
@@ -23,7 +25,10 @@ export interface ProductCardItem extends ProductListItem {
 
 // Carte produit (brief « Strates », §7.8) : image, nom (h2 + lien étiré), prix,
 // une ligne mono où l'unité réelle passe d'abord (« Hauteur 209 mm · PLA · 3 j »),
-// pastilles, favori, ajout rapide en contour (un seul rouge par écran). L'image
+// la roue des couleurs (« 19 couleurs »), favori, action en contour (un seul
+// rouge par écran). Un article à couleurs ne s'ajoute pas depuis la carte : la
+// couleur se choisit sur la fiche (une couleur prise d'office pouvait être
+// épuisée, et le client ne l'avait pas choisie) ; sans couleur, ajout rapide. L'image
 // porte le nom de transition `product-<slug>` : elle glisse jusqu'à la galerie
 // de la fiche (« morph », classe posée par share="morph").
 export function ProductCard({
@@ -41,8 +46,8 @@ export function ProductCard({
   const tc = useTranslations("catalog.card");
   const locale = useLocale();
 
-  // Ajout rapide depuis la carte : si le produit a des couleurs, on prend la
-  // première par défaut (le choix fin se fait sur la fiche produit).
+  // Favori depuis la carte : si le produit a des couleurs, il garde la première
+  // (le choix se fait sur la fiche produit).
   const firstColor = product.colors[0];
   const item = {
     productId: product.id,
@@ -142,25 +147,33 @@ export function ProductCard({
             {formatChf(product.priceCents, locale)}
           </p>
           {product.colors.length > 0 && (
-            <div className="flex items-center gap-1.5">
-              {product.colors.slice(0, 5).map((c) => (
-                <span
-                  key={c.id}
-                  title={c.name}
-                  className="h-3.5 w-3.5 rounded-full border border-swatch-ring"
-                  style={chipBackground(c.hexes.length ? c.hexes : [c.hex])}
-                />
-              ))}
-              {product.colors.length > 5 && (
-                <span className="s3d-label normal-case text-soft">
-                  +{product.colors.length - 5}
-                </span>
-              )}
-            </div>
+            // Mêmes couleurs que le sur mesure sur tous les articles : une seule
+            // pastille, la roue de toutes ses teintes, et leur nombre (moins les
+            // couleurs décochées pour l'article).
+            <p className="s3d-label flex items-center gap-1.5 normal-case text-soft">
+              <FilamentChip
+                hexes={wheelOrder(product.colors.map((c) => c.hex))}
+                size={14}
+              />
+              {tc("colors", { count: product.colors.length })}
+            </p>
           )}
         </div>
         <div className="relative z-10 mt-3">
-          <AddToCartMini item={item} disabled={soldOut} />
+          {product.colors.length > 0 && !soldOut ? (
+            <ButtonLink
+              href={`/products/${product.slug}`}
+              coupe={false}
+              variant="secondary"
+              size="sm"
+              full
+            >
+              <Palette size={14} aria-hidden="true" />
+              {tc("chooseColor")}
+            </ButtonLink>
+          ) : (
+            <AddToCartMini item={item} disabled={soldOut} />
+          )}
         </div>
       </div>
     </article>
