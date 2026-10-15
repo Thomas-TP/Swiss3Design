@@ -10,6 +10,10 @@
 > Postgres** (colonne `order_items.studio`) et change les prix et la livraison : la section
 > **1.4** donne l'**ordre exact** des opérations. Le retour arrière n'est donc plus « de code
 > seulement » (voir 1.4 et la section 4).
+>
+> **Mise à jour du 15.10.2026 : stock de filament.** Seconde migration additive (`0010`, tables
+> `filament_*`) et seed des références, à appliquer elles aussi avant la fusion ; le Studio ne vend
+> que les couleurs en stock (section **1.4**, étape 2).
 
 **Où en est-on.** La branche `claude/redesign-2026` contient tous les packages, les vagues de
 correctifs R1 et R16 et ce lot WP-99. Elle est **à jour avec `main`** (aucun commit de `main`
@@ -97,21 +101,30 @@ enregistrée comme payée).
    `drizzle-pg/0009_cuddly_viper.sql`). Vérification :
    `SELECT column_name FROM information_schema.columns WHERE table_name='order_items' AND column_name='studio';`.
    La branche Neon **preview** l'a déjà reçue (14.10.2026).
-2. **Déploiement** : fusion dans `main` (section 2), puis vérification du déploiement (3.1).
-3. **Réglages de port à 0**, d'abord sur la preview puis en production : `shipping_cents` = `0` et
+2. **Stock de filament, AVANT la fusion** (additif lui aussi) : appliquer
+   `drizzle-pg/0010_filament_stock.sql` (7 tables `filament_*`), puis
+   `scripts/seed-filament-refs.sql` (19 références, aucune bobine). Vérification :
+   `SELECT count(*) FROM filament_refs;` doit donner 19. La preview a reçu les deux le 15.10.2026,
+   plus `scripts/seed-filament-stock-preview.sql` (stock de test, **jamais en production**).
+   **Sans bobine en stock, chaque couleur du Studio est « épuisée » et le Studio ne vend rien** :
+   saisissez la commande Bambu reçue juste après le déploiement (`/admin/filaments` → réception,
+   pesée), ou préparez avant la fusion une version de production du seed de stock.
+3. **Déploiement** : fusion dans `main` (section 2), puis vérification du déploiement (3.1).
+4. **Réglages de port à 0**, d'abord sur la preview puis en production : `shipping_cents` = `0` et
    `free_shipping_over_cents` = `0` dans la table `settings`. Hyperdrive met les SELECT en cache
    **60 s** : comptez une minute avant que le site le voie. Le code n'en dépend pas pour le Studio
    (une ligne du Studio ne porte jamais de port) ; sans cette étape, un panier **de la boutique seule**
    paie encore 8.90 CHF alors que les textes annoncent la livraison offerte.
-4. **Vase spirale à 34.90 CHF** (admin → Produits, ou SQL).
-5. **Resynchroniser le flux Stripe** (catalogue agentique) après la bascule du port : le flux ne
+5. **Vase spirale à 34.90 CHF** (admin → Produits, ou SQL).
+6. **Resynchroniser le flux Stripe** (catalogue agentique) après la bascule du port : le flux ne
    porte plus de seuil de gratuité ; sans action, le cron le remet à jour (quotidien).
 
 À relire avant la fusion : les textes légaux (CGV, confidentialité, livraison, version française
 qui fait foi ; dates réglées sur le jour du dernier commit, à recaler sur la fusion), la nouvelle
 section CGV « Objets du Studio » et l'engagement de **relecture des textes sous 2 jours ouvrés**.
 
-Parcours de test sur la preview (carte `4242 4242 4242 4242`) : un objet du Studio de chaque type
+Parcours de test sur la preview (carte `4242 4242 4242 4242`), après avoir marqué « reçue » la
+commande Bambu de test dans `/admin/filaments` (sinon toutes les couleurs du Studio sont épuisées) : un objet du Studio de chaque type
 (la Cartouche à 1 et à 10 pièces), une commande mixte (boutique + Studio), puis dans l'admin :
 résumé de la ligne, bobines à charger, « Télécharger le STL », « Textes relus ».
 
@@ -240,8 +253,9 @@ commandes. Dans le doute sur le paiement ou une erreur générale, **revenir d'a
 1. **Revenir** (instantané, sans reconstruction) : dashboard Cloudflare → `swiss3design` → **Deployments** →
    le déploiement précédent la fusion → **Rollback**. Ou, depuis une machine connectée :
    `bunx wrangler rollback` (en visant le Worker `swiss3design`, **jamais** `--env preview` par erreur).
-2. **Base de données : rien à faire.** La refonte ne contient aucune migration Postgres ni aucun changement
-   de binding, de CSP ou de secret par rapport à `main`. N'exécutez ni `db:push:pg` ni `wrangler secret put`
+2. **Base de données : rien à défaire.** Les deux migrations de la refonte (`0009`, colonne
+   `order_items.studio` ; `0010`, tables `filament_*`) sont additives : l'ancien code les ignore, on les
+   laisse en place. Aucun changement de binding, de CSP ni de secret par rapport à `main`. N'exécutez ni `db:push:pg` ni `wrangler secret put`
    dans ce cas (règle d'or 7 : un secret partagé écrasé par erreur verrouille les comptes 2FA).
 3. **Données du navigateur des visiteurs** : les clés `s3d-motion`, `s3d-creations-v1` (localStorage) et
    `s3d-studio-texts-v1`, `s3d-studio-upload-v1`, `s3d-quote-handoff-v1`, `s3d-webgl-lost` (sessionStorage)
