@@ -12,7 +12,9 @@
     "emptyText": "Rien n'a encore été empilé ici. Personnalisez un objet au Studio, choisissez en boutique ou envoyez-nous votre fichier.",
     "studioEdit": "Modifier dans le Studio",
     "studioNote": "Fabriqué sur commande · livraison offerte",
-    "freeAll": "Livraison offerte en Suisse."
+    "freeAll": "Livraison offerte en Suisse.",
+    "studioShort": "Épuisée : {colors}. Modifiez la pièce ou réduisez la quantité.",
+    "shortBlock": "Une couleur du Studio n'est plus en stock pour ce panier : modifiez la pièce concernée avant de commander."
   },
   "checkout": {
     "title": "Commande.",

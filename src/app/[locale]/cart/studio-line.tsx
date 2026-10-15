@@ -2,12 +2,17 @@
 
 import { Minus, Pencil, Plus, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { bandStatsFor } from "@/lib/studio/band-stats";
+import {
+  filamentGramsOf,
+  scaleGrams,
+  type FilamentGrams,
+} from "@/lib/studio/filament-need";
 import { useRouter } from "@/i18n/navigation";
 import type { StudioCartItem } from "@/lib/cart-data";
 import { formatChf } from "@/lib/format";
-import { STUDIO_QTY_MAX } from "@/lib/studio/price";
+import { PRICE_LOCALE, STUDIO_QTY_MAX } from "@/lib/studio/price";
 import { PRINT } from "@/lib/studio/print-params";
 import { computeStats } from "@/lib/studio/stats";
 import { writeStudioTexts } from "@/lib/studio/texts-store";
@@ -24,6 +29,9 @@ import { flatThumbnail } from "@/components/studio/thumbnail";
 //
 // Chargé à la demande par le panier (next/dynamic) : le moteur de statistiques
 // et les posters ne pèsent que si le panier contient une ligne du Studio.
+// Stock : la ligne remonte au panier ses grammes par couleur (pièce × quantité,
+// même calcul que le paiement, langue canonique) ; le panier additionne toutes
+// les lignes et lui renvoie les couleurs épuisées, signalées sous le résumé.
 // Les textes saisis sont des données personnelles : `ph-mask` (aucun
 // enregistrement de visite ne les garde).
 
@@ -31,10 +39,14 @@ export default function StudioLine({
   item,
   onQuantity,
   onRemove,
+  onNeeds,
+  shortColors,
 }: {
   item: StudioCartItem;
   onQuantity: (id: string, quantity: number) => void;
   onRemove: (item: StudioCartItem) => void;
+  onNeeds: (id: string, grams: FilamentGrams) => void;
+  shortColors: ReadonlySet<string>;
 }) {
   const t = useTranslations("cart");
   const ts = useTranslations("system.cart");
@@ -57,6 +69,19 @@ export default function StudioLine({
     };
     return lineSummary(input);
   }, [item.config, item.texts, item.locale, locale, studio, core]);
+
+  const needs = useMemo(
+    () =>
+      scaleGrams(
+        filamentGramsOf(item.config, item.texts, PRICE_LOCALE),
+        item.quantity,
+      ),
+    [item.config, item.texts, item.quantity],
+  );
+  useEffect(() => onNeeds(item.id, needs), [item.id, needs, onNeeds]);
+  const shortNames = summary.colors
+    .filter((color) => shortColors.has(color.id))
+    .map((color) => color.name);
 
   const posters = useMemo(
     () => ({
@@ -138,6 +163,11 @@ export default function StudioLine({
               {" · "}
               {ts("studioNote")}
             </p>
+            {shortNames.length > 0 ? (
+              <p className="mt-2 text-sm font-medium text-accent-text">
+                {ts("studioShort", { colors: shortNames.join(", ") })}
+              </p>
+            ) : null}
             <button
               type="button"
               onClick={edit}

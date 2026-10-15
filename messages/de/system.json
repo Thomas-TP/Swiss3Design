@@ -12,7 +12,9 @@
     "emptyText": "Hier wurde noch nichts aufgeschichtet. Personalisieren Sie im Studio ein Objekt, wählen Sie im Shop aus oder senden Sie uns Ihre Datei.",
     "studioEdit": "Im Studio bearbeiten",
     "studioNote": "Auf Bestellung gefertigt · Lieferung gratis",
-    "freeAll": "Gratis-Lieferung in der Schweiz."
+    "freeAll": "Gratis-Lieferung in der Schweiz.",
+    "studioShort": "Nicht vorrätig: {colors}. Bearbeiten Sie das Objekt oder reduzieren Sie die Menge.",
+    "shortBlock": "Eine Studio-Farbe ist für diesen Warenkorb nicht mehr vorrätig: Bearbeiten Sie das betroffene Objekt, bevor Sie bestellen."
   },
   "checkout": {
     "title": "Bestellung.",

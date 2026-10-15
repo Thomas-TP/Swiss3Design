@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
@@ -15,9 +15,11 @@ import {
 import { cfImage } from "@/lib/cf-image";
 import { formatChf } from "@/lib/format";
 import { shippingForOrder } from "@/lib/shipping";
+import { shortColors } from "@/lib/filament/capacity";
 import { CartReminder } from "@/components/cart-reminder";
 import { PageHeader } from "@/components/page-header";
-import { ButtonLink } from "@/components/ui/button";
+import { useFilamentCapacity } from "@/components/use-filament-capacity";
+import { Button, ButtonLink } from "@/components/ui/button";
 import { withDot } from "@/components/ui/dot-title";
 import { StrataIcon } from "@/components/ui/icons";
 
@@ -68,6 +70,35 @@ export default function CartContent({
     viewTracked.current = true;
     track("Cart Viewed", cartProperties(lines));
   }, [lines]);
+
+  // Stock de filament des objets du Studio : chaque ligne remonte ses grammes par
+  // couleur (pièce × quantité) ; la somme de toutes les lignes est comparée à la
+  // capacité publique. Une couleur épuisée est signalée sur sa ligne et bloque
+  // « Commander » (le paiement la refuserait : 409 out_of_stock). Sans objet du
+  // Studio, aucune requête ; capacité inconnue ou hors ligne : rien n'est bloqué.
+  const studioIds = lines.filter(isStudioLine).map((line) => line.id);
+  const capacity = useFilamentCapacity(studioIds.length > 0);
+  const [needs, setNeeds] = useState<
+    Record<string, Readonly<Record<string, number | undefined>>>
+  >({});
+  const onNeeds = useCallback(
+    (id: string, grams: Readonly<Record<string, number | undefined>>) =>
+      setNeeds((prev) =>
+        JSON.stringify(prev[id]) === JSON.stringify(grams)
+          ? prev
+          : { ...prev, [id]: grams },
+      ),
+    [],
+  );
+  const studioKey = studioIds.join("|");
+  const short = useMemo(
+    () =>
+      shortColors(
+        capacity,
+        studioKey.split("|").flatMap((id) => (needs[id] ? [needs[id]] : [])),
+      ),
+    [capacity, needs, studioKey],
+  );
 
   // Le port ne dépend que de la part boutique : le prix d'un objet du Studio est
   // ferme, livraison comprise.
@@ -132,6 +163,8 @@ export default function CartContent({
                   key={`studio:${line.id}`}
                   item={line}
                   onQuantity={setStudioQuantity}
+                  onNeeds={onNeeds}
+                  shortColors={short}
                   onRemove={(removed: StudioCartItem) => {
                     removeStudio(removed.id);
                     track("Product Removed", studioProductProperties(removed));
@@ -314,16 +347,34 @@ export default function CartContent({
             </div>
           )}
 
-          <ButtonLink
-            href="/checkout"
-            variant="primary"
-            size="lg"
-            full
-            className="mt-6"
-          >
-            {ts("checkout")}
-            <ArrowRight size={18} strokeWidth={1.5} />
-          </ButtonLink>
+          {short.size > 0 ? (
+            <>
+              <output className="mt-6 block text-sm text-accent-text">
+                {ts("shortBlock")}
+              </output>
+              <Button
+                variant="primary"
+                size="lg"
+                full
+                disabled
+                className="mt-3"
+              >
+                {ts("checkout")}
+                <ArrowRight size={18} strokeWidth={1.5} />
+              </Button>
+            </>
+          ) : (
+            <ButtonLink
+              href="/checkout"
+              variant="primary"
+              size="lg"
+              full
+              className="mt-6"
+            >
+              {ts("checkout")}
+              <ArrowRight size={18} strokeWidth={1.5} />
+            </ButtonLink>
+          )}
 
           <CartReminder />
         </aside>

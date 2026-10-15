@@ -3,7 +3,7 @@
 // l'atelier peut engager, arrondis à 10 g et plafonnés à 1500 g, jamais le niveau
 // exact. Une couleur absente de la réponse n'est pas suivie : elle est disponible.
 // Le paiement revérifie toujours côté serveur, avec une lecture fraîche.
-import { CAPACITY_MAX_GRAMS } from "@/lib/filament/constants";
+import { isShort, type Capacity } from "@/lib/filament/capacity";
 import type { BandSummary } from "./band-stats";
 import {
   filamentGramsFromSummary,
@@ -13,7 +13,7 @@ import {
 import { FILAMENT_IDS } from "./filaments";
 import type { FilamentId, StudioConfig } from "./types";
 
-export type Capacity = Readonly<Record<string, number>>;
+export { isShort, type Capacity };
 
 export interface StockView {
   /** Couleurs de la pièce actuelle dont le stock ne suffit pas (× quantité). */
@@ -30,18 +30,6 @@ export const EMPTY_STOCK_VIEW: StockView = {
   forBand: () => NONE,
   forRole: () => NONE,
 };
-
-/** Le besoin dépasse-t-il la capacité ? Sans capacité connue, ou plafonnée, jamais. */
-export function isShort(
-  capacity: Capacity | null,
-  id: FilamentId,
-  needGrams: number,
-): boolean {
-  if (!capacity) return false;
-  const cap = capacity[id];
-  if (cap === undefined || cap >= CAPACITY_MAX_GRAMS) return false;
-  return needGrams > cap;
-}
 
 /** Indice de la bande d'un rôle dans une pièce plate : relief = plaque puis encre, gravure = encre puis plaque. */
 function roleIndex(config: StudioConfig, role: "plate" | "ink"): number | null {

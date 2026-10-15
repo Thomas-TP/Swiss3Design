@@ -12,7 +12,9 @@
     "emptyText": "Qui non è ancora stato impilato nulla. Personalizzi un oggetto nello Studio, scelga in negozio o ci invii il Suo file.",
     "studioEdit": "Modifica nello Studio",
     "studioNote": "Realizzato su ordinazione · consegna gratuita",
-    "freeAll": "Consegna gratuita in Svizzera."
+    "freeAll": "Consegna gratuita in Svizzera.",
+    "studioShort": "Esaurito: {colors}. Modifichi l'oggetto o riduca la quantità.",
+    "shortBlock": "Un colore dello Studio non è più disponibile per questo carrello: modifichi l'oggetto interessato prima di ordinare."
   },
   "checkout": {
     "title": "Ordine.",
