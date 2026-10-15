@@ -520,7 +520,18 @@
       "otpSentTo": "Code sent to {email}. Enter it below:"
     },
     "reauthNotice": "Sign in again to confirm your identity before exporting your personal data.",
-    "adminReauthNotice": "Sign in again with your password and second factor, or with a passkey, before continuing in administration."
+    "adminReauthNotice": "Sign in again with your password and second factor, or with a passkey, before continuing in administration.",
+    "verifiedTitle": "Email confirmed",
+    "verifiedText": "Your account is active and you are signed in.",
+    "verifiedBack": "Taking you back to the tab where you created your account…",
+    "verifiedClose": "All done: you can close this tab.",
+    "verifiedRedirect": "Taking you to your account…",
+    "verifiedContinue": "Go to my account",
+    "verifyFailedTitle": "Invalid confirmation link",
+    "verifyFailedExpired": "This link has expired: it is valid for one hour. Get a new one below.",
+    "verifyFailedInvalid": "This link is invalid or has already been used. Get a new one below, or sign in if your address is already confirmed.",
+    "verifyResendCta": "Send me a new link",
+    "verifyResent": "If an unconfirmed account exists for this address, a new link is on its way."
   },
   "errors": {
     "notFoundTitle": "Page not found",

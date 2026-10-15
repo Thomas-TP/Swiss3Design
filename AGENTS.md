@@ -126,7 +126,12 @@ which for a multi-line hook body is rarely the line you'd expect.
    recent write — revocation, claim state, anything shown right after a
    mutation — adds `uncached` from [`src/db/fresh.ts`](src/db/fresh.ts) to its
    `where` (a `now()` call, which Hyperdrive never caches); "read then insert"
-   must become `INSERT … ON CONFLICT`. `bun run dev` connects straight to Neon
+   must become `INSERT … ON CONFLICT`. Code that does not write its own SQL
+   (Better Auth) gets `getFreshDb()`: every SELECT of that pool is prefixed with
+   an unused `now()` CTE ([`src/db/fresh.ts`](src/db/fresh.ts)); never hand
+   Better Auth the cached `getDb()` (2026-10-15: a signup cached « no user »
+   and the verification link clicked within the minute failed with
+   USER_NOT_FOUND). `bun run dev` connects straight to Neon
    and will NOT reveal stale reads — only preview/prod do (hit live: the OAuth
    resource seeding failed on preview with a duplicate insert).
 7. **Never commit secrets.** Local secrets live in `.dev.vars`; prod secrets in

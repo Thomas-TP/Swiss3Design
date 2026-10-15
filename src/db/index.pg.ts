@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
 import * as schema from "./schema.pg";
+import { freshQueryArgs } from "./fresh";
 
 // Pool Postgres request-scoped, jamais de pool/singleton au niveau module
 // (une connexion partagée entre requêtes échoue sur Workers — isolate
@@ -23,10 +24,27 @@ const requestDatabases = new WeakMap<
   ReturnType<typeof drizzle<typeof schema>>
 >();
 
+const freshDatabases = new WeakMap<
+  object,
+  ReturnType<typeof drizzle<typeof schema>>
+>();
+
 export async function getPgDb() {
+  return requestDb(requestDatabases, false);
+}
+
+/** Comme getPgDb, mais aucune lecture ne passe par le cache Hyperdrive (Better Auth). */
+export async function getFreshPgDb() {
+  return requestDb(freshDatabases, true);
+}
+
+async function requestDb(
+  cache: WeakMap<object, ReturnType<typeof drizzle<typeof schema>>>,
+  fresh: boolean,
+) {
   const { env, ctx, cf } = await getCloudflareContext({ async: true });
   const requestKey = cf ? ctx : undefined;
-  const existing = requestKey && requestDatabases.get(requestKey);
+  const existing = requestKey && cache.get(requestKey);
   if (existing) return existing;
   if (!env.HYPERDRIVE) {
     // Non lié dans cet environnement (ex. "preview", pas encore câblé —
@@ -50,11 +68,21 @@ export async function getPgDb() {
   pool.on("error", (err) => {
     console.error("[db] Erreur de connexion Postgres (pool) :", err);
   });
+  // Pool frais : chaque connexion réécrit ses SELECT (voir freshQueryText) ;
+  // « connect » est émis avant que la connexion ne serve à la moindre requête.
+  if (fresh)
+    pool.on("connect", (client) => {
+      const query = client.query.bind(client) as (
+        ...args: unknown[]
+      ) => unknown;
+      (client as unknown as { query: unknown }).query = (...args: unknown[]) =>
+        query(...freshQueryArgs(args));
+    });
   const db = drizzle(pool, { schema });
-  if (requestKey) requestDatabases.set(requestKey, db);
+  if (requestKey) cache.set(requestKey, db);
   after(async () => {
     await pool.end();
-    if (requestKey) requestDatabases.delete(requestKey);
+    if (requestKey) cache.delete(requestKey);
   });
   return db;
 }

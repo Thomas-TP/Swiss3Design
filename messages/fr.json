@@ -520,7 +520,18 @@
       "otpSentTo": "Code envoyé à {email}. Saisissez-le ci-dessous :"
     },
     "reauthNotice": "Reconnectez-vous pour confirmer votre identité avant d’exporter vos données personnelles.",
-    "adminReauthNotice": "Reconnectez-vous avec votre mot de passe et votre double facteur, ou avec votre clé de connexion, avant de continuer dans la zone Administration."
+    "adminReauthNotice": "Reconnectez-vous avec votre mot de passe et votre double facteur, ou avec votre clé de connexion, avant de continuer dans la zone Administration.",
+    "verifiedTitle": "Adresse confirmée",
+    "verifiedText": "Votre compte est activé et vous êtes connecté.",
+    "verifiedBack": "Retour à l'onglet où vous avez créé votre compte…",
+    "verifiedClose": "C'est fait : vous pouvez fermer cet onglet.",
+    "verifiedRedirect": "Redirection vers votre compte…",
+    "verifiedContinue": "Aller à mon compte",
+    "verifyFailedTitle": "Lien de confirmation invalide",
+    "verifyFailedExpired": "Ce lien a expiré : il est valable une heure. Recevez-en un nouveau ci-dessous.",
+    "verifyFailedInvalid": "Ce lien n'est pas valide ou a déjà servi. Recevez-en un nouveau ci-dessous, ou connectez-vous si votre adresse est déjà confirmée.",
+    "verifyResendCta": "Recevoir un nouveau lien",
+    "verifyResent": "Si un compte non confirmé existe pour cette adresse, un nouveau lien vient de partir."
   },
   "errors": {
     "notFoundTitle": "Page introuvable",

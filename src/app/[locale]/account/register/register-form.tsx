@@ -6,6 +6,7 @@ import { useTranslations, useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { signUp, signIn } from "@/lib/auth-client";
 import { track } from "@/lib/analytics";
+import { isAuthMessage, openAuthChannel } from "@/lib/auth-channel";
 import { Field, fieldClass } from "@/components/ui/field";
 import { alertError, btnAccentLg } from "../(dashboard)/_ui";
 
@@ -56,9 +57,23 @@ export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
       if (document.visibilityState === "visible") attempt();
     };
     document.addEventListener("visibilitychange", onVisible);
+    // Lien cliqué dans ce navigateur : la page « Adresse confirmée » l'annonce
+    // (lib/auth-channel.ts). On répond (elle se ferme alors), et la session
+    // qu'elle vient d'ouvrir vaut pour cet onglet : direction le compte.
+    const channel = openAuthChannel();
+    if (channel)
+      channel.onmessage = (event) => {
+        if (!isAuthMessage(event.data, "verified") || signedIn.current) return;
+        channel.postMessage({ type: "ack" });
+        signedIn.current = true;
+        setSigningIn(true);
+        router.push("/account");
+        router.refresh();
+      };
     return () => {
       clearInterval(id);
       document.removeEventListener("visibilitychange", onVisible);
+      channel?.close();
     };
   }, [waiting, router]);
 
@@ -73,7 +88,8 @@ export function RegisterForm({ defaultEmail = "" }: { defaultEmail?: string }) {
       name: String(data.get("name")),
       email,
       password,
-      callbackURL: `/${locale}/account`,
+      // Page de confirmation : elle ramène à cet onglet, ou au compte (connecté).
+      callbackURL: `/${locale}/account/verified`,
     });
     if (err) {
       setError(

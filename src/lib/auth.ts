@@ -14,7 +14,7 @@ import { passkey } from "@better-auth/passkey";
 import { oauthProvider } from "@better-auth/oauth-provider";
 import { and, eq, isNull } from "drizzle-orm";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { getDb } from "@/db";
+import { getFreshDb } from "@/db";
 import { uncached } from "@/db/fresh";
 import * as schema from "@/db/schema";
 import { APIError } from "better-auth/api";
@@ -68,10 +68,12 @@ export function enabledSocialProviders(env: CloudflareEnv): string[] {
 }
 
 // Instance par requête : les bindings Cloudflare ne sont disponibles
-// que dans le contexte d'une requête.
+// que dans le contexte d'une requête. Base « fraîche » (getFreshDb, règle 6c) :
+// Better Auth relit juste après avoir écrit (inscription puis vérification,
+// connexion, révocation), jamais à travers le cache Hyperdrive de 60 s.
 export async function getAuth() {
   const { env } = await getCloudflareContext({ async: true });
-  const db = await getDb();
+  const db = await getFreshDb();
 
   // La vérification d'e-mail exige un envoyeur opérationnel : elle
   // s'active automatiquement dès que RESEND_API_KEY est configurée.

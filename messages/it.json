@@ -520,7 +520,18 @@
       "otpSentTo": "Codice inviato a {email}. Lo inserisca qui sotto:"
     },
     "reauthNotice": "Acceda di nuovo per confermare la Sua identità prima di esportare i Suoi dati personali.",
-    "adminReauthNotice": "Acceda di nuovo con la password e il secondo fattore, oppure con una passkey, prima di continuare nella sezione Amministrazione."
+    "adminReauthNotice": "Acceda di nuovo con la password e il secondo fattore, oppure con una passkey, prima di continuare nella sezione Amministrazione.",
+    "verifiedTitle": "Indirizzo confermato",
+    "verifiedText": "Il Suo account è attivo e l'accesso è stato effettuato.",
+    "verifiedBack": "Ritorno alla scheda in cui ha creato l'account…",
+    "verifiedClose": "Fatto: può chiudere questa scheda.",
+    "verifiedRedirect": "Reindirizzamento al Suo account…",
+    "verifiedContinue": "Vai al mio account",
+    "verifyFailedTitle": "Link di conferma non valido",
+    "verifyFailedExpired": "Questo link è scaduto: è valido un'ora. Ne richieda uno nuovo qui sotto.",
+    "verifyFailedInvalid": "Questo link non è valido o è già stato usato. Ne richieda uno nuovo qui sotto, oppure acceda se il Suo indirizzo è già confermato.",
+    "verifyResendCta": "Ricevi un nuovo link",
+    "verifyResent": "Se esiste un account non confermato per questo indirizzo, è appena partito un nuovo link."
   },
   "errors": {
     "notFoundTitle": "Pagina non trovata",

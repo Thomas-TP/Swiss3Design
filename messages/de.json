@@ -520,7 +520,18 @@
       "otpSentTo": "Code an {email} gesendet. Geben Sie ihn unten ein:"
     },
     "reauthNotice": "Melden Sie sich erneut an, um Ihre Identität vor dem Export Ihrer persönlichen Daten zu bestätigen.",
-    "adminReauthNotice": "Melden Sie sich mit Passwort und Zwei-Faktor-Code oder mit einem Passkey erneut an, bevor Sie in der Verwaltung fortfahren."
+    "adminReauthNotice": "Melden Sie sich mit Passwort und Zwei-Faktor-Code oder mit einem Passkey erneut an, bevor Sie in der Verwaltung fortfahren.",
+    "verifiedTitle": "Adresse bestätigt",
+    "verifiedText": "Ihr Konto ist aktiviert und Sie sind angemeldet.",
+    "verifiedBack": "Zurück zum Tab, in dem Sie Ihr Konto erstellt haben…",
+    "verifiedClose": "Erledigt: Sie können diesen Tab schliessen.",
+    "verifiedRedirect": "Weiterleitung zu Ihrem Konto…",
+    "verifiedContinue": "Zu meinem Konto",
+    "verifyFailedTitle": "Ungültiger Bestätigungslink",
+    "verifyFailedExpired": "Dieser Link ist abgelaufen: Er ist eine Stunde gültig. Fordern Sie unten einen neuen an.",
+    "verifyFailedInvalid": "Dieser Link ist ungültig oder wurde bereits verwendet. Fordern Sie unten einen neuen an, oder melden Sie sich an, falls Ihre Adresse schon bestätigt ist.",
+    "verifyResendCta": "Neuen Link erhalten",
+    "verifyResent": "Falls für diese Adresse ein unbestätigtes Konto besteht, wurde soeben ein neuer Link gesendet."
   },
   "errors": {
     "notFoundTitle": "Seite nicht gefunden",
