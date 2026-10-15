@@ -53,13 +53,13 @@ import { toCreasedNormals } from "three/addons/utils/BufferGeometryUtils.js";
 import {
   VIEWER_TURN_EVENT,
   type ProductViewerProps,
+  type ViewerDecor,
   type ViewerState,
   type ViewerTurnDetail,
 } from "@/components/catalog/viewer-props";
 import type { StageContext, StageScene, StageTheme, ViewFrame } from "../types";
 import type { StageViewDescriptor } from "@/lib/motion-bridge/types";
 import { coextrudedBlend } from "./coextruded";
-import { DecorBlur } from "./decor-blur";
 
 // ── Réglages (§2.4 : longue focale, élévation 20–25°, lumière du nord-ouest) ──
 
@@ -97,24 +97,25 @@ const PROGRESS_INTERVAL_MS = 250;
 // 0,78 m, dossiers à 1 m, plan de travail à 0,86 m ; le vase fait 21 cm) : on ne
 // grossit jamais la pièce, ce serait mentir sur sa taille. Elle est cadrée comme
 // sur une photo de produit (demande du 15.10.2026 : « elle doit donner envie ») :
-// grande dans l'image (78 % de la hauteur), objectif de portrait (28° vertical),
-// caméra presque à hauteur de plateau, et la salle FLOUE derrière elle
-// (profondeur de champ, decor-blur.ts). L'angle HORIZONTAL vaut au plus 55° :
-// sur un écran large (vue 2,2 fois plus large que haute), un angle vertical
-// ouvert devenait un fish-eye où la pièce paraissait minuscule au milieu.
-const DECOR_FOV = 28;
+// grande dans l'image, posée sur un meuble à son échelle, caméra presque à
+// hauteur du meuble. L'angle HORIZONTAL vaut au plus 55° : sur un écran large
+// (vue 2,2 fois plus large que haute), un angle vertical ouvert devenait un
+// fish-eye où la pièce paraissait minuscule au milieu.
+const DECOR_FOV = 35;
 const DECOR_HFOV_MAX = 55;
-/** Première vue : depuis le bout de la table, vers la cuisine (fenêtre à gauche). */
-const DECOR_AZIMUTH_START = rad(70);
+/** Première vue par défaut : depuis le bout de la table, vers la cuisine. */
+const DECOR_AZIMUTH_START_DEG = 70;
 /**
- * Polaire en décor : de 55° (plongée) à 86° (à hauteur de plateau, 15 cm
- * au-dessus). La caméra reste au-dessus du plateau, jamais dans les chaises.
+ * Polaire en décor par défaut : de 45° (plongée) à 76°. Plus bas, sur un écran
+ * large (caméra à ~0,7 m du vase, au-delà du bord de la table de 1 m), elle
+ * passerait dans les dossiers des chaises (1,01 m). Un décor peut la
+ * restreindre (tablette au-dessus de la pièce).
  */
-const DECOR_POLAR_MIN = rad(55);
-const DECOR_POLAR_MAX = rad(86);
-const DECOR_POLAR_START = rad(82);
-/** En décor, la pièce occupe 78 % de la hauteur de la vue. */
-const DECOR_FILL = 0.78;
+const DECOR_POLAR_MIN = rad(45);
+const DECOR_POLAR_MAX = rad(76);
+const DECOR_POLAR_START = rad(72);
+/** En décor, la pièce occupe 62 % de la hauteur de la vue. */
+const DECOR_FILL = 0.62;
 /** Lumière d'appoint côté fenêtre (le décor a ses baies vers −Z). */
 const DECOR_SUN = new Vector3(0.25, 1.1, -1);
 
@@ -173,9 +174,11 @@ export function decorDistance(o: {
   radius: number;
   aspect: number;
   fovDeg: number;
+  /** Part de la hauteur occupée (défaut DECOR_FILL). */
+  fill?: number;
 }): number {
   const tan = Math.tan(rad(o.fovDeg) / 2);
-  const byHeight = o.height / DECOR_FILL / 2 / tan;
+  const byHeight = o.height / (o.fill ?? DECOR_FILL) / 2 / tan;
   const byWidth = (o.radius * 2) / 0.5 / 2 / (tan * Math.max(0.2, o.aspect));
   return Math.max(byHeight, byWidth);
 }
@@ -300,9 +303,15 @@ const create = (
   let paintedKey: string | null = null;
   /** Décor chargé (la pièce y est posée), ou null : fond neutre de la page. */
   let decor: Object3D | null = null;
-  /** Le décor vit dans sa propre scène : rendu flou d'abord, la pièce par-dessus. */
+  /** Le décor vit dans sa propre scène : rendu d'abord, la pièce ensuite (même profondeur). */
   const decorScene = new Scene();
-  let decorBlur: DecorBlur | null = null;
+  /** Plage d'azimut permise (radians) quand un mur empêche d'en faire le tour. */
+  let azimuthRange: [number, number] | null = null;
+  /** Sens de l'autorotation dans une plage limitée (aller-retour). */
+  let sweep = 1;
+  /** Polaire propre au décor (tablette au-dessus, plateau en dessous), sinon null. */
+  let polarRange: [number, number] | null = null;
+  let decorPolarStart = DECOR_POLAR_START;
   const decorMaterials = new Set<Material>();
   const decorTextures = new Set<Texture>();
   let decorEnv: WebGLRenderTarget | null = null;
@@ -497,6 +506,9 @@ const create = (
     try {
       const { GLTFLoader } = await import("three/addons/loaders/GLTFLoader.js");
       const gltf = await new GLTFLoader().loadAsync(url);
+      // Netteté des surfaces vues en biais (plateau, sol) : filtrage anisotrope
+      // au maximum du GPU, au lieu du flou des mipmaps.
+      const anisotropy = ctx.renderer.capabilities.getMaxAnisotropy();
       gltf.scene.traverse((child) => {
         const mesh = child as Mesh;
         if (!mesh.isMesh) return;
@@ -505,14 +517,20 @@ const create = (
           ? mesh.material
           : [mesh.material];
         for (const material of materials) {
-          material.toneMapped = false;
-          // Luminosité voulue par l'auteur (l'albédo servait aussi d'émission
-          // sur Sketchfab) : scripts/optimize-decor.mjs l'écrit en extras.
-          const brightness = Number(material.userData.brightness) || 1;
-          (material as MeshBasicMaterial).color?.multiplyScalar(brightness);
           decorMaterials.add(material);
-          const map = (material as MeshBasicMaterial).map;
-          if (map) decorTextures.add(map);
+          for (const value of Object.values(material))
+            if ((value as Texture | null)?.isTexture) {
+              (value as Texture).anisotropy = anisotropy;
+              decorTextures.add(value as Texture);
+            }
+          // Précalculé (« unlit ») : montré tel quel, à la luminosité voulue par
+          // l'auteur (l'albédo servait aussi d'émission sur Sketchfab ;
+          // scripts/optimize-decor.mjs l'écrit en extras). La table, elle, est un
+          // matériau PBR éclairé comme la pièce vendue.
+          if (!(material as MeshBasicMaterial).isMeshBasicMaterial) continue;
+          material.toneMapped = false;
+          const brightness = Number(material.userData.brightness) || 1;
+          (material as MeshBasicMaterial).color.multiplyScalar(brightness);
         }
       });
       return gltf.scene;
@@ -523,7 +541,8 @@ const create = (
   }
 
   /** Pose la pièce sur le meuble du décor et éclaire-la avec la salle. */
-  function placeInDecor(room: Object3D, anchor: readonly number[]) {
+  function placeInDecor(room: Object3D, decorProps: ViewerDecor) {
+    const anchor = decorProps.anchor;
     decor = room;
     decorScene.add(room);
     unitScale = unitScaleFor(modelHeight);
@@ -531,8 +550,18 @@ const create = (
     pivot.scale.setScalar(unitScale);
     pivot.rotation.y = 0;
     target.set(anchor[0], anchor[1] + modelHeight * unitScale * 0.5, anchor[2]);
-    // Reflets et ambiance de la salle elle-même, vue depuis la pièce : la
-    // teinte du produit prend la lumière du décor, pas celle d'un studio.
+    // La table (PBR) est éclairée par la fenêtre et par un environnement : celui
+    // du Stage le temps de capturer la salle, puis la salle elle-même.
+    sun.intensity = 1.1;
+    sun.position.copy(DECOR_SUN).normalize().multiplyScalar(20).add(target);
+    sun.target.position.copy(target);
+    scene.add(sun.target);
+    const roomLight = sun.clone();
+    roomLight.target = sun.target.clone();
+    decorScene.add(roomLight, roomLight.target);
+    decorScene.environment = ctx.envMap;
+    // Reflets et ambiance de la salle, vue depuis la pièce : la teinte du
+    // produit prend la lumière du décor, pas celle d'un studio.
     const generator = new PMREMGenerator(ctx.renderer);
     decorEnv = generator.fromScene(decorScene, 0.03, 0.02, 30, {
       position: target,
@@ -540,13 +569,18 @@ const create = (
     generator.dispose();
     scene.environment = decorEnv.texture;
     scene.environmentIntensity = 1;
-    sun.intensity = 1.1;
-    sun.position.copy(DECOR_SUN).normalize().multiplyScalar(20).add(target);
-    sun.target.position.copy(target);
-    scene.add(sun.target);
+    decorScene.environment = decorEnv.texture;
+    const span = decorProps.azimuth;
+    azimuthRange =
+      span?.min !== undefined && span.max !== undefined
+        ? [rad(span.min), rad(span.max)]
+        : null;
+    const tilt = decorProps.polar;
+    polarRange = tilt ? [rad(tilt.min), rad(tilt.max)] : null;
+    decorPolarStart = tilt ? rad(tilt.start) : DECOR_POLAR_START;
     camera.fov = DECOR_FOV;
-    polar = DECOR_POLAR_START;
-    azimuth = azimuthTarget = DECOR_AZIMUTH_START;
+    polar = decorPolarStart;
+    azimuth = azimuthTarget = rad(span?.start ?? DECOR_AZIMUTH_START_DEG);
     floor.visible = false;
     // Ombre de contact sur le plateau (le décor n'a pas d'ombre pour un objet
     // qu'il ne connaissait pas).
@@ -580,7 +614,7 @@ const create = (
       // Bobine co-extrudée choisie avant l'arrivée du modèle : on la peint maintenant.
       applyColor();
       if (loadedRoom && decorProps) {
-        placeInDecor(loadedRoom, decorProps.anchor);
+        placeInDecor(loadedRoom, decorProps);
       } else {
         target.set(0, modelHeight * 0.5, 0);
         // Cyclorama et ombre calés sur l'empreinte réelle de la pièce.
@@ -608,14 +642,27 @@ const create = (
     lastInteractionAt = performance.now() / 1000;
   }
 
+  /** Azimut ramené dans la plage permise (décor contre un mur), sinon libre. */
+  function limitPolar(value: number): number {
+    return polarRange
+      ? Math.min(polarRange[1], Math.max(polarRange[0], value))
+      : clampPolar(value, decor !== null);
+  }
+
+  function clampAzimuth(value: number): number {
+    return azimuthRange
+      ? Math.min(azimuthRange[1], Math.max(azimuthRange[0], value))
+      : value;
+  }
+
   function turnTo(step: number) {
     markInteraction();
     spin = 0;
     if (ctx.reduced) {
-      azimuth += step;
+      azimuth = clampAzimuth(azimuth + step);
       azimuthTarget = azimuth;
     } else {
-      azimuthTarget = azimuth + step;
+      azimuthTarget = clampAzimuth(azimuth + step);
     }
     ctx.invalidate();
   }
@@ -652,9 +699,9 @@ const create = (
     lastX = event.clientX;
     lastY = event.clientY;
     const dAz = dx * RAD_PER_PX;
-    azimuth += dAz;
+    azimuth = clampAzimuth(azimuth + dAz);
     azimuthTarget = azimuth;
-    polar = clampPolar(polar - dy * POLAR_PER_PX, decor !== null);
+    polar = limitPolar(polar - dy * POLAR_PER_PX);
     const dt = Math.max(1, now - lastMoveAt) / 1000;
     // Vitesse lissée, reprise à la relâche pour l'inertie.
     spin = spin * 0.6 + (dAz / dt) * 0.4;
@@ -689,20 +736,22 @@ const create = (
         turnTo(TURN_STEP);
         break;
       case "ArrowUp":
-        polar = clampPolar(polar - POLAR_STEP, decor !== null);
+        polar = limitPolar(polar - POLAR_STEP);
         markInteraction();
         ctx.invalidate();
         break;
       case "ArrowDown":
-        polar = clampPolar(polar + POLAR_STEP, decor !== null);
+        polar = limitPolar(polar + POLAR_STEP);
         markInteraction();
         ctx.invalidate();
         break;
       case "Home": {
-        const start = decor ? DECOR_AZIMUTH_START : AZIMUTH_START;
+        const start = decor
+          ? rad(props?.decor?.azimuth?.start ?? DECOR_AZIMUTH_START_DEG)
+          : AZIMUTH_START;
         azimuthTarget = start;
         azimuth = ctx.reduced ? start : azimuth;
-        polar = decor ? DECOR_POLAR_START : POLAR_START;
+        polar = decor ? decorPolarStart : POLAR_START;
         spin = 0;
         markInteraction();
         ctx.invalidate();
@@ -794,10 +843,11 @@ const create = (
       let again = dragging;
       if (!dragging) {
         if (!current.reduced && Math.abs(spin) > 0.02) {
-          // Inertie du geste, amortie.
-          azimuth += spin * dt;
+          // Inertie du geste, amortie (arrêtée net en bout de plage).
+          const next = clampAzimuth(azimuth + spin * dt);
+          spin = next === azimuth + spin * dt ? spin * Math.exp(-dt * 3.5) : 0;
+          azimuth = next;
           azimuthTarget = azimuth;
-          spin *= Math.exp(-dt * 3.5);
           again = true;
         } else {
           spin = 0;
@@ -811,7 +861,16 @@ const create = (
           }
           if (autoRotate) {
             if (!again && sinceInteraction > AUTO_RESUME_S) {
-              azimuth += AUTO_ROTATE * dt;
+              // Plage limitée (mur) : aller-retour au lieu du tour complet.
+              let next = azimuth + AUTO_ROTATE * dt * sweep;
+              if (azimuthRange && next >= azimuthRange[1]) {
+                next = azimuthRange[1];
+                sweep = -1;
+              } else if (azimuthRange && next <= azimuthRange[0]) {
+                next = azimuthRange[0];
+                sweep = 1;
+              }
+              azimuth = next;
               azimuthTarget = azimuth;
             }
             // Tourne, ou attend la reprise : dans les deux cas, une frame de plus.
@@ -833,6 +892,7 @@ const create = (
           radius: modelRadius * unitScale,
           aspect,
           fovDeg: camera.fov,
+          fill: props?.decor?.fill,
         });
         orbit = azimuth;
         camera.near = 0.02;
@@ -867,19 +927,9 @@ const create = (
       );
       camera.lookAt(target);
       camera.updateProjectionMatrix();
-      if (decor) {
-        // La salle, nette au pied de la pièce et floue derrière, puis la pièce
-        // par-dessus (profondeur effacée : rien du décor ne passe devant).
-        decorBlur ??= new DecorBlur(current.renderer);
-        decorBlur.draw(
-          current.renderer,
-          decorScene,
-          camera,
-          { width: rect.width * frame.dpr, height: rect.height * frame.dpr },
-          distance,
-        );
-        current.renderer.clearDepth();
-      }
+      // Le décor d'abord, la pièce ensuite : même tampon de profondeur, un
+      // montant d'étagère passe donc bien devant elle.
+      if (decor) current.renderer.render(decorScene, camera);
       current.renderer.render(scene, camera);
       return again;
     },
@@ -911,8 +961,6 @@ const create = (
       decorTextures.clear();
       decorEnv?.dispose();
       decorEnv = null;
-      decorBlur?.dispose();
-      decorBlur = null;
       decorScene.clear();
       scene.clear();
       model = null;

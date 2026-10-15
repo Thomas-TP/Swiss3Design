@@ -45,6 +45,18 @@ export interface ViewerDecor {
   url: string;
   /** Point d'appui de la pièce dans le décor (mètres, Y vers le haut). */
   anchor: readonly [number, number, number];
+  /**
+   * Azimut de la caméra (degrés) : départ, et plage permise quand un mur ou un
+   * meuble empêche d'en faire le tour (sans plage : tour complet).
+   */
+  azimuth?: { start: number; min?: number; max?: number };
+  /**
+   * Polaire de la caméra (degrés depuis la verticale) : départ et plage, quand
+   * une tablette au-dessus ou un plateau en dessous limite la vue.
+   */
+  polar?: { start: number; min: number; max: number };
+  /** Part de la hauteur de la vue occupée par la pièce (défaut 0,62). */
+  fill?: number;
   /** Crédit exigé par la licence du décor (rendu sous la vue). */
   credit: {
     title: string;
@@ -57,15 +69,17 @@ export interface ViewerDecor {
 
 /**
  * La salle à manger de ChristyHsu (« Dining room | Kichen baked », Sketchfab,
- * CC BY 4.0), adaptée pour le web : vase et bouquet d'origine retirés, petits
- * objets du plan de travail simplifiés, matériaux sans éclairage (la lumière est
- * dans les textures), textures en WebP ≤ 2048 px. 44 Mo → 3,8 Mo. Source et
- * licence hors du dépôt (sources-3d/), script : scripts/optimize-decor.mjs.
- * Le produit est posé au centre de la table ovale (plateau à 0,78 m).
+ * CC BY 4.0), adaptée pour le web : vase et bouquet d'origine retirés, table
+ * ramenée de 1,61 × 2,60 m à 1,00 × 1,80 m en chêne haute définition (« Oak
+ * Veneer 01 », Poly Haven, CC0) et chaises rapprochées, petits objets du plan de
+ * travail simplifiés, matériaux sans éclairage ailleurs (la lumière est dans les
+ * textures), textures en WebP ≤ 2048 px. 44 Mo → 5,3 Mo. Source et licence hors
+ * du dépôt (sources-3d/), script : scripts/optimize-decor.mjs.
+ * Le produit est posé au centre de la table (plateau à 0,78 m).
  */
 export const DINING_ROOM_DECOR: ViewerDecor = {
   url: "/scenes/dining-room/dining-room.gltf",
-  anchor: [0.83, 0.78, 0.245],
+  anchor: [0.831, 0.78, 0.247],
   credit: {
     title: "Dining room | Kichen baked",
     author: "ChristyHsu",

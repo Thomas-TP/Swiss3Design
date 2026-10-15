@@ -5,7 +5,8 @@
 // Outil ponctuel, hors des dépendances du dépôt : dans un dossier à part,
 //   bun add @gltf-transform/core@4 @gltf-transform/functions@4 \
 //     @gltf-transform/extensions@4 meshoptimizer sharp
-//   bun optimize-decor.mjs <source.glb> <dossier de sortie>
+//   bun optimize-decor.mjs <source.glb> <dossier de sortie> <dossier du chêne>
+// (chêne : textures 2k « oak_veneer_01 » de Poly Haven, CC0 : diff, nor_gl, arm)
 // Source (GLB 4k de Sketchfab, 44 Mo) et licence : hors du dépôt
 // (sources-3d/dining-room-christyhsu/ chez le propriétaire).
 //
@@ -14,7 +15,7 @@
 // géométrie est donc seulement quantifiée (KHR_mesh_quantization, lue sans WASM)
 // et les textures sont des fichiers WebP à part, chargés comme des images de
 // même origine (pas de blob: dans connect-src).
-import { mkdirSync } from "node:fs";
+import { mkdirSync, readFileSync } from "node:fs";
 import { NodeIO } from "@gltf-transform/core";
 import { ALL_EXTENSIONS, KHRMaterialsUnlit } from "@gltf-transform/extensions";
 import {
@@ -45,48 +46,7 @@ for (const node of root.listNodes())
   }
 if (dropped !== DROP.size) throw new Error(`nœuds retirés : ${dropped}`);
 
-// 2. L'ombre précalculée du vase retiré reste dans la texture du plateau (un
-// disque noir à son pied) : on la recouvre du bois voisin, pris au-dessus et
-// au-dessous dans le sens du fil (vertical dans l'atlas), avec un bord fondu.
-const table = root
-  .listMaterials()
-  .find((material) => material.getName() === "Material5.001");
-const tableImage = table?.getBaseColorTexture()?.getImage();
-if (!table || !tableImage) throw new Error("texture du plateau introuvable");
-{
-  const { data, info } = await sharp(tableImage)
-    .removeAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-  const { width, height, channels } = info;
-  // Pied du vase retiré, mesuré dans l'atlas 1024 px (centre du disque sombre).
-  const cx = (133.2 / 1024) * width;
-  const cy = (351 / 1024) * height;
-  const inner = (26 / 1024) * width;
-  const outer = (40 / 1024) * width;
-  const shift = Math.round((80 / 1024) * height);
-  const out = Buffer.from(data);
-  for (let y = Math.floor(cy - outer); y <= Math.ceil(cy + outer); y++)
-    for (let x = Math.floor(cx - outer); x <= Math.ceil(cx + outer); x++) {
-      const r = Math.hypot(x - cx, y - cy);
-      if (r > outer) continue;
-      const k = Math.min(1, Math.max(0, (outer - r) / (outer - inner)));
-      const w = k * k * (3 - 2 * k);
-      for (let c = 0; c < channels; c++) {
-        const at = (yy) => data[(yy * width + x) * channels + c];
-        const donor = (at(y - shift) + at(y + shift)) / 2;
-        const i = (y * width + x) * channels + c;
-        out[i] = Math.round(data[i] * (1 - w) + donor * w);
-      }
-    }
-  table
-    .getBaseColorTexture()
-    .setImage(
-      await sharp(out, { raw: { width, height, channels } }).png().toBuffer(),
-    );
-}
-
-// 3. Éclairage précalculé dans l'albédo : matériaux « unlit », rien d'autre.
+// 2. Éclairage précalculé dans l'albédo : matériaux « unlit », rien d'autre.
 // Sur Sketchfab, l'albédo sert aussi d'émission (facteur 0,5 à 1 selon le
 // matériau) : la luminosité voulue par l'auteur passe en `extras.brightness`
 // (lu par la scène, multiplicateur de couleur), 1,5 pour une émission pleine.
@@ -108,6 +68,190 @@ for (const mesh of root.listMeshes())
     prim.setAttribute("NORMAL", null);
     prim.setAttribute("TANGENT", null);
   }
+
+// 3. Une table à l'échelle d'un séjour : le plateau d'origine (1,61 × 2,60 m,
+// texture de 1024 px pour tout le meuble, floue de près) devient une table de
+// 6 places de 1,00 × 1,80 m en chêne (« Oak Veneer 01 », Poly Haven, CC0, 2k :
+// fil, relief et vernis), éclairée comme la pièce vendue (matériau PBR) ; les six
+// chaises se rapprochent d'autant (même écart au bord qu'avant).
+const OAK = process.argv[4]; // dossier des textures oak_veneer_01_*_2k.jpg
+if (!OAK)
+  throw new Error("dossier des textures de chêne manquant (3e argument)");
+const TABLE = "table_Material5.001_0";
+const CENTER = [0.831, 0.247]; // centre du plateau au sol (x, z), mètres
+const HALF_BEFORE = [0.807, 1.298];
+const HALF_AFTER = [0.5, 0.9];
+const SCALE = [HALF_AFTER[0] / HALF_BEFORE[0], HALF_AFTER[1] / HALF_BEFORE[1]];
+const SHIFT = [HALF_BEFORE[0] - HALF_AFTER[0], HALF_BEFORE[1] - HALF_AFTER[1]];
+// Chaises (mesurées dans la scène : centre au sol) et leur déplacement.
+const CHAIRS = [
+  { at: [0.82, -1.4], move: [0, SHIFT[1]] },
+  { at: [-0.45, -0.26], move: [SHIFT[0], 0] },
+  { at: [-0.45, 0.75], move: [SHIFT[0], 0] },
+  { at: [2.13, -0.22], move: [-SHIFT[0], 0] },
+  { at: [2.13, 0.78], move: [-SHIFT[0], 0] },
+  { at: [0.78, 1.94], move: [0, -SHIFT[1]] },
+];
+/** Taille d'une répétition de la texture de chêne (son échantillon fait 1,83 m). */
+const OAK_TILE = 1.83;
+
+/** Matrice 4 × 4 (colonnes) appliquée à un point (w = 1) ou une direction (w = 0). */
+const apply = (m, v, w = 1) =>
+  [0, 1, 2].map(
+    (r) => m[r] * v[0] + m[4 + r] * v[1] + m[8 + r] * v[2] + m[12 + r] * w,
+  );
+/** Inverse d'une matrice affine (rotation, échelle, translation) en colonnes. */
+function invert(m) {
+  const a = [
+    [m[0], m[4], m[8]],
+    [m[1], m[5], m[9]],
+    [m[2], m[6], m[10]],
+  ];
+  const det =
+    a[0][0] * (a[1][1] * a[2][2] - a[1][2] * a[2][1]) -
+    a[0][1] * (a[1][0] * a[2][2] - a[1][2] * a[2][0]) +
+    a[0][2] * (a[1][0] * a[2][1] - a[1][1] * a[2][0]);
+  const inv = [
+    [
+      (a[1][1] * a[2][2] - a[1][2] * a[2][1]) / det,
+      (a[0][2] * a[2][1] - a[0][1] * a[2][2]) / det,
+      (a[0][1] * a[1][2] - a[0][2] * a[1][1]) / det,
+    ],
+    [
+      (a[1][2] * a[2][0] - a[1][0] * a[2][2]) / det,
+      (a[0][0] * a[2][2] - a[0][2] * a[2][0]) / det,
+      (a[0][2] * a[1][0] - a[0][0] * a[1][2]) / det,
+    ],
+    [
+      (a[1][0] * a[2][1] - a[1][1] * a[2][0]) / det,
+      (a[0][1] * a[2][0] - a[0][0] * a[2][1]) / det,
+      (a[0][0] * a[1][1] - a[0][1] * a[1][0]) / det,
+    ],
+  ];
+  const t = [m[12], m[13], m[14]];
+  const it = inv.map((row) => -(row[0] * t[0] + row[1] * t[1] + row[2] * t[2]));
+  return [
+    inv[0][0],
+    inv[1][0],
+    inv[2][0],
+    0,
+    inv[0][1],
+    inv[1][1],
+    inv[2][1],
+    0,
+    inv[0][2],
+    inv[1][2],
+    inv[2][2],
+    0,
+    it[0],
+    it[1],
+    it[2],
+    1,
+  ];
+}
+const normalize = (v) => {
+  const l = Math.hypot(...v) || 1;
+  return v.map((c) => c / l);
+};
+const nodeNamed = (name) => {
+  const node = root.listNodes().find((n) => n.getName() === name);
+  if (!node?.getMesh()) throw new Error(`nœud introuvable : ${name}`);
+  return node;
+};
+
+// Plateau : réduit autour de son centre, normales d'origine corrigées dans le
+// même rapport (les flancs de l'ovale), UV « en boîte » en mètres réels.
+{
+  const node = nodeNamed(TABLE);
+  const original = (await io.read(src))
+    .getRoot()
+    .listNodes()
+    .find((n) => n.getName() === TABLE)
+    .getMesh()
+    .listPrimitives();
+  const world = node.getWorldMatrix();
+  const local = invert(world);
+  const texture = (file) =>
+    doc
+      .createTexture(file)
+      .setImage(readFileSync(`${OAK}/${file}`))
+      .setMimeType("image/jpeg");
+  // ARM de Poly Haven = occlusion (R), rugosité (G), métal (B) : le canal ORM de glTF.
+  const arm = texture("oak_veneer_01_arm_2k.jpg");
+  const oak = doc
+    .createMaterial("oak_veneer_01")
+    .setBaseColorTexture(texture("oak_veneer_01_diff_2k.jpg"))
+    .setNormalTexture(texture("oak_veneer_01_nor_gl_2k.jpg"))
+    .setMetallicRoughnessTexture(arm)
+    .setOcclusionTexture(arm)
+    .setMetallicFactor(1)
+    .setRoughnessFactor(1);
+  const buffer = root.listBuffers()[0];
+  node
+    .getMesh()
+    .listPrimitives()
+    .forEach((prim, p) => {
+      const positions = prim.getAttribute("POSITION");
+      const sourceNormals = original[p].getAttribute("NORMAL");
+      const count = positions.getCount();
+      const normals = new Float32Array(count * 3);
+      const uvs = new Float32Array(count * 2);
+      for (let i = 0; i < count; i++) {
+        const w = apply(world, positions.getElement(i, []));
+        w[0] = CENTER[0] + (w[0] - CENTER[0]) * SCALE[0];
+        w[2] = CENTER[1] + (w[2] - CENTER[1]) * SCALE[1];
+        positions.setElement(i, apply(local, w));
+        let n = normalize(apply(world, sourceNormals.getElement(i, []), 0));
+        n = normalize([n[0] / SCALE[0], n[1], n[2] / SCALE[1]]);
+        const [ax, ay, az] = n.map(Math.abs);
+        const uv =
+          ay >= ax && ay >= az
+            ? [w[0], w[2]]
+            : ax >= az
+              ? [w[2], w[1]]
+              : [w[0], w[1]];
+        uvs.set([uv[0] / OAK_TILE, uv[1] / OAK_TILE], i * 2);
+        normals.set(normalize(apply(local, n, 0)), i * 3);
+      }
+      prim.setAttribute(
+        "NORMAL",
+        doc
+          .createAccessor()
+          .setType("VEC3")
+          .setArray(normals)
+          .setBuffer(buffer),
+      );
+      prim.setAttribute(
+        "TEXCOORD_0",
+        doc.createAccessor().setType("VEC2").setArray(uvs).setBuffer(buffer),
+      );
+      prim.setMaterial(oak);
+    });
+}
+
+// Chaises : chaque sommet suit la chaise la plus proche (centre au sol).
+for (const name of ["seat_Leather_0", "seat_Material5_0"]) {
+  const node = nodeNamed(name);
+  const world = node.getWorldMatrix();
+  const local = invert(world);
+  for (const prim of node.getMesh().listPrimitives()) {
+    const positions = prim.getAttribute("POSITION");
+    for (let i = 0; i < positions.getCount(); i++) {
+      const w = apply(world, positions.getElement(i, []));
+      let best = CHAIRS[0];
+      for (const chair of CHAIRS)
+        if (
+          Math.hypot(w[0] - chair.at[0], w[2] - chair.at[1]) <
+          Math.hypot(w[0] - best.at[0], w[2] - best.at[1])
+        )
+          best = chair;
+      positions.setElement(
+        i,
+        apply(local, [w[0] + best.move[0], w[1], w[2] + best.move[1]]),
+      );
+    }
+  }
+}
 
 await doc.transform(dedup(), prune(), weld());
 
