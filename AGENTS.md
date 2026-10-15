@@ -306,7 +306,7 @@ put` on an environment with real users without `--env <name>` explicitly
     sale goes on). A spool's need is the SUM of its Studio and shop lines, checked PER REF
     (`checkStockNeeds`: same advisory lock, same 409 `out_of_stock`); the cart sums the same
     way with the public capacity (`refs` of `/api/stock/colors`, KV key `v2`). No spool for a
-    ref = « épuisée » for on-demand articles. `materials`/`filament_colors`/`product_colors`
+    ref = « épuisée » for every article with a weight. `materials`/`filament_colors`/`product_colors`
     stay for the rollback but no code reads them; `/admin/materials` is gone. Preview data:
     `scripts/seed-preview-shop-pla.sql` (by hand, never in a deploy). Worker gzip with the shop colours: 2 536 KiB
     (2 528.56 before, same path length, 2026-10-15).
