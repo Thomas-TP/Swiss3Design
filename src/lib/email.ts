@@ -1,4 +1,5 @@
 import { getCloudflareContext } from "@opennextjs/cloudflare";
+import { allowedRecipients } from "./preview-email";
 
 export interface EmailMessage {
   to: string | string[];
@@ -25,6 +26,14 @@ export async function sendEmail(
     );
     return false;
   }
+  // Preview : seules les adresses autorisées reçoivent (src/lib/preview-email.ts).
+  // Un message sans destinataire autorisé est écarté volontairement : `true`, pour
+  // que la file d'envoi (outbox) ne le retente pas.
+  const to = allowedRecipients(env, message.to);
+  if (to.length === 0) {
+    console.log(`[email écarté — preview] ${message.subject}`);
+    return true;
+  }
 
   const res = await fetch("https://api.resend.com/emails", {
     method: "POST",
@@ -38,7 +47,7 @@ export async function sendEmail(
         message.from ||
         env.EMAIL_FROM ||
         "Swiss3Design <onboarding@resend.dev>",
-      to: message.to,
+      to,
       subject: message.subject,
       html: message.html,
       ...(message.replyTo ? { reply_to: message.replyTo } : {}),
@@ -59,15 +68,20 @@ export async function sendEmail(
 // Retourne le nombre de messages effectivement envoyés.
 const RESEND_BATCH_SIZE = 100;
 
-export async function sendBulkEmail(messages: EmailMessage[]): Promise<number> {
-  if (messages.length === 0) return 0;
+export async function sendBulkEmail(all: EmailMessage[]): Promise<number> {
+  if (all.length === 0) return 0;
   const { env } = await getCloudflareContext({ async: true });
   if (!env.RESEND_API_KEY) {
     console.log(
-      `[email en masse ignoré — pas de RESEND_API_KEY] ${messages.length} destinataires`,
+      `[email en masse ignoré — pas de RESEND_API_KEY] ${all.length} destinataires`,
     );
     return 0;
   }
+  // Preview : seuls les destinataires autorisés (src/lib/preview-email.ts).
+  const messages = all.flatMap((m) => {
+    const to = allowedRecipients(env, m.to);
+    return to.length > 0 ? [{ ...m, to }] : [];
+  });
 
   let sent = 0;
   for (let i = 0; i < messages.length; i += RESEND_BATCH_SIZE) {

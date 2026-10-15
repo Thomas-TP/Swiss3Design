@@ -40,6 +40,11 @@ DATABASE_URL="postgresql://user:password@host/dbname?sslmode=verify-full"
 # Emails (Resend) — optionnel : sans clé, l'envoi est ignoré et la
 # vérification d'e-mail est désactivée automatiquement.
 RESEND_API_KEY="re_..."
+# Preview seulement (APP_ENV=preview) : adresses qui reçoivent des e-mails et
+# peuvent ouvrir un compte, séparées par des virgules (ADMIN_EMAILS en plus).
+# Secret Cloudflare (`wrangler secret put PREVIEW_EMAIL_ALLOWLIST --env preview`),
+# ignoré ailleurs. Voir src/lib/preview-email.ts.
+PREVIEW_EMAIL_ALLOWLIST=""
 
 # Connexion Google — optionnel en local (laisser vide pour désactiver le bouton)
 GOOGLE_CLIENT_ID=""

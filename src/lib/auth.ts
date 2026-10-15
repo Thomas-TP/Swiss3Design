@@ -17,7 +17,9 @@ import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { getDb } from "@/db";
 import { uncached } from "@/db/fresh";
 import * as schema from "@/db/schema";
+import { APIError } from "better-auth/api";
 import { sendEmail } from "./email";
+import { previewEmailGate } from "./preview-email";
 import { consumeRequestLimit } from "./rate-limit";
 import { agentAuthExtension, agentAuthPlugin } from "./agent/agent-auth";
 import { OAUTH_SCOPES, oauthIssuer } from "./agent/oauth";
@@ -234,14 +236,24 @@ export async function getAuth() {
     databaseHooks: {
       user: {
         create: {
-          before: async (u) => ({
-            data: {
-              ...u,
-              role: adminEmails(env).includes(u.email.toLowerCase())
-                ? "admin"
-                : "customer",
-            },
-          }),
+          before: async (u) => {
+            // Preview : comptes réservés aux adresses autorisées, les seules qui
+            // reçoivent l'e-mail de vérification (src/lib/preview-email.ts).
+            const gate = previewEmailGate(env);
+            if (gate && !gate(u.email))
+              throw new APIError("FORBIDDEN", {
+                message:
+                  "Preview : inscription réservée aux adresses autorisées.",
+              });
+            return {
+              data: {
+                ...u,
+                role: adminEmails(env).includes(u.email.toLowerCase())
+                  ? "admin"
+                  : "customer",
+              },
+            };
+          },
           // Rattache au nouveau compte les commandes et devis passés en invité
           // avec la même adresse. Sûr avant vérification d'e-mail : un compte
           // non vérifié ne peut pas se connecter, donc personne ne consulte ces

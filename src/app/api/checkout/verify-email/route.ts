@@ -6,6 +6,7 @@ import { verification } from "@/db/schema";
 import { sendEmail } from "@/lib/email";
 import { checkoutCodeEmail } from "@/lib/email-templates";
 import { createEmailProof } from "@/lib/email-proof";
+import { previewEmailGate } from "@/lib/preview-email";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
 
 // Vérification d'e-mail pour les commandes sans compte : un code à 6 chiffres
@@ -71,6 +72,15 @@ export async function POST(request: Request) {
   const db = await getDb();
   const email = parsed.data.email.trim().toLowerCase();
   const identifier = identifierFor(email);
+
+  // Preview : le code ne part qu'aux adresses autorisées (src/lib/preview-email.ts) ;
+  // les autres reçoivent une erreur claire plutôt qu'un code qui n'arrivera jamais.
+  if (parsed.data.action === "send") {
+    const { env } = await getCloudflareContext({ async: true });
+    const gate = previewEmailGate(env);
+    if (gate && !gate(email))
+      return Response.json({ error: "email_not_allowed" }, { status: 403 });
+  }
 
   return db.transaction(async (db) => {
     // Le verrou couvre aussi la création initiale, lorsqu'aucune ligne n'existe.
