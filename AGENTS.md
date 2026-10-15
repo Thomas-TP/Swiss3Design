@@ -262,6 +262,33 @@ put` on an environment with real users without `--env <name>` explicitly
     the admin settings still override them. Studio filaments are the Bambu Lab
     PLA Matte hex (15.10.2026 decision, 10 colours), displayed untransformed (`filaments.ts`,
     `filaments.test.ts`).
+13. **Filament stock (15.10.2026): reservations are DERIVED, the payment never
+    depends on the stock migration.** Tables `filament_*` (migration
+    `drizzle-pg/0010`, additive: no column added to an existing table); seeds
+    `scripts/seed-filament-refs.sql` (safe in production, no spool) and
+    `scripts/seed-filament-stock-preview.sql` (preview only), both applied by hand.
+    Reserved grams are never stored: Studio orders (paid, in production, or pending
+    with a live reservation; `order_items.studio.filamentGrams`) and accepted quotes
+    (`filament_quote_details.plan`), minus whatever `filament_consumptions` records.
+    Reads are fresh (`uncached`, rule 6c: `lib/filament/stock-db.ts`); the only write
+    path is `lib/filament/ledger.ts` (append-only `filament_movements`, the spool's
+    `remaining_grams` updated in the same transaction). `POST /api/checkout` re-checks
+    every Studio line (fresh pre-check, then `pg_advisory_xact_lock` + check inside
+    the order transaction): **409 `out_of_stock`**; missing tables (`42P01`) mean
+    « colour not tracked » (logged), the sale goes on. The public
+    `GET /api/stock/colors` gives a rounded capacity (10 g steps, capped at 1500 g),
+    never the exact level; KV-cached 60 s, emptied by every admin write.
+    `/custom`: the 3D file is required on the client AND in the Server Action (a
+    Studio quote may carry its `S3D-STUDIO v1` configuration line instead); the
+    weight is estimated in the browser (`src/lib/mesh-weight`; STEP/STP through
+    `occt-import-js`, WebAssembly in a classic Worker served from
+    `public/vendor/occt/`, LGPL-2.1, version pinned, files byte-identical to the npm
+    package: `occt-assets.test.ts`). Those static responses carry no CSP (a path with a
+    dot is outside the middleware), so `'wasm-unsafe-eval'` is NOT needed: keep the
+    WASM in that Worker, never on the main thread, never in the server Worker
+    (`mesh-estimator.tsx` is `ssr: false` for the same reason as the gates). Worker
+    gzip measured with the stock and the admin: 2 528 KiB (2 491 KiB at `0be8e4e`,
+    same path length, 2026-10-15).
 
 ## Tech stack
 

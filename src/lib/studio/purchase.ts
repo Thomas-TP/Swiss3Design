@@ -10,6 +10,7 @@
 // `studioDigest` n'en laisse qu'un condensé).
 import { z } from "zod";
 import { canonicalJson } from "./kernel/hash";
+import { filamentGramsOf, type FilamentGrams } from "./filament-need";
 import { studioLineId, type LineLocale } from "./line-id";
 import { PRINT } from "./print-params";
 import {
@@ -74,6 +75,8 @@ export interface ValidatedStudioLine {
   lineCents: number;
   stats: StudioStats;
   hash: string;
+  /** Grammes par couleur d'UNE pièce (réservation de stock). */
+  filamentGrams: FilamentGrams;
   expectedUnitCents: number | null;
   snapshot: StudioOrderLine;
 }
@@ -130,6 +133,7 @@ export function validateStudioLine(input: StudioLineInput): StudioLineResult {
   const figures = { grams: stats.grams, changes: stats.changes };
   const unitCents = studioUnitCents(config.object, figures, input.quantity);
   const lineCents = studioLineCents(config.object, figures, input.quantity);
+  const filamentGrams = filamentGramsOf(config, texts, PRICE_LOCALE);
   const locale = input.locale;
   const snapshot: StudioOrderLine = {
     v: 1,
@@ -154,6 +158,7 @@ export function validateStudioLine(input: StudioLineInput): StudioLineResult {
       grams: stats.grams,
       changes: stats.changes,
     },
+    filamentGrams,
     hash: studioHash(config, texts, locale),
   };
   return {
@@ -170,6 +175,7 @@ export function validateStudioLine(input: StudioLineInput): StudioLineResult {
       lineCents,
       stats,
       hash: snapshot.hash,
+      filamentGrams,
       expectedUnitCents: input.expectedUnitCents ?? null,
       snapshot,
     },

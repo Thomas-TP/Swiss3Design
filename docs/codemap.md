@@ -296,6 +296,23 @@ hexagonal), lissée ou en strates, colorée par altitude. Pure TypeScript comme 
 | Ventes par agents IA (Stripe ACS)       | `lib/commerce/` (flux, hooks, commandes) · webhook `api/stripe/webhook` · hooks `api/stripe/agentic-commerce` · tests `lib/commerce/commerce.test.ts`                                                                                                                                                                                                                                                                            |
 | Achat direct par agent (MPP/ACP/UCP)    | `lib/commerce/checkout-core.ts` (cœur) · `mpp.ts` / `acp-*.ts` / `ucp-*.ts` · routes `api/v1/purchases`, `api/acp`, `api/ucp`, `/.well-known/{acp.json,ucp}` · tests `lib/commerce/protocols.test.ts`                                                                                                                                                                                                                            |
 
+## Stock de filament (15.10.2026)
+
+| Fichier / route                                             | Rôle                                                                                           |
+| ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------- |
+| `db/schema.pg.ts` (`filament_*`), `drizzle-pg/0010`         | Références, supports, achats, bobines, mouvements (append-only), décompte, détails de devis    |
+| `lib/filament/availability.ts` · `shopping.ts` · `costs.ts` | Calculs purs : disponible, capacité publique, panier Bambu (paliers 2/4/6/10), coûts           |
+| `lib/filament/stock-db.ts`                                  | Lectures fraîches : réservé (dérivé des commandes et devis), disponible, contrôle du paiement  |
+| `lib/filament/ledger.ts`                                    | Seules écritures : mouvements, pesée, réception d'achat, décompte (dans une transaction)       |
+| `lib/filament/public-stock.ts` · `api/stock/colors`         | Capacité publique par couleur (cache KV 60 s, vidé par l'admin)                                |
+| `lib/studio/filament-need.ts` · `stock-view.ts`             | Grammes par couleur d'une pièce (instantané `filamentGrams`) ; couleurs « épuisées » du Studio |
+| `components/studio/use-filament-stock.tsx`                  | Capacité lue côté navigateur, pastilles grisées, ajout au panier bloqué                        |
+| `app/[locale]/admin/filaments/`                             | Écran « Stock de filament » (inventaire, pesée, achats, à acheter, mouvements, coûts, réfs)    |
+| `admin/filaments/consumption-panel.tsx`                     | Décompte d'une commande ou d'un devis (pages admin commande et devis)                          |
+| `lib/mesh-weight/` · `components/quote/`                    | Poids d'un fichier 3D dans le navigateur (STL, OBJ, 3MF, STEP) ; couleurs du devis             |
+| `public/vendor/occt/`                                       | occt-import-js (STEP, LGPL-2.1) et son Worker : fichiers statiques, jamais dans le Worker      |
+| `scripts/seed-filament-*.sql`                               | Références (sûr en production) et stock de départ (preview seulement), à jouer à la main       |
+
 ## Remédiation septembre 2026
 
 - Paiement/réservation : `lib/payment-state.ts`, `lib/stock.ts`, `lib/checkout-session.ts`, `lib/quote-session.ts`.

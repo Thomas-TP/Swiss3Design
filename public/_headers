@@ -10,3 +10,7 @@
 # de contenu change le nom, d'où « immutable ».
 /studio/glyphs/*
   Cache-Control: public, max-age=31536000, immutable
+
+# occt-import-js (lecture des fichiers STEP, LGPL-2.1) : noms non versionnés, cache d une semaine
+/vendor/occt/*
+  Cache-Control: public, max-age=604800

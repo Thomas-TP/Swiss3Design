@@ -712,10 +712,12 @@ export function CheckoutFlow({
                 ? "errorProductChanged"
                 : failure.error === "price_changed"
                   ? "errorStudioPrice"
-                  : failure.error === "studio_invalid" ||
-                      failure.error === "studio_unprintable"
-                    ? "errorStudioInvalid"
-                    : "errorGeneric";
+                  : failure.error === "out_of_stock"
+                    ? "errorFilament"
+                    : failure.error === "studio_invalid" ||
+                        failure.error === "studio_unprintable"
+                      ? "errorStudioInvalid"
+                      : "errorGeneric";
         if (
           failure.error === "checkout_closed" ||
           failure.error === "checkout_changed"

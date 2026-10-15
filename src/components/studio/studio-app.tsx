@@ -23,6 +23,7 @@ import { saveCreation } from "@/lib/studio/creations";
 import { clampConfig } from "@/lib/studio/ranges";
 import { computeStats } from "@/lib/studio/stats";
 import { bandStatsFor } from "@/lib/studio/band-stats";
+import { makeStockView } from "@/lib/studio/stock-view";
 import {
   ISSUE_MESSAGE_KEYS,
   issueStrings,
@@ -47,6 +48,10 @@ import type {
 } from "@/lib/studio/types";
 import { listCreations } from "@/lib/studio/creations";
 import { BuyBox } from "./buy-box";
+import {
+  FilamentStockProvider,
+  useFilamentCapacity,
+} from "./use-filament-stock";
 import {
   clearEditIntent,
   readEditIntent,
@@ -174,6 +179,13 @@ export function StudioApp({
   const bands = useMemo(
     () => bandStatsFor(config, shown, PRINT, locale),
     [config, shown, locale],
+  );
+  // Stock de filament : les couleurs que la pièce et la quantité permettent
+  // (capacité lue après l'hydratation ; sans elle, rien n'est grisé).
+  const capacity = useFilamentCapacity();
+  const stockView = useMemo(
+    () => makeStockView(capacity, bands, config, quantity),
+    [capacity, bands, config, quantity],
   );
   // Prix ferme, livraison comprise : `studioPrice` (price-figures.ts), la même
   // fonction que le serveur refait au paiement, en langue canonique pour la
@@ -436,6 +448,21 @@ export function StudioApp({
         ? t("send.needText", { field: t(`ctl.text.${missing}`) })
         : null;
 
+  // Couleur épuisée : l'ajout au panier est bloqué (le devis reste possible), avec
+  // le motif. Le serveur revérifie toujours au paiement (409 out_of_stock).
+  const stockShort = stockView.short;
+  const addBlocked = blocked || stockShort.size > 0;
+  const addReason =
+    reason ??
+    (stockShort.size > 0
+      ? t("buy.stockShort", {
+          count: stockShort.size,
+          colors: [...stockShort]
+            .map((id) => core(`filaments.${id}`))
+            .join(", "),
+        })
+      : null);
+
   // Les textes SAISIS partent, jamais les exemples (voir texts.ts).
   const sendInput: SummaryInput = useMemo(
     () => ({
@@ -471,7 +498,7 @@ export function StudioApp({
   // envoyé au serveur avant le paiement, qui revalide tout et refait le prix.
   const { addStudio, replaceStudio } = cart;
   const addToCart = useCallback(() => {
-    if (blocked) return;
+    if (addBlocked) return;
     const line = buildStudioCartLine({
       config,
       texts: textsForObject(object, texts),
@@ -493,7 +520,7 @@ export function StudioApp({
     toast.show(updated ? t("buy.updated") : t("buy.added"));
     setDone(updated ? "updated" : "added");
   }, [
-    blocked,
+    addBlocked,
     config,
     texts,
     object,
@@ -526,8 +553,8 @@ export function StudioApp({
         unitCents={price.unitCents}
         quantity={quantity}
         onQuantity={setQuantity}
-        blocked={blocked}
-        reason={reason}
+        blocked={addBlocked}
+        reason={addReason}
         reasonId={reasonId}
         onAdd={addToCart}
         onQuote={openSend}
@@ -541,8 +568,8 @@ export function StudioApp({
       locale,
       price.unitCents,
       quantity,
-      blocked,
-      reason,
+      addBlocked,
+      addReason,
       reasonId,
       addToCart,
       openSend,
@@ -595,179 +622,181 @@ export function StudioApp({
   );
 
   return (
-    <div ref={rootRef} className="group/studio">
-      {/* Formulaire « de l'interface » : les curseurs, puces et champs de texte
+    <FilamentStockProvider value={stockView}>
+      <div ref={rootRef} className="group/studio">
+        {/* Formulaire « de l'interface » : les curseurs, puces et champs de texte
           qui ne font pas partie de la requête GET y sont rattachés (attribut form). */}
-      <form id="studio-local" onSubmit={(event) => event.preventDefault()} />
-      <StudioEngine locale={locale} preloadGlyphs={object !== "lavaux"} />
+        <form id="studio-local" onSubmit={(event) => event.preventDefault()} />
+        <StudioEngine locale={locale} preloadGlyphs={object !== "lavaux"} />
 
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 max-lg:hidden">
-        {breadcrumb}
-        <StudioToolbar
-          canUndo={doc.canUndo}
-          canRedo={doc.canRedo}
-          onUndo={undo}
-          onRedo={redo}
-          onSurprise={onSurprise}
-          onCopy={copyLink}
-          onKeep={keep}
-          labels={{
-            undo: t("tools.undo"),
-            redo: t("tools.redo"),
-            surprise: t("tools.surprise"),
-            copy: t("tools.copy"),
-            keep: t("tools.keep"),
-            group: t("tools.group"),
-          }}
-        />
-      </div>
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 max-lg:hidden">
+          {breadcrumb}
+          <StudioToolbar
+            canUndo={doc.canUndo}
+            canRedo={doc.canRedo}
+            onUndo={undo}
+            onRedo={redo}
+            onSurprise={onSurprise}
+            onCopy={copyLink}
+            onKeep={keep}
+            labels={{
+              undo: t("tools.undo"),
+              redo: t("tools.redo"),
+              surprise: t("tools.surprise"),
+              copy: t("tools.copy"),
+              keep: t("tools.keep"),
+              group: t("tools.group"),
+            }}
+          />
+        </div>
 
-      <form
-        method="get"
-        action={action}
-        onSubmit={onGetSubmit}
-        className={cx(
-          // Mobile : un écran d'application. L'aperçu occupe 40 % de la
-          // hauteur (un bandeau de 8 rem une fois réduit), les réglages
-          // défilent dans le reste, la barre d'action est dessous. La hauteur
-          // retranche l'en-tête (65 px), l'air au-dessus du formulaire (0,5 rem)
-          // et la barre (3,5 rem + son filet + la zone sûre).
-          "max-lg:flex max-lg:h-[calc(100svh-4.0625rem-0.5rem-3.5625rem-env(safe-area-inset-bottom))] max-lg:min-h-[26rem] max-lg:flex-col",
-          "lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-gutter",
-        )}
-      >
-        {/* Bureau : la colonne s'étire sur toute la hauteur des réglages (sans
-            quoi elle n'a pas la place de coller), et l'aperçu qu'elle porte reste
-            sous l'en-tête pendant qu'on fait défiler les réglages. */}
-        <div
+        <form
+          method="get"
+          action={action}
+          onSubmit={onGetSubmit}
           className={cx(
-            "max-lg:flex max-lg:shrink-0 max-lg:flex-col lg:col-span-7 lg:self-stretch",
-            compact ? "max-lg:h-32" : "max-lg:h-[40%]",
+            // Mobile : un écran d'application. L'aperçu occupe 40 % de la
+            // hauteur (un bandeau de 8 rem une fois réduit), les réglages
+            // défilent dans le reste, la barre d'action est dessous. La hauteur
+            // retranche l'en-tête (65 px), l'air au-dessus du formulaire (0,5 rem)
+            // et la barre (3,5 rem + son filet + la zone sûre).
+            "max-lg:flex max-lg:h-[calc(100svh-4.0625rem-0.5rem-3.5625rem-env(safe-area-inset-bottom))] max-lg:min-h-[26rem] max-lg:flex-col",
+            "lg:grid lg:grid-cols-12 lg:items-start lg:gap-x-gutter",
           )}
         >
-          <div className="max-lg:min-h-0 max-lg:flex-1 lg:sticky lg:top-[88px]">
-            <ScenePanel
-              object={object}
-              config={config}
-              texts={shown}
-              locale={locale}
-              stats={stats}
-              bands={bands}
-              reprint={reprint}
-              compact={compact}
-              onCompactChange={setCompact}
-              t={t}
-              core={core}
-              className="w-full max-lg:h-full lg:aspect-square lg:max-h-[calc(100svh-14rem)]"
-              bandBar={bandBar}
-            />
-            <MeasureStrip
-              items={measureItems({
-                config,
-                stats,
-                locale,
-                core,
-                t,
-                price: { unitCents: price.unitCents, quantity },
-              })}
-              label={t("measure.label")}
-              className="mt-3 max-lg:hidden"
-            />
-          </div>
-        </div>
-
-        <div
-          data-lenis-prevent=""
-          className="max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:pb-6 max-lg:pt-3 lg:col-span-5"
-        >
-          <div className="flex flex-col gap-8 max-lg:gap-3">
-            {intro}
-            <div className="lg:hidden">
-              <StudioToolbar
-                canUndo={doc.canUndo}
-                canRedo={doc.canRedo}
-                onUndo={undo}
-                onRedo={redo}
-                onSurprise={onSurprise}
-                onCopy={copyLink}
-                onKeep={keep}
-                labels={{
-                  undo: t("tools.undo"),
-                  redo: t("tools.redo"),
-                  surprise: t("tools.surprise"),
-                  copy: t("tools.copy"),
-                  keep: t("tools.keep"),
-                  group: t("tools.group"),
-                }}
+          {/* Bureau : la colonne s'étire sur toute la hauteur des réglages (sans
+            quoi elle n'a pas la place de coller), et l'aperçu qu'elle porte reste
+            sous l'en-tête pendant qu'on fait défiler les réglages. */}
+          <div
+            className={cx(
+              "max-lg:flex max-lg:shrink-0 max-lg:flex-col lg:col-span-7 lg:self-stretch",
+              compact ? "max-lg:h-32" : "max-lg:h-[40%]",
+            )}
+          >
+            <div className="max-lg:min-h-0 max-lg:flex-1 lg:sticky lg:top-[88px]">
+              <ScenePanel
+                object={object}
+                config={config}
+                texts={shown}
+                locale={locale}
+                stats={stats}
+                bands={bands}
+                reprint={reprint}
+                compact={compact}
+                onCompactChange={setCompact}
+                t={t}
+                core={core}
+                className="w-full max-lg:h-full lg:aspect-square lg:max-h-[calc(100svh-14rem)]"
+                bandBar={bandBar}
+              />
+              <MeasureStrip
+                items={measureItems({
+                  config,
+                  stats,
+                  locale,
+                  core,
+                  t,
+                  price: { unitCents: price.unitCents, quantity },
+                })}
+                label={t("measure.label")}
+                className="mt-3 max-lg:hidden"
               />
             </div>
-            <SectionTabs
-              legend={t("sections.legend")}
-              sections={sections}
-              value={tab}
-              onChange={setTab}
-              labelOf={sectionLabel}
-            />
-            <StudioSections
-              ctl={ctl}
-              sections={sections}
-              tab={tab}
-              titleOf={sectionLabel}
-              issueText={issueText}
-              onFix={fix}
-              actions={buyBox}
-              noscriptNote={noscriptNote}
-            />
-            {/* Sans JavaScript : « Appliquer » envoie le formulaire GET (la page se recharge avec les réglages). */}
-            <div className="group-data-[js]/studio:hidden">
-              <Button type="submit" variant="secondary">
-                {t("apply")}
-              </Button>
+          </div>
+
+          <div
+            data-lenis-prevent=""
+            className="max-lg:min-h-0 max-lg:flex-1 max-lg:overflow-y-auto max-lg:pb-6 max-lg:pt-3 lg:col-span-5"
+          >
+            <div className="flex flex-col gap-8 max-lg:gap-3">
+              {intro}
+              <div className="lg:hidden">
+                <StudioToolbar
+                  canUndo={doc.canUndo}
+                  canRedo={doc.canRedo}
+                  onUndo={undo}
+                  onRedo={redo}
+                  onSurprise={onSurprise}
+                  onCopy={copyLink}
+                  onKeep={keep}
+                  labels={{
+                    undo: t("tools.undo"),
+                    redo: t("tools.redo"),
+                    surprise: t("tools.surprise"),
+                    copy: t("tools.copy"),
+                    keep: t("tools.keep"),
+                    group: t("tools.group"),
+                  }}
+                />
+              </div>
+              <SectionTabs
+                legend={t("sections.legend")}
+                sections={sections}
+                value={tab}
+                onChange={setTab}
+                labelOf={sectionLabel}
+              />
+              <StudioSections
+                ctl={ctl}
+                sections={sections}
+                tab={tab}
+                titleOf={sectionLabel}
+                issueText={issueText}
+                onFix={fix}
+                actions={buyBox}
+                noscriptNote={noscriptNote}
+              />
+              {/* Sans JavaScript : « Appliquer » envoie le formulaire GET (la page se recharge avec les réglages). */}
+              <div className="group-data-[js]/studio:hidden">
+                <Button type="submit" variant="secondary">
+                  {t("apply")}
+                </Button>
+              </div>
             </div>
           </div>
-        </div>
-      </form>
+        </form>
 
-      {/* Résumé vivant : le canvas est muet pour les lecteurs d'écran (§6.10). */}
-      <p
-        aria-live="polite"
-        className={cx("sr-only", summaryHasText(config, shown) && "ph-mask")}
-      >
-        {announced}
-      </p>
+        {/* Résumé vivant : le canvas est muet pour les lecteurs d'écran (§6.10). */}
+        <p
+          aria-live="polite"
+          className={cx("sr-only", summaryHasText(config, shown) && "ph-mask")}
+        >
+          {announced}
+        </p>
 
-      {/* Barre d'action de mobile : remplace la BottomNav sur /studio/<objet>. */}
-      <div
-        className="fixed inset-x-0 bottom-0 z-[45] hidden border-t border-line bg-surface/90 backdrop-blur-lg group-data-[js]/studio:max-lg:block"
-        style={{
-          paddingBottom: "env(safe-area-inset-bottom)",
-          viewTransitionName: "site-bottom-nav",
-        }}
-      >
-        <div className="flex h-14 items-center justify-between gap-3 px-[var(--spacing-margin)]">
-          <p className="s3d-label ph-no-capture min-w-0 normal-case text-ink">
-            {formatChf(price.unitCents * quantity, locale)}
-            {quantity > 1 ? ` · ×${quantity}` : ""}
-          </p>
-          <Button
-            variant="primary"
-            disabled={blocked}
-            onClick={addToCart}
-            aria-describedby={reason ? reasonId : undefined}
-          >
-            {editing ? t("buy.update") : t("buy.cta")}
-          </Button>
+        {/* Barre d'action de mobile : remplace la BottomNav sur /studio/<objet>. */}
+        <div
+          className="fixed inset-x-0 bottom-0 z-[45] hidden border-t border-line bg-surface/90 backdrop-blur-lg group-data-[js]/studio:max-lg:block"
+          style={{
+            paddingBottom: "env(safe-area-inset-bottom)",
+            viewTransitionName: "site-bottom-nav",
+          }}
+        >
+          <div className="flex h-14 items-center justify-between gap-3 px-[var(--spacing-margin)]">
+            <p className="s3d-label ph-no-capture min-w-0 normal-case text-ink">
+              {formatChf(price.unitCents * quantity, locale)}
+              {quantity > 1 ? ` · ×${quantity}` : ""}
+            </p>
+            <Button
+              variant="primary"
+              disabled={addBlocked}
+              onClick={addToCart}
+              aria-describedby={addReason ? reasonId : undefined}
+            >
+              {editing ? t("buy.update") : t("buy.cta")}
+            </Button>
+          </div>
         </div>
+
+        <SendDrawerHost
+          state={sendState}
+          input={sendInput}
+          object={object}
+          locale={locale}
+          link={link}
+        />
+        <Toast message={toast.message} onDismiss={toast.dismiss} />
       </div>
-
-      <SendDrawerHost
-        state={sendState}
-        input={sendInput}
-        object={object}
-        locale={locale}
-        link={link}
-      />
-      <Toast message={toast.message} onDismiss={toast.dismiss} />
-    </div>
+    </FilamentStockProvider>
   );
 }

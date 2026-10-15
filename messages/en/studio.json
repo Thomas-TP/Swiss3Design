@@ -247,7 +247,8 @@
   "colors": {
     "plate": "Plate color",
     "ink": "Text color",
-    "base": "Base color"
+    "base": "Base color",
+    "soldOut": "sold out"
   },
   "bands": {
     "palettes": "Palettes",
@@ -361,6 +362,7 @@
     "cancelEdit": "Cancel editing",
     "quoteLead": "A special request?",
     "quoteLink": "Request a quote",
-    "quoteHint": "More than {max} pieces, another material or a special request: the workshop replies with a quote."
+    "quoteHint": "More than {max} pieces, another material or a special request: the workshop replies with a quote.",
+    "stockShort": "{count, plural, one {Colour sold out} other {Colours sold out}}: {colors}. Pick another, or request a quote."
   }
 }

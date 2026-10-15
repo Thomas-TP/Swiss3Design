@@ -247,7 +247,8 @@
   "colors": {
     "plate": "Couleur de la plaque",
     "ink": "Couleur du texte",
-    "base": "Couleur de base"
+    "base": "Couleur de base",
+    "soldOut": "épuisée"
   },
   "bands": {
     "palettes": "Palettes",
@@ -361,6 +362,7 @@
     "cancelEdit": "Annuler la modification",
     "quoteLead": "Une demande particulière ?",
     "quoteLink": "Demander un devis",
-    "quoteHint": "Plus de {max} pièces, autre matière ou demande spéciale : l'atelier répond par un devis."
+    "quoteHint": "Plus de {max} pièces, autre matière ou demande spéciale : l'atelier répond par un devis.",
+    "stockShort": "{count, plural, one {Couleur épuisée} other {Couleurs épuisées}} : {colors}. Choisissez-en une autre, ou demandez un devis."
   }
 }

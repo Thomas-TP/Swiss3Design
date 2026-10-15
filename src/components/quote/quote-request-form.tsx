@@ -4,7 +4,9 @@ import {
   startTransition,
   useActionState,
   useEffect,
+  useCallback,
   useId,
+  useMemo,
   useRef,
   useState,
   type FormEvent,
@@ -37,6 +39,14 @@ import {
 } from "./quote-logic";
 import { QuoteFileField, useQuoteFile } from "./quote-file-field";
 import { StudioAttachmentCard } from "./studio-attachment-card";
+import { MeshEstimator } from "./mesh-estimator";
+import {
+  QuoteColorPicker,
+  eligibleColors,
+  useCustomStock,
+} from "./quote-color-picker";
+import type { EstimateResult } from "@/lib/mesh-weight/client";
+import { QUOTE_COLORS_MAX, QUOTE_QUANTITY_MAX } from "@/lib/filament/constants";
 
 // Formulaire de demande de devis PARTAGÉ (brief « Strates », §7.10, §6.9) :
 // la page /custom (variante « page », une fiche à filets) et le tiroir
@@ -136,6 +146,25 @@ export interface QuoteRequestFormProps {
 
 const INITIAL_STATE: QuoteFormState = { status: "idle" };
 
+/** Lecture du fichier 3D dans le navigateur (poids estimé d'UNE pièce). */
+type EstimateState =
+  | { status: "idle" }
+  | { status: "running" }
+  | { status: "ok"; grams: number; approximate: boolean }
+  | {
+      status: "error";
+      reason: "unsupported" | "unreadable" | "timeout" | "empty" | "tiny";
+      step: boolean;
+    };
+
+/** Message (clé de `quote.file.*`) d'un fichier que l'on n'a pas pu lire : jamais d'estimation inventée. */
+function estimateErrorKey(state: Extract<EstimateState, { status: "error" }>) {
+  if (state.reason === "timeout") return "file.timeout";
+  if (state.reason === "empty") return "file.empty";
+  if (state.reason === "tiny") return "file.tooSmall";
+  return state.step ? "file.stepFailed" : "file.estimateFailed";
+}
+
 export function QuoteRequestForm({
   materials,
   source,
@@ -221,6 +250,59 @@ export function QuoteRequestForm({
   const uploading = file.state.status === "uploading";
   const hasError = !busy && (submitError !== null || state.status === "error");
 
+  // ── Fichier 3D obligatoire, poids estimé, quantité, couleurs du stock ─────────
+  // (variante « page » sans pièce jointe du Studio seulement)
+  const [estimateTarget, setEstimateTarget] = useState<File | null>(null);
+  const [estimate, setEstimate] = useState<EstimateState>({ status: "idle" });
+  const [quantityText, setQuantityText] = useState("1");
+  const [colorRefs, setColorRefs] = useState<string[]>([]);
+  const customStock = useCustomStock(showFileField);
+  const quantity = Math.min(
+    QUOTE_QUANTITY_MAX,
+    Math.max(1, Number.parseInt(quantityText, 10) || 1),
+  );
+  const gramsPerPiece = estimate.status === "ok" ? estimate.grams : null;
+  const eligibleIds = useMemo(
+    () =>
+      new Set(
+        customStock.status === "ready" && gramsPerPiece !== null
+          ? eligibleColors(customStock.colors, gramsPerPiece, quantity).map(
+              (color) => color.id,
+            )
+          : [],
+      ),
+    [customStock, gramsPerPiece, quantity],
+  );
+  // Une couleur qui ne suffit plus (quantité en hausse) sort de la sélection.
+  const chosenRefs = colorRefs.filter((id) => eligibleIds.has(id));
+  const onEstimate = useCallback((result: EstimateResult) => {
+    setEstimate(
+      result.ok
+        ? {
+            status: "ok",
+            grams: result.grams,
+            approximate: result.issue === "overlap",
+          }
+        : {
+            status: "error",
+            reason: result.reason,
+            step: result.format === "step",
+          },
+    );
+  }, []);
+  function pickFile(next: File) {
+    file.select(next);
+    setEstimateTarget(next);
+    setEstimate({ status: "running" });
+    setColorRefs([]);
+  }
+  function clearFile() {
+    file.clear();
+    setEstimateTarget(null);
+    setEstimate({ status: "idle" });
+    setColorRefs([]);
+  }
+
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     // JavaScript actif : c'est nous qui envoyons (voir l'en-tête du fichier).
     event.preventDefault();
@@ -234,6 +316,22 @@ export function QuoteRequestForm({
       if (!key && file.state.status === "done") {
         key = file.state.key;
         name = file.state.name;
+      }
+      // Page /custom : un modèle 3D lisible est obligatoire, et son poids estimé
+      // (sans quoi on n'invente rien) ; le serveur l'exige aussi.
+      if (showFileField) {
+        if (!key) {
+          setSubmitError(t("file.required"));
+          return;
+        }
+        if (estimate.status !== "ok") {
+          setSubmitError(
+            estimate.status === "error"
+              ? t(estimateErrorKey(estimate))
+              : t("file.estimating"),
+          );
+          return;
+        }
       }
       if (!key && attachment?.prepare) {
         const result =
@@ -332,16 +430,17 @@ export function QuoteRequestForm({
     dimensions: `${uid}-dimensions`,
     email: `${uid}-email`,
     file: `${uid}-file`,
+    quantity: `${uid}-quantity`,
   };
   const page = variant === "page";
   const sectionClass = page ? "px-5 py-6 sm:px-8" : "";
   const legendClass =
     "s3d-label float-left mb-5 w-full text-soft [&+*]:clear-both";
 
-  // Numéro de section : 01 projet, 02 fichier (si présent), puis contact.
+  // Numéro de section : 01 fichier (si présent), puis projet, puis contact.
   const sectionNumbers = {
-    project: "01",
-    file: "02",
+    file: "01",
+    project: showFileField ? "02" : "01",
     contact: showFileField ? "03" : "02",
   };
 
@@ -392,6 +491,55 @@ export function QuoteRequestForm({
         </div>
       ) : null}
 
+      {showFileField ? (
+        <fieldset className={cx("m-0 min-w-0 border-0", sectionClass)}>
+          <legend className={legendClass}>
+            <span className="text-ink">{sectionNumbers.file}</span>
+            <span aria-hidden="true" className="mx-2 text-iso-index">
+              ·
+            </span>
+            {t("sheet.file")}
+          </legend>
+          <QuoteFileField
+            id={ids.file}
+            state={file.state}
+            onSelect={pickFile}
+            onClear={clearFile}
+          />
+          {/* Lecture du fichier dans le navigateur : poids estimé d'UNE pièce. */}
+          {estimateTarget && estimate.status === "running" ? (
+            <MeshEstimator
+              key={`${estimateTarget.name}-${estimateTarget.size}-${estimateTarget.lastModified}`}
+              file={estimateTarget}
+              onResult={onEstimate}
+            />
+          ) : null}
+          <div className="mt-3 min-h-5 text-sm" aria-live="polite">
+            {estimate.status === "running" ? (
+              <p className="text-soft">{t("file.estimating")}</p>
+            ) : estimate.status === "ok" ? (
+              <p className="ph-no-capture text-ink">
+                {t("file.estimate", {
+                  grams: `${formatCount(estimate.grams, locale)} g`,
+                })}
+                {estimate.approximate ? (
+                  <span className="text-soft">
+                    {" "}
+                    · {t("file.estimateApprox")}
+                  </span>
+                ) : null}
+              </p>
+            ) : estimate.status === "error" ? (
+              <p role="alert" className="font-medium text-accent-text">
+                {t(estimateErrorKey(estimate))}
+              </p>
+            ) : (
+              <p className="text-soft">{t("file.required")}</p>
+            )}
+          </div>
+        </fieldset>
+      ) : null}
+
       {locked ? (
         <>
           {/* ph-no-capture : la description complète (avec les textes à
@@ -426,7 +574,13 @@ export function QuoteRequestForm({
           />
         </>
       ) : (
-        <fieldset className={cx("m-0 min-w-0 border-0", sectionClass)}>
+        <fieldset
+          className={cx(
+            "m-0 min-w-0 border-0",
+            sectionClass,
+            showFileField && "border-t border-line",
+          )}
+        >
           <legend className={legendClass}>
             <span className="text-ink">{sectionNumbers.project}</span>
             <span aria-hidden="true" className="mx-2 text-iso-index">
@@ -485,26 +639,70 @@ export function QuoteRequestForm({
                 // Pas de sélecteur : la matière vient du préremplissage (ou reste vide).
                 <input type="hidden" name="material" value={material} />
               )}
-              <Field
-                label={
-                  <>
-                    {tCustom("colors")}{" "}
-                    <span className="normal-case">({tCustom("optional")})</span>
-                  </>
-                }
-                htmlFor={ids.colors}
-              >
-                <input
-                  id={ids.colors}
-                  name="colors"
-                  maxLength={QUOTE_LIMITS.colors}
-                  value={colors}
-                  onChange={(e) => setColors(e.target.value)}
-                  placeholder={tCustom("colorsPlaceholder")}
-                  className={fieldClass}
-                />
-              </Field>
+              {showFileField ? (
+                <Field
+                  label={t("fields.quantity")}
+                  htmlFor={ids.quantity}
+                  hint={t("hints.quantity", { max: QUOTE_QUANTITY_MAX })}
+                >
+                  <input
+                    id={ids.quantity}
+                    name="quantity"
+                    type="number"
+                    inputMode="numeric"
+                    min={1}
+                    max={QUOTE_QUANTITY_MAX}
+                    value={quantityText}
+                    onChange={(e) => setQuantityText(e.target.value)}
+                    aria-describedby={fieldIds(ids.quantity).hint}
+                    className={fieldClass}
+                  />
+                </Field>
+              ) : (
+                <Field
+                  label={
+                    <>
+                      {tCustom("colors")}{" "}
+                      <span className="normal-case">
+                        ({tCustom("optional")})
+                      </span>
+                    </>
+                  }
+                  htmlFor={ids.colors}
+                >
+                  <input
+                    id={ids.colors}
+                    name="colors"
+                    maxLength={QUOTE_LIMITS.colors}
+                    value={colors}
+                    onChange={(e) => setColors(e.target.value)}
+                    placeholder={tCustom("colorsPlaceholder")}
+                    className={fieldClass}
+                  />
+                </Field>
+              )}
             </div>
+
+            {showFileField ? (
+              <QuoteColorPicker
+                stock={customStock}
+                gramsPerPiece={gramsPerPiece}
+                quantity={quantity}
+                selected={chosenRefs}
+                onChange={setColorRefs}
+                max={QUOTE_COLORS_MAX}
+                labels={{
+                  legend: t("colorsPicker.legend"),
+                  hint: t("colorsPicker.hint", { max: QUOTE_COLORS_MAX }),
+                  pending: t("colorsPicker.pending"),
+                  none: t("colorsPicker.none"),
+                  loading: t("colorsPicker.loading"),
+                  unavailable: t("colorsPicker.unavailable"),
+                  approximate: t("colorsPicker.approximate"),
+                  limit: t("colorsPicker.limit", { max: QUOTE_COLORS_MAX }),
+                }}
+              />
+            ) : null}
 
             <Field
               label={
@@ -528,31 +726,6 @@ export function QuoteRequestForm({
           </div>
         </fieldset>
       )}
-
-      {showFileField ? (
-        <fieldset
-          className={cx(
-            "m-0 min-w-0 border-0",
-            sectionClass,
-            page && "border-t border-line",
-          )}
-        >
-          <legend className={legendClass}>
-            <span className="text-ink">{sectionNumbers.file}</span>
-            <span aria-hidden="true" className="mx-2 text-iso-index">
-              ·
-            </span>
-            {t("sheet.file")}{" "}
-            <span className="normal-case">({tCustom("optional")})</span>
-          </legend>
-          <QuoteFileField
-            id={ids.file}
-            state={file.state}
-            onSelect={file.select}
-            onClear={file.clear}
-          />
-        </fieldset>
-      ) : null}
 
       <fieldset
         className={cx(
@@ -603,7 +776,12 @@ export function QuoteRequestForm({
             role="alert"
             className="rounded-field bg-accent/10 px-4 py-3 text-sm font-medium text-accent-text"
           >
-            {submitError ?? tCustom("error")}
+            {submitError ??
+              (state.status === "error" && state.reason === "file"
+                ? t("file.required")
+                : state.status === "error" && state.reason === "color"
+                  ? t("errors.color")
+                  : tCustom("error"))}
           </p>
         ) : null}
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -611,7 +789,7 @@ export function QuoteRequestForm({
             type="submit"
             variant="primary"
             size="lg"
-            disabled={busy || uploading}
+            disabled={busy || uploading || estimate.status === "running"}
             className="w-full sm:w-auto"
           >
             <Send size={16} strokeWidth={1.5} aria-hidden="true" />
@@ -639,6 +817,19 @@ export function QuoteRequestForm({
       )}
     >
       <input type="hidden" name="locale" value={locale} />
+      <input type="hidden" name="source" value={source} />
+      {showFileField ? (
+        <>
+          <input
+            type="hidden"
+            name="colorRefs"
+            value={JSON.stringify(chosenRefs)}
+          />
+          {gramsPerPiece !== null ? (
+            <input type="hidden" name="estGrams" value={gramsPerPiece} />
+          ) : null}
+        </>
+      ) : null}
       {body}
     </form>
   );

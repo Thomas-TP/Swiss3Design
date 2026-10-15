@@ -133,7 +133,8 @@
     "errorVerifyAgain": "Verifichi nuovamente l’indirizzo e-mail prima di pagare.",
     "errorProductChanged": "Un articolo o un’opzione è cambiato. Lo selezioni nuovamente dalla scheda prodotto.",
     "errorStudioPrice": "Il prezzo di un oggetto dello Studio è stato aggiornato. Verifichi il totale e confermi di nuovo.",
-    "errorStudioInvalid": "Un oggetto dello Studio nel carrello non può essere stampato così com'è. Lo riapra nello Studio dal carrello."
+    "errorStudioInvalid": "Un oggetto dello Studio nel carrello non può essere stampato così com'è. Lo riapra nello Studio dal carrello.",
+    "errorFilament": "Un colore di un oggetto dello Studio nel carrello non è più disponibile. Lo riapra nello Studio per sceglierne un altro, oppure richieda un preventivo."
   },
   "orderSuccess": {
     "processingTitle": "Pagamento in corso",

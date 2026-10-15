@@ -133,7 +133,8 @@
     "errorVerifyAgain": "Bestätigen Sie Ihre E-Mail-Adresse erneut, bevor Sie bezahlen.",
     "errorProductChanged": "Ein Artikel oder eine Option hat sich geändert. Wählen Sie ihn auf der Produktseite erneut aus.",
     "errorStudioPrice": "Der Preis eines Studio-Objekts wurde aktualisiert. Prüfen Sie den Gesamtbetrag und bestätigen Sie erneut.",
-    "errorStudioInvalid": "Ein Studio-Objekt in Ihrem Warenkorb kann so nicht gedruckt werden. Öffnen Sie es im Warenkorb erneut im Studio."
+    "errorStudioInvalid": "Ein Studio-Objekt in Ihrem Warenkorb kann so nicht gedruckt werden. Öffnen Sie es im Warenkorb erneut im Studio.",
+    "errorFilament": "Eine Farbe eines Studio-Objekts in Ihrem Warenkorb ist nicht mehr vorrätig. Öffnen Sie es erneut im Studio und wählen Sie eine andere Farbe, oder fordern Sie ein Angebot an."
   },
   "orderSuccess": {
     "processingTitle": "Zahlung in Bearbeitung",

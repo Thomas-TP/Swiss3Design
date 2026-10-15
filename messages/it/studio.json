@@ -247,7 +247,8 @@
   "colors": {
     "plate": "Colore della piastra",
     "ink": "Colore del testo",
-    "base": "Colore di base"
+    "base": "Colore di base",
+    "soldOut": "esaurito"
   },
   "bands": {
     "palettes": "Palette",
@@ -361,6 +362,7 @@
     "cancelEdit": "Annulla la modifica",
     "quoteLead": "Una richiesta particolare?",
     "quoteLink": "Richiedere un preventivo",
-    "quoteHint": "Oltre {max} pezzi, altro materiale o richiesta speciale: il laboratorio risponde con un preventivo."
+    "quoteHint": "Oltre {max} pezzi, altro materiale o richiesta speciale: il laboratorio risponde con un preventivo.",
+    "stockShort": "{count, plural, one {Colore esaurito} other {Colori esauriti}}: {colors}. Ne scelga un altro oppure richieda un preventivo."
   }
 }

@@ -34,6 +34,7 @@ import {
   layoutMontagne,
   type Locale,
 } from "./objects/montagne-model";
+import { solidPrintVolume } from "./solid-volume";
 import { PRINT, type PrintParams } from "./print-params";
 import type {
   Band,
@@ -107,21 +108,7 @@ function lavauxStats(config: LavauxConfig, params: PrintParams): StudioStats {
   return stats;
 }
 
-/** Épaisseur de la coque pleine (mm) et remplissage des objets épais (§6.5). */
-export const SHELL_MM = 0.8;
-export const INFILL = 0.15;
-
-/**
- * Volume imprimé (mm³) d'un objet plein de plus de 3 mm : coque de 0,8 mm
- * pleine + remplissage à 15 % du reste (`V_coque = min(V, A × 0,8)`).
- */
-export function solidPrintVolume(
-  volumeMm3: number,
-  surfaceMm2: number,
-): number {
-  const shell = Math.min(volumeMm3, surfaceMm2 * SHELL_MM);
-  return shell + INFILL * (volumeMm3 - shell);
-}
+export { INFILL, SHELL_MM, solidPrintVolume } from "./solid-volume";
 
 function finish(
   base: Omit<StudioStats, "grams" | "minutes" | "purgeGrams"> & {

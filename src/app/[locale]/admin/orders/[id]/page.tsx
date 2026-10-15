@@ -10,6 +10,8 @@ import { uncached } from "@/db/fresh";
 import { orders, orderItems, statusEvents, user } from "@/db/schema";
 import { readStudioOrderLine } from "@/lib/studio/order-line";
 import { StudioSection } from "./studio-section";
+import { OrderFilamentPanel } from "../../filaments/consumption-panel";
+import { loadOrderPanel } from "@/lib/filament/panel-data";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { updateOrderStatus, updateOrderNote } from "../actions";
@@ -92,6 +94,8 @@ export default async function AdminOrderDetailPage({
       )
       .orderBy(desc(statusEvents.createdAt)),
   ]);
+
+  const filamentPanel = await loadOrderPanel(db, id);
 
   // Objets du Studio dont les textes n'ont pas encore été relus : pas de production.
   const studioPending = items.some((it) => {
@@ -286,6 +290,14 @@ export default async function AdminOrderDetailPage({
         items={items}
         locale={locale}
       />
+
+      {filamentPanel ? (
+        <OrderFilamentPanel
+          orderId={order.id}
+          status={order.status}
+          panel={filamentPanel}
+        />
+      ) : null}
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <section className="rounded-card border border-line bg-surface p-5 text-sm">

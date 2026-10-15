@@ -9,7 +9,7 @@
     "studio": {
       "kicker": "Studio",
       "title": "Ich habe keine Datei",
-      "body": "Personalisieren Sie im Studio eine Vase, eine Visitenkarte, einen Berg oder ein Namensschild und senden Sie es dem Atelier. Eine Idee ohne Datei? Beschreiben Sie sie im Formular."
+      "body": "Personalisieren Sie im Studio eine Vase, eine Visitenkarte, einen Berg oder ein Namensschild und senden Sie es dem Atelier."
     }
   },
   "sheet": {
@@ -29,7 +29,8 @@
   },
   "hints": {
     "description": "Mindestens {min} Zeichen.",
-    "email": "Das Atelier antwortet an diese Adresse."
+    "email": "Das Atelier antwortet an diese Adresse.",
+    "quantity": "Von 1 bis {max} Stück."
   },
   "file": {
     "drop": "Datei hier ablegen",
@@ -38,7 +39,16 @@
     "uploading": "Datei wird hochgeladen · {percent}",
     "attached": "An die Anfrage angehängt",
     "remove": "Datei {name} entfernen",
-    "noscript": "Um eine Datei anzuhängen, aktivieren Sie JavaScript oder schreiben Sie an {email}."
+    "noscript": "Um eine Datei anzuhängen, aktivieren Sie JavaScript oder schreiben Sie an {email}.",
+    "required": "Fügen Sie eine lesbare 3D-Datei bei (STL, 3MF, OBJ oder STEP): Sie ist Pflicht, damit das Atelier antworten kann.",
+    "estimating": "Datei wird gelesen …",
+    "estimate": "Geschätztes Gewicht ≈ {grams} pro Stück",
+    "estimateApprox": "offenes oder überlappendes Netz, Schätzung ungefähr",
+    "estimateFailed": "Wir konnten diese Datei nicht lesen. Exportieren Sie sie als STL oder 3MF.",
+    "stepFailed": "Wir konnten diese STEP-Datei nicht lesen. Exportieren Sie sie als STL oder 3MF.",
+    "timeout": "Das Lesen dieser Datei dauert länger als 20 Sekunden. Exportieren Sie sie als leichteres STL oder 3MF.",
+    "empty": "Diese Datei enthält kein druckbares Volumen (leeres oder offenes Netz). Exportieren Sie sie als geschlossenes STL oder 3MF.",
+    "tooSmall": "Dieses Modell misst weniger als 2 mm: Die Einheit ist wahrscheinlich falsch (Zoll? Meter?). Exportieren Sie es erneut in Millimetern."
   },
   "studioCard": {
     "kicker": "Studio-Konfiguration angehängt",
@@ -68,7 +78,8 @@
     "415": "Format nicht unterstützt. Senden Sie eine STL-, 3MF-, OBJ- oder STEP-Datei.",
     "429": "Zu viele Uploads von dieser Verbindung (10 pro Stunde). Versuchen Sie es später erneut oder schreiben Sie an {email}.",
     "network": "Der Upload ist fehlgeschlagen. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
-    "unknown": "Die Datei konnte nicht vorbereitet werden. Versuchen Sie es erneut oder schreiben Sie an {email}."
+    "unknown": "Die Datei konnte nicht vorbereitet werden. Versuchen Sie es erneut oder schreiben Sie an {email}.",
+    "color": "Eine gewählte Farbe ist für Ihr Teil nicht mehr ausreichend am Lager. Wählen Sie eine andere."
   },
   "retry": "Erneut versuchen",
   "success": {
@@ -76,5 +87,18 @@
     "form": "Das Atelier prüft Ihre Anfrage und antwortet Ihnen innert 48 Stunden per E-Mail.",
     "studio": "Das Atelier prüft Ihr Teil und antwortet Ihnen innert 48 Stunden mit einem verbindlichen Preis.",
     "account": "Meine Anfrage verfolgen"
+  },
+  "fields": {
+    "quantity": "Menge"
+  },
+  "colorsPicker": {
+    "legend": "Farben am Lager (optional)",
+    "hint": "Bis zu {max} Farben, aus jenen, deren Lagerbestand für Ihr Teil reicht.",
+    "pending": "Fügen Sie zuerst Ihre Datei bei: Wir zeigen dann die Farben, die für Ihr Teil ausreichend am Lager sind.",
+    "none": "Keine Farbe am Lager reicht für dieses Teil. Beschreiben Sie die gewünschte Farbe in Ihrem Projekt: Das Atelier antwortet Ihnen.",
+    "loading": "Lagerbestand wird gelesen …",
+    "unavailable": "Der Lagerbestand konnte nicht gelesen werden. Beschreiben Sie die gewünschte Farbe in Ihrem Projekt.",
+    "approximate": "ungefährer Farbton",
+    "limit": "Höchstens {max} Farben."
   }
 }

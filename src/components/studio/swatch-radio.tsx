@@ -23,6 +23,8 @@ export function SwatchRadio({
   filaments = FILAMENT_IDS,
   className,
   hideLegend = false,
+  unavailable,
+  soldOutLabel,
 }: {
   legend: string;
   name: string;
@@ -34,6 +36,10 @@ export function SwatchRadio({
   filaments?: readonly FilamentId[];
   className?: string;
   hideLegend?: boolean;
+  /** Couleurs dont le stock ne suffit pas pour la pièce : grisées, non choisissables (sauf si déjà choisie). */
+  unavailable?: ReadonlySet<FilamentId>;
+  /** « épuisée » : annoncé avec le nom de la couleur. */
+  soldOutLabel?: string;
 }) {
   return (
     <fieldset className={cx("m-0 min-w-0 border-0 p-0", className)}>
@@ -47,12 +53,19 @@ export function SwatchRadio({
       </legend>
       <div className="-ml-1.5 flex flex-wrap">
         {filaments.map((id) => {
-          const label = nameOf(id);
+          const out = Boolean(unavailable?.has(id));
+          const label =
+            out && soldOutLabel
+              ? `${nameOf(id)} (${soldOutLabel})`
+              : nameOf(id);
           return (
             <label
               key={id}
               title={label}
-              className="relative inline-flex size-11 cursor-pointer items-center justify-center"
+              className={cx(
+                "relative inline-flex size-11 items-center justify-center",
+                out && id !== value ? "cursor-not-allowed" : "cursor-pointer",
+              )}
             >
               <input
                 type="radio"
@@ -61,6 +74,7 @@ export function SwatchRadio({
                 form={form}
                 value={id}
                 checked={id === value}
+                disabled={out && id !== value}
                 onChange={() => onChange(id)}
               />
               <span
@@ -68,6 +82,13 @@ export function SwatchRadio({
                 className="size-7 rounded-full border border-swatch-ring outline-offset-2 transition-[outline-color] duration-150 ease-strate peer-checked:outline-2 peer-checked:outline-ink peer-focus-visible:outline-2 peer-focus-visible:outline-ink peer-checked:peer-focus-visible:outline-4"
                 style={{ backgroundColor: filamentHex(id) }}
               />
+              {out ? (
+                // Une barre en travers : la teinte reste EXACTE (ni voile ni transparence).
+                <span
+                  aria-hidden="true"
+                  className="pointer-events-none absolute left-1/2 top-1/2 h-0.5 w-9 -translate-x-1/2 -translate-y-1/2 -rotate-45 rounded-full bg-ink ring-1 ring-paper"
+                />
+              ) : null}
               <span className="sr-only">{label}</span>
             </label>
           );
@@ -75,6 +96,7 @@ export function SwatchRadio({
       </div>
       <p aria-hidden="true" className="mt-0.5 text-sm text-ink">
         {nameOf(value)}
+        {unavailable?.has(value) && soldOutLabel ? ` (${soldOutLabel})` : ""}
       </p>
     </fieldset>
   );

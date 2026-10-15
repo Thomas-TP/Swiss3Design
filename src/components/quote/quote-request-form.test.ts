@@ -107,3 +107,46 @@ describe("QuoteRequestForm : enregistrements de visite", () => {
     expect(list).toContain("ph-mask");
   });
 });
+
+describe("QuoteRequestForm : /custom, un fichier 3D d'abord", () => {
+  const page = render({ source: "form", variant: "page" });
+
+  it("le fichier est la première section et n'est plus facultatif", () => {
+    const file = page.indexOf("sheet.file");
+    const project = page.indexOf("sheet.project");
+    expect(file).toBeGreaterThan(-1);
+    expect(file).toBeLessThan(project);
+    // « (facultatif) » n'accompagne plus le titre du fichier.
+    const legend =
+      /<legend[^>]*>(?:(?!<\/legend>)[\s\S])*sheet\.file(?:(?!<\/legend>)[\s\S])*<\/legend>/.exec(
+        page,
+      )?.[0] ?? "";
+    expect(legend).not.toContain("optional");
+  });
+
+  it("quantité de 1 à 100, source et couleurs du stock (JSON) partent avec la demande", () => {
+    expect(page).toMatch(/<input[^>]*name="quantity"/);
+    expect(page).toContain('max="100"');
+    const hidden = hiddenInputs(page);
+    expect(hidden.get("source")).toContain('value="form"');
+    expect(hidden.get("colorRefs")).toContain('value="[]"');
+    expect(page).not.toContain('name="estGrams"');
+  });
+
+  it("le champ libre « couleurs » est remplacé par les pastilles du stock", () => {
+    expect(page).not.toContain('name="colors"');
+    expect(page).toContain("colorsPicker.legend");
+  });
+
+  it("le tiroir du Studio envoie sa source et garde ses champs, sans fichier à choisir ni quantité propre", () => {
+    const drawer = render({
+      source: "studio",
+      object: "lavaux",
+      variant: "drawer",
+      prefill: { description: "Vase. S3D-STUDIO v1 lavaux" },
+    });
+    expect(hiddenInputs(drawer).get("source")).toContain('value="studio"');
+    expect(drawer).not.toContain('name="quantity"');
+    expect(drawer).not.toContain('type="file"');
+  });
+});

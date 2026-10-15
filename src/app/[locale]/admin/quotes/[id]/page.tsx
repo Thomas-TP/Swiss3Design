@@ -9,6 +9,8 @@ import { requireAdmin } from "@/lib/session";
 import { formatChf, renderTime } from "@/lib/format";
 import { updateQuote } from "../actions";
 import { StatusHistory } from "../../status-history";
+import { QuoteFilamentPanel } from "../../filaments/consumption-panel";
+import { loadQuotePanel } from "@/lib/filament/panel-data";
 import {
   QUOTE_STATUSES,
   QUOTE_STATUS_FR,
@@ -50,6 +52,8 @@ export default async function AdminQuoteDetailPage({
       )
       .orderBy(desc(statusEvents.createdAt)),
   ]);
+
+  const filamentPanel = await loadQuotePanel(db, id);
 
   const specs = [
     ["Matière", quote.material],
@@ -176,6 +180,10 @@ export default async function AdminQuoteDetailPage({
       )}
 
       <StatusHistory events={history} statusLabels={QUOTE_STATUS_FR} />
+
+      {filamentPanel ? (
+        <QuoteFilamentPanel quoteId={quote.id} panel={filamentPanel} />
+      ) : null}
 
       <form
         action={updateQuote}

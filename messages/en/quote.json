@@ -9,7 +9,7 @@
     "studio": {
       "kicker": "Studio",
       "title": "I don't have a file",
-      "body": "Customise a vase, a business card, a mountain or a name tag in the Studio, then send it to the workshop. An idea without a file? Describe it in the form."
+      "body": "Customise a vase, a business card, a mountain or a name tag in the Studio, then send it to the workshop."
     }
   },
   "sheet": {
@@ -29,7 +29,8 @@
   },
   "hints": {
     "description": "{min} characters minimum.",
-    "email": "The workshop replies to this address."
+    "email": "The workshop replies to this address.",
+    "quantity": "From 1 to {max} pieces."
   },
   "file": {
     "drop": "Drop your file here",
@@ -38,7 +39,16 @@
     "uploading": "Uploading file · {percent}",
     "attached": "Attached to the request",
     "remove": "Remove file {name}",
-    "noscript": "To attach a file, turn on JavaScript or write to {email}."
+    "noscript": "To attach a file, turn on JavaScript or write to {email}.",
+    "required": "Attach a readable 3D file (STL, 3MF, OBJ or STEP): it is required for the workshop to reply.",
+    "estimating": "Reading the file…",
+    "estimate": "Estimated weight ≈ {grams} per piece",
+    "estimateApprox": "open or overlapping mesh, approximate estimate",
+    "estimateFailed": "We could not read this file. Export it as STL or 3MF.",
+    "stepFailed": "We could not read this STEP file. Export it as STL or 3MF.",
+    "timeout": "Reading this file takes more than 20 seconds. Export it as a lighter STL or 3MF.",
+    "empty": "This file has no printable volume (empty or open mesh). Export it as a closed STL or 3MF.",
+    "tooSmall": "This model is smaller than 2 mm: the unit is probably wrong (inches? metres?). Export it again in millimetres."
   },
   "studioCard": {
     "kicker": "Studio configuration attached",
@@ -68,7 +78,8 @@
     "415": "Unsupported format. Send an STL, 3MF, OBJ or STEP file.",
     "429": "Too many uploads from this connection (10 per hour). Try again later or write to {email}.",
     "network": "The upload failed. Check your connection and try again.",
-    "unknown": "The file could not be prepared. Try again, or write to {email}."
+    "unknown": "The file could not be prepared. Try again, or write to {email}.",
+    "color": "A colour you chose no longer has enough stock for your piece. Choose another one."
   },
   "retry": "Try again",
   "success": {
@@ -76,5 +87,18 @@
     "form": "The workshop reviews your request and replies by email within 48 hours.",
     "studio": "The workshop checks your part and replies within 48 hours with a firm price.",
     "account": "Track my request"
+  },
+  "fields": {
+    "quantity": "Quantity"
+  },
+  "colorsPicker": {
+    "legend": "Colours in stock (optional)",
+    "hint": "Up to {max} colours, among those with enough stock for your piece.",
+    "pending": "Attach your file first: we then show the colours with enough stock for your piece.",
+    "none": "No colour in stock is enough for this piece. Describe the colour you want in your project: the workshop will reply.",
+    "loading": "Reading the stock…",
+    "unavailable": "The stock could not be read. Describe the colour you want in your project.",
+    "approximate": "approximate shade",
+    "limit": "{max} colours at most."
   }
 }

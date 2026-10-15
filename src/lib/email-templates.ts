@@ -914,6 +914,9 @@ export function adminNewQuoteEmail(
     dimensions: string | null;
     fileName: string | null;
     locale: string;
+    /** Formulaire de /custom : quantité et poids estimé d'UNE pièce (navigateur, indicatif). */
+    quantity?: number | null;
+    estGrams?: number | null;
   },
   adminEmails: string[],
 ): EmailMessage {
@@ -922,6 +925,11 @@ export function adminNewQuoteEmail(
     ["Couleurs", quote.colors],
     ["Dimensions", quote.dimensions],
     ["Fichier 3D", quote.fileName],
+    [
+      "Quantité",
+      quote.quantity && quote.quantity > 1 ? String(quote.quantity) : null,
+    ],
+    ["Poids estimé", quote.estGrams ? `≈ ${quote.estGrams} g par pièce` : null],
   ].filter((entry): entry is [string, string] => Boolean(entry[1]));
 
   const body = `

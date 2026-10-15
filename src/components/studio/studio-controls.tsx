@@ -77,6 +77,7 @@ import { RadioGroup } from "./pattern-radio";
 import { PrintableBadge } from "./printable-badge";
 import { ProfileIcon } from "./profile-icon";
 import { SwatchRadio } from "./swatch-radio";
+import { useStockView } from "./use-filament-stock";
 import { mm, num, type Translate } from "./summary";
 
 // Les contrôles du Studio, une section par regroupement du brief « Strates »
@@ -486,6 +487,7 @@ export function BandsSection({
   config: LavauxConfig | MontagneConfig;
 }) {
   const { t, core, locale, change } = ctl;
+  const stock = useStockView();
   const montagne = config.object === "montagne";
   const bands = config.bands;
   const apply = (next: typeof bands, control: string, commit = true) =>
@@ -552,6 +554,8 @@ export function BandsSection({
         addLabel={t("bands.add")}
         removeText={t("bands.remove")}
         removeLabelOf={(index) => t("bands.removeBand", { index })}
+        unavailableFor={stock.forBand}
+        soldOutLabel={t("colors.soldOut")}
       />
       <p className="text-sm text-soft">{t("bands.hint")}</p>
       {montagne ? (
@@ -642,6 +646,8 @@ export function PlateInkSection({
   onInk: (id: FilamentId) => void;
 }) {
   const nameOf = filamentName(ctl);
+  const stock = useStockView();
+  const soldOutLabel = ctl.t("colors.soldOut");
   return (
     <div className="flex flex-col gap-6">
       <SwatchRadio
@@ -650,6 +656,8 @@ export function PlateInkSection({
         value={plate}
         onChange={onPlate}
         nameOf={nameOf}
+        unavailable={stock.forRole("plate")}
+        soldOutLabel={soldOutLabel}
       />
       <SwatchRadio
         legend={inkLegend}
@@ -657,6 +665,8 @@ export function PlateInkSection({
         value={ink}
         onChange={onInk}
         nameOf={nameOf}
+        unavailable={stock.forRole("ink")}
+        soldOutLabel={soldOutLabel}
       />
     </div>
   );

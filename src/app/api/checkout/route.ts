@@ -25,6 +25,8 @@ import {
   type StudioLineInput,
 } from "@/lib/studio/purchase";
 import { resolveStudioLines } from "@/lib/studio/order-lines";
+import { scaleGrams, sumGrams } from "@/lib/studio/filament-need";
+import { checkStudioStock, lockStockChecks } from "@/lib/filament/stock-db";
 import { STUDIO_MAX_LINES } from "@/lib/studio/price";
 import { getShippingSettings } from "@/lib/shipping-settings";
 import { getAuth } from "@/lib/auth";
@@ -68,6 +70,17 @@ const bodySchema = z.object({
   saveAddress: z.boolean().optional(),
   locale: z.enum(["fr", "de", "it", "en"]).catch("fr"),
 });
+
+/** Couleur(s) du Studio épuisée(s) : le client revoit sa configuration. */
+class OutOfFilamentStock extends Error {
+  constructor(readonly colors: string[]) {
+    super("out_of_stock");
+  }
+}
+
+function filamentOutOfStock(colors: string[]) {
+  return Response.json({ error: "out_of_stock", colors }, { status: 409 });
+}
 
 export async function POST(request: Request) {
   // Anti-abus : plafonne la création de PaymentIntents/commandes par IP
@@ -162,6 +175,21 @@ export async function POST(request: Request) {
       return Response.json(studioLines.body, { status: studioLines.status });
   }
   const studioOrderLines = studioLines.ok ? studioLines.lines : [];
+
+  // Stock de filament : une couleur épuisée refuse le paiement (409 out_of_stock).
+  // Pré-contrôle frais ici, avant la moindre écriture ; le contrôle qui fait foi est
+  // refait dans la transaction, sous verrou, juste avant d'insérer la commande.
+  // Tables du stock absentes (migration pas encore appliquée) : couleurs non suivies.
+  const filamentNeeds = sumGrams(
+    studioOrderLines.map((l) => scaleGrams(l.filamentGrams, l.quantity)),
+  );
+  let filamentTracked = false;
+  if (Object.keys(filamentNeeds).length > 0) {
+    const pre = await checkStudioStock(db, filamentNeeds);
+    if (pre.status === "short")
+      return filamentOutOfStock(pre.short.map((s) => s.studioId));
+    filamentTracked = pre.status === "ok";
+  }
 
   const fallbackTranslation = alias(
     productTranslations,
@@ -354,6 +382,12 @@ export async function POST(request: Request) {
   let order;
   try {
     order = await db.transaction(async (tx) => {
+      if (filamentTracked) {
+        await lockStockChecks(tx);
+        const locked = await checkStudioStock(tx, filamentNeeds);
+        if (locked.status === "short")
+          throw new OutOfFilamentStock(locked.short.map((s) => s.studioId));
+      }
       const [order] = await tx
         .insert(orders)
         .values({
@@ -442,6 +476,8 @@ export async function POST(request: Request) {
       .where(eq(orders.checkoutAttemptKey, attemptKey));
     if (retry && retry.checkoutFingerprint === fingerprint)
       return resumeOrderCheckout(db, retry);
+    if (error instanceof OutOfFilamentStock)
+      return filamentOutOfStock(error.colors);
     const message = error instanceof Error ? error.message : "";
     return Response.json(
       {

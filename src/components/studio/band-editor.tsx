@@ -189,6 +189,8 @@ export function BandList({
   addLabel,
   removeText,
   removeLabelOf,
+  unavailableFor,
+  soldOutLabel,
   className,
 }: {
   bands: readonly Band[];
@@ -207,6 +209,9 @@ export function BandList({
   /** Texte visible du bouton (« Retirer »), complété pour les lecteurs d'écran. */
   removeText: string;
   removeLabelOf: (index: number) => string;
+  /** Pastilles dont le stock ne suffit pas pour la bande `index` (0 = la plus basse). */
+  unavailableFor?: (index: number) => ReadonlySet<FilamentId>;
+  soldOutLabel?: string;
   className?: string;
 }) {
   // Du haut vers le bas, comme la barre : la dernière bande est la plus haute.
@@ -242,6 +247,8 @@ export function BandList({
               value={bands[index].filament}
               onChange={(id) => onFilament(index, id)}
               nameOf={nameOf}
+              unavailable={unavailableFor?.(index)}
+              soldOutLabel={soldOutLabel}
             />
           </li>
         ))}

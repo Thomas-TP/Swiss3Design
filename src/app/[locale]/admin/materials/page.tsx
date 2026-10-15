@@ -28,12 +28,13 @@ export default async function AdminMaterialsPage() {
   return (
     <div>
       <h2 className="mb-4 text-xl font-bold tracking-tight">
-        Filaments &amp; couleurs
+        Palette boutique
       </h2>
       <p className="mb-5 max-w-2xl text-sm text-soft">
-        Vos filaments et, pour chacun, sa palette de couleurs. Les couleurs
-        définies ici sont proposées à la création d&apos;un produit, puis
-        affichées en pastilles sélectionnables dans la boutique.
+        Les filaments de la boutique et, pour chacun, sa palette de couleurs. Le
+        stock des bobines est dans « Stock de filament ». Les couleurs définies
+        ici sont proposées à la création d&apos;un produit, puis affichées en
+        pastilles sélectionnables dans la boutique.
       </p>
       <MaterialsManager materials={items} />
     </div>

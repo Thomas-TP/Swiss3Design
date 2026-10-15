@@ -9,7 +9,7 @@
     "studio": {
       "kicker": "Studio",
       "title": "Je n'ai pas de fichier",
-      "body": "Personnalisez un vase, une carte de visite, une montagne ou un porte-nom dans le Studio, puis envoyez-le à l'atelier. Une idée sans fichier ? Décrivez-la dans le formulaire."
+      "body": "Personnalisez un vase, une carte de visite, une montagne ou un porte-nom dans le Studio, puis envoyez-le à l'atelier."
     }
   },
   "sheet": {
@@ -29,7 +29,8 @@
   },
   "hints": {
     "description": "{min} caractères au minimum.",
-    "email": "L'atelier vous répond à cette adresse."
+    "email": "L'atelier vous répond à cette adresse.",
+    "quantity": "De 1 à {max} pièces."
   },
   "file": {
     "drop": "Déposez votre fichier ici",
@@ -38,7 +39,16 @@
     "uploading": "Envoi du fichier · {percent}",
     "attached": "Joint à la demande",
     "remove": "Retirer le fichier {name}",
-    "noscript": "Pour joindre un fichier, activez JavaScript ou écrivez à {email}."
+    "noscript": "Pour joindre un fichier, activez JavaScript ou écrivez à {email}.",
+    "required": "Joignez un fichier 3D lisible (STL, 3MF, OBJ ou STEP) : il est obligatoire pour que l'atelier vous réponde.",
+    "estimating": "Lecture du fichier…",
+    "estimate": "Poids estimé ≈ {grams} par pièce",
+    "estimateApprox": "maillage ouvert ou recouvrant, estimation approximative",
+    "estimateFailed": "Nous n'avons pas pu lire ce fichier. Exportez-le en STL ou 3MF.",
+    "stepFailed": "Nous n'avons pas pu lire ce fichier STEP. Exportez-le en STL ou 3MF.",
+    "timeout": "La lecture de ce fichier dépasse 20 secondes. Exportez-le en STL ou 3MF, plus léger.",
+    "empty": "Ce fichier ne contient aucun volume imprimable (maillage vide ou ouvert). Exportez-le en STL ou 3MF fermé.",
+    "tooSmall": "Ce modèle mesure moins de 2 mm : l'unité est probablement fausse (pouces ? mètres ?). Réexportez-le en millimètres."
   },
   "studioCard": {
     "kicker": "Configuration Studio jointe",
@@ -68,7 +78,8 @@
     "415": "Format non pris en charge. Envoyez un fichier STL, 3MF, OBJ ou STEP.",
     "429": "Trop d'envois depuis cette connexion (10 par heure). Réessayez plus tard ou écrivez à {email}.",
     "network": "L'envoi a échoué. Vérifiez votre connexion et réessayez.",
-    "unknown": "Le fichier n'a pas pu être préparé. Réessayez, ou écrivez à {email}."
+    "unknown": "Le fichier n'a pas pu être préparé. Réessayez, ou écrivez à {email}.",
+    "color": "Une couleur choisie n'est plus assez en stock pour votre pièce. Choisissez-en une autre."
   },
   "retry": "Réessayer",
   "success": {
@@ -76,5 +87,18 @@
     "form": "L'atelier relit votre demande et vous répond par e-mail sous 48 h.",
     "studio": "L'atelier vérifie votre pièce et vous répond sous 48 h avec un prix ferme.",
     "account": "Suivre ma demande"
+  },
+  "fields": {
+    "quantity": "Quantité"
+  },
+  "colorsPicker": {
+    "legend": "Couleurs en stock (facultatif)",
+    "hint": "Jusqu'à {max} couleurs, parmi celles dont le stock suffit pour votre pièce.",
+    "pending": "Joignez d'abord votre fichier : nous affichons alors les couleurs en stock assez fournies pour votre pièce.",
+    "none": "Aucune couleur du stock ne suffit pour cette pièce. Décrivez la couleur souhaitée dans votre projet : l'atelier vous répond.",
+    "loading": "Lecture du stock…",
+    "unavailable": "Le stock n'a pas pu être lu. Décrivez la couleur souhaitée dans votre projet.",
+    "approximate": "teinte approximative",
+    "limit": "{max} couleurs au maximum."
   }
 }

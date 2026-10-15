@@ -9,7 +9,7 @@
     "studio": {
       "kicker": "Studio",
       "title": "Non ho un file",
-      "body": "Personalizzi nello Studio un vaso, un biglietto da visita, una montagna o un portanome, poi lo invii all'atelier. Un'idea senza file? La descriva nel modulo."
+      "body": "Personalizzi nello Studio un vaso, un biglietto da visita, una montagna o un portanome, poi lo invii all'atelier."
     }
   },
   "sheet": {
@@ -29,7 +29,8 @@
   },
   "hints": {
     "description": "Almeno {min} caratteri.",
-    "email": "L'atelier Le risponde a questo indirizzo."
+    "email": "L'atelier Le risponde a questo indirizzo.",
+    "quantity": "Da 1 a {max} pezzi."
   },
   "file": {
     "drop": "Trascini qui il file",
@@ -38,7 +39,16 @@
     "uploading": "Caricamento del file · {percent}",
     "attached": "Allegato alla richiesta",
     "remove": "Rimuovi il file {name}",
-    "noscript": "Per allegare un file, attivi JavaScript o scriva a {email}."
+    "noscript": "Per allegare un file, attivi JavaScript o scriva a {email}.",
+    "required": "Alleghi un file 3D leggibile (STL, 3MF, OBJ o STEP): è obbligatorio perché l'atelier possa risponderLe.",
+    "estimating": "Lettura del file…",
+    "estimate": "Peso stimato ≈ {grams} per pezzo",
+    "estimateApprox": "mesh aperta o sovrapposta, stima approssimativa",
+    "estimateFailed": "Non siamo riusciti a leggere questo file. Lo esporti in STL o 3MF.",
+    "stepFailed": "Non siamo riusciti a leggere questo file STEP. Lo esporti in STL o 3MF.",
+    "timeout": "La lettura di questo file supera i 20 secondi. Lo esporti in STL o 3MF, più leggero.",
+    "empty": "Questo file non contiene alcun volume stampabile (mesh vuota o aperta). Lo esporti in STL o 3MF chiuso.",
+    "tooSmall": "Questo modello misura meno di 2 mm: l'unità è probabilmente sbagliata (pollici? metri?). Lo riesporti in millimetri."
   },
   "studioCard": {
     "kicker": "Configurazione Studio allegata",
@@ -68,7 +78,8 @@
     "415": "Formato non supportato. Invii un file STL, 3MF, OBJ o STEP.",
     "429": "Troppi invii da questa connessione (10 all'ora). Riprovi più tardi o scriva a {email}.",
     "network": "Invio non riuscito. Verifichi la connessione e riprovi.",
-    "unknown": "Non è stato possibile preparare il file. Riprovi o scriva a {email}."
+    "unknown": "Non è stato possibile preparare il file. Riprovi o scriva a {email}.",
+    "color": "Un colore scelto non è più in magazzino in quantità sufficiente per il Suo pezzo. Ne scelga un altro."
   },
   "retry": "Riprova",
   "success": {
@@ -76,5 +87,18 @@
     "form": "L'atelier esamina la Sua richiesta e Le risponde per e-mail entro 48 ore.",
     "studio": "L'atelier verifica il Suo pezzo e Le risponde entro 48 ore con un prezzo fermo.",
     "account": "Segui la mia richiesta"
+  },
+  "fields": {
+    "quantity": "Quantità"
+  },
+  "colorsPicker": {
+    "legend": "Colori in magazzino (facoltativo)",
+    "hint": "Fino a {max} colori, tra quelli la cui scorta basta per il Suo pezzo.",
+    "pending": "Alleghi prima il file: mostreremo allora i colori in magazzino con scorta sufficiente per il Suo pezzo.",
+    "none": "Nessun colore in magazzino basta per questo pezzo. Descriva il colore desiderato nel progetto: l'atelier Le risponde.",
+    "loading": "Lettura del magazzino…",
+    "unavailable": "Non è stato possibile leggere il magazzino. Descriva il colore desiderato nel progetto.",
+    "approximate": "tinta approssimativa",
+    "limit": "Al massimo {max} colori."
   }
 }

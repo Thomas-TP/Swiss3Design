@@ -247,7 +247,8 @@
   "colors": {
     "plate": "Farbe der Platte",
     "ink": "Farbe des Textes",
-    "base": "Grundfarbe"
+    "base": "Grundfarbe",
+    "soldOut": "ausverkauft"
   },
   "bands": {
     "palettes": "Paletten",
@@ -361,6 +362,7 @@
     "cancelEdit": "Änderung abbrechen",
     "quoteLead": "Ein besonderer Wunsch?",
     "quoteLink": "Offerte anfragen",
-    "quoteHint": "Mehr als {max} Stück, anderes Material oder Sonderwunsch: Die Werkstatt antwortet mit einer Offerte."
+    "quoteHint": "Mehr als {max} Stück, anderes Material oder Sonderwunsch: Die Werkstatt antwortet mit einer Offerte.",
+    "stockShort": "{count, plural, one {Farbe ausverkauft} other {Farben ausverkauft}}: {colors}. Wählen Sie eine andere Farbe oder fordern Sie ein Angebot an."
   }
 }

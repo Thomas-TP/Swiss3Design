@@ -133,7 +133,8 @@
     "errorVerifyAgain": "Verify your email address again before paying.",
     "errorProductChanged": "An item or option has changed. Select it again from the product page.",
     "errorStudioPrice": "The price of a Studio object was updated. Check the total, then confirm again.",
-    "errorStudioInvalid": "A Studio object in your cart cannot be printed as it is. Reopen it in the Studio from your cart."
+    "errorStudioInvalid": "A Studio object in your cart cannot be printed as it is. Reopen it in the Studio from your cart.",
+    "errorFilament": "A colour of a Studio object in your cart is no longer in stock. Reopen it in the Studio to pick another, or request a quote."
   },
   "orderSuccess": {
     "processingTitle": "Payment processing",

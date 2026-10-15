@@ -1,3 +1,7 @@
 * text=auto eol=lf
 
 *.bat text eol=crlf
+
+# occt-import-js : octets identiques au paquet npm (le test occt-assets.test.ts les compare)
+public/vendor/occt/** -text
+*.wasm binary

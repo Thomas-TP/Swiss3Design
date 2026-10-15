@@ -426,6 +426,269 @@ export const inventoryLog = pgTable("inventory_log", {
   createdAt: createdAt(),
 });
 
+// ── Stock de filament (« Filaments », 15.10.2026) ────────────────────────────
+// Bobines PHYSIQUES de l'atelier : références (une couleur d'une gamme d'une
+// marque), supports plastique vides, achats, bobines et journal des mouvements.
+// Le « réservé » n'est pas stocké : il se déduit des commandes du Studio et des
+// devis (lib/filament/reservations.ts). Les grammes sont des entiers.
+
+export const SPOOL_TYPES = [
+  "bambu_reusable", // bobine plastique réutilisable Bambu (tare 212 g)
+  "bambu_refill", // recharge Bambu montée sur un support (support + mandrin)
+  "polymaker_cardboard", // carton Polymaker 1 kg (140 g)
+  "r3d_cardboard", // carton R3D (≈ 150 g, à vérifier)
+  "other",
+] as const;
+export const SPOOL_STATUSES = [
+  "ordered",
+  "in_stock",
+  "empty",
+  "retired",
+] as const;
+export const SPOOL_LOCATIONS = ["ams_p1s", "cfs_k2", "shelf"] as const;
+export const MOVEMENT_KINDS = [
+  "receipt",
+  "consumption",
+  "weigh",
+  "adjust",
+  "empty",
+  "retire",
+] as const;
+
+// Une couleur d'une gamme : l'unité que l'on achète et que l'on propose. Les
+// drapeaux d'usage sont portés ici : Studio (`studio_id`), boutique
+// (`shop_color_id`), sur mesure (`custom_ok`).
+export const filamentRefs = pgTable(
+  "filament_refs",
+  {
+    id: id(),
+    brand: text("brand").notNull(),
+    rangeName: text("range_name").notNull(),
+    officialName: text("official_name").notNull(),
+    productCode: text("product_code"),
+    // Hex officiel ; un filament multicolore (tricolore co-extrudé) en porte
+    // jusqu'à trois (hex2, hex3), la pastille montre alors un dégradé.
+    hex: text("hex").notNull(),
+    hex2: text("hex2"),
+    hex3: text("hex3"),
+    // Faux : teintes approximatives, à confirmer sur la bobine.
+    hexConfirmed: boolean("hex_confirmed").notNull().default(true),
+    studioId: text("studio_id").unique(),
+    shopColorId: text("shop_color_id").references(() => filamentColors.id, {
+      onDelete: "set null",
+    }),
+    customOk: boolean("custom_ok").notNull().default(false),
+    spoolNetGrams: integer("spool_net_grams").notNull().default(1000),
+    reorderBelowGrams: integer("reorder_below_grams").notNull().default(300),
+    minSpareSpools: integer("min_spare_spools").notNull().default(0),
+    // Prix catalogue Bambu Europe, en centimes d'EUR (exception documentée à la
+    // règle « tout en CHF » : le seuil de port gratuit est en euros). Les coûts
+    // réels, eux, sont en centimes CHF (`filament_spools.cost_cents`).
+    priceSpoolEurCents: integer("price_spool_eur_cents"),
+    priceRefillEurCents: integer("price_refill_eur_cents"),
+    urlSpool: text("url_spool"),
+    urlRefill: text("url_refill"),
+    active: boolean("active").notNull().default(true),
+    note: text("note"),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    uniqueIndex("filament_refs_identity_unique").on(
+      t.brand,
+      t.rangeName,
+      t.officialName,
+    ),
+    check(
+      "filament_refs_hex_valid",
+      sql`${t.hex} ~ '^#[0-9A-F]{6}$' AND (${t.hex2} IS NULL OR ${t.hex2} ~ '^#[0-9A-F]{6}$') AND (${t.hex3} IS NULL OR ${t.hex3} ~ '^#[0-9A-F]{6}$') AND (${t.hex3} IS NULL OR ${t.hex2} IS NOT NULL)`,
+    ),
+    check(
+      "filament_refs_grams_valid",
+      sql`${t.spoolNetGrams} > 0 AND ${t.reorderBelowGrams} >= 0 AND ${t.minSpareSpools} >= 0`,
+    ),
+  ],
+);
+
+// Support plastique réutilisable vide (ou monté) : sert à compter les recharges
+// que l'on peut monter. Libre tant qu'aucune bobine active ne le référence.
+export const filamentHolders = pgTable(
+  "filament_holders",
+  {
+    id: id(),
+    tareGrams: integer("tare_grams").notNull().default(212),
+    note: text("note"),
+    retiredAt: timestamp("retired_at", { withTimezone: true }),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    check(
+      "filament_holders_tare_valid",
+      sql`${t.tareGrams} BETWEEN 50 AND 400`,
+    ),
+  ],
+);
+
+export const filamentPurchases = pgTable("filament_purchases", {
+  id: id(),
+  supplier: text("supplier").notNull().default("Bambu Lab Europe"),
+  reference: text("reference"),
+  status: text("status", { enum: ["ordered", "received", "cancelled"] })
+    .notNull()
+    .default("ordered"),
+  orderedAt: timestamp("ordered_at", { withTimezone: true }),
+  receivedAt: timestamp("received_at", { withTimezone: true }),
+  // CHF réellement payé (null tant qu'inconnu) ; l'EUR n'est qu'un mémo.
+  totalCents: integer("total_cents"),
+  totalEurCents: integer("total_eur_cents"),
+  shippingCents: integer("shipping_cents").notNull().default(0),
+  note: text("note"),
+  createdAt: createdAt(),
+});
+
+export const filamentSpools = pgTable(
+  "filament_spools",
+  {
+    id: id(),
+    refId: text("ref_id")
+      .notNull()
+      .references(() => filamentRefs.id, { onDelete: "restrict" }),
+    purchaseId: text("purchase_id").references(() => filamentPurchases.id, {
+      onDelete: "set null",
+    }),
+    holderId: text("holder_id").references(() => filamentHolders.id, {
+      onDelete: "set null",
+    }),
+    spoolType: text("spool_type", { enum: SPOOL_TYPES }).notNull(),
+    tareGrams: integer("tare_grams").notNull(),
+    // Faux : tare estimée, à vérifier en pesant le support vide.
+    tareConfirmed: boolean("tare_confirmed").notNull().default(true),
+    initialGrams: integer("initial_grams").notNull().default(1000),
+    // Dénormalisé : somme des mouvements, mis à jour dans la même transaction.
+    remainingGrams: integer("remaining_grams").notNull().default(0),
+    status: text("status", { enum: SPOOL_STATUSES })
+      .notNull()
+      .default("in_stock"),
+    sealed: boolean("sealed").notNull().default(false),
+    location: text("location", { enum: SPOOL_LOCATIONS }),
+    slot: text("slot"),
+    costCents: integer("cost_cents"),
+    purchasedAt: timestamp("purchased_at", { withTimezone: true }),
+    // Identification incertaine (couleur à confirmer sur la bobine).
+    toConfirm: boolean("to_confirm").notNull().default(false),
+    lastWeighedAt: timestamp("last_weighed_at", { withTimezone: true }),
+    note: text("note"),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("filament_spools_ref_status_idx").on(t.refId, t.status),
+    check(
+      "filament_spools_grams_valid",
+      sql`${t.tareGrams} >= 0 AND ${t.initialGrams} > 0 AND ${t.remainingGrams} >= 0`,
+    ),
+    check(
+      "filament_spools_status_valid",
+      sql`${t.status} IN ('ordered','in_stock','empty','retired')`,
+    ),
+    check(
+      "filament_spools_type_valid",
+      sql`${t.spoolType} IN ('bambu_reusable','bambu_refill','polymaker_cardboard','r3d_cardboard','other')`,
+    ),
+  ],
+);
+
+// Journal APPEND-ONLY : une correction est un nouveau mouvement. Une bobine
+// ne se supprime pas (RESTRICT) : elle se retire.
+export const filamentMovements = pgTable(
+  "filament_movements",
+  {
+    id: id(),
+    spoolId: text("spool_id")
+      .notNull()
+      .references(() => filamentSpools.id, { onDelete: "restrict" }),
+    kind: text("kind", { enum: MOVEMENT_KINDS }).notNull(),
+    deltaGrams: integer("delta_grams").notNull(),
+    gramsAfter: integer("grams_after").notNull(),
+    grossGrams: integer("gross_grams"),
+    tareGrams: integer("tare_grams"),
+    orderId: text("order_id").references(() => orders.id, {
+      onDelete: "set null",
+    }),
+    quoteId: text("quote_id").references(() => quoteRequests.id, {
+      onDelete: "set null",
+    }),
+    idempotencyKey: text("idempotency_key").unique(),
+    note: text("note"),
+    actorId: text("actor_id"),
+    createdAt: createdAt(),
+  },
+  (t) => [
+    index("filament_movements_spool_idx").on(t.spoolId, t.createdAt),
+    index("filament_movements_order_idx").on(t.orderId),
+    index("filament_movements_quote_idx").on(t.quoteId),
+    index("filament_movements_kind_idx").on(t.kind, t.createdAt),
+    check(
+      "filament_movements_kind_valid",
+      sql`${t.kind} IN ('receipt','consumption','weigh','adjust','empty','retire')`,
+    ),
+    check("filament_movements_after_valid", sql`${t.gramsAfter} >= 0`),
+  ],
+);
+
+// Décompte fait : une commande ou un devis dont les grammes ont été retirés des
+// bobines ne réserve plus rien. Table À PART (et non une colonne de `orders` ou
+// `quote_requests`) : les `select()` du paiement et du webhook Stripe listent
+// toutes les colonnes de ces tables, et le paiement ne doit jamais dépendre
+// d'une migration du stock.
+export const filamentConsumptions = pgTable(
+  "filament_consumptions",
+  {
+    id: id(),
+    orderId: text("order_id")
+      .unique()
+      .references(() => orders.id, { onDelete: "cascade" }),
+    quoteId: text("quote_id")
+      .unique()
+      .references(() => quoteRequests.id, { onDelete: "cascade" }),
+    consumedAt: timestamp("consumed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    actorId: text("actor_id"),
+    note: text("note"),
+  },
+  (t) => [
+    check(
+      "filament_consumptions_one_source",
+      sql`(${t.orderId} IS NOT NULL)::int + (${t.quoteId} IS NOT NULL)::int = 1`,
+    ),
+  ],
+);
+
+// Ce que le stock sait d'un devis du formulaire : quantité, couleurs choisies
+// (ids de `filament_refs`), poids estimé d'UNE pièce par le navigateur (donnée
+// indicative) et grammes par couleur saisis par l'admin (réservation).
+export const filamentQuoteDetails = pgTable(
+  "filament_quote_details",
+  {
+    quoteId: text("quote_id")
+      .primaryKey()
+      .references(() => quoteRequests.id, { onDelete: "cascade" }),
+    quantity: integer("quantity").notNull().default(1),
+    colorRefs: jsonb("color_refs").$type<string[]>(),
+    estGrams: integer("est_grams"),
+    plan: jsonb("plan").$type<Record<string, number>>(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow()
+      .$onUpdate(() => new Date()),
+  },
+  (t) => [
+    check(
+      "filament_quote_details_quantity_valid",
+      sql`${t.quantity} BETWEEN 1 AND 100`,
+    ),
+  ],
+);
+
 export const settings = pgTable("settings", {
   key: text("key").primaryKey(),
   value: text("value").notNull(),

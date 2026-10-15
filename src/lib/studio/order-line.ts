@@ -4,6 +4,7 @@
 import type { StudioConfig, StudioObjectId, StudioTexts } from "./types";
 import { STUDIO_OBJECT_IDS } from "./types";
 import type { LineLocale } from "./line-id";
+import type { FilamentGrams } from "./filament-need";
 
 /** Ce que la commande garde d'une ligne du Studio : `order_items.studio` (jsonb). */
 export interface StudioOrderLine {
@@ -30,6 +31,12 @@ export interface StudioOrderLine {
   };
   /** Barème appliqué (traçabilité : les commandes gardent leur prix si le barème change). */
   price: { v: number; unitCents: number; grams: number; changes: number };
+  /**
+   * Grammes de filament d'UNE pièce, par couleur (purge comprise, arrondis au gramme
+   * supérieur) : la base de la réservation de stock. Absent des commandes
+   * antérieures au stock de filament (15.10.2026).
+   */
+  filamentGrams?: FilamentGrams;
   /** Empreinte (`studioHash`) : nom du fichier STL de l'atelier. */
   hash: string;
   /** Relecture humaine des textes : posée par l'admin ; `in_production` l'exige. */
