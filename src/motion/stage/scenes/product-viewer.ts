@@ -95,8 +95,13 @@ const PROGRESS_INTERVAL_MS = 250;
 // posée. Tout est à l'échelle réelle (salle « scaled to real world » : plateau à
 // 0,78 m, dossiers à 1 m, plan de travail à 0,86 m ; le vase fait 21 cm) : on ne
 // grossit jamais la pièce, ce serait mentir sur sa taille. Pour qu'elle domine
-// l'image, la caméra s'en approche au grand angle : la salle s'éloigne derrière.
+// l'image, la caméra s'en approche : la salle s'éloigne derrière. L'angle
+// VERTICAL vaut au plus 50°, et l'angle HORIZONTAL au plus 55° : sur un écran
+// large (vue 2,2 fois plus large que haute), 50° vertical faisaient 91° en
+// largeur, un fish-eye où la salle entière défilait, bords étirés, et la pièce
+// paraissait minuscule au milieu.
 const DECOR_FOV = 50;
+const DECOR_HFOV_MAX = 55;
 /** Première vue : depuis le bout de la table, vers la cuisine (fenêtre à gauche). */
 const DECOR_AZIMUTH_START = rad(70);
 /**
@@ -106,8 +111,8 @@ const DECOR_AZIMUTH_START = rad(70);
 const DECOR_POLAR_MIN = rad(40);
 const DECOR_POLAR_MAX = rad(84);
 const DECOR_POLAR_START = rad(78);
-/** En décor, la pièce occupe 52 % de la hauteur de la vue (la salle autour). */
-const DECOR_FILL = 0.52;
+/** En décor, la pièce occupe 60 % de la hauteur de la vue (la salle autour). */
+const DECOR_FILL = 0.6;
 /** Lumière d'appoint côté fenêtre (le décor a ses baies vers −Z). */
 const DECOR_SUN = new Vector3(0.25, 1.1, -1);
 
@@ -145,6 +150,19 @@ export function clampPolar(polar: number, decor = false): number {
  */
 export function unitScaleFor(height: number): number {
   return height > 5 ? 0.001 : 1;
+}
+
+/**
+ * Angle vertical de la caméra en décor : DECOR_FOV, réduit sur une vue large pour
+ * que l'angle horizontal ne dépasse pas DECOR_HFOV_MAX (pas de fish-eye).
+ */
+export function decorFov(aspect: number): number {
+  const widest =
+    (2 *
+      Math.atan(Math.tan(rad(DECOR_HFOV_MAX) / 2) / Math.max(0.2, aspect)) *
+      180) /
+    Math.PI;
+  return Math.min(DECOR_FOV, widest);
 }
 
 /** Distance de la caméra en décor : la pièce occupe DECOR_FILL de la hauteur. */
@@ -806,11 +824,12 @@ const create = (
       // pièce reste posée et la caméra tourne autour (la salle défile derrière).
       let orbit = 0;
       if (decor) {
+        camera.fov = decorFov(aspect);
         distance = decorDistance({
           height: modelHeight * unitScale,
           radius: modelRadius * unitScale,
           aspect,
-          fovDeg: DECOR_FOV,
+          fovDeg: camera.fov,
         });
         orbit = azimuth;
         camera.near = 0.02;
