@@ -1003,7 +1003,7 @@ describe("Préréglages des objets plats", () => {
     });
     expect(MONTAGNE_DEFAULT.bands.map((b) => b.filament)).toEqual([
       "encre",
-      "vert-lavaux",
+      "vert-foret",
       "gris-molasse",
       "blanc-neve",
     ]);

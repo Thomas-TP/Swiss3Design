@@ -74,7 +74,7 @@
       },
       "colors": {
         "q": "Come vengono stampati i colori?",
-        "a": "Con cambi di filamento ad altezze precise, fino a quattro filamenti Polymaker Panchroma Matte: è ciò che il laboratorio programma nel proprio software di slicing. La tinta mostrata è quella del produttore; sullo schermo resta approssimativa, fa fede la bobina."
+        "a": "Con cambi di filamento ad altezze precise, fino a quattro filamenti Bambu Lab PLA Matte: è ciò che il laboratorio programma nel proprio software di slicing. La tinta mostrata è quella del produttore; sullo schermo resta approssimativa, fa fede la bobina."
       },
       "after": {
         "q": "Cosa succede dopo l'ordine?",
@@ -274,7 +274,7 @@
       "price": "Prezzo"
     },
     "materialValue": "PLA",
-    "indicative": "Filamento Polymaker Panchroma Matte: la tinta sullo schermo è approssimativa.",
+    "indicative": "Filamento Bambu Lab PLA Matte: la tinta sullo schermo è approssimativa.",
     "firm": "prezzo fisso, consegna gratuita"
   },
   "summary": {

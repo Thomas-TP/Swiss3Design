@@ -92,7 +92,13 @@ describe("outil WebMCP studio_configure (§6.13)", () => {
     expect(
       configureFromTool({
         object: "lavaux",
-        palette: ["encre", "ambre", "glacier", "blanc-neve", "rouge-signal"],
+        palette: [
+          "encre",
+          "terre-cuite",
+          "glacier",
+          "blanc-neve",
+          "rouge-signal",
+        ],
       }).ok,
     ).toBe(false);
   });
@@ -100,10 +106,10 @@ describe("outil WebMCP studio_configure (§6.13)", () => {
   it("palette : plaque puis texte pour une carte, base puis texte pour un porte-nom, strates pour un sous-verre", () => {
     const card = configureFromTool({
       object: "cartouche",
-      palette: ["ambre", "encre"],
+      palette: ["terre-cuite", "encre"],
     });
     expect(card.ok && card.config).toMatchObject({
-      plate: "ambre",
+      plate: "terre-cuite",
       ink: "encre",
     });
     const tag = configureFromTool({ object: "borne", palette: ["glacier"] });

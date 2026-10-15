@@ -74,7 +74,7 @@
       },
       "colors": {
         "q": "How are the colors printed?",
-        "a": "By changing filament at set heights, with up to four Polymaker Panchroma Matte filaments: this is what the workshop programs in its slicing software. The shade shown is the manufacturer's; it stays approximate on screen, the spool is what counts."
+        "a": "By changing filament at set heights, with up to four Bambu Lab PLA Matte filaments: this is what the workshop programs in its slicing software. The shade shown is the manufacturer's; it stays approximate on screen, the spool is what counts."
       },
       "after": {
         "q": "What happens after I order?",
@@ -274,7 +274,7 @@
       "price": "Price"
     },
     "materialValue": "PLA",
-    "indicative": "Polymaker Panchroma Matte filament: the on-screen shade is approximate.",
+    "indicative": "Bambu Lab PLA Matte filament: the on-screen shade is approximate.",
     "firm": "firm price, free delivery"
   },
   "summary": {

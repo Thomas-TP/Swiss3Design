@@ -126,13 +126,13 @@ describe("posters des objets plats : structure", () => {
     );
     expect(dark.layers[1].stroke).not.toBe(light.layers[1].stroke);
     const luma = (hex: string) => parseInt(hex.slice(1, 3), 16);
-    // Encre noire : filet plus clair qu'elle en sombre, plus foncé ou égal en clair.
+    // Encre noire (#000000) : en sombre, un filet nettement plus clair ; en clair, un
+    // gris très foncé (le noir pur ne s'assombrit plus : `edgeShade` l'éclaircit à peine).
     expect(luma(dark.layers[1].stroke)).toBeGreaterThan(
       luma(dark.layers[1].fill),
     );
-    expect(luma(light.layers[1].stroke)).toBeLessThanOrEqual(
-      luma(light.layers[1].fill),
-    );
+    expect(luma(light.layers[1].stroke)).toBeLessThanOrEqual(0x40);
+    expect(light.layers[1].stroke).not.toBe(light.layers[1].fill);
   });
 
   it("déterministe : même entrée, même chaîne SVG (SSR et client)", () => {

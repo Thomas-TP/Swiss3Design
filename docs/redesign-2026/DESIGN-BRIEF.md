@@ -296,20 +296,24 @@ les garde et on change leurs valeurs. On ajoute cinq jetons. Contrastes calculé
 marquée `indicative: true` tant que le propriétaire n'a pas fourni l'inventaire réel (§11.2).
 L'UI affiche alors « Teintes indicatives, couleur finale selon les bobines en stock ».
 
-| id             | Nom FR       | Hex (indicatif) | Réalité aujourd'hui |
-| -------------- | ------------ | --------------- | ------------------- |
-| `blanc-neve`   | Blanc névé   | `#F5F5F4`       | vendu (« Blanc »)   |
-| `encre`        | Encre        | `#1C1917`       | vendu (« Noir »)    |
-| `rouge-signal` | Rouge Signal | `#E5231C`       | à confirmer         |
-| `bleu-leman`   | Bleu Léman   | `#2E6A9E`       | à confirmer         |
-| `vert-lavaux`  | Vert Lavaux  | `#5E7F3A`       | à confirmer         |
-| `gris-molasse` | Gris molasse | `#8C8A85`       | à confirmer         |
-| `ambre`        | Ambre        | `#D98E1F`       | à confirmer         |
-| `glacier`      | Glacier      | `#9CC3DA`       | à confirmer         |
+| id             | Nom FR         | Bambu Lab PLA Matte (code) | Hex       |
+| -------------- | -------------- | -------------------------- | --------- |
+| `blanc-neve`   | Blanc névé     | Ivory White (11100)        | `#FFFFFF` |
+| `gris-molasse` | Gris molasse   | Ash Gray (11102)           | `#9B9EA0` |
+| `encre`        | Encre          | Charcoal (11101)           | `#000000` |
+| `vert-foret`   | Vert forêt     | Dark Green (11501)         | `#68724D` |
+| `bleu-leman`   | Bleu Léman     | Marine Blue (11600)        | `#0078BF` |
+| `glacier`      | Glacier        | Ice Blue (11601)           | `#A3D8E1` |
+| `gres`         | Grès           | Latte Brown (11800)        | `#D3B7A7` |
+| `terre-cuite`  | Terre cuite    | Terracotta (11203)         | `#B15533` |
+| `rouge-signal` | Rouge Signal   | Scarlet Red (11200)        | `#DE4343` |
+| `rose-alpes`   | Rose des Alpes | Sakura Pink (11201)        | `#E8AFCF` |
 
-Palettes prêtes (du bas vers le haut) : **Léman** = bleu-leman / vert-lavaux / blanc-neve ;
+(Palette du 15.10.2026, qui remplace les huit teintes Polymaker : voir `filaments.ts`.)
+Palettes prêtes (du bas vers le haut) : **Léman** = bleu-leman / vert-foret / blanc-neve ;
 **Molasse** = encre / gris-molasse / blanc-neve ; **Signal** = encre / blanc-neve / rouge-signal ;
-**Uni** = blanc-neve (0 changement, la moins chère). Les noms de filaments sont traduits dans le
+**Uni** = blanc-neve (0 changement, la moins chère).
+Les noms de filaments sont traduits dans le
 namespace `studioCore` (§4.9).
 
 ### 2.2 Typographie
@@ -3730,7 +3734,7 @@ annexe B, §11.2 n° 3, textes `studio.estimate` et `studio.success`), et réali
 - Prix ferme, livraison comprise : `src/lib/studio/price.ts` (fonction pure, la même
   dans le navigateur et sur le serveur) ; livraison offerte partout en Suisse pour le
   Studio **et** la boutique.
-- Filaments : gamme Polymaker Panchroma Matte, hex officiels affichés sans
+- Filaments : gamme Bambu Lab PLA Matte (depuis le 15.10.2026 ; Polymaker avant), hex officiels affichés sans
   transformation (`src/lib/studio/filaments.ts`).
 - Données : `order_items.studio` (migration `0009`), textes saisis conservés avec la commande.
 - Détail : `docs/architecture.md` (« Studio direct purchase »), `AGENTS.md` (règle d'or 12).

@@ -134,7 +134,7 @@ describe("Lavaux : variété du maillage d'export", () => {
     const nearFloor = {
       ...HERO_CONFIG,
       bands: [
-        { filament: "ambre", toMm: 2 },
+        { filament: "terre-cuite", toMm: 2 },
         { filament: "glacier", toMm: 4.2 },
         { filament: "blanc-neve", toMm: 150 },
       ],

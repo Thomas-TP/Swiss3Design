@@ -45,7 +45,7 @@ export const HERO_CONFIG: LavauxConfig = {
   wall: 1.6,
   bands: [
     { filament: "bleu-leman", toMm: 42 }, // couches 1–210
-    { filament: "vert-lavaux", toMm: 108 }, // couches 211–540
+    { filament: "vert-foret", toMm: 108 }, // couches 211–540
     { filament: "blanc-neve", toMm: 150 }, // couches 541–750
   ],
 };
@@ -57,7 +57,7 @@ export const HERO_PATTERNS = {
 } as const; // jamais « nervures » dans le héros
 
 export const HERO_PALETTES = {
-  leman: ["bleu-leman", "vert-lavaux", "blanc-neve"],
+  leman: ["bleu-leman", "vert-foret", "blanc-neve"],
   molasse: ["encre", "gris-molasse", "blanc-neve"],
   signal: ["encre", "blanc-neve", "rouge-signal"],
   uni: ["blanc-neve"], // 1 bande, 0 changement
@@ -168,7 +168,7 @@ export const MONTAGNE_DEFAULT: MontagneConfig = {
   style: "lisse",
   levels: 24,
   bands: montagneBands(
-    ["encre", "vert-lavaux", "gris-molasse", "blanc-neve"],
+    ["encre", "vert-foret", "gris-molasse", "blanc-neve"],
     5,
     75,
   ),
@@ -288,7 +288,7 @@ export const LAVAUX_PRESETS: readonly LavauxPreset[] = [
       lip: 0,
       pattern: { kind: "lisse" },
       wall: 1.6,
-      bands: bandsForPalette(HERO_PALETTES.signal, 120),
+      bands: bandsForPalette(["terre-cuite", "gres", "blanc-neve"], 120), // Terre
     },
   },
 ];
@@ -319,7 +319,8 @@ export const CARTOUCHE_PRESETS: readonly ObjectPreset<CartoucheConfig>[] = [
       depth: 0.6,
       layout: "centree",
       plate: "gris-molasse",
-      ink: "blanc-neve",
+      // Encre noire : le blanc sur le gris Bambu (#9B9EA0) ne fait que 2,7:1.
+      ink: "encre",
     },
   },
   {
@@ -381,7 +382,7 @@ export const MONTAGNE_PRESETS: readonly ObjectPreset<MontagneConfig>[] = [
       steep: 0.5,
       seed: 3187,
       bands: montagneBands(
-        ["encre", "vert-lavaux", "gris-molasse", "blanc-neve"],
+        ["encre", "vert-foret", "gris-molasse", "blanc-neve"],
         5,
         66,
       ),
@@ -502,16 +503,18 @@ const SURPRISE_PROFILES: LavauxConfig["profile"][] = [
 
 // Teintes voisines contrastées : on ne pose jamais deux bandes contiguës de
 // luminosité trop proche, sinon le changement ne se verrait pas. Luma (Rec. 709,
-// valeurs sRGB codées) des hex Polymaker Panchroma Matte de `filaments.ts`.
+// valeurs sRGB codées) des hex Bambu Lab PLA Matte de `filaments.ts`.
 const LUMA: Record<FilamentId, number> = {
-  "blanc-neve": 0.94,
-  encre: 0.18,
-  "rouge-signal": 0.34,
-  "bleu-leman": 0.33,
-  "vert-lavaux": 0.37,
-  "gris-molasse": 0.55,
-  ambre: 0.6,
-  glacier: 0.78,
+  "blanc-neve": 1,
+  "gris-molasse": 0.62,
+  encre: 0,
+  "vert-foret": 0.43,
+  "bleu-leman": 0.39,
+  glacier: 0.81,
+  gres: 0.74,
+  "terre-cuite": 0.4,
+  "rouge-signal": 0.39,
+  "rose-alpes": 0.74,
 };
 const SURPRISE_FILAMENTS = Object.keys(LUMA) as FilamentId[];
 
@@ -663,12 +666,14 @@ export function surpriseCartouche(seed: number): CartoucheConfig {
 
 /** Palettes de la Montagne : socle, puis prairie ou eau, roche, neige (2 à 4 teintes, du bas vers le haut). */
 const MONTAGNE_PALETTES: readonly (readonly FilamentId[])[] = [
-  ["encre", "vert-lavaux", "gris-molasse", "blanc-neve"],
-  ["encre", "vert-lavaux", "blanc-neve"],
+  ["encre", "vert-foret", "gris-molasse", "blanc-neve"], // Alpes
+  ["encre", "vert-foret", "blanc-neve"],
+  ["bleu-leman", "gris-molasse", "glacier", "blanc-neve"], // Glacier
   ["gris-molasse", "glacier", "blanc-neve"],
   ["encre", "gris-molasse", "blanc-neve"],
-  ["encre", "ambre", "gris-molasse", "blanc-neve"],
-  ["bleu-leman", "vert-lavaux", "gris-molasse", "blanc-neve"],
+  ["encre", "terre-cuite", "gres", "blanc-neve"], // Terre
+  ["encre", "vert-foret", "rose-alpes", "blanc-neve"], // prairie fleurie
+  ["bleu-leman", "vert-foret", "gris-molasse", "blanc-neve"],
   ["rouge-signal", "gris-molasse", "blanc-neve"],
 ];
 

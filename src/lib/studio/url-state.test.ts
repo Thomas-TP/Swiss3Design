@@ -69,7 +69,7 @@ describe("fragment : aller-retour", () => {
       w: 1.6,
       bd: [
         ["bleu-leman", 42],
-        ["vert-lavaux", 108],
+        ["vert-foret", 108],
         ["blanc-neve", 150],
       ],
     });
@@ -127,7 +127,7 @@ describe("fragment : aller-retour", () => {
         { filament: "rouge-signal", toMm: 40.2 },
         { filament: "gris-molasse", toMm: 80.4 },
         { filament: "glacier", toMm: 120.6 },
-        { filament: "ambre", toMm: 150 },
+        { filament: "terre-cuite", toMm: 150 },
       ],
     });
     expect(encodeConfig(worst).length).toBeLessThan(MAX_FRAGMENT_LENGTH);
@@ -287,7 +287,7 @@ describe("paramètres GET (formulaire sans JavaScript)", () => {
   it("aller-retour avec les bandes en bd=bleu-leman:42,…", () => {
     const qs = encodeSearchParams(HERO_CONFIG);
     expect(qs).toContain(
-      "bd=bleu-leman%3A42%2Cvert-lavaux%3A108%2Cblanc-neve%3A150",
+      "bd=bleu-leman%3A42%2Cvert-foret%3A108%2Cblanc-neve%3A150",
     );
     const back = decodeSearchParams(
       "lavaux",
@@ -439,7 +439,7 @@ describe("schémas et bornage", () => {
       [
         { filament: "encre", toMm: 0.3 },
         { filament: "rouge-signal", toMm: 50.07 },
-        { filament: "ambre", toMm: 50.3 },
+        { filament: "terre-cuite", toMm: 50.3 },
         { filament: "glacier", toMm: 90 },
         { filament: "blanc-neve", toMm: 100 },
       ],
@@ -480,7 +480,7 @@ describe("schémas et bornage", () => {
 describe("ligne machine du devis", () => {
   it("le héros : exactement la ligne du brief (§6.9)", () => {
     expect(machineLine(HERO_CONFIG)).toBe(
-      "S3D-STUDIO v1 lavaux h=150 d=96 p=galet b=0.5 n=0.72 l=0.08 m=gradins gs=5 gd=1.4 w=1.6 bd=bleu-leman:42,vert-lavaux:108,blanc-neve:150",
+      "S3D-STUDIO v1 lavaux h=150 d=96 p=galet b=0.5 n=0.72 l=0.08 m=gradins gs=5 gd=1.4 w=1.6 bd=bleu-leman:42,vert-foret:108,blanc-neve:150",
     );
   });
 

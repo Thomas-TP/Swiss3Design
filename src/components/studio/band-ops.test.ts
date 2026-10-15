@@ -43,7 +43,7 @@ describe("bandes de la Montagne : le socle est la première bande, verrouillée 
     valid(bands);
     expect(bands.map((b) => b.filament)).toEqual([
       "encre",
-      "vert-lavaux",
+      "vert-foret",
       "gris-molasse",
       "blanc-neve",
     ]);

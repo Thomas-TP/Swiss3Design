@@ -13,7 +13,7 @@
 // (chasse × capitale) ; avec `glyphs`, par les contours réels des glyphes.
 // Montagne : le poster statique exclut l'étiquette (`label: false`) : elle est
 // en DOM, mise à jour à chaque frappe (§7.5, chapitre 02).
-import { filamentHex, shade, tint } from "./filaments";
+import { edgeShade, filamentHex, tint } from "./filaments";
 import type { Polygon } from "./kernel/extrude";
 import { layoutBorne } from "./objects/borne-model";
 import { layoutCartouche } from "./objects/cartouche-model";
@@ -78,7 +78,7 @@ export interface TopViewOptions {
 
 /** Filet d'une couche : plus sombre que sa teinte, plus clair en thème sombre pour détacher l'encre du fond. */
 function strokeOf(fill: string, theme: Theme): string {
-  return theme === "dark" ? tint(fill, 0.28) : shade(fill, 0.4);
+  return theme === "dark" ? tint(fill, 0.28) : edgeShade(fill, 0.4);
 }
 
 const U = TOP_VIEW_UNITS_PER_MM;

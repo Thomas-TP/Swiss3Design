@@ -43,13 +43,15 @@
   },
   "filaments": {
     "blanc-neve": "Schneeweiss",
-    "encre": "Tintenschwarz",
-    "rouge-signal": "Signalrot",
-    "bleu-leman": "Léman-Blau",
-    "vert-lavaux": "Lavaux-Grün",
     "gris-molasse": "Molassegrau",
-    "ambre": "Bernstein",
-    "glacier": "Gletscherblau"
+    "encre": "Tintenschwarz",
+    "vert-foret": "Waldgrün",
+    "bleu-leman": "Léman-Blau",
+    "glacier": "Gletscherblau",
+    "gres": "Sandstein",
+    "terre-cuite": "Terrakotta",
+    "rouge-signal": "Signalrot",
+    "rose-alpes": "Alpenrose"
   },
   "presets": {
     "lavaux": "Lavaux",

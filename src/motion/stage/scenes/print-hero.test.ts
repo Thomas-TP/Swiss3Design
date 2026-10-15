@@ -50,7 +50,7 @@ describe("print-hero · logique pure", () => {
     expect(bands.map((b) => b.topMm)).toEqual([42, 108, 150]);
     expect(new Set(bands.map((b) => b.color)).size).toBe(1);
     const leman = expandBands(
-      ["bleu-leman", "vert-lavaux", "blanc-neve"],
+      ["bleu-leman", "vert-foret", "blanc-neve"],
       [42, 108, 150],
     );
     expect(new Set(leman.map((b) => b.color)).size).toBe(3);

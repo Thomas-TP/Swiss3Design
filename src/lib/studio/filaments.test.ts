@@ -3,8 +3,11 @@ import { describe, expect, it } from "vitest";
 import {
   FILAMENTS,
   FILAMENT_IDS,
+  edgeShade,
   filamentHex,
   filamentInfo,
+  hexToRgb,
+  shade,
 } from "./filaments";
 import {
   elevationToSvg,
@@ -16,53 +19,57 @@ import { cartoucheTopView, borneTopView, topViewToSvg } from "./poster-flat";
 import { montagneElevation } from "./poster-montagne";
 import {
   BORNE_DEFAULT,
+  BORNE_PRESETS,
   CARTOUCHE_DEFAULT,
+  CARTOUCHE_PRESETS,
   HERO_CONFIG,
   MONTAGNE_DEFAULT,
 } from "./presets";
 import type { FilamentId } from "./types";
 
-// Décision du propriétaire du 14.10.2026 : les couleurs proposées sont EXACTEMENT
-// les hex officiels de la gamme Polymaker Panchroma Matte (wiki Polymaker, « HEX
-// Codes and Transmission Distances »), au caractère près, et affichées sans
-// transformation (ni tint, ni shade, ni transparence, ni filtre) : pastilles,
-// puces, aplats des posters, couleur de base du matériau 3D.
+// Décision du propriétaire du 15.10.2026 : les couleurs proposées sont EXACTEMENT
+// les hex officiels de la gamme Bambu Lab PLA Matte (PDF « PLA Matte Hex Code »),
+// au caractère près, et affichées sans transformation (ni tint, ni shade, ni
+// transparence, ni filtre) : pastilles, puces, aplats des posters, couleur de
+// base du matériau 3D.
 
-const POLYMAKER: Record<FilamentId, [string, string]> = {
-  "blanc-neve": ["#F4EFEB", "Matte Cotton White"],
-  encre: ["#2F2E30", "Matte Charcoal Black"],
-  "rouge-signal": ["#ED2F2E", "Matte Lava Red"],
-  "bleu-leman": ["#0163A6", "Matte Sapphire Blue"],
-  "vert-lavaux": ["#5F6244", "Matte Army Dark Green"],
-  "gris-molasse": ["#8A8C94", "Matte Fossil Grey"],
-  ambre: ["#F88B17", "Matte Sunrise Orange"],
-  glacier: ["#A4D0DF", "Matte Pastel Ice"],
+const BAMBU: Record<FilamentId, [string, string, string]> = {
+  "blanc-neve": ["#FFFFFF", "Ivory White", "11100"],
+  "gris-molasse": ["#9B9EA0", "Ash Gray", "11102"],
+  encre: ["#000000", "Charcoal", "11101"],
+  "vert-foret": ["#68724D", "Dark Green", "11501"],
+  "bleu-leman": ["#0078BF", "Marine Blue", "11600"],
+  glacier: ["#A3D8E1", "Ice Blue", "11601"],
+  gres: ["#D3B7A7", "Latte Brown", "11800"],
+  "terre-cuite": ["#B15533", "Terracotta", "11203"],
+  "rouge-signal": ["#DE4343", "Scarlet Red", "11200"],
+  "rose-alpes": ["#E8AFCF", "Sakura Pink", "11201"],
 };
 
-describe("FILAMENTS : les huit hex officiels Polymaker, au caractère près", () => {
-  it("contient exactement les huit filaments, dans l'ordre, avec leur hex", () => {
+describe("FILAMENTS : les dix hex officiels Bambu Lab PLA Matte, au caractère près", () => {
+  it("contient exactement les dix filaments, dans l'ordre, avec leur hex", () => {
     expect(FILAMENTS.map((f) => [f.id, f.hex])).toEqual(
-      Object.entries(POLYMAKER).map(([id, [hex]]) => [id, hex]),
+      Object.entries(BAMBU).map(([id, [hex]]) => [id, hex]),
     );
-    expect(FILAMENT_IDS).toHaveLength(8);
+    expect(FILAMENT_IDS).toHaveLength(10);
   });
 
   it("chaque hex est écrit en #RRGGBB majuscules, tel que publié", () => {
     for (const f of FILAMENTS) expect(f.hex).toMatch(/^#[0-9A-F]{6}$/);
   });
 
-  it("porte la marque, la gamme et le nom officiel de la bobine (affichés à l'atelier)", () => {
+  it("porte la marque, la gamme, le nom officiel et le code produit (affichés à l'atelier)", () => {
     for (const f of FILAMENTS) {
-      expect(f.brand).toBe("Polymaker");
-      expect(f.range).toBe("Panchroma Matte");
-      expect(f.officialName).toBe(POLYMAKER[f.id][1]);
+      expect(f.brand).toBe("Bambu Lab");
+      expect(f.range).toBe("PLA Matte");
+      expect(f.officialName).toBe(BAMBU[f.id][1]);
+      expect(f.productCode).toBe(BAMBU[f.id][2]);
     }
   });
 
   it("filamentHex rend l'hex du tableau, sans transformation", () => {
-    for (const id of FILAMENT_IDS)
-      expect(filamentHex(id)).toBe(POLYMAKER[id][0]);
-    expect(filamentInfo("encre").hex).toBe("#2F2E30");
+    for (const id of FILAMENT_IDS) expect(filamentHex(id)).toBe(BAMBU[id][0]);
+    expect(filamentInfo("encre").hex).toBe("#000000");
   });
 });
 
@@ -162,5 +169,41 @@ describe("posters SVG : les aplats de bande sont l'hex exact", () => {
       );
       expect(topViewToSvg(card)).toContain(filamentHex(id));
     }
+  });
+});
+
+// Contraste WCAG (luminance relative sRGB) : un texte en relief ou gravé doit se
+// lire sur sa plaque. Le blanc sur le gris Bambu (#9B9EA0) ne ferait que 2,7:1.
+function contrast(a: string, b: string): number {
+  const lum = (hex: string) => {
+    const [r, g, bl] = hexToRgb(hex).map((c) => {
+      const s = c / 255;
+      return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
+    });
+    return 0.2126 * r + 0.7152 * g + 0.0722 * bl;
+  };
+  const [hi, lo] = [lum(a), lum(b)].sort((x, y) => y - x);
+  return (hi + 0.05) / (lo + 0.05);
+}
+
+describe("lisibilité : plaque et encre des préréglages", () => {
+  it("chaque préréglage de Cartouche et de Borne contraste au moins 3:1", () => {
+    for (const preset of CARTOUCHE_PRESETS) {
+      const { plate, ink } = preset.config;
+      expect(contrast(filamentHex(plate), filamentHex(ink))).toBeGreaterThan(3);
+    }
+    for (const preset of BORNE_PRESETS) {
+      const { base, ink } = preset.config;
+      expect(contrast(filamentHex(base), filamentHex(ink))).toBeGreaterThan(3);
+    }
+  });
+});
+
+describe("edgeShade : le filet d'une strate reste visible, même sur l'encre noire", () => {
+  it("assombrit une teinte claire, éclaircit une teinte très sombre", () => {
+    expect(edgeShade("#FFFFFF", 0.38)).toBe(shade("#FFFFFF", 0.38));
+    const ink = edgeShade("#000000", 0.38);
+    expect(ink).not.toBe("#000000");
+    expect(hexToRgb(ink)[0]).toBeLessThan(0x40);
   });
 });

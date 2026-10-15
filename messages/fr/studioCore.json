@@ -43,13 +43,15 @@
   },
   "filaments": {
     "blanc-neve": "Blanc névé",
-    "encre": "Encre",
-    "rouge-signal": "Rouge Signal",
-    "bleu-leman": "Bleu Léman",
-    "vert-lavaux": "Vert Lavaux",
     "gris-molasse": "Gris molasse",
-    "ambre": "Ambre",
-    "glacier": "Glacier"
+    "encre": "Encre",
+    "vert-foret": "Vert forêt",
+    "bleu-leman": "Bleu Léman",
+    "glacier": "Glacier",
+    "gres": "Grès",
+    "terre-cuite": "Terre cuite",
+    "rouge-signal": "Rouge Signal",
+    "rose-alpes": "Rose des Alpes"
   },
   "presets": {
     "lavaux": "Lavaux",

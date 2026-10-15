@@ -187,7 +187,7 @@ describe("Élévation exacte du vase", () => {
     expect(el.bands.map((b) => b.height)).toEqual([42, 66, 42]);
     expect(el.bands.map((b) => b.filament)).toEqual([
       "bleu-leman",
-      "vert-lavaux",
+      "vert-foret",
       "blanc-neve",
     ]);
     expect(el.baseY).toBeCloseTo(el.heightMm + 6, 1);

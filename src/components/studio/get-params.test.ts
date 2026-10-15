@@ -5,7 +5,7 @@ import { decodeSearchParams } from "@/lib/studio/url-state";
 import { adaptBandsParam } from "./get-params";
 
 describe("adaptBandsParam (formulaire GET sans JavaScript)", () => {
-  const bands = "bleu-leman:42,vert-lavaux:108,blanc-neve:150";
+  const bands = "bleu-leman:42,vert-foret:108,blanc-neve:150";
 
   function decode(
     object: "lavaux" | "montagne",
@@ -39,7 +39,7 @@ describe("adaptBandsParam (formulaire GET sans JavaScript)", () => {
     expect(config.bands.at(-1)?.toMm).toBe(120);
     expect(config.bands.map((b) => b.filament)).toEqual([
       "bleu-leman",
-      "vert-lavaux",
+      "vert-foret",
       "blanc-neve",
     ]);
   });
@@ -74,7 +74,7 @@ describe("adaptBandsParam (formulaire GET sans JavaScript)", () => {
     const decoded = decode("montagne", {
       pl: "6",
       h: "100",
-      bd: "encre:5,vert-lavaux:35,blanc-neve:80",
+      bd: "encre:5,vert-foret:35,blanc-neve:80",
     });
     expect(decoded.ok).toBe(true);
     if (!decoded.ok || decoded.config.object !== "montagne") return;
@@ -87,7 +87,7 @@ describe("adaptBandsParam (formulaire GET sans JavaScript)", () => {
       s: "60",
       pl: "5",
       h: "120",
-      bd: "encre:5,vert-lavaux:35,blanc-neve:125",
+      bd: "encre:5,vert-foret:35,blanc-neve:125",
     });
     expect(decoded.ok).toBe(true);
     if (!decoded.ok || decoded.config.object !== "montagne") return;

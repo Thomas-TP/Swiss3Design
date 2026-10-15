@@ -259,8 +259,9 @@ put` on an environment with real users without `--env <name>` explicitly
     `drizzle-pg/0009` (additive column) must be applied BEFORE deploying code that
     reads it**: every `select()` on `order_items` lists the column, the Stripe
     webhook included. Shipping defaults are 0/0 (free everywhere in Switzerland);
-    the admin settings still override them. Studio filaments are the Polymaker
-    Panchroma Matte hex, displayed untransformed (`filaments.ts`, `filaments.test.ts`).
+    the admin settings still override them. Studio filaments are the Bambu Lab
+    PLA Matte hex (15.10.2026 decision, 10 colours), displayed untransformed (`filaments.ts`,
+    `filaments.test.ts`).
 
 ## Tech stack
 

@@ -62,7 +62,7 @@ describe("demande de devis du Studio (§6.9)", () => {
     );
     expect(lines[3]).toBe("Motif : Gradins (pas 5 mm, profondeur 1,4 mm)");
     expect(lines[4]).toMatch(
-      /^Couleurs \(changements à la couche\) : Bleu Léman 0–42 mm \(couches 1–210\) · Vert Lavaux 42–108 mm \(couches 211–540\) · Blanc névé 108–150 mm \(couches 541–750\)$/,
+      /^Couleurs \(changements à la couche\) : Bleu Léman 0–42 mm \(couches 1–210\) · Vert forêt 42–108 mm \(couches 211–540\) · Blanc névé 108–150 mm \(couches 541–750\)$/,
     );
     expect(lines[5]).toMatch(
       /^Chiffres affichés : ≈ 92 g · ≈ 3 h 01 · 2 changements$/,
@@ -72,7 +72,7 @@ describe("demande de devis du Studio (§6.9)", () => {
     expect(lines[8]).toBe("Remarque : —");
     expect(lines[9]).toBe(machineLine(LAVAUX_DEFAULT));
     expect(lines[9]).toMatch(
-      /^S3D-STUDIO v1 lavaux h=150 d=96 p=galet b=0\.5 n=0\.72 l=0\.08 m=gradins gs=5 gd=1\.4 w=1\.6 bd=bleu-leman:42,vert-lavaux:108,blanc-neve:150$/,
+      /^S3D-STUDIO v1 lavaux h=150 d=96 p=galet b=0\.5 n=0\.72 l=0\.08 m=gradins gs=5 gd=1\.4 w=1\.6 bd=bleu-leman:42,vert-foret:108,blanc-neve:150$/,
     );
     expect(lines).toHaveLength(10);
   });
@@ -80,7 +80,7 @@ describe("demande de devis du Studio (§6.9)", () => {
   it("couleurs ≤ 200 caractères, dimensions « 96 × 96 × 150 mm », espaces ordinaires (e-mail en texte brut)", () => {
     const i = input(LAVAUX_DEFAULT, {});
     expect(quoteColors(i)).toBe(
-      "Bleu Léman 0–42 mm · Vert Lavaux 42–108 mm · Blanc névé 108–150 mm",
+      "Bleu Léman 0–42 mm · Vert forêt 42–108 mm · Blanc névé 108–150 mm",
     );
     expect(quoteDimensions(i)).toBe("96 × 96 × 150 mm");
     const description = quoteDescription(i, {
@@ -158,7 +158,7 @@ describe("demande de devis du Studio (§6.9)", () => {
 describe("résumé vivant et bande de mesure (§6.7, §6.10)", () => {
   it("le résumé du vase : nom, hauteur, motif, couleurs nommées, statut", () => {
     expect(norm(liveSummary(input(LAVAUX_DEFAULT, {})))).toBe(
-      "Vase « Lavaux », 150 mm, Gradins, 3 couleurs : Bleu Léman, Vert Lavaux, Blanc névé ; Imprimable.",
+      "Vase « Lavaux », 150 mm, Gradins, 3 couleurs : Bleu Léman, Vert forêt, Blanc névé ; Imprimable.",
     );
   });
 

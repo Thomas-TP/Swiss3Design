@@ -74,7 +74,7 @@
       },
       "colors": {
         "q": "Wie werden die Farben gedruckt?",
-        "a": "Durch Filamentwechsel in bestimmten Höhen, mit bis zu vier Polymaker-Panchroma-Matte-Filamenten: So programmiert es die Werkstatt in ihrer Slicer-Software. Der angezeigte Farbton ist der des Herstellers; auf dem Bildschirm bleibt er annähernd, massgebend ist die Spule."
+        "a": "Durch Filamentwechsel in bestimmten Höhen, mit bis zu vier Bambu-Lab-PLA-Matte-Filamenten: So programmiert es die Werkstatt in ihrer Slicer-Software. Der angezeigte Farbton ist der des Herstellers; auf dem Bildschirm bleibt er annähernd, massgebend ist die Spule."
       },
       "after": {
         "q": "Was passiert nach der Bestellung?",
@@ -274,7 +274,7 @@
       "price": "Preis"
     },
     "materialValue": "PLA",
-    "indicative": "Filament Polymaker Panchroma Matte: Der Farbton auf dem Bildschirm ist nur annähernd.",
+    "indicative": "Filament Bambu Lab PLA Matte: Der Farbton auf dem Bildschirm ist nur annähernd.",
     "firm": "Fixpreis, Lieferung gratis"
   },
   "summary": {

@@ -197,11 +197,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           modifiée ; les objets du Studio étant personnalisés, ils ne sont ni
           repris ni échangés (voir « Retours »), sous réserve de la garantie
           légale. Les couleurs affichées à l’écran sont approximatives : les
-          objets sont imprimés en filament Polymaker Panchroma Matte, dont la
-          teinte peut légèrement varier d’une bobine à l’autre. Les objets du
-          Studio ne sont pas disponibles à l’achat par un agent IA. Pour plus de
-          20 pièces ou une demande particulière, un devis est possible (voir
-          ci-dessous).
+          objets sont imprimés en filament Bambu Lab PLA Matte, dont la teinte
+          peut légèrement varier d’une bobine à l’autre. Les objets du Studio ne
+          sont pas disponibles à l’achat par un agent IA. Pour plus de 20 pièces
+          ou une demande particulière, un devis est possible (voir ci-dessous).
         </p>
       ),
     },
@@ -532,8 +531,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           sind, werden sie unter Vorbehalt der gesetzlichen Gewährleistung weder
           zurückgenommen noch umgetauscht (siehe «Rücksendungen»). Die am
           Bildschirm angezeigten Farben sind annähernd: Die Objekte werden mit
-          Polymaker-Panchroma-Matte-Filament gedruckt, dessen Farbton von Spule
-          zu Spule leicht abweichen kann. Studio-Objekte können nicht von einem
+          Bambu-Lab-PLA-Matte-Filament gedruckt, dessen Farbton von Spule zu
+          Spule leicht abweichen kann. Studio-Objekte können nicht von einem
           KI-Agenten gekauft werden. Für mehr als 20 Stück oder einen besonderen
           Wunsch ist eine Offerte möglich (siehe unten).
         </p>
@@ -865,7 +864,7 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           personalizzati, gli oggetti dello Studio non vengono né ripresi né
           cambiati (vedere «Resi»), fatta salva la garanzia legale. I colori
           mostrati sullo schermo sono approssimativi: gli oggetti sono stampati
-          con filamento Polymaker Panchroma Matte, la cui tinta può variare
+          con filamento Bambu Lab PLA Matte, la cui tinta può variare
           leggermente da una bobina all’altra. Gli oggetti dello Studio non
           possono essere acquistati da un agente IA. Per più di 20 pezzi o una
           richiesta particolare è possibile un preventivo (vedere sotto).
@@ -1185,10 +1184,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           changed; because they are customised, Studio objects can be neither
           returned nor exchanged (see “Returns”), subject to the statutory
           warranty. The colours shown on screen are approximate: objects are
-          printed in Polymaker Panchroma Matte filament, whose shade may vary
-          slightly from one spool to another. Studio objects cannot be purchased
-          by an AI agent. For more than 20 pieces or a special request, a quote
-          is available (see below).
+          printed in Bambu Lab PLA Matte filament, whose shade may vary slightly
+          from one spool to another. Studio objects cannot be purchased by an AI
+          agent. For more than 20 pieces or a special request, a quote is
+          available (see below).
         </p>
       ),
     },

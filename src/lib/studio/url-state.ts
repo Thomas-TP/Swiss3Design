@@ -4,7 +4,7 @@
 //    p, b, n, l, m, gs/gd, wl/wa/wk, vc/va/vs, rn/ra/rt, w, bd…), ≤ 600
 //    caractères, jamais envoyé au serveur. `bd` = [["bleu-leman",42],…].
 //  - Paramètres GET (formulaire sans JS) : mêmes clés, bandes en
-//    `bd=bleu-leman:42,vert-lavaux:108,blanc-neve:150`.
+//    `bd=bleu-leman:42,vert-foret:108,blanc-neve:150`.
 //  - AUCUN texte personnel (nom, fonction, contact, sommet) : une clé de texte
 //    est REFUSÉE (`text-key`), pas ignorée ; toute clé inconnue aussi. Les
 //    textes vivent en mémoire et dans sessionStorage, jamais dans l'URL.
@@ -518,7 +518,7 @@ export function encodeSearchParams(config: StudioConfig): string {
 /**
  * Ligne « machine » de la demande de devis (brief §6.9, point 4) : le réglage
  * exact, lisible par l'atelier et par un script, sans aucun texte personnel :
- * `S3D-STUDIO v1 lavaux h=150 d=96 … bd=bleu-leman:42,vert-lavaux:108,blanc-neve:150`.
+ * `S3D-STUDIO v1 lavaux h=150 d=96 … bd=bleu-leman:42,vert-foret:108,blanc-neve:150`.
  */
 export function machineLine(config: StudioConfig): string {
   const parts = Object.entries(toShortKeys(config)).map(([key, value]) =>

@@ -43,13 +43,15 @@
   },
   "filaments": {
     "blanc-neve": "Bianco neve",
-    "encre": "Nero inchiostro",
-    "rouge-signal": "Rosso segnale",
-    "bleu-leman": "Blu Lemano",
-    "vert-lavaux": "Verde Lavaux",
     "gris-molasse": "Grigio molassa",
-    "ambre": "Ambra",
-    "glacier": "Ghiacciaio"
+    "encre": "Nero inchiostro",
+    "vert-foret": "Verde foresta",
+    "bleu-leman": "Blu Lemano",
+    "glacier": "Ghiacciaio",
+    "gres": "Arenaria",
+    "terre-cuite": "Terracotta",
+    "rouge-signal": "Rosso segnale",
+    "rose-alpes": "Rosa delle Alpi"
   },
   "presets": {
     "lavaux": "Lavaux",

@@ -74,7 +74,7 @@
       },
       "colors": {
         "q": "Comment les couleurs sont-elles imprimées ?",
-        "a": "Par des changements de filament à des hauteurs données, jusqu'à quatre filaments Polymaker Panchroma Matte : c'est ce que l'atelier programme dans son logiciel de tranchage. La teinte affichée est celle du fabricant ; elle reste approximative à l'écran, la bobine fait foi."
+        "a": "Par des changements de filament à des hauteurs données, jusqu'à quatre filaments Bambu Lab PLA Matte : c'est ce que l'atelier programme dans son logiciel de tranchage. La teinte affichée est celle du fabricant ; elle reste approximative à l'écran, la bobine fait foi."
       },
       "after": {
         "q": "Que se passe-t-il après la commande ?",
@@ -274,7 +274,7 @@
       "price": "Prix"
     },
     "materialValue": "PLA",
-    "indicative": "Filament Polymaker Panchroma Matte : la teinte à l'écran est approximative.",
+    "indicative": "Filament Bambu Lab PLA Matte : la teinte à l'écran est approximative.",
     "firm": "prix ferme, livraison offerte"
   },
   "summary": {

@@ -94,7 +94,7 @@ describe("ajouter et retirer", () => {
     // La nouvelle bande n'a pas le filament de ses voisines.
     expect(three[2].filament).not.toBe(three[1].filament);
     expectValid(three);
-    expect(addBand(two, "ambre")[2].filament).toBe("ambre");
+    expect(addBand(two, "terre-cuite")[2].filament).toBe("terre-cuite");
   });
 
   it("jamais plus de 4 bandes, jamais de bande de moins de 2 mm", () => {
@@ -118,10 +118,10 @@ describe("ajouter et retirer", () => {
     ]);
     expect(removeBand(hero, 2)).toEqual([
       { filament: "bleu-leman", toMm: 42 },
-      { filament: "vert-lavaux", toMm: 150 },
+      { filament: "vert-foret", toMm: 150 },
     ]);
     expect(removeBand(hero, 0)).toEqual([
-      { filament: "vert-lavaux", toMm: 108 },
+      { filament: "vert-foret", toMm: 108 },
       { filament: "blanc-neve", toMm: 150 },
     ]);
     expectValid(removeBand(hero, 0));
@@ -137,9 +137,9 @@ describe("ajouter et retirer", () => {
   });
 
   it("changer de filament ne touche pas aux hauteurs", () => {
-    const next = setBandFilament(hero, 1, "ambre");
+    const next = setBandFilament(hero, 1, "terre-cuite");
     expect(next.map((b) => b.toMm)).toEqual(hero.map((b) => b.toMm));
-    expect(next[1].filament).toBe("ambre");
+    expect(next[1].filament).toBe("terre-cuite");
     expect(bandThicknesses(hero)).toEqual([42, 66, 42]);
   });
 });

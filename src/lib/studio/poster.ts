@@ -26,7 +26,7 @@ import {
   projectPoint,
   type CameraSpec,
 } from "./camera";
-import { filamentHex, shade } from "./filaments";
+import { edgeShade, filamentHex } from "./filaments";
 import { simplifyClosed, type Vec2 } from "./kernel/simplify";
 import {
   FLOOR_MM,
@@ -249,7 +249,7 @@ export function heroPoster(
   const bands = config.bands;
   const layers: PosterLayer[] = bands.map((band, k) => {
     const fill = filamentHex(band.filament);
-    return { band: k, fill, stroke: shade(fill, 0.38), ellipses: [] };
+    return { band: k, fill, stroke: edgeShade(fill, 0.38), ellipses: [] };
   });
   for (const z of zs) {
     const k = bandIndexAt(bands, z - STRATE_STEP_MM / 2);
@@ -272,7 +272,7 @@ export function heroPoster(
         top: project(camera, aspect, zTop, outer(zTop, -1), s),
         topFill: layers[k].fill,
         mouth: project(camera, aspect, zTop, mouth(zTop, -1), s),
-        mouthFill: shade(layers[k].fill, 0.5),
+        mouthFill: edgeShade(layers[k].fill, 0.5),
       };
     });
     return { ...base, layers };
@@ -284,7 +284,7 @@ export function heroPoster(
     layers,
     mouth: {
       ellipse: project(camera, aspect, config.h, mouth(config.h, -1), 0),
-      fill: shade(last.fill, 0.5),
+      fill: edgeShade(last.fill, 0.5),
     },
   };
 }

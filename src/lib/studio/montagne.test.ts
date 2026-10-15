@@ -370,7 +370,7 @@ describe("bandes : le socle est la première, verrouillée au dessus du socle", 
     const squeezed = normalizeMontagneBands(
       [
         { filament: "encre", toMm: 12 },
-        { filament: "vert-lavaux", toMm: 5.4 },
+        { filament: "vert-foret", toMm: 5.4 },
         { filament: "blanc-neve", toMm: 5.6 },
         { filament: "gris-molasse", toMm: 80 },
       ],
@@ -380,7 +380,7 @@ describe("bandes : le socle est la première, verrouillée au dessus du socle", 
     expect(squeezed.map((b) => b.toMm)).toEqual([5, 7, 9, 80]);
     expect(
       montagneBands(
-        ["encre", "vert-lavaux", "gris-molasse", "blanc-neve"],
+        ["encre", "vert-foret", "gris-molasse", "blanc-neve"],
         5,
         75,
       ),

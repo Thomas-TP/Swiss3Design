@@ -8,13 +8,15 @@ export type StudioObjectId = "lavaux" | "cartouche" | "montagne" | "borne";
 
 export type FilamentId =
   | "blanc-neve"
-  | "encre"
-  | "rouge-signal"
-  | "bleu-leman"
-  | "vert-lavaux"
   | "gris-molasse"
-  | "ambre"
-  | "glacier";
+  | "encre"
+  | "vert-foret"
+  | "bleu-leman"
+  | "glacier"
+  | "gres"
+  | "terre-cuite"
+  | "rouge-signal"
+  | "rose-alpes";
 
 /**
  * Bande de couleur : les bandes sont contiguës depuis z = 0, frontières

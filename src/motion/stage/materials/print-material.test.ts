@@ -9,7 +9,7 @@ import { createPrintMaterial } from "./print-material";
 // calcul, rendu en sRGB). Aucune teinte n'est ajoutée au-delà de l'éclairage
 // normal de la scène.
 describe("matériau d'impression : la couleur de base est l'hex exact du filament", () => {
-  it("chaque bande, relue en sRGB, rend exactement l'hex Polymaker", () => {
+  it("chaque bande, relue en sRGB, rend exactement l'hex Bambu Lab", () => {
     for (const filament of FILAMENTS) {
       const print = createPrintMaterial({
         heightMm: 100,
@@ -24,7 +24,7 @@ describe("matériau d'impression : la couleur de base est l'hex exact du filamen
   });
 
   it("quatre bandes : chaque palier garde sa propre teinte exacte", () => {
-    const ids = ["encre", "vert-lavaux", "gris-molasse", "blanc-neve"] as const;
+    const ids = ["encre", "vert-foret", "gris-molasse", "blanc-neve"] as const;
     const print = createPrintMaterial({
       heightMm: 80,
       bands: ids.map((id, k) => ({

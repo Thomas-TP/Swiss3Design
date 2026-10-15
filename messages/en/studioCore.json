@@ -43,13 +43,15 @@
   },
   "filaments": {
     "blanc-neve": "Snow white",
-    "encre": "Ink",
-    "rouge-signal": "Signal red",
-    "bleu-leman": "Léman blue",
-    "vert-lavaux": "Lavaux green",
     "gris-molasse": "Molasse gray",
-    "ambre": "Amber",
-    "glacier": "Glacier"
+    "encre": "Ink",
+    "vert-foret": "Forest green",
+    "bleu-leman": "Léman blue",
+    "glacier": "Glacier",
+    "gres": "Sandstone",
+    "terre-cuite": "Terracotta",
+    "rouge-signal": "Signal red",
+    "rose-alpes": "Alpine rose"
   },
   "presets": {
     "lavaux": "Lavaux",

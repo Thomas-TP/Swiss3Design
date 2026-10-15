@@ -51,7 +51,7 @@ describe("construction d'affichage (Worker)", () => {
     expect(built.mesh.triangles).toBeLessThan(130_000);
     expect(built.bands).toEqual([
       { filament: "bleu-leman", toMm: 42 },
-      { filament: "vert-lavaux", toMm: 108 },
+      { filament: "vert-foret", toMm: 108 },
       { filament: "blanc-neve", toMm: 150 },
     ]);
     expect(built.heightMm).toBe(150);

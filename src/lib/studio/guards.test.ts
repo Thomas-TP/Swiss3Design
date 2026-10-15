@@ -244,7 +244,7 @@ describe("pied, plateau, bandes, couplage des gradins", () => {
       ...HERO_CONFIG,
       bands: [
         { filament: "bleu-leman", toMm: 1 },
-        { filament: "vert-lavaux", toMm: 100 },
+        { filament: "vert-foret", toMm: 100 },
         { filament: "blanc-neve", toMm: 150 },
       ],
     } as LavauxConfig;

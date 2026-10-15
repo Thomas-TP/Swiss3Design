@@ -138,18 +138,18 @@ describe("calculs de la scène studio-object", () => {
     ];
     expect(
       onlyColorsChanged(a, [
-        { filament: "ambre", toMm: 42 },
+        { filament: "terre-cuite", toMm: 42 },
         { filament: "blanc-neve", toMm: 150 },
       ]),
     ).toBe(true);
     expect(onlyColorsChanged(a, a)).toBe(false);
     expect(
       onlyColorsChanged(a, [
-        { filament: "ambre", toMm: 50 },
+        { filament: "terre-cuite", toMm: 50 },
         { filament: "blanc-neve", toMm: 150 },
       ]),
     ).toBe(false);
-    expect(onlyColorsChanged(a, [{ filament: "ambre", toMm: 150 }])).toBe(
+    expect(onlyColorsChanged(a, [{ filament: "terre-cuite", toMm: 150 }])).toBe(
       false,
     );
     expect(onlyColorsChanged([], [])).toBe(false);
