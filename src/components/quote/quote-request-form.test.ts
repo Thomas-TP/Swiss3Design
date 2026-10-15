@@ -150,3 +150,23 @@ describe("QuoteRequestForm : /custom, un fichier 3D d'abord", () => {
     expect(drawer).not.toContain('type="file"');
   });
 });
+
+describe("page /custom avec fichier", () => {
+  it("impose le PLA et ne demande pas les dimensions (mesurées dans le fichier)", () => {
+    const html = render({ source: "form", variant: "page" });
+    const hidden = hiddenInputs(html);
+    expect(hidden.get("material")).toContain('value="PLA"');
+    expect(hidden.has("dimensions")).toBe(true);
+    const tags = html.match(/<input[^>]*name="dimensions"[^>]*>/g) ?? [];
+    expect(tags).toHaveLength(1);
+    expect(tags[0]).toContain('type="hidden"');
+  });
+});
+
+describe("formatSize", () => {
+  it("arrondit au millimètre, au dixième sous 10 mm", async () => {
+    const { formatSize } = await import("./quote-request-form");
+    expect(formatSize([120.4, 80.6, 4.25], "fr")).toBe("120 × 81 × 4,3 mm");
+    expect(formatSize([120.4, 80.6, 4.25], "en")).toBe("120 × 81 × 4.3 mm");
+  });
+});

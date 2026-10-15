@@ -48,7 +48,8 @@
     "stepFailed": "Nous n'avons pas pu lire ce fichier STEP. Exportez-le en STL ou 3MF.",
     "timeout": "La lecture de ce fichier dépasse 20 secondes. Exportez-le en STL ou 3MF, plus léger.",
     "empty": "Ce fichier ne contient aucun volume imprimable (maillage vide ou ouvert). Exportez-le en STL ou 3MF fermé.",
-    "tooSmall": "Ce modèle mesure moins de 2 mm : l'unité est probablement fausse (pouces ? mètres ?). Réexportez-le en millimètres."
+    "tooSmall": "Ce modèle mesure moins de 2 mm : l'unité est probablement fausse (pouces ? mètres ?). Réexportez-le en millimètres.",
+    "size": "Dimensions {size}"
   },
   "studioCard": {
     "kicker": "Configuration Studio jointe",
@@ -89,16 +90,19 @@
     "account": "Suivre ma demande"
   },
   "fields": {
-    "quantity": "Quantité"
+    "quantity": "Quantité",
+    "material": "Matière",
+    "materialOnly": "la seule matière de l'atelier"
   },
   "colorsPicker": {
     "legend": "Couleurs en stock (facultatif)",
     "hint": "Jusqu'à {max} couleurs, parmi celles dont le stock suffit pour votre pièce.",
-    "pending": "Joignez d'abord votre fichier : nous affichons alors les couleurs en stock assez fournies pour votre pièce.",
+    "pending": "Dès votre fichier lu, celles qui ne suffisent pas sont grisées.",
     "none": "Aucune couleur du stock ne suffit pour cette pièce. Décrivez la couleur souhaitée dans votre projet : l'atelier vous répond.",
     "loading": "Lecture du stock…",
     "unavailable": "Le stock n'a pas pu être lu. Décrivez la couleur souhaitée dans votre projet.",
     "approximate": "teinte approximative",
-    "limit": "{max} couleurs au maximum."
+    "limit": "{max} couleurs au maximum.",
+    "short": "stock insuffisant"
   }
 }

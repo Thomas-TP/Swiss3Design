@@ -18,7 +18,6 @@ import {
   submitQuoteRequest,
   type QuoteFormState,
 } from "@/app/[locale]/(site)/custom/actions";
-import { Select } from "@/components/select";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
 import { withDot } from "@/components/ui/dot-title";
@@ -42,11 +41,15 @@ import { StudioAttachmentCard } from "./studio-attachment-card";
 import { MeshEstimator } from "./mesh-estimator";
 import {
   QuoteColorPicker,
-  eligibleColors,
+  selectableColorIds,
   useCustomStock,
 } from "./quote-color-picker";
 import type { EstimateResult } from "@/lib/mesh-weight/client";
-import { QUOTE_COLORS_MAX, QUOTE_QUANTITY_MAX } from "@/lib/filament/constants";
+import {
+  CUSTOM_MATERIAL,
+  QUOTE_COLORS_MAX,
+  QUOTE_QUANTITY_MAX,
+} from "@/lib/filament/constants";
 
 // Formulaire de demande de devis PARTAGÉ (brief « Strates », §7.10, §6.9) :
 // la page /custom (variante « page », une fiche à filets) et le tiroir
@@ -132,7 +135,6 @@ export interface QuoteAttachment {
 }
 
 export interface QuoteRequestFormProps {
-  materials?: string[]; // absent → sélecteur masqué si prefill.material est fourni
   source: "form" | "studio";
   object?: StudioObjectId;
   prefill?: QuotePrefill;
@@ -150,7 +152,13 @@ const INITIAL_STATE: QuoteFormState = { status: "idle" };
 type EstimateState =
   | { status: "idle" }
   | { status: "running" }
-  | { status: "ok"; grams: number; approximate: boolean }
+  | {
+      status: "ok";
+      grams: number;
+      approximate: boolean;
+      /** Boîte englobante en mm (largeur, profondeur, hauteur). */
+      size: [number, number, number];
+    }
   | {
       status: "error";
       reason: "unsupported" | "unreadable" | "timeout" | "empty" | "tiny";
@@ -165,8 +173,19 @@ function estimateErrorKey(state: Extract<EstimateState, { status: "error" }>) {
   return state.step ? "file.stepFailed" : "file.estimateFailed";
 }
 
+/** « 120 × 80 × 45 mm » : au millimètre, au dixième sous 10 mm. */
+export function formatSize(
+  size: readonly [number, number, number],
+  locale: string,
+): string {
+  const format = (mm: number) =>
+    new Intl.NumberFormat(locale === "de" ? "de-CH" : locale, {
+      maximumFractionDigits: mm < 10 ? 1 : 0,
+    }).format(mm);
+  return `${size.map(format).join(" × ")} mm`;
+}
+
 export function QuoteRequestForm({
-  materials,
   source,
   object,
   prefill,
@@ -199,7 +218,6 @@ export function QuoteRequestForm({
   // vidée, l'emporte toujours.
   const [typedEmail, setTypedEmail] = useState<string | null>(null);
   const [description, setDescription] = useState(prefill?.description ?? "");
-  const [material, setMaterial] = useState(prefill?.material ?? "");
   const [colors, setColors] = useState(prefill?.colors ?? "");
   const [dimensions, setDimensions] = useState(prefill?.dimensions ?? "");
 
@@ -245,8 +263,10 @@ export function QuoteRequestForm({
 
   // Variante « drawer » avec description préremplie : tout vient de `prefill`.
   const locked = variant === "drawer" && Boolean(prefill?.description?.trim());
-  const showMaterial = !locked && Boolean(materials && materials.length > 0);
   const showFileField = variant === "page" && !attachment;
+  // Matière : le PLA, seule matière de l'atelier, pour une demande de /custom avec
+  // fichier (le serveur l'impose aussi) ; sinon celle du préremplissage (Studio).
+  const material = showFileField ? CUSTOM_MATERIAL : (prefill?.material ?? "");
   const uploading = file.state.status === "uploading";
   const hasError = !busy && (submitError !== null || state.status === "error");
 
@@ -262,19 +282,18 @@ export function QuoteRequestForm({
     Math.max(1, Number.parseInt(quantityText, 10) || 1),
   );
   const gramsPerPiece = estimate.status === "ok" ? estimate.grams : null;
-  const eligibleIds = useMemo(
+  // Dimensions : calculées depuis le fichier (boîte englobante), jamais demandées.
+  const measured =
+    estimate.status === "ok" ? formatSize(estimate.size, locale) : null;
+  const selectableIds = useMemo(
     () =>
-      new Set(
-        customStock.status === "ready" && gramsPerPiece !== null
-          ? eligibleColors(customStock.colors, gramsPerPiece, quantity).map(
-              (color) => color.id,
-            )
-          : [],
-      ),
+      customStock.status === "ready"
+        ? selectableColorIds(customStock.colors, gramsPerPiece, quantity)
+        : new Set<string>(),
     [customStock, gramsPerPiece, quantity],
   );
-  // Une couleur qui ne suffit plus (quantité en hausse) sort de la sélection.
-  const chosenRefs = colorRefs.filter((id) => eligibleIds.has(id));
+  // Une couleur qui ne suffit plus (fichier lu, quantité en hausse) sort de la sélection.
+  const chosenRefs = colorRefs.filter((id) => selectableIds.has(id));
   const onEstimate = useCallback((result: EstimateResult) => {
     setEstimate(
       result.ok
@@ -282,6 +301,11 @@ export function QuoteRequestForm({
             status: "ok",
             grams: result.grams,
             approximate: result.issue === "overlap",
+            size: [
+              result.stats.bbox[3] - result.stats.bbox[0],
+              result.stats.bbox[4] - result.stats.bbox[1],
+              result.stats.bbox[5] - result.stats.bbox[2],
+            ],
           }
         : {
             status: "error",
@@ -294,13 +318,11 @@ export function QuoteRequestForm({
     file.select(next);
     setEstimateTarget(next);
     setEstimate({ status: "running" });
-    setColorRefs([]);
   }
   function clearFile() {
     file.clear();
     setEstimateTarget(null);
     setEstimate({ status: "idle" });
-    setColorRefs([]);
   }
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -519,6 +541,8 @@ export function QuoteRequestForm({
               <p className="text-soft">{t("file.estimating")}</p>
             ) : estimate.status === "ok" ? (
               <p className="ph-no-capture text-ink">
+                {t("file.size", { size: measured ?? "" })}
+                {" · "}
                 {t("file.estimate", {
                   grams: `${formatCount(estimate.grams, locale)} g`,
                 })}
@@ -612,33 +636,24 @@ export function QuoteRequestForm({
               />
             </Field>
 
-            {/* Deux colonnes seulement quand le sélecteur de matière est là. */}
-            <div className={cx("grid gap-5", showMaterial && "sm:grid-cols-2")}>
-              {showMaterial ? (
+            {/* /custom avec fichier : matière (PLA, sans choix) et quantité côte à côte. */}
+            <div
+              className={cx("grid gap-5", showFileField && "sm:grid-cols-2")}
+            >
+              {showFileField ? (
                 <div className="flex flex-col gap-2">
                   <span className="s3d-label text-soft">
-                    {tCustom("material")}{" "}
-                    <span className="normal-case">({tCustom("optional")})</span>
+                    {t("fields.material")}
                   </span>
-                  <Select
-                    name="material"
-                    value={material}
-                    onChange={setMaterial}
-                    options={[
-                      { value: "", label: tCustom("materialAny") },
-                      ...(materials ?? []).map((m) => ({
-                        value: m,
-                        label: m,
-                      })),
-                    ]}
-                    placeholder={tCustom("materialAny")}
-                    ariaLabel={tCustom("material")}
-                  />
+                  <p className="flex min-h-11 flex-wrap items-center gap-x-2 text-ink">
+                    {CUSTOM_MATERIAL}
+                    <span className="text-sm text-soft">
+                      · {t("fields.materialOnly")}
+                    </span>
+                  </p>
                 </div>
-              ) : (
-                // Pas de sélecteur : la matière vient du préremplissage (ou reste vide).
-                <input type="hidden" name="material" value={material} />
-              )}
+              ) : null}
+              <input type="hidden" name="material" value={material} />
               {showFileField ? (
                 <Field
                   label={t("fields.quantity")}
@@ -700,29 +715,40 @@ export function QuoteRequestForm({
                   unavailable: t("colorsPicker.unavailable"),
                   approximate: t("colorsPicker.approximate"),
                   limit: t("colorsPicker.limit", { max: QUOTE_COLORS_MAX }),
+                  short: t("colorsPicker.short"),
                 }}
               />
             ) : null}
 
-            <Field
-              label={
-                <>
-                  {tCustom("dimensions")}{" "}
-                  <span className="normal-case">({tCustom("optional")})</span>
-                </>
-              }
-              htmlFor={ids.dimensions}
-            >
+            {page ? (
+              // Page : dimensions mesurées dans le fichier (ou venues du Studio),
+              // jamais demandées au visiteur.
               <input
-                id={ids.dimensions}
+                type="hidden"
                 name="dimensions"
-                maxLength={QUOTE_LIMITS.dimensions}
-                value={dimensions}
-                onChange={(e) => setDimensions(e.target.value)}
-                placeholder={tCustom("dimensionsPlaceholder")}
-                className={fieldClass}
+                value={measured ?? dimensions}
               />
-            </Field>
+            ) : (
+              <Field
+                label={
+                  <>
+                    {tCustom("dimensions")}{" "}
+                    <span className="normal-case">({tCustom("optional")})</span>
+                  </>
+                }
+                htmlFor={ids.dimensions}
+              >
+                <input
+                  id={ids.dimensions}
+                  name="dimensions"
+                  maxLength={QUOTE_LIMITS.dimensions}
+                  value={dimensions}
+                  onChange={(e) => setDimensions(e.target.value)}
+                  placeholder={tCustom("dimensionsPlaceholder")}
+                  className={fieldClass}
+                />
+              </Field>
+            )}
           </div>
         </fieldset>
       )}

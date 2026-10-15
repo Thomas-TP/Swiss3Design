@@ -48,7 +48,8 @@
     "stepFailed": "Non siamo riusciti a leggere questo file STEP. Lo esporti in STL o 3MF.",
     "timeout": "La lettura di questo file supera i 20 secondi. Lo esporti in STL o 3MF, più leggero.",
     "empty": "Questo file non contiene alcun volume stampabile (mesh vuota o aperta). Lo esporti in STL o 3MF chiuso.",
-    "tooSmall": "Questo modello misura meno di 2 mm: l'unità è probabilmente sbagliata (pollici? metri?). Lo riesporti in millimetri."
+    "tooSmall": "Questo modello misura meno di 2 mm: l'unità è probabilmente sbagliata (pollici? metri?). Lo riesporti in millimetri.",
+    "size": "Dimensioni {size}"
   },
   "studioCard": {
     "kicker": "Configurazione Studio allegata",
@@ -89,16 +90,19 @@
     "account": "Segui la mia richiesta"
   },
   "fields": {
-    "quantity": "Quantità"
+    "quantity": "Quantità",
+    "material": "Materiale",
+    "materialOnly": "l'unico materiale del laboratorio"
   },
   "colorsPicker": {
     "legend": "Colori in magazzino (facoltativo)",
     "hint": "Fino a {max} colori, tra quelli la cui scorta basta per il Suo pezzo.",
-    "pending": "Alleghi prima il file: mostreremo allora i colori in magazzino con scorta sufficiente per il Suo pezzo.",
+    "pending": "Appena letto il Suo file, quelli che non bastano vengono disattivati.",
     "none": "Nessun colore in magazzino basta per questo pezzo. Descriva il colore desiderato nel progetto: l'atelier Le risponde.",
     "loading": "Lettura del magazzino…",
     "unavailable": "Non è stato possibile leggere il magazzino. Descriva il colore desiderato nel progetto.",
     "approximate": "tinta approssimativa",
-    "limit": "Al massimo {max} colori."
+    "limit": "Al massimo {max} colori.",
+    "short": "scorta insufficiente"
   }
 }

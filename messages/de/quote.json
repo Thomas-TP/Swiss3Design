@@ -48,7 +48,8 @@
     "stepFailed": "Wir konnten diese STEP-Datei nicht lesen. Exportieren Sie sie als STL oder 3MF.",
     "timeout": "Das Lesen dieser Datei dauert länger als 20 Sekunden. Exportieren Sie sie als leichteres STL oder 3MF.",
     "empty": "Diese Datei enthält kein druckbares Volumen (leeres oder offenes Netz). Exportieren Sie sie als geschlossenes STL oder 3MF.",
-    "tooSmall": "Dieses Modell misst weniger als 2 mm: Die Einheit ist wahrscheinlich falsch (Zoll? Meter?). Exportieren Sie es erneut in Millimetern."
+    "tooSmall": "Dieses Modell misst weniger als 2 mm: Die Einheit ist wahrscheinlich falsch (Zoll? Meter?). Exportieren Sie es erneut in Millimetern.",
+    "size": "Abmessungen {size}"
   },
   "studioCard": {
     "kicker": "Studio-Konfiguration angehängt",
@@ -89,16 +90,19 @@
     "account": "Meine Anfrage verfolgen"
   },
   "fields": {
-    "quantity": "Menge"
+    "quantity": "Menge",
+    "material": "Material",
+    "materialOnly": "das einzige Material der Werkstatt"
   },
   "colorsPicker": {
     "legend": "Farben am Lager (optional)",
     "hint": "Bis zu {max} Farben, aus jenen, deren Lagerbestand für Ihr Teil reicht.",
-    "pending": "Fügen Sie zuerst Ihre Datei bei: Wir zeigen dann die Farben, die für Ihr Teil ausreichend am Lager sind.",
+    "pending": "Sobald Ihre Datei gelesen ist, werden jene, die nicht reichen, ausgegraut.",
     "none": "Keine Farbe am Lager reicht für dieses Teil. Beschreiben Sie die gewünschte Farbe in Ihrem Projekt: Das Atelier antwortet Ihnen.",
     "loading": "Lagerbestand wird gelesen …",
     "unavailable": "Der Lagerbestand konnte nicht gelesen werden. Beschreiben Sie die gewünschte Farbe in Ihrem Projekt.",
     "approximate": "ungefährer Farbton",
-    "limit": "Höchstens {max} Farben."
+    "limit": "Höchstens {max} Farben.",
+    "short": "Lagerbestand reicht nicht"
   }
 }

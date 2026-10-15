@@ -8,11 +8,13 @@ import { quoteNeedGrams } from "@/lib/filament/availability";
 import type { PublicCustomColor } from "@/lib/filament/public-stock";
 
 // Couleurs du stock proposées pour un devis (/custom) : une pastille par couleur,
-// jusqu'à 4. N'apparaissent que celles dont le stock couvre la pièce : poids
-// estimé × quantité, avec la marge (× 1,15 + 15 g). Par prudence, UNE couleur doit
-// couvrir le poids TOTAL (on ignore la répartition entre couleurs). Le niveau exact
-// du stock n'est jamais affiché ni connu ici : l'API ne donne qu'une capacité
-// arrondie. Le serveur revérifie à l'envoi avec une lecture fraîche.
+// jusqu'à 4. Avant le fichier, toutes les couleurs en stock s'affichent ; dès que
+// le poids est estimé, celles dont le stock ne couvre pas la pièce (poids estimé ×
+// quantité, avec la marge × 1,15 + 15 g) sont grisées et ne peuvent plus être
+// choisies. Par prudence, UNE couleur doit couvrir le poids TOTAL (on ignore la
+// répartition entre couleurs). Le niveau exact du stock n'est jamais affiché ni
+// connu ici : l'API ne donne qu'une capacité arrondie. Le serveur revérifie à
+// l'envoi avec une lecture fraîche.
 
 export type CustomStock =
   | { status: "loading" }
@@ -59,6 +61,20 @@ export function eligibleColors(
   return colors.filter((c) => c.cap >= CAPACITY_MAX_GRAMS || need <= c.cap);
 }
 
+/** Couleurs proposées : toutes avant l'estimation, celles qui suffisent ensuite. */
+export function selectableColorIds(
+  colors: readonly PublicCustomColor[],
+  gramsPerPiece: number | null,
+  quantity: number,
+): Set<string> {
+  return new Set(
+    (gramsPerPiece === null
+      ? colors
+      : eligibleColors(colors, gramsPerPiece, quantity)
+    ).map((color) => color.id),
+  );
+}
+
 export interface ColorPickerLabels {
   legend: string;
   hint: string;
@@ -68,6 +84,7 @@ export interface ColorPickerLabels {
   unavailable: string;
   approximate: string;
   limit: string;
+  short: string;
 }
 
 export function QuoteColorPicker({
@@ -88,37 +105,38 @@ export function QuoteColorPicker({
   max: number;
   labels: ColorPickerLabels;
 }) {
-  const eligible =
-    stock.status === "ready" && gramsPerPiece !== null
-      ? eligibleColors(stock.colors, gramsPerPiece, quantity)
-      : [];
+  const colors = stock.status === "ready" ? stock.colors : [];
+  const selectable = selectableColorIds(colors, gramsPerPiece, quantity);
   const message =
-    gramsPerPiece === null
-      ? labels.pending
-      : stock.status === "loading"
-        ? labels.loading
-        : stock.status === "error"
-          ? labels.unavailable
-          : eligible.length === 0
-            ? labels.none
-            : null;
+    stock.status === "loading"
+      ? labels.loading
+      : stock.status === "error"
+        ? labels.unavailable
+        : selectable.size === 0
+          ? labels.none
+          : null;
   const atLimit = selected.length >= max;
   return (
     <fieldset className="m-0 min-w-0 border-0 p-0">
       <legend className="s3d-label mb-1 p-0 text-soft">{labels.legend}</legend>
-      <p className="mb-3 text-sm text-soft">{labels.hint}</p>
-      {message ? (
-        <p className="text-sm text-soft">{message}</p>
-      ) : (
+      <p className="mb-3 text-sm text-soft">
+        {labels.hint}
+        {gramsPerPiece === null ? ` ${labels.pending}` : ""}
+      </p>
+      {message ? <p className="mb-3 text-sm text-soft">{message}</p> : null}
+      {colors.length > 0 ? (
         <ul className="flex flex-wrap gap-2">
-          {eligible.map((color) => {
+          {colors.map((color) => {
             const on = selected.includes(color.id);
-            const blocked = !on && atLimit;
+            const short = !selectable.has(color.id);
+            const blocked = short || (!on && atLimit);
             return (
               <li key={color.id}>
                 {/* Une vraie case à cocher (native), le libellé en est la pastille. */}
                 <label
-                  title={blocked ? labels.limit : undefined}
+                  title={
+                    short ? labels.short : blocked ? labels.limit : undefined
+                  }
                   className={cx(
                     "relative inline-flex min-h-11 items-center gap-2.5 rounded-field border px-3 py-1.5 text-left text-sm transition-colors has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-ink",
                     on
@@ -147,7 +165,11 @@ export function QuoteColorPicker({
                     <span className="text-ink">{color.name}</span>
                     <span className="text-xs text-soft">
                       {color.brand} {color.range}
-                      {color.approximate ? ` · ${labels.approximate}` : ""}
+                      {short
+                        ? ` · ${labels.short}`
+                        : color.approximate
+                          ? ` · ${labels.approximate}`
+                          : ""}
                     </span>
                   </span>
                 </label>
@@ -155,7 +177,7 @@ export function QuoteColorPicker({
             );
           })}
         </ul>
-      )}
+      ) : null}
     </fieldset>
   );
 }

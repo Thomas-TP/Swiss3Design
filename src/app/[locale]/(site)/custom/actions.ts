@@ -14,7 +14,11 @@ import { getAdminEmails } from "@/lib/email";
 import { adminNewQuoteEmail } from "@/lib/email-templates";
 import { recordStatusTransition } from "@/lib/status-history";
 import { covers, quoteNeedGrams } from "@/lib/filament/availability";
-import { QUOTE_COLORS_MAX, QUOTE_QUANTITY_MAX } from "@/lib/filament/constants";
+import {
+  CUSTOM_MATERIAL,
+  QUOTE_COLORS_MAX,
+  QUOTE_QUANTITY_MAX,
+} from "@/lib/filament/constants";
 import { isMissingTable, loadStockSnapshot } from "@/lib/filament/stock-db";
 
 // Une configuration du Studio porte sa ligne machine « S3D-STUDIO v1 … » dans la
@@ -160,6 +164,8 @@ export async function submitQuoteRequest(
         .insert(quoteRequests)
         .values({
           ...rest,
+          // /custom : le PLA, seule matière de l'atelier, quoi qu'envoie le client.
+          material: source === "form" ? CUSTOM_MATERIAL : rest.material,
           // Le texte des couleurs vient des références du stock, jamais du client.
           colors:
             colorNames.length > 0
@@ -208,7 +214,8 @@ export async function submitQuoteRequest(
                 id: created.id,
                 email: rest.email,
                 description: rest.description,
-                material: rest.material ?? null,
+                material:
+                  source === "form" ? CUSTOM_MATERIAL : (rest.material ?? null),
                 colors:
                   colorNames.length > 0
                     ? colorNames.join(", ")

@@ -48,7 +48,8 @@
     "stepFailed": "We could not read this STEP file. Export it as STL or 3MF.",
     "timeout": "Reading this file takes more than 20 seconds. Export it as a lighter STL or 3MF.",
     "empty": "This file has no printable volume (empty or open mesh). Export it as a closed STL or 3MF.",
-    "tooSmall": "This model is smaller than 2 mm: the unit is probably wrong (inches? metres?). Export it again in millimetres."
+    "tooSmall": "This model is smaller than 2 mm: the unit is probably wrong (inches? metres?). Export it again in millimetres.",
+    "size": "Dimensions {size}"
   },
   "studioCard": {
     "kicker": "Studio configuration attached",
@@ -89,16 +90,19 @@
     "account": "Track my request"
   },
   "fields": {
-    "quantity": "Quantity"
+    "quantity": "Quantity",
+    "material": "Material",
+    "materialOnly": "the workshop's only material"
   },
   "colorsPicker": {
     "legend": "Colours in stock (optional)",
     "hint": "Up to {max} colours, among those with enough stock for your piece.",
-    "pending": "Attach your file first: we then show the colours with enough stock for your piece.",
+    "pending": "Once your file is read, those that fall short are greyed out.",
     "none": "No colour in stock is enough for this piece. Describe the colour you want in your project: the workshop will reply.",
     "loading": "Reading the stock…",
     "unavailable": "The stock could not be read. Describe the colour you want in your project.",
     "approximate": "approximate shade",
-    "limit": "{max} colours at most."
+    "limit": "{max} colours at most.",
+    "short": "not enough stock"
   }
 }

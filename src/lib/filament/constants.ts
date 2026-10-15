@@ -89,6 +89,9 @@ export const STOCK_LOCK_KEY = 7_300_001;
 export const QUOTE_QUANTITY_MAX = 100;
 export const QUOTE_COLORS_MAX = 4;
 
+/** Matière d'une demande de /custom avec fichier : la seule que l'atelier imprime (stock 100 % PLA). */
+export const CUSTOM_MATERIAL = "PLA";
+
 /** Tarification Bambu Lab Europe (réglable dans `settings` : `filament.shop`). */
 export const BAMBU_SHOP = {
   tiers: [

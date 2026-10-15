@@ -38,7 +38,7 @@ function scrollToSheet() {
   else sheet.scrollIntoView({ behavior: "auto", block: "start" });
 }
 
-export function QuoteForm({ materials }: { materials: string[] }) {
+export function QuoteForm() {
   const t = useTranslations("quote.studioCard");
   const locale = useLocale();
   const [handoff, setHandoff] = useState<QuoteHandoff | null>(null);
@@ -59,14 +59,7 @@ export function QuoteForm({ materials }: { materials: string[] }) {
   // oxlint-enable set-state-in-effect
 
   if (!handoff) {
-    return (
-      <QuoteRequestForm
-        key="form"
-        materials={materials}
-        source="form"
-        variant="page"
-      />
-    );
+    return <QuoteRequestForm key="form" source="form" variant="page" />;
   }
 
   const { prefill: raw, attachment: sent } = handoff;

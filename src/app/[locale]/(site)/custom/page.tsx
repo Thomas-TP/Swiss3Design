@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import { ArrowDown } from "lucide-react";
 import type { Locale } from "@/i18n/routing";
-import { getMaterials } from "@/db/queries";
 import { customServiceJsonLd, pageMetadata } from "@/lib/seo";
 import { JsonLd } from "@/components/json-ld";
 import { QuoteForm } from "./quote-form";
@@ -35,12 +34,11 @@ export default async function CustomPage({
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
-  const [t, tCustom, tShell, tSeo, materials] = await Promise.all([
+  const [t, tCustom, tShell, tSeo] = await Promise.all([
     getTranslations("quote"),
     getTranslations("custom"),
     getTranslations("shell.cta"),
     getTranslations("seo"),
-    getMaterials(),
   ]);
 
   return (
@@ -112,7 +110,7 @@ export default async function CustomPage({
             />
           </div>
           <div className="col-span-full max-w-2xl lg:col-span-8 lg:max-w-none">
-            <QuoteForm materials={materials} />
+            <QuoteForm />
           </div>
         </section>
       </div>
