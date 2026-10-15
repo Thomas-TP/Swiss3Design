@@ -298,8 +298,8 @@ put` on an environment with real users without `--env <name>` explicitly
     minus `product_filament_exclusions` (boxes unticked in the admin product form); material
     always PLA (`CUSTOM_MATERIAL`, forced on save). The cart identifies a colour by `colorRef`
     (ref id; an old cart holding only a NAME is attached by `parseCart`: Blanc/Noir/Bleu,
-    `lib/filament/shop.ts`); the server re-reads everything. An `on_demand` article with a
-    weight reserves `ceil(weight × quantity × 1.10)` g in `order_item_filaments` (grams of ONE
+    `lib/filament/shop.ts`); the server re-reads everything. Every article with a weight
+    (`stock` as well as `on_demand`: the piece is printed in the chosen colour) reserves `ceil(weight × quantity × 1.10)` g in `order_item_filaments` (grams of ONE
     piece; its own table, not an `order_items` column: webhook included, every `select()` of
     that table lists its columns). Migration `drizzle-pg/0011` is additive, applied AFTER 0010
     and BEFORE the refs seed; the code tolerates 42P01 (no exclusion, nothing reserved, the

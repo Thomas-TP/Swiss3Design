@@ -6,7 +6,7 @@
 -- Ce que ça fait, uniquement sur les 6 articles de démonstration (repérés par leur
 -- slug, jamais par un id) :
 --   1. matière PLA partout (l'atelier n'imprime que du PLA) et descriptions sans PETG ;
---   2. un poids partout où il manque : les articles imprimés à la demande réservent
+--   2. un poids partout où il manque : tout article qui a un poids réserve
 --      leur filament (poids × quantité + 10 %), un poids absent = couleur non suivie ;
 --   3. UNE exclusion de démonstration (le « Support de casque » ne se fait pas en
 --      Sakura Pink) pour voir une case décochée côté fiche et côté admin.

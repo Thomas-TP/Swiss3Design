@@ -686,7 +686,7 @@ export const productFilamentExclusions = pgTable(
 );
 
 // Réservation de filament d'une ligne de commande de la boutique (article
-// imprimé à la demande, couleur suivie) : grammes d'UNE pièce ; la ligne réserve
+// avec un poids, couleur suivie) : grammes d'UNE pièce ; la ligne réserve
 // `grams_per_piece × quantité`, dérivé comme tout le reste (aucun total réservé
 // n'est stocké). Table À PART, pas une colonne de `order_items` : tous les
 // `select()` de `order_items` (webhook Stripe compris) listent ses colonnes, et le

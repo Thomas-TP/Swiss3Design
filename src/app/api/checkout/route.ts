@@ -282,8 +282,8 @@ export async function POST(request: Request) {
     const colorRef = resolved.color?.id ?? null;
     const colorName = resolved.color?.name ?? null;
     const colorHex = resolved.color?.hex ?? null;
-    // Filament à réserver : seulement un article imprimé à la demande, avec un poids
-    // et une couleur (un article en stock est déjà imprimé).
+    // Filament à réserver : tout article qui a un poids et une couleur (la pièce
+    // est imprimée dans la couleur choisie, « en stock » compris).
     const filament = {
       saleType: product.saleType,
       weightGrams: product.weightGrams,
@@ -334,7 +334,7 @@ export async function POST(request: Request) {
 
   // Stock de filament : une couleur épuisée refuse le paiement (409 out_of_stock). Le
   // besoin d'une bobine est la SOMME de ses lignes du Studio (par couleur de la
-  // palette) et de ses articles de la boutique imprimés à la demande (par
+  // palette) et de ses articles de la boutique qui ont un poids (par
   // référence : poids × quantité + 10 %). Pré-contrôle frais ici, avant la moindre
   // écriture ; le contrôle qui fait foi est refait dans la transaction, sous verrou,
   // juste avant d'insérer la commande. Tables du stock absentes (migration pas
@@ -488,14 +488,14 @@ export async function POST(request: Request) {
         })),
       ]);
 
-      // Filament réservé par chaque ligne imprimée à la demande (grammes d'UNE pièce ;
+      // Filament réservé par chaque ligne qui a un poids (grammes d'UNE pièce ;
       // la ligne réserve ce chiffre × quantité + 10 %, dérivé à la lecture). Table
       // absente : journalisé, la vente continue. Les lignes sans couleur suivie
       // n'écrivent rien.
       await recordShopReservations(
         tx,
         validLines.flatMap((l, index) => {
-          const gramsPerPiece = shopReservationGrams(l.saleType, l.weightGrams);
+          const gramsPerPiece = shopReservationGrams(l.weightGrams);
           return l.colorRef && gramsPerPiece !== null
             ? [
                 {

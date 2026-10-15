@@ -402,15 +402,12 @@ export async function createPendingAgentOrder(
           quantity: l.quantity,
         })),
       );
-      // Filament de l'article imprimé à la demande : réservé comme au paiement web
+      // Filament de l'article (s'il a un poids) : réservé comme au paiement web
       // (sans le refuser ici : le stock de filament ne bloque pas les achats agents).
       await recordShopReservations(
         tx,
         input.quote.lines.flatMap((l, index): ShopReservationInput[] => {
-          const gramsPerPiece = shopReservationGrams(
-            l.sku.saleType,
-            l.sku.weightGrams,
-          );
+          const gramsPerPiece = shopReservationGrams(l.sku.weightGrams);
           return l.sku.colorRef && gramsPerPiece !== null
             ? [
                 {

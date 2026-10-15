@@ -15,7 +15,7 @@ import {
 } from "./consume-actions";
 
 // Panneau « Filament » d'une commande (objets du Studio et articles de la boutique
-// imprimés à la demande, une ligne par couleur) ou d'un devis : ce que la
+// qui ont un poids, une ligne par couleur) ou d'un devis : ce que la
 // pièce consomme par couleur, la bobine à débiter et les grammes RÉELS du slicer
 // (le calcul du site n'est qu'une proposition, modifiable). Tant que le décompte
 // n'est pas fait, ces grammes sont RÉSERVÉS : ils ne comptent plus comme disponibles.

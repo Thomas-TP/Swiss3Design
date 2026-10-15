@@ -99,7 +99,7 @@ export async function loadOrderPanel(
       for (const [id, g] of Object.entries(grams))
         totals.set(id, (totals.get(id) ?? 0) + (g ?? 0) * item.quantity);
     }
-    // Articles de la boutique imprimés à la demande : grammes d'une pièce enregistrés
+    // Articles de la boutique (avec un poids) : grammes d'une pièce enregistrés
     // à la commande, × quantité + 10 % de perte (même calcul que la réservation).
     const shopTotals = new Map<string, number>();
     if (await hasShopReservationTable(db)) {

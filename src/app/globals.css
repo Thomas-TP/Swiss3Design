@@ -347,8 +347,11 @@ body {
 [data-stage-view] > .s3d-poster {
   transition: opacity 240ms var(--ease-strate);
 }
+/* Effacé, le poster ne capte plus le pointeur : sinon une vue interactive
+   (viewer de la fiche) recevait le glisser sur la photo invisible, pas l'orbite. */
 [data-stage-view][data-stage-ready="true"] > .s3d-poster {
   opacity: 0;
+  pointer-events: none;
 }
 /* Une vue qui couvre une section tonale peint elle-même le fond de la section. */
 [data-tone]:has(> [data-stage-view][data-stage-ready="true"]) {

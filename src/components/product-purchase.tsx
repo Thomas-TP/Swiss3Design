@@ -27,7 +27,7 @@ interface Variant {
 // « Acheter » est en encre. Colonne collante dès le premier écran : tout ce qui
 // décide de l'achat reste sous les yeux.
 //
-// Stock de filament (article imprimé à la demande, avec un poids) : comme au
+// Stock de filament (tout article qui a un poids, « en stock » compris) : comme au
 // Studio, une couleur dont la capacité ne couvre pas UNE pièce (poids + 10 % de
 // perte) est grisée, barrée et annoncée « épuisée » ; choisie quand même (elle
 // l'était par défaut), elle bloque l'ajout. La capacité arrive après
@@ -52,7 +52,7 @@ export function ProductPurchase({
   saleType: "stock" | "on_demand";
   productionDays: number | null;
   productStock: number | null;
-  /** Poids d'une pièce (g) : fonde le contrôle du filament des articles à la demande. */
+  /** Poids d'une pièce (g) : fonde le contrôle du filament de l'article. */
   weightGrams: number | null;
   imageUrl: string | null;
   variants: Variant[];
@@ -73,11 +73,9 @@ export function ProductPurchase({
     selected: selectedColor,
   } = useProductColor();
 
-  // Filament d'UNE pièce ; null = rien à contrôler (article en stock, sans poids).
-  const needGrams = useMemo(
-    () => (saleType === "on_demand" ? shopNeedGrams(weightGrams, 1) : null),
-    [saleType, weightGrams],
-  );
+  // Filament d'UNE pièce ; null = rien à contrôler (article sans poids). Tout
+  // article est imprimé dans la couleur choisie : « en stock » compris.
+  const needGrams = useMemo(() => shopNeedGrams(weightGrams, 1), [weightGrams]);
   const filament = useFilamentStock(needGrams !== null);
   const shortIds = useMemo(
     () =>

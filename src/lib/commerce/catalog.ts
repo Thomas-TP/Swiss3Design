@@ -34,7 +34,7 @@ export interface SellableSku {
   colorHex: string | null;
   // Référence du stock de la couleur (`filament_refs.id`) et son nom officiel :
   // un agent peut la demander par l'un ou l'autre, et la commande réserve son
-  // filament (article imprimé à la demande).
+  // filament (article qui a un poids).
   colorRef?: string | null;
   colorOfficialName?: string | null;
   slug: string;

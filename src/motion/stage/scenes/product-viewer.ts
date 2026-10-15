@@ -7,8 +7,10 @@
 // fait tourner : jamais de changement de géométrie, de taille ni de motif, donc
 // ici ni zoom ni panoramique, ni plan de coupe, ni matériau d'impression
 // (celui de print-hero et du Studio), ni ligne de couche, ni teinte hors des
-// couleurs réellement vendues (la couleur arrive par les props, depuis la
-// pastille choisie à l'achat). Les seules opérations sur la géométrie sont
+// couleurs réellement vendues (les teintes arrivent par les props, depuis la
+// pastille choisie à l'achat ; une bobine bi- ou tricolore co-extrudée est
+// peinte en secteurs autour de la pièce, voir coextruded.ts, par couleurs de
+// sommets : la géométrie ne bouge pas). Les seules opérations sur la géométrie sont
 // rigides et d'affichage : redresser l'objet (quel que soit l'axe « haut » de
 // l'export), le poser sur le plateau, lisser les NORMALES (l'éclairage, pas les
 // sommets). Aucun sommet n'est déplacé, ajouté ni retiré.
@@ -24,11 +26,14 @@
 // photo reste et le DOM l'annonce.
 import {
   Box3,
+  BufferAttribute,
   BufferGeometry,
   CanvasTexture,
   Color,
   DirectionalLight,
   Group,
+  Matrix3,
+  Matrix4,
   Mesh,
   MeshBasicMaterial,
   MeshStandardMaterial,
@@ -49,14 +54,22 @@ import {
 } from "@/components/catalog/viewer-props";
 import type { StageContext, StageScene, StageTheme, ViewFrame } from "../types";
 import type { StageViewDescriptor } from "@/lib/motion-bridge/types";
+import { coextrudedBlend } from "./coextruded";
 
 // ── Réglages (§2.4 : longue focale, élévation 20–25°, lumière du nord-ouest) ──
 
 const FOV = 20;
 const rad = (deg: number) => (deg * Math.PI) / 180;
-/** Polaire bornée 60–95° (depuis le zénith) : on ne passe ni au-dessus ni sous le plateau. */
-const POLAR_MIN = rad(60);
-const POLAR_MAX = rad(95);
+/**
+ * Polaire (depuis le zénith) bornée à 6–174° : on voit la pièce sous tous les
+ * angles, du dessus comme du dessous (demande du 15.10.2026), sans passer
+ * exactement par les pôles (la caméra y perdrait son « haut »).
+ */
+const POLAR_MIN = rad(6);
+const POLAR_MAX = rad(174);
+/** Sous le plateau, le sol et l'ombre s'effacent entre ces deux polaires. */
+const FLOOR_FADE_FROM = rad(88);
+const FLOOR_FADE_TO = rad(100);
 const POLAR_START = rad(68);
 const AZIMUTH_START = rad(-28);
 /** Un cran de flèche ou de bouton « Tourner ». */
@@ -67,7 +80,7 @@ const AUTO_ROTATE = (0.6 / 60) * 2 * Math.PI;
 /** Reprise de l'autorotation après une interaction (s). */
 const AUTO_RESUME_S = 2.5;
 const RAD_PER_PX = rad(0.5);
-const POLAR_PER_PX = rad(0.3);
+const POLAR_PER_PX = rad(0.4);
 /** La pièce occupe 74 % de la hauteur de la vue et au plus 66 % de sa largeur. */
 const FILL_HEIGHT = 0.74;
 const FILL_WIDTH = 0.66;
@@ -212,6 +225,10 @@ const create = (
   let observer: IntersectionObserver | null = null;
   let model: Object3D | null = null;
   const ownedGeometries: BufferGeometry[] = [];
+  /** Maillages de la pièce, à peindre quand la bobine est co-extrudée. */
+  const meshes: Mesh[] = [];
+  /** Teintes déjà peintes en couleurs de sommets (clé), pour ne pas repeindre. */
+  let paintedKey: string | null = null;
   const target = new Vector3();
   let modelHeight = 1;
   let modelRadius = 1;
@@ -242,8 +259,76 @@ const create = (
     shadowMaterial.color.set(next.ink);
   }
 
+  /**
+   * Teinte de la pièce. Une couleur : celle du matériau. Bobine co-extrudée (2 à
+   * 3 teintes) : couleurs de sommets, calculées une fois par bobine depuis les
+   * normales dans le repère de la pièce posée (le secteur colle donc à la pièce
+   * quand elle tourne, comme sur l'objet imprimé).
+   */
   function applyColor() {
-    if (props) material.color.set(props.color);
+    const tints = props?.colors.length ? props.colors : null;
+    if (!tints) return;
+    if (tints.length === 1) {
+      if (material.vertexColors) {
+        material.vertexColors = false;
+        material.needsUpdate = true;
+      }
+      material.color.set(tints[0]);
+      return;
+    }
+    if (!model) {
+      // Pas encore de pièce : la première teinte en attendant le modèle.
+      material.color.set(tints[0]);
+      return;
+    }
+    const key = tints.join(",");
+    if (key !== paintedKey) {
+      paint(tints.map((hex) => new Color(hex)));
+      paintedKey = key;
+    }
+    material.color.set(0xffffff);
+    if (!material.vertexColors) {
+      material.vertexColors = true;
+      material.needsUpdate = true;
+    }
+  }
+
+  function paint(tints: Color[]) {
+    if (!model) return;
+    // Mélange (dessus, dessous) : la moyenne des teintes, en linéaire.
+    const mix = new Color(0, 0, 0);
+    for (const tint of tints) mix.add(tint);
+    mix.multiplyScalar(1 / tints.length);
+    model.updateMatrixWorld(true);
+    const toModel = new Matrix4().copy(model.matrixWorld).invert();
+    const normalMatrix = new Matrix3();
+    const normal = new Vector3();
+    const color = new Color();
+    for (const mesh of meshes) {
+      const normals = mesh.geometry.getAttribute("normal");
+      if (!normals) continue;
+      normalMatrix.getNormalMatrix(
+        new Matrix4().multiplyMatrices(toModel, mesh.matrixWorld),
+      );
+      const out = new Float32Array(normals.count * 3);
+      for (let i = 0; i < normals.count; i++) {
+        normal.fromBufferAttribute(normals, i).applyMatrix3(normalMatrix);
+        const blend = coextrudedBlend(
+          normal.x,
+          normal.y,
+          normal.z,
+          tints.length,
+        );
+        color
+          .copy(tints[blend.a])
+          .lerp(tints[blend.b], blend.t)
+          .lerp(mix, blend.flat);
+        out[i * 3] = color.r;
+        out[i * 3 + 1] = color.g;
+        out[i * 3 + 2] = color.b;
+      }
+      mesh.geometry.setAttribute("color", new BufferAttribute(out, 3));
+    }
   }
 
   // ── Chargement ──
@@ -306,6 +391,7 @@ const create = (
         // sont pas utilisées, donc jamais chargées par le viewer.
         mesh.material = material;
         ownedGeometries.push(mesh.geometry);
+        meshes.push(mesh);
       });
       // glTF : Y vers le haut par convention, rien à redresser.
       return place(gltf.scene, "y");
@@ -318,7 +404,9 @@ const create = (
     const geometry = toCreasedNormals(parsed, rad(45));
     parsed.dispose();
     ownedGeometries.push(geometry);
-    return place(new Mesh(geometry, material), null);
+    const mesh = new Mesh(geometry, material);
+    meshes.push(mesh);
+    return place(mesh, null);
   }
 
   async function startLoad() {
@@ -334,6 +422,8 @@ const create = (
       if (!holder || disposed || signal.aborted) return;
       model = holder;
       pivot.add(holder);
+      // Bobine co-extrudée choisie avant l'arrivée du modèle : on la peint maintenant.
+      applyColor();
       target.set(0, modelHeight * 0.5, 0);
       // Cyclorama et ombre calés sur l'empreinte réelle de la pièce.
       floor.scale.setScalar(modelRadius * 7);
@@ -464,6 +554,10 @@ const create = (
     event.preventDefault();
   }
 
+  function preventDrag(event: Event) {
+    event.preventDefault();
+  }
+
   function onTurn(event: Event) {
     if (state !== "ready") return;
     const step = (event as CustomEvent<ViewerTurnDetail>).detail?.step;
@@ -487,7 +581,11 @@ const create = (
       element.addEventListener("pointercancel", onPointerUp);
       element.addEventListener("keydown", onKeyDown);
       element.addEventListener(VIEWER_TURN_EVENT, onTurn);
+      // Aucun glisser natif (image, texte) dans la vue : il volerait le geste
+      // d'orbite (pointercancel) et traînerait une vignette à l'écran.
+      element.addEventListener("dragstart", preventDrag);
       disposers.push(
+        () => element.removeEventListener("dragstart", preventDrag),
         () => element.removeEventListener("pointerdown", onPointerDown),
         () => element.removeEventListener("pointermove", onPointerMove),
         () => element.removeEventListener("pointerup", onPointerUp),
@@ -562,6 +660,19 @@ const create = (
       }
       pivot.rotation.y = azimuth;
 
+      // Vue par-dessous : le sol (une tache claire) et l'ombre de contact
+      // masqueraient la pièce, ils s'effacent.
+      const below = Math.min(
+        1,
+        Math.max(
+          0,
+          (polar - FLOOR_FADE_FROM) / (FLOOR_FADE_TO - FLOOR_FADE_FROM),
+        ),
+      );
+      floorMaterial.opacity = 1 - below;
+      shadowMaterial.opacity = 1 - below;
+      floor.visible = shadow.visible = below < 1;
+
       const rect = frame.rect;
       const aspect = rect.width / Math.max(1, rect.height);
       camera.aspect = aspect;
@@ -598,6 +709,7 @@ const create = (
       for (const off of disposers.splice(0)) off();
       for (const geometry of ownedGeometries) geometry.dispose();
       ownedGeometries.length = 0;
+      meshes.length = 0;
       flat.dispose();
       floorTexture.dispose();
       shadowTexture.dispose();

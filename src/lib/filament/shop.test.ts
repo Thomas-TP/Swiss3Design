@@ -49,16 +49,13 @@ describe("shopNeedGrams : besoin d'une ligne = ceil(poids × quantité × 1,10)"
   });
 });
 
-describe("shopLineTracksFilament : seuls les articles à la demande réservent", () => {
-  it("à la demande avec un poids : suivi", () => {
-    expect(shopLineTracksFilament("on_demand", 120)).toBe(true);
+describe("shopLineTracksFilament : tout article avec un poids réserve", () => {
+  it("avec un poids : suivi (« en stock » comme « à la demande »)", () => {
+    expect(shopLineTracksFilament(120)).toBe(true);
   });
-  it("à la demande sans poids : non suivi", () => {
-    expect(shopLineTracksFilament("on_demand", null)).toBe(false);
-    expect(shopLineTracksFilament("on_demand", 0)).toBe(false);
-  });
-  it("pièce déjà imprimée (stock) : jamais de contrôle ni de réservation", () => {
-    expect(shopLineTracksFilament("stock", 120)).toBe(false);
+  it("sans poids : non suivi", () => {
+    expect(shopLineTracksFilament(null)).toBe(false);
+    expect(shopLineTracksFilament(0)).toBe(false);
   });
 });
 
@@ -261,14 +258,13 @@ describe("findShortfalls : un seul contrôle par référence", () => {
 });
 
 describe("shopReservationGrams : grammes d'UNE pièce écrits à la commande", () => {
-  it("le poids arrondi au gramme supérieur, seulement pour un article à la demande", () => {
-    expect(shopReservationGrams("on_demand", 320)).toBe(320);
-    expect(shopReservationGrams("on_demand", 99.2)).toBe(100);
+  it("le poids arrondi au gramme supérieur", () => {
+    expect(shopReservationGrams(320)).toBe(320);
+    expect(shopReservationGrams(99.2)).toBe(100);
   });
-  it("rien à écrire pour un article en stock ou sans poids", () => {
-    expect(shopReservationGrams("stock", 320)).toBeNull();
-    expect(shopReservationGrams("on_demand", null)).toBeNull();
-    expect(shopReservationGrams("on_demand", 0)).toBeNull();
+  it("rien à écrire pour un article sans poids", () => {
+    expect(shopReservationGrams(null)).toBeNull();
+    expect(shopReservationGrams(0)).toBeNull();
   });
   it("× quantité + 10 % redonne le besoin du paiement (même calcul que la requête de réservation)", () => {
     // La requête SQL fait CEIL(grammes d'une pièce × quantité × 110 / 100).
@@ -278,7 +274,7 @@ describe("shopReservationGrams : grammes d'UNE pièce écrits à la commande", (
       [8, 7],
       [45, 2],
     ]) {
-      const perPiece = shopReservationGrams("on_demand", weight)!;
+      const perPiece = shopReservationGrams(weight)!;
       expect(shopNeedGrams(perPiece, quantity)).toBe(
         shopNeedGrams(weight, quantity),
       );
@@ -290,14 +286,10 @@ describe("shopNeedsByRef : le besoin des lignes de la boutique, par référence"
   const line = (
     colorRef: string | null,
     quantity: number,
-    over: Partial<{
-      saleType: "stock" | "on_demand";
-      weightGrams: number | null;
-    }> = {},
+    over: Partial<{ weightGrams: number | null }> = {},
   ) => ({
     colorRef,
     quantity,
-    saleType: "on_demand" as const,
     weightGrams: 100,
     ...over,
   });
@@ -315,10 +307,9 @@ describe("shopNeedsByRef : le besoin des lignes de la boutique, par référence"
       "r-black": 220,
     });
   });
-  it("ignore les articles en stock, sans poids ou sans couleur", () => {
+  it("ignore les articles sans poids ou sans couleur", () => {
     expect(
       shopNeedsByRef([
-        line("r-white", 1, { saleType: "stock" }),
         line("r-white", 1, { weightGrams: null }),
         line(null, 1),
       ]),

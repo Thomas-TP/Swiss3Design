@@ -5,8 +5,8 @@
 //
 // Licence : le viewer MONTRE et FAIT TOURNER le fichier original de Ian (CC
 // BY-ND 4.0), rien d'autre. Ce contrat ne porte donc ni zoom, ni plan de coupe,
-// ni mode « impression », ni teinte libre : seulement une couleur réellement
-// vendue, l'autorotation et la rotation (§1.5, §7.9).
+// ni mode « impression », ni teinte libre : seulement les teintes d'une bobine
+// réellement vendue, l'autorotation et la rotation (§1.5, §7.9).
 
 export type ViewerState = "idle" | "loading" | "ready" | "error";
 
@@ -21,8 +21,11 @@ export interface ViewerStatus {
 export interface ProductViewerProps {
   /** STL (ou GLB) du produit, même origine que la page (`/api/files/…`). */
   modelUrl: string;
-  /** Couleur réellement vendue (hex), celle de la pastille choisie à l'achat. */
-  color: string;
+  /**
+   * Teintes (hex) de la bobine choisie à l'achat : une seule, ou 2 à 3 pour une
+   * bobine co-extrudée (bicolore, tricolore), rendue en secteurs autour de la pièce.
+   */
+  colors: readonly string[];
   /** Mouvement complet demandé ; la scène ne tourne seule qu'en capacité C2. */
   autoRotate: boolean;
   /** Rappel appelé au changement d'état et pendant le chargement (≈ 4 Hz). */

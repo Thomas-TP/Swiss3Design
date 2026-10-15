@@ -90,12 +90,21 @@ export function ProductViewer({
     return () => observer.disconnect();
   }, []);
 
-  // Une couleur réellement vendue, ou à défaut un blanc neutre : jamais une
-  // teinte libre (le viewer ne « colorie » rien qui ne soit au catalogue).
-  const color = selected?.hex ?? colors[0]?.hex ?? VIEWER_FALLBACK_COLOR;
+  // Une bobine réellement vendue (ses 1 à 3 teintes), ou à défaut un blanc
+  // neutre : jamais une teinte libre (le viewer ne « colorie » rien qui ne soit
+  // au catalogue). La clé texte garde les props stables d'un rendu à l'autre.
+  const chosen = selected ?? colors[0] ?? null;
+  const tints = chosen
+    ? (chosen.hexes.length > 0 ? chosen.hexes : [chosen.hex]).join(",")
+    : VIEWER_FALLBACK_COLOR;
   const viewProps = useMemo<ProductViewerProps>(
-    () => ({ modelUrl, color, autoRotate: !reduced, onStatus: setStatus }),
-    [modelUrl, color, reduced],
+    () => ({
+      modelUrl,
+      colors: tints.split(","),
+      autoRotate: !reduced,
+      onStatus: setStatus,
+    }),
+    [modelUrl, tints, reduced],
   );
 
   const ready = status.state === "ready";
@@ -118,6 +127,9 @@ export function ProductViewer({
       alt={poster.alt ?? name}
       loading="lazy"
       decoding="async"
+      // Un glisser sur la vue fait tourner la pièce : jamais le glisser natif de
+      // l'image (qui volait le geste et traînait la photo à l'écran).
+      draggable={false}
       className="h-full w-full object-contain p-6 sm:p-10"
     />
   ) : null;

@@ -54,7 +54,7 @@ export interface ProductListItem {
   material: string;
   multicolor: boolean;
   stock: number | null;
-  /** Poids d'UNE pièce (g) : le panier en tire le filament à réserver (articles à la demande). */
+  /** Poids d'UNE pièce (g) : le panier en tire le filament à réserver. */
   weightGrams: number | null;
   name: string;
   description: string;

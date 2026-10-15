@@ -2,7 +2,8 @@
 // navigateur et le serveur le partagent). Décision du propriétaire du 15.10.2026 :
 // les articles de la boutique proposent les MÊMES couleurs que « Sur mesure » (les
 // références du stock actives avec `custom_ok`), moins les exclusions de l'article ;
-// les articles imprimés à la demande réservent leur filament comme le Studio.
+// tout article qui a un poids réserve son filament comme le Studio (la pièce est
+// imprimée dans la couleur choisie, « en stock » compris).
 import { isShort, type Capacity } from "./capacity";
 import { CUSTOM_MATERIAL } from "./constants";
 
@@ -38,27 +39,28 @@ export function shopNeedGrams(
   );
 }
 
-/** Cette ligne réserve-t-elle du filament ? Seulement un article imprimé à la demande, avec un poids. */
+/**
+ * Cette ligne réserve-t-elle du filament ? Tout article qui a un poids, « en
+ * stock » comme « à la demande » : avec les couleurs du stock, la pièce est
+ * imprimée dans la couleur choisie à la commande (décision du 15.10.2026, une
+ * couleur sans filament ne se choisit sur aucun article).
+ */
 export function shopLineTracksFilament(
-  saleType: "stock" | "on_demand",
   weightGrams: number | null | undefined,
 ): boolean {
-  return (
-    shopNeedGrams(saleType === "on_demand" ? weightGrams : null, 1) !== null
-  );
+  return shopNeedGrams(weightGrams, 1) !== null;
 }
 
 /**
  * Grammes d'UNE pièce à réserver pour une ligne (`order_item_filaments.grams_per_piece`) :
- * le poids de la fiche arrondi au gramme supérieur, seulement pour un article
- * imprimé à la demande avec un poids ; null sinon (rien n'est écrit). La ligne
- * réserve ensuite `grams_per_piece × quantité + perte`, dérivé à la lecture.
+ * le poids de la fiche arrondi au gramme supérieur ; null sans poids (rien n'est
+ * écrit). La ligne réserve ensuite `grams_per_piece × quantité + perte`, dérivé à
+ * la lecture.
  */
 export function shopReservationGrams(
-  saleType: "stock" | "on_demand",
   weightGrams: number | null | undefined,
 ): number | null {
-  return shopLineTracksFilament(saleType, weightGrams)
+  return shopLineTracksFilament(weightGrams)
     ? Math.ceil(weightGrams as number)
     : null;
 }
@@ -190,7 +192,7 @@ export interface NeedRef {
 export interface CombinedNeeds {
   /** Grammes par id de palette du Studio (lignes du Studio : pièce × quantité). */
   studio: Readonly<Record<string, number>>;
-  /** Grammes par id de référence (lignes de la boutique imprimées à la demande). */
+  /** Grammes par id de référence (lignes de la boutique qui ont un poids). */
   shop: Readonly<Record<string, number>>;
 }
 
@@ -244,14 +246,13 @@ export function findShortfalls(
 export interface ShopNeedLine {
   /** Référence de la couleur choisie, ou null (ligne sans couleur : rien à réserver). */
   colorRef: string | null;
-  saleType: "stock" | "on_demand";
   weightGrams: number | null | undefined;
   quantity: number;
 }
 
 /**
- * Grammes à réserver par référence pour des lignes de la boutique : seulement les
- * articles imprimés à la demande, avec un poids et une couleur ; chaque ligne est
+ * Grammes à réserver par référence pour des lignes de la boutique : les articles
+ * qui ont un poids et une couleur (`shopLineTracksFilament`) ; chaque ligne est
  * arrondie au gramme supérieur AVANT d'être additionnée (comme la requête de
  * réservation, qui additionne des lignes arrondies). Pur : le panier et le
  * paiement partagent ce calcul.
@@ -262,10 +263,7 @@ export function shopNeedsByRef(
   const out: Record<string, number> = {};
   for (const line of lines) {
     if (!line.colorRef) continue;
-    const grams = shopNeedGrams(
-      line.saleType === "on_demand" ? line.weightGrams : null,
-      line.quantity,
-    );
+    const grams = shopNeedGrams(line.weightGrams, line.quantity);
     if (grams === null) continue;
     out[line.colorRef] = (out[line.colorRef] ?? 0) + grams;
   }

@@ -31,7 +31,7 @@ export interface Reservations {
   studio: Readonly<Record<string, number>>;
   /** Grammes réservés par id de référence (devis acceptés). */
   quote: Readonly<Record<string, number>>;
-  /** Grammes réservés par id de référence (lignes de la boutique imprimées à la demande). */
+  /** Grammes réservés par id de référence (lignes de la boutique qui ont un poids). */
   shop: Readonly<Record<string, number>>;
 }
 

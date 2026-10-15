@@ -83,7 +83,7 @@ export default function CartContent({
   }, [lines]);
 
   // Stock de filament : chaque ligne du Studio remonte ses grammes par couleur
-  // (pièce × quantité), chaque article de la boutique imprimé à la demande les
+  // (pièce × quantité), chaque article de la boutique qui a un poids les
   // siens (poids × quantité + 10 % de perte) ; une même bobine sert les deux, la
   // somme est donc faite PAR RÉFÉRENCE puis comparée à la capacité publique. Une
   // couleur épuisée est signalée sur sa ligne et bloque « Commander » (le paiement

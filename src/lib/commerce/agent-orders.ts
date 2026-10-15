@@ -258,13 +258,13 @@ export async function recordPaidAgentOrder(
         quantity: line.quantity,
       }));
       await tx.insert(orderItems).values(items);
-      // Filament de l'article imprimé à la demande, réservé (jamais bloquant : la
+      // Filament de l'article (s'il a un poids), réservé (jamais bloquant : la
       // commande est déjà payée ; une table ou une référence absente est ignorée).
       await recordShopReservations(
         tx,
         draft.lines.flatMap((line, index): ShopReservationInput[] => {
           const gramsPerPiece = line.sku
-            ? shopReservationGrams(line.sku.saleType, line.sku.weightGrams)
+            ? shopReservationGrams(line.sku.weightGrams)
             : null;
           return line.sku?.colorRef && gramsPerPiece !== null
             ? [

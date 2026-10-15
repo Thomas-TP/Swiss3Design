@@ -10,7 +10,7 @@ import type { ClientStock } from "@/lib/filament/shop";
 // au retour sur l'onglet. Tant qu'elle n'est pas là, ou si elle échoue, aucune
 // couleur n'est épuisée : le paiement revérifie toujours côté serveur (409
 // out_of_stock). Rien de lourd : un simple fetch. `enabled` à faux (panier sans
-// objet du Studio ni article imprimé à la demande, fiche d'un article en stock) :
+// objet du Studio ni article avec un poids, fiche d'un article sans poids) :
 // aucune requête.
 
 const REFRESH_MS = 60_000;

@@ -123,11 +123,11 @@ enregistrée comme payée).
    **Production : matière.** `SELECT material, count(*) FROM products GROUP BY 1;` ; si autre chose
    que `PLA` apparaît, `UPDATE products SET material = 'PLA' WHERE material <> 'PLA';` (le formulaire
    admin impose désormais PLA à chaque enregistrement ; la boutique l'affiche telle quelle).
-   **Articles à la demande : le filament est contrôlé comme au Studio.** Un article « imprimé à la
-   demande » avec un poids réserve poids × quantité + 10 %, et une couleur sans bobine en stock est
+   **Articles de la boutique : le filament est contrôlé comme au Studio.** Tout article qui a un
+   poids (« en stock » comme « à la demande ») réserve poids × quantité + 10 %, et une couleur sans bobine en stock est
    « épuisée » (grisée sur la fiche, bloquante au panier et au paiement). Renseignez le **poids** de
-   chaque article à la demande (sans poids, la couleur n'est pas suivie et la vente passe), et saisissez
-   le stock de bobines avant de vendre. Les articles « en stock » ne réservent aucun filament.
+   chaque article (sans poids, la couleur n'est pas suivie et la vente passe), et saisissez le stock
+   de bobines avant de vendre.
    **Sans bobine en stock, chaque couleur du Studio est « épuisée » et le Studio ne vend rien** :
    saisissez la commande Bambu reçue juste après le déploiement (`/admin/filaments` → réception,
    pesée), ou préparez avant la fusion une version de production du seed de stock.
@@ -150,13 +150,13 @@ Couleurs de la boutique, à regarder sur la preview une fois la 0011 et le seed 
 - [ ] Fiche d'un article (`/fr/products/lampe-voronoi`) : toutes les couleurs du « Sur mesure »
       sont proposées, la première est la blanche, le nom de la couleur choisie s'affiche ; sur
       « Support de casque », **Sakura Pink est absente** (exclusion de démonstration).
-- [ ] Un article « imprimé à la demande » (lampe, support de casque), couleur sans bobine ou trop
+- [ ] Un article de la boutique (vase, lampe, support de casque…), couleur sans bobine ou trop
       peu de grammes : la pastille est **grisée et barrée**, annoncée « épuisée » (comme au Studio) ;
       choisie quand même, elle bloque « Ajouter au panier » et « Acheter ».
 - [ ] Panier : une ligne dont la couleur manque de grammes (en cumulant avec un objet du Studio de la
       même couleur) affiche « Couleur épuisée : … » et **« Commander » est désactivé** ; un panier
       d'avant (couleur « Blanc », « Noir » ou « Bleu » enregistrée dans le navigateur) se relit et se paie.
-- [ ] Paiement d'un article à la demande : la commande est créée ; dans l'admin, la commande montre le
+- [ ] Paiement d'un article de la boutique : la commande est créée ; dans l'admin, la commande montre le
       bloc « Filament de la commande » avec la couleur de l'article (poids × quantité + 10 %), et
       `/admin/filaments` voit ces grammes réservés ; « Décompter du stock » les libère.
 - [ ] Admin → Produits → un produit : la matière est un texte fixe « PLA », les couleurs sont des

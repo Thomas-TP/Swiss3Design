@@ -1,5 +1,5 @@
 // Réservation de filament d'une ligne de la boutique (écriture, serveur). Une ligne
-// d'article imprimé à la demande, de couleur suivie, écrit UNE ligne
+// d'article qui a un poids, de couleur suivie, écrit UNE ligne
 // `order_item_filaments` (grammes d'une pièce) DANS la transaction de la commande ;
 // ce que la commande réserve se dérive ensuite (`stock-db.ts`), rien n'est stocké en
 // total. La migration 0011 peut manquer : le paiement ne dépend jamais d'elle.

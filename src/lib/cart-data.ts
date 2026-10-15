@@ -22,7 +22,7 @@ export interface CartItem {
   colorHex?: string | null;
   /**
    * Poids d'UNE pièce (g), repris de la fiche à l'ajout : le panier en tire le
-   * filament à réserver (article imprimé à la demande) pour signaler une couleur
+   * filament à réserver (tout article qui a un poids) pour signaler une couleur
    * épuisée. Indicatif : le serveur relit le poids en base. Absent d'un ancien
    * panier : pas d'avertissement dans le panier, le paiement revérifie.
    */
