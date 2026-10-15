@@ -19,12 +19,14 @@ export const dynamic = "force-dynamic";
 
 export async function generateMetadata({
   params,
+  searchParams,
 }: {
   params: Promise<{ locale: Locale }>;
+  searchParams: Promise<{ error?: string }>;
 }): Promise<Metadata> {
-  const { locale } = await params;
+  const [{ locale }, { error }] = await Promise.all([params, searchParams]);
   const t = await getTranslations({ locale, namespace: "auth" });
-  return { title: t("verifiedTitle") };
+  return { title: t(error ? "verifyFailedTitle" : "verifiedTitle") };
 }
 
 export default async function VerifiedPage({
