@@ -59,6 +59,7 @@ import {
 import type { StageContext, StageScene, StageTheme, ViewFrame } from "../types";
 import type { StageViewDescriptor } from "@/lib/motion-bridge/types";
 import { coextrudedBlend } from "./coextruded";
+import { DecorBlur } from "./decor-blur";
 
 // ── Réglages (§2.4 : longue focale, élévation 20–25°, lumière du nord-ouest) ──
 
@@ -94,25 +95,26 @@ const PROGRESS_INTERVAL_MS = 250;
 // La caméra tourne AUTOUR de la pièce (on voit la salle défiler), la pièce reste
 // posée. Tout est à l'échelle réelle (salle « scaled to real world » : plateau à
 // 0,78 m, dossiers à 1 m, plan de travail à 0,86 m ; le vase fait 21 cm) : on ne
-// grossit jamais la pièce, ce serait mentir sur sa taille. Pour qu'elle domine
-// l'image, la caméra s'en approche : la salle s'éloigne derrière. L'angle
-// VERTICAL vaut au plus 50°, et l'angle HORIZONTAL au plus 55° : sur un écran
-// large (vue 2,2 fois plus large que haute), 50° vertical faisaient 91° en
-// largeur, un fish-eye où la salle entière défilait, bords étirés, et la pièce
-// paraissait minuscule au milieu.
-const DECOR_FOV = 50;
+// grossit jamais la pièce, ce serait mentir sur sa taille. Elle est cadrée comme
+// sur une photo de produit (demande du 15.10.2026 : « elle doit donner envie ») :
+// grande dans l'image (78 % de la hauteur), objectif de portrait (28° vertical),
+// caméra presque à hauteur de plateau, et la salle FLOUE derrière elle
+// (profondeur de champ, decor-blur.ts). L'angle HORIZONTAL vaut au plus 55° :
+// sur un écran large (vue 2,2 fois plus large que haute), un angle vertical
+// ouvert devenait un fish-eye où la pièce paraissait minuscule au milieu.
+const DECOR_FOV = 28;
 const DECOR_HFOV_MAX = 55;
 /** Première vue : depuis le bout de la table, vers la cuisine (fenêtre à gauche). */
 const DECOR_AZIMUTH_START = rad(70);
 /**
- * Polaire en décor : de 40° (plongée) à 84° (presque à hauteur de plateau). Plus
- * bas, la caméra traverserait le plateau ou les dossiers des chaises.
+ * Polaire en décor : de 55° (plongée) à 86° (à hauteur de plateau, 15 cm
+ * au-dessus). La caméra reste au-dessus du plateau, jamais dans les chaises.
  */
-const DECOR_POLAR_MIN = rad(40);
-const DECOR_POLAR_MAX = rad(84);
-const DECOR_POLAR_START = rad(78);
-/** En décor, la pièce occupe 60 % de la hauteur de la vue (la salle autour). */
-const DECOR_FILL = 0.6;
+const DECOR_POLAR_MIN = rad(55);
+const DECOR_POLAR_MAX = rad(86);
+const DECOR_POLAR_START = rad(82);
+/** En décor, la pièce occupe 78 % de la hauteur de la vue. */
+const DECOR_FILL = 0.78;
 /** Lumière d'appoint côté fenêtre (le décor a ses baies vers −Z). */
 const DECOR_SUN = new Vector3(0.25, 1.1, -1);
 
@@ -298,6 +300,9 @@ const create = (
   let paintedKey: string | null = null;
   /** Décor chargé (la pièce y est posée), ou null : fond neutre de la page. */
   let decor: Object3D | null = null;
+  /** Le décor vit dans sa propre scène : rendu flou d'abord, la pièce par-dessus. */
+  const decorScene = new Scene();
+  let decorBlur: DecorBlur | null = null;
   const decorMaterials = new Set<Material>();
   const decorTextures = new Set<Texture>();
   let decorEnv: WebGLRenderTarget | null = null;
@@ -520,7 +525,7 @@ const create = (
   /** Pose la pièce sur le meuble du décor et éclaire-la avec la salle. */
   function placeInDecor(room: Object3D, anchor: readonly number[]) {
     decor = room;
-    scene.add(room);
+    decorScene.add(room);
     unitScale = unitScaleFor(modelHeight);
     pivot.position.set(anchor[0], anchor[1], anchor[2]);
     pivot.scale.setScalar(unitScale);
@@ -529,11 +534,9 @@ const create = (
     // Reflets et ambiance de la salle elle-même, vue depuis la pièce : la
     // teinte du produit prend la lumière du décor, pas celle d'un studio.
     const generator = new PMREMGenerator(ctx.renderer);
-    pivot.visible = false;
-    decorEnv = generator.fromScene(scene, 0.03, 0.02, 30, {
+    decorEnv = generator.fromScene(decorScene, 0.03, 0.02, 30, {
       position: target,
     });
-    pivot.visible = true;
     generator.dispose();
     scene.environment = decorEnv.texture;
     scene.environmentIntensity = 1;
@@ -864,6 +867,19 @@ const create = (
       );
       camera.lookAt(target);
       camera.updateProjectionMatrix();
+      if (decor) {
+        // La salle, nette au pied de la pièce et floue derrière, puis la pièce
+        // par-dessus (profondeur effacée : rien du décor ne passe devant).
+        decorBlur ??= new DecorBlur(current.renderer);
+        decorBlur.draw(
+          current.renderer,
+          decorScene,
+          camera,
+          { width: rect.width * frame.dpr, height: rect.height * frame.dpr },
+          distance,
+        );
+        current.renderer.clearDepth();
+      }
       current.renderer.render(scene, camera);
       return again;
     },
@@ -895,6 +911,9 @@ const create = (
       decorTextures.clear();
       decorEnv?.dispose();
       decorEnv = null;
+      decorBlur?.dispose();
+      decorBlur = null;
+      decorScene.clear();
       scene.clear();
       model = null;
       decor = null;

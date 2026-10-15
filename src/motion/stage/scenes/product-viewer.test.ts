@@ -12,16 +12,19 @@ const horizontalFov = (verticalDeg: number, aspect: number) =>
   deg(2 * Math.atan(Math.tan((verticalDeg * Math.PI) / 360) * aspect));
 
 describe("décor : cadrage de la caméra", () => {
-  it("vue haute ou carrée : 50° verticaux", () => {
-    expect(decorFov(1)).toBeCloseTo(50, 5);
-    expect(decorFov(0.6)).toBeCloseTo(50, 5);
+  it("objectif de portrait : 28° verticaux sur une vue haute ou carrée", () => {
+    expect(decorFov(1)).toBeCloseTo(28, 5);
+    expect(decorFov(0.6)).toBeCloseTo(28, 5);
   });
 
   it("vue large (bureau) : jamais plus de 55° en largeur, pas de fish-eye", () => {
-    for (const aspect of [1.6, 2.2, 3]) {
-      const vertical = decorFov(aspect);
-      expect(vertical).toBeLessThan(50);
-      expect(horizontalFov(vertical, aspect)).toBeCloseTo(55, 5);
+    for (const aspect of [1.2, 1.6, 2.2, 3])
+      expect(horizontalFov(decorFov(aspect), aspect)).toBeLessThanOrEqual(
+        55.0001,
+      );
+    for (const aspect of [2.2, 3]) {
+      expect(decorFov(aspect)).toBeLessThan(28);
+      expect(horizontalFov(decorFov(aspect), aspect)).toBeCloseTo(55, 5);
     }
   });
 
@@ -31,7 +34,7 @@ describe("décor : cadrage de la caméra", () => {
       const fovDeg = decorFov(aspect);
       const distance = decorDistance({ ...vase, aspect, fovDeg });
       const visible = 2 * distance * Math.tan((fovDeg * Math.PI) / 360);
-      expect(vase.height / visible).toBeCloseTo(0.6, 5);
+      expect(vase.height / visible).toBeCloseTo(0.78, 5);
     }
   });
 
@@ -43,13 +46,13 @@ describe("décor : cadrage de la caméra", () => {
       aspect: 2.2,
       fovDeg,
     });
-    // Polaire la plus basse (84°) : distance horizontale < demi-largeur.
-    expect(distance * Math.sin((84 * Math.PI) / 180)).toBeLessThan(0.8);
+    // Polaire la plus basse (86°) : distance horizontale < demi-largeur.
+    expect(distance * Math.sin((86 * Math.PI) / 180)).toBeLessThan(0.8);
   });
 
-  it("polaire bornée à 40–84° en décor, 6–174° sur le fond neutre", () => {
-    expect(deg(clampPolar(0, true))).toBeCloseTo(40);
-    expect(deg(clampPolar(Math.PI, true))).toBeCloseTo(84);
+  it("polaire bornée à 55–86° en décor, 6–174° sur le fond neutre", () => {
+    expect(deg(clampPolar(0, true))).toBeCloseTo(55);
+    expect(deg(clampPolar(Math.PI, true))).toBeCloseTo(86);
     expect(deg(clampPolar(0))).toBeCloseTo(6);
     expect(deg(clampPolar(Math.PI))).toBeCloseTo(174);
   });
