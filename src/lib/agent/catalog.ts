@@ -42,7 +42,15 @@ export interface AgentProduct extends AgentProductSummary {
   weightGrams: number | null;
   images: { url: string; alt: string | null }[];
   variants: { id: string; name: string; price: AgentPrice }[];
-  colorOptions: { name: string; hex: string }[];
+  // Les couleurs de l'article : celles du stock (les mêmes que « Sur mesure »),
+  // moins les exclusions de la fiche. Une ligne de panier les retrouve par `id`,
+  // par `name` (langue de la requête) ou par `officialName`.
+  colorOptions: {
+    id: string;
+    name: string;
+    officialName: string;
+    hex: string;
+  }[];
 }
 
 export const price = (cents: number): AgentPrice => ({
@@ -141,7 +149,12 @@ export async function getAgentProduct(
       name: v.name,
       price: price(v.priceCents ?? p.priceCents),
     })),
-    colorOptions: p.colors.map((c) => ({ name: c.name, hex: c.hex })),
+    colorOptions: p.colors.map((c) => ({
+      id: c.id,
+      name: c.name,
+      officialName: c.officialName,
+      hex: c.hex,
+    })),
   };
 }
 

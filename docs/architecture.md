@@ -57,10 +57,15 @@ of truth.
 - **product_images** — R2 `url`, `alt`, `sortOrder`.
 - **product_variants** — `sku`, `name`, `priceCents` (`null` → inherits product),
   `stock` (`null` → on-demand).
-- **materials** — editable filament palette; products store the chosen name as
-  text in `products.material` (shop filters derive from real usage).
-- **filament_colors** — `(materialId)` colours: `name` + `hex`.
-- **product_colors** — `(productId, colorId)` colours a product offers.
+- **Colours of an article** — the stock's: active `filament_refs` with `custom_ok`
+  (the same as the custom-print form), minus **product_filament_exclusions**
+  `(productId, refId)` (boxes unticked in the admin product form; migration `0011`).
+  `products.material` is always `PLA`. The former palette tables **materials**,
+  **filament_colors** and **product_colors** are kept for the D1 rollback only: no
+  code reads them any more.
+- **order_item_filaments** — `(orderItemId)` → `refId`, `gramsPerPiece`: the filament an
+  on-demand shop line reserves (`gramsPerPiece × quantity + 10 %`, derived at read time,
+  released by `filament_consumptions` like Studio orders and quotes; migration `0011`).
 - **categories** / **category_translations** / **product_categories** (M:N).
 
 ### Orders

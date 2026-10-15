@@ -14,7 +14,8 @@
     "studioNote": "Fabriqué sur commande · livraison offerte",
     "freeAll": "Livraison offerte en Suisse.",
     "studioShort": "Épuisée : {colors}. Modifiez la pièce ou réduisez la quantité.",
-    "shortBlock": "Une couleur du Studio n'est plus en stock pour ce panier : modifiez la pièce concernée avant de commander."
+    "shopShort": "Couleur épuisée : {color}. Choisissez-en une autre sur la fiche de l'article ou réduisez la quantité.",
+    "shortBlock": "Une couleur n'est plus en stock pour ce panier : modifiez la ligne concernée avant de commander."
   },
   "checkout": {
     "title": "Commande.",

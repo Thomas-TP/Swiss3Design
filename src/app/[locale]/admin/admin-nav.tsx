@@ -5,7 +5,6 @@ import {
   Package,
   Sparkles,
   Tags,
-  Layers,
   Disc3,
   ShoppingCart,
   FileText,
@@ -36,7 +35,6 @@ const groups: { title?: string; items: NavItem[] }[] = [
       { href: "/admin/products", label: "Produits", Icon: Package },
       { href: "/admin/featured", label: "Sélection du moment", Icon: Sparkles },
       { href: "/admin/categories", label: "Catégories", Icon: Tags },
-      { href: "/admin/materials", label: "Palette boutique", Icon: Layers },
     ],
   },
   {

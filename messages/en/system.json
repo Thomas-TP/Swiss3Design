@@ -14,7 +14,8 @@
     "studioNote": "Made to order · free delivery",
     "freeAll": "Free delivery in Switzerland.",
     "studioShort": "Out of stock: {colors}. Edit the piece or lower the quantity.",
-    "shortBlock": "A Studio colour is no longer in stock for this cart: edit the affected piece before checking out."
+    "shopShort": "Colour out of stock: {color}. Pick another colour on the item page or lower the quantity.",
+    "shortBlock": "A colour is no longer in stock for this cart: edit the affected line before checking out."
   },
   "checkout": {
     "title": "Checkout.",

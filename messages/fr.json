@@ -15,7 +15,6 @@
     "all": "Tout",
     "results": "{count, plural, =0 {Aucun produit} one {# produit} other {# produits}}",
     "empty": "Aucun produit ne correspond à ces filtres.",
-    "filterColor": "Couleur",
     "filterMulticolor": "Multicolore",
     "sortLabel": "Trier :",
     "sortNew": "Nouveautés",
@@ -32,6 +31,8 @@
     "multicolorBadge": "Multicolore",
     "variant": "Variante",
     "color": "Couleur",
+    "colorSoldOut": "épuisée",
+    "colorShort": "Cette couleur n'est plus disponible pour cet article : choisissez-en une autre.",
     "material": "Matière",
     "dimensions": "Dimensions",
     "weight": "Poids",
@@ -134,7 +135,8 @@
     "errorProductChanged": "Un article ou une option a changé. Revenez à sa fiche pour le sélectionner de nouveau.",
     "errorStudioPrice": "Le prix d'un objet du Studio a été mis à jour. Vérifiez le total, puis validez à nouveau.",
     "errorStudioInvalid": "Un objet du Studio de votre panier ne peut pas être imprimé tel quel. Rouvrez-le dans le Studio depuis le panier.",
-    "errorFilament": "Une couleur d'un objet du Studio de votre panier n'est plus en stock. Rouvrez-le dans le Studio pour en choisir une autre, ou demandez un devis."
+    "errorColor": "Un article de votre panier n'a pas de couleur. Retirez-le du panier, puis ajoutez-le de nouveau depuis sa fiche en choisissant une couleur.",
+    "errorFilament": "Une couleur de votre panier n'est plus en stock. Modifiez la ligne concernée (rouvrez l'objet dans le Studio, ou choisissez une autre couleur sur la fiche de l'article), ou demandez un devis."
   },
   "orderSuccess": {
     "processingTitle": "Paiement en cours",
@@ -450,7 +452,7 @@
       "decline": "Refuser le devis",
       "reviseTitle": "Demander une modification",
       "reviseDesc": "Décrivez le changement souhaité (matière, taille, quantité, budget…).",
-      "revisePlaceholder": "Ex. : serait-il possible de le faire en PETG noir, hauteur 15 cm ?",
+      "revisePlaceholder": "Ex. : serait-il possible de le faire en noir, hauteur 15 cm ?",
       "fileHint": "Joindre un fichier 3D corrigé (facultatif)",
       "fileUploading": "Envoi du fichier…",
       "fileError": "Échec de l'envoi du fichier. Réessayez ou vérifiez le format.",

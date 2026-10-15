@@ -2,10 +2,13 @@
 
 import { createContext, useContext, useMemo, useState } from "react";
 
+/** Une couleur de la fiche : une référence du stock (`id` = `filament_refs.id`). */
 export interface ProductColor {
   id: string;
   name: string;
   hex: string;
+  /** 1 à 3 teintes (tricolore co-extrudé) : la pastille montre des secteurs. */
+  hexes: string[];
 }
 
 interface ProductColorValue {

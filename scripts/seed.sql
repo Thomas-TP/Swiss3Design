@@ -11,14 +11,15 @@ INSERT OR REPLACE INTO category_translations (category_id, locale, name) VALUES
   ('c_bureau', 'fr', 'Bureau'), ('c_bureau', 'de', 'Büro'), ('c_bureau', 'it', 'Ufficio'), ('c_bureau', 'en', 'Desk'),
   ('c_accessoires', 'fr', 'Accessoires'), ('c_accessoires', 'de', 'Accessoires'), ('c_accessoires', 'it', 'Accessori'), ('c_accessoires', 'en', 'Accessories');
 
--- Produits
+-- Produits (tous en PLA : l'atelier n'imprime que dans cette matière ; les couleurs
+-- viennent du stock de filament, pas d'ici)
 INSERT OR REPLACE INTO products (id, slug, price_cents, sale_type, production_days, material, dimensions_mm, weight_grams, multicolor, featured, active, created_at) VALUES
   ('p_vase', 'vase-spirale', 2990, 'stock', NULL, 'PLA', '120 × 120 × 220 mm', 180, 0, 1, 1, unixepoch()),
   ('p_lampe', 'lampe-voronoi', 4990, 'on_demand', 5, 'PLA', '180 × 180 × 260 mm', 320, 0, 1, 1, unixepoch()),
-  ('p_organiseur', 'organiseur-bureau', 2490, 'stock', NULL, 'PETG', '220 × 100 × 110 mm', 240, 1, 1, 1, unixepoch()),
-  ('p_jardiniere', 'jardiniere-geometrique', 1990, 'stock', NULL, 'PETG', '150 × 150 × 130 mm', 160, 0, 0, 1, unixepoch()),
+  ('p_organiseur', 'organiseur-bureau', 2490, 'stock', NULL, 'PLA', '220 × 100 × 110 mm', 240, 1, 1, 1, unixepoch()),
+  ('p_jardiniere', 'jardiniere-geometrique', 1990, 'stock', NULL, 'PLA', '150 × 150 × 130 mm', 160, 0, 0, 1, unixepoch()),
   ('p_portecles', 'porte-cles-relief', 990, 'stock', NULL, 'PLA', '60 × 30 × 4 mm', 8, 1, 0, 1, unixepoch()),
-  ('p_casque', 'support-casque', 3490, 'on_demand', 3, 'PETG', '120 × 100 × 280 mm', 280, 1, 0, 1, unixepoch());
+  ('p_casque', 'support-casque', 3490, 'on_demand', 3, 'PLA', '120 × 100 × 280 mm', 280, 1, 0, 1, unixepoch());
 
 -- Traductions produits
 INSERT OR REPLACE INTO product_translations (product_id, locale, name, description) VALUES
@@ -47,10 +48,10 @@ INSERT OR REPLACE INTO product_translations (product_id, locale, name, descripti
   ('p_portecles', 'it', 'Portachiavi in rilievo', 'Portachiavi personalizzabile stampato in quattro colori, testo in rilievo nitido e resistente. Ideale come regalo o per il Suo team.'),
   ('p_portecles', 'en', 'Relief keychain', 'Customizable keychain printed in four colors with crisp, durable raised text. Great as a gift or for your team.'),
 
-  ('p_casque', 'fr', 'Support de casque', 'Support audio stable au look bicolore, avec passe-câble intégré. Imprimé en PETG pour une rigidité durable.'),
-  ('p_casque', 'de', 'Kopfhörerständer', 'Stabiler Audio-Ständer im zweifarbigen Look mit integrierter Kabelführung. In PETG gedruckt für dauerhafte Steifigkeit.'),
-  ('p_casque', 'it', 'Supporto per cuffie', 'Supporto audio stabile dal look bicolore, con passacavo integrato. Stampato in PETG per una rigidità duratura.'),
-  ('p_casque', 'en', 'Headphone stand', 'Stable audio stand with a two-tone look and built-in cable guide. Printed in PETG for lasting rigidity.');
+  ('p_casque', 'fr', 'Support de casque', 'Support audio stable au look bicolore, avec passe-câble intégré. Imprimé en PLA pour une tenue nette et durable.'),
+  ('p_casque', 'de', 'Kopfhörerständer', 'Stabiler Audio-Ständer im zweifarbigen Look mit integrierter Kabelführung. In PLA gedruckt für ein sauberes, dauerhaftes Ergebnis.'),
+  ('p_casque', 'it', 'Supporto per cuffie', 'Supporto audio stabile dal look bicolore, con passacavo integrato. Stampato in PLA per un risultato pulito e duraturo.'),
+  ('p_casque', 'en', 'Headphone stand', 'Stable audio stand with a two-tone look and built-in cable guide. Printed in PLA for a clean, lasting finish.');
 
 -- Images
 INSERT OR REPLACE INTO product_images (id, product_id, url, alt, sort_order) VALUES

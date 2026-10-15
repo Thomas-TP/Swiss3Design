@@ -14,7 +14,8 @@
     "studioNote": "Realizzato su ordinazione · consegna gratuita",
     "freeAll": "Consegna gratuita in Svizzera.",
     "studioShort": "Esaurito: {colors}. Modifichi l'oggetto o riduca la quantità.",
-    "shortBlock": "Un colore dello Studio non è più disponibile per questo carrello: modifichi l'oggetto interessato prima di ordinare."
+    "shopShort": "Colore esaurito: {color}. Scelga un altro colore dalla scheda dell'articolo o riduca la quantità.",
+    "shortBlock": "Un colore non è più disponibile per questo carrello: modifichi la riga interessata prima di ordinare."
   },
   "checkout": {
     "title": "Ordine.",

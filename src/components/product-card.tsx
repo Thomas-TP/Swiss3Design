@@ -4,6 +4,7 @@ import { formatChf } from "@/lib/format";
 import { cfImage } from "@/lib/cf-image";
 import type { ProductListItem } from "@/db/queries";
 import { cx } from "@/components/ui/cx";
+import { chipBackground } from "@/components/filament-chip";
 import { SiteLink } from "@/components/ui/site-link";
 import { heightMmOf } from "@/components/catalog/specs";
 import "@/components/catalog/morph.css";
@@ -50,8 +51,10 @@ export function ProductCard({
     priceCents: product.priceCents,
     imageUrl: product.imageUrl,
     saleType: product.saleType,
+    colorRef: firstColor?.id ?? null,
     colorName: firstColor?.name ?? null,
     colorHex: firstColor?.hex ?? null,
+    weightGrams: product.weightGrams,
   };
 
   const soldOut = product.saleType === "stock" && product.stock === 0;
@@ -142,10 +145,10 @@ export function ProductCard({
             <div className="flex items-center gap-1.5">
               {product.colors.slice(0, 5).map((c) => (
                 <span
-                  key={c.name}
+                  key={c.id}
                   title={c.name}
                   className="h-3.5 w-3.5 rounded-full border border-swatch-ring"
-                  style={{ backgroundColor: c.hex }}
+                  style={chipBackground(c.hexes.length ? c.hexes : [c.hex])}
                 />
               ))}
               {product.colors.length > 5 && (

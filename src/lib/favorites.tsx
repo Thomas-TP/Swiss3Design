@@ -69,6 +69,7 @@ export function parseFavorites(raw: string | null): FavoriteItem[] {
         ![
           i.variantId,
           i.variantName,
+          i.colorRef,
           i.colorName,
           i.colorHex,
           i.imageUrl,
@@ -80,8 +81,18 @@ export function parseFavorites(raw: string | null): FavoriteItem[] {
         productId: i.productId,
         variantId: (i.variantId as string | null | undefined) ?? null,
         variantName: (i.variantName as string | null | undefined) ?? null,
+        // Une liste d'avant les couleurs du stock se relit à l'identique : ces deux
+        // champs ne sont ajoutés que s'ils sont là.
+        ...(typeof i.colorRef === "string" && i.colorRef
+          ? { colorRef: i.colorRef }
+          : {}),
         colorName: (i.colorName as string | null | undefined) ?? null,
         colorHex: (i.colorHex as string | null | undefined) ?? null,
+        ...(typeof i.weightGrams === "number" &&
+        Number.isFinite(i.weightGrams) &&
+        i.weightGrams > 0
+          ? { weightGrams: i.weightGrams }
+          : {}),
         slug: i.slug,
         name: i.name,
         priceCents: i.priceCents,

@@ -226,8 +226,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     ],
     materialsNote: (
       <>
-        Besoin de plus de résistance, d’un usage extérieur ou au contact de la
-        chaleur ? D’autres matières comme le PETG sont disponibles sur devis —{" "}
+        Un usage extérieur ou au contact de la chaleur ? Tout est imprimé en PLA
+        : décrivez-nous l’objet, nous vous dirons franchement s’il convient —{" "}
         <Link href="/custom" className={link}>
           parlons de votre projet
         </Link>
@@ -286,10 +286,9 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Quelle matière utilisez-vous ?",
         a: (
           <>
-            Nous imprimons principalement en PLA, idéal pour la déco et les
-            objets du quotidien, avec une très large palette de couleurs. Pour
-            un besoin spécifique, d’autres matières comme le PETG sont possibles
-            via une{" "}
+            Nous imprimons uniquement en PLA, idéal pour la déco et les objets
+            du quotidien, avec une très large palette de couleurs. Pour un
+            besoin spécifique, décrivez-le-nous dans une{" "}
             <Link href="/custom" className={link}>
               demande sur mesure
             </Link>
@@ -324,7 +323,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
           <>
             Le PLA se ramollit autour de 50–60 °C. Évitez de laisser une pièce
             dans une voiture en plein soleil ou contre une source de chaleur.
-            Pour un objet exposé à la chaleur, demandez-nous le PETG.
+            Pour un objet exposé à la chaleur, parlez-nous-en avant de
+            commander.
           </>
         ),
       },
@@ -551,8 +551,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     ],
     materialsNote: (
       <>
-        Mehr Festigkeit nötig, Einsatz im Freien oder bei Wärme? Andere
-        Materialien wie PETG sind auf Offerte verfügbar —{" "}
+        Einsatz im Freien oder bei Wärme? Wir drucken alles in PLA: Beschreiben
+        Sie uns das Objekt, wir sagen Ihnen ehrlich, ob es passt —{" "}
         <Link href="/custom" className={link}>
           sprechen wir über Ihr Projekt
         </Link>
@@ -610,13 +610,13 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Welches Material verwenden Sie?",
         a: (
           <>
-            Wir drucken hauptsächlich mit PLA, ideal für Deko und
-            Alltagsobjekte, mit einer sehr grossen Farbpalette. Für besondere
-            Bedürfnisse sind andere Materialien wie PETG über eine{" "}
+            Wir drucken ausschliesslich mit PLA, ideal für Deko und
+            Alltagsobjekte, mit einer sehr grossen Farbpalette. Besondere
+            Bedürfnisse beschreiben Sie uns in einer{" "}
             <Link href="/custom" className={link}>
               Massanfertigung
-            </Link>{" "}
-            möglich.
+            </Link>
+            .
           </>
         ),
       },
@@ -647,7 +647,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
           <>
             PLA wird um die 50–60 °C weich. Lassen Sie ein Stück nicht in einem
             Auto in der prallen Sonne oder an einer Wärmequelle. Für ein der
-            Hitze ausgesetztes Objekt fragen Sie uns nach PETG.
+            Hitze ausgesetztes Objekt sprechen Sie uns vor der Bestellung an.
           </>
         ),
       },
@@ -878,8 +878,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     ],
     materialsNote: (
       <>
-        Serve più resistenza, un uso esterno o a contatto con il calore? Altri
-        materiali come il PETG sono disponibili su preventivo —{" "}
+        Un uso esterno o a contatto con il calore? Stampiamo tutto in PLA: ci
+        descriva l’oggetto, Le diremo francamente se è adatto —{" "}
         <Link href="/custom" className={link}>
           parliamo del Suo progetto
         </Link>
@@ -938,10 +938,9 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Quale materiale viene utilizzato?",
         a: (
           <>
-            Stampiamo principalmente in PLA, ideale per la decorazione e gli
+            Stampiamo esclusivamente in PLA, ideale per la decorazione e gli
             oggetti di tutti i giorni, con una palette di colori molto ampia.
-            Per esigenze specifiche, altri materiali come il PETG sono possibili
-            tramite una{" "}
+            Per esigenze specifiche, ce le descriva in una{" "}
             <Link href="/custom" className={link}>
               richiesta su misura
             </Link>
@@ -976,7 +975,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
           <>
             Il PLA si ammorbidisce intorno ai 50–60 °C. Eviti di lasciare un
             pezzo in un’auto al sole o vicino a una fonte di calore. Per un
-            oggetto esposto al calore, ci chieda il PETG.
+            oggetto esposto al calore, ce ne parli prima di ordinare.
           </>
         ),
       },
@@ -1199,8 +1198,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
     ],
     materialsNote: (
       <>
-        Need more strength, outdoor use or heat resistance? Other materials such
-        as PETG are available on quote —{" "}
+        Outdoor use or heat exposure? Everything is printed in PLA: describe the
+        object and we’ll tell you honestly whether it suits —{" "}
         <Link href="/custom" className={link}>
           let’s talk about your project
         </Link>
@@ -1257,9 +1256,8 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
         q: "Which material do you use?",
         a: (
           <>
-            We print mainly in PLA, ideal for décor and everyday objects, with a
-            very wide colour palette. For specific needs, other materials such
-            as PETG are possible through a{" "}
+            We print only in PLA, ideal for décor and everyday objects, with a
+            very wide colour palette. For specific needs, describe them in a{" "}
             <Link href="/custom" className={link}>
               custom request
             </Link>
@@ -1293,7 +1291,7 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
           <>
             PLA softens at around 50–60 °C. Avoid leaving a piece in a car in
             full sun or against a heat source. For an object exposed to heat,
-            ask us about PETG.
+            talk to us before ordering.
           </>
         ),
       },

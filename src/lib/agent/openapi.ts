@@ -389,7 +389,9 @@ export function openApiDocument() {
                   items: {
                     type: "object",
                     properties: {
+                      id: { type: "string" },
                       name: { type: "string" },
+                      officialName: { type: "string" },
                       hex: { type: "string" },
                     },
                   },

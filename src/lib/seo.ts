@@ -222,7 +222,6 @@ export function siteJsonLd(locale: Locale, description: string) {
           "3D printing",
           "Multicolor 3D printing",
           "PLA",
-          "PETG",
           "Custom 3D printing",
         ],
         hasMerchantReturnPolicy: returnPolicy(locale),

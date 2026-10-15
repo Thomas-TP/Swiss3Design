@@ -4,7 +4,6 @@ import { and, desc, eq, ne, sql } from "drizzle-orm";
 import type { getDb } from "@/db";
 import { uncached } from "@/db/fresh";
 import {
-  filamentColors,
   filamentHolders,
   filamentMovements,
   filamentPurchases,
@@ -34,12 +33,11 @@ export interface AdminStock {
   tarePresets: Record<SpoolType, number>;
   /** Consommation moyenne des 90 derniers jours, en g/jour, par référence. */
   gramsPerDay: Record<string, number>;
-  shopColors: { id: string; name: string; hex: string }[];
 }
 
 export async function loadAdminStock(db: Db): Promise<AdminStock> {
   const snapshot = await loadStockSnapshot(db);
-  const [spools, holders, purchases, presets, usage, shopColors, freeHolders] =
+  const [spools, holders, purchases, presets, usage, freeHolders] =
     await Promise.all([
       db
         .select()
@@ -69,14 +67,6 @@ export async function loadAdminStock(db: Db): Promise<AdminStock> {
         FROM filament_movements m JOIN filament_spools s ON s.id = m.spool_id
         WHERE m.kind = 'consumption' AND m.created_at > now() - interval '90 days'
         GROUP BY s.ref_id`),
-      db
-        .select({
-          id: filamentColors.id,
-          name: filamentColors.name,
-          hex: filamentColors.hex,
-        })
-        .from(filamentColors)
-        .orderBy(filamentColors.name),
       countFreeHolders(db),
     ]);
   const tarePresets = { ...DEFAULT_TARES } as Record<SpoolType, number>;
@@ -111,7 +101,6 @@ export async function loadAdminStock(db: Db): Promise<AdminStock> {
     gramsPerDay: Object.fromEntries(
       usage.rows.map((r) => [String(r.id), Number(r.grams) / 90]),
     ),
-    shopColors,
   };
 }
 

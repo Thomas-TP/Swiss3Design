@@ -1,5 +1,5 @@
 // Données du panneau « Filament » des pages admin commande et devis.
-import { and, eq, inArray, isNotNull } from "drizzle-orm";
+import { and, eq, inArray, isNotNull, or } from "drizzle-orm";
 import type { getDb } from "@/db";
 import { uncached } from "@/db/fresh";
 import {
@@ -7,12 +7,14 @@ import {
   filamentQuoteDetails,
   filamentRefs,
   filamentSpools,
+  orderItemFilaments,
   orderItems,
 } from "@/db/schema";
 import { filamentGramsOf } from "@/lib/studio/filament-need";
 import { readStudioOrderLine } from "@/lib/studio/order-line";
 import { PRICE_LOCALE } from "@/lib/studio/price";
-import { isMissingTable } from "./stock-db";
+import { shopNeedGrams } from "./shop";
+import { hasShopReservationTable, isMissingTable } from "./stock-db";
 
 type Db = Awaited<ReturnType<typeof getDb>>;
 
@@ -66,7 +68,11 @@ const hexesOf = (r: {
   hex3: string | null;
 }) => [r.hex, r.hex2, r.hex3].filter((h): h is string => Boolean(h));
 
-/** Ce que la commande consomme par couleur (Studio), ou null s'il n'y a aucun objet du Studio. */
+/**
+ * Ce que la commande consomme par couleur, ou null s'il n'y a ni objet du Studio ni
+ * article de la boutique à filament suivi. Une même bobine sert les deux familles
+ * de lignes : une seule ligne du panneau par référence (grammes additionnés).
+ */
 export async function loadOrderPanel(
   db: Db,
   orderId: string,
@@ -93,19 +99,59 @@ export async function loadOrderPanel(
       for (const [id, g] of Object.entries(grams))
         totals.set(id, (totals.get(id) ?? 0) + (g ?? 0) * item.quantity);
     }
-    if (totals.size === 0) return null;
+    // Articles de la boutique imprimés à la demande : grammes d'une pièce enregistrés
+    // à la commande, × quantité + 10 % de perte (même calcul que la réservation).
+    const shopTotals = new Map<string, number>();
+    if (await hasShopReservationTable(db)) {
+      const rows = await db
+        .select({
+          refId: orderItemFilaments.refId,
+          gramsPerPiece: orderItemFilaments.gramsPerPiece,
+          quantity: orderItems.quantity,
+        })
+        .from(orderItemFilaments)
+        .innerJoin(
+          orderItems,
+          eq(orderItems.id, orderItemFilaments.orderItemId),
+        )
+        .where(and(eq(orderItems.orderId, orderId), uncached));
+      for (const row of rows)
+        shopTotals.set(
+          row.refId,
+          (shopTotals.get(row.refId) ?? 0) +
+            (shopNeedGrams(row.gramsPerPiece, row.quantity) ?? 0),
+        );
+    }
+    if (totals.size === 0 && shopTotals.size === 0) return null;
     const refs = await db
       .select()
       .from(filamentRefs)
-      .where(inArray(filamentRefs.studioId, [...totals.keys()]));
+      .where(
+        or(
+          totals.size
+            ? inArray(filamentRefs.studioId, [...totals.keys()])
+            : undefined,
+          shopTotals.size
+            ? inArray(filamentRefs.id, [...shopTotals.keys()])
+            : undefined,
+        ),
+      );
     const byStudio = new Map(refs.map((r) => [r.studioId, r]));
+    const byId = new Map(refs.map((r) => [r.id, r]));
     const [done] = await db
       .select()
       .from(filamentConsumptions)
       .where(and(eq(filamentConsumptions.orderId, orderId), uncached));
-    const needs: PanelNeed[] = [...totals].map(([studioId, grams]) => {
+    // Une ligne par référence ; une couleur du Studio sans référence reste « non suivie ».
+    const merged = new Map<string, PanelNeed>();
+    const add = (key: string, need: PanelNeed) => {
+      const current = merged.get(key);
+      if (current) current.grams += need.grams;
+      else merged.set(key, need);
+    };
+    for (const [studioId, grams] of totals) {
       const ref = byStudio.get(studioId);
-      return {
+      add(ref?.id ?? `studio:${studioId}`, {
         refId: ref?.id ?? null,
         studioId,
         label: ref
@@ -113,8 +159,21 @@ export async function loadOrderPanel(
           : `${studioId} (non suivie)`,
         hexes: ref ? hexesOf(ref) : [],
         grams,
-      };
-    });
+      });
+    }
+    for (const [refId, grams] of shopTotals) {
+      const ref = byId.get(refId);
+      add(refId, {
+        refId,
+        studioId: ref?.studioId ?? null,
+        label: ref
+          ? `${ref.brand} ${ref.rangeName} · ${ref.officialName}`
+          : "Couleur supprimée du stock",
+        hexes: ref ? hexesOf(ref) : [],
+        grams,
+      });
+    }
+    const needs = [...merged.values()];
     return {
       needs,
       spools: await spoolsFor(

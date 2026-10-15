@@ -3,7 +3,7 @@
 // paiement. Règle d'or 6c : toute lecture qui doit voir une écriture récente
 // (réservation, paiement) passe par `uncached` ou `now()`, jamais par le cache
 // Hyperdrive de 60 s.
-import { and, asc, inArray, isNotNull, sql } from "drizzle-orm";
+import { and, asc, inArray, isNotNull, or, sql } from "drizzle-orm";
 import type { getDb } from "@/db";
 import { uncached } from "@/db/fresh";
 import { filamentRefs, filamentSpools } from "@/db/schema";
@@ -14,6 +14,12 @@ import {
   type Reservations,
 } from "./availability";
 import { STOCK_LOCK_KEY } from "./constants";
+import {
+  SHOP_WASTE_PERCENT,
+  combineNeedsByRef,
+  findShortfalls,
+  type CombinedNeeds,
+} from "./shop";
 
 type Db = Awaited<ReturnType<typeof getDb>>;
 /** Une connexion ou une transaction : ce dont les lectures ont besoin. */
@@ -41,8 +47,13 @@ const RE_NUMBER = "^[0-9]+(\\.[0-9]+)?$";
 /**
  * Grammes réservés. Studio : commandes payées, en production, ou en attente
  * de paiement dont la réservation n'a pas expiré (comme le stock de la
- * boutique), sans décompte fait. Devis : acceptés, payés, en production, avec
+ * boutique), sans décompte fait. Boutique : mêmes commandes, lignes imprimées à
+ * la demande qui ont une réservation (`order_item_filaments` : grammes d'UNE pièce
+ * × quantité + perte d'impression). Devis : acceptés, payés, en production, avec
  * les grammes saisis par l'admin, sans décompte fait.
+ *
+ * Migration 0011 absente (42P01) : la boutique ne réserve encore rien, le reste
+ * est inchangé.
  */
 export async function loadReservations(db: Queryable): Promise<Reservations> {
   const studioRows = await db.execute(sql`
@@ -66,11 +77,55 @@ export async function loadReservations(db: Queryable): Promise<Reservations> {
       AND q.status IN ('accepted', 'paid', 'in_production')
       AND NOT EXISTS (SELECT 1 FROM filament_consumptions c WHERE c.quote_id = q.id)
     GROUP BY p.key`);
+  const shopRows = await loadShopReservationRows(db);
   const toMap = (rows: { rows: Record<string, unknown>[] }) =>
     Object.fromEntries(
       rows.rows.map((r) => [String(r.id), Number(r.grams) || 0]),
     );
-  return { studio: toMap(studioRows), quote: toMap(quoteRows) };
+  return {
+    studio: toMap(studioRows),
+    quote: toMap(quoteRows),
+    shop: toMap(shopRows),
+  };
+}
+
+/**
+ * Lignes de la boutique qui réservent du filament, par référence. Même règle de
+ * statut que le Studio. La perte d'impression est celle de `shopNeedGrams` (pour
+ * cent entier : `CEIL` exact en `numeric`). Comme pour le Studio, `now()` dans la
+ * requête la garde hors du cache Hyperdrive (règle d'or 6c).
+ */
+async function loadShopReservationRows(
+  db: Queryable,
+): Promise<{ rows: Record<string, unknown>[] }> {
+  // Sondage plutôt que try/catch : dans une transaction (contrôle du paiement,
+  // sous verrou), une requête en erreur ferme toute la transaction (25P02).
+  if (!(await hasShopReservationTable(db))) return { rows: [] };
+  return db.execute(sql`
+    SELECT f.ref_id AS id,
+           SUM(CEIL(f.grams_per_piece::numeric * oi.quantity
+                    * ${100 + SHOP_WASTE_PERCENT}::numeric / 100))::int AS grams
+    FROM order_item_filaments f
+    JOIN order_items oi ON oi.id = f.order_item_id
+    JOIN orders o ON o.id = oi.order_id
+    WHERE ${uncached}
+      AND NOT EXISTS (SELECT 1 FROM filament_consumptions c WHERE c.order_id = o.id)
+      AND (o.status IN ('paid', 'in_production')
+           OR (o.status = 'pending' AND o.reservation_expires_at > now()))
+    GROUP BY f.ref_id`);
+}
+
+/**
+ * La migration 0011 (`order_item_filaments`) est-elle appliquée ? `to_regclass`
+ * rend NULL au lieu de lever 42P01 : sans erreur, donc sans fermer une transaction
+ * en cours. `now()` garde le sondage hors du cache Hyperdrive (règle d'or 6c) : la
+ * migration appliquée compte tout de suite, pas une minute plus tard.
+ */
+export async function hasShopReservationTable(db: Queryable): Promise<boolean> {
+  const result = await db.execute(
+    sql`SELECT to_regclass('public.order_item_filaments') IS NOT NULL AS ok WHERE now() IS NOT NULL`,
+  );
+  return result.rows[0]?.ok === true;
 }
 
 /** Supports plastique vides libres : non retirés et sans bobine active dessus. */
@@ -93,28 +148,40 @@ export interface StockSnapshot {
   availability: Map<string, RefAvailability>;
 }
 
-/** Références (toutes, ou celles de ces ids Studio) avec leur disponible, lecture fraîche. */
+/**
+ * Références (toutes, ou celles de ces ids Studio et de ces ids de référence)
+ * avec leur disponible, lecture fraîche.
+ */
 export async function loadStockSnapshot(
   db: Queryable,
-  options: { studioIds?: readonly string[] } = {},
+  options: {
+    studioIds?: readonly string[];
+    refIds?: readonly string[];
+  } = {},
 ): Promise<StockSnapshot> {
+  const scoped =
+    options.studioIds !== undefined || options.refIds !== undefined;
+  const scope = scoped
+    ? or(
+        options.studioIds?.length
+          ? inArray(filamentRefs.studioId, [...options.studioIds])
+          : undefined,
+        options.refIds?.length
+          ? inArray(filamentRefs.id, [...options.refIds])
+          : undefined,
+      )
+    : isNotNull(filamentRefs.id);
   const refs = await db
     .select()
     .from(filamentRefs)
-    .where(
-      and(
-        uncached,
-        options.studioIds
-          ? inArray(filamentRefs.studioId, [...options.studioIds])
-          : isNotNull(filamentRefs.id),
-      ),
-    )
+    // Une portée donnée mais vide ne ramène rien (et non « toutes les références »).
+    .where(and(uncached, scope ?? sql`false`))
     .orderBy(asc(filamentRefs.brand), asc(filamentRefs.officialName));
   if (refs.length === 0)
     return {
       refs,
       spools: [],
-      reservations: { studio: {}, quote: {} },
+      reservations: { studio: {}, quote: {}, shop: {} },
       availability: new Map(),
     };
   const [spools, reservations] = await Promise.all([
@@ -158,6 +225,60 @@ export type StudioStockCheck =
   | { status: "untracked" }
   | { status: "short"; short: Shortfall[] };
 
+/** Une référence dont le stock ne couvre pas le besoin TOTAL (Studio + boutique). */
+export interface RefShortage {
+  refId: string;
+  /** Id de palette du Studio de la référence, ou null. */
+  studioId: string | null;
+  needGrams: number;
+  availableGrams: number;
+}
+
+export type StockCheck =
+  | { status: "ok" }
+  /** Migration 0010 absente : couleurs non suivies, la vente continue. */
+  | { status: "untracked" }
+  | { status: "short"; short: RefShortage[] };
+
+/**
+ * Le stock couvre-t-il ces besoins ? Un seul contrôle par RÉFÉRENCE : le besoin
+ * d'une bobine est la somme de ses lignes du Studio (grammes par id de palette)
+ * et de ses lignes de la boutique (grammes par id de référence), comparée au
+ * disponible (restant − réservé) avec la marge de fin de bobine. Une couleur sans
+ * référence en base n'est pas suivie : elle passe. Dans une transaction, à appeler
+ * après `lockStockChecks`.
+ */
+export async function checkStockNeeds(
+  db: Queryable,
+  needs: CombinedNeeds,
+): Promise<StockCheck> {
+  const studioIds = Object.keys(needs.studio).filter(
+    (id) => needs.studio[id] > 0,
+  );
+  const refIds = Object.keys(needs.shop).filter((id) => needs.shop[id] > 0);
+  if (studioIds.length === 0 && refIds.length === 0) return { status: "ok" };
+  let snapshot: StockSnapshot;
+  try {
+    snapshot = await loadStockSnapshot(db, { studioIds, refIds });
+  } catch (error) {
+    if (!isMissingTable(error)) throw error;
+    console.warn("[stock] tables du stock absentes : couleurs non suivies");
+    return { status: "untracked" };
+  }
+  const available = new Map(
+    snapshot.refs.map((ref) => [
+      ref.id,
+      snapshot.availability.get(ref.id)?.available ?? 0,
+    ]),
+  );
+  const short = findShortfalls(
+    combineNeedsByRef(snapshot.refs, needs),
+    available,
+    covers,
+  );
+  return short.length > 0 ? { status: "short", short } : { status: "ok" };
+}
+
 /**
  * Le stock couvre-t-il ces besoins (grammes par id de palette du Studio) ?
  * Une couleur sans référence en base n'est pas suivie : elle passe.
@@ -166,27 +287,20 @@ export async function checkStudioStock(
   db: Queryable,
   needs: Readonly<Record<string, number>>,
 ): Promise<StudioStockCheck> {
-  const ids = Object.keys(needs).filter((id) => needs[id] > 0);
-  if (ids.length === 0) return { status: "ok" };
-  let snapshot: StockSnapshot;
-  try {
-    snapshot = await loadStockSnapshot(db, { studioIds: ids });
-  } catch (error) {
-    if (!isMissingTable(error)) throw error;
-    console.warn("[stock] tables du stock absentes : couleurs non suivies");
-    return { status: "untracked" };
-  }
-  const short: Shortfall[] = [];
-  for (const ref of snapshot.refs) {
-    if (!ref.studioId) continue;
-    const available = snapshot.availability.get(ref.id)?.available ?? 0;
-    const need = needs[ref.studioId] ?? 0;
-    if (!covers(available, need))
-      short.push({
-        studioId: ref.studioId,
-        needGrams: need,
-        availableGrams: available,
-      });
-  }
-  return short.length > 0 ? { status: "short", short } : { status: "ok" };
+  const check = await checkStockNeeds(db, { studio: needs, shop: {} });
+  if (check.status !== "short") return check;
+  return {
+    status: "short",
+    short: check.short.flatMap((s) =>
+      s.studioId
+        ? [
+            {
+              studioId: s.studioId,
+              needGrams: s.needGrams,
+              availableGrams: s.availableGrams,
+            },
+          ]
+        : [],
+    ),
+  };
 }

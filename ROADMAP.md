@@ -74,8 +74,8 @@ Vue d'ensemble commentée : [`docs/architecture.md`](docs/architecture.md#data-m
 Principes : `id` UUID, **argent en centimes CHF** (`*_cents`), textes traduits
 dans des tables `*_translations` `(parentId, locale)`, **snapshots** figés (nom,
 prix, couleur, adresse) dans `order_items` / commandes au moment de l'achat.
-Familles de tables : catalogue (products, variants, images, materials, couleurs,
-catégories), commandes (orders, order_items), devis (quote_requests,
+Familles de tables : catalogue (products, variants, images, exclusions de couleurs,
+catégories ; les couleurs viennent du stock de filament), commandes (orders, order_items), devis (quote_requests,
 quote_messages), stock & réglages (inventory_log, settings, discount_codes),
 auth Better Auth (user, session, account, two_factor, customer_addresses).
 

@@ -12,6 +12,8 @@ import {
   X,
 } from "lucide-react";
 import { Link, useRouter } from "@/i18n/navigation";
+import { chipBackground } from "@/components/filament-chip";
+import { SHOP_MATERIAL, type ShopColor } from "@/lib/filament/shop";
 import { saveProduct, deleteProduct, type ProductFormState } from "./actions";
 import { redirectToAdminReauthentication } from "@/lib/admin-reauth-client";
 import { FIELD, BTN_PRIMARY, BTN_GHOST } from "../ui";
@@ -19,18 +21,6 @@ import { FIELD, BTN_PRIMARY, BTN_GHOST } from "../ui";
 interface Img {
   url: string;
   alt?: string;
-}
-
-export interface FilamentColor {
-  id: string;
-  name: string;
-  hex: string;
-}
-
-export interface FilamentOption {
-  id: string;
-  name: string;
-  colors: FilamentColor[];
 }
 
 export interface ProductFormInitial {
@@ -50,7 +40,8 @@ export interface ProductFormInitial {
   translations: Record<string, { name: string; description: string }>;
   images: Img[];
   categoryIds: string[];
-  colorIds: string[];
+  /** Références du stock décochées pour cet article (`product_filament_exclusions`). */
+  excludedRefIds: string[];
   variants: VariantInitial[];
 }
 
@@ -70,39 +61,23 @@ const LOCALE_LABELS: Record<string, string> = {
 
 export function ProductForm({
   categories,
-  materials,
+  colors,
   initial,
 }: {
   categories: { id: string; name: string }[];
-  materials: FilamentOption[];
+  /** Les couleurs proposées par la boutique : références actives du stock avec « sur mesure ». */
+  colors: ShopColor[];
   initial?: ProductFormInitial;
 }) {
-  // La matière du produit en cours peut avoir été retirée de la palette :
-  // on l'ajoute aux options pour ne pas la perdre silencieusement.
-  const materialNames = Array.from(
-    new Set([
-      ...materials.map((m) => m.name),
-      ...(initial?.material ? [initial.material] : []),
-    ]),
+  // Couleurs : toutes celles du stock sont proposées d'office ; on ne garde ici que
+  // les EXCLUSIONS de l'article (cases décochées).
+  const [excluded, setExcluded] = useState<string[]>(
+    initial?.excludedRefIds ?? [],
   );
-  const defaultMaterial =
-    initial?.material ??
-    (materialNames.includes("PLA") ? "PLA" : materialNames[0]);
-
-  const [material, setMaterial] = useState(defaultMaterial ?? "");
-  const colorsForMaterial =
-    materials.find((m) => m.name === material)?.colors ?? [];
-  const [selectedColors, setSelectedColors] = useState<string[]>(
-    initial?.colorIds ?? [],
-  );
-  // Au changement de filament, ne garder que les couleurs de sa palette.
-  const visibleColorIds = colorsForMaterial.map((c) => c.id);
-  const activeColors = selectedColors.filter((id) =>
-    visibleColorIds.includes(id),
-  );
-
+  const shownIds = colors.map((c) => c.id);
+  const activeExclusions = excluded.filter((id) => shownIds.includes(id));
   const toggleColor = (id: string) =>
-    setSelectedColors((prev) =>
+    setExcluded((prev) =>
       prev.includes(id) ? prev.filter((c) => c !== id) : [...prev, id],
     );
 
@@ -194,34 +169,14 @@ export function ProductForm({
               className={FIELD}
             />
           </label>
-          {materialNames.length > 0 ? (
-            <label className="block text-sm">
-              <span className="mb-1.5 block font-semibold">Matière</span>
-              <select
-                name="material"
-                value={material}
-                onChange={(e) => setMaterial(e.target.value)}
-                className={FIELD}
-              >
-                {materialNames.map((m) => (
-                  <option key={m} value={m}>
-                    {m}
-                  </option>
-                ))}
-              </select>
-            </label>
-          ) : (
-            <div className="text-sm">
-              <span className="mb-1.5 block font-semibold">Matière</span>
-              <p className="rounded-xl border border-line bg-line/20 px-3 py-2 text-xs text-soft">
-                Aucun filament.{" "}
-                <Link href="/admin/materials" className="underline">
-                  Ajoutez-en un
-                </Link>{" "}
-                pour pouvoir le choisir.
-              </p>
-            </div>
-          )}
+          <div className="text-sm">
+            <span className="mb-1.5 block font-semibold">Matière</span>
+            {/* L'atelier n'imprime qu'en PLA : la matière n'est plus un choix. */}
+            <input type="hidden" name="material" value={SHOP_MATERIAL} />
+            <p className="rounded-xl border border-line bg-line/20 px-3 py-2 text-sm">
+              {SHOP_MATERIAL}
+            </p>
+          </div>
           <label className="block text-sm">
             <span className="mb-1.5 block font-semibold">Dimensions</span>
             <input
@@ -243,46 +198,56 @@ export function ProductForm({
           </label>
         </div>
 
-        {/* Couleurs proposées (palette du filament choisi) */}
+        {/* Couleurs proposées : celles du stock (les mêmes que « Sur mesure »), moins
+            les cases décochées ici. */}
         <div className="mt-5 border-t border-line pt-4">
           <input
             type="hidden"
-            name="colors"
-            value={JSON.stringify(activeColors)}
+            name="excludedRefs"
+            value={JSON.stringify(activeExclusions)}
           />
           <p className="text-sm font-semibold">
             Couleurs proposées{" "}
             <span className="font-normal text-soft">
-              (palette « {material || "—"} »)
+              ({colors.length - activeExclusions.length} sur {colors.length})
             </span>
           </p>
-          {colorsForMaterial.length === 0 ? (
+          <p className="mt-1 text-xs text-soft">
+            Toutes les couleurs du « Sur mesure » sont proposées sur chaque
+            article. Décochez celles qui ne vont pas pour celui-ci. La liste
+            vient du stock de filament (onglet Références).
+          </p>
+          {colors.length === 0 ? (
             <p className="mt-2 text-xs text-soft">
-              Ce filament n&apos;a pas encore de couleur.{" "}
-              <Link href="/admin/materials" className="underline">
-                Gérer les couleurs
+              Aucune référence de filament active avec « sur mesure » :{" "}
+              <Link
+                href="/admin/filaments?tab=references"
+                className="underline"
+              >
+                gérer les références
               </Link>
               .
             </p>
           ) : (
             <div className="mt-3 flex flex-wrap gap-2">
-              {colorsForMaterial.map((c) => {
-                const on = activeColors.includes(c.id);
+              {colors.map((c) => {
+                const on = !activeExclusions.includes(c.id);
                 return (
                   <button
                     key={c.id}
                     type="button"
                     onClick={() => toggleColor(c.id)}
                     aria-pressed={on}
+                    title={`${c.brand} ${c.range} · ${c.officialName}`}
                     className={`inline-flex items-center gap-2 rounded-full border py-1.5 pl-1.5 pr-3 text-sm font-medium transition-colors ${
                       on
                         ? "border-ink bg-ink text-paper"
-                        : "border-line bg-surface text-soft hover:border-ink hover:text-ink"
+                        : "border-line bg-surface text-soft line-through hover:border-ink hover:text-ink"
                     }`}
                   >
                     <span
                       className="h-5 w-5 shrink-0 rounded-full border border-swatch-ring"
-                      style={{ backgroundColor: c.hex }}
+                      style={chipBackground(c.hexes)}
                     />
                     {c.name}
                   </button>

@@ -1,7 +1,7 @@
 "use server";
 
 import { z } from "zod";
-import { eq } from "drizzle-orm";
+import { and, eq, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { getDb } from "@/db";
 import {
@@ -10,11 +10,12 @@ import {
   productImages,
   productVariants,
   productCategories,
-  productColors,
-  filamentColors,
-  materials,
+  productFilamentExclusions,
   LOCALES,
 } from "@/db/schema";
+import { SHOP_MATERIAL } from "@/lib/filament/shop";
+import { loadShopRefs } from "@/lib/filament/shop-db";
+import { isMissingTable } from "@/lib/filament/stock-db";
 import { requireFreshAdmin } from "@/lib/session";
 import { notifyIndexNow } from "@/lib/indexnow";
 import { pushCatalogChange } from "@/lib/commerce/stripe-catalog";
@@ -60,7 +61,8 @@ const variantsSchema = z
   )
   .max(20);
 
-const colorsSchema = z.array(z.string().max(60)).max(50);
+// Références du stock décochées pour l'article (ids de `filament_refs`).
+const excludedRefsSchema = z.array(z.string().max(80)).max(200);
 
 function slugify(input: string): string {
   return input
@@ -154,7 +156,8 @@ export async function saveProduct(
     priceCents,
     saleType: saleType as "stock" | "on_demand",
     productionDays,
-    material: String(formData.get("material") || "PLA").trim() || "PLA",
+    // L'atelier n'imprime qu'en PLA : la matière n'est plus un choix de l'admin.
+    material: SHOP_MATERIAL,
     dimensionsMm: String(formData.get("dimensionsMm") || "").trim() || null,
     weightGrams: weightRaw ? Number.parseInt(weightRaw, 10) || null : null,
     model3dUrl: String(formData.get("model3dUrl") || "").trim() || null,
@@ -172,33 +175,22 @@ export async function saveProduct(
 
   const categoryIds = formData.getAll("categories").map(String);
 
-  const parsedColors = colorsSchema.safeParse(
-    JSON.parse(String(formData.get("colors") || "[]")),
+  const parsedExclusions = excludedRefsSchema.safeParse(
+    JSON.parse(String(formData.get("excludedRefs") || "[]")),
   );
-  if (!parsedColors.success) {
+  if (!parsedExclusions.success) {
     return { error: "Couleurs invalides." };
   }
 
   const db = await getDb();
 
-  // On ne garde que les couleurs appartenant réellement à la palette du
-  // filament choisi : le formulaire ne doit pas pouvoir injecter d'id arbitraire.
-  let validColorIds: string[] = [];
-  if (parsedColors.data.length > 0) {
-    const [materialRow] = await db
-      .select({ id: materials.id })
-      .from(materials)
-      .where(eq(materials.name, data.material))
-      .limit(1);
-    if (materialRow) {
-      const palette = await db
-        .select({ id: filamentColors.id })
-        .from(filamentColors)
-        .where(eq(filamentColors.materialId, materialRow.id));
-      const allowed = new Set(palette.map((p) => p.id));
-      validColorIds = parsedColors.data.filter((id) => allowed.has(id));
-    }
-  }
+  // Les couleurs sont celles du stock (actives, « sur mesure ») ; l'article n'en
+  // garde que les EXCLUSIONS. On ne retient que des références réellement
+  // proposées : le formulaire ne doit pas pouvoir injecter d'id arbitraire.
+  const shopRefIds = (await loadShopRefs(db, { fresh: true })).map((r) => r.id);
+  const exclusions = [...new Set(parsedExclusions.data)].filter((refId) =>
+    shopRefIds.includes(refId),
+  );
 
   // Ancien slug (renommage) : l'ancienne URL devient une 404 à signaler aussi.
   const previousSlug = id
@@ -223,7 +215,6 @@ export async function saveProduct(
         .delete(productCategories)
         .where(eq(productCategories.productId, id));
       await db.delete(productVariants).where(eq(productVariants.productId, id));
-      await db.delete(productColors).where(eq(productColors.productId, id));
     } else {
       const [row] = await db
         .insert(products)
@@ -255,15 +246,6 @@ export async function saveProduct(
         .insert(productVariants)
         .values(variantRows.map((v) => ({ ...v, productId })));
     }
-    if (validColorIds.length > 0) {
-      await db.insert(productColors).values(
-        validColorIds.map((colorId, i) => ({
-          productId,
-          colorId,
-          sortOrder: i,
-        })),
-      );
-    }
   } catch (e) {
     if (String(e).includes("UNIQUE")) {
       return { error: `Le slug « ${slug} » est déjà utilisé.` };
@@ -271,10 +253,42 @@ export async function saveProduct(
     return { error: "Erreur lors de l'enregistrement." };
   }
 
+  // Exclusions de couleurs : on remplace celles des références proposées (une
+  // exclusion d'une référence désactivée entre-temps reste intacte, elle
+  // reprendra effet si la référence revient). Migration 0011 absente : rien à
+  // effacer ; une exclusion demandée ne peut alors pas être enregistrée.
+  let exclusionsSaved = true;
+  try {
+    if (shopRefIds.length > 0)
+      await db
+        .delete(productFilamentExclusions)
+        .where(
+          and(
+            eq(productFilamentExclusions.productId, productId),
+            inArray(productFilamentExclusions.refId, shopRefIds),
+          ),
+        );
+    if (exclusions.length > 0)
+      await db
+        .insert(productFilamentExclusions)
+        .values(exclusions.map((refId) => ({ productId, refId })));
+  } catch (e) {
+    if (!isMissingTable(e)) {
+      console.error("[admin] exclusions de couleurs", e);
+      return { error: "Produit enregistré, mais pas ses couleurs décochées." };
+    }
+    exclusionsSaved = exclusions.length === 0;
+  }
+
   revalidatePath("/", "layout");
   await notifyIndexNow(changedPaths(slug, previousSlug));
   // Catalogue des agents IA (Stripe) : fiche complète renvoyée.
   await pushCatalogChange(db, "product");
+  if (!exclusionsSaved)
+    return {
+      error:
+        "Produit enregistré, mais la migration 0011 (couleurs décochées) n'est pas appliquée : les couleurs décochées n'ont pas été prises en compte.",
+    };
   return { success: true };
 }
 

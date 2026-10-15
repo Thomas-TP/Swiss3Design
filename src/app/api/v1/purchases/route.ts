@@ -128,7 +128,7 @@ export async function GET() {
         "Buy Swiss3Design products with a Machine Payments Protocol (MPP) payment: POST the order below without payment to get a 402 challenge (method=stripe, card via a Stripe Shared Payment Token, e.g. from the Link agent wallet), then retry the same POST with the Authorization: Payment credential.",
       method: "POST",
       example: {
-        items: [{ slug: "vase-spirale", color: "Noir", quantity: 1 }],
+        items: [{ slug: "vase-spirale", color: "Ivory White", quantity: 1 }],
         email: "buyer@example.ch",
         shipping_address: {
           name: "Jeanne Exemple",

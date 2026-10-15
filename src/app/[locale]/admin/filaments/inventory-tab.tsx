@@ -267,8 +267,9 @@ export function InventoryTab({ stock }: { stock: AdminStock }) {
                   </p>
                   <p className="mt-1 flex flex-wrap gap-1.5">
                     {ref.studioId ? <Badge tone="ok">Studio</Badge> : null}
-                    {ref.shopColorId ? <Badge>Boutique</Badge> : null}
-                    {ref.customOk ? <Badge>Sur mesure</Badge> : null}
+                    {ref.customOk ? (
+                      <Badge>Sur mesure et boutique</Badge>
+                    ) : null}
                     {!ref.hexConfirmed ? (
                       <Badge tone="warn">Teinte à confirmer</Badge>
                     ) : null}

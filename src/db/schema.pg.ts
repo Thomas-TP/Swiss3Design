@@ -663,6 +663,52 @@ export const filamentConsumptions = pgTable(
   ],
 );
 
+// Couleurs de la boutique : TOUS les articles proposent les références de
+// filament proposées en « Sur mesure » (`filament_refs.custom_ok`, actives) ; cette
+// table ne porte que les EXCLUSIONS, par article (case décochée dans la fiche
+// admin). Table à part, vide par défaut : aucun article n'exclut rien tant que le
+// propriétaire n'a rien décoché, et la boutique reste affichable sans cette
+// migration (code tolérant : 42P01 → aucune exclusion).
+export const productFilamentExclusions = pgTable(
+  "product_filament_exclusions",
+  {
+    productId: text("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    refId: text("ref_id")
+      .notNull()
+      .references(() => filamentRefs.id, { onDelete: "cascade" }),
+  },
+  (t) => [
+    primaryKey({ columns: [t.productId, t.refId] }),
+    index("product_filament_exclusions_ref_idx").on(t.refId),
+  ],
+);
+
+// Réservation de filament d'une ligne de commande de la boutique (article
+// imprimé à la demande, couleur suivie) : grammes d'UNE pièce ; la ligne réserve
+// `grams_per_piece × quantité`, dérivé comme tout le reste (aucun total réservé
+// n'est stocké). Table À PART, pas une colonne de `order_items` : tous les
+// `select()` de `order_items` (webhook Stripe compris) listent ses colonnes, et le
+// paiement ne doit jamais dépendre d'une migration du stock. RESTRICT : une
+// référence réservée par une commande ne se supprime pas (on la désactive).
+export const orderItemFilaments = pgTable(
+  "order_item_filaments",
+  {
+    orderItemId: text("order_item_id")
+      .primaryKey()
+      .references(() => orderItems.id, { onDelete: "cascade" }),
+    refId: text("ref_id")
+      .notNull()
+      .references(() => filamentRefs.id, { onDelete: "restrict" }),
+    gramsPerPiece: integer("grams_per_piece").notNull(),
+  },
+  (t) => [
+    index("order_item_filaments_ref_idx").on(t.refId),
+    check("order_item_filaments_grams_positive", sql`${t.gramsPerPiece} > 0`),
+  ],
+);
+
 // Ce que le stock sait d'un devis du formulaire : quantité, couleurs choisies
 // (ids de `filament_refs`), poids estimé d'UNE pièce par le navigateur (donnée
 // indicative) et grammes par couleur saisis par l'admin (réservation).

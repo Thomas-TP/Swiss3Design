@@ -113,7 +113,6 @@ export async function saveRef(
     hex3,
     hexConfirmed: flag(data, "hexConfirmed"),
     studioId,
-    shopColorId: optionalText(data, "shopColorId", 80),
     customOk: flag(data, "customOk"),
     spoolNetGrams: Math.max(1, intField(data, "spoolNetGrams") ?? 1000),
     reorderBelowGrams: Math.max(0, intField(data, "reorderBelowGrams") ?? 300),

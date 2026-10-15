@@ -112,8 +112,10 @@ export default async function AdminFilamentsPage({
       </h2>
       <p className="mb-5 max-w-2xl text-sm text-soft">
         Les bobines de l&apos;atelier : grammes restants, réservés par les
-        commandes du Studio et les devis, à acheter. La palette de la boutique
-        (couleurs des produits) reste dans « Palette boutique ».
+        commandes du Studio, les articles imprimés à la demande de la boutique
+        et les devis, à acheter. Les couleurs de la boutique sont les références
+        « sur mesure » de l&apos;onglet Références (décochables article par
+        article dans la fiche produit).
       </p>
       <nav className="mb-6 flex flex-wrap gap-2 border-b border-line pb-3 text-sm">
         {TABS.map(([key, label]) => (

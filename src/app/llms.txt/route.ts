@@ -56,7 +56,8 @@ export async function GET() {
 - Website: ${SITE_URL} — French (default), German, Italian and English versions under /fr, /de, /it and /en.
 - Company: Swiss3Design, Gland (VD), Switzerland. Contact: contact@swiss3design.ch (reply within 48 hours).
 - Machines: Bambu Lab P1S with AMS 2 Pro (Gland) and Creality K2 with CFS (Pully) — up to 4 filament colours combined in one print, no painting or assembly.
-- Materials: mainly PLA (softens around 50–60 °C); PETG and other materials on request.
+- Materials: PLA only (softens around 50–60 °C).
+- Colours: every catalogue item comes in the same range of PLA colours as custom printing (the \`colorOptions\` of the product API, one is required per item); a colour can be unavailable for a while when its filament is out of stock.
 - Shipping: Switzerland only, with Swiss Post. ${
     shipping.shippingCents === 0
       ? "Free for every order, no minimum."

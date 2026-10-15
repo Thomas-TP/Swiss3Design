@@ -76,7 +76,7 @@ export async function getStoreInfo(locale: Locale) {
       request: page("/custom"),
     },
     materials:
-      "mainly PLA (softens around 50–60 °C); PETG and other materials on request; up to 4 filament colours in one piece",
+      "PLA only (softens around 50–60 °C); up to 4 filament colours in one piece",
     legal: {
       terms: page("/legal/terms"),
       privacy: page("/legal/privacy"),

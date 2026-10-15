@@ -12,8 +12,6 @@ import {
   products,
   productTranslations,
   productVariants,
-  productColors,
-  filamentColors,
   customerAddresses,
   discountCodes,
 } from "@/db/schema";
@@ -26,7 +24,19 @@ import {
 } from "@/lib/studio/purchase";
 import { resolveStudioLines } from "@/lib/studio/order-lines";
 import { scaleGrams, sumGrams } from "@/lib/studio/filament-need";
-import { checkStudioStock, lockStockChecks } from "@/lib/filament/stock-db";
+import {
+  checkStockNeeds,
+  lockStockChecks,
+  type RefShortage,
+} from "@/lib/filament/stock-db";
+import {
+  findColorOption,
+  shopNeedsByRef,
+  shopReservationGrams,
+  type ShopColor,
+} from "@/lib/filament/shop";
+import { loadProductColors } from "@/lib/filament/shop-db";
+import { recordShopReservations } from "@/lib/filament/shop-reservation";
 import { STUDIO_MAX_LINES } from "@/lib/studio/price";
 import { getShippingSettings } from "@/lib/shipping-settings";
 import { getAuth } from "@/lib/auth";
@@ -39,9 +49,13 @@ import { makeOrderNumber } from "@/lib/order-number";
 
 // Ligne PRODUIT (sans `kind`, comme avant le Studio) ou objet du Studio
 // (`kind: "studio"` : configuration et textes saisis, revalidés plus bas).
+// La couleur d'une ligne est une référence du stock (`colorRef`, l'identité) ; `color`
+// (un NOM) reste accepté pour les anciens paniers et les clients qui n'ont que lui :
+// le serveur retrouve la référence parmi les couleurs de l'article.
 const productLineSchema = z.object({
   productId: z.string().min(1),
   variantId: z.string().min(1).optional(),
+  colorRef: z.string().min(1).max(80).optional(),
   color: z.string().min(1).max(60).optional(),
   quantity: z.number().int().min(1).max(99),
 });
@@ -71,15 +85,24 @@ const bodySchema = z.object({
   locale: z.enum(["fr", "de", "it", "en"]).catch("fr"),
 });
 
-/** Couleur(s) du Studio épuisée(s) : le client revoit sa configuration. */
+/** Couleur(s) épuisée(s) (Studio ou boutique) : le client revoit sa ligne. */
 class OutOfFilamentStock extends Error {
-  constructor(readonly colors: string[]) {
+  constructor(readonly short: RefShortage[]) {
     super("out_of_stock");
   }
 }
 
-function filamentOutOfStock(colors: string[]) {
-  return Response.json({ error: "out_of_stock", colors }, { status: 409 });
+// `colors` : l'id de palette du Studio quand la référence en a un (ce que lisaient
+// déjà les clients), sinon l'id de la référence ; `refs` : toujours les références.
+function filamentOutOfStock(short: RefShortage[]) {
+  return Response.json(
+    {
+      error: "out_of_stock",
+      colors: short.map((s) => s.studioId ?? s.refId),
+      refs: short.map((s) => s.refId),
+    },
+    { status: 409 },
+  );
 }
 
 export async function POST(request: Request) {
@@ -176,21 +199,6 @@ export async function POST(request: Request) {
   }
   const studioOrderLines = studioLines.ok ? studioLines.lines : [];
 
-  // Stock de filament : une couleur épuisée refuse le paiement (409 out_of_stock).
-  // Pré-contrôle frais ici, avant la moindre écriture ; le contrôle qui fait foi est
-  // refait dans la transaction, sous verrou, juste avant d'insérer la commande.
-  // Tables du stock absentes (migration pas encore appliquée) : couleurs non suivies.
-  const filamentNeeds = sumGrams(
-    studioOrderLines.map((l) => scaleGrams(l.filamentGrams, l.quantity)),
-  );
-  let filamentTracked = false;
-  if (Object.keys(filamentNeeds).length > 0) {
-    const pre = await checkStudioStock(db, filamentNeeds);
-    if (pre.status === "short")
-      return filamentOutOfStock(pre.short.map((s) => s.studioId));
-    filamentTracked = pre.status === "ok";
-  }
-
   const fallbackTranslation = alias(
     productTranslations,
     "fallback_translation",
@@ -198,13 +206,17 @@ export async function POST(request: Request) {
   const productIds = [...new Set(items.map((i) => i.productId))];
   // Prix et noms relus en base : on ne fait jamais confiance au client.
   // Produits, variantes et couleurs sont des lectures indépendantes → en parallèle.
-  const [dbProducts, dbVariants, dbColors] = productIds.length
+  // Les couleurs (références du stock, moins les exclusions de l'article) sont lues
+  // FRAÎCHES : une couleur retirée ou épuisée à l'instant ne se vend pas.
+  const [dbProducts, dbVariants, colorsByProduct] = productIds.length
     ? await Promise.all([
         db
           .select({
             id: products.id,
             priceCents: products.priceCents,
             stock: products.stock,
+            saleType: products.saleType,
+            weightGrams: products.weightGrams,
             name: sql<string>`coalesce(${productTranslations.name},${fallbackTranslation.name},${products.slug})`,
           })
           .from(products)
@@ -229,38 +241,34 @@ export async function POST(request: Request) {
           .select()
           .from(productVariants)
           .where(inArray(productVariants.productId, productIds)),
-        db
-          .select({
-            productId: productColors.productId,
-            name: filamentColors.name,
-            hex: filamentColors.hex,
-          })
-          .from(productColors)
-          .innerJoin(
-            filamentColors,
-            eq(filamentColors.id, productColors.colorId),
-          )
-          .where(inArray(productColors.productId, productIds)),
+        loadProductColors(db, productIds, locale, { fresh: true }),
       ])
-    : [[], [], []];
+    : [[], [], new Map<string, ShopColor[]>()];
   const byId = new Map(dbProducts.map((p) => [p.id, p]));
   const variantById = new Map(dbVariants.map((v) => [v.id, v]));
-  // Couleurs autorisées par produit : nom → hex (le hex vient de la base, jamais
-  // du client). Permet de figer la couleur choisie dans la commande.
-  const colorsByProduct = new Map<string, Map<string, string>>();
-  for (const c of dbColors) {
-    const m = colorsByProduct.get(c.productId) ?? new Map<string, string>();
-    m.set(c.name, c.hex);
-    colorsByProduct.set(c.productId, m);
-  }
 
-  // Couleur choisie : validée contre la palette du produit, hex relu en base.
-  const resolveColor = (productId: string, requested?: string) => {
-    if (!requested) return { colorName: null, colorHex: null };
-    const hex = colorsByProduct.get(productId)?.get(requested);
-    return hex
-      ? { colorName: requested, colorHex: hex }
-      : { colorName: null, colorHex: null };
+  // Un article qui propose des couleurs en exige une : sans elle, la commande n'a
+  // pas de couleur à fabriquer (400 color_required, le client rechoisit sur la fiche).
+  if (
+    items.some(
+      (i) =>
+        byId.has(i.productId) &&
+        (colorsByProduct.get(i.productId)?.length ?? 0) > 0 &&
+        !(i.colorRef ?? i.color),
+    )
+  )
+    return Response.json({ error: "color_required" }, { status: 400 });
+
+  // Couleur choisie : retrouvée parmi celles de l'article (référence, sinon nom),
+  // nom affiché et hex relus en base, jamais pris du client.
+  const resolveColor = (productId: string, i: (typeof items)[number]) => {
+    const palette = colorsByProduct.get(productId) ?? [];
+    if (palette.length === 0)
+      return { ok: true as const, color: null as ShopColor | null };
+    const color = findColorOption(palette, i.colorRef ?? i.color);
+    return color
+      ? { ok: true as const, color }
+      : { ok: false as const, color: null };
   };
 
   // Ligne effective (prix/stock/nom selon produit ou variante choisie)
@@ -269,12 +277,17 @@ export async function POST(request: Request) {
     if (!product) return null;
     if (!i.variantId && dbVariants.some((v) => v.productId === i.productId))
       return null;
-    if (
-      colorsByProduct.has(i.productId) &&
-      (!i.color || !colorsByProduct.get(i.productId)?.has(i.color))
-    )
-      return null;
-    const { colorName, colorHex } = resolveColor(i.productId, i.color);
+    const resolved = resolveColor(i.productId, i);
+    if (!resolved.ok) return null;
+    const colorRef = resolved.color?.id ?? null;
+    const colorName = resolved.color?.name ?? null;
+    const colorHex = resolved.color?.hex ?? null;
+    // Filament à réserver : seulement un article imprimé à la demande, avec un poids
+    // et une couleur (un article en stock est déjà imprimé).
+    const filament = {
+      saleType: product.saleType,
+      weightGrams: product.weightGrams,
+    };
     if (i.variantId) {
       const v = variantById.get(i.variantId);
       if (!v || v.productId !== i.productId) return null;
@@ -285,8 +298,10 @@ export async function POST(request: Request) {
         priceCents: v.priceCents ?? product.priceCents,
         stock: v.stock,
         name: v.name ? `${product.name} — ${v.name}` : product.name,
+        colorRef,
         colorName,
         colorHex,
+        ...filament,
       };
     }
     return {
@@ -296,8 +311,10 @@ export async function POST(request: Request) {
       priceCents: product.priceCents,
       stock: product.stock,
       name: product.name,
+      colorRef,
       colorName,
       colorHex,
+      ...filament,
     };
   });
   if (lines.some((l) => l === null)) {
@@ -313,6 +330,29 @@ export async function POST(request: Request) {
       { error: "insufficient_stock", productName: outOfStock.name },
       { status: 409 },
     );
+  }
+
+  // Stock de filament : une couleur épuisée refuse le paiement (409 out_of_stock). Le
+  // besoin d'une bobine est la SOMME de ses lignes du Studio (par couleur de la
+  // palette) et de ses articles de la boutique imprimés à la demande (par
+  // référence : poids × quantité + 10 %). Pré-contrôle frais ici, avant la moindre
+  // écriture ; le contrôle qui fait foi est refait dans la transaction, sous verrou,
+  // juste avant d'insérer la commande. Tables du stock absentes (migration pas
+  // encore appliquée) : couleurs non suivies, la vente continue.
+  const filamentNeeds = {
+    studio: sumGrams(
+      studioOrderLines.map((l) => scaleGrams(l.filamentGrams, l.quantity)),
+    ),
+    shop: shopNeedsByRef(validLines),
+  };
+  let filamentTracked = false;
+  if (
+    Object.keys(filamentNeeds.studio).length > 0 ||
+    Object.keys(filamentNeeds.shop).length > 0
+  ) {
+    const pre = await checkStockNeeds(db, filamentNeeds);
+    if (pre.status === "short") return filamentOutOfStock(pre.short);
+    filamentTracked = pre.status === "ok";
   }
 
   const shopSubtotalCents = validLines.reduce(
@@ -384,9 +424,9 @@ export async function POST(request: Request) {
     order = await db.transaction(async (tx) => {
       if (filamentTracked) {
         await lockStockChecks(tx);
-        const locked = await checkStudioStock(tx, filamentNeeds);
+        const locked = await checkStockNeeds(tx, filamentNeeds);
         if (locked.status === "short")
-          throw new OutOfFilamentStock(locked.short.map((s) => s.studioId));
+          throw new OutOfFilamentStock(locked.short);
       }
       const [order] = await tx
         .insert(orders)
@@ -417,8 +457,12 @@ export async function POST(request: Request) {
         actorId: authSession?.user.id ?? null,
       });
 
+      // Identifiants posés ici : la réservation de filament d'une ligne s'y rattache
+      // sans dépendre de l'ordre des lignes renvoyées par l'INSERT.
+      const shopItemIds = validLines.map(() => crypto.randomUUID());
       await tx.insert(orderItems).values([
-        ...validLines.map((l) => ({
+        ...validLines.map((l, index) => ({
+          id: shopItemIds[index],
           orderId: order.id,
           productId: l.productId,
           variantId: l.variantId,
@@ -443,6 +487,26 @@ export async function POST(request: Request) {
           studio: l.snapshot,
         })),
       ]);
+
+      // Filament réservé par chaque ligne imprimée à la demande (grammes d'UNE pièce ;
+      // la ligne réserve ce chiffre × quantité + 10 %, dérivé à la lecture). Table
+      // absente : journalisé, la vente continue. Les lignes sans couleur suivie
+      // n'écrivent rien.
+      await recordShopReservations(
+        tx,
+        validLines.flatMap((l, index) => {
+          const gramsPerPiece = shopReservationGrams(l.saleType, l.weightGrams);
+          return l.colorRef && gramsPerPiece !== null
+            ? [
+                {
+                  orderItemId: shopItemIds[index],
+                  refId: l.colorRef,
+                  gramsPerPiece,
+                },
+              ]
+            : [];
+        }),
+      );
 
       await reserveStock(tx, validLines, order.id);
       if (appliedCode) {
@@ -477,7 +541,7 @@ export async function POST(request: Request) {
     if (retry && retry.checkoutFingerprint === fingerprint)
       return resumeOrderCheckout(db, retry);
     if (error instanceof OutOfFilamentStock)
-      return filamentOutOfStock(error.colors);
+      return filamentOutOfStock(error.short);
     const message = error instanceof Error ? error.message : "";
     return Response.json(
       {

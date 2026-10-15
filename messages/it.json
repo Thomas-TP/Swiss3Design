@@ -15,7 +15,6 @@
     "all": "Tutti",
     "results": "{count, plural, =0 {Nessun prodotto} one {# prodotto} other {# prodotti}}",
     "empty": "Nessun prodotto corrisponde a questi filtri.",
-    "filterColor": "Colore",
     "filterMulticolor": "Multicolore",
     "sortLabel": "Ordina:",
     "sortNew": "Novità",
@@ -32,6 +31,8 @@
     "multicolorBadge": "Multicolore",
     "variant": "Variante",
     "color": "Colore",
+    "colorSoldOut": "esaurito",
+    "colorShort": "Questo colore non è più disponibile per questo articolo: ne scelga un altro.",
     "material": "Materiale",
     "dimensions": "Dimensioni",
     "weight": "Peso",
@@ -134,7 +135,8 @@
     "errorProductChanged": "Un articolo o un’opzione è cambiato. Lo selezioni nuovamente dalla scheda prodotto.",
     "errorStudioPrice": "Il prezzo di un oggetto dello Studio è stato aggiornato. Verifichi il totale e confermi di nuovo.",
     "errorStudioInvalid": "Un oggetto dello Studio nel carrello non può essere stampato così com'è. Lo riapra nello Studio dal carrello.",
-    "errorFilament": "Un colore di un oggetto dello Studio nel carrello non è più disponibile. Lo riapra nello Studio per sceglierne un altro, oppure richieda un preventivo."
+    "errorColor": "A un articolo nel carrello manca il colore. Lo rimuova dal carrello e lo aggiunga di nuovo dalla sua scheda scegliendo un colore.",
+    "errorFilament": "Un colore nel carrello non è più disponibile. Modifichi la riga interessata (riapra l'oggetto nello Studio oppure scelga un altro colore dalla scheda dell'articolo), oppure richieda un preventivo."
   },
   "orderSuccess": {
     "processingTitle": "Pagamento in corso",
@@ -450,7 +452,7 @@
       "decline": "Rifiuta il preventivo",
       "reviseTitle": "Richieda una modifica",
       "reviseDesc": "Descriva la modifica desiderata (materiale, dimensione, quantità, budget…).",
-      "revisePlaceholder": "Es.: sarebbe possibile in PETG nero, alto 15 cm?",
+      "revisePlaceholder": "Es.: sarebbe possibile in nero, alto 15 cm?",
       "fileHint": "Alleghi un file 3D corretto (facoltativo)",
       "fileUploading": "Caricamento del file…",
       "fileError": "Caricamento del file non riuscito. Riprovi o verifichi il formato.",

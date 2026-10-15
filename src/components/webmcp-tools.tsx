@@ -2,7 +2,7 @@
 import { useEffect, useRef } from "react";
 import { useLocale } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
-import { sameLine, useCart } from "@/lib/cart";
+import { lineColorKey, sameLine, useCart } from "@/lib/cart";
 import { fetchCartLine } from "@/lib/agent/cart-line";
 import { FILAMENT_IDS } from "@/lib/studio/filaments";
 
@@ -231,7 +231,7 @@ export function WebMcpTools() {
             },
             color: {
               type: "string",
-              description: "Colour name from colorOptions",
+              description: "Colour id or name from colorOptions",
             },
             variant: { type: "string", description: "Variant id or name" },
           },
@@ -260,7 +260,7 @@ export function WebMcpTools() {
           current.setQuantity(
             line.productId,
             line.variantId ?? null,
-            line.colorName ?? null,
+            lineColorKey(line),
             quantity,
           );
           return text({ added: line.name, color: line.colorName, quantity });
@@ -289,11 +289,15 @@ export function WebMcpTools() {
         async execute(input) {
           const slug = str(input.slug);
           const color = str(input.color)?.toLowerCase();
+          const colorKey = (i: {
+            colorRef?: string | null;
+            colorName?: string | null;
+          }) => [i.colorRef, i.colorName].map((v) => v?.toLowerCase());
           const variant = str(input.variant)?.toLowerCase();
           const lines = state.current.cart.items.filter(
             (i) =>
               i.slug === slug &&
-              (!color || i.colorName?.toLowerCase() === color) &&
+              (!color || colorKey(i).includes(color)) &&
               (!variant ||
                 i.variantId === variant ||
                 i.variantName?.toLowerCase() === variant),
@@ -302,7 +306,7 @@ export function WebMcpTools() {
             state.current.cart.remove(
               l.productId,
               l.variantId ?? null,
-              l.colorName ?? null,
+              lineColorKey(l),
             );
           return text({ removed: lines.length });
         },

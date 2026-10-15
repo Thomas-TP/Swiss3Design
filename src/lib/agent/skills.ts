@@ -29,7 +29,7 @@ Use the MCP server at \`${MCP}\` (Streamable HTTP, no authentication) or the RES
 
 1. \`search_products\` (\`GET ${API}/products?query=vase&max_price_chf=50&language=en\`) — find products. Check \`availability\`: \`in_stock\`, \`made_to_order\` (see \`productionDays\`) or \`out_of_stock\`.
 2. \`get_product\` (\`GET ${API}/products/{slug}\`) — details, \`colorOptions\` and \`variants\`.
-3. \`build_cart_link\` (\`POST ${API}/cart-links\`) — send \`{"items":[{"slug":"…","quantity":1,"color":"…"}]}\`. A colour is required when the product has \`colorOptions\`, a variant when it has \`variants\`. Give the returned \`cartUrl\` to the customer: it fills their cart on swiss3design.ch, where they pay with TWINT, Visa, Mastercard or Google Pay.
+3. \`build_cart_link\` (\`POST ${API}/cart-links\`) — send \`{"items":[{"slug":"…","quantity":1,"color":"…"}]}\`. A colour (\`id\`, \`name\` or \`officialName\` from \`colorOptions\`) is required when the product has \`colorOptions\`, a variant when it has \`variants\`. Give the returned \`cartUrl\` to the customer: it fills their cart on swiss3design.ch, where they pay with TWINT, Visa, Mastercard or Google Pay.
 
 ## Rules
 
@@ -63,7 +63,7 @@ Customers can also follow their order on ${STORE.url}/en/track.
 Swiss3Design prints custom parts and objects from the customer's own file or idea, in up to 4 colours in one piece.
 
 - Accepted files: STL, 3MF, OBJ, STEP (or a description of the idea).
-- Materials: mainly PLA; PETG and others on request.
+- Materials: PLA only.
 - The customer submits the request on ${STORE.url}/en/custom (file upload, material, colour, quantity) and receives a personalised quote within 48 hours by email, then pays online.
 - Questions: ${STORE.email}.
 

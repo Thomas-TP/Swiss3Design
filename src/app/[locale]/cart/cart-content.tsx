@@ -5,7 +5,12 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { isStudioLine, useCart, type StudioCartItem } from "@/lib/cart";
+import {
+  isStudioLine,
+  lineColorKey,
+  useCart,
+  type StudioCartItem,
+} from "@/lib/cart";
 import {
   cartProperties,
   productProperties,
@@ -15,10 +20,15 @@ import {
 import { cfImage } from "@/lib/cf-image";
 import { formatChf } from "@/lib/format";
 import { shippingForOrder } from "@/lib/shipping";
-import { shortColors } from "@/lib/filament/capacity";
+import {
+  requestedColorRef,
+  shopNeedsByRef,
+  shortRefIds,
+  studioIdsOfRefs,
+} from "@/lib/filament/shop";
 import { CartReminder } from "@/components/cart-reminder";
 import { PageHeader } from "@/components/page-header";
-import { useFilamentCapacity } from "@/components/use-filament-capacity";
+import { useFilamentStock } from "@/components/use-filament-capacity";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { withDot } from "@/components/ui/dot-title";
 import { StrataIcon } from "@/components/ui/icons";
@@ -53,6 +63,7 @@ export default function CartContent({
   const locale = useLocale();
   const {
     lines,
+    items,
     count,
     subtotalCents,
     shopSubtotalCents,
@@ -71,13 +82,32 @@ export default function CartContent({
     track("Cart Viewed", cartProperties(lines));
   }, [lines]);
 
-  // Stock de filament des objets du Studio : chaque ligne remonte ses grammes par
-  // couleur (pièce × quantité) ; la somme de toutes les lignes est comparée à la
-  // capacité publique. Une couleur épuisée est signalée sur sa ligne et bloque
-  // « Commander » (le paiement la refuserait : 409 out_of_stock). Sans objet du
-  // Studio, aucune requête ; capacité inconnue ou hors ligne : rien n'est bloqué.
+  // Stock de filament : chaque ligne du Studio remonte ses grammes par couleur
+  // (pièce × quantité), chaque article de la boutique imprimé à la demande les
+  // siens (poids × quantité + 10 % de perte) ; une même bobine sert les deux, la
+  // somme est donc faite PAR RÉFÉRENCE puis comparée à la capacité publique. Une
+  // couleur épuisée est signalée sur sa ligne et bloque « Commander » (le paiement
+  // la refuserait : 409 out_of_stock). Sans ligne concernée, aucune requête ;
+  // capacité inconnue ou hors ligne : rien n'est bloqué.
   const studioIds = lines.filter(isStudioLine).map((line) => line.id);
-  const capacity = useFilamentCapacity(studioIds.length > 0);
+  const shopNeeds = useMemo(
+    () =>
+      shopNeedsByRef(
+        items.map((item) => ({
+          colorRef: requestedColorRef({
+            colorRef: item.colorRef,
+            color: item.colorName,
+          }),
+          saleType: item.saleType,
+          weightGrams: item.weightGrams,
+          quantity: item.quantity,
+        })),
+      ),
+    [items],
+  );
+  const stock = useFilamentStock(
+    studioIds.length > 0 || Object.keys(shopNeeds).length > 0,
+  );
   const [needs, setNeeds] = useState<
     Record<string, Readonly<Record<string, number | undefined>>>
   >({});
@@ -91,13 +121,19 @@ export default function CartContent({
     [],
   );
   const studioKey = studioIds.join("|");
-  const short = useMemo(
+  const shortRefs = useMemo(
     () =>
-      shortColors(
-        capacity,
+      shortRefIds(
+        stock,
         studioKey.split("|").flatMap((id) => (needs[id] ? [needs[id]] : [])),
+        shopNeeds,
       ),
-    [capacity, needs, studioKey],
+    [stock, needs, studioKey, shopNeeds],
+  );
+  // Les lignes du Studio se repèrent par id de palette, celles de la boutique par référence.
+  const shortStudio = useMemo(
+    () => studioIdsOfRefs(stock, shortRefs),
+    [stock, shortRefs],
   );
 
   // Le port ne dépend que de la part boutique : le prix d'un objet du Studio est
@@ -164,7 +200,7 @@ export default function CartContent({
                   item={line}
                   onQuantity={setStudioQuantity}
                   onNeeds={onNeeds}
-                  shortColors={short}
+                  shortColors={shortStudio}
                   onRemove={(removed: StudioCartItem) => {
                     removeStudio(removed.id);
                     track("Product Removed", studioProductProperties(removed));
@@ -174,9 +210,11 @@ export default function CartContent({
             }
             const item = line;
             const image = cfImage(item.imageUrl, { width: 200 });
+            const colorKey = lineColorKey(item);
+            const colorShort = shortRefs.has(colorKey ?? "");
             return (
               <li
-                key={`${item.productId}:${item.variantId ?? ""}:${item.colorName ?? ""}`}
+                key={`${item.productId}:${item.variantId ?? ""}:${colorKey ?? ""}`}
                 className="flex gap-4 rounded-card border border-line bg-surface p-3 sm:p-4"
               >
                 {/* Vignette décorative : le lien du nom suffit au clavier. */}
@@ -228,6 +266,11 @@ export default function CartContent({
                           price: formatChf(item.priceCents, locale),
                         })}
                       </p>
+                      {colorShort ? (
+                        <p className="mt-2 text-sm font-medium text-accent-text">
+                          {ts("shopShort", { color: item.colorName ?? "" })}
+                        </p>
+                      ) : null}
                     </div>
                     <button
                       type="button"
@@ -235,7 +278,7 @@ export default function CartContent({
                         remove(
                           item.productId,
                           item.variantId ?? null,
-                          item.colorName ?? null,
+                          colorKey,
                         );
                         track("Product Removed", productProperties(item));
                       }}
@@ -253,7 +296,7 @@ export default function CartContent({
                           setQuantity(
                             item.productId,
                             item.variantId ?? null,
-                            item.colorName ?? null,
+                            colorKey,
                             item.quantity - 1,
                           )
                         }
@@ -274,7 +317,7 @@ export default function CartContent({
                           setQuantity(
                             item.productId,
                             item.variantId ?? null,
-                            item.colorName ?? null,
+                            colorKey,
                             item.quantity + 1,
                           )
                         }
@@ -347,7 +390,7 @@ export default function CartContent({
             </div>
           )}
 
-          {short.size > 0 ? (
+          {shortRefs.size > 0 ? (
             <>
               <output className="mt-6 block text-sm text-accent-text">
                 {ts("shortBlock")}

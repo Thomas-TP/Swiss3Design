@@ -28,9 +28,12 @@ function feel() {
 export function AddToCart({
   item,
   disabled = false,
+  disabledLabel,
 }: {
   item: Omit<CartItem, "quantity">;
   disabled?: boolean;
+  /** Libellé du bouton désactivé (« épuisée » pour une couleur) ; sinon « Rupture de stock ». */
+  disabledLabel?: string;
 }) {
   const t = useTranslations("product");
   const { add } = useCart();
@@ -39,7 +42,7 @@ export function AddToCart({
   if (disabled) {
     return (
       <Button variant="secondary" size="lg" full disabled>
-        {t("outOfStock")}
+        {disabledLabel ?? t("outOfStock")}
       </Button>
     );
   }

@@ -31,6 +31,8 @@ export interface Reservations {
   studio: Readonly<Record<string, number>>;
   /** Grammes réservés par id de référence (devis acceptés). */
   quote: Readonly<Record<string, number>>;
+  /** Grammes réservés par id de référence (lignes de la boutique imprimées à la demande). */
+  shop: Readonly<Record<string, number>>;
 }
 
 export interface RefAvailability {
@@ -60,7 +62,8 @@ export function computeAvailability(
     const remaining = stock.reduce((sum, s) => sum + s.remainingGrams, 0);
     const reserved =
       (ref.studioId ? (reservations.studio[ref.studioId] ?? 0) : 0) +
-      (reservations.quote[ref.id] ?? 0);
+      (reservations.quote[ref.id] ?? 0) +
+      (reservations.shop[ref.id] ?? 0);
     out.set(ref.id, {
       refId: ref.id,
       remaining,

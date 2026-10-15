@@ -14,6 +14,11 @@
 > **Mise à jour du 15.10.2026 : stock de filament.** Seconde migration additive (`0010`, tables
 > `filament_*`) et seed des références, à appliquer elles aussi avant la fusion ; le Studio ne vend
 > que les couleurs en stock (section **1.4**, étape 2).
+>
+> **Mise à jour du 15.10.2026 : couleurs de la boutique.** Les articles de la boutique proposent
+> les **mêmes couleurs que « Sur mesure »** (les références du stock), la matière est **PLA
+> partout**, et la page admin « Palette boutique » n'existe plus. Troisième migration additive
+> (`0011`, deux tables) : section **1.4**, étape 2, ordre **0010, 0011, seed des références**.
 
 **Où en est-on.** La branche `claude/redesign-2026` contient tous les packages, les vagues de
 correctifs R1 et R16 et ce lot WP-99. Elle est **à jour avec `main`** (aucun commit de `main`
@@ -101,11 +106,28 @@ enregistrée comme payée).
    `drizzle-pg/0009_cuddly_viper.sql`). Vérification :
    `SELECT column_name FROM information_schema.columns WHERE table_name='order_items' AND column_name='studio';`.
    La branche Neon **preview** l'a déjà reçue (14.10.2026).
-2. **Stock de filament, AVANT la fusion** (additif lui aussi) : appliquer
-   `drizzle-pg/0010_filament_stock.sql` (7 tables `filament_*`), puis
-   `scripts/seed-filament-refs.sql` (19 références, aucune bobine). Vérification :
-   `SELECT count(*) FROM filament_refs;` doit donner 19. La preview a reçu les deux le 15.10.2026,
-   plus `scripts/seed-filament-stock-preview.sql` (stock de test, **jamais en production**).
+2. **Stock de filament et couleurs de la boutique, AVANT la fusion** (additifs eux aussi), dans
+   cet ordre : `drizzle-pg/0010_filament_stock.sql` (7 tables `filament_*`), puis
+   **`drizzle-pg/0011_shop_colors.sql`** (`product_filament_exclusions` et `order_item_filaments`,
+   deux tables sans donnée ; elle référence `filament_refs`, donc APRÈS la 0010), puis
+   `scripts/seed-filament-refs.sql` (19 références, aucune bobine). Vérifications :
+   `SELECT count(*) FROM filament_refs;` doit donner 19 ;
+   `SELECT to_regclass('public.product_filament_exclusions'), to_regclass('public.order_item_filaments');`
+   doit rendre les deux noms (et `SELECT count(*) FROM product_filament_exclusions;` donner 0).
+   Le code tolère l'absence de la 0011 (aucune exclusion, rien de réservé : le paiement ne
+   dépend jamais d'elle), mais sans elle les cases décochées de la fiche produit ne s'enregistrent
+   pas. La preview a reçu la 0010 et le seed le 15.10.2026,
+   plus `scripts/seed-filament-stock-preview.sql` (stock de test, **jamais en production**) ;
+   la 0011 et **`scripts/seed-preview-shop-pla.sql`** (articles de démo en PLA, poids,
+   une exclusion de démonstration) sont à y jouer à la main.
+   **Production : matière.** `SELECT material, count(*) FROM products GROUP BY 1;` ; si autre chose
+   que `PLA` apparaît, `UPDATE products SET material = 'PLA' WHERE material <> 'PLA';` (le formulaire
+   admin impose désormais PLA à chaque enregistrement ; la boutique l'affiche telle quelle).
+   **Articles à la demande : le filament est contrôlé comme au Studio.** Un article « imprimé à la
+   demande » avec un poids réserve poids × quantité + 10 %, et une couleur sans bobine en stock est
+   « épuisée » (grisée sur la fiche, bloquante au panier et au paiement). Renseignez le **poids** de
+   chaque article à la demande (sans poids, la couleur n'est pas suivie et la vente passe), et saisissez
+   le stock de bobines avant de vendre. Les articles « en stock » ne réservent aucun filament.
    **Sans bobine en stock, chaque couleur du Studio est « épuisée » et le Studio ne vend rien** :
    saisissez la commande Bambu reçue juste après le déploiement (`/admin/filaments` → réception,
    pesée), ou préparez avant la fusion une version de production du seed de stock.
@@ -122,6 +144,26 @@ enregistrée comme payée).
 À relire avant la fusion : les textes légaux (CGV, confidentialité, livraison, version française
 qui fait foi ; dates réglées sur le jour du dernier commit, à recaler sur la fusion), la nouvelle
 section CGV « Objets du Studio » et l'engagement de **relecture des textes sous 2 jours ouvrés**.
+
+Couleurs de la boutique, à regarder sur la preview une fois la 0011 et le seed PLA joués :
+
+- [ ] Fiche d'un article (`/fr/products/lampe-voronoi`) : toutes les couleurs du « Sur mesure »
+      sont proposées, la première est la blanche, le nom de la couleur choisie s'affiche ; sur
+      « Support de casque », **Sakura Pink est absente** (exclusion de démonstration).
+- [ ] Un article « imprimé à la demande » (lampe, support de casque), couleur sans bobine ou trop
+      peu de grammes : la pastille est **grisée et barrée**, annoncée « épuisée » (comme au Studio) ;
+      choisie quand même, elle bloque « Ajouter au panier » et « Acheter ».
+- [ ] Panier : une ligne dont la couleur manque de grammes (en cumulant avec un objet du Studio de la
+      même couleur) affiche « Couleur épuisée : … » et **« Commander » est désactivé** ; un panier
+      d'avant (couleur « Blanc », « Noir » ou « Bleu » enregistrée dans le navigateur) se relit et se paie.
+- [ ] Paiement d'un article à la demande : la commande est créée ; dans l'admin, la commande montre le
+      bloc « Filament de la commande » avec la couleur de l'article (poids × quantité + 10 %), et
+      `/admin/filaments` voit ces grammes réservés ; « Décompter du stock » les libère.
+- [ ] Admin → Produits → un produit : la matière est un texte fixe « PLA », les couleurs sont des
+      pastilles à cocher/décocher (enregistrer, rouvrir, la fiche publique suit) ; plus de « Palette
+      boutique » dans le menu ; l'onglet Références de `/admin/filaments` n'a plus de « couleur de la
+      boutique » (la case « Proposée en sur mesure et en boutique » la remplace).
+- [ ] `/fr/shop` : plus de filtre par couleur (la puce de matière n'apparaît que s'il y en a plusieurs).
 
 Parcours de test sur la preview (carte `4242 4242 4242 4242`), après avoir marqué « reçue » la
 commande Bambu de test dans `/admin/filaments` (sinon toutes les couleurs du Studio sont épuisées) : un objet du Studio de chaque type
@@ -253,9 +295,13 @@ commandes. Dans le doute sur le paiement ou une erreur générale, **revenir d'a
 1. **Revenir** (instantané, sans reconstruction) : dashboard Cloudflare → `swiss3design` → **Deployments** →
    le déploiement précédent la fusion → **Rollback**. Ou, depuis une machine connectée :
    `bunx wrangler rollback` (en visant le Worker `swiss3design`, **jamais** `--env preview` par erreur).
-2. **Base de données : rien à défaire.** Les deux migrations de la refonte (`0009`, colonne
-   `order_items.studio` ; `0010`, tables `filament_*`) sont additives : l'ancien code les ignore, on les
-   laisse en place. Aucun changement de binding, de CSP ni de secret par rapport à `main`. N'exécutez ni `db:push:pg` ni `wrangler secret put`
+2. **Base de données : rien à défaire.** Les trois migrations de la refonte (`0009`, colonne
+   `order_items.studio` ; `0010`, tables `filament_*` ; `0011`, tables `product_filament_exclusions` et
+   `order_item_filaments`) sont additives : l'ancien code les ignore, on les laisse en place. Les anciennes
+   tables de la palette de la boutique (`materials`, `filament_colors`, `product_colors`) n'ont jamais été
+   touchées : l'ancien code retrouve sa palette et ses couleurs de produits tels qu'ils étaient.
+   Les commandes passées entre-temps gardent leur couleur (nom et hex figés dans `order_items`)
+   et leurs lignes `order_item_filaments` restent inertes. Aucun changement de binding, de CSP ni de secret par rapport à `main`. N'exécutez ni `db:push:pg` ni `wrangler secret put`
    dans ce cas (règle d'or 7 : un secret partagé écrasé par erreur verrouille les comptes 2FA).
 3. **Données du navigateur des visiteurs** : les clés `s3d-motion`, `s3d-creations-v1` (localStorage) et
    `s3d-studio-texts-v1`, `s3d-studio-upload-v1`, `s3d-quote-handoff-v1`, `s3d-webgl-lost` (sessionStorage)

@@ -78,6 +78,13 @@
       "when": 1792064022737,
       "tag": "0010_filament_stock",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1792075592148,
+      "tag": "0011_shop_colors",
+      "breakpoints": true
     }
   ]
 }

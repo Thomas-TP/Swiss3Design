@@ -1,3 +1,4 @@
+import { requestedColorRef } from "@/lib/filament/shop";
 import { STUDIO_MAX_LINES, STUDIO_QTY_MAX } from "@/lib/studio/price";
 import {
   isStudioObjectId,
@@ -11,9 +12,21 @@ export interface CartItem {
   // Variante choisie (taille/finition). null = produit sans variante.
   variantId?: string | null;
   variantName?: string | null;
-  // Couleur choisie (palette du filament). null = produit sans couleur.
+  // Couleur choisie : une référence du stock (`filament_refs.id`, les mêmes que
+  // « Sur mesure »). `colorRef` en est l'identité ; `colorName` et `colorHex` ne
+  // servent qu'à l'affichage (le serveur relit tout). Un ancien panier n'a que le
+  // NOM de l'ancienne palette : `parseCart` le rattache à une référence. null =
+  // produit sans couleur.
+  colorRef?: string | null;
   colorName?: string | null;
   colorHex?: string | null;
+  /**
+   * Poids d'UNE pièce (g), repris de la fiche à l'ajout : le panier en tire le
+   * filament à réserver (article imprimé à la demande) pour signaler une couleur
+   * épuisée. Indicatif : le serveur relit le poids en base. Absent d'un ancien
+   * panier : pas d'avertissement dans le panier, le paiement revérifie.
+   */
+  weightGrams?: number | null;
   slug: string;
   name: string;
   priceCents: number;
@@ -70,12 +83,28 @@ export const STUDIO_CART_TTL_MS = 30 * 24 * 3600 * 1000;
 type LineRef = {
   productId: string;
   variantId?: string | null;
+  colorRef?: string | null;
   colorName?: string | null;
 };
+
+/**
+ * Clé de la couleur d'une ligne : sa référence du stock, à défaut la référence
+ * d'un ancien nom de l'ancienne palette (« Blanc »…), à défaut le nom brut. Deux
+ * lignes de la même couleur ont la même clé, qu'elles viennent d'un panier d'avant
+ * ou d'après ; les actions du panier (`setQuantity`, `remove`) la prennent telle quelle.
+ */
+export const lineColorKey = (line: {
+  colorRef?: string | null;
+  colorName?: string | null;
+}): string | null =>
+  requestedColorRef({ colorRef: line.colorRef, color: line.colorName }) ??
+  line.colorName ??
+  null;
+
 export const sameLine = (a: LineRef, b: LineRef) =>
   a.productId === b.productId &&
   (a.variantId ?? null) === (b.variantId ?? null) &&
-  (a.colorName ?? null) === (b.colorName ?? null);
+  lineColorKey(a) === lineColorKey(b);
 
 /** Une ligne du Studio est identifiée par l'empreinte de sa configuration et de ses textes. */
 export const sameStudioLine = (a: { id: string }, b: { id: string }) =>
@@ -108,13 +137,32 @@ export function parseCart(raw: string): CartItem[] {
           [
             i.variantId,
             i.variantName,
+            i.colorRef,
             i.colorName,
             i.colorHex,
             i.imageUrl,
-          ].every((v) => v == null || typeof v === "string"),
+          ].every((v) => v == null || typeof v === "string") &&
+          (i.weightGrams == null ||
+            (typeof i.weightGrams === "number" &&
+              Number.isFinite(i.weightGrams) &&
+              i.weightGrams > 0 &&
+              i.weightGrams <= 100_000)),
       )
       .slice(0, CART_MAX_LINES)
-      .map((i) => ({ ...i, quantity: Math.min(i.quantity, 99) }));
+      .map((i) => {
+        // Un ancien panier (avant les couleurs du stock) n'a que le NOM de la
+        // couleur : « Blanc », « Noir » et « Bleu » sont rattachés à leur
+        // référence, tout autre nom reste un nom (le serveur le retrouve parmi les
+        // couleurs de l'article, sinon la couleur est à rechoisir sur la fiche).
+        const colorRef =
+          requestedColorRef({ colorRef: i.colorRef, color: i.colorName }) ??
+          null;
+        return {
+          ...i,
+          ...(colorRef ? { colorRef } : {}),
+          quantity: Math.min(i.quantity, 99),
+        };
+      });
   } catch {
     return [];
   }

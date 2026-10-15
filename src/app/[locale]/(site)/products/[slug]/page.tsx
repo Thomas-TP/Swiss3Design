@@ -341,6 +341,7 @@ export default async function ProductPage({
                 saleType={product.saleType}
                 productionDays={product.productionDays}
                 productStock={product.stock}
+                weightGrams={product.weightGrams}
                 imageUrl={image?.url ?? null}
                 variants={product.variants.map((v) => ({
                   id: v.id,

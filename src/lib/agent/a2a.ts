@@ -53,7 +53,7 @@ const SKILL_EXAMPLES: Record<ToolName, string[]> = {
     "Where is my order S3D-MFZ3K2Q1A7BX? My email is jean@example.ch",
   ],
   build_cart_link: [
-    '{"skill":"build_cart_link","items":[{"slug":"vase-spirale","quantity":1,"color":"Blanc"}]}',
+    '{"skill":"build_cart_link","items":[{"slug":"vase-spirale","quantity":1,"color":"Ivory White"}]}',
   ],
 };
 

@@ -293,7 +293,23 @@ put` on an environment with real users without `--env <name>` explicitly
     WASM in that Worker, never on the main thread, never in the server Worker
     (`mesh-estimator.tsx` is `ssr: false` for the same reason as the gates). Worker
     gzip measured with the stock and the admin: 2 528 KiB (2 491 KiB at `0be8e4e`,
-    same path length, 2026-10-15).
+    same path length, 2026-10-15). **Shop colours (15.10.2026): an article's colours
+    ARE the stock's:** active `filament_refs` with `custom_ok` (the same as « Sur mesure »)
+    minus `product_filament_exclusions` (boxes unticked in the admin product form); material
+    always PLA (`CUSTOM_MATERIAL`, forced on save). The cart identifies a colour by `colorRef`
+    (ref id; an old cart holding only a NAME is attached by `parseCart`: Blanc/Noir/Bleu,
+    `lib/filament/shop.ts`); the server re-reads everything. An `on_demand` article with a
+    weight reserves `ceil(weight × quantity × 1.10)` g in `order_item_filaments` (grams of ONE
+    piece; its own table, not an `order_items` column: webhook included, every `select()` of
+    that table lists its columns). Migration `drizzle-pg/0011` is additive, applied AFTER 0010
+    and BEFORE the refs seed; the code tolerates 42P01 (no exclusion, nothing reserved, the
+    sale goes on). A spool's need is the SUM of its Studio and shop lines, checked PER REF
+    (`checkStockNeeds`: same advisory lock, same 409 `out_of_stock`); the cart sums the same
+    way with the public capacity (`refs` of `/api/stock/colors`, KV key `v2`). No spool for a
+    ref = « épuisée » for on-demand articles. `materials`/`filament_colors`/`product_colors`
+    stay for the rollback but no code reads them; `/admin/materials` is gone. Preview data:
+    `scripts/seed-preview-shop-pla.sql` (by hand, never in a deploy). Worker gzip with the shop colours: 2 536 KiB
+    (2 528.56 before, same path length, 2026-10-15).
 
 ## Tech stack
 

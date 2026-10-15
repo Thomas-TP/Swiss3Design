@@ -83,25 +83,29 @@ describe.skipIf(!url)(
       return value;
     };
 
+    const studioItem = (quantity: number, config: object = BORNE_DEFAULT) => ({
+      kind: "studio",
+      object: "borne",
+      config,
+      texts: { text: "Léa" },
+      locale: "fr",
+      quantity,
+    });
+
     function request(
       to: string,
       quantity: number,
       config: object = BORNE_DEFAULT,
     ) {
+      return checkout(to, [studioItem(quantity, config)]);
+    }
+
+    function checkout(to: string, items: object[]) {
       return new Request("https://swiss3design.ch/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json", "x-test-email": to },
         body: JSON.stringify({
-          items: [
-            {
-              kind: "studio",
-              object: "borne",
-              config,
-              texts: { text: "Léa" },
-              locale: "fr",
-              quantity,
-            },
-          ],
+          items,
           email: to,
           address: {
             name: "Test Stock",
@@ -264,6 +268,86 @@ describe.skipIf(!url)(
       expect(created).toBe(1);
     });
 
+    // Article de la boutique imprimé à la demande (100 g la pièce) : il réserve
+    // poids × quantité + 10 % sur la référence choisie, comme le Studio.
+    let productId: string | null = null;
+    async function onDemandProduct() {
+      if (productId) return productId;
+      const [created] = await db
+        .insert(schema.products)
+        .values({
+          slug: `${tag}-article`,
+          priceCents: 1000,
+          saleType: "on_demand",
+          weightGrams: 100,
+        })
+        .returning();
+      productId = created.id;
+      return productId;
+    }
+
+    it("article à la demande : réserve poids × quantité + 10 % sur sa référence", async () => {
+      const product = await onDemandProduct();
+      const r = await ref(BORNE_DEFAULT.base);
+      // 2 pièces de 100 g : ceil(200 × 1,10) = 220 g.
+      await setAvailable(BORNE_DEFAULT.base, 220 + 200);
+      const to = email();
+      const res = await POST(
+        checkout(to, [{ productId: product, colorRef: r.id, quantity: 2 }]),
+      );
+      expect(res.status).toBe(200);
+      const [order] = await ordersOf(to);
+      const [item] = await db
+        .select()
+        .from(schema.orderItems)
+        .where(eq(schema.orderItems.orderId, order.id));
+      expect(item.colorName).toBeTruthy();
+      expect(item.colorHex).toBe(r.hex);
+      const [reserved] = await db
+        .select()
+        .from(schema.orderItemFilaments)
+        .where(eq(schema.orderItemFilaments.orderItemId, item.id));
+      expect(reserved).toMatchObject({ refId: r.id, gramsPerPiece: 100 });
+      const snap = await loadStockSnapshot(db, { refIds: [r.id] });
+      expect(snap.availability.get(r.id)!.available).toBe(200);
+    });
+
+    it("Studio + boutique sur la même bobine : le besoin CUMULÉ est contrôlé", async () => {
+      const product = await onDemandProduct();
+      const r = await ref(BORNE_DEFAULT.base);
+      const needs = needsOf(1);
+      for (const [id, g] of Object.entries(needs))
+        await setAvailable(id, (g ?? 0) + 200);
+      // Base : chaque ligne passerait seule (réserve de 20 g comprise), pas les deux
+      // ensemble (besoin Studio + 110 g de la pièce de boutique).
+      const base = needs[BORNE_DEFAULT.base] ?? 0;
+      await setAvailable(BORNE_DEFAULT.base, base + 110 + 20 - 1);
+      const to = email();
+      const res = await POST(
+        checkout(to, [
+          studioItem(1),
+          { productId: product, colorRef: r.id, quantity: 1 },
+        ]),
+      );
+      expect(res.status).toBe(409);
+      const body = (await res.json()) as { error: string; refs: string[] };
+      expect(body.error).toBe("out_of_stock");
+      expect(body.refs).toEqual([r.id]);
+      expect(await ordersOf(to)).toHaveLength(0);
+    });
+
+    it("article à couleurs sans couleur : 400 color_required", async () => {
+      const product = await onDemandProduct();
+      const to = email();
+      const res = await POST(
+        checkout(to, [{ productId: product, quantity: 1 }]),
+      );
+      expect(res.status).toBe(400);
+      expect(((await res.json()) as { error: string }).error).toBe(
+        "color_required",
+      );
+    });
+
     afterAll(async () => {
       const orderRows = mine.emails.length
         ? await db
@@ -283,6 +367,10 @@ describe.skipIf(!url)(
       await db
         .delete(schema.orders)
         .where(like(schema.orders.email, `${tag}%`));
+      if (productId)
+        await db
+          .delete(schema.products)
+          .where(eq(schema.products.id, productId));
       if (mine.spools.length) {
         await db
           .delete(schema.filamentMovements)

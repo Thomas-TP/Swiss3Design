@@ -85,7 +85,7 @@ export default async function AdminEmailsPage({
         locale: previewLocale,
         quotedPriceCents: 4900,
         adminMessage:
-          "Impression en PETG noir et rouge, 2 exemplaires, prêts sous 5 jours ouvrés.",
+          "Impression en PLA noir et rouge, 2 exemplaires, prêts sous 5 jours ouvrés.",
         validUntil: validUntilPreview,
       }),
       height: 560,
@@ -136,7 +136,7 @@ export default async function AdminEmailsPage({
           email: "client@example.ch",
           description:
             "Bonjour, j'aurais besoin d'un support de casque sur mesure, environ 25 cm de haut, si possible en deux couleurs.",
-          material: "PETG",
+          material: "PLA",
           colors: "Noir + rouge",
           dimensions: "250 × 120 × 80 mm",
           fileName: "support-casque.stl",
@@ -151,7 +151,7 @@ export default async function AdminEmailsPage({
       desc: "Envoyé à l'équipe quand le client demande une modification depuis son espace — avec son message et le fichier joint éventuel.",
       email: adminQuoteRevisionEmail(
         { id: "demo", email: "client@example.ch", locale: previewLocale },
-        "Serait-il possible de l'avoir en PETG noir plutôt qu'en PLA, et 2 cm plus haut ?",
+        "Serait-il possible de l'avoir en noir plutôt qu'en blanc, et 2 cm plus haut ?",
         "support-casque-v2.stl",
         ["vous@example.ch"],
       ),

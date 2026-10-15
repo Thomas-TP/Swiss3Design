@@ -2,6 +2,7 @@
 
 import { and, eq, inArray, or } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { getLocale } from "next-intl/server";
 import { getDb } from "@/db";
 import {
   orders,
@@ -11,6 +12,8 @@ import {
   productVariants,
   productImages,
 } from "@/db/schema";
+import { findColorOption } from "@/lib/filament/shop";
+import { loadProductColors } from "@/lib/filament/shop-db";
 import { getServerSession } from "@/lib/session";
 
 export interface ReviewState {
@@ -96,8 +99,11 @@ export interface ReorderItem {
   productId: string;
   variantId: string | null;
   variantName: string | null;
+  /** Référence du stock de la couleur (les couleurs de la boutique sont celles du stock). */
+  colorRef: string | null;
   colorName: string | null;
   colorHex: string | null;
+  weightGrams: number | null;
   slug: string;
   name: string;
   priceCents: number;
@@ -126,7 +132,7 @@ export async function getReorderItems(orderId: string): Promise<
 
   const db = await getDb();
   const [order] = await db
-    .select({ id: orders.id })
+    .select({ id: orders.id, locale: orders.locale })
     .from(orders)
     .where(
       and(
@@ -173,6 +179,17 @@ export async function getReorderItems(orderId: string): Promise<
   ]);
   const productById = new Map(dbProducts.map((p) => [p.id, p]));
   const variantById = new Map(dbVariants.map((v) => [v.id, v]));
+  // Couleurs actuelles de chaque article. La ligne de la commande ne garde que le
+  // NOM affiché dans la langue de la commande : on le retrouve dans cette langue,
+  // puis on l'affiche dans celle du client.
+  const currentLocale = await getLocale();
+  const orderLocale = order.locale || currentLocale;
+  const [orderPalettes, currentPalettes] = await Promise.all([
+    loadProductColors(db, productIds, orderLocale),
+    orderLocale === currentLocale
+      ? null
+      : loadProductColors(db, productIds, currentLocale),
+  ]);
   const firstImageByProduct = new Map<string, string>();
   for (const img of dbImages) {
     if (!firstImageByProduct.has(img.productId)) {
@@ -237,12 +254,31 @@ export async function getReorderItems(orderId: string): Promise<
       continue;
     }
 
+    // Un article qui propose des couleurs exige celle de la commande ; si elle ne
+    // l'est plus (décochée, retirée du stock), la ligne est écartée comme un article
+    // retiré. Sans palette (stock non suivi), pas de couleur.
+    const palette = orderPalettes.get(product.id) ?? [];
+    const matched = palette.length
+      ? findColorOption(palette, line.colorName)
+      : undefined;
+    if (palette.length && !matched) {
+      unavailableCount++;
+      continue;
+    }
+    const color = matched
+      ? ((currentPalettes ?? orderPalettes)
+          .get(product.id)
+          ?.find((c) => c.id === matched.id) ?? matched)
+      : null;
+
     items.push({
       productId: product.id,
       variantId: line.variantId,
       variantName,
-      colorName: line.colorName,
-      colorHex: line.colorHex,
+      colorRef: color?.id ?? null,
+      colorName: color?.name ?? null,
+      colorHex: color?.hex ?? null,
+      weightGrams: product.weightGrams,
       slug: product.slug,
       name: line.nameSnapshot,
       priceCents,

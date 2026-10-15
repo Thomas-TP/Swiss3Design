@@ -15,7 +15,6 @@
     "all": "Alle",
     "results": "{count, plural, =0 {Keine Produkte} one {# Produkt} other {# Produkte}}",
     "empty": "Keine Produkte entsprechen diesen Filtern.",
-    "filterColor": "Farbe",
     "filterMulticolor": "Mehrfarbig",
     "sortLabel": "Sortieren:",
     "sortNew": "Neuheiten",
@@ -32,6 +31,8 @@
     "multicolorBadge": "Mehrfarbig",
     "variant": "Variante",
     "color": "Farbe",
+    "colorSoldOut": "ausverkauft",
+    "colorShort": "Diese Farbe ist für diesen Artikel nicht mehr verfügbar: Wählen Sie eine andere.",
     "material": "Material",
     "dimensions": "Abmessungen",
     "weight": "Gewicht",
@@ -134,7 +135,8 @@
     "errorProductChanged": "Ein Artikel oder eine Option hat sich geändert. Wählen Sie ihn auf der Produktseite erneut aus.",
     "errorStudioPrice": "Der Preis eines Studio-Objekts wurde aktualisiert. Prüfen Sie den Gesamtbetrag und bestätigen Sie erneut.",
     "errorStudioInvalid": "Ein Studio-Objekt in Ihrem Warenkorb kann so nicht gedruckt werden. Öffnen Sie es im Warenkorb erneut im Studio.",
-    "errorFilament": "Eine Farbe eines Studio-Objekts in Ihrem Warenkorb ist nicht mehr vorrätig. Öffnen Sie es erneut im Studio und wählen Sie eine andere Farbe, oder fordern Sie ein Angebot an."
+    "errorColor": "Einem Artikel in Ihrem Warenkorb fehlt die Farbe. Entfernen Sie ihn aus dem Warenkorb und fügen Sie ihn von der Produktseite aus mit einer gewählten Farbe erneut hinzu.",
+    "errorFilament": "Eine Farbe in Ihrem Warenkorb ist nicht mehr vorrätig. Bearbeiten Sie die betroffene Position (öffnen Sie das Objekt erneut im Studio oder wählen Sie auf der Produktseite eine andere Farbe) oder fordern Sie ein Angebot an."
   },
   "orderSuccess": {
     "processingTitle": "Zahlung in Bearbeitung",
@@ -450,7 +452,7 @@
       "decline": "Offerte ablehnen",
       "reviseTitle": "Änderung anfragen",
       "reviseDesc": "Beschreiben Sie die gewünschte Änderung (Material, Grösse, Menge, Budget…).",
-      "revisePlaceholder": "Z. B.: Wäre es in schwarzem PETG, 15 cm hoch, möglich?",
+      "revisePlaceholder": "Z. B.: Wäre es in Schwarz, 15 cm hoch, möglich?",
       "fileHint": "Korrigierte 3D-Datei anhängen (optional)",
       "fileUploading": "Datei wird hochgeladen…",
       "fileError": "Datei-Upload fehlgeschlagen. Erneut versuchen oder Format prüfen.",

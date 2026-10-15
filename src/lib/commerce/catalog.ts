@@ -3,15 +3,14 @@ import type { getDb } from "@/db";
 import {
   categories,
   categoryTranslations,
-  filamentColors,
   productCategories,
-  productColors,
   productImages,
   productTranslations,
   productVariants,
   products,
   reviews,
 } from "@/db/schema";
+import { loadProductColors } from "@/lib/filament/shop-db";
 import { SITE_URL } from "@/lib/seo";
 
 type Db = Awaited<ReturnType<typeof getDb>>;
@@ -21,8 +20,10 @@ type Db = Awaited<ReturnType<typeof getDb>>;
 // couleur —, identifiée par un SKU stable. Les variantes sont recréées à
 // chaque enregistrement de la fiche (nouveaux id) ; leur `sku` et le slug du
 // produit, eux, ne bougent pas : SKU = sku de variante ou slug, suffixé de la
-// couleur quand le produit en propose. Le flux est en français (langue qui
-// fait foi) ; les agents traduisent pour l'acheteur.
+// couleur quand le produit en propose. Les couleurs sont celles du stock (les
+// références « sur mesure », moins les exclusions de l'article) : leur NOM est le
+// nom français de la palette du Studio, sinon le nom officiel. Le flux est en
+// français (langue qui fait foi) ; les agents traduisent pour l'acheteur.
 
 export interface SellableSku {
   sku: string;
@@ -31,6 +32,11 @@ export interface SellableSku {
   variantName: string | null;
   colorName: string | null;
   colorHex: string | null;
+  // Référence du stock de la couleur (`filament_refs.id`) et son nom officiel :
+  // un agent peut la demander par l'un ou l'autre, et la commande réserve son
+  // filament (article imprimé à la demande).
+  colorRef?: string | null;
+  colorOfficialName?: string | null;
   slug: string;
   // item_group_id : regroupe variantes et couleurs d'une même fiche.
   groupId: string | null;
@@ -114,7 +120,13 @@ export interface CatalogRows {
     priceCents: number | null;
     stock: number | null;
   }[];
-  colors: { productId: string; name: string; hex: string }[];
+  colors: {
+    productId: string;
+    name: string;
+    hex: string;
+    refId?: string;
+    officialName?: string;
+  }[];
   categories: { productId: string; name: string }[];
   ratings: { productId: string; count: number; average: number | null }[];
 }
@@ -167,8 +179,13 @@ export function buildSellableSkus(rows: CatalogRows): SellableSku[] {
           },
         ];
     const shades = productColors.length
-      ? productColors.map((c) => ({ name: c.name, hex: c.hex }))
-      : [{ name: null, hex: null }];
+      ? productColors.map((c) => ({
+          name: c.name as string | null,
+          hex: c.hex as string | null,
+          refId: c.refId ?? null,
+          officialName: c.officialName ?? null,
+        }))
+      : [{ name: null, hex: null, refId: null, officialName: null }];
     const grouped = options.length * shades.length > 1;
     const rating = ratings.get(p.id);
 
@@ -189,6 +206,8 @@ export function buildSellableSkus(rows: CatalogRows): SellableSku[] {
           variantName: option.variantName,
           colorName: shade.name,
           colorHex: shade.hex,
+          colorRef: shade.refId,
+          colorOfficialName: shade.officialName,
           slug: p.slug,
           groupId: grouped ? p.slug : null,
           productName,
@@ -238,7 +257,7 @@ export async function loadSellableSkus(db: Db): Promise<SellableSku[]> {
   const ids = productRows.map((p) => p.id);
   if (!ids.length) return [];
   // Lectures indépendantes → en parallèle (pool pg du Worker).
-  const [translations, images, variants, colors, cats, ratings] =
+  const [translations, images, variants, colorsByProduct, cats, ratings] =
     await Promise.all([
       db
         .select({
@@ -266,16 +285,7 @@ export async function loadSellableSkus(db: Db): Promise<SellableSku[]> {
         .from(productVariants)
         .where(inArray(productVariants.productId, ids))
         .orderBy(asc(productVariants.sku)),
-      db
-        .select({
-          productId: productColors.productId,
-          name: filamentColors.name,
-          hex: filamentColors.hex,
-        })
-        .from(productColors)
-        .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
-        .where(inArray(productColors.productId, ids))
-        .orderBy(asc(productColors.productId), asc(productColors.sortOrder)),
+      loadProductColors(db, ids, "fr"),
       db
         .select({
           productId: productCategories.productId,
@@ -309,7 +319,15 @@ export async function loadSellableSkus(db: Db): Promise<SellableSku[]> {
     translations,
     images,
     variants,
-    colors,
+    colors: ids.flatMap((productId) =>
+      (colorsByProduct.get(productId) ?? []).map((c) => ({
+        productId,
+        name: c.name,
+        hex: c.hex,
+        refId: c.id,
+        officialName: c.officialName,
+      })),
+    ),
     categories: cats,
     ratings: ratings.map((r) => ({
       productId: r.productId,

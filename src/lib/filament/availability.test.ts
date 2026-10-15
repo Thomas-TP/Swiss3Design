@@ -44,7 +44,7 @@ describe("computeAvailability : disponible = restant − réservé", () => {
     const map = computeAvailability(
       refs,
       [spool("r-white", 400), spool("r-white", 1000, { sealed: true })],
-      { studio: { "blanc-neve": 300 }, quote: { "r-white": 120 } },
+      { studio: { "blanc-neve": 300 }, quote: { "r-white": 120 }, shop: {} },
     );
     const white = map.get("r-white")!;
     expect(white.remaining).toBe(1400);
@@ -61,7 +61,7 @@ describe("computeAvailability : disponible = restant − réservé", () => {
         spool("r-red", 0, { status: "empty" }),
         spool("r-red", 500, { status: "retired" }),
       ],
-      { studio: {}, quote: {} },
+      { studio: {}, quote: {}, shop: {} },
     );
     const red = map.get("r-red")!;
     expect(red.remaining).toBe(0);
@@ -73,6 +73,7 @@ describe("computeAvailability : disponible = restant − réservé", () => {
     const map = computeAvailability(refs, [spool("r-silk", 250)], {
       studio: { "r-silk": 999 },
       quote: { "r-silk": 100 },
+      shop: {},
     });
     expect(map.get("r-silk")!.available).toBe(150);
   });
@@ -81,8 +82,25 @@ describe("computeAvailability : disponible = restant − réservé", () => {
     const map = computeAvailability(refs, [spool("r-white", 100)], {
       studio: { "blanc-neve": 250 },
       quote: {},
+      shop: {},
     });
     expect(map.get("r-white")!.available).toBe(-150);
+  });
+
+  it("les lignes de la boutique réservent par id de référence, avec le Studio et les devis", () => {
+    const map = computeAvailability(
+      refs,
+      [spool("r-white", 1000), spool("r-silk", 300)],
+      {
+        studio: { "blanc-neve": 100 },
+        quote: { "r-white": 50 },
+        shop: { "r-white": 200, "r-silk": 120 },
+      },
+    );
+    expect(map.get("r-white")!.reserved).toBe(350);
+    expect(map.get("r-white")!.available).toBe(650);
+    expect(map.get("r-silk")!.reserved).toBe(120);
+    expect(map.get("r-silk")!.available).toBe(180);
   });
 });
 

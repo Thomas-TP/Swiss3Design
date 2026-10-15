@@ -2,6 +2,7 @@ import { z } from "zod";
 import { SITE_URL } from "@/lib/seo";
 import { rateLimit } from "@/lib/rate-limit";
 import { getShippingSettings } from "@/lib/shipping-settings";
+import { findColorOption } from "@/lib/filament/shop";
 import { FREE_SHIPPING_OVER_CENTS, SHIPPING_CENTS } from "@/lib/shipping";
 import {
   getAgentProduct,
@@ -112,7 +113,7 @@ const schemas = {
             .max(60)
             .optional()
             .describe(
-              "Colour name from the product's colorOptions, required when the product offers colours",
+              "Colour id or name from the product's colorOptions, required when the product offers colours",
             ),
         }),
       )
@@ -215,11 +216,7 @@ const handlers: { [N in ToolName]: Handler<N> } = {
           "invalid_arguments",
           `${product.name} requires a variant: ${product.variants.map((v) => v.name).join(", ")}`,
         );
-      const color = item.color
-        ? product.colorOptions.find(
-            (c) => c.name.toLowerCase() === item.color!.toLowerCase(),
-          )
-        : undefined;
+      const color = findColorOption(product.colorOptions, item.color);
       if (product.colorOptions.length > 0 && !color)
         throw new ToolError(
           "invalid_arguments",
@@ -229,9 +226,8 @@ const handlers: { [N in ToolName]: Handler<N> } = {
       const unit = variant?.price ?? product.price;
       params.append(
         "item",
-        [product.slug, quantity, variant?.id ?? "", color?.name ?? ""].join(
-          "|",
-        ),
+        // L'id de la couleur, pas son nom : le lien se lit dans toutes les langues.
+        [product.slug, quantity, variant?.id ?? "", color?.id ?? ""].join("|"),
       );
       lines.push({
         slug: product.slug,

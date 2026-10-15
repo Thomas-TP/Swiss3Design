@@ -63,14 +63,13 @@ export default async function ShopPage({
   searchParams: Promise<{
     category?: string;
     material?: string;
-    color?: string;
     multicolor?: string;
     sort?: string;
     q?: string;
   }>;
 }) {
   const { locale } = await params;
-  const { category, material, color, multicolor, sort, q } = await searchParams;
+  const { category, material, multicolor, sort, q } = await searchParams;
   const searchParam = q?.trim() || undefined;
   const multicolorOn = multicolor === "1";
   // Le filtre multicolore n'apparaît que si un produit l'utilise — ou s'il est
@@ -93,7 +92,6 @@ export default async function ShopPage({
     getProducts(locale, {
       categorySlug: category,
       material,
-      color,
       multicolor: multicolorOn,
       sort: activeSort,
       q: searchParam,
@@ -111,9 +109,12 @@ export default async function ShopPage({
   // Le schéma ItemList ne décrit que le catalogue complet (la page canonique),
   // pas une vue filtrée. Même critère pour la planche éditoriale : un filtre
   // actif donne toujours la grille et sa liste de résultats.
-  const isFullCatalog =
-    !category && !material && !color && !multicolorOn && !searchParam;
+  const isFullCatalog = !category && !material && !multicolorOn && !searchParam;
   const plates = isFullCatalog && products.length <= PLATE_MAX;
+  // Toute la boutique est en PLA : une seule puce « PLA » ne départagerait rien.
+  // Elle reste affichée si le filtre est déjà actif (pour pouvoir le retirer) ou
+  // si une autre matière apparaît au catalogue.
+  const showMaterials = filters.materials.length > 1 || Boolean(material);
 
   return (
     <PageCut>
@@ -140,13 +141,12 @@ export default async function ShopPage({
             properties={{ query: searchParam, results: products.length }}
           />
         )}
-        {(category || material || color || multicolorOn || sortParam) && (
+        {(category || material || multicolorOn || sortParam) && (
           <TrackEvent
             event="Product List Filtered"
             properties={{
               category,
               material,
-              color,
               multicolor: multicolorOn || undefined,
               sort: sortParam,
               results: products.length,
@@ -203,7 +203,6 @@ export default async function ShopPage({
                 {material && (
                   <input type="hidden" name="material" value={material} />
                 )}
-                {color && <input type="hidden" name="color" value={color} />}
                 {multicolorParam && (
                   <input
                     type="hidden"
@@ -219,7 +218,6 @@ export default async function ShopPage({
                 <SiteLink
                   href={linkFor({
                     material,
-                    color,
                     multicolor: multicolorParam,
                     sort: sortParam,
                   })}
@@ -234,7 +232,6 @@ export default async function ShopPage({
                     href={linkFor({
                       category: c.slug,
                       material,
-                      color,
                       multicolor: multicolorParam,
                       sort: sortParam,
                     })}
@@ -244,36 +241,33 @@ export default async function ShopPage({
                     {c.name}
                   </SiteLink>
                 ))}
-                {(filters.materials.length > 0 ||
-                  filters.multicolor ||
-                  multicolorOn) && (
+                {(showMaterials || filters.multicolor || multicolorOn) && (
                   <span
                     aria-hidden="true"
                     className="mx-1 hidden w-px self-stretch bg-line sm:block"
                   />
                 )}
-                {filters.materials.map((m) => (
-                  <SiteLink
-                    key={m}
-                    href={linkFor({
-                      category,
-                      material: material === m ? undefined : m,
-                      color,
-                      multicolor: multicolorParam,
-                      sort: sortParam,
-                    })}
-                    aria-current={material === m ? "true" : undefined}
-                    className={chipClass(material === m)}
-                  >
-                    {m}
-                  </SiteLink>
-                ))}
+                {showMaterials &&
+                  filters.materials.map((m) => (
+                    <SiteLink
+                      key={m}
+                      href={linkFor({
+                        category,
+                        material: material === m ? undefined : m,
+                        multicolor: multicolorParam,
+                        sort: sortParam,
+                      })}
+                      aria-current={material === m ? "true" : undefined}
+                      className={chipClass(material === m)}
+                    >
+                      {m}
+                    </SiteLink>
+                  ))}
                 {(filters.multicolor || multicolorOn) && (
                   <SiteLink
                     href={linkFor({
                       category,
                       material,
-                      color,
                       multicolor: multicolorOn ? undefined : "1",
                       sort: sortParam,
                     })}
@@ -284,43 +278,6 @@ export default async function ShopPage({
                   </SiteLink>
                 )}
               </div>
-
-              {(filters.colors.length > 0 || color) && (
-                <div className="mt-4 flex flex-wrap items-center gap-2.5">
-                  <span className="s3d-label text-soft">
-                    {t("filterColor")}
-                  </span>
-                  {filters.colors.map((c) => {
-                    const active = color === c.name;
-                    return (
-                      <SiteLink
-                        key={c.name}
-                        href={linkFor({
-                          category,
-                          material,
-                          color: active ? undefined : c.name,
-                          multicolor: multicolorParam,
-                          sort: sortParam,
-                        })}
-                        title={c.name}
-                        aria-current={active ? "true" : undefined}
-                        className={cx(
-                          "h-7 w-7 rounded-full border transition-transform duration-300 ease-purge hover:scale-105",
-                          active
-                            ? "border-ink ring-2 ring-ink ring-offset-2 ring-offset-paper"
-                            : "border-swatch-ring",
-                        )}
-                        style={{ backgroundColor: c.hex }}
-                      >
-                        {/* Texte d'ancre réel (masqué) plutôt qu'un aria-label :
-                          lecteurs d'écran ET robots (Semrush signale les liens
-                          sans ancre) lisent le nom de la couleur. */}
-                        <span className="sr-only">{c.name}</span>
-                      </SiteLink>
-                    );
-                  })}
-                </div>
-              )}
             </div>
 
             {products.length === 0 ? (
@@ -357,7 +314,6 @@ export default async function ShopPage({
                             href={linkFor({
                               category,
                               material,
-                              color,
                               multicolor: multicolorParam,
                               sort: s === "new" ? undefined : s,
                             })}

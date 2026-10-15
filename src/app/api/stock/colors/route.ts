@@ -15,7 +15,7 @@ export async function GET() {
     // (le paiement et le devis revérifient côté serveur).
     console.error("[stock] lecture publique impossible", error);
     return Response.json(
-      { v: 1, studio: {}, custom: [] },
+      { v: 1, studio: {}, refs: {}, custom: [] },
       { status: 200, headers: { "Cache-Control": "no-store" } },
     );
   }

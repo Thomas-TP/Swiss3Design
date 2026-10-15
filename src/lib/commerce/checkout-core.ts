@@ -8,6 +8,12 @@ import { makeOrderNumber } from "@/lib/order-number";
 import { deliveryDays, shippingFor } from "@/lib/shipping";
 import { recordStatusTransition } from "@/lib/status-history";
 import { releaseOrderStock, reserveStock } from "@/lib/stock";
+import { legacyColorRef } from "@/lib/filament/shop";
+import {
+  recordShopReservations,
+  type ShopReservationInput,
+} from "@/lib/filament/shop-reservation";
+import { shopReservationGrams } from "@/lib/filament/shop";
 import { colorKey, type SellableSku } from "./catalog";
 import {
   isUniqueViolation,
@@ -118,10 +124,17 @@ export function resolveLine(
         `${pool[0]?.productName ?? request.slug} requires a colour: ${colors.join(", ")}`,
         param,
       );
+    // Par nom (celui du flux), par référence du stock, par nom officiel (« Ivory
+    // White ») ou par l'un des anciens noms de la palette (« Blanc »…).
+    const wantedKey = colorKey(wanted);
+    const wantedLegacy = legacyColorRef(wanted);
     pool = pool.filter(
       (s) =>
         same(s.colorName, wanted) ||
-        (s.colorName && colorKey(s.colorName) === colorKey(wanted)),
+        (s.colorName && colorKey(s.colorName) === wantedKey) ||
+        (s.colorRef &&
+          (s.colorRef === wanted.trim() || s.colorRef === wantedLegacy)) ||
+        (s.colorOfficialName && colorKey(s.colorOfficialName) === wantedKey),
     );
   }
   if (pool.length !== 1)
@@ -375,8 +388,10 @@ export async function createPendingAgentOrder(
         toStatus: "pending",
         source: "checkout",
       });
+      const itemIds = input.quote.lines.map(() => crypto.randomUUID());
       await tx.insert(orderItems).values(
-        input.quote.lines.map((l) => ({
+        input.quote.lines.map((l, index) => ({
+          id: itemIds[index],
           orderId: order.id,
           productId: l.sku.productId,
           variantId: l.sku.variantId,
@@ -386,6 +401,26 @@ export async function createPendingAgentOrder(
           priceCentsSnapshot: l.unitCents,
           quantity: l.quantity,
         })),
+      );
+      // Filament de l'article imprimé à la demande : réservé comme au paiement web
+      // (sans le refuser ici : le stock de filament ne bloque pas les achats agents).
+      await recordShopReservations(
+        tx,
+        input.quote.lines.flatMap((l, index): ShopReservationInput[] => {
+          const gramsPerPiece = shopReservationGrams(
+            l.sku.saleType,
+            l.sku.weightGrams,
+          );
+          return l.sku.colorRef && gramsPerPiece !== null
+            ? [
+                {
+                  orderItemId: itemIds[index],
+                  refId: l.sku.colorRef,
+                  gramsPerPiece,
+                },
+              ]
+            : [];
+        }),
       );
       await reserveStock(
         tx,

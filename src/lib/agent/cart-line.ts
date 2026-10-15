@@ -1,4 +1,5 @@
 import type { CartItem } from "@/lib/cart-data";
+import { findColorOption } from "@/lib/filament/shop";
 
 // Côté navigateur : transforme un produit de l'API publique en ligne de
 // panier, avec les mêmes exigences que le checkout (variante obligatoire si
@@ -14,8 +15,14 @@ interface ApiProduct {
   saleType: "stock" | "on_demand";
   availability: "in_stock" | "made_to_order" | "out_of_stock";
   price: { cents: number };
+  weightGrams: number | null;
   variants: { id: string; name: string; price: { cents: number } }[];
-  colorOptions: { name: string; hex: string }[];
+  colorOptions: {
+    id: string;
+    name: string;
+    officialName: string;
+    hex: string;
+  }[];
 }
 
 export interface LineRequest {
@@ -47,11 +54,9 @@ export async function fetchCartLine(
     throw new Error(
       `${product.name} requires a variant: ${product.variants.map((v) => v.name).join(", ")}`,
     );
-  const color = request.color
-    ? product.colorOptions.find(
-        (c) => c.name.toLowerCase() === request.color!.toLowerCase(),
-      )
-    : undefined;
+  // Par id, par nom affiché, par nom officiel ou par ancien nom de la palette
+  // (« Blanc »…) : la même tolérance que le paiement.
+  const color = findColorOption(product.colorOptions, request.color);
   if (product.colorOptions.length > 0 && !color)
     throw new Error(
       `${product.name} requires a colour: ${product.colorOptions.map((c) => c.name).join(", ")}`,
@@ -60,8 +65,10 @@ export async function fetchCartLine(
     productId: product.id,
     variantId: variant?.id ?? null,
     variantName: variant?.name ?? null,
+    colorRef: color?.id ?? null,
     colorName: color?.name ?? null,
     colorHex: color?.hex ?? null,
+    weightGrams: product.weightGrams,
     slug: product.slug,
     name: product.name,
     priceCents: variant?.price.cents ?? product.price.cents,
@@ -71,7 +78,8 @@ export async function fetchCartLine(
   };
 }
 
-// Paramètre `item` des liens panier : slug|quantité|variante|couleur.
+// Paramètre `item` des liens panier : slug|quantité|variante|couleur (l'id de la
+// couleur, ou son nom).
 export function parseItemParam(value: string): LineRequest | null {
   const [slug, quantity, variant, color] = value.split("|");
   if (!slug) return null;

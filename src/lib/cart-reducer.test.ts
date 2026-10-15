@@ -143,7 +143,7 @@ describe("réducteur du panier : lignes du Studio", () => {
       type: "remove",
       productId: "p1",
       variantId: null,
-      colorName: null,
+      colorKey: null,
     });
     expect(state).toEqual([studio]);
   });

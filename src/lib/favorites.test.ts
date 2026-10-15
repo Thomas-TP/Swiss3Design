@@ -19,6 +19,19 @@ describe("parseFavorites", () => {
     expect(parseFavorites(JSON.stringify([valid]))).toEqual([valid]);
   });
 
+  it("garde la couleur du stock et le poids d'un favori d'après les couleurs du stock", () => {
+    const withColor = {
+      ...valid,
+      colorRef: "ref-bambu-matte-ivory-white",
+      weightGrams: 320,
+    };
+    expect(parseFavorites(JSON.stringify([withColor]))).toEqual([withColor]);
+    // Un poids ou une référence invalides sont abandonnés, le favori reste.
+    expect(
+      parseFavorites(JSON.stringify([{ ...valid, weightGrams: -4 }])),
+    ).toEqual([valid]);
+  });
+
   it("renvoie une liste vide pour un stockage absent, vide ou illisible", () => {
     expect(parseFavorites(null)).toEqual([]);
     expect(parseFavorites("")).toEqual([]);

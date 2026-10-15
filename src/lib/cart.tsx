@@ -20,6 +20,7 @@ import {
 import { isProduct, reducer } from "./cart-reducer";
 export {
   sameLine,
+  lineColorKey,
   parseCart,
   parseCartLines,
   isStudioLine,
@@ -45,16 +46,17 @@ interface CartContextValue {
   shopSubtotalCents: number;
   studioSubtotalCents: number;
   add: (item: Omit<CartItem, "quantity">) => void;
+  /** `colorKey` : la clé de couleur de la ligne (`lineColorKey(item)`). */
   setQuantity: (
     productId: string,
     variantId: string | null,
-    colorName: string | null,
+    colorKey: string | null,
     quantity: number,
   ) => void;
   remove: (
     productId: string,
     variantId: string | null,
-    colorName: string | null,
+    colorKey: string | null,
   ) => void;
   addStudio: (item: StudioCartItem) => void;
   setStudioQuantity: (id: string, quantity: number) => void;
@@ -119,16 +121,16 @@ export function CartProvider({ children }: { children: ReactNode }) {
       shopSubtotalCents: sum(items),
       studioSubtotalCents: sum(studioItems),
       add: (item) => dispatch({ type: "add", item }),
-      setQuantity: (productId, variantId, colorName, quantity) =>
+      setQuantity: (productId, variantId, colorKey, quantity) =>
         dispatch({
           type: "setQuantity",
           productId,
           variantId,
-          colorName,
+          colorKey,
           quantity,
         }),
-      remove: (productId, variantId, colorName) =>
-        dispatch({ type: "remove", productId, variantId, colorName }),
+      remove: (productId, variantId, colorKey) =>
+        dispatch({ type: "remove", productId, variantId, colorKey }),
       addStudio: (item) => dispatch({ type: "addStudio", item }),
       setStudioQuantity: (id, quantity) =>
         dispatch({ type: "setStudioQuantity", id, quantity }),

@@ -10,7 +10,8 @@ import {
   categories,
   categoryTranslations,
 } from "@/db/schema";
-import { getMaterialsWithColors, getProductColorIds } from "@/db/queries";
+import { getProductExcludedRefIds } from "@/db/queries";
+import { loadShopColors } from "@/lib/filament/shop-db";
 import { requireAdmin } from "@/lib/session";
 import { ProductForm, type ProductFormInitial } from "../product-form";
 
@@ -30,7 +31,7 @@ export default async function EditProductPage({
     .limit(1);
   if (!product) notFound();
 
-  const [translations, images, links, variants, cats, materials, colorIds] =
+  const [translations, images, links, variants, cats, colors, excludedRefIds] =
     await Promise.all([
       db
         .select()
@@ -61,8 +62,8 @@ export default async function EditProductPage({
           ),
         )
         .orderBy(asc(categories.sortOrder)),
-      getMaterialsWithColors(),
-      getProductColorIds(id),
+      loadShopColors(db, "fr"),
+      getProductExcludedRefIds(id),
     ]);
 
   const initial: ProductFormInitial = {
@@ -87,7 +88,7 @@ export default async function EditProductPage({
     ),
     images: images.map((i) => ({ url: i.url, alt: i.alt ?? undefined })),
     categoryIds: links.map((l) => l.categoryId),
-    colorIds,
+    excludedRefIds,
     variants: variants.map((v) => ({
       name: v.name,
       sku: v.sku,
@@ -99,7 +100,7 @@ export default async function EditProductPage({
   return (
     <div>
       <h2 className="mb-5 text-xl font-bold">Modifier le produit</h2>
-      <ProductForm categories={cats} materials={materials} initial={initial} />
+      <ProductForm categories={cats} colors={colors} initial={initial} />
     </div>
   );
 }

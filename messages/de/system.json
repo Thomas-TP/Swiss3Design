@@ -14,7 +14,8 @@
     "studioNote": "Auf Bestellung gefertigt · Lieferung gratis",
     "freeAll": "Gratis-Lieferung in der Schweiz.",
     "studioShort": "Nicht vorrätig: {colors}. Bearbeiten Sie das Objekt oder reduzieren Sie die Menge.",
-    "shortBlock": "Eine Studio-Farbe ist für diesen Warenkorb nicht mehr vorrätig: Bearbeiten Sie das betroffene Objekt, bevor Sie bestellen."
+    "shopShort": "Farbe nicht vorrätig: {color}. Wählen Sie auf der Produktseite eine andere Farbe oder reduzieren Sie die Menge.",
+    "shortBlock": "Eine Farbe ist für diesen Warenkorb nicht mehr vorrätig: Bearbeiten Sie die betroffene Position, bevor Sie bestellen."
   },
   "checkout": {
     "title": "Bestellung.",

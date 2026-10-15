@@ -1,14 +1,14 @@
 import { asc, and, eq } from "drizzle-orm";
 import { getDb } from "@/db";
 import { categories, categoryTranslations } from "@/db/schema";
-import { getMaterialsWithColors } from "@/db/queries";
+import { loadShopColors } from "@/lib/filament/shop-db";
 import { requireAdmin } from "@/lib/session";
 import { ProductForm } from "../product-form";
 
 export default async function NewProductPage() {
   await requireAdmin();
   const db = await getDb();
-  const [cats, materials] = await Promise.all([
+  const [cats, colors] = await Promise.all([
     db
       .select({ id: categories.id, name: categoryTranslations.name })
       .from(categories)
@@ -20,13 +20,13 @@ export default async function NewProductPage() {
         ),
       )
       .orderBy(asc(categories.sortOrder)),
-    getMaterialsWithColors(),
+    loadShopColors(db, "fr"),
   ]);
 
   return (
     <div>
       <h2 className="mb-5 text-xl font-bold">Nouveau produit</h2>
-      <ProductForm categories={cats} materials={materials} />
+      <ProductForm categories={cats} colors={colors} />
     </div>
   );
 }

@@ -18,25 +18,32 @@ import {
   productTranslations,
   productImages,
   productVariants,
-  productColors,
-  filamentColors,
+  productFilamentExclusions,
   categories,
   categoryTranslations,
   productCategories,
-  materials,
   settings,
   reviews,
 } from "./schema";
+import { loadProductColors } from "@/lib/filament/shop-db";
+import { isMissingTable } from "@/lib/filament/stock-db";
+import type { ShopColor } from "@/lib/filament/shop";
 import type { Locale } from "@/i18n/routing";
 
 const fallbackTranslation = alias(productTranslations, "fallback_translation");
 const translatedName = sql<string>`coalesce(${productTranslations.name},${fallbackTranslation.name},${products.slug})`;
 const translatedDescription = sql<string>`coalesce(${productTranslations.description},${fallbackTranslation.description},'')`;
 
-export interface ColorSwatch {
-  name: string;
-  hex: string;
-}
+// Couleur proposée par un article : une référence du stock (les mêmes que « Sur
+// mesure », moins les exclusions de l'article). `id` = `filament_refs.id`.
+export type ColorSwatch = Pick<ShopColor, "id" | "name" | "hex" | "hexes">;
+
+const toSwatch = (c: ShopColor): ColorSwatch => ({
+  id: c.id,
+  name: c.name,
+  hex: c.hex,
+  hexes: c.hexes,
+});
 
 export interface ProductListItem {
   id: string;
@@ -47,6 +54,8 @@ export interface ProductListItem {
   material: string;
   multicolor: boolean;
   stock: number | null;
+  /** Poids d'UNE pièce (g) : le panier en tire le filament à réserver (articles à la demande). */
+  weightGrams: number | null;
   name: string;
   description: string;
   imageUrl: string | null;
@@ -55,30 +64,22 @@ export interface ProductListItem {
 }
 
 // Récupère, pour une liste de produits, la première image et les pastilles de
-// couleur (palette du filament) — deux lectures groupées plutôt qu'une par produit.
+// couleur (les références du stock, moins les exclusions de chaque article) —
+// lectures groupées plutôt qu'une par produit.
 async function attachImagesAndColors(
   db: Awaited<ReturnType<typeof getDb>>,
   rows: Omit<ProductListItem, "imageUrl" | "imageAlt" | "colors">[],
+  locale: Locale,
 ): Promise<ProductListItem[]> {
   if (rows.length === 0) return [];
   const ids = rows.map((r) => r.id);
-  const [images, colorRows] = await Promise.all([
+  const [images, colorsByProductId] = await Promise.all([
     db
       .select()
       .from(productImages)
       .where(inArray(productImages.productId, ids))
       .orderBy(asc(productImages.sortOrder)),
-    db
-      .select({
-        productId: productColors.productId,
-        name: filamentColors.name,
-        hex: filamentColors.hex,
-        sortOrder: productColors.sortOrder,
-      })
-      .from(productColors)
-      .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
-      .where(inArray(productColors.productId, ids))
-      .orderBy(asc(productColors.sortOrder)),
+    loadProductColors(db, ids, locale),
   ]);
 
   const firstImage = new Map<string, { url: string; alt: string | null }>();
@@ -87,18 +88,12 @@ async function attachImagesAndColors(
       firstImage.set(img.productId, { url: img.url, alt: img.alt });
     }
   }
-  const colorsByProduct = new Map<string, ColorSwatch[]>();
-  for (const c of colorRows) {
-    const list = colorsByProduct.get(c.productId) ?? [];
-    list.push({ name: c.name, hex: c.hex });
-    colorsByProduct.set(c.productId, list);
-  }
 
   return rows.map((r) => ({
     ...r,
     imageUrl: firstImage.get(r.id)?.url ?? null,
     imageAlt: firstImage.get(r.id)?.alt ?? null,
-    colors: colorsByProduct.get(r.id) ?? [],
+    colors: (colorsByProductId.get(r.id) ?? []).map(toSwatch),
   }));
 }
 
@@ -110,7 +105,6 @@ export async function getProducts(
     featuredOnly?: boolean;
     categorySlug?: string;
     material?: string;
-    color?: string;
     multicolor?: boolean;
     sort?: ProductSort;
     q?: string;
@@ -149,17 +143,6 @@ export async function getProducts(
     conditions.push(inArray(products.id, ids));
   }
 
-  if (opts.color) {
-    const rows = await db
-      .selectDistinct({ productId: productColors.productId })
-      .from(productColors)
-      .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
-      .where(eq(filamentColors.name, opts.color));
-    const ids = rows.map((r) => r.productId);
-    if (ids.length === 0) return [];
-    conditions.push(inArray(products.id, ids));
-  }
-
   const rows = await db
     .select({
       id: products.id,
@@ -170,6 +153,7 @@ export async function getProducts(
       material: products.material,
       multicolor: products.multicolor,
       stock: products.stock,
+      weightGrams: products.weightGrams,
       name: translatedName,
       description: translatedDescription,
     })
@@ -201,67 +185,17 @@ export async function getProducts(
             : [desc(products.createdAt)]),
     );
 
-  return attachImagesAndColors(db, rows);
-}
-
-// Palette de filaments éditable en admin (proposée à la création produit).
-export async function getMaterials(): Promise<string[]> {
-  const db = await getDb();
-  const rows = await db
-    .select({ name: materials.name })
-    .from(materials)
-    .orderBy(asc(materials.name));
-  return rows.map((r) => r.name);
-}
-
-export interface MaterialWithColors {
-  id: string;
-  name: string;
-  colors: { id: string; name: string; hex: string }[];
-}
-
-// Filaments avec leur palette de couleurs — pour l'admin (gestion + formulaire
-// produit). Les couleurs sont rattachées en mémoire après deux lectures.
-export async function getMaterialsWithColors(): Promise<MaterialWithColors[]> {
-  const db = await getDb();
-  const [mats, colors] = await Promise.all([
-    db
-      .select({ id: materials.id, name: materials.name })
-      .from(materials)
-      .orderBy(asc(materials.name)),
-    db
-      .select({
-        id: filamentColors.id,
-        materialId: filamentColors.materialId,
-        name: filamentColors.name,
-        hex: filamentColors.hex,
-      })
-      .from(filamentColors)
-      .orderBy(asc(filamentColors.sortOrder), asc(filamentColors.name)),
-  ]);
-  const byMaterial = new Map<
-    string,
-    { id: string; name: string; hex: string }[]
-  >();
-  for (const c of colors) {
-    const list = byMaterial.get(c.materialId) ?? [];
-    list.push({ id: c.id, name: c.name, hex: c.hex });
-    byMaterial.set(c.materialId, list);
-  }
-  return mats.map((m) => ({
-    id: m.id,
-    name: m.name,
-    colors: byMaterial.get(m.id) ?? [],
-  }));
+  return attachImagesAndColors(db, rows, locale);
 }
 
 // Filtres réellement utilisables : catégories ayant ≥1 produit actif,
 // matières effectivement présentes dans le catalogue actif, et le filtre
-// multicolore seulement si au moins un produit actif l'est.
+// multicolore seulement si au moins un produit actif l'est. Plus de filtre
+// couleur : tous les articles proposent les mêmes couleurs (moins leurs
+// exclusions), il ne départagerait plus rien.
 export async function getUsedFilters(locale: Locale): Promise<{
   categories: { id: string; slug: string; name: string }[];
   materials: string[];
-  colors: ColorSwatch[];
   multicolor: boolean;
 }> {
   const db = await getDb();
@@ -306,29 +240,9 @@ export async function getUsedFilters(locale: Locale): Promise<{
     .where(and(eq(products.active, true), eq(products.multicolor, true)))
     .limit(1);
 
-  // Couleurs réellement proposées par des produits actifs. On dédoublonne par
-  // nom (deux filaments peuvent partager « Rouge ») en gardant le premier hex.
-  const colorRows = await db
-    .selectDistinct({ name: filamentColors.name, hex: filamentColors.hex })
-    .from(productColors)
-    .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
-    .innerJoin(
-      products,
-      and(eq(products.id, productColors.productId), eq(products.active, true)),
-    )
-    .orderBy(asc(filamentColors.name));
-  const seenColor = new Set<string>();
-  const colors: ColorSwatch[] = [];
-  for (const c of colorRows) {
-    if (seenColor.has(c.name)) continue;
-    seenColor.add(c.name);
-    colors.push({ name: c.name, hex: c.hex });
-  }
-
   return {
     categories: cats.map((c) => ({ id: c.id, slug: c.slug, name: c.name })),
     materials: mats.map((m) => m.material),
-    colors,
     multicolor: multicolorRow.length > 0,
   };
 }
@@ -372,7 +286,7 @@ export async function getProductBySlug(slug: string, locale: Locale) {
   const product = rows[0];
   if (!product) return null;
 
-  const [images, variants, colors] = await Promise.all([
+  const [images, variants, colorsByProductId] = await Promise.all([
     db
       .select()
       .from(productImages)
@@ -382,22 +296,19 @@ export async function getProductBySlug(slug: string, locale: Locale) {
       .select()
       .from(productVariants)
       .where(eq(productVariants.productId, product.id)),
-    db
-      .select({
-        id: filamentColors.id,
-        name: filamentColors.name,
-        hex: filamentColors.hex,
-      })
-      .from(productColors)
-      .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
-      .where(eq(productColors.productId, product.id))
-      .orderBy(asc(productColors.sortOrder)),
+    loadProductColors(db, [product.id], locale),
   ]);
 
-  return { ...product, images, variants, colors };
+  return {
+    ...product,
+    images,
+    variants,
+    // Les couleurs de la fiche : toutes celles du stock proposées en « Sur mesure »,
+    // moins les exclusions de l'article, dans la langue de la page.
+    colors: colorsByProductId.get(product.id) ?? [],
+  };
 }
 
-// IDs des couleurs cochées pour un produit (pré-remplissage du formulaire admin).
 // Produits « Vous aimerez aussi » : d'abord ceux partageant une catégorie avec
 // le produit courant (hors lui-même), complétés par les nouveautés si besoin.
 export async function getRelatedProducts(
@@ -416,6 +327,7 @@ export async function getRelatedProducts(
     material: products.material,
     multicolor: products.multicolor,
     stock: products.stock,
+    weightGrams: products.weightGrams,
     name: translatedName,
     description: translatedDescription,
   };
@@ -485,17 +397,25 @@ export async function getRelatedProducts(
     rows = [...rows, ...fillers];
   }
 
-  return attachImagesAndColors(db, rows);
+  return attachImagesAndColors(db, rows, locale);
 }
 
-export async function getProductColorIds(productId: string): Promise<string[]> {
+// Références décochées pour un produit (pré-remplissage du formulaire admin).
+// Migration 0011 absente : aucune exclusion.
+export async function getProductExcludedRefIds(
+  productId: string,
+): Promise<string[]> {
   const db = await getDb();
-  const rows = await db
-    .select({ colorId: productColors.colorId })
-    .from(productColors)
-    .where(eq(productColors.productId, productId))
-    .orderBy(asc(productColors.sortOrder));
-  return rows.map((r) => r.colorId);
+  try {
+    const rows = await db
+      .select({ refId: productFilamentExclusions.refId })
+      .from(productFilamentExclusions)
+      .where(eq(productFilamentExclusions.productId, productId));
+    return rows.map((r) => r.refId);
+  } catch (error) {
+    if (!isMissingTable(error)) throw error;
+    return [];
+  }
 }
 
 export async function getCategories(locale: Locale) {

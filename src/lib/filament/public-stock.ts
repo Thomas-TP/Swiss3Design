@@ -27,15 +27,23 @@ export interface PublicStock {
   v: 1;
   /** Capacité par id de palette du Studio ; un id absent n'est pas suivi (disponible). */
   studio: Record<string, number>;
+  /**
+   * Capacité par id de référence (la boutique : ses couleurs sont des références
+   * du stock) et, pour celles qui en ont un, l'id de palette du Studio : le panier
+   * additionne ainsi les lignes du Studio et celles de la boutique sur la même
+   * bobine. Absent d'un cache écrit avant la boutique : le client le tolère.
+   */
+  refs?: Record<string, { cap: number; studio?: string }>;
   /** Couleurs « sur mesure » en stock (capacité > 0). */
   custom: PublicCustomColor[];
 }
 
-const CACHE_KEY = "filament:public-stock:v1";
+// v2 : la réponse porte `refs` (un cache v1 vivant 60 s au plus n'en a pas).
+const CACHE_KEY = "filament:public-stock:v2";
 const TTL_SECONDS = 60;
 
 export async function buildPublicStock(db: Db): Promise<PublicStock> {
-  const empty: PublicStock = { v: 1, studio: {}, custom: [] };
+  const empty: PublicStock = { v: 1, studio: {}, refs: {}, custom: [] };
   let snapshot;
   try {
     snapshot = await loadStockSnapshot(db);
@@ -44,13 +52,14 @@ export async function buildPublicStock(db: Db): Promise<PublicStock> {
     console.warn("[stock] tables du stock absentes : rien n'est suivi");
     return empty;
   }
-  const out: PublicStock = { v: 1, studio: {}, custom: [] };
+  const out: PublicStock = { v: 1, studio: {}, refs: {}, custom: [] };
   for (const ref of snapshot.refs) {
     if (!ref.active) continue;
     const cap = publicCapacity(
       snapshot.availability.get(ref.id)?.available ?? 0,
     );
     if (ref.studioId) out.studio[ref.studioId] = cap;
+    out.refs![ref.id] = ref.studioId ? { cap, studio: ref.studioId } : { cap };
     if (ref.customOk && cap > 0)
       out.custom.push({
         id: ref.id,

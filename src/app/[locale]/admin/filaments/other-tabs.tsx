@@ -285,13 +285,7 @@ export function CostsTab({ costs }: { costs: CostSummary }) {
 
 // ── Références et réglages ───────────────────────────────────────────────────
 
-function RefForm({
-  stock,
-  ref_,
-}: {
-  stock: AdminStock;
-  ref_?: AdminStock["refs"][number];
-}) {
+function RefForm({ ref_ }: { ref_?: AdminStock["refs"][number] }) {
   const f = (name: string) =>
     ref_
       ? String((ref_ as unknown as Record<string, unknown>)[name] ?? "")
@@ -381,21 +375,6 @@ function RefForm({
         </select>
       </label>
       <label className="text-xs text-soft">
-        Couleur de la boutique
-        <select
-          name="shopColorId"
-          defaultValue={f("shopColorId")}
-          className={`${FIELD} mt-1`}
-        >
-          <option value="">(aucune)</option>
-          {stock.shopColors.map((c) => (
-            <option key={c.id} value={c.id}>
-              {c.name} {c.hex}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="text-xs text-soft">
         Net d&apos;une bobine (g)
         <input
           name="spoolNetGrams"
@@ -460,7 +439,7 @@ function RefForm({
             name="customOk"
             defaultChecked={ref_?.customOk ?? false}
           />{" "}
-          Proposée en sur mesure
+          Proposée en sur mesure et en boutique
         </label>
         <label className="flex items-center gap-1.5">
           <input
@@ -590,7 +569,7 @@ export function RefsTab({ stock }: { stock: AdminStock }) {
               </span>
             </summary>
             <div className="mt-4">
-              <RefForm stock={stock} ref_={r} />
+              <RefForm ref_={r} />
             </div>
           </details>
         ))}
@@ -599,7 +578,7 @@ export function RefsTab({ stock }: { stock: AdminStock }) {
             Ajouter une référence
           </summary>
           <div className="mt-4">
-            <RefForm stock={stock} />
+            <RefForm />
           </div>
         </details>
       </section>

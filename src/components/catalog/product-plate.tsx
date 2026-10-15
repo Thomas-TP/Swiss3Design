@@ -4,6 +4,7 @@ import { formatChf } from "@/lib/format";
 import { cfImage } from "@/lib/cf-image";
 import { attributionFor } from "@/lib/attribution";
 import { AddToCartMini } from "@/components/add-to-cart";
+import { chipBackground } from "@/components/filament-chip";
 import { FavoriteButton } from "@/components/favorite-button";
 import { MulticolorDots } from "@/components/multicolor-dots";
 import type { ProductCardItem } from "@/components/product-card";
@@ -12,6 +13,9 @@ import { SiteLink } from "@/components/ui/site-link";
 import { SpecTable, type SpecRow } from "@/components/ui/spec-table";
 import { registryRef } from "./specs";
 import "./morph.css";
+
+/** Couleurs nommées sur la planche : les autres sont comptées (« +9 »). */
+const PLATE_COLORS = 5;
 
 // « Planche » éditoriale d'un produit (brief « Strates », §7.8) : quand le
 // catalogue ne compte qu'un ou deux articles et qu'aucun filtre n'est actif,
@@ -47,8 +51,10 @@ export function ProductPlate({
     priceCents: product.priceCents,
     imageUrl: product.imageUrl,
     saleType: product.saleType,
+    colorRef: firstColor?.id ?? null,
     colorName: firstColor?.name ?? null,
     colorHex: firstColor?.hex ?? null,
+    weightGrams: product.weightGrams,
   };
   const soldOut = product.saleType === "stock" && product.stock === 0;
   const attribution = attributionFor(product.slug);
@@ -124,19 +130,27 @@ export function ProductPlate({
             {formatChf(product.priceCents, locale)}
           </p>
           {product.colors.length > 0 && (
+            // Tous les articles proposent les couleurs du stock : on en montre
+            // quelques-unes, nommées, et le nombre des autres (la liste complète
+            // est sur la fiche).
             <ul className="flex flex-wrap items-center gap-x-4 gap-y-1.5">
-              {product.colors.map((c) => (
-                <li key={c.name} className="flex items-center gap-2">
+              {product.colors.slice(0, PLATE_COLORS).map((c) => (
+                <li key={c.id} className="flex items-center gap-2">
                   <span
                     aria-hidden="true"
                     className="h-3.5 w-3.5 rounded-full border border-swatch-ring"
-                    style={{ backgroundColor: c.hex }}
+                    style={chipBackground(c.hexes.length ? c.hexes : [c.hex])}
                   />
                   <span className="s3d-label normal-case text-soft">
                     {c.name}
                   </span>
                 </li>
               ))}
+              {product.colors.length > PLATE_COLORS && (
+                <li className="s3d-label normal-case text-soft">
+                  +{product.colors.length - PLATE_COLORS}
+                </li>
+              )}
             </ul>
           )}
         </div>

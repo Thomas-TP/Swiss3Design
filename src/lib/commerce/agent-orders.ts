@@ -14,6 +14,11 @@ import {
   adminNewOrderEmail,
   orderConfirmationEmail,
 } from "@/lib/email-templates";
+import { shopReservationGrams } from "@/lib/filament/shop";
+import {
+  recordShopReservations,
+  type ShopReservationInput,
+} from "@/lib/filament/shop-reservation";
 import { drainEmailOutbox, queueEmail, type Transaction } from "@/lib/outbox";
 import { makeOrderNumber } from "@/lib/order-number";
 import { recordStatusTransition } from "@/lib/status-history";
@@ -242,6 +247,7 @@ export async function recordPaidAgentOrder(
         })
         .returning();
       const items = draft.lines.map((line) => ({
+        id: crypto.randomUUID(),
         orderId,
         productId: line.sku?.productId ?? null,
         variantId: line.sku?.variantId ?? null,
@@ -252,6 +258,25 @@ export async function recordPaidAgentOrder(
         quantity: line.quantity,
       }));
       await tx.insert(orderItems).values(items);
+      // Filament de l'article imprimé à la demande, réservé (jamais bloquant : la
+      // commande est déjà payée ; une table ou une référence absente est ignorée).
+      await recordShopReservations(
+        tx,
+        draft.lines.flatMap((line, index): ShopReservationInput[] => {
+          const gramsPerPiece = line.sku
+            ? shopReservationGrams(line.sku.saleType, line.sku.weightGrams)
+            : null;
+          return line.sku?.colorRef && gramsPerPiece !== null
+            ? [
+                {
+                  orderItemId: items[index].id,
+                  refId: line.sku.colorRef,
+                  gramsPerPiece,
+                },
+              ]
+            : [];
+        }),
+      );
       await recordStatusTransition(tx, {
         entityType: "order",
         entityId: orderId,

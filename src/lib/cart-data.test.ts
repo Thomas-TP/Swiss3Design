@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { sameLine, parseCart } from "./cart-data";
+import { lineColorKey, parseCart, sameLine } from "./cart-data";
 import { hasExpectedSignature } from "./file-signature";
 const item = {
   productId: "p",
@@ -24,6 +24,64 @@ describe("Panier et fichiers entrants", () => {
     expect(sameLine(item, { ...item, variantId: null, colorName: null })).toBe(
       true,
     );
+  });
+  it("identifie la couleur par sa référence du stock, avant les noms", () => {
+    const white = "ref-bambu-matte-ivory-white";
+    const black = "ref-bambu-matte-charcoal";
+    expect(
+      sameLine({ ...item, colorRef: white }, { ...item, colorRef: black }),
+    ).toBe(false);
+    // Même référence : le libellé affiché (langue, ancien nom) ne change pas la ligne.
+    expect(
+      sameLine(
+        { ...item, colorRef: white, colorName: "Blanc neige" },
+        { ...item, colorRef: white, colorName: "Weiss" },
+      ),
+    ).toBe(true);
+    expect(lineColorKey({ colorRef: black, colorName: "Noir" })).toBe(black);
+    expect(lineColorKey({})).toBeNull();
+  });
+  it("une ancienne ligne (nom seul) retrouve sa référence", () => {
+    // Une ligne d'avant les couleurs du stock et la même ligne d'après : une seule ligne.
+    expect(
+      sameLine(
+        { ...item, colorName: "Blanc" },
+        { ...item, colorRef: "ref-bambu-matte-ivory-white" },
+      ),
+    ).toBe(true);
+    expect(lineColorKey({ colorName: "Bleu" })).toBe(
+      "ref-bambu-matte-marine-blue",
+    );
+    // Un nom inconnu reste un nom : deux « Rouge » se confondent, « Rouge » ≠ « Blanc ».
+    expect(lineColorKey({ colorName: "Rouge" })).toBe("Rouge");
+    expect(
+      sameLine(
+        { ...item, colorName: "Rouge" },
+        { ...item, colorName: "Blanc" },
+      ),
+    ).toBe(false);
+  });
+  it("parseCart rattache l'ancien nom à sa référence et valide le poids", () => {
+    const [legacy] = parseCart(
+      JSON.stringify([{ ...item, colorName: "Noir", colorHex: "#111111" }]),
+    );
+    expect(legacy.colorRef).toBe("ref-bambu-matte-charcoal");
+    // Le libellé affiché de l'ancienne ligne reste celui du client.
+    expect(legacy.colorName).toBe("Noir");
+    const [unknown] = parseCart(
+      JSON.stringify([{ ...item, colorName: "Rouge" }]),
+    );
+    expect(unknown.colorRef).toBeUndefined();
+    expect(
+      parseCart(
+        JSON.stringify([
+          { ...item, colorRef: "ref-x", weightGrams: 120 },
+          { ...item, weightGrams: -3 },
+          { ...item, weightGrams: "lourd" },
+          { ...item, colorRef: 42 },
+        ]),
+      ).map((i) => i.weightGrams),
+    ).toEqual([120]);
   });
   it("écarte les données invalides et borne le volume du panier", () => {
     expect(parseCart("{")).toEqual([]);

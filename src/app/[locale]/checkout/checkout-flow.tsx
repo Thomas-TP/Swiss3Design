@@ -35,6 +35,7 @@ import { useIsDark } from "@/lib/theme";
 import { stripeAppearance } from "@/lib/stripe-appearance";
 import { formatChf } from "@/lib/format";
 import { shippingForOrder } from "@/lib/shipping";
+import { requestedColorRef } from "@/lib/filament/shop";
 import { CANTONS, CANTON_CODES } from "@/lib/cantons";
 
 // Stripe.js est préchargé dès l'arrivée sur le checkout (voir le useEffect dans
@@ -630,6 +631,13 @@ export function CheckoutFlow({
           ...items.map((i) => ({
             productId: i.productId,
             variantId: i.variantId ?? undefined,
+            // La référence du stock est l'identité de la couleur ; le nom ne sert
+            // qu'aux anciennes lignes (le serveur retrouve la référence).
+            colorRef:
+              requestedColorRef({
+                colorRef: i.colorRef,
+                color: i.colorName,
+              }) ?? undefined,
             color: i.colorName ?? undefined,
             quantity: i.quantity,
           })),
@@ -714,10 +722,12 @@ export function CheckoutFlow({
                   ? "errorStudioPrice"
                   : failure.error === "out_of_stock"
                     ? "errorFilament"
-                    : failure.error === "studio_invalid" ||
-                        failure.error === "studio_unprintable"
-                      ? "errorStudioInvalid"
-                      : "errorGeneric";
+                    : failure.error === "color_required"
+                      ? "errorColor"
+                      : failure.error === "studio_invalid" ||
+                          failure.error === "studio_unprintable"
+                        ? "errorStudioInvalid"
+                        : "errorGeneric";
         if (
           failure.error === "checkout_closed" ||
           failure.error === "checkout_changed"

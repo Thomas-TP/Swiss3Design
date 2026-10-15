@@ -19,14 +19,15 @@ export type CartAction =
       type: "setQuantity";
       productId: string;
       variantId: string | null;
-      colorName: string | null;
+      /** Clé de couleur de la ligne (`lineColorKey`) : sa référence du stock, ou null. */
+      colorKey: string | null;
       quantity: number;
     }
   | {
       type: "remove";
       productId: string;
       variantId: string | null;
-      colorName: string | null;
+      colorKey: string | null;
     }
   | { type: "addStudio"; item: StudioCartItem }
   | { type: "setStudioQuantity"; id: string; quantity: number }
@@ -37,6 +38,17 @@ export type CartAction =
 
 export const isProduct = (line: CartLine): line is CartItem =>
   !isStudioLine(line);
+
+/** La ligne visée par une action : produit + variante + clé de couleur. */
+const target = (action: {
+  productId: string;
+  variantId: string | null;
+  colorKey: string | null;
+}) => ({
+  productId: action.productId,
+  variantId: action.variantId,
+  colorRef: action.colorKey,
+});
 
 /** Le même objet à une autre quantité : le prix unitaire suit (F est partagé par la ligne). */
 function requantified(item: StudioCartItem, quantity: number): StudioCartItem {
@@ -88,10 +100,12 @@ export function reducer(state: CartLine[], action: CartAction): CartLine[] {
     }
     case "setQuantity":
       if (action.quantity <= 0) {
-        return state.filter((i) => !(isProduct(i) && sameLine(i, action)));
+        return state.filter(
+          (i) => !(isProduct(i) && sameLine(i, target(action))),
+        );
       }
       return state.map((i) =>
-        isProduct(i) && sameLine(i, action)
+        isProduct(i) && sameLine(i, target(action))
           ? {
               ...i,
               quantity: Math.min(
@@ -102,7 +116,9 @@ export function reducer(state: CartLine[], action: CartAction): CartLine[] {
           : i,
       );
     case "remove":
-      return state.filter((i) => !(isProduct(i) && sameLine(i, action)));
+      return state.filter(
+        (i) => !(isProduct(i) && sameLine(i, target(action))),
+      );
     case "addStudio": {
       const existing = state.find(
         (i) => isStudioLine(i) && i.id === action.item.id,

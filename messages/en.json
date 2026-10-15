@@ -15,7 +15,6 @@
     "all": "All",
     "results": "{count, plural, =0 {No products} one {# product} other {# products}}",
     "empty": "No products match these filters.",
-    "filterColor": "Color",
     "filterMulticolor": "Multicolor",
     "sortLabel": "Sort:",
     "sortNew": "Newest",
@@ -32,6 +31,8 @@
     "multicolorBadge": "Multicolor",
     "variant": "Variant",
     "color": "Color",
+    "colorSoldOut": "sold out",
+    "colorShort": "This colour is no longer available for this item: pick another one.",
     "material": "Material",
     "dimensions": "Dimensions",
     "weight": "Weight",
@@ -134,7 +135,8 @@
     "errorProductChanged": "An item or option has changed. Select it again from the product page.",
     "errorStudioPrice": "The price of a Studio object was updated. Check the total, then confirm again.",
     "errorStudioInvalid": "A Studio object in your cart cannot be printed as it is. Reopen it in the Studio from your cart.",
-    "errorFilament": "A colour of a Studio object in your cart is no longer in stock. Reopen it in the Studio to pick another, or request a quote."
+    "errorColor": "An item in your cart has no colour. Remove it from the cart, then add it again from its page and choose a colour.",
+    "errorFilament": "A colour in your cart is no longer in stock. Edit the affected line (reopen the object in the Studio, or pick another colour on the item page), or request a quote."
   },
   "orderSuccess": {
     "processingTitle": "Payment processing",
@@ -450,7 +452,7 @@
       "decline": "Decline quote",
       "reviseTitle": "Request a change",
       "reviseDesc": "Describe the change you'd like (material, size, quantity, budget…).",
-      "revisePlaceholder": "E.g. could you make it in black PETG, 15 cm tall?",
+      "revisePlaceholder": "E.g. could you make it in black, 15 cm tall?",
       "fileHint": "Attach a revised 3D file (optional)",
       "fileUploading": "Uploading file…",
       "fileError": "File upload failed. Try again or check the format.",
