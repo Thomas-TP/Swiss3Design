@@ -9,7 +9,10 @@
     "freeReached": "Livraison offerte.",
     "emptyKicker": "Terrain vierge",
     "emptyTitle": "Votre panier est vide.",
-    "emptyText": "Rien n'a encore été empilé ici. Personnalisez un objet au Studio, choisissez en boutique ou envoyez-nous votre fichier."
+    "emptyText": "Rien n'a encore été empilé ici. Personnalisez un objet au Studio, choisissez en boutique ou envoyez-nous votre fichier.",
+    "studioEdit": "Modifier dans le Studio",
+    "studioNote": "Fabriqué sur commande · livraison offerte",
+    "freeAll": "Livraison offerte en Suisse."
   },
   "checkout": {
     "title": "Commande.",

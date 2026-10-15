@@ -11,6 +11,7 @@ import {
   jsonb,
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
+import type { StudioOrderLine } from "@/lib/studio/order-line";
 
 // Traduction mécanique de schema.ts (D1/SQLite) vers Postgres (Hyperdrive) —
 // mêmes tables/colonnes/contraintes, adaptées aux types natifs Postgres :
@@ -275,6 +276,11 @@ export const orderItems = pgTable(
     colorHex: text("color_hex"),
     priceCentsSnapshot: integer("price_cents_snapshot").notNull(),
     quantity: integer("quantity").notNull(),
+    // Objet du Studio acheté (« Achat direct », 14.10.2026) : configuration,
+    // textes saisis (données personnelles possibles), chiffres et prix de la
+    // pièce. NULL pour une ligne de la boutique. Une ligne du Studio n'a ni
+    // `product_id` ni `variant_id` : aucun stock, aucune fiche produit.
+    studio: jsonb("studio").$type<StudioOrderLine>(),
   },
   (t) => [
     index("order_items_order_idx").on(t.orderId),

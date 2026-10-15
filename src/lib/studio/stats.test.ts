@@ -1,12 +1,10 @@
 // Statistiques, bandes et estimation (brief « Strates », §6.4, §6.5, annexe B).
 import { describe, expect, it } from "vitest";
 import { bandStats } from "./band-stats";
-import { estimate } from "./estimate";
 import { buildLavaux } from "./objects/lavaux";
 import { meshVolume } from "./kernel/mesh";
 import { mulberry32 } from "./kernel/rng";
 import { createLavauxModel, innerRadius } from "./objects/lavaux-model";
-import { PRICING, type PricingParams } from "./pricing-params";
 import { HERO_CONFIG, heroVariant, LAVAUX_PRESETS } from "./presets";
 import { boundaryLayer, computeStats, countChanges, layerCount } from "./stats";
 import { randomLavaux } from "./testing";
@@ -68,11 +66,6 @@ describe("computeStats : héros", () => {
     expect(stats.grams).toBeLessThan(110);
     expect(stats.minutes).toBeGreaterThan(120);
     expect(stats.minutes).toBeLessThan(240);
-  });
-
-  it("aucun prix tant que les coefficients ne sont pas validés", () => {
-    expect(PRICING.validated).toBe(false);
-    expect(stats.estimate).toBeNull();
   });
 });
 
@@ -144,54 +137,5 @@ describe("couches, changements et bandes", () => {
     expect(changes).toBe(2);
     expect(purgeGrams).toBeCloseTo(1.6, 9);
     expect(extraMinutes).toBe(4);
-  });
-});
-
-describe("estimate", () => {
-  const validated: PricingParams = { ...PRICING, validated: true };
-  const base = { grams: 90, minutes: 180, changes: 2 };
-
-  it("null tant que validated vaut false", () => {
-    expect(estimate(base)).toBeNull();
-    expect(computeStats(HERO_CONFIG, undefined, PRICING).estimate).toBeNull();
-  });
-
-  it("centimes entiers, arrondis à 50, fourchette ±15 %", () => {
-    const e = estimate(base, validated)!;
-    expect(Number.isInteger(e.lowCents)).toBe(true);
-    expect(Number.isInteger(e.highCents)).toBe(true);
-    expect(e.lowCents % 50).toBe(0);
-    expect(e.highCents % 50).toBe(0);
-    // 400 + 90 × 8 + 3 h × 300 + 2 × 60 = 2140 centimes.
-    expect(e.lowCents).toBe(1800);
-    expect(e.highCents).toBe(2450);
-    expect(e.highCents).toBeGreaterThan(e.lowCents);
-  });
-
-  it("plancher respecté : une pièce minuscule ne descend jamais sous CHF 9", () => {
-    const tiny = estimate({ grams: 2, minutes: 10, changes: 0 }, validated)!;
-    expect(tiny.lowCents).toBeGreaterThanOrEqual(900);
-    expect(tiny.highCents).toBeGreaterThanOrEqual(tiny.lowCents);
-    expect(tiny.highCents).toBe(1050);
-  });
-
-  it("calibration : une fourchette plus serrée reste dans la première", () => {
-    const wide = estimate(base, validated)!;
-    const narrow = estimate(base, validated, 8)!;
-    expect(narrow.lowCents).toBeGreaterThanOrEqual(wide.lowCents);
-    expect(narrow.highCents).toBeLessThanOrEqual(wide.highCents);
-  });
-
-  it("calculé dans computeStats quand le barème est validé", () => {
-    const s = computeStats(HERO_CONFIG, undefined, validated);
-    expect(s.estimate).toBeTruthy();
-    expect(s.estimate!.lowCents % 50).toBe(0);
-    expect(s.estimate!.highCents).toBeGreaterThanOrEqual(s.estimate!.lowCents);
-  });
-
-  it("marge : multiplie le prix avant la fourchette, jamais sous le plancher", () => {
-    const m = estimate(base, { ...validated, margin: 1.2 })!;
-    const n = estimate(base, validated)!;
-    expect(m.lowCents).toBeGreaterThan(n.lowCents);
   });
 });

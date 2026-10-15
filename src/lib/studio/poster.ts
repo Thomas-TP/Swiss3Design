@@ -26,7 +26,7 @@ import {
   projectPoint,
   type CameraSpec,
 } from "./camera";
-import { filamentHex, shade, tint } from "./filaments";
+import { filamentHex, shade } from "./filaments";
 import { simplifyClosed, type Vec2 } from "./kernel/simplify";
 import {
   FLOOR_MM,
@@ -270,7 +270,7 @@ export function heroPoster(
       const s = k * EXPLODE_GAP_MM;
       layers[k].cap = {
         top: project(camera, aspect, zTop, outer(zTop, -1), s),
-        topFill: tint(layers[k].fill, 0.22),
+        topFill: layers[k].fill,
         mouth: project(camera, aspect, zTop, mouth(zTop, -1), s),
         mouthFill: shade(layers[k].fill, 0.5),
       };

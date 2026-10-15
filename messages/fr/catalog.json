@@ -17,8 +17,7 @@
     },
     "studio": {
       "title": "À personnaliser au Studio.",
-      "intro": "Quatre objets dessinés par l'atelier, que vous personnalisez en 3D avant de nous les envoyer. Ce ne sont pas des articles de la boutique : le prix ferme est confirmé sur devis sous 48 h.",
-      "quote": "Sur devis",
+      "intro": "Quatre objets dessinés par l'atelier, que vous personnalisez en 3D puis commandez directement : prix ferme, livraison offerte en Suisse.",
       "adjust": "Personnaliser",
       "objects": {
         "lavaux": {
@@ -37,7 +36,8 @@
           "name": "Porte-nom « Borne »",
           "line": "Un porte-nom à deux couleurs, en relief ou gravé, avec ou sans anneau."
         }
-      }
+      },
+      "startPrice": "Configuration de départ : {price}"
     },
     "file": {
       "title": "Vous avez déjà un fichier ?",

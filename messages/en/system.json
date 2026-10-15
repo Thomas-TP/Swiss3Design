@@ -9,7 +9,10 @@
     "freeReached": "Free shipping.",
     "emptyKicker": "Blank terrain",
     "emptyTitle": "Your cart is empty.",
-    "emptyText": "Nothing has been stacked here yet. Customise an object in the Studio, pick from the shop or send us your file."
+    "emptyText": "Nothing has been stacked here yet. Customise an object in the Studio, pick from the shop or send us your file.",
+    "studioEdit": "Edit in the Studio",
+    "studioNote": "Made to order · free delivery",
+    "freeAll": "Free delivery in Switzerland."
   },
   "checkout": {
     "title": "Checkout.",

@@ -7,24 +7,24 @@
   "seo": {
     "index": {
       "title": "Das Studio: Ihr Objekt in 3D personalisieren",
-      "description": "Vier Objekte in 3D personalisieren: Vase, Visitenkarte, Berg, Namensschild. Bis zu vier Farben, gedruckt in der Schweiz, Festpreis innert 48 Stunden."
+      "description": "Vier Objekte zum Gestalten in 3D: Vase, Visitenkarte, Berg, Namensschild. Bis zu vier Farben, in der Schweiz gedruckt, Fixpreis, Gratis-Lieferung."
     },
     "objects": {
       "lavaux": {
         "title": "Vase Lavaux nach Mass, in 3D",
-        "description": "Profil, Muster und bis zu vier Farben Ihrer Vase Lavaux personalisieren, in 3D prüfen und senden: gedruckt in der Schweiz, Festpreis innert 48 Stunden."
+        "description": "Gestalten Sie Profil, Muster und bis zu vier Farben Ihrer Vase Lavaux, prüfen Sie sie in 3D und bestellen Sie sie: Druck in der Schweiz, Fixpreis, Gratis-Lieferung."
       },
       "cartouche": {
         "title": "3D-Visitenkarte Cartouche",
-        "description": "Ihre Visitenkarte von 85 × 55 mm, erhaben oder graviert, zwei Farben, Ihr Text: in 3D personalisieren, in der Schweiz gedruckt, Festpreis innert 48 Stunden."
+        "description": "Ihre Visitenkarte von 85 × 55 mm im Relief oder graviert, zwei Farben, Ihr eigener Text: in 3D gestalten und bestellen. In der Schweiz gedruckt, Fixpreis, Gratis-Lieferung."
       },
       "montagne": {
         "title": "Berg nach Mass, nach Höhe eingefärbt",
-        "description": "Ein kleiner Berg für den Schreibtisch, bis 12 cm hoch, nach Höhe eingefärbt, Ihr Name auf dem Sockel. Gedruckt in der Schweiz, Festpreis innert 48 Stunden."
+        "description": "Ein kleiner Berg für den Schreibtisch, bis 12 cm, nach Höhe eingefärbt, Ihr Name auf dem Sockel. In der Schweiz gedruckt, Fixpreis, Gratis-Lieferung."
       },
       "borne": {
         "title": "Namensschild Borne in zwei Farben",
-        "description": "Ein zweifarbiges Namensschild mit Ihrem Text, erhaben oder graviert, Ring links oder rechts. In 3D personalisiert, in der Schweiz gedruckt, Festpreis innert 48 h."
+        "description": "Ein Namensschild in zwei Farben mit Ihrem Text, im Relief oder graviert, Ring links oder rechts. In 3D gestaltet, in der Schweiz gedruckt, Fixpreis, Gratis-Lieferung."
       }
     }
   },
@@ -32,8 +32,9 @@
     "eyebrow": "3D-Konfigurator",
     "title": "Das Studio",
     "intro": "Personalisieren. Wir drucken.",
-    "lead": "Vier Objekte aus der Werkstatt, so begrenzt, dass sie sich auf unseren Maschinen drucken lassen. Personalisieren Sie Form, Farben und Text, prüfen Sie die Zahlen und senden Sie das Objekt: Die Werkstatt liest jede Anfrage durch und antwortet innert 48 Stunden mit einem Festpreis.",
-    "adjust": "Personalisieren"
+    "lead": "Vier von der Werkstatt entworfene Objekte, so begrenzt, dass sie sich auf unseren Maschinen drucken lassen. Gestalten Sie Form, Farben und Text, prüfen Sie die Zahlen und bestellen Sie dann: Fixpreis, Gratis-Lieferung in der Schweiz.",
+    "adjust": "Personalisieren",
+    "startPrice": "Startkonfiguration: {price}"
   },
   "how": {
     "title": "So funktioniert es",
@@ -47,12 +48,12 @@
         "text": "Masse, Gramm, Dauer und Druckbarkeit werden wirklich berechnet, nicht grob geschätzt."
       },
       "send": {
-        "title": "Senden",
-        "text": "Ihre Personalisierung geht mit ihrer Druckdatei an die Werkstatt. Bezahlt wird jetzt noch nichts."
+        "title": "Bestellen",
+        "text": "Legen Sie es in den Warenkorb und bezahlen Sie online: Fixpreis, Gratis-Lieferung in der Schweiz."
       },
       "receive": {
         "title": "Erhalten",
-        "text": "Die Werkstatt prüft Ihr Stück und antwortet innert 48 Stunden mit einem Festpreis, den Sie online bezahlen."
+        "text": "Ein Mensch liest Ihren Text gegen, dann druckt die Werkstatt Ihr Stück und verschickt es mit der Schweizerischen Post."
       }
     }
   },
@@ -65,19 +66,19 @@
       },
       "price": {
         "q": "Was kostet es?",
-        "a": "Der Festpreis wird von der Werkstatt innert 48 Stunden nach Durchsicht Ihres Stücks bestätigt. Er hängt vom Material, von der Druckdauer und von der Anzahl Farbwechsel ab. Vor dieser Bestätigung wird nichts bezahlt."
+        "a": "Der Preis ist fix und inklusive Lieferung: Er wird live im Studio angezeigt und hängt vom Objekt, vom Material, von der Zahl der Farbwechsel und von der Menge ab (1 bis 20 Stück; je grösser die Menge, desto günstiger das einzelne Stück). Sie bezahlen online genau den angezeigten Preis."
       },
       "text": {
         "q": "Wird mein Text durchgesehen?",
-        "a": "Ja. Ein Mensch der Werkstatt liest jeden Text vor dem Druck durch. Wir lehnen Marken Dritter, Beleidigungen und rechtswidrige Inhalte ab. Ihr Text erscheint nie in der Adresse der Seite und nie in Links, die Sie kopieren."
+        "a": "Ja. Ein Mitarbeiter der Werkstatt liest jeden Text vor dem Druck gegen, innert 2 Werktagen. Wir lehnen Fremdmarken, Beleidigungen und rechtswidrige Inhalte ab: In diesem Fall wird die Bestellung storniert und Ihnen der volle Betrag erstattet. Ihr Text erscheint nie in der Adresse der Seite und nicht in den Links, die Sie kopieren."
       },
       "colors": {
         "q": "Wie werden die Farben gedruckt?",
-        "a": "Durch Filamentwechsel auf bestimmten Höhen, bis zu vier Filamente: Das programmiert die Werkstatt in ihrer Slicer-Software. Die angezeigten Farbtöne sind unverbindlich, die endgültige Farbe hängt von der vorrätigen Spule ab."
+        "a": "Durch Filamentwechsel in bestimmten Höhen, mit bis zu vier Polymaker-Panchroma-Matte-Filamenten: So programmiert es die Werkstatt in ihrer Slicer-Software. Der angezeigte Farbton ist der des Herstellers; auf dem Bildschirm bleibt er annähernd, massgebend ist die Spule."
       },
       "after": {
-        "q": "Was passiert nach dem Senden?",
-        "a": "Die Werkstatt prüft Ihre Datei und antwortet innert 48 Stunden per E-Mail mit einem Festpreis. Sie verfolgen die Anfrage in Ihrem Konto und bezahlen dann online; das Stück wird gedruckt und in der Schweiz versandt."
+        "q": "Was passiert nach der Bestellung?",
+        "a": "Sie erhalten eine Bestätigung per E-Mail mit Ihren Texten. Die Werkstatt liest die Texte gegen, druckt Ihr Stück auf Bestellung (das Studio hat kein Lager) und verschickt es mit der Schweizerischen Post; Sie verfolgen die Bestellung in Ihrem Konto oder auf der Verfolgungsseite."
       }
     }
   },
@@ -273,23 +274,21 @@
       "price": "Preis"
     },
     "materialValue": "PLA",
-    "estimate": "Schätzung · Festpreis von der Werkstatt innert 48 Stunden bestätigt",
-    "indicative": "Unverbindliche Farbtöne: Die endgültige Farbe hängt von der vorrätigen Spule ab."
+    "indicative": "Filament Polymaker Panchroma Matte: Der Farbton auf dem Bildschirm ist nur annähernd.",
+    "firm": "Fixpreis, Lieferung gratis"
   },
   "summary": {
     "lavaux": "{name}, {height}, {pattern}, {count, plural, one {# Farbe} other {# Farben}}: {colors}; {status}.",
     "flat": "{name}, {dimensions}, {count, plural, one {# Farbe} other {# Farben}}: {colors}; Text: {text}; {status}."
   },
   "send": {
-    "title": "An die Werkstatt senden",
-    "intro": "Die Werkstatt prüft Ihr Stück und antwortet innert 48 Stunden mit einem Festpreis. Jetzt wird nichts bezahlt.",
-    "cta": "An die Werkstatt senden",
+    "title": "Offertanfrage",
+    "intro": "Mehr als 20 Stück oder ein besonderer Wunsch? Die Werkstatt liest Ihre Anfrage und antwortet innert 48 Stunden mit einer Offerte. Jetzt wird nichts bezahlt.",
     "noscript": "Offerte anfragen",
     "noscriptNote": "Ohne JavaScript wenden Sie Ihre Personalisierung an und kopieren sie in Ihre Offertanfrage: Die Werkstatt bereitet die Datei für Sie vor.",
     "machineLine": "Personalisierung zum Einfügen in die Anfrage",
     "blocked": "Korrigieren Sie zuerst die im Datenblatt gemeldeten Punkte.",
     "needText": "Geben Sie mindestens ein Zeichen ein: {field}.",
-    "estimateNote": "Schätzung · Festpreis von der Werkstatt innert 48 Stunden bestätigt.",
     "colors": "Farben:",
     "quantity": "Anzahl",
     "quantityHint": "Von 1 bis {max} Stück.",
@@ -308,12 +307,11 @@
     "none": "—",
     "labelFictive": "ja, fiktive Höhe",
     "labelTyped": "ja, eingegebene Höhe: {value} m",
-    "indicative": "unverbindlich",
     "title": "[Studio] {object} · Konfiguration v1",
     "link": "Link: {link}",
     "dimensions": "Masse: {dimensions} · {layers} · {detail}",
     "colors": "Farben (Wechsel pro Schicht): {colors}",
-    "estimate": "Angezeigte Schätzung: {figures}",
+    "estimate": "Angezeigte Werte: {figures}",
     "texts": "Zu druckende Texte: {texts}",
     "textItem": "{label}: «{value}»",
     "quantity": "Anzahl: {count}",
@@ -346,5 +344,23 @@
       "montagne": "Parameter: {form} · {style} · Steilheit {steep} % · Startwert {seed} · Beschriftung: {label}",
       "borne": "Parameter: Form {shape} · Buchstaben {cap} · Ring {ring} · Modus {mode}"
     }
+  },
+  "buy": {
+    "cta": "In den Warenkorb",
+    "update": "Warenkorb aktualisieren",
+    "quantity": "Menge",
+    "decrease": "Ein Stück weniger",
+    "increase": "Ein Stück mehr",
+    "unit": "{price} pro Stück",
+    "freeShipping": "Gratis-Lieferung in der Schweiz",
+    "firm": "Fixpreis, Lieferung inklusive.",
+    "added": "Zum Warenkorb hinzugefügt.",
+    "updated": "Warenkorb aktualisiert.",
+    "viewCart": "Warenkorb ansehen",
+    "editing": "Sie bearbeiten eine Position Ihres Warenkorbs.",
+    "cancelEdit": "Änderung abbrechen",
+    "quoteLead": "Ein besonderer Wunsch?",
+    "quoteLink": "Offerte anfragen",
+    "quoteHint": "Mehr als {max} Stück, anderes Material oder Sonderwunsch: Die Werkstatt antwortet mit einer Offerte."
   }
 }

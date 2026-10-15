@@ -10,7 +10,7 @@ import { Chapter } from "@/components/ui/chapter";
 // de paiement. C'est aussi l'accès mobile à l'Atelier (lien « Visiter
 // l'atelier »). Aucune image : une illustration ChatGPT n'arrive que si le
 // propriétaire la fournit, étiquetée « Illustration » (§11.3).
-export function ChapterAtelier({ freeOver }: { freeOver: string }) {
+export function ChapterAtelier() {
   const t = useTranslations("landing.atelier");
   const places = [
     { key: "gland", machine: t("glandMachine"), coords: t("glandCoords") },
@@ -23,7 +23,7 @@ export function ChapterAtelier({ freeOver }: { freeOver: string }) {
         <div className="s3d-rise col-span-full lg:col-span-5">
           <p className="max-w-[48ch] text-lead text-soft">{t("intro")}</p>
           <p className="s3d-label mt-6 normal-case text-ink">
-            {t("delivery", { amount: freeOver })}
+            {t("delivery")}
             <span aria-hidden="true" className="mx-2 text-iso-index">
               ·
             </span>

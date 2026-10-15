@@ -44,8 +44,9 @@ describe("outil WebMCP studio_configure (§6.13)", () => {
     const hash = answer.link.slice(answer.link.indexOf("#"));
     const back = decodeFragment("lavaux", hash, defaultConfig("lavaux"));
     expect(back.ok && back.config).toEqual(result.config);
-    // Pas de prix tant que le barème n'est pas validé.
-    expect(answer.stats).not.toHaveProperty("estimate_chf");
+    // Prix ferme d'une pièce, livraison comprise : au « ,90 » (une pièce).
+    expect(answer.price_chf).toBeGreaterThan(10);
+    expect(Math.round(answer.price_chf * 100) % 100).toBe(90);
   });
 
   it("les quatre objets se configurent ; les valeurs hors plage sont ramenées à la plage", () => {

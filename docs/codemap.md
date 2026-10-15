@@ -154,6 +154,20 @@ changement de langue).
 | `lib/commerce/acp-*.ts` · `api/acp/`       | ACP 2026-04-17 (+ `/.well-known/acp.json`), idempotence KV                                  |
 | `lib/commerce/ucp-*.ts` · `api/ucp/`       | UCP 2026-08-25 (+ `/.well-known/ucp`, handler `ch.swiss3design.stripe_spt`)                 |
 
+## Achat direct du Studio (14.10.2026)
+
+| Fichier                                                                | Rôle                                                                                                               |
+| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `lib/studio/price.ts` · `price-figures.ts`                             | Barème de prix ferme (centimes entiers, léger) · prix d'une configuration (grammes, changements, langue canonique) |
+| `lib/studio/purchase.ts` · `order-lines.ts` · `order-line.ts`          | Schéma zod de la ligne reçue + validation serveur · résolution au paiement (409 prix) · type `order_items.studio`  |
+| `lib/studio/line-id.ts` · `cart-line.ts` · `text/rules.ts`             | Identité d'une ligne · ligne de panier (« Ajouter au panier ») · règles de texte partagées client/serveur          |
+| `lib/cart-data.ts` · `cart-reducer.ts` · `cart.tsx`                    | Panier mixte (produits + lignes du Studio), réducteur testé, fournisseur                                           |
+| `components/studio/buy-box.tsx` · `edit-intent.ts` · `line-summary.ts` | Bloc d'achat du Studio · « Modifier dans le Studio » (remplace la ligne) · résumé sans texte saisi                 |
+| `app/[locale]/cart/studio-line.tsx`                                    | Ligne du Studio du panier (chargée à la demande)                                                                   |
+| `app/api/checkout/route.ts`                                            | Valide produits et objets du Studio, recalcule le prix, port sur la part boutique                                  |
+| `lib/studio/order-stl.ts` · `components/admin/studio-stl-*.tsx`        | STL regénéré dans le navigateur de l'admin (hors Worker)                                                           |
+| `app/[locale]/admin/orders/[id]/studio-section.tsx`                    | Résumé, bobines, textes, relecture, refus                                                                          |
+
 ## Mouvement et 3D (`src/motion`, `src/gates`, `src/lib/motion-bridge`)
 
 Frontière du bundle (règle d'or 11 d'`AGENTS.md`) : gsap, lenis et three ne

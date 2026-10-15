@@ -3714,3 +3714,23 @@ changements × 110 s + 360 s`.
 | `system.error.title`                      | Une couche a raté. On réessaie ?                                                                                                                                                                                      | Eine Schicht ist missglückt. Nochmals versuchen?                                                                                                                                                                         | Uno strato non è riuscito. Riproviamo?                                                                                                                                                                                             | A layer failed. Shall we retry?                                                                                                                                                                                      |
 
 _Fin du brief._
+
+---
+
+## Addendum du 14.10.2026 : achat direct du Studio
+
+Décision du propriétaire, avant J3 : les objets du Studio s'achètent **directement**
+(panier, puis paiement), comme un produit de la boutique ; le devis devient un lien
+secondaire pour plus de 20 pièces ou une demande particulière. Cet addendum
+**remplace** ce que le brief dit de « pas de paiement en v1 », de l'estimation en
+fourchette, de `PRICING.validated` et du libellé « prix ferme sous 48 h » (§6.5, §6.9,
+annexe B, §11.2 n° 3, textes `studio.estimate` et `studio.success`), et réalise la phase
+« P6 » annoncée au §6.5 (le serveur recalcule le prix ferme).
+
+- Prix ferme, livraison comprise : `src/lib/studio/price.ts` (fonction pure, la même
+  dans le navigateur et sur le serveur) ; livraison offerte partout en Suisse pour le
+  Studio **et** la boutique.
+- Filaments : gamme Polymaker Panchroma Matte, hex officiels affichés sans
+  transformation (`src/lib/studio/filaments.ts`).
+- Données : `order_items.studio` (migration `0009`), textes saisis conservés avec la commande.
+- Détail : `docs/architecture.md` (« Studio direct purchase »), `AGENTS.md` (règle d'or 12).

@@ -9,6 +9,7 @@ import { orders, orderItems } from "@/db/schema";
 import { getServerSession } from "@/lib/session";
 import { getReviewedProductIds } from "@/db/queries";
 import { formatChf } from "@/lib/format";
+import { readStudioOrderLine } from "@/lib/studio/order-line";
 import { statusBadge, backLink } from "../../_ui";
 import { ReviewForm } from "./review-form";
 import { ReorderButton } from "./reorder-button";
@@ -57,6 +58,7 @@ export default async function OrderDetailPage({
   const canReview = order.status === "delivered";
   const reviewedIds = canReview ? await getReviewedProductIds(order.id) : [];
   const tReviews = await getTranslations("reviews");
+  const tStudio = await getTranslations("studio");
 
   let address = { name: "", street: "", npa: "", city: "", canton: "" };
   try {
@@ -140,6 +142,22 @@ export default async function OrderDetailPage({
                   {formatChf(i.priceCentsSnapshot * i.quantity, locale)}
                 </span>
               </div>
+              {/* Objet du Studio : les textes à imprimer, que le client relit ici. */}
+              {(() => {
+                const studio = readStudioOrderLine(i.studio);
+                const texts = studio
+                  ? Object.entries(studio.texts).filter(([, v]) => v)
+                  : [];
+                return texts.length > 0 ? (
+                  <ul className="ph-mask mt-1.5 space-y-0.5 text-xs text-soft">
+                    {texts.map(([field, value]) => (
+                      <li key={field} className="break-words">
+                        {tStudio(`quote.field.${field}` as never)} : « {value} »
+                      </li>
+                    ))}
+                  </ul>
+                ) : null;
+              })()}
               {canReview && i.productId && (
                 <div className="mt-3 border-t border-line pt-3">
                   {reviewedIds.includes(i.productId) ? (

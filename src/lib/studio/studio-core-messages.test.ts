@@ -98,8 +98,7 @@ describe("studioCore : couverture du code", () => {
       ]) {
         has(`units.${v}`);
       }
-      for (const v of ["strip", "hero", "onQuote", "priceLater"])
-        has(`measure.${v}`);
+      for (const v of ["strip", "hero"]) has(`measure.${v}`);
       for (const v of ["real", "simulated", "extra"]) has(`duration.${v}`);
       for (const v of [
         "label",

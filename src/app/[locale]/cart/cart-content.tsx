@@ -1,14 +1,20 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useRef } from "react";
 import { ArrowRight, Minus, Plus, Trash2 } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { Link } from "@/i18n/navigation";
-import { useCart } from "@/lib/cart";
-import { cartProperties, productProperties, track } from "@/lib/analytics";
+import { isStudioLine, useCart, type StudioCartItem } from "@/lib/cart";
+import {
+  cartProperties,
+  productProperties,
+  studioProductProperties,
+  track,
+} from "@/lib/analytics";
 import { cfImage } from "@/lib/cf-image";
 import { formatChf } from "@/lib/format";
-import { shippingFor } from "@/lib/shipping";
+import { shippingForOrder } from "@/lib/shipping";
 import { CartReminder } from "@/components/cart-reminder";
 import { PageHeader } from "@/components/page-header";
 import { ButtonLink } from "@/components/ui/button";
@@ -22,6 +28,18 @@ import { StrataIcon } from "@/components/ui/icons";
 // La logique (panier local, port, « Cart Viewed », « Product Removed ») est
 // celle d'avant la refonte.
 
+// Les lignes du Studio (poster, résumé, moteur de statistiques) se chargent à la
+// demande : un panier de produits seuls ne paie rien de plus.
+const StudioLine = dynamic(() => import("./studio-line"), {
+  ssr: false,
+  loading: () => (
+    <li
+      className="h-28 rounded-card border border-line bg-surface"
+      aria-hidden="true"
+    />
+  ),
+});
+
 export default function CartContent({
   shippingSettings,
 }: {
@@ -31,30 +49,53 @@ export default function CartContent({
   const ts = useTranslations("system.cart");
   const tShell = useTranslations("shell.cta");
   const locale = useLocale();
-  const { items, count, subtotalCents, setQuantity, remove } = useCart();
+  const {
+    lines,
+    count,
+    subtotalCents,
+    shopSubtotalCents,
+    setQuantity,
+    remove,
+    setStudioQuantity,
+    removeStudio,
+  } = useCart();
 
   // « Cart Viewed » une fois, dès que le panier relu du stockage local est
   // non vide (il est vide au premier rendu, avant l'hydratation).
   const viewTracked = useRef(false);
   useEffect(() => {
-    if (viewTracked.current || items.length === 0) return;
+    if (viewTracked.current || lines.length === 0) return;
     viewTracked.current = true;
-    track("Cart Viewed", cartProperties(items));
-  }, [items]);
+    track("Cart Viewed", cartProperties(lines));
+  }, [lines]);
 
-  const shippingCents = shippingFor(subtotalCents, shippingSettings);
+  // Le port ne dépend que de la part boutique : le prix d'un objet du Studio est
+  // ferme, livraison comprise.
+  const shippingCents = shippingForOrder(
+    {
+      shopCents: shopSubtotalCents,
+      studioCents: subtotalCents - shopSubtotalCents,
+    },
+    shippingSettings,
+  );
   const totalCents = subtotalCents + shippingCents;
-  const remainingForFree = shippingSettings.freeOverCents - subtotalCents;
-  // Part du seuil atteinte (0–100). Seuil nul : la livraison est toujours offerte.
+  const remainingForFree = shippingSettings.freeOverCents - shopSubtotalCents;
+  // Livraison offerte partout (port à 0) : plus de seuil, donc plus de barre ni de
+  // « Plus que X pour la livraison offerte ». Sinon : part du seuil atteinte (0–100).
+  // Un panier du Studio seul n'a jamais de port : pas de seuil à atteindre non plus.
+  const freeForAll =
+    shippingSettings.shippingCents === 0 || shopSubtotalCents === 0;
   const progress =
     shippingSettings.freeOverCents > 0
       ? Math.min(
           100,
-          Math.round((subtotalCents / shippingSettings.freeOverCents) * 100),
+          Math.round(
+            (shopSubtotalCents / shippingSettings.freeOverCents) * 100,
+          ),
         )
       : 100;
 
-  if (items.length === 0) {
+  if (lines.length === 0) {
     return (
       <div className="s3d-page py-16 md:py-24">
         <p className="s3d-label text-soft">{ts("emptyKicker")}</p>
@@ -84,7 +125,21 @@ export default function CartContent({
 
       <div className="mt-10 grid grid-cols-1 gap-8 lg:grid-cols-[minmax(0,1fr)_380px] lg:items-start">
         <ul className="space-y-3">
-          {items.map((item) => {
+          {lines.map((line) => {
+            if (isStudioLine(line)) {
+              return (
+                <StudioLine
+                  key={`studio:${line.id}`}
+                  item={line}
+                  onQuantity={setStudioQuantity}
+                  onRemove={(removed: StudioCartItem) => {
+                    removeStudio(removed.id);
+                    track("Product Removed", studioProductProperties(removed));
+                  }}
+                />
+              );
+            }
+            const item = line;
             const image = cfImage(item.imageUrl, { width: 200 });
             return (
               <li
@@ -231,28 +286,33 @@ export default function CartContent({
             </div>
           </dl>
 
-          {/* Progression vers la livraison offerte : un filet rouge dont la
-              tête est un point, la buse (brief §7.13). Décoratif : la phrase
-              dessous porte l'information. */}
-          <div className="mt-6">
-            <div aria-hidden="true" className="relative h-0.5 bg-line">
-              <div
-                className="absolute inset-y-0 left-0 bg-accent transition-[width] duration-[var(--dur-reveal)] ease-strate"
-                style={{ width: `${progress}%` }}
-              />
-              <span
-                className="absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-accent transition-[left] duration-[var(--dur-reveal)] ease-strate"
-                style={{ left: `calc(${progress}% - 5px)` }}
-              />
+          {freeForAll ? (
+            // Livraison offerte partout en Suisse : plus de seuil, plus de barre.
+            <p className="mt-6 text-sm text-soft">{ts("freeAll")}</p>
+          ) : (
+            // Progression vers la livraison offerte : un filet rouge dont la tête est
+            // un point, la buse (brief §7.13). Décoratif : la phrase dessous porte
+            // l'information. Seule la part boutique compte.
+            <div className="mt-6">
+              <div aria-hidden="true" className="relative h-0.5 bg-line">
+                <div
+                  className="absolute inset-y-0 left-0 bg-accent transition-[width] duration-[var(--dur-reveal)] ease-strate"
+                  style={{ width: `${progress}%` }}
+                />
+                <span
+                  className="absolute top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-accent transition-[left] duration-[var(--dur-reveal)] ease-strate"
+                  style={{ left: `calc(${progress}% - 5px)` }}
+                />
+              </div>
+              <p className="mt-3 text-sm text-soft">
+                {remainingForFree > 0
+                  ? ts("freeHint", {
+                      amount: formatChf(remainingForFree, locale),
+                    })
+                  : ts("freeReached")}
+              </p>
             </div>
-            <p className="mt-3 text-sm text-soft">
-              {remainingForFree > 0
-                ? ts("freeHint", {
-                    amount: formatChf(remainingForFree, locale),
-                  })
-                : ts("freeReached")}
-            </p>
-          </div>
+          )}
 
           <ButtonLink
             href="/checkout"

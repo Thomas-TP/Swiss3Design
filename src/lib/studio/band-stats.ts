@@ -23,7 +23,7 @@ import {
   layoutMontagne,
   type Locale,
 } from "./objects/montagne-model";
-import { PRICING, type PricingParams } from "./pricing-params";
+import { PRINT, type PrintParams } from "./print-params";
 import type {
   Band,
   FilamentId,
@@ -67,7 +67,7 @@ function summarize(
   config: { bands: readonly Band[] },
   heightMm: number,
   volumesMm3: readonly number[],
-  params: PricingParams,
+  params: PrintParams,
   printScale = 1,
 ): BandSummary {
   const totalLayers = layerCount(heightMm);
@@ -107,7 +107,7 @@ function summarize(
 
 export function bandStats(
   config: LavauxConfig,
-  params: PricingParams = PRICING,
+  params: PrintParams = PRINT,
 ): BandSummary {
   const analysis = analyzeLavaux(config);
   return summarize(config, config.h, analysis.bandVolumesMm3, params);
@@ -116,7 +116,7 @@ export function bandStats(
 function flatBandStats(
   model: FlatModel,
   solid: boolean,
-  params: PricingParams,
+  params: PrintParams,
 ): BandSummary {
   const analysis = analyzeFlat(model);
   const scale = solid
@@ -143,7 +143,7 @@ function flatBandStats(
 export function bandStatsFor(
   config: StudioConfig,
   texts?: StudioTexts,
-  params: PricingParams = PRICING,
+  params: PrintParams = PRINT,
   locale?: Locale,
 ): BandSummary {
   switch (config.object) {

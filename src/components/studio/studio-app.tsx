@@ -11,27 +11,27 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
-import { Button, ButtonLink } from "@/components/ui/button";
+import { Button } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
 import { MeasureStrip } from "@/components/ui/measure-strip";
 import { Toast, useToast } from "@/components/ui/toast";
 import { StudioEngine } from "@/gates/studio";
-import { track } from "@/lib/analytics";
+import { studioProductProperties, track } from "@/lib/analytics";
+import { useCart } from "@/lib/cart";
+import { formatChf } from "@/lib/format";
 import { saveCreation } from "@/lib/studio/creations";
 import { clampConfig } from "@/lib/studio/ranges";
 import { computeStats } from "@/lib/studio/stats";
 import { bandStatsFor } from "@/lib/studio/band-stats";
 import {
-  formatChfRange,
-  formatDuration,
-  formatGrams,
-} from "@/lib/studio/format";
-import {
   ISSUE_MESSAGE_KEYS,
   issueStrings,
   issueValues,
 } from "@/lib/studio/guards";
-import { PRICING } from "@/lib/studio/pricing-params";
+import { buildStudioCartLine } from "@/lib/studio/cart-line";
+import { STUDIO_QTY_MAX, studioUnitCents } from "@/lib/studio/price";
+import { studioPrice } from "@/lib/studio/price-figures";
+import { PRINT } from "@/lib/studio/print-params";
 import {
   surpriseBorne,
   surpriseCartouche,
@@ -46,6 +46,12 @@ import type {
   StudioObjectId,
 } from "@/lib/studio/types";
 import { listCreations } from "@/lib/studio/creations";
+import { BuyBox } from "./buy-box";
+import {
+  clearEditIntent,
+  readEditIntent,
+  type EditIntent,
+} from "./edit-intent";
 import { missingText, textsForObject } from "./objects";
 import { SendDrawerHost, createOpenState } from "./send-drawer";
 import type { StudioLocale } from "./scene-props";
@@ -142,7 +148,13 @@ export function StudioApp({
   const { config, texts, dispatch } = doc;
   const toast = useToast();
 
+  const cart = useCart();
   const [reprint, setReprint] = useState(0);
+  // Achat : quantité de la ligne, ligne du panier en cours de modification et
+  // dernier geste réussi (annonce « Ajouté au panier »).
+  const [quantity, setQuantity] = useState(1);
+  const [edit, setEdit] = useState<EditIntent | null>(null);
+  const [done, setDone] = useState<"added" | "updated" | null>(null);
   const [tab, setTab] = useState<SectionId>("shape");
   // Mobile : l'aperçu réduit en bandeau pour laisser la place aux réglages.
   const [compact, setCompact] = useState(false);
@@ -156,12 +168,29 @@ export function StudioApp({
     [object, texts, examples],
   );
   const stats = useMemo(
-    () => computeStats(config, shown, PRICING, locale),
+    () => computeStats(config, shown, PRINT, locale),
     [config, shown, locale],
   );
   const bands = useMemo(
-    () => bandStatsFor(config, shown, PRICING, locale),
+    () => bandStatsFor(config, shown, PRINT, locale),
     [config, shown, locale],
+  );
+  // Prix ferme, livraison comprise : `studioPrice` (price-figures.ts), la même
+  // fonction que le serveur refait au paiement, en langue canonique pour la
+  // Montagne (l'étiquette d'altitude change les grammes d'une langue à l'autre).
+  const price = useMemo(
+    () => studioPrice(config, shown, quantity, { locale, stats }),
+    [config, shown, quantity, locale, stats],
+  );
+  // Prix d'UNE pièce, pour la ligne « Prix » de la fiche (indépendante de la quantité).
+  const singleCents = useMemo(
+    () =>
+      studioUnitCents(
+        config.object,
+        { grams: price.stats.grams, changes: price.stats.changes },
+        1,
+      ),
+    [config.object, price.stats],
   );
   const sections = useMemo(() => sectionsFor(object), [object]);
 
@@ -207,6 +236,7 @@ export function StudioApp({
       texts,
       examples,
       stats,
+      singleCents,
       bands,
       locale,
       t,
@@ -223,6 +253,7 @@ export function StudioApp({
       texts,
       examples,
       stats,
+      singleCents,
       bands,
       locale,
       t,
@@ -350,6 +381,26 @@ export function StudioApp({
     toast,
   ]);
 
+  // Modification d'une ligne du panier (« Modifier dans le Studio ») : la
+  // configuration arrive par le fragment, les textes par la session, la quantité
+  // et l'identité de la ligne par l'intention (edit-intent.ts).
+  // oxlint-disable set-state-in-effect -- lecture de sessionStorage, que le serveur ne voit pas
+  useEffect(() => {
+    if (!doc.ready) return;
+    const intent = readEditIntent(object);
+    if (!intent) return;
+    setEdit(intent);
+    setQuantity(Math.min(STUDIO_QTY_MAX, Math.max(1, intent.quantity)));
+  }, [doc.ready, object]);
+  // oxlint-enable set-state-in-effect
+
+  // Un geste sur la configuration, les textes ou la quantité efface l'annonce « Ajouté ».
+  // oxlint-disable set-state-in-effect -- l'annonce suit le dernier geste
+  useEffect(() => {
+    setDone(null);
+  }, [config, texts, quantity]);
+  // oxlint-enable set-state-in-effect
+
   // Un lien partagé illisible : réglages de départ et un mot (§6.7 « États »).
   useEffect(() => {
     if (doc.ready && doc.invalidLink) toast.show(t("toast.invalidLink"));
@@ -406,6 +457,56 @@ export function StudioApp({
     });
   }, [blocked, sendState]);
 
+  // La ligne du panier modifiée existe encore (sinon c'est un simple ajout).
+  const editing = Boolean(
+    edit && cart.studioItems.some((line) => line.id === edit.id),
+  );
+  const cancelEdit = useCallback(() => {
+    clearEditIntent();
+    setEdit(null);
+  }, []);
+
+  // « Ajouter au panier » : les textes SAISIS (jamais les exemples) et la
+  // configuration partent dans une ligne du panier du navigateur ; rien n'est
+  // envoyé au serveur avant le paiement, qui revalide tout et refait le prix.
+  const { addStudio, replaceStudio } = cart;
+  const addToCart = useCallback(() => {
+    if (blocked) return;
+    const line = buildStudioCartLine({
+      config,
+      texts: textsForObject(object, texts),
+      locale,
+      quantity,
+    });
+    const updated = Boolean(edit && editing);
+    if (updated && edit) replaceStudio(edit.id, line);
+    else addStudio(line);
+    if (updated) {
+      clearEditIntent();
+      setEdit(null);
+    }
+    // Jamais un texte saisi dans l'événement : l'objet, le prix, la quantité.
+    track("Product Added", {
+      ...studioProductProperties(line),
+      source: "studio",
+    });
+    toast.show(updated ? t("buy.updated") : t("buy.added"));
+    setDone(updated ? "updated" : "added");
+  }, [
+    blocked,
+    config,
+    texts,
+    object,
+    locale,
+    quantity,
+    edit,
+    editing,
+    addStudio,
+    replaceStudio,
+    toast,
+    t,
+  ]);
+
   // ── Résumé vivant (aria-live, 1 s) ────────────────────────────────────────
   const summary = liveSummary(summaryInput);
   const announced = useDebounced(summary, SUMMARY_DELAY_MS);
@@ -415,52 +516,40 @@ export function StudioApp({
     if (rootRef.current?.hasAttribute("data-js")) event.preventDefault();
   }, []);
 
-  const priceText = stats.estimate
-    ? formatChfRange(stats.estimate.lowCents, stats.estimate.highCents, locale)
-    : null;
-
-  // Mémorisés avec le bloc de réglage qui les porte : sans changement de
-  // l'envoi (bloqué, motif du blocage), ils ne se redessinent pas à chaque cran.
-  const sendButton = useMemo(
+  // Mémorisé avec le bloc de réglage qui le porte : sans changement du prix, de
+  // la quantité ou du blocage, il ne se redessine pas à chaque cran.
+  const buyBox = useMemo(
     () => (
-      <div className="flex flex-col items-start gap-3">
-        {/* Sans JavaScript : le lien de devis. Avec : le bouton qui ouvre le tiroir. */}
-        <ButtonLink
-          href="/custom#demande"
-          variant="primary"
-          size="lg"
-          className="group-data-[js]/studio:hidden"
-        >
-          {t("send.noscript")}
-        </ButtonLink>
-        {/* Le conteneur porte l'affichage conditionnel : le bouton a son propre
-          `inline-flex`, que `hidden` ne battrait pas (même spécificité), et un
-          bouton sans effet sans JavaScript serait trompeur. */}
-        <div className="hidden group-data-[js]/studio:max-lg:hidden group-data-[js]/studio:block">
-          <Button
-            variant="primary"
-            size="lg"
-            disabled={blocked}
-            onClick={openSend}
-            aria-describedby={reason ? reasonId : undefined}
-          >
-            {t("send.cta")}
-          </Button>
-        </div>
-        {reason ? (
-          <p
-            id={reasonId}
-            className="max-w-[46ch] text-sm font-medium text-accent-text"
-          >
-            {reason}
-          </p>
-        ) : null}
-        <p className="max-w-[52ch] text-sm text-soft">
-          {t("send.estimateNote")}
-        </p>
-      </div>
+      <BuyBox
+        t={t}
+        locale={locale}
+        unitCents={price.unitCents}
+        quantity={quantity}
+        onQuantity={setQuantity}
+        blocked={blocked}
+        reason={reason}
+        reasonId={reasonId}
+        onAdd={addToCart}
+        onQuote={openSend}
+        editing={editing}
+        onCancelEdit={cancelEdit}
+        done={done}
+      />
     ),
-    [blocked, openSend, reason, reasonId, t],
+    [
+      t,
+      locale,
+      price.unitCents,
+      quantity,
+      blocked,
+      reason,
+      reasonId,
+      addToCart,
+      openSend,
+      editing,
+      cancelEdit,
+      done,
+    ],
   );
 
   const noscriptNote = useMemo(
@@ -573,7 +662,14 @@ export function StudioApp({
               bandBar={bandBar}
             />
             <MeasureStrip
-              items={measureItems({ config, stats, locale, core, t })}
+              items={measureItems({
+                config,
+                stats,
+                locale,
+                core,
+                t,
+                price: { unitCents: price.unitCents, quantity },
+              })}
               label={t("measure.label")}
               className="mt-3 max-lg:hidden"
             />
@@ -619,7 +715,7 @@ export function StudioApp({
               titleOf={sectionLabel}
               issueText={issueText}
               onFix={fix}
-              actions={sendButton}
+              actions={buyBox}
               noscriptNote={noscriptNote}
             />
             {/* Sans JavaScript : « Appliquer » envoie le formulaire GET (la page se recharge avec les réglages). */}
@@ -650,16 +746,16 @@ export function StudioApp({
       >
         <div className="flex h-14 items-center justify-between gap-3 px-[var(--spacing-margin)]">
           <p className="s3d-label ph-no-capture min-w-0 normal-case text-ink">
-            {priceText ??
-              `≈ ${formatGrams(stats.grams, locale)} · ≈ ${formatDuration(stats.minutes, locale)}`}
+            {formatChf(price.unitCents * quantity, locale)}
+            {quantity > 1 ? ` · ×${quantity}` : ""}
           </p>
           <Button
             variant="primary"
             disabled={blocked}
-            onClick={openSend}
+            onClick={addToCart}
             aria-describedby={reason ? reasonId : undefined}
           >
-            {t("send.cta")}
+            {editing ? t("buy.update") : t("buy.cta")}
           </Button>
         </div>
       </div>

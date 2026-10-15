@@ -22,12 +22,8 @@ import {
   setBandFilament,
 } from "@/lib/studio/bands";
 import { FILAMENTS_INDICATIVE } from "@/lib/studio/filaments";
-import {
-  formatChfRange,
-  formatDuration,
-  formatGrams,
-  formatNumber,
-} from "@/lib/studio/format";
+import { formatChf } from "@/lib/format";
+import { formatDuration, formatGrams, formatNumber } from "@/lib/studio/format";
 import {
   BORNE_RANGES,
   CARTOUCHE_RANGES,
@@ -102,6 +98,8 @@ export interface Ctl {
   /** Textes d'exemple de la langue : placeholders des champs, et aperçu tant que rien n'est saisi. */
   examples: StudioTexts;
   stats: StudioStats;
+  /** Prix ferme d'UNE pièce (centimes), livraison comprise : la ligne « Prix » de la fiche. */
+  singleCents: number;
   bands: BandSummary;
   locale: string;
   t: Translate;
@@ -1175,9 +1173,7 @@ export function SheetSection({
     { term: t("sheet.rows.material"), value: t("sheet.materialValue") },
     {
       term: t("sheet.rows.price"),
-      value: stats.estimate
-        ? `${formatChfRange(stats.estimate.lowCents, stats.estimate.highCents, locale)} · ${t("sheet.estimate")}`
-        : core("measure.priceLater"),
+      value: `${formatChf(ctl.singleCents, locale)} · ${t("sheet.firm")}`,
     },
   ];
   return (

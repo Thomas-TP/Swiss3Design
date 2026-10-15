@@ -6,8 +6,9 @@ import type { Locale } from "@/i18n/routing";
 // (src/app/[locale]/legal/terms/content.tsx) — même politique, reformulée
 // pour une lecture rapide plutôt que le format numéroté des CGV. En cas
 // d'écart, les CGV font foi (rappelé dans le dernier encart).
-// Frais de port : garder en phase avec src/lib/shipping.ts
-// (SHIPPING_CENTS=890, FREE_SHIPPING_OVER_CENTS=6000) si ces valeurs changent.
+// Frais de port : depuis le 14.10.2026 la livraison est OFFERTE partout en Suisse,
+// sans minimum (src/lib/shipping.ts : SHIPPING_CENTS=0, FREE_SHIPPING_OVER_CENTS=0).
+// Si un tarif revient, le réglage de l'admin fait foi : réécrire cette page.
 
 export interface ShippingSection {
   title: string;
@@ -35,7 +36,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
           Les articles en stock sont remis à la Poste sous 1 à 3 jours ouvrés.
           Les pièces imprimées à la demande le sont après le délai de production
           indiqué sur la fiche produit (ou dans le devis pour une création sur
-          mesure). Ces délais sont indicatifs.
+          mesure). Les objets du Studio sont fabriqués sur commande : leurs
+          textes sont relus sous 2 jours ouvrés, puis la pièce est imprimée et
+          remise à la Poste. Ces délais sont indicatifs.
         </p>
       ),
     },
@@ -43,9 +46,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Frais de port",
       body: (
         <p>
-          Tarif unique de <strong>8.90 CHF</strong>, offert dès{" "}
-          <strong>60.00 CHF</strong> d'achat. Le montant exact est toujours
-          affiché dans le panier avant paiement.
+          La livraison est <strong>offerte</strong> partout en Suisse, sans
+          montant minimum d'achat. Le prix d'un objet du Studio est ferme,
+          livraison comprise.
         </p>
       ),
     },
@@ -128,7 +131,10 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
           Lagerartikel werden innerhalb von 1 bis 3 Werktagen der Post
           übergeben. Auf Bestellung gedruckte Stücke werden nach der auf der
           Produktseite (oder in der Offerte für Massanfertigungen) angegebenen
-          Produktionszeit versandt. Diese Fristen sind unverbindlich.
+          Produktionszeit versandt. Studio-Objekte werden auf Bestellung
+          gefertigt: Ihre Texte werden innert 2 Werktagen gegengelesen, danach
+          wird das Stück gedruckt und der Post übergeben. Diese Fristen sind
+          unverbindlich.
         </p>
       ),
     },
@@ -136,9 +142,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Versandkosten",
       body: (
         <p>
-          Einheitstarif von <strong>8.90 CHF</strong>, gratis ab{" "}
-          <strong>60.00 CHF</strong> Einkaufswert. Der genaue Betrag wird vor
-          der Zahlung im Warenkorb angezeigt.
+          Die Lieferung in der ganzen Schweiz ist <strong>gratis</strong>, ohne
+          Mindestbestellwert. Der Preis eines Studio-Objekts ist ein Fixpreis,
+          Lieferung inklusive.
         </p>
       ),
     },
@@ -222,7 +228,10 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
           Gli articoli disponibili vengono consegnati alla Posta entro 1-3
           giorni lavorativi. I pezzi stampati su richiesta vengono spediti dopo
           il tempo di produzione indicato sulla scheda prodotto (o nel
-          preventivo per le creazioni su misura). Questi tempi sono indicativi.
+          preventivo per le creazioni su misura). Gli oggetti dello Studio sono
+          realizzati su ordinazione: i testi vengono riletti entro 2 giorni
+          lavorativi, poi il pezzo è stampato e consegnato alla Posta. Questi
+          tempi sono indicativi.
         </p>
       ),
     },
@@ -230,9 +239,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Spese di spedizione",
       body: (
         <p>
-          Tariffa unica di <strong>8.90 CHF</strong>, gratuita a partire da{" "}
-          <strong>60.00 CHF</strong> di acquisto. L'importo esatto è sempre
-          indicato nel carrello prima del pagamento.
+          La consegna in tutta la Svizzera è <strong>gratuita</strong>, senza
+          importo minimo d'acquisto. Il prezzo di un oggetto dello Studio è
+          fisso, consegna inclusa.
         </p>
       ),
     },
@@ -314,7 +323,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
         <p>
           In-stock items are handed to Swiss Post within 1 to 3 business days.
           Made-to-order pieces ship after the production time shown on the
-          product page (or in the quote for custom work). These timelines are
+          product page (or in the quote for custom work). Studio objects are
+          made to order: their texts are read within 2 working days, then the
+          piece is printed and handed to Swiss Post. These timelines are
           indicative.
         </p>
       ),
@@ -323,9 +334,9 @@ export const SHIPPING_CONTENT: Record<Locale, ShippingSection[]> = {
       title: "Shipping cost",
       body: (
         <p>
-          Flat rate of <strong>CHF 8.90</strong>, free from{" "}
-          <strong>CHF 60.00</strong> of purchase. The exact amount is always
-          shown in the cart before payment.
+          Delivery is <strong>free</strong> everywhere in Switzerland, with no
+          minimum purchase. The price of a Studio object is firm, delivery
+          included.
         </p>
       ),
     },

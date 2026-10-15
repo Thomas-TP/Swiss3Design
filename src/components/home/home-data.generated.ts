@@ -471,8 +471,8 @@ export const HOME_DATA: HomeData = {
       layers: [
         {
           band: 0,
-          fill: "#2E6A9E",
-          stroke: "#1D4262",
+          fill: "#0163A6",
+          stroke: "#013D67",
           ellipses: [
             {
               cx: 200,
@@ -604,8 +604,8 @@ export const HOME_DATA: HomeData = {
         },
         {
           band: 1,
-          fill: "#5E7F3A",
-          stroke: "#3A4F24",
+          fill: "#5F6244",
+          stroke: "#3B3D2A",
           ellipses: [
             {
               cx: 200,
@@ -809,8 +809,8 @@ export const HOME_DATA: HomeData = {
         },
         {
           band: 2,
-          fill: "#F5F5F4",
-          stroke: "#989897",
+          fill: "#F4EFEB",
+          stroke: "#979492",
           ellipses: [
             {
               cx: 200,
@@ -948,7 +948,7 @@ export const HOME_DATA: HomeData = {
           rx: 92.5,
           ry: 24.3,
         },
-        fill: "#7B7B7A",
+        fill: "#7A7876",
       },
     },
     exploded: {
@@ -966,8 +966,8 @@ export const HOME_DATA: HomeData = {
       layers: [
         {
           band: 0,
-          fill: "#2E6A9E",
-          stroke: "#1D4262",
+          fill: "#0163A6",
+          stroke: "#013D67",
           ellipses: [
             {
               cx: 200,
@@ -1103,20 +1103,20 @@ export const HOME_DATA: HomeData = {
               rx: 91.8,
               ry: 39.8,
             },
-            topFill: "#5C8BB3",
+            topFill: "#0163A6",
             mouth: {
               cx: 200,
               cy: 340.6,
               rx: 88,
               ry: 38.1,
             },
-            mouthFill: "#17354F",
+            mouthFill: "#013253",
           },
         },
         {
           band: 1,
-          fill: "#5E7F3A",
-          stroke: "#3A4F24",
+          fill: "#5F6244",
+          stroke: "#3B3D2A",
           ellipses: [
             {
               cx: 200,
@@ -1324,20 +1324,20 @@ export const HOME_DATA: HomeData = {
               rx: 95.5,
               ry: 32,
             },
-            topFill: "#819B65",
+            topFill: "#5F6244",
             mouth: {
               cx: 200,
               cy: 189.9,
               rx: 91.9,
               ry: 30.7,
             },
-            mouthFill: "#2F401D",
+            mouthFill: "#303122",
           },
         },
         {
           band: 2,
-          fill: "#F5F5F4",
-          stroke: "#989897",
+          fill: "#F4EFEB",
+          stroke: "#979492",
           ellipses: [
             {
               cx: 200,
@@ -1473,14 +1473,14 @@ export const HOME_DATA: HomeData = {
               rx: 85.2,
               ry: 22.2,
             },
-            topFill: "#F7F7F6",
+            topFill: "#F4EFEB",
             mouth: {
               cx: 200,
               cy: 77.1,
               rx: 81.5,
               ry: 21.3,
             },
-            mouthFill: "#7B7B7A",
+            mouthFill: "#7A7876",
           },
         },
       ],
@@ -1578,7 +1578,7 @@ export const HOME_DATA: HomeData = {
           minutes: 181,
           changes: 2,
         },
-        estimate: null,
+        priceCents: 4490,
         poster: {
           kind: "hero",
         },
@@ -1592,10 +1592,10 @@ export const HOME_DATA: HomeData = {
           minutes: 24,
           changes: 1,
         },
-        estimate: null,
+        priceCents: 1790,
         poster: {
           kind: "svg",
-          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F5F5F4" stroke="#939392" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#1C1917" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F4EFEB" stroke="#928F8D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#2F2E30" stroke="#1C1C1D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#2F2E30" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
         },
       },
       montagne: {
@@ -1607,7 +1607,7 @@ export const HOME_DATA: HomeData = {
           minutes: 81,
           changes: 3,
         },
-        estimate: null,
+        priceCents: 4990,
         poster: {
           kind: "montagne",
         },
@@ -1621,10 +1621,10 @@ export const HOME_DATA: HomeData = {
           minutes: 11,
           changes: 1,
         },
-        estimate: null,
+        priceCents: 2490,
         poster: {
           kind: "svg",
-          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-224 -92 449 183" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M133 72l18 -3 18 -7 14 -11 12 -15 7 -17 2 -19 -2 -19 -7 -17 -12 -15 -14 -11 -18 -7 -18 -3 -266 0 -18 3 -18 7 -14 11 -12 15 -7 17 -2 19 2 19 7 17 12 15 14 11 18 7 18 3zM-108 0l-1 -6 -2 -6 -4 -6 -5 -4 -6 -2 -7 -1 -6 1 -6 2 -5 4 -4 6 -3 6 -1 6 1 6 3 6 4 6 5 4 6 2 6 1 7 -1 6 -2 5 -4 4 -5 2 -7z"/><path fill="#F5F5F4" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M133 35l10 -2 8 -5 6 -9 2 -9 -2 -10 -6 -8 -8 -5 -10 -2 -178 0 -9 2 -8 5 -6 8 -2 10 2 9 6 9 8 5 9 2z"/></svg>',
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-224 -92 449 183" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#2F2E30" stroke="#1C1C1D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M133 72l18 -3 18 -7 14 -11 12 -15 7 -17 2 -19 -2 -19 -7 -17 -12 -15 -14 -11 -18 -7 -18 -3 -266 0 -18 3 -18 7 -14 11 -12 15 -7 17 -2 19 2 19 7 17 12 15 14 11 18 7 18 3zM-108 0l-1 -6 -2 -6 -4 -6 -5 -4 -6 -2 -7 -1 -6 1 -6 2 -5 4 -4 6 -3 6 -1 6 1 6 3 6 4 6 5 4 6 2 6 1 7 -1 6 -2 5 -4 4 -5 2 -7z"/><path fill="#F4EFEB" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M133 35l10 -2 8 -5 6 -9 2 -9 -2 -10 -6 -8 -8 -5 -10 -2 -178 0 -9 2 -8 5 -6 8 -2 10 2 9 6 9 8 5 9 2z"/></svg>',
         },
       },
     },
@@ -1638,7 +1638,7 @@ export const HOME_DATA: HomeData = {
           minutes: 181,
           changes: 2,
         },
-        estimate: null,
+        priceCents: 4490,
         poster: {
           kind: "hero",
         },
@@ -1652,10 +1652,10 @@ export const HOME_DATA: HomeData = {
           minutes: 24,
           changes: 1,
         },
-        estimate: null,
+        priceCents: 1790,
         poster: {
           kind: "svg",
-          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F5F5F4" stroke="#939392" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#1C1917" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F4EFEB" stroke="#928F8D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#2F2E30" stroke="#1C1C1D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#2F2E30" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
         },
       },
       montagne: {
@@ -1667,7 +1667,7 @@ export const HOME_DATA: HomeData = {
           minutes: 80,
           changes: 3,
         },
-        estimate: null,
+        priceCents: 4990,
         poster: {
           kind: "montagne",
         },
@@ -1681,10 +1681,10 @@ export const HOME_DATA: HomeData = {
           minutes: 11,
           changes: 1,
         },
-        estimate: null,
+        priceCents: 2490,
         poster: {
           kind: "svg",
-          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-224 -92 449 183" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M133 72l18 -3 18 -7 14 -11 12 -15 7 -17 2 -19 -2 -19 -7 -17 -12 -15 -14 -11 -18 -7 -18 -3 -266 0 -18 3 -18 7 -14 11 -12 15 -7 17 -2 19 2 19 7 17 12 15 14 11 18 7 18 3zM-108 0l-1 -6 -2 -6 -4 -6 -5 -4 -6 -2 -7 -1 -6 1 -6 2 -5 4 -4 6 -3 6 -1 6 1 6 3 6 4 6 5 4 6 2 6 1 7 -1 6 -2 5 -4 4 -5 2 -7z"/><path fill="#F5F5F4" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M133 35l10 -2 8 -5 6 -9 2 -9 -2 -10 -6 -8 -8 -5 -10 -2 -178 0 -9 2 -8 5 -6 8 -2 10 2 9 6 9 8 5 9 2z"/></svg>',
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-224 -92 449 183" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#2F2E30" stroke="#1C1C1D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M133 72l18 -3 18 -7 14 -11 12 -15 7 -17 2 -19 -2 -19 -7 -17 -12 -15 -14 -11 -18 -7 -18 -3 -266 0 -18 3 -18 7 -14 11 -12 15 -7 17 -2 19 2 19 7 17 12 15 14 11 18 7 18 3zM-108 0l-1 -6 -2 -6 -4 -6 -5 -4 -6 -2 -7 -1 -6 1 -6 2 -5 4 -4 6 -3 6 -1 6 1 6 3 6 4 6 5 4 6 2 6 1 7 -1 6 -2 5 -4 4 -5 2 -7z"/><path fill="#F4EFEB" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M133 35l10 -2 8 -5 6 -9 2 -9 -2 -10 -6 -8 -8 -5 -10 -2 -178 0 -9 2 -8 5 -6 8 -2 10 2 9 6 9 8 5 9 2z"/></svg>',
         },
       },
     },
@@ -1698,7 +1698,7 @@ export const HOME_DATA: HomeData = {
           minutes: 181,
           changes: 2,
         },
-        estimate: null,
+        priceCents: 4490,
         poster: {
           kind: "hero",
         },
@@ -1712,10 +1712,10 @@ export const HOME_DATA: HomeData = {
           minutes: 24,
           changes: 1,
         },
-        estimate: null,
+        priceCents: 1790,
         poster: {
           kind: "svg",
-          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F5F5F4" stroke="#939392" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#1C1917" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F4EFEB" stroke="#928F8D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#2F2E30" stroke="#1C1C1D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#2F2E30" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
         },
       },
       montagne: {
@@ -1727,7 +1727,7 @@ export const HOME_DATA: HomeData = {
           minutes: 81,
           changes: 3,
         },
-        estimate: null,
+        priceCents: 4990,
         poster: {
           kind: "montagne",
         },
@@ -1741,10 +1741,10 @@ export const HOME_DATA: HomeData = {
           minutes: 11,
           changes: 1,
         },
-        estimate: null,
+        priceCents: 2490,
         poster: {
           kind: "svg",
-          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-224 -92 449 183" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M133 72l18 -3 18 -7 14 -11 12 -15 7 -17 2 -19 -2 -19 -7 -17 -12 -15 -14 -11 -18 -7 -18 -3 -266 0 -18 3 -18 7 -14 11 -12 15 -7 17 -2 19 2 19 7 17 12 15 14 11 18 7 18 3zM-108 0l-1 -6 -2 -6 -4 -6 -5 -4 -6 -2 -7 -1 -6 1 -6 2 -5 4 -4 6 -3 6 -1 6 1 6 3 6 4 6 5 4 6 2 6 1 7 -1 6 -2 5 -4 4 -5 2 -7z"/><path fill="#F5F5F4" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M133 35l10 -2 8 -5 6 -9 2 -9 -2 -10 -6 -8 -8 -5 -10 -2 -178 0 -9 2 -8 5 -6 8 -2 10 2 9 6 9 8 5 9 2z"/></svg>',
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-224 -92 449 183" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#2F2E30" stroke="#1C1C1D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M133 72l18 -3 18 -7 14 -11 12 -15 7 -17 2 -19 -2 -19 -7 -17 -12 -15 -14 -11 -18 -7 -18 -3 -266 0 -18 3 -18 7 -14 11 -12 15 -7 17 -2 19 2 19 7 17 12 15 14 11 18 7 18 3zM-108 0l-1 -6 -2 -6 -4 -6 -5 -4 -6 -2 -7 -1 -6 1 -6 2 -5 4 -4 6 -3 6 -1 6 1 6 3 6 4 6 5 4 6 2 6 1 7 -1 6 -2 5 -4 4 -5 2 -7z"/><path fill="#F4EFEB" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M133 35l10 -2 8 -5 6 -9 2 -9 -2 -10 -6 -8 -8 -5 -10 -2 -178 0 -9 2 -8 5 -6 8 -2 10 2 9 6 9 8 5 9 2z"/></svg>',
         },
       },
     },
@@ -1758,7 +1758,7 @@ export const HOME_DATA: HomeData = {
           minutes: 181,
           changes: 2,
         },
-        estimate: null,
+        priceCents: 4490,
         poster: {
           kind: "hero",
         },
@@ -1772,10 +1772,10 @@ export const HOME_DATA: HomeData = {
           minutes: 24,
           changes: 1,
         },
-        estimate: null,
+        priceCents: 1790,
         poster: {
           kind: "svg",
-          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F5F5F4" stroke="#939392" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#1C1917" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-445 -295 890 590" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#F4EFEB" stroke="#928F8D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M395 275l8 -1 7 -3 6 -5 5 -6 3 -7 1 -8 0 -490 -1 -8 -3 -7 -5 -6 -6 -5 -7 -3 -8 -1 -790 0 -8 1 -7 3 -6 5 -5 6 -3 7 -1 8 0 490 1 8 3 7 5 6 6 5 7 3 8 1z"/><path fill="#2F2E30" stroke="#1C1C1D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M375 -210l-1 -4 -1 -4 -2 -3 -3 -2 -4 -1 -4 -1 -4 1 -3 1 -4 2 -2 3 -1 4 -1 4 1 4 1 3 2 4 4 2 3 1 4 1 4 -1 4 -1 3 -2 2 -4 1 -3z"/><path fill="#2F2E30" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M111 -173l8 -1 6 -4 4 -7 1 -7 -1 -7 -4 -6 -6 -4 -8 -1 -467 0 -7 1 -7 4 -4 6 -1 7 1 7 4 7 7 4 7 1zM-10 -97l6 -1 4 -3 4 -5 1 -6 -1 -5 -4 -5 -4 -3 -6 -1 -351 0 -5 1 -5 3 -3 5 -1 5 1 6 3 5 5 3 5 1zM143 148l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -505 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1zM135 214l5 -1 4 -3 3 -4 1 -5 -1 -5 -3 -4 -4 -3 -5 -1 -497 0 -5 1 -4 3 -3 4 -1 5 1 5 3 4 4 3 5 1z"/></svg>',
         },
       },
       montagne: {
@@ -1787,7 +1787,7 @@ export const HOME_DATA: HomeData = {
           minutes: 81,
           changes: 3,
         },
-        estimate: null,
+        priceCents: 4990,
         poster: {
           kind: "montagne",
         },
@@ -1801,10 +1801,10 @@ export const HOME_DATA: HomeData = {
           minutes: 11,
           changes: 1,
         },
-        estimate: null,
+        priceCents: 2490,
         poster: {
           kind: "svg",
-          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-224 -92 449 183" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#1C1917" stroke="#110F0E" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M133 72l18 -3 18 -7 14 -11 12 -15 7 -17 2 -19 -2 -19 -7 -17 -12 -15 -14 -11 -18 -7 -18 -3 -266 0 -18 3 -18 7 -14 11 -12 15 -7 17 -2 19 2 19 7 17 12 15 14 11 18 7 18 3zM-108 0l-1 -6 -2 -6 -4 -6 -5 -4 -6 -2 -7 -1 -6 1 -6 2 -5 4 -4 6 -3 6 -1 6 1 6 3 6 4 6 5 4 6 2 6 1 7 -1 6 -2 5 -4 4 -5 2 -7z"/><path fill="#F5F5F4" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M133 35l10 -2 8 -5 6 -9 2 -9 -2 -10 -6 -8 -8 -5 -10 -2 -178 0 -9 2 -8 5 -6 8 -2 10 2 9 6 9 8 5 9 2z"/></svg>',
+          svg: '<svg xmlns="http://www.w3.org/2000/svg" class="h-full w-full" viewBox="-224 -92 449 183" preserveAspectRatio="xMidYMid meet" aria-hidden="true" focusable="false"><path fill="#2F2E30" stroke="#1C1C1D" stroke-width="1" stroke-linejoin="round" vector-effect="non-scaling-stroke" fill-rule="evenodd" d="M133 72l18 -3 18 -7 14 -11 12 -15 7 -17 2 -19 -2 -19 -7 -17 -12 -15 -14 -11 -18 -7 -18 -3 -266 0 -18 3 -18 7 -14 11 -12 15 -7 17 -2 19 2 19 7 17 12 15 14 11 18 7 18 3zM-108 0l-1 -6 -2 -6 -4 -6 -5 -4 -6 -2 -7 -1 -6 1 -6 2 -5 4 -4 6 -3 6 -1 6 1 6 3 6 4 6 5 4 6 2 6 1 7 -1 6 -2 5 -4 4 -5 2 -7z"/><path fill="#F4EFEB" fill-opacity="0.55" stroke="none" fill-rule="evenodd" d="M133 35l10 -2 8 -5 6 -9 2 -9 -2 -10 -6 -8 -8 -5 -10 -2 -178 0 -9 2 -8 5 -6 8 -2 10 2 9 6 9 8 5 9 2z"/></svg>',
         },
       },
     },

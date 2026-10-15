@@ -1,9 +1,10 @@
-import { desc, eq, like, or, and, type SQL } from "drizzle-orm";
+import { count, desc, eq, like, or, and, sql, type SQL } from "drizzle-orm";
 import { Search, Truck } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
-import { orders } from "@/db/schema";
+import { uncached } from "@/db/fresh";
+import { orderItems, orders } from "@/db/schema";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { ORDER_STATUSES, ORDER_STATUS_FR, STATUS_STYLE, FIELD } from "../ui";
@@ -13,11 +14,13 @@ export default async function AdminOrdersPage({
   searchParams,
 }: {
   params: Promise<{ locale: Locale }>;
-  searchParams: Promise<{ s?: string; q?: string }>;
+  searchParams: Promise<{ s?: string; q?: string; r?: string }>;
 }) {
   await requireAdmin();
   const { locale } = await params;
-  const { s, q } = await searchParams;
+  const { s, q, r } = await searchParams;
+  // « Studio à relire » : commandes payées dont un texte du Studio attend la relecture.
+  const reviewFilter = r === "studio";
   const statusFilter = (ORDER_STATUSES as readonly string[]).includes(s ?? "")
     ? (s as (typeof ORDER_STATUSES)[number])
     : null;
@@ -30,7 +33,20 @@ export default async function AdminOrdersPage({
     countByStatus.set(row.status, (countByStatus.get(row.status) ?? 0) + 1);
   }
 
+  // `uncached` : la liste doit refléter une relecture posée à l'instant (Hyperdrive met
+  // les SELECT en cache 60 s).
+  const toReview = and(
+    sql`${orders.status} in ('paid', 'in_production')`,
+    sql`exists (select 1 from ${orderItems} where ${orderItems.orderId} = ${orders.id} and ${orderItems.studio} is not null and ${orderItems.studio}->>'reviewedAt' is null)`,
+    uncached,
+  )!;
+  const [{ value: toReviewCount }] = await db
+    .select({ value: count() })
+    .from(orders)
+    .where(toReview);
+
   const conditions: SQL[] = [];
+  if (reviewFilter) conditions.push(toReview);
   if (statusFilter) conditions.push(eq(orders.status, statusFilter));
   if (query) {
     conditions.push(
@@ -71,7 +87,7 @@ export default async function AdminOrdersPage({
                 },
               }}
               className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
-                statusFilter === c.value
+                !reviewFilter && statusFilter === c.value
                   ? "bg-ink text-paper"
                   : "border border-line bg-surface text-soft hover:text-ink"
               }`}
@@ -80,6 +96,21 @@ export default async function AdminOrdersPage({
               <span className="ml-1.5 font-normal tabular-nums">{c.count}</span>
             </Link>
           ))}
+          {toReviewCount > 0 || reviewFilter ? (
+            <Link
+              href={{ pathname: "/admin/orders", query: { r: "studio" } }}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-semibold transition-colors ${
+                reviewFilter
+                  ? "bg-ink text-paper"
+                  : "border border-amber-500/50 bg-amber-500/10 text-amber-900 hover:text-ink dark:text-amber-200"
+              }`}
+            >
+              Studio à relire
+              <span className="ml-1.5 font-normal tabular-nums">
+                {toReviewCount}
+              </span>
+            </Link>
+          ) : null}
         </div>
         <form className="relative" action="">
           {statusFilter && (
@@ -100,7 +131,7 @@ export default async function AdminOrdersPage({
 
       {rows.length === 0 ? (
         <p className="rounded-card border border-line bg-surface p-10 text-center text-soft">
-          {query || statusFilter
+          {query || statusFilter || reviewFilter
             ? "Aucune commande ne correspond à ces critères."
             : "Aucune commande pour l'instant."}
         </p>

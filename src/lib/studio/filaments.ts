@@ -1,31 +1,98 @@
-// Palette de filaments du Studio (brief « Strates », §2.1 : « Palette de
-// filaments du Studio (données, pas jetons) »). Les teintes sont INDICATIVES
-// tant que le propriétaire n'a pas fourni l'inventaire réel des bobines
-// (§11.2) : l'interface affiche alors « Teintes indicatives, couleur finale
-// selon les bobines en stock ». Les NOMS sont traduits dans le namespace
-// `studioCore` (filaments.<id>) ; ce fichier ne porte que l'identifiant, la
-// teinte et l'état commercial.
+// Palette de filaments du Studio : des bobines RÉELLES, la gamme Polymaker
+// Panchroma Matte (ex-PolyTerra, PLA mat). Décision du propriétaire du 14.10.2026 :
+// les couleurs proposées sur le site sont EXACTEMENT les hex officiels de
+// Polymaker (wiki Polymaker, « HEX Codes and Transmission Distances »), au
+// caractère près. Les NOMS du Studio (Blanc névé, Encre…) restent, traduits dans
+// le namespace `studioCore` (filaments.<id>) ; ce fichier porte l'identifiant, la
+// teinte, la bobine (marque, gamme, nom officiel : l'atelier sait quelle bobine
+// charger) et l'état commercial.
+//
+// RÈGLE : partout où une couleur de filament est AFFICHÉE (pastille, puce,
+// aplat d'un poster, couleur de base du matériau 3D), c'est `filamentHex()`
+// tel quel, sans `tint`, `shade`, transparence ni filtre. `shade` et `tint`
+// ne servent qu'aux FILETS des posters (strates, contours), jamais à une pastille
+// ni à un aplat de bande (filaments.test.ts le vérifie).
 import type { FilamentId } from "./types";
 
 export interface FilamentInfo {
   id: FilamentId;
-  /** Teinte d'affichage (sRGB). Indicative : la couleur finale dépend de la bobine. */
+  /** Teinte officielle du fabricant (sRGB, #RRGGBB) : la couleur affichée, sans transformation. */
   hex: string;
-  /** Vrai tant que l'inventaire réel n'est pas validé (toutes les teintes aujourd'hui). */
+  /** Marque de la bobine. */
+  brand: "Polymaker";
+  /** Gamme de la bobine. */
+  range: "Panchroma Matte";
+  /** Nom officiel de la couleur chez le fabricant. */
+  officialName: string;
+  /** Vrai : la teinte à l'écran reste approximative (écran, éclairage), la bobine fait foi. */
   indicative: true;
   /** Déjà vendu dans la boutique (« Blanc », « Noir ») ; sinon à confirmer. */
   sold: boolean;
 }
 
+const POLYMAKER = {
+  brand: "Polymaker",
+  range: "Panchroma Matte",
+  indicative: true,
+} as const;
+
 export const FILAMENTS: readonly FilamentInfo[] = [
-  { id: "blanc-neve", hex: "#F5F5F4", indicative: true, sold: true },
-  { id: "encre", hex: "#1C1917", indicative: true, sold: true },
-  { id: "rouge-signal", hex: "#E5231C", indicative: true, sold: false },
-  { id: "bleu-leman", hex: "#2E6A9E", indicative: true, sold: false },
-  { id: "vert-lavaux", hex: "#5E7F3A", indicative: true, sold: false },
-  { id: "gris-molasse", hex: "#8C8A85", indicative: true, sold: false },
-  { id: "ambre", hex: "#D98E1F", indicative: true, sold: false },
-  { id: "glacier", hex: "#9CC3DA", indicative: true, sold: false },
+  {
+    id: "blanc-neve",
+    hex: "#F4EFEB",
+    officialName: "Matte Cotton White",
+    sold: true,
+    ...POLYMAKER,
+  },
+  {
+    id: "encre",
+    hex: "#2F2E30",
+    officialName: "Matte Charcoal Black",
+    sold: true,
+    ...POLYMAKER,
+  },
+  {
+    id: "rouge-signal",
+    hex: "#ED2F2E",
+    officialName: "Matte Lava Red",
+    sold: false,
+    ...POLYMAKER,
+  },
+  {
+    id: "bleu-leman",
+    hex: "#0163A6",
+    officialName: "Matte Sapphire Blue",
+    sold: false,
+    ...POLYMAKER,
+  },
+  {
+    id: "vert-lavaux",
+    hex: "#5F6244",
+    officialName: "Matte Army Dark Green",
+    sold: false,
+    ...POLYMAKER,
+  },
+  {
+    id: "gris-molasse",
+    hex: "#8A8C94",
+    officialName: "Matte Fossil Grey",
+    sold: false,
+    ...POLYMAKER,
+  },
+  {
+    id: "ambre",
+    hex: "#F88B17",
+    officialName: "Matte Sunrise Orange",
+    sold: false,
+    ...POLYMAKER,
+  },
+  {
+    id: "glacier",
+    hex: "#A4D0DF",
+    officialName: "Matte Pastel Ice",
+    sold: false,
+    ...POLYMAKER,
+  },
 ];
 
 export const FILAMENT_IDS: readonly FilamentId[] = FILAMENTS.map((f) => f.id);
@@ -57,7 +124,7 @@ export function hexToRgb(hex: string): [number, number, number] {
   return [(n >> 16) & 255, (n >> 8) & 255, n & 255];
 }
 
-/** `#RRGGBB` assombri de `amount` (0–1), vers le noir : filet des posters « strates ». */
+/** `#RRGGBB` assombri de `amount` (0–1), vers le noir : FILET des posters « strates » seulement (jamais une pastille ni un aplat). */
 export function shade(hex: string, amount: number): string {
   const [r, g, b] = hexToRgb(hex);
   const k = 1 - Math.min(Math.max(amount, 0), 1);
@@ -68,7 +135,7 @@ export function shade(hex: string, amount: number): string {
   return `#${to(r)}${to(g)}${to(b)}`.toUpperCase();
 }
 
-/** `#RRGGBB` éclairci de `amount` (0–1), vers le blanc. */
+/** `#RRGGBB` éclairci de `amount` (0–1), vers le blanc : filet d'un poster en thème sombre seulement (jamais une pastille ni un aplat). */
 export function tint(hex: string, amount: number): string {
   const [r, g, b] = hexToRgb(hex);
   const k = Math.min(Math.max(amount, 0), 1);

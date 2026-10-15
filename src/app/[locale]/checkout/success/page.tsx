@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
 import { getCloudflareContext } from "@opennextjs/cloudflare";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import type Stripe from "stripe";
 import { getDb } from "@/db";
 import { orderItems, orders } from "@/db/schema";
@@ -37,6 +37,8 @@ async function orderCompletedProperties(
         db
           .select({
             productId: orderItems.productId,
+            // Objet du Studio : seulement l'objet (jamais la configuration ni les textes).
+            studioObject: sql<string | null>`${orderItems.studio}->>'object'`,
             name: orderItems.nameSnapshot,
             color: orderItems.colorName,
             priceCents: orderItems.priceCentsSnapshot,
@@ -59,8 +61,11 @@ async function orderCompletedProperties(
     shipping: chf(session.total_details?.amount_shipping ?? 0),
     discount: chf(session.total_details?.amount_discount ?? 0),
     currency: (session.currency ?? "chf").toUpperCase(),
+    has_studio: items.some((i) => i.studioObject !== null),
     products: items.map((i) => ({
-      product_id: i.productId,
+      product_id:
+        i.productId ?? (i.studioObject ? `studio:${i.studioObject}` : null),
+      ...(i.studioObject ? { object: i.studioObject, source: "studio" } : {}),
       name: i.name,
       variant: i.color ?? undefined,
       price: chf(i.priceCents),

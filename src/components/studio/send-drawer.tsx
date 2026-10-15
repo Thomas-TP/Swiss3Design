@@ -20,11 +20,7 @@ import { SiteLink } from "@/components/ui/site-link";
 import { Field, fieldClass, fieldIds } from "@/components/ui/field";
 import { useRouter } from "@/i18n/navigation";
 import { writeQuoteHandoff } from "@/lib/quote-handoff";
-import {
-  formatChfRange,
-  formatDuration,
-  formatGrams,
-} from "@/lib/studio/format";
+import { formatDuration, formatGrams } from "@/lib/studio/format";
 import { clearStudioTexts } from "@/lib/studio/texts-store";
 import type { StudioObjectId } from "@/lib/studio/types";
 import { hasTextFields, printedTexts } from "./objects";
@@ -216,16 +212,12 @@ function SendBodyImpl({
     colors: quoteColors(input),
     dimensions: quoteDimensions(input),
   };
-  const price = stats.estimate
-    ? `${formatChfRange(stats.estimate.lowCents, stats.estimate.highCents, locale)} · ${t("sheet.estimate")}`
-    : core("measure.priceLater");
   const lines = [
     plain(quoteDimensions(input)),
     plain(`${t("send.colors")} ${names.join(", ")}`),
     plain(
       `≈ ${formatGrams(stats.grams, locale)} · ≈ ${formatDuration(stats.minutes, locale)} · ${core("units.changes", { count: stats.changes })}`,
     ),
-    price,
     ...(typed.length > 0 ? [plain(textsLine(input))] : []),
   ];
 
@@ -237,7 +229,6 @@ function SendBodyImpl({
         locale,
         object,
         bands: input.bands.bands.length,
-        estimate: stats.estimate,
         messages: {
           engine: t("send.errors.engine"),
           export: t("send.errors.export"),

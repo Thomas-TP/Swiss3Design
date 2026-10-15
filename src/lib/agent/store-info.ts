@@ -29,6 +29,9 @@ export async function getStoreInfo(locale: Locale) {
     shipping: {
       countries: ["CH"],
       carrier: "Swiss Post",
+      // Depuis le 14.10.2026 : livraison offerte partout en Suisse, sans minimum
+      // (réglages de l'admin : port 0). Les montants restent lus en base.
+      free: shipping.shippingCents === 0,
       flatRate: price(shipping.shippingCents),
       freeFrom: price(shipping.freeOverCents),
       inStockDispatch: "1–3 working days",
@@ -55,6 +58,16 @@ export async function getStoreInfo(locale: Locale) {
       acp: `${SITE_URL}/.well-known/acp.json`,
       ucp: `${SITE_URL}/.well-known/ucp`,
       guide: `${SITE_URL}/agents.md`,
+    },
+    // Studio : objets originaux personnalisables, achetés DIRECTEMENT dans le
+    // navigateur (panier puis paiement). Hors périmètre des achats d'agent.
+    studio: {
+      url: page("/studio"),
+      purchase:
+        "Four original objects (vase, business card, mountain, name tag) customised in 3D and bought directly in the browser: firm price shown live, delivery included, free shipping in Switzerland, 1 to 20 pieces per line. Agents cannot buy Studio objects: give the customer the configuration link (tool studio_configure).",
+      texts:
+        "A human reads every printed text before printing; a refused text (third-party brand, insult, unlawful content) means the order is cancelled and fully refunded.",
+      quote: "More than 20 pieces or a special request: ask for a quote.",
     },
     customPrinting: {
       description:

@@ -7,24 +7,24 @@
   "seo": {
     "index": {
       "title": "The Studio: customise your 3D object",
-      "description": "Four objects to customise in 3D: vase, business card, mountain, name tag. Up to four colors, printed in Switzerland, firm price within 48 hours."
+      "description": "Four objects to customise in 3D: vase, business card, mountain, name holder. Up to four colours, printed in Switzerland, firm price, free delivery."
     },
     "objects": {
       "lavaux": {
         "title": "Custom Lavaux vase, in 3D",
-        "description": "Customise the profile, pattern and up to four colors of your Lavaux vase, check it in 3D and send it: printed in Switzerland, firm price within 48 hours."
+        "description": "Customise the profile, pattern and up to four colours of your Lavaux vase, check it in 3D, then order it: printed in Switzerland, firm price, free delivery."
       },
       "cartouche": {
         "title": "Cartouche 3D business card",
-        "description": "Your 85 × 55 mm business card, embossed or engraved, two colors, your own text: customise it in 3D, printed in Switzerland, firm price within 48 hours."
+        "description": "Your 85 × 55 mm business card in relief or engraved, two colours, your own text: customise it in 3D and order it. Printed in Switzerland, firm price, free delivery."
       },
       "montagne": {
         "title": "Custom mountain, colored by altitude",
-        "description": "A small mountain for your desk, up to 12 cm tall, colored by altitude, with your name on the plinth. Printed in Switzerland, firm price within 48 hours."
+        "description": "A small mountain for your desk, up to 12 cm, coloured by altitude, your name on the plinth. Printed in Switzerland, firm price, free delivery."
       },
       "borne": {
         "title": "Borne two-color name tag",
-        "description": "A two-color name tag with your own text, embossed or engraved, ring on the left or right. Customised in 3D, printed in Switzerland, firm price within 48 hours."
+        "description": "A two-colour name holder with your text, in relief or engraved, ring on the left or right. Customised in 3D, printed in Switzerland, firm price, free delivery."
       }
     }
   },
@@ -32,8 +32,9 @@
     "eyebrow": "3D configurator",
     "title": "The Studio",
     "intro": "Customise it. We print it.",
-    "lead": "Four objects designed by the workshop, limited so they print on our machines. Customise the shape, the colors and the text, check the numbers, then send it: the workshop reviews every request and replies within 48 hours with a firm price.",
-    "adjust": "Customise"
+    "lead": "Four objects designed by the workshop, limited so they print on our machines. Customise the shape, colours and text, check the figures, then order: firm price, free delivery in Switzerland.",
+    "adjust": "Customise",
+    "startPrice": "Starting configuration: {price}"
   },
   "how": {
     "title": "How it works",
@@ -47,12 +48,12 @@
         "text": "Dimensions, grams, time and printability are really calculated, not guessed."
       },
       "send": {
-        "title": "Send",
-        "text": "Your customisation goes to the workshop with its print file. Nothing is paid at this stage."
+        "title": "Order",
+        "text": "Add it to your cart and pay online: firm price, free delivery in Switzerland."
       },
       "receive": {
         "title": "Receive",
-        "text": "The workshop reviews your piece and replies within 48 hours with a firm price, payable online."
+        "text": "A person reads your text, then the workshop prints your piece and ships it with Swiss Post."
       }
     }
   },
@@ -65,19 +66,19 @@
       },
       "price": {
         "q": "How much does it cost?",
-        "a": "The firm price is confirmed by the workshop within 48 hours, after it reviews your piece. It depends on the material, the print time and the number of color changes. Nothing is charged before this confirmation."
+        "a": "The price is firm and delivery is included: it updates live in the Studio and depends on the object, the material, the number of colour changes and the quantity (1 to 20 pieces; the larger the quantity, the lower the price per piece). You pay online exactly the price shown."
       },
       "text": {
         "q": "Is my text reviewed?",
-        "a": "Yes. A person at the workshop reads every text before printing. We refuse third-party brands, insults and unlawful content. Your text never appears in the page address or in the links you copy."
+        "a": "Yes. A person at the workshop reads every text before printing, within 2 working days. We refuse third-party brands, insults and unlawful content: in that case the order is cancelled and you are refunded in full. Your text never appears in the page address or in the links you copy."
       },
       "colors": {
         "q": "How are the colors printed?",
-        "a": "With filament changes at set heights, up to four filaments: this is what the workshop sets up in its slicer. The colors shown are indicative, the final color depends on the spool in stock."
+        "a": "By changing filament at set heights, with up to four Polymaker Panchroma Matte filaments: this is what the workshop programs in its slicing software. The shade shown is the manufacturer's; it stays approximate on screen, the spool is what counts."
       },
       "after": {
-        "q": "What happens after I send it?",
-        "a": "The workshop checks your file and replies by e-mail within 48 hours with a firm price. You follow the request in your account, then pay online; the piece is printed and shipped within Switzerland."
+        "q": "What happens after I order?",
+        "a": "You receive a confirmation e-mail with your texts. The workshop reads the texts, prints your piece to order (the Studio has no stock) and ships it with Swiss Post; you follow the order in your account or on the tracking page."
       }
     }
   },
@@ -273,23 +274,21 @@
       "price": "Price"
     },
     "materialValue": "PLA",
-    "estimate": "Estimate · firm price confirmed by the workshop within 48 hours",
-    "indicative": "Indicative colors: the final color depends on the spool in stock."
+    "indicative": "Polymaker Panchroma Matte filament: the on-screen shade is approximate.",
+    "firm": "firm price, free delivery"
   },
   "summary": {
     "lavaux": "{name}, {height}, {pattern}, {count, plural, one {# color} other {# colors}}: {colors}; {status}.",
     "flat": "{name}, {dimensions}, {count, plural, one {# color} other {# colors}}: {colors}; text: {text}; {status}."
   },
   "send": {
-    "title": "Send to the workshop",
-    "intro": "The workshop reviews your piece and replies within 48 hours with a firm price. Nothing is paid now.",
-    "cta": "Send to the workshop",
+    "title": "Quote request",
+    "intro": "More than 20 pieces or a special request? The workshop reads your request and replies within 48 hours with a quote. Nothing is paid now.",
     "noscript": "Request a quote",
     "noscriptNote": "Without JavaScript, apply your customisation then copy it into your quote request: the workshop prepares the file for you.",
     "machineLine": "Customisation to paste into the request",
     "blocked": "Fix the points flagged in the specs first.",
     "needText": "Enter at least one character: {field}.",
-    "estimateNote": "Estimate · firm price confirmed by the workshop within 48 hours.",
     "colors": "Colors:",
     "quantity": "Quantity",
     "quantityHint": "From 1 to {max} pieces.",
@@ -308,12 +307,11 @@
     "none": "—",
     "labelFictive": "yes, fictional altitude",
     "labelTyped": "yes, typed altitude: {value} m",
-    "indicative": "indicative",
     "title": "[Studio] {object} · configuration v1",
     "link": "Link: {link}",
     "dimensions": "Dimensions: {dimensions} · {layers} · {detail}",
     "colors": "Colors (changes at the layer): {colors}",
-    "estimate": "Estimate shown: {figures}",
+    "estimate": "Figures shown: {figures}",
     "texts": "Texts to print: {texts}",
     "textItem": "{label}: “{value}”",
     "quantity": "Quantity: {count}",
@@ -346,5 +344,23 @@
       "montagne": "Settings: {form} · {style} · steepness {steep} % · seed {seed} · label: {label}",
       "borne": "Settings: shape {shape} · letters {cap} · ring {ring} · mode {mode}"
     }
+  },
+  "buy": {
+    "cta": "Add to cart",
+    "update": "Update cart",
+    "quantity": "Quantity",
+    "decrease": "One fewer",
+    "increase": "One more",
+    "unit": "{price} each",
+    "freeShipping": "Free delivery in Switzerland",
+    "firm": "Firm price, delivery included.",
+    "added": "Added to your cart.",
+    "updated": "Cart updated.",
+    "viewCart": "View cart",
+    "editing": "You are editing a line of your cart.",
+    "cancelEdit": "Cancel editing",
+    "quoteLead": "A special request?",
+    "quoteLink": "Request a quote",
+    "quoteHint": "More than {max} pieces, another material or a special request: the workshop replies with a quote."
   }
 }

@@ -24,7 +24,7 @@ import {
 // repart jamais, un « Réessayer » après une erreur de la Server Action non plus.
 //
 // Aucun texte saisi dans l'événement `Studio Sent` : l'objet, le nombre de
-// bandes, la taille du fichier et, si elle est affichée, l'estimation (§4.10).
+// bandes et la taille du fichier (§4.10).
 
 /** Erreur dont le message est déjà rédigé pour le visiteur (convention de quote-logic.ts). */
 export class StudioSendError extends Error {
@@ -57,7 +57,6 @@ export interface PrepareInput {
   locale: string;
   object: StudioObjectId;
   bands: number;
-  estimate?: { lowCents: number; highCents: number } | null;
   messages: { engine: string; export: string };
   onProgress: (progress: PrepareProgress) => void;
 }
@@ -165,12 +164,6 @@ export async function prepareStudioFile(
     bands: input.bands,
     triangles: exported.triangles,
     bytes: exported.bytes,
-    ...(input.estimate
-      ? {
-          estimate_low: input.estimate.lowCents / 100,
-          estimate_high: input.estimate.highCents / 100,
-        }
-      : {}),
   });
   return {
     key: uploaded.key,

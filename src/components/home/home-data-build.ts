@@ -29,6 +29,7 @@ import {
   MONTAGNE_DEFAULT,
   heroVariant,
 } from "@/lib/studio/presets";
+import { studioPrice } from "@/lib/studio/price-figures";
 import { computeStats } from "@/lib/studio/stats";
 import { configFragment } from "@/lib/studio/url-state";
 import type { StudioObjectId, StudioTexts } from "@/lib/studio/types";
@@ -168,7 +169,10 @@ export function buildHomeData(): HomeData {
       const stats = computeStats(DEFAULT_CONFIGS[id], texts, undefined, locale);
       objects[locale][id] = {
         stats: figuresOf(stats),
-        estimate: stats.estimate ?? null,
+        priceCents: studioPrice(DEFAULT_CONFIGS[id], texts, 1, {
+          locale,
+          stats,
+        }).unitCents,
         poster: posters[id],
       };
     }

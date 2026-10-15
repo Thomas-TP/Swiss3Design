@@ -16,7 +16,7 @@ import type {
   PostHogConfig,
   Properties,
 } from "posthog-js";
-import type { CartItem } from "./cart-data";
+import type { CartItem, CartLine, StudioCartItem } from "./cart-data";
 import type { StudioObjectId } from "./studio/types";
 import {
   ANALYTICS_HOSTNAME,
@@ -321,14 +321,12 @@ export interface TrackedEvents {
   "Studio Viewed": { object: StudioObjectId };
   /** Premier réglage par objet et par session. */
   "Studio Configured": { object: StudioObjectId; control: string };
-  /** Upload réussi, avant la Server Action ; estimation en CHF décimaux, si affichée. */
+  /** Upload réussi, avant la Server Action (demande de devis particulière). */
   "Studio Sent": {
     object: StudioObjectId;
     bands: number;
     triangles: number;
     bytes: number;
-    estimate_low?: number;
-    estimate_high?: number;
   };
   "Studio Link Copied": { object: StudioObjectId };
   "Studio Saved": { object: StudioObjectId };
@@ -451,10 +449,41 @@ export function productProperties(item: ProductLike): Properties {
   };
 }
 
-export function cartProperties(items: CartItem[]): Properties {
+/** Noms d'objet du Studio dans les événements (anglais, stables : ce ne sont jamais des textes saisis). */
+const STUDIO_PRODUCT_NAMES: Record<StudioObjectId, string> = {
+  lavaux: "Lavaux vase",
+  cartouche: "Cartouche business card",
+  montagne: "Montagne",
+  borne: "Borne name holder",
+};
+
+/**
+ * Propriétés e-commerce d'une ligne du Studio : l'objet, le prix, la quantité.
+ * JAMAIS un texte saisi, une configuration ou une empreinte (règle du §4.10).
+ */
+export function studioProductProperties(
+  item: Pick<StudioCartItem, "object" | "priceCents" | "quantity">,
+): Properties {
+  return {
+    product_id: `studio:${item.object}`,
+    sku: `studio-${item.object}`,
+    name: STUDIO_PRODUCT_NAMES[item.object],
+    price: chf(item.priceCents),
+    quantity: item.quantity,
+    currency: "CHF",
+    sale_type: "on_demand",
+    object: item.object,
+  };
+}
+
+export function cartProperties(items: CartLine[]): Properties {
   const cents = items.reduce((sum, i) => sum + i.priceCents * i.quantity, 0);
   return {
-    products: items.map(productProperties),
+    products: items.map((i) =>
+      "kind" in i && i.kind === "studio"
+        ? studioProductProperties(i)
+        : productProperties(i as CartItem),
+    ),
     value: chf(cents),
     currency: "CHF",
     quantity: items.reduce((sum, i) => sum + i.quantity, 0),

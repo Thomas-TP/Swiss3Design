@@ -62,7 +62,8 @@
     "error": "Ein Fehler ist aufgetreten, bitte erneut versuchen.",
     "verifyNotice": "Bestätigen Sie Ihre E-Mail-Adresse, um Ihren Warenkorb auf einem anderen Gerät zu erhalten.",
     "restored": "Warenkorb mit aktuellen Preisen und Verfügbarkeiten wiederhergestellt. Ihre anderen Artikel bleiben erhalten.",
-    "restoreError": "Dieser Warenkorb kann nicht mehr wiederhergestellt werden. Verfügbare Artikel finden Sie im Katalog."
+    "restoreError": "Dieser Warenkorb kann nicht mehr wiederhergestellt werden. Verfügbare Artikel finden Sie im Katalog.",
+    "studioNote": "Objekte aus dem Studio sind nicht im Erinnerungs-E-Mail enthalten: Sie enthalten Ihre persönlichen Texte, die wir nicht speichern."
   },
   "cart": {
     "title": "Warenkorb",
@@ -130,7 +131,9 @@
     "paymentReassurance": "Verschlüsselte Zahlung. Ihre Kartendaten erreichen unsere Server nie.",
     "errorStock": "Der verfügbare Bestand hat sich geändert. Passen Sie die Mengen im Warenkorb an.",
     "errorVerifyAgain": "Bestätigen Sie Ihre E-Mail-Adresse erneut, bevor Sie bezahlen.",
-    "errorProductChanged": "Ein Artikel oder eine Option hat sich geändert. Wählen Sie ihn auf der Produktseite erneut aus."
+    "errorProductChanged": "Ein Artikel oder eine Option hat sich geändert. Wählen Sie ihn auf der Produktseite erneut aus.",
+    "errorStudioPrice": "Der Preis eines Studio-Objekts wurde aktualisiert. Prüfen Sie den Gesamtbetrag und bestätigen Sie erneut.",
+    "errorStudioInvalid": "Ein Studio-Objekt in Ihrem Warenkorb kann so nicht gedruckt werden. Öffnen Sie es im Warenkorb erneut im Studio."
   },
   "orderSuccess": {
     "processingTitle": "Zahlung in Bearbeitung",

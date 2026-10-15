@@ -71,6 +71,15 @@ const cents = Math.round(parseFloat(raw.replace(",", ".")) * 100);
 Format for display with the helpers in [`src/lib/format.ts`](../src/lib/format.ts)
 (CHF formatting, locale-aware) — don't hand-roll `toFixed`.
 
+**Studio prices** ([`src/lib/studio/price.ts`](../src/lib/studio/price.ts)) are
+computed in **integer arithmetic** (grams × 10, centimes × q), never with a float
+rounding: the browser and the Worker must agree to the centime. The module is
+deliberately light (no `computeStats`, no geometry) so the browser cart can
+re-price a quantity; `price-figures.ts` is the bridge to `computeStats`, always in
+`PRICE_LOCALE`. A price shown to the customer is never the amount that is charged:
+`POST /api/checkout` recomputes it, and a mismatch is a 409 `price_changed` that
+carries the server prices (never a silent charge).
+
 ## Snapshots — never "fix" history
 
 `order_items` and paid quotes freeze `nameSnapshot`, `priceCentsSnapshot`,

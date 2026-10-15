@@ -197,6 +197,40 @@ the redesign; the rules that keep production safe are golden rules 10 and 11 of
    no second stock, discount or e-mail effect. E-mail transport failures remain in
    the persistent outbox for the maintenance job.
 
+### Studio direct purchase (14.10.2026)
+
+Studio objects are bought through the cart and the normal checkout; the quote
+flow stays for more than 20 pieces or special requests (secondary link).
+
+1. **Price.** `src/lib/studio/price.ts` (pure, integer centimes): per line of
+   quantity q, `gross per piece = (F + changes × 150) / q + U + grams × r`; one
+   piece rounds to the nearest « ,90 », q ≥ 2 to 10 centimes; total = unit × q.
+   Same function in the browser and on the server; Montagne figures are computed
+   with the canonical language (the altitude label changes grams by language).
+2. **Cart.** `s3d-cart-v1` holds product lines and `StudioCartItem` lines
+   (`kind: "studio"`: object, config, typed texts, quantity, display price,
+   `addedAt`, 30-day expiry). The line identity is the fingerprint of config + texts
+   (`line-id.ts`). `parseCart` stays product-only: abandoned-cart reminders never
+   store a Studio line (typed texts are personal data).
+3. **Checkout** (`api/checkout`). The body mixes product items and
+   `kind: "studio"` items. Steps: resume an existing attempt (fingerprint holds
+   only a SHA-256 digest of Studio lines) → `resolveStudioLines` (schema, canonical
+   config, texts, guards, price; 400 / 422 / 409 `price_changed`) → product lines
+   (stock reserved) → subtotal, shipping on the **shop part only**
+   (`shippingForOrder`), discount on the full subtotal → one transaction inserting
+   `orders` + `order_items` (Studio lines: `product_id` null, `studio` jsonb, no stock) →
+   Checkout Session with one line (order total); Stripe metadata only holds
+   `orderId`/`orderNumber`.
+4. **Payment.** Webhook and success page are unchanged (`markOrderPaid` idempotent:
+   amount check, `paidAt`, outbox keys). Emails list the typed texts (escaped).
+5. **After payment.** The workshop reads the typed texts within 2 working days
+   (CGV): admin order page → « Textes relus » sets `studio.reviewedAt` (`in_production`
+   is refused before) or « Refuser le texte et annuler » cancels the order and
+   sends the dedicated email; the refund is made by hand in Stripe (runbook). The STL
+   is generated in the admin's browser from the stored config
+   (`order-stl.ts`, loaded through `studio-stl-gate.tsx` so geometry stays out of the
+   Worker). Admin list filter: « Studio à relire ».
+
 ### Quote lifecycle
 
 Customer submits `/custom` (file → R2 via `/api/quote-upload`) **or sends a

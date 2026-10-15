@@ -149,6 +149,13 @@ describe("flux CSV Stripe", () => {
     );
   });
 
+  it("livraison offerte partout (port à 0) : port à 0.00 CHF et aucun seuil à annoncer", () => {
+    const free = { shippingCents: 0, freeOverCents: 0 };
+    const row = productFeedRow(index.get("vase-spirale--noir")!, free);
+    expect(row.shipping).toBe("CH:ALL:Poste suisse:4-8:0.00 CHF");
+    expect(row.free_shipping_threshold).toBeNull();
+  });
+
   it("déclare port, seuil de gratuité, taxe et stock non suivi", () => {
     const row = productFeedRow(index.get("vase-spirale--noir")!, rule);
     expect(row.price).toBe("24.00 CHF");

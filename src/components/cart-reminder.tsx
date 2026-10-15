@@ -19,7 +19,9 @@ import { useCart } from "@/lib/cart";
 export function CartReminder() {
   const t = useTranslations("cartReminder");
   const locale = useLocale();
-  const { items } = useCart();
+  // `items` = les lignes PRODUIT seulement : les objets du Studio (textes
+  // personnels) ne partent jamais vers les relances de panier.
+  const { items, studioItems } = useCart();
   const { data: session } = useSession();
   const [proof, setProof] = useState<EmailProof | null>(null);
   const email = session?.user.emailVerified ? session.user.email : proof?.email;
@@ -76,6 +78,9 @@ export function CartReminder() {
           notice={t("verifyNotice")}
           next="/cart"
         />
+      )}
+      {studioItems.length > 0 && (
+        <p className="mt-3 text-sm text-soft">{t("studioNote")}</p>
       )}
       <label className="mt-3 flex cursor-pointer items-start gap-2.5 text-sm text-soft">
         <input

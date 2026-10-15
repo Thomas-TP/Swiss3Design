@@ -1,6 +1,7 @@
 // Templates d'e-mails transactionnels — HTML inline, sobres, aux couleurs du site.
 // Chaque template existe en FR/DE/IT/EN et suit la locale du client.
 
+import { readStudioOrderLine } from "@/lib/studio/order-line";
 import type { EmailMessage } from "./email";
 
 type Locale = "fr" | "de" | "it" | "en";
@@ -198,6 +199,72 @@ export function abandonedCartEmail(params: {
   };
 }
 
+// ── Objets du Studio dans les e-mails de commande ────────────────────────────
+// Le libellé d'une ligne (nameSnapshot) n'a aucun texte saisi. Les textes à
+// imprimer, eux, sont affichés au CLIENT dans sa confirmation (il repère une
+// faute avant l'impression) et à l'ATELIER dans la notification : toujours
+// échappés (`esc`), ce sont des chaînes saisies librement.
+const STUDIO_FIELD_LABELS: Record<Locale, Record<string, string>> = {
+  fr: {
+    name: "Nom",
+    role: "Fonction",
+    line1: "Ligne 1",
+    line2: "Ligne 2",
+    peak: "Nom de la montagne",
+    text: "Texte",
+  },
+  de: {
+    name: "Name",
+    role: "Funktion",
+    line1: "Zeile 1",
+    line2: "Zeile 2",
+    peak: "Name des Bergs",
+    text: "Text",
+  },
+  it: {
+    name: "Nome",
+    role: "Funzione",
+    line1: "Riga 1",
+    line2: "Riga 2",
+    peak: "Nome della montagna",
+    text: "Testo",
+  },
+  en: {
+    name: "Name",
+    role: "Role",
+    line1: "Line 1",
+    line2: "Line 2",
+    peak: "Mountain name",
+    text: "Text",
+  },
+};
+
+const STUDIO_ORDER_NOTE: Record<Locale, string> = {
+  fr: "Les objets du Studio sont fabriqués sur commande. Un humain de l'atelier relit chaque texte avant l'impression ; si un texte est refusé (marque de tiers, injure, contenu illicite), la commande est annulée et vous êtes remboursé intégralement.",
+  de: "Studio-Objekte werden auf Bestellung gefertigt. Ein Mitarbeiter der Werkstatt liest jeden Text vor dem Druck gegen; wird ein Text abgelehnt (Fremdmarke, Beleidigung, rechtswidriger Inhalt), wird die Bestellung storniert und Ihnen der volle Betrag erstattet.",
+  it: "Gli oggetti dello Studio sono realizzati su ordinazione. Una persona del laboratorio rilegge ogni testo prima della stampa; se un testo viene rifiutato (marchio di terzi, ingiuria, contenuto illecito), l'ordine è annullato e Lei è rimborsato integralmente.",
+  en: "Studio objects are made to order. A person at the workshop reads every text before printing; if a text is refused (third-party brand, insult, unlawful content), the order is cancelled and you are refunded in full.",
+};
+
+/** Textes à imprimer d'une ligne du Studio (échappés), ou "" si la ligne n'en porte pas. */
+function studioTextsHtml(item: ItemForEmail, locale: Locale): string {
+  const studio = readStudioOrderLine(item.studio);
+  if (!studio) return "";
+  const labels = STUDIO_FIELD_LABELS[locale];
+  const parts = Object.entries(studio.texts)
+    .filter(([, value]) => typeof value === "string" && value)
+    .map(
+      ([field, value]) =>
+        `${esc(labels[field] ?? field)} : « ${esc(String(value))} »`,
+    );
+  return parts.length
+    ? `<br/><span style="font-size:12px;color:#78716c;">${parts.join(" · ")}</span>`
+    : "";
+}
+
+const hasStudio = (items: ItemForEmail[]) =>
+  items.some((item) => readStudioOrderLine(item.studio) !== null);
+
 // ── Confirmation de commande ─────────────────────────────────────────────────
 
 interface OrderForEmail {
@@ -225,6 +292,8 @@ const CHANNEL_LABELS: Record<string, string> = {
 };
 
 interface ItemForEmail {
+  /** `order_items.studio` (jsonb) : l'objet du Studio acheté, ou null. */
+  studio?: unknown;
   nameSnapshot: string;
   colorName?: string | null;
   colorHex?: string | null;
@@ -319,7 +388,7 @@ export function orderConfirmationEmail(
   const rows = items
     .map(
       (it) => `<tr>
-        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${esc(it.nameSnapshot)}${it.colorName ? ` — <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${esc(it.colorHex ?? "#cccccc")};vertical-align:middle;margin:0 3px 1px 0;"></span>${esc(it.colorName)}` : ""}</td>
+        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${esc(it.nameSnapshot)}${studioTextsHtml(it, locale)}${it.colorName ? ` — <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${esc(it.colorHex ?? "#cccccc")};vertical-align:middle;margin:0 3px 1px 0;"></span>${esc(it.colorName)}` : ""}</td>
         <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;text-align:right;white-space:nowrap;">${chf(it.priceCentsSnapshot * it.quantity)}</td>
       </tr>`,
     )
@@ -359,7 +428,12 @@ export function orderConfirmationEmail(
     <p style="margin:20px 0 0;font-size:13px;color:#78716c;">
       <strong style="color:#1c1917;">${t.address}</strong><br/>
       ${esc(address.name)}<br/>${esc(address.street)}<br/>${esc(address.npa)} ${esc(address.city)}, CH
-    </p>`;
+    </p>
+    ${
+      hasStudio(items)
+        ? `<p style="margin:18px 0 0;padding:12px 16px;background:#f5f5f4;border-radius:10px;font-size:13px;color:#57534e;line-height:1.6;">${STUDIO_ORDER_NOTE[locale]}</p>`
+        : ""
+    }`;
 
   return {
     to: order.email,
@@ -523,14 +597,29 @@ const CANCELLED_TEXTS: Record<
   },
 };
 
-export function orderCancelledEmail(order: OrderForEmail): EmailMessage {
+// Motif d'annulation propre aux objets du Studio : un texte refusé à la relecture.
+const STUDIO_REFUSED: Record<Locale, string> = {
+  fr: "Un texte de votre objet du Studio n'a pas pu être imprimé après relecture (marque de tiers, injure ou contenu illicite). La commande est annulée et vous êtes remboursé intégralement ; le remboursement vous est confirmé séparément. Vous pouvez recommencer dans le Studio avec un autre texte.",
+  de: "Ein Text Ihres Studio-Objekts konnte nach der Durchsicht nicht gedruckt werden (Fremdmarke, Beleidigung oder rechtswidriger Inhalt). Die Bestellung wurde storniert und Ihnen wird der volle Betrag erstattet; die Rückerstattung bestätigen wir Ihnen separat. Sie können im Studio mit einem anderen Text neu beginnen.",
+  it: "Un testo del Suo oggetto dello Studio non ha potuto essere stampato dopo la rilettura (marchio di terzi, ingiuria o contenuto illecito). L'ordine è annullato e Lei viene rimborsato integralmente; il rimborso Le sarà confermato separatamente. Può ricominciare nello Studio con un altro testo.",
+  en: "A text on your Studio object could not be printed after review (third-party brand, insult or unlawful content). The order has been cancelled and you are refunded in full; we will confirm the refund separately. You can start again in the Studio with another text.",
+};
+
+export function orderCancelledEmail(
+  order: OrderForEmail,
+  reason?: "studio-text",
+): EmailMessage {
   const locale = (
     ["fr", "de", "it", "en"].includes(order.locale) ? order.locale : "fr"
   ) as Locale;
   const t = CANCELLED_TEXTS[locale];
   const body = `
     <p style="margin:0 0 16px;color:#44403c;line-height:1.6;">${t.body.replace("{n}", order.orderNumber)}</p>
-    <p style="margin:0;font-size:13px;color:#78716c;line-height:1.6;">${t.refund}</p>`;
+    ${
+      reason === "studio-text"
+        ? `<p style="margin:0 0 16px;color:#44403c;line-height:1.6;">${STUDIO_REFUSED[locale]}</p>`
+        : `<p style="margin:0;font-size:13px;color:#78716c;line-height:1.6;">${t.refund}</p>`
+    }`;
   return {
     to: order.email,
     from: FROM_ORDERS,
@@ -740,7 +829,7 @@ export function adminNewOrderEmail(
   const rows = items
     .map(
       (it) => `<tr>
-        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${esc(it.nameSnapshot)}${it.colorName ? ` — <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${esc(it.colorHex ?? "#cccccc")};vertical-align:middle;margin:0 3px 1px 0;"></span>${esc(it.colorName)}` : ""}</td>
+        <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;">${it.quantity} × ${esc(it.nameSnapshot)}${studioTextsHtml(it, "fr")}${it.colorName ? ` — <span style="display:inline-block;width:9px;height:9px;border-radius:50%;background:${esc(it.colorHex ?? "#cccccc")};vertical-align:middle;margin:0 3px 1px 0;"></span>${esc(it.colorName)}` : ""}</td>
         <td style="padding:8px 0;border-bottom:1px solid #f5f5f4;text-align:right;white-space:nowrap;">${chf(it.priceCentsSnapshot * it.quantity)}</td>
       </tr>`,
     )
@@ -768,12 +857,22 @@ export function adminNewOrderEmail(
         </p>`
     : "";
 
+  // Objets du Studio : les textes sont à relire AVANT l'impression (CGV : sous
+  // 2 jours ouvrés). Sans relecture posée dans l'admin, la commande ne peut pas
+  // passer en production.
+  const studioReview = hasStudio(items)
+    ? `<p style="margin:0 0 18px;padding:12px 16px;background:#fffbeb;border:1px solid #fde68a;border-radius:10px;font-size:13px;color:#92400e;line-height:1.7;">
+          <strong>⚠ Textes du Studio à relire avant l'impression</strong> (sous 2 jours ouvrés). Refus (marque de tiers, injure, contenu illicite) : annuler la commande et la rembourser intégralement dans Stripe.
+        </p>`
+    : "";
+
   const body = `
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
       Nouvelle commande payée de <strong>${esc(order.email)}</strong> (langue : ${order.locale.toUpperCase()}).
     </p>
     ${channel}
     ${notes}
+    ${studioReview}
     <table style="width:100%;border-collapse:collapse;font-size:14px;">
       ${rows}
       <tr>

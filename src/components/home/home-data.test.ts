@@ -25,10 +25,14 @@ describe("données précalculées de l'accueil", () => {
     }
   });
 
-  it("aucun prix tant que le barème n'est pas validé (« Sur devis »)", () => {
+  it("chaque carte porte le prix ferme de sa configuration de départ (une pièce, au « ,90 »)", () => {
     for (const locale of ["fr", "de", "it", "en"] as const)
       for (const id of ["lavaux", "cartouche", "montagne", "borne"] as const)
-        expect(HOME_DATA.objects[locale][id].estimate).toBeNull();
+        expect(HOME_DATA.objects[locale][id].priceCents % 100).toBe(90);
+    expect(HOME_DATA.objects.fr.lavaux.priceCents).toBe(4490);
+    expect(HOME_DATA.objects.fr.cartouche.priceCents).toBe(1790);
+    expect(HOME_DATA.objects.fr.montagne.priceCents).toBe(4990);
+    expect(HOME_DATA.objects.fr.borne.priceCents).toBe(2490);
   });
 
   it("le lien du sous-verre porte la configuration, jamais un texte", () => {

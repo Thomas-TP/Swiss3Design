@@ -151,7 +151,11 @@ export function productFeedRow(sku: SellableSku, rule: ShippingRule) {
     shipping: `CH:ALL:${SHIPPING_SERVICE}:${days.min}-${days.max}:${money(rule.shippingCents)}`,
     shipping_cost_basis: "per_order",
     shipping_tax_behavior: "inclusive",
-    free_shipping_threshold: `CH:ALL:${SHIPPING_SERVICE}:${money(rule.freeOverCents)}`,
+    // Livraison offerte partout (port à 0, 14.10.2026) : pas de seuil à annoncer.
+    free_shipping_threshold:
+      rule.shippingCents === 0
+        ? null
+        : `CH:ALL:${SHIPPING_SERVICE}:${money(rule.freeOverCents)}`,
     product_review_count: sku.reviewCount,
     product_review_rating:
       sku.reviewCount > 0 && sku.reviewAverage != null

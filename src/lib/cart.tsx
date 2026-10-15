@@ -4,90 +4,46 @@ import {
   createContext,
   useContext,
   useEffect,
+  useMemo,
   useReducer,
   useState,
   type ReactNode,
 } from "react";
 
-import { sameLine, parseCart, type CartItem } from "./cart-data";
-export { sameLine, parseCart, type CartItem } from "./cart-data";
-type CartAction =
-  | { type: "hydrate"; items: CartItem[] }
-  | { type: "restore"; items: CartItem[] }
-  | { type: "add"; item: Omit<CartItem, "quantity"> }
-  | {
-      type: "setQuantity";
-      productId: string;
-      variantId: string | null;
-      colorName: string | null;
-      quantity: number;
-    }
-  | {
-      type: "remove";
-      productId: string;
-      variantId: string | null;
-      colorName: string | null;
-    }
-  | { type: "clear" };
+import {
+  isStudioLine,
+  parseCartLines,
+  type CartItem,
+  type CartLine,
+  type StudioCartItem,
+} from "./cart-data";
+import { isProduct, reducer } from "./cart-reducer";
+export {
+  sameLine,
+  parseCart,
+  parseCartLines,
+  isStudioLine,
+  type CartItem,
+  type CartLine,
+  type StudioCartItem,
+} from "./cart-data";
 
 const STORAGE_KEY = "s3d-cart-v1";
 
-function reducer(state: CartItem[], action: CartAction): CartItem[] {
-  switch (action.type) {
-    case "hydrate":
-      return action.items;
-    case "restore": {
-      const next = [...state];
-      for (const item of action.items) {
-        const index = next.findIndex((i) => sameLine(i, item));
-        if (index < 0) next.push(item);
-        else
-          next[index] = {
-            ...item,
-            quantity: Math.max(next[index].quantity, item.quantity),
-          };
-      }
-      return next.slice(0, 50);
-    }
-    case "add": {
-      const existing = state.find((i) => sameLine(i, action.item));
-      if (existing) {
-        return state.map((i) =>
-          sameLine(i, action.item)
-            ? { ...i, quantity: Math.min(99, i.quantity + 1) }
-            : i,
-        );
-      }
-      return state.length >= 50
-        ? state
-        : [...state, { ...action.item, quantity: 1 }];
-    }
-    case "setQuantity":
-      if (action.quantity <= 0) {
-        return state.filter((i) => !sameLine(i, action));
-      }
-      return state.map((i) =>
-        sameLine(i, action)
-          ? {
-              ...i,
-              quantity: Math.min(
-                99,
-                Math.max(1, Math.trunc(action.quantity) || 1),
-              ),
-            }
-          : i,
-      );
-    case "remove":
-      return state.filter((i) => !sameLine(i, action));
-    case "clear":
-      return [];
-  }
-}
-
 interface CartContextValue {
+  /** Toutes les lignes, dans l'ordre d'ajout (produits et objets du Studio). */
+  lines: CartLine[];
+  /** Les lignes PRODUIT seulement. */
   items: CartItem[];
+  /** Les lignes du Studio seulement. */
+  studioItems: StudioCartItem[];
+  /** Nombre d'exemplaires, tout compris. */
   count: number;
+  /** Total des lignes (centimes), tout compris. */
   subtotalCents: number;
+  /** Part boutique : seule elle compte pour le port (une ligne du Studio n'en porte jamais). */
+  shopSubtotalCents: number;
+  studioSubtotalCents: number;
   add: (item: Omit<CartItem, "quantity">) => void;
   setQuantity: (
     productId: string,
@@ -100,6 +56,13 @@ interface CartContextValue {
     variantId: string | null,
     colorName: string | null,
   ) => void;
+  addStudio: (item: StudioCartItem) => void;
+  setStudioQuantity: (id: string, quantity: number) => void;
+  removeStudio: (id: string) => void;
+  /** Remplace une ligne du Studio par sa version modifiée (« Mettre à jour le panier »). */
+  replaceStudio: (id: string, item: StudioCartItem) => void;
+  /** Aligne les prix unitaires sur ceux que le serveur a recalculés (409 `price_changed`). */
+  syncStudioPrices: (prices: { id: string; unitCents: number }[]) => void;
   restore: (items: CartItem[]) => void;
   clear: () => void;
 }
@@ -107,13 +70,13 @@ interface CartContextValue {
 const CartContext = createContext<CartContextValue | null>(null);
 
 export function CartProvider({ children }: { children: ReactNode }) {
-  const [items, dispatch] = useReducer(reducer, []);
+  const [lines, dispatch] = useReducer(reducer, []);
   const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) dispatch({ type: "hydrate", items: parseCart(raw) });
+      if (raw) dispatch({ type: "hydrate", lines: parseCartLines(raw) });
     } catch {
       // panier corrompu → on repart à vide
     } finally {
@@ -124,7 +87,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const synchronize = (event: StorageEvent) => {
       if (event.key === STORAGE_KEY || event.key === null)
-        dispatch({ type: "hydrate", items: parseCart(event.newValue ?? "[]") });
+        dispatch({
+          type: "hydrate",
+          lines: parseCartLines(event.newValue ?? "[]"),
+        });
     };
     window.addEventListener("storage", synchronize);
     return () => window.removeEventListener("storage", synchronize);
@@ -133,42 +99,60 @@ export function CartProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!hydrated) return;
     try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lines));
     } catch {
       /* Stockage privé ou plein : le panier en mémoire reste utilisable. */
     }
-  }, [items, hydrated]);
+  }, [lines, hydrated]);
 
-  const value: CartContextValue = {
-    items,
-    count: items.reduce((sum, i) => sum + i.quantity, 0),
-    subtotalCents: items.reduce((sum, i) => sum + i.priceCents * i.quantity, 0),
-    add: (item) => dispatch({ type: "add", item }),
-    setQuantity: (productId, variantId, colorName, quantity) =>
-      dispatch({
-        type: "setQuantity",
-        productId,
-        variantId,
-        colorName,
-        quantity,
-      }),
-    remove: (productId, variantId, colorName) =>
-      dispatch({ type: "remove", productId, variantId, colorName }),
-    restore: (items) => dispatch({ type: "restore", items }),
-    clear: () => {
-      dispatch({ type: "clear" });
-      // Supprime aussi la copie persistée. Sur /checkout/success, chargée via
-      // la redirection plein écran de Stripe, le provider se re-monte : son
-      // effet d'hydratation lit le localStorage APRÈS ce clear (effet enfant
-      // avant effet parent). Sans cette suppression, il re-remplirait le
-      // panier qu'on vient de vider.
-      try {
-        localStorage.removeItem(STORAGE_KEY);
-      } catch {
-        // stockage indisponible — sans gravité
-      }
-    },
-  };
+  const value: CartContextValue = useMemo(() => {
+    const items = lines.filter(isProduct);
+    const studioItems = lines.filter(isStudioLine);
+    const sum = (list: CartLine[]) =>
+      list.reduce((total, i) => total + i.priceCents * i.quantity, 0);
+    return {
+      lines,
+      items,
+      studioItems,
+      count: lines.reduce((total, i) => total + i.quantity, 0),
+      subtotalCents: sum(lines),
+      shopSubtotalCents: sum(items),
+      studioSubtotalCents: sum(studioItems),
+      add: (item) => dispatch({ type: "add", item }),
+      setQuantity: (productId, variantId, colorName, quantity) =>
+        dispatch({
+          type: "setQuantity",
+          productId,
+          variantId,
+          colorName,
+          quantity,
+        }),
+      remove: (productId, variantId, colorName) =>
+        dispatch({ type: "remove", productId, variantId, colorName }),
+      addStudio: (item) => dispatch({ type: "addStudio", item }),
+      setStudioQuantity: (id, quantity) =>
+        dispatch({ type: "setStudioQuantity", id, quantity }),
+      removeStudio: (id) => dispatch({ type: "removeStudio", id }),
+      replaceStudio: (id, item) =>
+        dispatch({ type: "replaceStudio", id, item }),
+      syncStudioPrices: (prices) =>
+        dispatch({ type: "syncStudioPrices", prices }),
+      restore: (items) => dispatch({ type: "restore", items }),
+      clear: () => {
+        dispatch({ type: "clear" });
+        // Supprime aussi la copie persistée. Sur /checkout/success, chargée via
+        // la redirection plein écran de Stripe, le provider se re-monte : son
+        // effet d'hydratation lit le localStorage APRÈS ce clear (effet enfant
+        // avant effet parent). Sans cette suppression, il re-remplirait le
+        // panier qu'on vient de vider.
+        try {
+          localStorage.removeItem(STORAGE_KEY);
+        } catch {
+          // stockage indisponible — sans gravité
+        }
+      },
+    };
+  }, [lines]);
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }

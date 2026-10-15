@@ -184,8 +184,6 @@ export interface StudioStats {
   changes: number;
   purgeGrams: number;
   printable: Printability;
-  /** Centimes entiers ; null tant que PRICING.validated = false (aucun CHF affiché). */
-  estimate?: { lowCents: number; highCents: number } | null;
 }
 
 /** Garde de type partagée par les stockages locaux (créations, textes, devis). */

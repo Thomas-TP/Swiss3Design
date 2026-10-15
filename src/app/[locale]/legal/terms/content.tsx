@@ -47,8 +47,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Les prix s’entendent en francs suisses (CHF). L’exploitant n’est pas
-          assujetti à la TVA (art. 10 LTVA) ; aucune TVA n’est facturée. Les
-          frais de livraison sont indiqués avant la confirmation de paiement.
+          assujetti à la TVA (art. 10 LTVA) ; aucune TVA n’est facturée. La
+          livraison est offerte partout en Suisse. Le prix d’un objet du Studio
+          est ferme, livraison comprise.
         </p>
       ),
     },
@@ -61,7 +62,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           moment de la confirmation du paiement, attestée par l’e-mail de
           confirmation de commande. L’exploitant se réserve le droit de refuser
           une commande, notamment en cas d’indisponibilité ou d’erreur manifeste
-          de prix ; les montants déjà perçus sont alors remboursés.
+          de prix ; les montants déjà perçus sont alors remboursés. Pour un
+          objet du Studio, le contrat est conclu au paiement, sous réserve de la
+          relecture des textes (voir « Objets du Studio »).
         </p>
       ),
     },
@@ -162,12 +165,43 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           La livraison est effectuée <strong>en Suisse uniquement</strong>, par
           la Poste suisse. Les produits en stock sont remis à la Poste sous 1 à
           3 jours ouvrés ; les produits imprimés à la demande le sont après le
-          délai de production indiqué sur la fiche produit. Les frais de port et
-          le seuil de livraison offerte applicables sont affichés dans le
-          panier. Les délais de livraison sont indicatifs ; un retard ne donne
-          pas droit à des dommages-intérêts. Le risque de perte ou de dommage
-          pendant le transport est supporté par l’exploitant jusqu’à la remise
-          du produit au client.
+          délai de production indiqué sur la fiche produit. La livraison est
+          offerte partout en Suisse, sans montant minimum. Les objets du Studio
+          sont fabriqués sur commande : leurs textes sont relus sous 2 jours
+          ouvrés, puis la pièce est imprimée et remise à la Poste. Les délais de
+          livraison sont indicatifs ; un retard ne donne pas droit à des
+          dommages-intérêts. Le risque de perte ou de dommage pendant le
+          transport est supporté par l’exploitant jusqu’à la remise du produit
+          au client.
+        </p>
+      ),
+    },
+    {
+      title: "Objets du Studio (fabriqués sur commande)",
+      body: (
+        <p>
+          Les objets du Studio (vase, carte de visite, montagne, porte-nom) sont
+          des objets personnalisés, fabriqués sur commande. Le prix affiché au
+          moment de la commande est ferme et la livraison est comprise ;
+          l’exploitant le recalcule au paiement, et c’est le prix confirmé à
+          l’écran de paiement qui lie les parties. Les textes saisis par le
+          client (nom, fonction, coordonnées, nom de sommet, etc.) sont relus
+          par un humain de l’atelier avant l’impression, sous 2 jours ouvrés.
+          L’exploitant refuse tout texte qui reproduit une marque de tiers, qui
+          est injurieux, discriminatoire ou illicite, ou dont l’impression
+          violerait un droit de tiers : la commande est alors annulée et le
+          client est remboursé intégralement. Le client garantit être en droit
+          de faire imprimer les textes saisis et indemnise l’exploitant de toute
+          prétention de tiers à ce sujet. Une fois les textes relus et
+          l’impression commencée, la commande ne peut plus être annulée ni
+          modifiée ; les objets du Studio étant personnalisés, ils ne sont ni
+          repris ni échangés (voir « Retours »), sous réserve de la garantie
+          légale. Les couleurs affichées à l’écran sont approximatives : les
+          objets sont imprimés en filament Polymaker Panchroma Matte, dont la
+          teinte peut légèrement varier d’une bobine à l’autre. Les objets du
+          Studio ne sont pas disponibles à l’achat par un agent IA. Pour plus de
+          20 pièces ou une demande particulière, un devis est possible (voir
+          ci-dessous).
         </p>
       ),
     },
@@ -175,19 +209,20 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Impressions sur mesure (devis)",
       body: (
         <p>
-          Les prestations personnalisées (fichiers fournis par le client ou
-          projets spécifiques) font l’objet d’un devis. Le contrat est conclu à
-          l’acceptation du devis et au paiement. Le client peut annuler sa
-          commande ou en demander la modification tant que l’impression n’a pas
-          commencé ; une fois l’impression commencée, la commande ne peut plus
-          être annulée ni modifiée. Les articles personnalisés ne sont ni repris
-          ni échangés (voir « Retours »). Le client garantit détenir les droits
-          sur les fichiers transmis et que leur impression ne viole aucun droit
-          de tiers ni aucune disposition légale ; l’exploitant peut refuser tout
-          fichier sans justification. Le client indemnise l’exploitant contre
-          toute prétention de tiers découlant de ses fichiers. Sont notamment
-          exclus les fichiers d’armes ou de pièces d’armes, de contrefaçons et
-          de tout objet illicite.
+          Les demandes particulières (plus de 20 pièces d’un objet du Studio,
+          fichiers fournis par le client ou projets spécifiques) font l’objet
+          d’un devis. Le contrat est conclu à l’acceptation du devis et au
+          paiement. Le client peut annuler sa commande ou en demander la
+          modification tant que l’impression n’a pas commencé ; une fois
+          l’impression commencée, la commande ne peut plus être annulée ni
+          modifiée. Les articles personnalisés ne sont ni repris ni échangés
+          (voir « Retours »). Le client garantit détenir les droits sur les
+          fichiers transmis et que leur impression ne viole aucun droit de tiers
+          ni aucune disposition légale ; l’exploitant peut refuser tout fichier
+          sans justification. Le client indemnise l’exploitant contre toute
+          prétention de tiers découlant de ses fichiers. Sont notamment exclus
+          les fichiers d’armes ou de pièces d’armes, de contrefaçons et de tout
+          objet illicite.
         </p>
       ),
     },
@@ -201,7 +236,7 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           suivant la réception, à condition qu’ils soient non utilisés et dans
           leur état d’origine. Les frais de retour sont à la charge du client ;
           le prix des articles est remboursé, hors frais d’envoi initiaux. Les
-          articles sur mesure sont exclus du retour.
+          articles sur mesure, dont les objets du Studio, sont exclus du retour.
         </p>
       ),
     },
@@ -341,8 +376,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Alle Preise verstehen sich in Schweizer Franken (CHF). Der Betreiber
           ist nicht mehrwertsteuerpflichtig (Art. 10 MWSTG); es wird keine
-          Mehrwertsteuer erhoben. Die Versandkosten werden vor der
-          Zahlungsbestätigung ausgewiesen.
+          Mehrwertsteuer erhoben. Die Lieferung in der Schweiz ist gratis. Der
+          Preis eines Studio-Objekts ist ein Fixpreis, Lieferung inklusive.
         </p>
       ),
     },
@@ -356,7 +391,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           E-Mail belegt wird. Der Betreiber behält sich vor, eine Bestellung
           abzulehnen, insbesondere bei Nichtverfügbarkeit oder offensichtlichem
           Preisfehler; bereits bezahlte Beträge werden in diesem Fall
-          zurückerstattet.
+          zurückerstattet. Bei einem Studio-Objekt kommt der Vertrag mit der
+          Zahlung zustande, unter dem Vorbehalt der Textdurchsicht (siehe
+          «Studio-Objekte»).
         </p>
       ),
     },
@@ -462,12 +499,43 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           <strong>ausschliesslich innerhalb der Schweiz</strong> durch die
           Schweizerische Post. Lagerartikel werden innert 1 bis 3 Werktagen der
           Post übergeben; auf Bestellung gedruckte Artikel nach Ablauf der auf
-          der Produktseite angegebenen Produktionszeit. Die anwendbaren
-          Versandkosten und die Schwelle für den Gratisversand werden im
-          Warenkorb angezeigt. Lieferfristen sind unverbindlich; eine
-          Verzögerung begründet keinen Anspruch auf Schadenersatz. Das Risiko
-          von Verlust oder Beschädigung während des Transports trägt der
-          Betreiber bis zur Übergabe des Produkts an den Kunden.
+          der Produktseite angegebenen Produktionszeit. Die Lieferung ist in der
+          ganzen Schweiz ohne Mindestbestellwert gratis. Studio-Objekte werden
+          auf Bestellung gefertigt: Ihre Texte werden innert 2 Werktagen
+          gegengelesen, danach wird das Stück gedruckt und der Post übergeben.
+          Lieferfristen sind unverbindlich; eine Verzögerung begründet keinen
+          Anspruch auf Schadenersatz. Das Risiko von Verlust oder Beschädigung
+          während des Transports trägt der Betreiber bis zur Übergabe des
+          Produkts an den Kunden.
+        </p>
+      ),
+    },
+    {
+      title: "Studio-Objekte (auf Bestellung gefertigt)",
+      body: (
+        <p>
+          Studio-Objekte (Vase, Visitenkarte, Berg, Namensschild) sind
+          personalisierte, auf Bestellung gefertigte Artikel. Der bei der
+          Bestellung angezeigte Preis ist ein Fixpreis, Lieferung inklusive; der
+          Betreiber berechnet ihn bei der Zahlung neu, und verbindlich ist der
+          auf dem Zahlungsbildschirm bestätigte Preis. Die vom Kunden
+          eingegebenen Texte (Name, Funktion, Kontaktdaten, Gipfelname usw.)
+          werden vor dem Druck innert 2 Werktagen von einer Person der Werkstatt
+          gegengelesen. Der Betreiber lehnt Texte ab, die eine Marke Dritter
+          wiedergeben, beleidigend, diskriminierend oder rechtswidrig sind oder
+          deren Druck Rechte Dritter verletzen würde: Die Bestellung wird dann
+          storniert und dem Kunden der volle Betrag erstattet. Der Kunde
+          gewährleistet, dass er die eingegebenen Texte drucken lassen darf, und
+          stellt den Betreiber von Ansprüchen Dritter frei. Sobald die Texte
+          gegengelesen sind und der Druck begonnen hat, kann die Bestellung
+          weder storniert noch geändert werden; da Studio-Objekte personalisiert
+          sind, werden sie unter Vorbehalt der gesetzlichen Gewährleistung weder
+          zurückgenommen noch umgetauscht (siehe «Rücksendungen»). Die am
+          Bildschirm angezeigten Farben sind annähernd: Die Objekte werden mit
+          Polymaker-Panchroma-Matte-Filament gedruckt, dessen Farbton von Spule
+          zu Spule leicht abweichen kann. Studio-Objekte können nicht von einem
+          KI-Agenten gekauft werden. Für mehr als 20 Stück oder einen besonderen
+          Wunsch ist eine Offerte möglich (siehe unten).
         </p>
       ),
     },
@@ -475,21 +543,21 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Massanfertigungen (Offerten)",
       body: (
         <p>
-          Individuelle Leistungen (vom Kunden gelieferte Dateien oder
-          spezifische Projekte) erfolgen auf der Grundlage einer Offerte. Der
-          Vertrag kommt mit der Annahme der Offerte und der Zahlung zustande.
-          Der Kunde kann seine Bestellung stornieren oder deren Änderung
-          verlangen, solange der Druckvorgang noch nicht begonnen hat; sobald
-          der Druck begonnen hat, kann die Bestellung weder storniert noch
-          geändert werden. Personalisierte Artikel werden weder zurückgenommen
-          noch umgetauscht (siehe «Rücksendungen»). Der Kunde gewährleistet,
-          dass er über die Rechte an den übermittelten Dateien verfügt und deren
-          Druck weder Rechte Dritter noch gesetzliche Bestimmungen verletzt; der
-          Betreiber kann jede Datei ohne Begründung ablehnen. Der Kunde stellt
-          den Betreiber von sämtlichen Ansprüchen Dritter frei, die sich aus
-          seinen Dateien ergeben. Ausgeschlossen sind insbesondere Dateien von
-          Waffen oder Waffenteilen, von Fälschungen sowie von jeglichen
-          widerrechtlichen Gegenständen.
+          Besondere Anfragen (mehr als 20 Stück eines Studio-Objekts, vom Kunden
+          gelieferte Dateien oder spezifische Projekte) erfolgen auf der
+          Grundlage einer Offerte. Der Vertrag kommt mit der Annahme der Offerte
+          und der Zahlung zustande. Der Kunde kann seine Bestellung stornieren
+          oder deren Änderung verlangen, solange der Druckvorgang noch nicht
+          begonnen hat; sobald der Druck begonnen hat, kann die Bestellung weder
+          storniert noch geändert werden. Personalisierte Artikel werden weder
+          zurückgenommen noch umgetauscht (siehe «Rücksendungen»). Der Kunde
+          gewährleistet, dass er über die Rechte an den übermittelten Dateien
+          verfügt und deren Druck weder Rechte Dritter noch gesetzliche
+          Bestimmungen verletzt; der Betreiber kann jede Datei ohne Begründung
+          ablehnen. Der Kunde stellt den Betreiber von sämtlichen Ansprüchen
+          Dritter frei, die sich aus seinen Dateien ergeben. Ausgeschlossen sind
+          insbesondere Dateien von Waffen oder Waffenteilen, von Fälschungen
+          sowie von jeglichen widerrechtlichen Gegenständen.
         </p>
       ),
     },
@@ -503,7 +571,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           nach Erhalt, sofern diese unbenutzt und im Originalzustand sind. Die
           Rücksendekosten trägt der Kunde; der Preis der Artikel wird
           zurückerstattet, ohne die ursprünglichen Versandkosten.
-          Massanfertigungen sind von der Rückgabe ausgeschlossen.
+          Massanfertigungen, einschliesslich Studio-Objekte, sind von der
+          Rückgabe ausgeschlossen.
         </p>
       ),
     },
@@ -644,7 +713,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           I prezzi si intendono in franchi svizzeri (CHF). Il gestore non è
           assoggettato all’IVA (art. 10 LIVA); non viene fatturata alcuna IVA.
-          Le spese di consegna sono indicate prima della conferma del pagamento.
+          La consegna in Svizzera è gratuita. Il prezzo di un oggetto dello
+          Studio è fisso, consegna inclusa.
         </p>
       ),
     },
@@ -658,7 +728,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           dall’e-mail di conferma dell’ordine. Il gestore si riserva il diritto
           di rifiutare un ordine, in particolare in caso di indisponibilità o di
           errore manifesto di prezzo; gli importi già percepiti vengono in tal
-          caso rimborsati.
+          caso rimborsati. Per un oggetto dello Studio il contratto è concluso
+          al pagamento, con riserva della rilettura dei testi (vedere «Oggetti
+          dello Studio»).
         </p>
       ),
     },
@@ -762,11 +834,41 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           tramite la Posta svizzera. I prodotti a magazzino vengono affidati
           alla Posta entro 1–3 giorni lavorativi; i prodotti stampati su
           richiesta dopo il tempo di produzione indicato nella scheda prodotto.
-          Le spese di spedizione e la soglia per la consegna gratuita
-          applicabili sono visualizzate nel carrello. I termini di consegna sono
-          indicativi; un ritardo non dà diritto a risarcimento danni. Il rischio
-          di perdita o danneggiamento durante il trasporto è a carico del
-          gestore fino alla consegna del prodotto al cliente.
+          La consegna è gratuita in tutta la Svizzera, senza importo minimo. Gli
+          oggetti dello Studio sono realizzati su ordinazione: i loro testi
+          vengono riletti entro 2 giorni lavorativi, poi il pezzo è stampato e
+          consegnato alla Posta. I termini di consegna sono indicativi; un
+          ritardo non dà diritto a risarcimento danni. Il rischio di perdita o
+          danneggiamento durante il trasporto è a carico del gestore fino alla
+          consegna del prodotto al cliente.
+        </p>
+      ),
+    },
+    {
+      title: "Oggetti dello Studio (realizzati su ordinazione)",
+      body: (
+        <p>
+          Gli oggetti dello Studio (vaso, biglietto da visita, montagna,
+          porta-nome) sono articoli personalizzati realizzati su ordinazione. Il
+          prezzo mostrato al momento dell’ordine è fisso e comprende la
+          consegna; il gestore lo ricalcola al pagamento e vincola le parti il
+          prezzo confermato nella schermata di pagamento. I testi inseriti dal
+          cliente (nome, funzione, recapiti, nome della vetta, ecc.) sono
+          riletti da una persona dell’atelier prima della stampa, entro 2 giorni
+          lavorativi. Il gestore rifiuta qualsiasi testo che riproduca un
+          marchio di terzi, ingiurioso, discriminatorio o illecito, o la cui
+          stampa violerebbe un diritto di terzi: l’ordine è allora annullato e
+          il cliente è rimborsato integralmente. Il cliente garantisce di avere
+          il diritto di far stampare i testi inseriti e tiene indenne il gestore
+          da qualsiasi pretesa di terzi. Una volta riletti i testi e iniziata la
+          stampa, l’ordine non può più essere annullato né modificato; essendo
+          personalizzati, gli oggetti dello Studio non vengono né ripresi né
+          cambiati (vedere «Resi»), fatta salva la garanzia legale. I colori
+          mostrati sullo schermo sono approssimativi: gli oggetti sono stampati
+          con filamento Polymaker Panchroma Matte, la cui tinta può variare
+          leggermente da una bobina all’altra. Gli oggetti dello Studio non
+          possono essere acquistati da un agente IA. Per più di 20 pezzi o una
+          richiesta particolare è possibile un preventivo (vedere sotto).
         </p>
       ),
     },
@@ -774,19 +876,20 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Stampe su misura (preventivi)",
       body: (
         <p>
-          Le prestazioni personalizzate (file forniti dal cliente o progetti
-          specifici) sono oggetto di un preventivo. Il contratto è concluso
-          all’accettazione del preventivo e al pagamento. Il cliente può
-          annullare l’ordine o richiederne la modifica finché la stampa non è
-          iniziata; una volta iniziata la stampa, l’ordine non può più essere
-          annullato né modificato. Gli articoli personalizzati non vengono né
-          ripresi né cambiati (vedere «Resi»). Il cliente garantisce di detenere
-          i diritti sui file trasmessi e che la loro stampa non viola alcun
-          diritto di terzi né alcuna disposizione legale; il gestore può
-          rifiutare qualsiasi file senza giustificazione. Il cliente tiene
-          indenne il gestore da qualsiasi pretesa di terzi derivante dai suoi
-          file. Sono in particolare esclusi i file di armi o di parti di armi,
-          di contraffazioni e di qualsiasi oggetto illecito.
+          Le richieste particolari (più di 20 pezzi di un oggetto dello Studio,
+          file forniti dal cliente o progetti specifici) sono oggetto di un
+          preventivo. Il contratto è concluso all’accettazione del preventivo e
+          al pagamento. Il cliente può annullare l’ordine o richiederne la
+          modifica finché la stampa non è iniziata; una volta iniziata la
+          stampa, l’ordine non può più essere annullato né modificato. Gli
+          articoli personalizzati non vengono né ripresi né cambiati (vedere
+          «Resi»). Il cliente garantisce di detenere i diritti sui file
+          trasmessi e che la loro stampa non viola alcun diritto di terzi né
+          alcuna disposizione legale; il gestore può rifiutare qualsiasi file
+          senza giustificazione. Il cliente tiene indenne il gestore da
+          qualsiasi pretesa di terzi derivante dai suoi file. Sono in
+          particolare esclusi i file di armi o di parti di armi, di
+          contraffazioni e di qualsiasi oggetto illecito.
         </p>
       ),
     },
@@ -800,7 +903,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           ricevimento, a condizione che siano inutilizzati e nel loro stato
           originale. Le spese di reso sono a carico del cliente; il prezzo degli
           articoli viene rimborsato, escluse le spese di spedizione iniziali.
-          Gli articoli su misura sono esclusi dal reso.
+          Gli articoli su misura, compresi gli oggetti dello Studio, sono
+          esclusi dal reso.
         </p>
       ),
     },
@@ -937,8 +1041,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           All prices are in Swiss francs (CHF). The Operator is not subject to
-          VAT (Art. 10 of the Swiss VAT Act); no VAT is charged. Shipping costs
-          are shown before payment confirmation.
+          VAT (Art. 10 of the Swiss VAT Act); no VAT is charged. Delivery in
+          Switzerland is free. The price of a Studio object is firm, delivery
+          included.
         </p>
       ),
     },
@@ -951,7 +1056,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           concluded upon confirmation of payment, evidenced by the order
           confirmation e-mail. The Operator reserves the right to refuse an
           order, in particular in the event of unavailability or an obvious
-          pricing error; any amounts already received will then be refunded.
+          pricing error; any amounts already received will then be refunded. For
+          a Studio object, the contract is concluded upon payment, subject to
+          the review of the texts (see “Studio objects”).
         </p>
       ),
     },
@@ -1048,11 +1155,40 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           Delivery is made <strong>within Switzerland only</strong>, by Swiss
           Post. In-stock products are handed over to the post within 1 to 3
           business days; made-to-order products after the production time
-          indicated on the product page. The applicable shipping costs and
-          free-shipping threshold are shown in the cart. Delivery times are
-          indicative; a delay does not give rise to any claim for damages. The
-          risk of loss or damage during transport is borne by the Operator until
-          the product is handed over to the customer.
+          indicated on the product page. Delivery is free everywhere in
+          Switzerland, with no minimum purchase. Studio objects are made to
+          order: their texts are read within 2 working days, then the piece is
+          printed and handed over to the post. Delivery times are indicative; a
+          delay does not give rise to any claim for damages. The risk of loss or
+          damage during transport is borne by the Operator until the product is
+          handed over to the customer.
+        </p>
+      ),
+    },
+    {
+      title: "Studio objects (made to order)",
+      body: (
+        <p>
+          Studio objects (vase, business card, mountain, name holder) are
+          customised items made to order. The price shown when ordering is firm
+          and includes delivery; the Operator recalculates it at payment, and
+          the price confirmed on the payment screen binds the parties. The texts
+          entered by the customer (name, role, contact details, peak name, etc.)
+          are read by a person at the workshop before printing, within 2 working
+          days. The Operator refuses any text that reproduces a third-party
+          brand or is insulting, discriminatory or unlawful, or whose printing
+          would infringe a third party’s rights: the order is then cancelled and
+          the customer is refunded in full. The customer warrants that they are
+          entitled to have the entered texts printed and shall indemnify the
+          Operator against any third-party claim. Once the texts have been read
+          and printing has started, the order can no longer be cancelled or
+          changed; because they are customised, Studio objects can be neither
+          returned nor exchanged (see “Returns”), subject to the statutory
+          warranty. The colours shown on screen are approximate: objects are
+          printed in Polymaker Panchroma Matte filament, whose shade may vary
+          slightly from one spool to another. Studio objects cannot be purchased
+          by an AI agent. For more than 20 pieces or a special request, a quote
+          is available (see below).
         </p>
       ),
     },
@@ -1060,19 +1196,19 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Custom prints (quotes)",
       body: (
         <p>
-          Customised services (files supplied by the customer or specific
-          projects) are subject to a quote. The contract is concluded upon
-          acceptance of the quote and payment. The customer may cancel the order
-          or request changes as long as printing has not yet started; once
-          printing has started, the order can no longer be cancelled or changed.
-          Customised items can be neither returned nor exchanged (see
-          “Returns”). The customer warrants that they hold the rights to the
-          files submitted and that printing them does not infringe any
-          third-party rights or legal provisions; the Operator may refuse any
-          file without justification. The customer shall indemnify the Operator
-          against any third-party claim arising from their files. Files of
-          weapons or weapon parts, counterfeits and any unlawful object are in
-          particular excluded.
+          Special requests (more than 20 pieces of a Studio object, files
+          supplied by the customer or specific projects) are subject to a quote.
+          The contract is concluded upon acceptance of the quote and payment.
+          The customer may cancel the order or request changes as long as
+          printing has not yet started; once printing has started, the order can
+          no longer be cancelled or changed. Customised items can be neither
+          returned nor exchanged (see “Returns”). The customer warrants that
+          they hold the rights to the files submitted and that printing them
+          does not infringe any third-party rights or legal provisions; the
+          Operator may refuse any file without justification. The customer shall
+          indemnify the Operator against any third-party claim arising from
+          their files. Files of weapons or weapon parts, counterfeits and any
+          unlawful object are in particular excluded.
         </p>
       ),
     },
@@ -1085,8 +1221,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           returns of catalogue items (non-customised) within 14 days of receipt,
           provided they are unused and in their original condition. Return costs
           are borne by the customer; the price of the items is refunded,
-          excluding the initial shipping costs. Custom-made items are excluded
-          from returns.
+          excluding the initial shipping costs. Custom-made items, including
+          Studio objects, are excluded from returns.
         </p>
       ),
     },

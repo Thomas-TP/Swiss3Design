@@ -28,13 +28,13 @@ import { Select } from "@/components/select";
 import { Button, ButtonLink } from "@/components/ui/button";
 import { fieldClass } from "@/components/ui/field";
 import { readReducedMotion } from "@/lib/motion-bridge/motion-pref";
-import { useCart } from "@/lib/cart";
+import { isStudioLine, useCart } from "@/lib/cart";
 import { cartProperties, chf, track } from "@/lib/analytics";
 import { useSession } from "@/lib/auth-client";
 import { useIsDark } from "@/lib/theme";
 import { stripeAppearance } from "@/lib/stripe-appearance";
 import { formatChf } from "@/lib/format";
-import { shippingFor } from "@/lib/shipping";
+import { shippingForOrder } from "@/lib/shipping";
 import { CANTONS, CANTON_CODES } from "@/lib/cantons";
 
 // Stripe.js est préchargé dès l'arrivée sur le checkout (voir le useEffect dans
@@ -344,7 +344,8 @@ function SummaryCard({
 }) {
   const t = useTranslations("checkout");
   const locale = useLocale();
-  const { items, subtotalCents: cartSubtotal } = useCart();
+  const { lines, subtotalCents: cartSubtotal } = useCart();
+  const tObjects = useTranslations("studioCore.objects");
   const subtotalCents = confirmedSubtotal ?? cartSubtotal;
   const [code, setCode] = useState(discount?.code ?? "");
   const [applying, setApplying] = useState(false);
@@ -394,21 +395,33 @@ function SummaryCard({
         {t("summary")}
       </h2>
       <ul className="mt-4 space-y-2 text-sm">
-        {items.map((i) => (
-          <li
-            key={`${i.productId}:${i.variantId ?? ""}:${i.colorName ?? ""}`}
-            className="flex justify-between gap-3"
-          >
-            <span className="text-soft">
-              {i.quantity} × {i.name}
-              {i.variantName ? ` (${i.variantName})` : ""}
-              {i.colorName ? ` — ${i.colorName}` : ""}
-            </span>
-            <span className="s3d-num font-medium">
-              {formatChf(i.priceCents * i.quantity, locale)}
-            </span>
-          </li>
-        ))}
+        {lines.map((i) =>
+          isStudioLine(i) ? (
+            // Objet du Studio : le nom de l'objet seulement (jamais un texte saisi).
+            <li key={`studio:${i.id}`} className="flex justify-between gap-3">
+              <span className="text-soft">
+                {i.quantity} × {tObjects(`${i.object}.name`)}
+              </span>
+              <span className="s3d-num font-medium">
+                {formatChf(i.priceCents * i.quantity, locale)}
+              </span>
+            </li>
+          ) : (
+            <li
+              key={`${i.productId}:${i.variantId ?? ""}:${i.colorName ?? ""}`}
+              className="flex justify-between gap-3"
+            >
+              <span className="text-soft">
+                {i.quantity} × {i.name}
+                {i.variantName ? ` (${i.variantName})` : ""}
+                {i.colorName ? ` — ${i.colorName}` : ""}
+              </span>
+              <span className="s3d-num font-medium">
+                {formatChf(i.priceCents * i.quantity, locale)}
+              </span>
+            </li>
+          ),
+        )}
         {discountCents > 0 && (
           <li className="flex justify-between gap-3 border-t border-line pt-2 text-emerald-700 dark:text-emerald-400">
             <span>
@@ -515,7 +528,14 @@ export function CheckoutFlow({
 }) {
   const t = useTranslations("checkout");
   const locale = useLocale();
-  const { items, subtotalCents } = useCart();
+  const {
+    lines,
+    items,
+    studioItems,
+    subtotalCents,
+    shopSubtotalCents,
+    syncStudioPrices,
+  } = useCart();
   const { data: authSession } = useSession();
 
   const accountEmail = authSession?.user.email ?? sessionEmail;
@@ -560,19 +580,25 @@ export function CheckoutFlow({
   // stockage local après le montage) contient des articles.
   const checkoutTracked = useRef(false);
   useEffect(() => {
-    if (checkoutTracked.current || items.length === 0) return;
+    if (checkoutTracked.current || lines.length === 0) return;
     checkoutTracked.current = true;
-    track("Checkout Started", cartProperties(items));
-  }, [items]);
+    track("Checkout Started", cartProperties(lines));
+  }, [lines]);
 
   const shippingCents = clientSecret
     ? serverShipping
-    : shippingFor(subtotalCents, shippingSettings);
+    : shippingForOrder(
+        {
+          shopCents: shopSubtotalCents,
+          studioCents: subtotalCents - shopSubtotalCents,
+        },
+        shippingSettings,
+      );
   const discountCents = clientSecret
     ? serverDiscount
     : (discount?.discountCents ?? 0);
 
-  if (items.length === 0 && !clientSecret) {
+  if (lines.length === 0 && !clientSecret) {
     return (
       <div className="rounded-card border border-line bg-surface p-8 sm:p-10">
         <ShoppingBag size={26} strokeWidth={1.5} className="text-soft" />
@@ -600,12 +626,28 @@ export function CheckoutFlow({
     setError(null);
     try {
       const payload = {
-        items: items.map((i) => ({
-          productId: i.productId,
-          variantId: i.variantId ?? undefined,
-          color: i.colorName ?? undefined,
-          quantity: i.quantity,
-        })),
+        items: [
+          ...items.map((i) => ({
+            productId: i.productId,
+            variantId: i.variantId ?? undefined,
+            color: i.colorName ?? undefined,
+            quantity: i.quantity,
+          })),
+          // Objets du Studio : la configuration et les textes SAISIS partent
+          // ici, dans le corps de la requête (jamais l'URL, Stripe ni une mesure).
+          // Le serveur revalide tout et refait le prix ; `expectedUnitCents` ne
+          // sert qu'à détecter un écart avec ce que le client a vu.
+          ...studioItems.map((i) => ({
+            kind: "studio" as const,
+            id: i.id,
+            object: i.object,
+            config: i.config,
+            texts: i.texts,
+            locale: i.locale,
+            quantity: i.quantity,
+            expectedUnitCents: i.priceCents,
+          })),
+        ],
         email: accountEmail ?? proof!.email,
         emailProof: proof?.token,
         address: addr,
@@ -653,7 +695,14 @@ export function CheckoutFlow({
         }),
       });
       if (!res.ok) {
-        const failure = (await res.json()) as { error?: string };
+        const failure = (await res.json()) as {
+          error?: string;
+          lines?: { id: string; unitCents: number }[];
+        };
+        // Le serveur a refait le prix d'un objet du Studio et trouvé un autre
+        // chiffre : le panier prend le sien, le client revérifie et revalide.
+        if (failure.error === "price_changed" && failure.lines)
+          syncStudioPrices(failure.lines);
         const key =
           failure.error === "insufficient_stock"
             ? "errorStock"
@@ -661,7 +710,12 @@ export function CheckoutFlow({
               ? "errorVerifyAgain"
               : failure.error === "unknown_product"
                 ? "errorProductChanged"
-                : "errorGeneric";
+                : failure.error === "price_changed"
+                  ? "errorStudioPrice"
+                  : failure.error === "studio_invalid" ||
+                      failure.error === "studio_unprintable"
+                    ? "errorStudioInvalid"
+                    : "errorGeneric";
         if (
           failure.error === "checkout_closed" ||
           failure.error === "checkout_changed"

@@ -52,7 +52,6 @@ describe("préparation du fichier de la demande (§6.9)", () => {
         locale: "fr",
         object: "cartouche",
         bands: 2,
-        estimate: { lowCents: 900, highCents: 1050 },
         messages,
         onProgress: (p) => progress.push(p),
       },
@@ -75,14 +74,12 @@ describe("préparation du fichier de la demande (§6.9)", () => {
       "upload",
     ]);
     expect(progress[1].triangles).toBe(10);
-    // Événement Studio Sent : aucun texte saisi, estimation en CHF décimaux.
+    // Événement Studio Sent : aucun texte saisi, aucun prix (le devis n'a plus d'estimation).
     expect(track).toHaveBeenCalledWith("Studio Sent", {
       object: "cartouche",
       bands: 2,
       triangles: 10,
       bytes: 584,
-      estimate_low: 9,
-      estimate_high: 10.5,
     });
     expect(JSON.stringify(track.mock.calls)).not.toContain("Sentinelle");
     // Mémorisé : une configuration inchangée n'est jamais renvoyée.

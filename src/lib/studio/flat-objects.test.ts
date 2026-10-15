@@ -45,7 +45,6 @@ import {
   surpriseCartouche,
   surpriseMontagne,
 } from "./presets";
-import { PRICING } from "./pricing-params";
 import { clampConfig, parseConfig } from "./schemas";
 import { computeStats } from "./stats";
 import {
@@ -154,8 +153,6 @@ describe("Cartouche : mise en page", () => {
     expect(stats.layers).toBe(11);
     expect(stats.changes).toBe(1);
     expect(stats.printable).toEqual({ status: "ok" });
-    expect(stats.estimate).toBeNull();
-    expect(PRICING.validated).toBe(false);
     expect(stats.grams).toBeGreaterThan(5);
     expect(stats.grams).toBeLessThan(20);
   });
@@ -732,13 +729,6 @@ describe("Statistiques des objets plats", () => {
     const long = computeStats(CARTOUCHE_DEFAULT, DEFAULT_TEXTS.cartouche);
     expect(long.volumeCm3).toBeGreaterThan(short.volumeCm3);
     expect(long.grams).toBeGreaterThan(short.grams);
-  });
-
-  it("le nom est affiché sans CHF tant que le barème n'est pas validé", () => {
-    for (const [object, config] of cases) {
-      const stats = computeStats(config, DEFAULT_TEXTS[object]);
-      expect(stats.estimate).toBeNull();
-    }
   });
 
   it("budgets : statistiques ≤ 2 ms à froid pour Cartouche et Borne, ≤ 8 ms pour une nouvelle montagne ; maillage d'affichage de la Cartouche ≤ 25 ms", () => {

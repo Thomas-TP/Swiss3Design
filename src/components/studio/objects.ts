@@ -2,17 +2,8 @@
 // vues disponibles, champs de texte, exigences avant l'envoi, choix de la
 // vue 2D exacte. Testé (objects.test.ts) : l'interface ne fait qu'appeler.
 import { MAX_BANDS } from "@/lib/studio/ranges";
-import {
-  OBJECT_TEXT_FIELDS,
-  cleanText,
-  type TextField,
-} from "@/lib/studio/text/fields";
-import {
-  STUDIO_OBJECT_IDS,
-  type StudioConfig,
-  type StudioObjectId,
-  type StudioTexts,
-} from "@/lib/studio/types";
+import { OBJECT_TEXT_FIELDS } from "@/lib/studio/text/fields";
+import { STUDIO_OBJECT_IDS, type StudioObjectId } from "@/lib/studio/types";
 
 export { OBJECT_TEXT_FIELDS, STUDIO_OBJECT_IDS };
 
@@ -58,61 +49,12 @@ export function minBands(object: StudioObjectId): number {
 
 export { MAX_BANDS };
 
-/** Champs de texte de l'objet, et seulement ceux dont la configuration a besoin. */
-export function textFieldsFor(config: StudioConfig): readonly TextField[] {
-  const fields = OBJECT_TEXT_FIELDS[config.object];
-  // L'étiquette de la montagne n'existe que si elle est activée.
-  if (config.object === "montagne" && !config.label) return [];
-  return fields;
-}
-
-export function hasTextFields(config: StudioConfig): boolean {
-  return textFieldsFor(config).length > 0;
-}
-
-/**
- * Premier champ à remplir avant l'envoi, ou null. Un porte-nom sans texte est
- * « imprimable » pour les garde-fous (rien à mesurer) : l'atelier recevrait une
- * plaque vide. La carte exige un nom ; la montagne un texte d'étiquette seulement
- * si l'étiquette est activée.
- */
-export function missingText(
-  config: StudioConfig,
-  texts: StudioTexts,
-): TextField | null {
-  switch (config.object) {
-    case "cartouche":
-      return cleanText(texts.name) ? null : "name";
-    case "borne":
-      return cleanText(texts.text) ? null : "text";
-    case "montagne":
-      return config.label && !cleanText(texts.peak) ? "peak" : null;
-    default:
-      return null;
-  }
-}
-
-/** Textes à imprimer, nettoyés, dans l'ordre d'affichage des champs (champs vides omis). */
-export function printedTexts(
-  config: StudioConfig,
-  texts: StudioTexts,
-): { field: TextField; value: string }[] {
-  const out: { field: TextField; value: string }[] = [];
-  for (const field of textFieldsFor(config)) {
-    const value = cleanText(texts[field]);
-    if (value) out.push({ field, value });
-  }
-  return out;
-}
-
-/** Copie des textes limitée aux champs de l'objet (un autre objet n'emporte pas le nom saisi ailleurs). */
-export function textsForObject(
-  object: StudioObjectId,
-  texts: StudioTexts,
-): StudioTexts {
-  const out: StudioTexts = {};
-  for (const field of OBJECT_TEXT_FIELDS[object]) {
-    if (texts[field] !== undefined) out[field] = texts[field];
-  }
-  return out;
-}
+// Règles sur les textes (partagées avec le panier et le serveur de paiement).
+export {
+  textFieldsFor,
+  hasTextFields,
+  missingText,
+  printedTexts,
+  textsForObject,
+  purchaseTexts,
+} from "@/lib/studio/text/rules";

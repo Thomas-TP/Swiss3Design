@@ -33,7 +33,7 @@
     "rulerValue": "Layer {layer} of {total}, {height} printed"
   },
   "trust": {
-    "shipping": "Free delivery from {amount}",
+    "shipping": "Free delivery in Switzerland",
     "made": "Printed in Gland and Pully",
     "payment": "TWINT, cards, Google Pay"
   },
@@ -58,7 +58,7 @@
   "studio": {
     "eyebrow": "The Studio",
     "title": "You customise it. We print it.",
-    "intro": "Four original objects that you customise in 3D before sending them to us. The firm price is confirmed on quote, within 48 hours.",
+    "intro": "Four original objects you customise in 3D and order online: firm price, free delivery in Switzerland.",
     "adjust": "Customise",
     "stepsTitle": "How it works",
     "steps": {
@@ -67,18 +67,19 @@
         "text": "Shape, pattern, colors, text: the object is customised in 3D, and grams and duration follow every move."
       },
       "send": {
-        "title": "Send",
-        "text": "One click sends the piece and its configuration to the workshop."
+        "title": "Order",
+        "text": "Add it to your cart and pay online, at the firm price shown."
       },
       "check": {
         "title": "The workshop checks",
-        "text": "A person reads every text and checks the piece: a firm price comes back within 48 hours."
+        "text": "A person reads every text before printing; a refused text is refunded in full."
       },
       "print": {
         "title": "Printed and delivered",
-        "text": "Printed in Gland or Pully, shipped by Swiss Post, free from {amount}."
+        "text": "Printed in Gland or Pully, shipped with Swiss Post, free delivery."
       }
-    }
+    },
+    "startPrice": "Starting configuration: {price}"
   },
   "shop": {
     "eyebrow": "The shop",
@@ -97,7 +98,7 @@
     "pullyMachine": "Creality K2 · CFS",
     "glandCoords": "46°25′N 6°16′E",
     "pullyCoords": "46°31′N 6°40′E",
-    "delivery": "Free delivery from {amount}",
+    "delivery": "Free delivery in Switzerland",
     "payment": "TWINT, cards, Google Pay",
     "visit": "Visit the workshop"
   },

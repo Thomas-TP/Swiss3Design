@@ -118,9 +118,7 @@
   },
   "measure": {
     "strip": "H {height} · Ø {diameter} · {layers} · ≈ {grams} · ≈ {duration} · {changes} · spurgo ≈ {purge}",
-    "hero": "{height} · {layers} · {filaments} · ≈ {grams} · ≈ {duration}",
-    "onQuote": "Su preventivo",
-    "priceLater": "Prezzo confermato entro 48 ore"
+    "hero": "{height} · {layers} · {filaments} · ≈ {grams} · ≈ {duration}"
   },
   "duration": {
     "real": "Durata reale ≈ {duration}",

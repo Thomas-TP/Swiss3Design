@@ -62,7 +62,8 @@
     "error": "Si è verificato un errore, riprovi.",
     "verifyNotice": "Confermi la Sua e-mail per ricevere il carrello su un altro dispositivo.",
     "restored": "Carrello ripristinato con prezzi e disponibilità aggiornati. Gli altri articoli sono stati conservati.",
-    "restoreError": "Questo carrello non può più essere ripristinato. Trovi gli articoli disponibili nel catalogo."
+    "restoreError": "Questo carrello non può più essere ripristinato. Trovi gli articoli disponibili nel catalogo.",
+    "studioNote": "Gli oggetti dello Studio non sono inclusi nel promemoria: contengono i Suoi testi personali, che non conserviamo."
   },
   "cart": {
     "title": "Carrello",
@@ -130,7 +131,9 @@
     "paymentReassurance": "Pagamento cifrato. I dati della Sua carta non passano mai dai nostri server.",
     "errorStock": "La disponibilità è cambiata. Aggiorni le quantità nel carrello.",
     "errorVerifyAgain": "Verifichi nuovamente l’indirizzo e-mail prima di pagare.",
-    "errorProductChanged": "Un articolo o un’opzione è cambiato. Lo selezioni nuovamente dalla scheda prodotto."
+    "errorProductChanged": "Un articolo o un’opzione è cambiato. Lo selezioni nuovamente dalla scheda prodotto.",
+    "errorStudioPrice": "Il prezzo di un oggetto dello Studio è stato aggiornato. Verifichi il totale e confermi di nuovo.",
+    "errorStudioInvalid": "Un oggetto dello Studio nel carrello non può essere stampato così com'è. Lo riapra nello Studio dal carrello."
   },
   "orderSuccess": {
     "processingTitle": "Pagamento in corso",

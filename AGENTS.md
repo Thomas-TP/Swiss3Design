@@ -171,7 +171,10 @@ put` on an environment with real users without `--env <name>` explicitly
     has no `minSize` nor request cap. It changes where modules sit in
     `.next/server`, never what runs. Do not remove it without re-measuring
     (−876 KiB gzip), and never extend the `ssr` → `rsc` rule to a package that
-    touches React.
+    touches React. The Studio direct purchase (2026-10-15) added +17.6 KiB gzip
+    (2 471.59 → 2 489.17 KiB, same path length, see
+    [`measures-achat-studio.md`](docs/redesign-2026/measures-achat-studio.md)); the
+    admin STL button stays out of the Worker through `studio-stl-gate.tsx`.
     Never add a binary asset through a Next file convention.** Since
     2026-09-26 the account is on **Workers Paid**, whose cap is 10 MiB
     **gzipped**. The **Free** plan's 3 MiB cap is what broke the deploy in
@@ -236,6 +239,28 @@ put` on an environment with real users without `--env <name>` explicitly
     namespace (WP-HOME `landing`, WP-STUDIO `studio`/`studioCore`) declares it
     there; `src/i18n/client-messages.test.ts` fails otherwise. Details:
     [`docs/conventions.md`](docs/conventions.md) → Motion, i18n, Design tokens.
+12. **Studio direct purchase (14.10.2026): money, texts, migration.** The Studio
+    objects (vase, business card, mountain, name tag) are bought in the cart like a
+    shop product. The firm price comes from ONE pure function,
+    [`src/lib/studio/price.ts`](src/lib/studio/price.ts) (integer centimes, rates in
+    the module), shared by the browser (live price, cart) and by `POST /api/checkout`,
+    which recomputes everything ([`studio/purchase.ts`](src/lib/studio/purchase.ts):
+    strict schema, canonical config, printable guards, price) and never trusts the
+    client's price (409 `price_changed` carries the server prices). The price must
+    NOT depend on the full glyph font (the server never loads it) nor on the page
+    language: never import `text/glyphs` or `text/shapes` on the stats path, and
+    price the Montagne with `PRICE_LOCALE` (`price-font.test.ts`,
+    `price-isolation.test.ts` enforce it). A Studio line has no stock, no product id
+    and **no shipping** (`shippingForOrder`: only the shop part is shipped-charged);
+    its snapshot is `order_items.studio` (jsonb: configuration + typed texts, which
+    are personal data: kept with the order, never in Stripe metadata, analytics,
+    logs or `checkout_fingerprint`). Server-side cart reminders never see Studio
+    lines (`parseCart` drops them; the browser doesn't send them). **Migration
+    `drizzle-pg/0009` (additive column) must be applied BEFORE deploying code that
+    reads it**: every `select()` on `order_items` lists the column, the Stripe
+    webhook included. Shipping defaults are 0/0 (free everywhere in Switzerland);
+    the admin settings still override them. Studio filaments are the Polymaker
+    Panchroma Matte hex, displayed untransformed (`filaments.ts`, `filaments.test.ts`).
 
 ## Tech stack
 

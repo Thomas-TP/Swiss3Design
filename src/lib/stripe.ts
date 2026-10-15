@@ -32,9 +32,12 @@ export async function createCheckoutSession(
         { idempotencyKey },
       );
     } catch (err) {
+      // « No such payment_method_configuration » (id d'un autre mode live/test)
+      // arrive sans `param` : le message le désigne aussi.
       if (
         !(err instanceof Stripe.errors.StripeInvalidRequestError) ||
-        err.param !== "payment_method_configuration"
+        (err.param !== "payment_method_configuration" &&
+          !/payment_method_configuration/.test(err.message))
       )
         throw err;
       console.error("[Stripe] configuration des moyens de paiement rejetée");

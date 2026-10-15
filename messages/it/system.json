@@ -9,7 +9,10 @@
     "freeReached": "Spedizione gratuita.",
     "emptyKicker": "Terreno vergine",
     "emptyTitle": "Il carrello è vuoto.",
-    "emptyText": "Qui non è ancora stato impilato nulla. Personalizzi un oggetto nello Studio, scelga in negozio o ci invii il Suo file."
+    "emptyText": "Qui non è ancora stato impilato nulla. Personalizzi un oggetto nello Studio, scelga in negozio o ci invii il Suo file.",
+    "studioEdit": "Modifica nello Studio",
+    "studioNote": "Realizzato su ordinazione · consegna gratuita",
+    "freeAll": "Consegna gratuita in Svizzera."
   },
   "checkout": {
     "title": "Ordine.",

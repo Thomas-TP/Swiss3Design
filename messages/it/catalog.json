@@ -17,8 +17,7 @@
     },
     "studio": {
       "title": "Da personalizzare nello Studio.",
-      "intro": "Quattro oggetti disegnati dall'atelier, che Lei personalizza in 3D prima di inviarceli. Non sono articoli del negozio: il prezzo definitivo è confermato su preventivo entro 48 ore.",
-      "quote": "Su preventivo",
+      "intro": "Quattro oggetti progettati dal laboratorio, che personalizza in 3D e ordina direttamente: prezzo fisso, consegna gratuita in Svizzera.",
       "adjust": "Personalizza",
       "objects": {
         "lavaux": {
@@ -37,7 +36,8 @@
           "name": "Portanome «Borne»",
           "line": "Un portanome bicolore, in rilievo o inciso, con o senza anello."
         }
-      }
+      },
+      "startPrice": "Configurazione di partenza: {price}"
     },
     "file": {
       "title": "Ha già un file?",

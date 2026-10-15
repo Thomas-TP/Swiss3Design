@@ -12,13 +12,10 @@ import {
   pageMetadata,
   webPageJsonLd,
 } from "@/lib/seo";
-import {
-  formatChfRange,
-  formatDuration,
-  formatGrams,
-  formatMm,
-} from "@/lib/studio/format";
-import { PRICING } from "@/lib/studio/pricing-params";
+import { formatChf } from "@/lib/format";
+import { formatDuration, formatGrams, formatMm } from "@/lib/studio/format";
+import { studioPrice } from "@/lib/studio/price-figures";
+import { PRINT } from "@/lib/studio/print-params";
 import { DEFAULT_CONFIGS } from "@/lib/studio/presets";
 import { computeStats } from "@/lib/studio/stats";
 import { OBJECT_TEXT_FIELDS } from "@/lib/studio/text/fields";
@@ -77,7 +74,7 @@ export default async function StudioIndexPage({
     const texts: StudioTexts = {};
     for (const field of OBJECT_TEXT_FIELDS[object])
       texts[field] = core(`examples.${field}`);
-    const stats = computeStats(config, texts, PRICING, locale);
+    const stats = computeStats(config, texts, PRINT, locale);
     const size =
       object === "lavaux"
         ? `H ${formatMm(stats.heightMm, locale, 0)} · Ø ${formatMm(stats.widthMm, locale, 0)}`
@@ -92,13 +89,13 @@ export default async function StudioIndexPage({
       name: core(`objects.${object}.name`),
       tagline: core(`objects.${object}.tagline`),
       figures: `${size} · ≈ ${formatGrams(stats.grams, locale)} · ≈ ${formatDuration(stats.minutes, locale)}`,
-      price: stats.estimate
-        ? formatChfRange(
-            stats.estimate.lowCents,
-            stats.estimate.highCents,
-            locale,
-          )
-        : core("measure.onQuote"),
+      // Prix ferme de la configuration de départ (une pièce, livraison comprise).
+      price: t("index.startPrice", {
+        price: formatChf(
+          studioPrice(config, texts, 1, { locale, stats }).unitCents,
+          locale,
+        ),
+      }),
     };
   });
 

@@ -33,7 +33,7 @@
     "rulerValue": "Couche {layer} sur {total}, {height} imprimés"
   },
   "trust": {
-    "shipping": "Livraison offerte dès {amount}",
+    "shipping": "Livraison offerte en Suisse",
     "made": "Imprimé à Gland et à Pully",
     "payment": "TWINT, cartes, Google Pay"
   },
@@ -58,7 +58,7 @@
   "studio": {
     "eyebrow": "Le Studio",
     "title": "Personnalisez-le. On l'imprime.",
-    "intro": "Quatre objets originaux, que vous personnalisez en 3D avant de nous les envoyer. Le prix ferme est confirmé sur devis, sous 48 h.",
+    "intro": "Quatre objets originaux, que vous personnalisez en 3D puis commandez en ligne : prix ferme, livraison offerte en Suisse.",
     "adjust": "Personnaliser",
     "stepsTitle": "Comment ça marche",
     "steps": {
@@ -67,18 +67,19 @@
         "text": "Forme, motif, couleurs, texte : l'objet se personnalise en 3D, et les grammes et la durée suivent chaque geste."
       },
       "send": {
-        "title": "Envoyez",
-        "text": "Un clic transmet la pièce et sa configuration à l'atelier."
+        "title": "Commandez",
+        "text": "Ajoutez-le au panier et payez en ligne, au prix ferme affiché."
       },
       "check": {
         "title": "L'atelier vérifie",
-        "text": "Un humain relit chaque texte et contrôle la pièce : un prix ferme vous répond sous 48 h."
+        "text": "Un humain relit chaque texte avant l'impression ; un texte refusé est remboursé intégralement."
       },
       "print": {
         "title": "Imprimé et livré",
-        "text": "Imprimé à Gland ou à Pully, expédié par la Poste suisse, offert dès {amount}."
+        "text": "Imprimé à Gland ou à Pully, expédié par la Poste suisse, livraison offerte."
       }
-    }
+    },
+    "startPrice": "Configuration de départ : {price}"
   },
   "shop": {
     "eyebrow": "La boutique",
@@ -97,7 +98,7 @@
     "pullyMachine": "Creality K2 · CFS",
     "glandCoords": "46°25′N 6°16′E",
     "pullyCoords": "46°31′N 6°40′E",
-    "delivery": "Livraison offerte dès {amount}",
+    "delivery": "Livraison offerte en Suisse",
     "payment": "TWINT, cartes, Google Pay",
     "visit": "Visiter l'atelier"
   },

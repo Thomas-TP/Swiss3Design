@@ -9,7 +9,10 @@
     "freeReached": "Gratisversand.",
     "emptyKicker": "Unberührtes Gelände",
     "emptyTitle": "Ihr Warenkorb ist leer.",
-    "emptyText": "Hier wurde noch nichts aufgeschichtet. Personalisieren Sie im Studio ein Objekt, wählen Sie im Shop aus oder senden Sie uns Ihre Datei."
+    "emptyText": "Hier wurde noch nichts aufgeschichtet. Personalisieren Sie im Studio ein Objekt, wählen Sie im Shop aus oder senden Sie uns Ihre Datei.",
+    "studioEdit": "Im Studio bearbeiten",
+    "studioNote": "Auf Bestellung gefertigt · Lieferung gratis",
+    "freeAll": "Gratis-Lieferung in der Schweiz."
   },
   "checkout": {
     "title": "Bestellung.",

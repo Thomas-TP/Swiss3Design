@@ -501,16 +501,17 @@ const SURPRISE_PROFILES: LavauxConfig["profile"][] = [
 ];
 
 // Teintes voisines contrastées : on ne pose jamais deux bandes contiguës de
-// même famille (luminosité trop proche), sinon le changement ne se verrait pas.
+// luminosité trop proche, sinon le changement ne se verrait pas. Luma (Rec. 709,
+// valeurs sRGB codées) des hex Polymaker Panchroma Matte de `filaments.ts`.
 const LUMA: Record<FilamentId, number> = {
-  "blanc-neve": 0.96,
-  encre: 0.1,
-  "rouge-signal": 0.36,
-  "bleu-leman": 0.4,
-  "vert-lavaux": 0.47,
+  "blanc-neve": 0.94,
+  encre: 0.18,
+  "rouge-signal": 0.34,
+  "bleu-leman": 0.33,
+  "vert-lavaux": 0.37,
   "gris-molasse": 0.55,
-  ambre: 0.68,
-  glacier: 0.76,
+  ambre: 0.6,
+  glacier: 0.78,
 };
 const SURPRISE_FILAMENTS = Object.keys(LUMA) as FilamentId[];
 

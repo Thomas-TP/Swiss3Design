@@ -17,8 +17,8 @@ export type ObjectPoster =
 
 export interface ObjectCard {
   stats: StatsFigures;
-  /** Centimes ; null tant que PRICING.validated vaut false (« Sur devis »). */
-  estimate: { lowCents: number; highCents: number } | null;
+  /** Prix ferme de la configuration de départ (une pièce, livraison comprise), en centimes. */
+  priceCents: number;
   poster: ObjectPoster;
 }
 

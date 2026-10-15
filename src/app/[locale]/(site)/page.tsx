@@ -16,9 +16,7 @@ import { ChapterRail, type RailChapter } from "@/components/ui/chapter-rail";
 import { PageCut } from "@/components/ui/page-cut";
 import { ClientMessages } from "@/i18n/client-messages";
 import type { Locale } from "@/i18n/routing";
-import { formatChf } from "@/lib/format";
 import { pageMetadata } from "@/lib/seo";
-import { getShippingSettings } from "@/lib/shipping-settings";
 
 // Accueil « Strates » (brief §7.5) : sept chapitres, de « Tout relief commence
 // par une couche. » (le héros : l'impression réglable) à « Vous avez déjà un
@@ -54,13 +52,11 @@ export default async function HomePage({
   params: Promise<{ locale: Locale }>;
 }) {
   const { locale } = await params;
-  const [rail, featured, shipping] = await Promise.all([
+  const [rail, featured] = await Promise.all([
     getTranslations({ locale, namespace: "landing.rail" }),
     getProducts(locale, { featuredOnly: true }),
-    getShippingSettings(),
   ]);
   const heroData = HOME_DATA.hero;
-  const freeOver = formatChf(shipping.freeOverCents, locale);
 
   const chapters: RailChapter[] = [
     { id: "relief", number: "00", label: rail("hero") },
@@ -92,12 +88,12 @@ export default async function HomePage({
         <HomeConfigProvider data={heroData}>
           <ChapterRail chapters={chapters} label={rail("label")} />
           <Hero />
-          <TrustStrip freeOver={freeOver} />
+          <TrustStrip />
           <ChapterMap data={heroData} />
           <ChapterSummit />
-          <ChapterStudio freeOver={freeOver} />
+          <ChapterStudio />
           <ChapterShop products={featured} />
-          <ChapterAtelier freeOver={freeOver} />
+          <ChapterAtelier />
           <ChapterFile />
           <HomeMotion />
         </HomeConfigProvider>

@@ -10,7 +10,7 @@
 // besoin (brief §4.11).
 import { bandStatsFor } from "@/lib/studio/band-stats";
 import { buildStudioMesh, exportStl } from "@/lib/studio/build";
-import { PRICING } from "@/lib/studio/pricing-params";
+import { PRINT } from "@/lib/studio/print-params";
 import { sanitizeTexts } from "@/lib/studio/text/fields";
 import {
   GLYPH_URL,
@@ -83,7 +83,7 @@ export async function runBuild(job: BuildJob): Promise<BuiltMesh> {
       separateBands: job.separate,
       locale: job.locale,
     });
-    const summary = bandStatsFor(job.config, texts, PRICING, job.locale);
+    const summary = bandStatsFor(job.config, texts, PRINT, job.locale);
     const bands = summary.bands.map((b) => ({
       filament: b.filament,
       toMm: b.toMm,

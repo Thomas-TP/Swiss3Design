@@ -6,7 +6,10 @@ import { ArrowLeft, UserCircle, StickyNote, Truck } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import type { Locale } from "@/i18n/routing";
 import { getDb } from "@/db";
+import { uncached } from "@/db/fresh";
 import { orders, orderItems, statusEvents, user } from "@/db/schema";
+import { readStudioOrderLine } from "@/lib/studio/order-line";
+import { StudioSection } from "./studio-section";
 import { formatChf } from "@/lib/format";
 import { requireAdmin } from "@/lib/session";
 import { updateOrderStatus, updateOrderNote } from "../actions";
@@ -58,7 +61,11 @@ export default async function AdminOrderDetailPage({
   if (!order) notFound();
 
   const [items, [customer], history] = await Promise.all([
-    db.select().from(orderItems).where(eq(orderItems.orderId, id)),
+    // `uncached` : la relecture des textes du Studio doit se voir tout de suite.
+    db
+      .select()
+      .from(orderItems)
+      .where(and(eq(orderItems.orderId, id), uncached)),
     db
       .select({
         id: user.id,
@@ -85,6 +92,12 @@ export default async function AdminOrderDetailPage({
       )
       .orderBy(desc(statusEvents.createdAt)),
   ]);
+
+  // Objets du Studio dont les textes n'ont pas encore été relus : pas de production.
+  const studioPending = items.some((it) => {
+    const line = readStudioOrderLine(it.studio);
+    return line !== null && !line.reviewedAt;
+  });
 
   let address: Address = {};
   try {
@@ -144,8 +157,13 @@ export default async function AdminOrderDetailPage({
             defaultValue={order.status}
             className={`${FIELD} w-auto`}
           >
-            {ORDER_STATUSES.filter((s) =>
-              canTransitionOrder(order.status, s),
+            {ORDER_STATUSES.filter(
+              (s) =>
+                canTransitionOrder(order.status, s) &&
+                !(
+                  studioPending &&
+                  ["in_production", "shipped", "delivered"].includes(s)
+                ),
             ).map((s) => (
               <option key={s} value={s}>
                 {ORDER_STATUS_FR[s]}
@@ -261,6 +279,13 @@ export default async function AdminOrderDetailPage({
           </li>
         </ul>
       </section>
+
+      <StudioSection
+        orderId={order.id}
+        status={order.status}
+        items={items}
+        locale={locale}
+      />
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
         <section className="rounded-card border border-line bg-surface p-5 text-sm">

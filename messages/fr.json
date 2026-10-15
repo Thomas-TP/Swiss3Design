@@ -62,7 +62,8 @@
     "error": "Une erreur est survenue, réessayez.",
     "verifyNotice": "Confirmez votre adresse e-mail pour recevoir votre panier sur un autre appareil.",
     "restored": "Panier restauré avec les prix et disponibilités actuels. Vos autres articles ont été conservés.",
-    "restoreError": "Ce panier ne peut plus être restauré. Retrouvez les articles disponibles dans le catalogue."
+    "restoreError": "Ce panier ne peut plus être restauré. Retrouvez les articles disponibles dans le catalogue.",
+    "studioNote": "Les objets du Studio ne sont pas inclus dans le rappel : ils contiennent vos textes personnels, que nous ne conservons pas."
   },
   "cart": {
     "title": "Panier",
@@ -130,7 +131,9 @@
     "paymentReassurance": "Paiement chiffré. Vos données bancaires ne transitent jamais par nos serveurs.",
     "errorStock": "Le stock disponible a changé. Revenez au panier pour ajuster les quantités.",
     "errorVerifyAgain": "Vérifiez de nouveau votre adresse e-mail avant de payer.",
-    "errorProductChanged": "Un article ou une option a changé. Revenez à sa fiche pour le sélectionner de nouveau."
+    "errorProductChanged": "Un article ou une option a changé. Revenez à sa fiche pour le sélectionner de nouveau.",
+    "errorStudioPrice": "Le prix d'un objet du Studio a été mis à jour. Vérifiez le total, puis validez à nouveau.",
+    "errorStudioInvalid": "Un objet du Studio de votre panier ne peut pas être imprimé tel quel. Rouvrez-le dans le Studio depuis le panier."
   },
   "orderSuccess": {
     "processingTitle": "Paiement en cours",

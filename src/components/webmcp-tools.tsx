@@ -157,7 +157,8 @@ export function WebMcpTools() {
         title: "Configure a Studio object",
         description:
           "Builds a shareable Studio link for one of Swiss3Design's own configurable objects " +
-          "(lavaux vase, cartouche business card, montagne mountain, borne name tag) and returns its stats. " +
+          "(lavaux vase, cartouche business card, montagne mountain, borne name tag) and returns its stats and the firm price of one piece in CHF " +
+          "(delivery included; for objects with text it is computed with an example text). The customer adds the object to the cart in the browser: agents cannot buy Studio objects. " +
           "Personal texts (names, contacts) are never accepted here: the human types them on the page.",
         inputSchema: {
           type: "object",

@@ -222,10 +222,14 @@ function summarize(skill: ToolName, data: unknown, exact = true): string {
         .join("\n");
     case "get_store_info": {
       const s = d.shipping as {
+        free?: boolean;
         flatRate: { amount: string };
         freeFrom: { amount: string };
       };
-      return `Shipping within Switzerland only (Swiss Post): CHF ${s.flatRate.amount}, free from CHF ${s.freeFrom.amount}. Returns within 14 days for catalogue items. Payment: TWINT, Visa, Mastercard, Google Pay. Custom 3D printing on quote at ${(d.customPrinting as { request: string }).request}. Contact: ${(d.contact as { email: string }).email}.`;
+      const shipping = s.free
+        ? "free for every order, no minimum"
+        : `CHF ${s.flatRate.amount}, free from CHF ${s.freeFrom.amount}`;
+      return `Shipping within Switzerland only (Swiss Post): ${shipping}. Returns within 14 days for catalogue items. Payment: TWINT, Visa, Mastercard, Google Pay. Custom 3D printing on quote at ${(d.customPrinting as { request: string }).request}. Contact: ${(d.contact as { email: string }).email}.`;
     }
     case "track_order":
       return `Order ${d.orderNumber}: ${d.status}${d.trackingUrl ? ` — tracking: ${d.trackingUrl}` : ""}.`;

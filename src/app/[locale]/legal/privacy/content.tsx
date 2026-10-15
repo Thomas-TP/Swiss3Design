@@ -29,12 +29,15 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           métadonnées techniques de l’appareil sont stockées sur nos serveurs ;
           votre empreinte digitale ou la reconnaissance faciale ne quittent
           jamais votre appareil. <strong>Commandes</strong> : adresse de
-          livraison, articles, historique. <strong>Paiement</strong> : traité
-          exclusivement par Stripe ; nous ne voyons ni ne stockons aucune donnée
-          de carte. <strong>Devis sur mesure</strong> : description du projet et
-          fichiers 3D transmis. <strong>Avis</strong> : si vous laissez un avis
-          sur un produit acheté, votre nom d’affichage, la note et le
-          commentaire sont publiés sur la fiche produit après modération.{" "}
+          livraison, articles, historique ; pour un objet du Studio, sa
+          configuration et les textes saisis, qui peuvent contenir des données
+          personnelles (nom, fonction, coordonnées), font partie du contenu de
+          la commande. <strong>Paiement</strong> : traité exclusivement par
+          Stripe ; nous ne voyons ni ne stockons aucune donnée de carte.{" "}
+          <strong>Devis sur mesure</strong> : description du projet et fichiers
+          3D transmis. <strong>Avis</strong> : si vous laissez un avis sur un
+          produit acheté, votre nom d’affichage, la note et le commentaire sont
+          publiés sur la fiche produit après modération.{" "}
           <strong>Échanges</strong> : e-mails et correspondance.{" "}
           <strong>Données techniques</strong> : lors de la consultation du site,
           votre adresse IP, le type de navigateur et des journaux de connexion
@@ -228,9 +231,17 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Le Studio garde dans le stockage local de votre navigateur les
           créations que vous enregistrez (« Mes créations », 12 au plus) et, le
           temps de la session, les textes que vous saisissez ainsi que la
-          configuration transmise au formulaire de devis. Ces données restent
-          sur votre appareil : elles ne nous parviennent que lorsque vous
-          envoyez votre demande à l’atelier. Quand vous déposez un fichier
+          configuration transmise au formulaire de devis. Quand vous ajoutez un
+          objet du Studio au panier, sa configuration et les textes saisis
+          restent dans le stockage local de votre navigateur, avec le panier,
+          jusqu’à la commande, au retrait de l’objet ou au plus tard 30 jours ;
+          ils ne sont jamais inclus dans les rappels de panier ni dans une
+          mesure d’audience. Ces données restent sur votre appareil : elles ne
+          nous parviennent que lorsque vous commandez ou envoyez votre demande à
+          l’atelier. À la commande, la configuration et les textes de l’objet
+          font partie du contenu de la commande : relus par un humain de
+          l’atelier avant l’impression, ils sont conservés avec la commande
+          (voir « Durées de conservation »). Quand vous déposez un fichier
           (Studio ou demande de devis), un cookie technique de 24 heures
           garantit que vous seul pouvez le joindre à votre demande.
         </p>
@@ -241,9 +252,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Compte : jusqu’à sa suppression par le client. Commandes : 10 ans
-          (obligation de conservation comptable, art. 958f CO). Demandes de
-          devis et fichiers 3D : supprimés au plus tard 2 ans après la fin du
-          projet ou le refus du devis.
+          (obligation de conservation comptable, art. 958f CO), contenu de la
+          commande compris : pour un objet du Studio, sa configuration et les
+          textes saisis sont conservés avec la commande, sans purge anticipée.
+          Demandes de devis et fichiers 3D : supprimés au plus tard 2 ans après
+          la fin du projet ou le refus du devis.
         </p>
       ),
     },
@@ -316,18 +329,21 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Fall werden nur der öffentliche Schlüssel und technische
           Gerätemetadaten auf unseren Servern gespeichert; Ihr Fingerabdruck
           oder Ihre Gesichtserkennung verlassen Ihr Gerät nie.{" "}
-          <strong>Bestellungen</strong>: Lieferadresse, Artikel, Verlauf.{" "}
-          <strong>Zahlung</strong>: wird ausschliesslich von Stripe verarbeitet;
-          wir sehen und speichern keinerlei Kartendaten.{" "}
-          <strong>Offerten für Massanfertigungen</strong>: Projektbeschreibung
-          und übermittelte 3D-Dateien. <strong>Bewertungen</strong>: Wenn Sie
-          eine Bewertung zu einem gekauften Produkt hinterlassen, werden Ihr
-          Anzeigename, die Bewertung und der Kommentar nach Prüfung auf der
-          Produktseite veröffentlicht. <strong>Korrespondenz</strong>: E-Mails
-          und Schriftverkehr. <strong>Technische Daten</strong>: Beim Besuch der
-          Website werden Ihre IP-Adresse, der Browsertyp und
-          Verbindungsprotokolle automatisch zu Zwecken der Sicherheit, der
-          Missbrauchsprävention und des einwandfreien Betriebs bearbeitet.
+          <strong>Bestellungen</strong>: Lieferadresse, Artikel, Verlauf; bei
+          einem Studio-Objekt gehören dessen Konfiguration und die eingegebenen
+          Texte, die personenbezogene Daten enthalten können (Name, Funktion,
+          Kontaktdaten), zum Inhalt der Bestellung. <strong>Zahlung</strong>:
+          wird ausschliesslich von Stripe verarbeitet; wir sehen und speichern
+          keinerlei Kartendaten. <strong>Offerten für Massanfertigungen</strong>
+          : Projektbeschreibung und übermittelte 3D-Dateien.{" "}
+          <strong>Bewertungen</strong>: Wenn Sie eine Bewertung zu einem
+          gekauften Produkt hinterlassen, werden Ihr Anzeigename, die Bewertung
+          und der Kommentar nach Prüfung auf der Produktseite veröffentlicht.{" "}
+          <strong>Korrespondenz</strong>: E-Mails und Schriftverkehr.{" "}
+          <strong>Technische Daten</strong>: Beim Besuch der Website werden Ihre
+          IP-Adresse, der Browsertyp und Verbindungsprotokolle automatisch zu
+          Zwecken der Sicherheit, der Missbrauchsprävention und des
+          einwandfreien Betriebs bearbeitet.
         </p>
       ),
     },
@@ -515,11 +531,20 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Das Studio speichert im lokalen Speicher Ihres Browsers die
           Kreationen, die Sie sichern («Meine Kreationen», höchstens 12), und
           für die Dauer der Sitzung die Texte, die Sie eingeben, sowie die an
-          das Offertformular übergebene Konfiguration. Diese Daten bleiben auf
-          Ihrem Gerät: Sie erreichen uns erst, wenn Sie Ihre Anfrage an die
-          Werkstatt senden. Wenn Sie eine Datei hochladen (Studio oder
-          Offertanfrage), stellt ein technisches Cookie mit 24 Stunden Laufzeit
-          sicher, dass nur Sie diese Datei Ihrer Anfrage beifügen können.
+          das Offertformular übergebene Konfiguration. Wenn Sie ein
+          Studio-Objekt in den Warenkorb legen, bleiben seine Konfiguration und
+          die eingegebenen Texte zusammen mit dem Warenkorb im lokalen Speicher
+          Ihres Browsers, bis zur Bestellung, zur Entfernung des Objekts oder
+          höchstens 30 Tage; sie sind nie in den Warenkorb-Erinnerungen und nie
+          in einer Reichweitenmessung enthalten. Diese Daten bleiben auf Ihrem
+          Gerät: Sie erreichen uns erst, wenn Sie bestellen oder Ihre Anfrage an
+          die Werkstatt senden. Bei der Bestellung gehören Konfiguration und
+          Texte des Objekts zum Inhalt der Bestellung: Sie werden vor dem Druck
+          von einer Person der Werkstatt gegengelesen und mit der Bestellung
+          aufbewahrt (siehe «Aufbewahrungsfristen»). Wenn Sie eine Datei
+          hochladen (Studio oder Offertanfrage), stellt ein technisches Cookie
+          mit 24 Stunden Laufzeit sicher, dass nur Sie diese Datei Ihrer Anfrage
+          beifügen können.
         </p>
       ),
     },
@@ -528,9 +553,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Konto: bis zur Löschung durch den Kunden. Bestellungen: 10 Jahre
-          (buchhalterische Aufbewahrungspflicht, Art. 958f OR). Offertanfragen
-          und 3D-Dateien: Löschung spätestens 2 Jahre nach Projektabschluss oder
-          Ablehnung der Offerte.
+          (buchhalterische Aufbewahrungspflicht, Art. 958f OR), einschliesslich
+          des Bestellinhalts: Bei einem Studio-Objekt werden Konfiguration und
+          eingegebene Texte mit der Bestellung aufbewahrt, ohne vorzeitige
+          Löschung. Offertanfragen und 3D-Dateien: Löschung spätestens 2 Jahre
+          nach Projektabschluss oder Ablehnung der Offerte.
         </p>
       ),
     },
@@ -605,13 +632,16 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           sono memorizzati solo la chiave pubblica e alcuni metadati tecnici del
           dispositivo; la Sua impronta digitale o il riconoscimento facciale non
           lasciano mai il Suo dispositivo. <strong>Ordini</strong>: indirizzo di
-          consegna, articoli, cronologia. <strong>Pagamento</strong>: trattato
-          esclusivamente da Stripe; non vediamo né memorizziamo alcun dato della
-          carta. <strong>Preventivi su misura</strong>: descrizione del progetto
-          e file 3D trasmessi. <strong>Recensioni</strong>: se lascia una
-          recensione su un prodotto acquistato, il Suo nome visualizzato, il
-          voto e il commento vengono pubblicati sulla scheda prodotto dopo
-          moderazione. <strong>Scambi</strong>: e-mail e corrispondenza.{" "}
+          consegna, articoli, cronologia; per un oggetto dello Studio, la sua
+          configurazione e i testi inseriti, che possono contenere dati
+          personali (nome, funzione, recapiti), fanno parte del contenuto
+          dell’ordine. <strong>Pagamento</strong>: trattato esclusivamente da
+          Stripe; non vediamo né memorizziamo alcun dato della carta.{" "}
+          <strong>Preventivi su misura</strong>: descrizione del progetto e file
+          3D trasmessi. <strong>Recensioni</strong>: se lascia una recensione su
+          un prodotto acquistato, il Suo nome visualizzato, il voto e il
+          commento vengono pubblicati sulla scheda prodotto dopo moderazione.{" "}
+          <strong>Scambi</strong>: e-mail e corrispondenza.{" "}
           <strong>Dati tecnici</strong>: durante la consultazione del sito, il
           Suo indirizzo IP, il tipo di browser e i registri di connessione sono
           trattati automaticamente a fini di sicurezza, prevenzione degli abusi
@@ -804,10 +834,18 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           Lo Studio conserva nella memoria locale del Suo browser le creazioni
           che salva («Le mie creazioni», al massimo 12) e, per la durata della
           sessione, i testi che inserisce e la configurazione trasmessa al
-          modulo di preventivo. Questi dati restano sul Suo dispositivo: ci
-          giungono solo quando invia la Sua richiesta all’atelier. Quando carica
-          un file (Studio o richiesta di preventivo), un cookie tecnico di 24
-          ore garantisce che solo Lei possa allegarlo alla Sua richiesta.
+          modulo di preventivo. Quando aggiunge un oggetto dello Studio al
+          carrello, la sua configurazione e i testi inseriti restano nella
+          memoria locale del Suo browser, con il carrello, fino all’ordine, alla
+          rimozione dell’oggetto o al massimo 30 giorni; non sono mai inclusi
+          nei promemoria del carrello né in una misurazione d’audience. Questi
+          dati restano sul Suo dispositivo: ci giungono solo quando ordina o
+          invia la Sua richiesta all’atelier. All’ordine, la configurazione e i
+          testi dell’oggetto fanno parte del contenuto dell’ordine: riletti da
+          una persona dell’atelier prima della stampa, sono conservati con
+          l’ordine (vedere «Durata di conservazione»). Quando carica un file
+          (Studio o richiesta di preventivo), un cookie tecnico di 24 ore
+          garantisce che solo Lei possa allegarlo alla Sua richiesta.
         </p>
       ),
     },
@@ -816,9 +854,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Conto: fino alla sua cancellazione da parte del cliente. Ordini: 10
-          anni (obbligo di conservazione contabile, art. 958f CO). Richieste di
-          preventivo e file 3D: cancellati al più tardi 2 anni dopo la fine del
-          progetto o il rifiuto del preventivo.
+          anni (obbligo di conservazione contabile, art. 958f CO), compreso il
+          contenuto dell’ordine: per un oggetto dello Studio, la configurazione
+          e i testi inseriti sono conservati con l’ordine, senza cancellazione
+          anticipata. Richieste di preventivo e file 3D: cancellati al più tardi
+          2 anni dopo la fine del progetto o il rifiuto del preventivo.
         </p>
       ),
     },
@@ -891,9 +931,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           in the latter case, only the public key and technical device metadata
           are stored on our servers; your fingerprint or facial recognition data
           never leaves your device. <strong>Orders</strong>: delivery address,
-          items, history. <strong>Payment</strong>: processed exclusively by
-          Stripe; we neither see nor store any card data.{" "}
-          <strong>Custom quotes</strong>: project description and 3D files
+          items, history; for a Studio object, its configuration and the texts
+          entered, which may contain personal data (name, role, contact
+          details), are part of the order content. <strong>Payment</strong>:
+          processed exclusively by Stripe; we neither see nor store any card
+          data. <strong>Custom quotes</strong>: project description and 3D files
           submitted. <strong>Reviews</strong>: if you leave a review on a
           purchased product, your display name, rating and comment are published
           on the product page after moderation. <strong>Correspondence</strong>:
@@ -1074,10 +1116,16 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           The Studio keeps the creations you save (“My creations”, 12 at most)
           in your browser’s local storage and, for the length of the session,
           the texts you type and the configuration passed to the quote form.
-          This data stays on your device: it only reaches us when you send your
-          request to the workshop. When you upload a file (Studio or quote
-          request), a technical cookie lasting 24 hours makes sure only you can
-          attach it to your request.
+          When you add a Studio object to your cart, its configuration and the
+          texts entered stay in your browser’s local storage, with the cart,
+          until you order, remove the object or at most 30 days; they are never
+          included in cart reminders or in audience measurement. This data stays
+          on your device: it only reaches us when you order or send your request
+          to the workshop. When you order, the object’s configuration and texts
+          are part of the order content: read by a person at the workshop before
+          printing, they are kept with the order (see “Retention periods”). When
+          you upload a file (Studio or quote request), a technical cookie
+          lasting 24 hours makes sure only you can attach it to your request.
         </p>
       ),
     },
@@ -1086,9 +1134,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Account: until deleted by the customer. Orders: 10 years (accounting
-          retention obligation, Art. 958f of the Swiss Code of Obligations).
-          Quote requests and 3D files: deleted no later than 2 years after the
-          end of the project or rejection of the quote.
+          retention obligation, Art. 958f of the Swiss Code of Obligations),
+          order content included: for a Studio object, its configuration and the
+          texts entered are kept with the order, with no early purge. Quote
+          requests and 3D files: deleted no later than 2 years after the end of
+          the project or rejection of the quote.
         </p>
       ),
     },

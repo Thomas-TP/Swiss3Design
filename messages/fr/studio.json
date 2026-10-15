@@ -7,24 +7,24 @@
   "seo": {
     "index": {
       "title": "Le Studio : personnalisez votre objet 3D",
-      "description": "Quatre objets à personnaliser en 3D : vase, carte de visite, montagne, porte-nom. Jusqu'à quatre couleurs, imprimés en Suisse, prix ferme sous 48 h."
+      "description": "Quatre objets à personnaliser en 3D : vase, carte de visite, montagne, porte-nom. Jusqu'à quatre couleurs, imprimés en Suisse, prix ferme, livraison offerte."
     },
     "objects": {
       "lavaux": {
         "title": "Vase Lavaux sur mesure, en 3D",
-        "description": "Personnalisez le profil, le motif et jusqu'à quatre couleurs de votre vase Lavaux, vérifiez-le en 3D puis envoyez-le : impression en Suisse, prix ferme sous 48 h."
+        "description": "Personnalisez le profil, le motif et jusqu'à quatre couleurs de votre vase Lavaux, vérifiez-le en 3D puis commandez-le : impression en Suisse, prix ferme, livraison offerte."
       },
       "cartouche": {
         "title": "Carte de visite 3D Cartouche",
-        "description": "Votre carte de visite de 85 × 55 mm en relief ou gravée, deux couleurs, texte à vous : personnalisez-la en 3D, l'atelier l'imprime en Suisse, prix ferme sous 48 h."
+        "description": "Votre carte de visite de 85 × 55 mm en relief ou gravée, deux couleurs, texte à vous : personnalisez-la en 3D et commandez-la. Imprimée en Suisse, prix ferme, livraison offerte."
       },
       "montagne": {
         "title": "Montagne sur mesure, colorée par altitude",
-        "description": "Une petite montagne à poser sur un bureau, jusqu'à 12 cm, colorée par altitude, votre nom sur le socle. Imprimée en Suisse, prix ferme sous 48 h."
+        "description": "Une petite montagne à poser sur un bureau, jusqu'à 12 cm, colorée par altitude, votre nom sur le socle. Imprimée en Suisse, prix ferme, livraison offerte."
       },
       "borne": {
         "title": "Porte-nom Borne en deux couleurs",
-        "description": "Un porte-nom imprimé en deux couleurs avec votre texte, en relief ou gravé, anneau à gauche ou à droite. Personnalisé en 3D, imprimé en Suisse, prix ferme sous 48 h."
+        "description": "Un porte-nom imprimé en deux couleurs avec votre texte, en relief ou gravé, anneau à gauche ou à droite. Personnalisé en 3D, imprimé en Suisse, prix ferme, livraison offerte."
       }
     }
   },
@@ -32,8 +32,9 @@
     "eyebrow": "Configurateur 3D",
     "title": "Le Studio",
     "intro": "Personnalisez-le. On l'imprime.",
-    "lead": "Quatre objets conçus par l'atelier, bornés pour s'imprimer sur nos machines. Personnalisez la forme, les couleurs et le texte, vérifiez les chiffres, puis envoyez-le : l'atelier relit chaque demande et répond sous 48 h avec un prix ferme.",
-    "adjust": "Personnaliser"
+    "lead": "Quatre objets conçus par l'atelier, bornés pour s'imprimer sur nos machines. Personnalisez la forme, les couleurs et le texte, vérifiez les chiffres, puis commandez-le : prix ferme, livraison offerte en Suisse.",
+    "adjust": "Personnaliser",
+    "startPrice": "Configuration de départ : {price}"
   },
   "how": {
     "title": "Comment ça marche",
@@ -47,12 +48,12 @@
         "text": "Dimensions, grammes, durée et imprimabilité sont calculés pour de vrai, pas estimés au hasard."
       },
       "send": {
-        "title": "Envoyez",
-        "text": "Votre personnalisation part à l'atelier avec son fichier d'impression. Rien n'est payé à ce stade."
+        "title": "Commandez",
+        "text": "Ajoutez-le au panier et payez en ligne : prix ferme, livraison offerte en Suisse."
       },
       "receive": {
         "title": "Recevez",
-        "text": "L'atelier relit votre pièce et vous répond sous 48 h avec un prix ferme, à payer en ligne."
+        "text": "Un humain relit votre texte, puis l'atelier imprime votre pièce et l'expédie par la Poste suisse."
       }
     }
   },
@@ -65,19 +66,19 @@
       },
       "price": {
         "q": "Combien ça coûte ?",
-        "a": "Le prix ferme est confirmé par l'atelier sous 48 h, après relecture de votre pièce. Il dépend de la matière, de la durée d'impression et du nombre de changements de couleur. Aucun paiement n'est demandé avant cette confirmation."
+        "a": "Le prix est ferme et livraison comprise : il s'affiche en direct dans le Studio et dépend de l'objet, de la matière, du nombre de changements de couleur et de la quantité (de 1 à 20 pièces ; plus la quantité est grande, plus le prix de la pièce baisse). Vous payez en ligne exactement le prix affiché."
       },
       "text": {
         "q": "Mon texte est-il relu ?",
-        "a": "Oui. Un humain de l'atelier relit chaque texte avant l'impression. Nous refusons les marques de tiers, les injures et les contenus illicites. Votre texte n'apparaît jamais dans l'adresse de la page, ni dans les liens que vous copiez."
+        "a": "Oui. Un humain de l'atelier relit chaque texte avant l'impression, sous 2 jours ouvrés. Nous refusons les marques de tiers, les injures et les contenus illicites : dans ce cas la commande est annulée et vous êtes remboursé intégralement. Votre texte n'apparaît jamais dans l'adresse de la page, ni dans les liens que vous copiez."
       },
       "colors": {
         "q": "Comment les couleurs sont-elles imprimées ?",
-        "a": "Par des changements de filament à des hauteurs données, jusqu'à quatre filaments : c'est ce que l'atelier programme dans son logiciel de tranchage. Les teintes affichées sont indicatives, la couleur finale dépend de la bobine en stock."
+        "a": "Par des changements de filament à des hauteurs données, jusqu'à quatre filaments Polymaker Panchroma Matte : c'est ce que l'atelier programme dans son logiciel de tranchage. La teinte affichée est celle du fabricant ; elle reste approximative à l'écran, la bobine fait foi."
       },
       "after": {
-        "q": "Que se passe-t-il après l'envoi ?",
-        "a": "L'atelier vérifie votre fichier et vous répond par e-mail sous 48 h avec un prix ferme. Vous suivez la demande dans votre compte, puis vous payez en ligne ; la pièce est imprimée et expédiée en Suisse."
+        "q": "Que se passe-t-il après la commande ?",
+        "a": "Vous recevez une confirmation par e-mail avec vos textes. L'atelier relit les textes, imprime votre pièce à la demande (le Studio n'a pas de stock) et l'expédie par la Poste suisse ; vous suivez la commande dans votre compte ou sur la page de suivi."
       }
     }
   },
@@ -273,23 +274,21 @@
       "price": "Prix"
     },
     "materialValue": "PLA",
-    "estimate": "Estimation · prix ferme confirmé par l'atelier sous 48 h",
-    "indicative": "Teintes indicatives : la couleur finale dépend de la bobine en stock."
+    "indicative": "Filament Polymaker Panchroma Matte : la teinte à l'écran est approximative.",
+    "firm": "prix ferme, livraison offerte"
   },
   "summary": {
     "lavaux": "{name}, {height}, {pattern}, {count, plural, one {# couleur} other {# couleurs}} : {colors} ; {status}.",
     "flat": "{name}, {dimensions}, {count, plural, one {# couleur} other {# couleurs}} : {colors} ; texte : {text} ; {status}."
   },
   "send": {
-    "title": "Envoyer à l'atelier",
-    "intro": "L'atelier relit votre pièce et vous répond sous 48 h avec un prix ferme. Rien n'est payé maintenant.",
-    "cta": "Envoyer à l'atelier",
+    "title": "Demande de devis",
+    "intro": "Plus de 20 pièces ou une demande particulière ? L'atelier relit votre demande et vous répond sous 48 h avec un devis. Rien n'est payé maintenant.",
     "noscript": "Demander un devis",
     "noscriptNote": "Sans JavaScript, appliquez votre personnalisation puis copiez-la dans votre demande de devis : l'atelier prépare le fichier pour vous.",
     "machineLine": "Personnalisation à coller dans la demande",
     "blocked": "Corrigez d'abord les points signalés dans la fiche.",
     "needText": "Saisissez au moins un caractère : {field}.",
-    "estimateNote": "Estimation · prix ferme confirmé par l'atelier sous 48 h.",
     "colors": "Couleurs :",
     "quantity": "Quantité",
     "quantityHint": "De 1 à {max} exemplaires.",
@@ -308,12 +307,11 @@
     "none": "—",
     "labelFictive": "oui, altitude fictive",
     "labelTyped": "oui, altitude saisie : {value} m",
-    "indicative": "indicatif",
     "title": "[Studio] {object} · configuration v1",
     "link": "Lien : {link}",
     "dimensions": "Dimensions : {dimensions} · {layers} · {detail}",
     "colors": "Couleurs (changements à la couche) : {colors}",
-    "estimate": "Estimation affichée : {figures}",
+    "estimate": "Chiffres affichés : {figures}",
     "texts": "Textes à imprimer : {texts}",
     "textItem": "{label} : « {value} »",
     "quantity": "Quantité : {count}",
@@ -346,5 +344,23 @@
       "montagne": "Paramètres : {form} · {style} · raideur {steep} % · graine {seed} · étiquette : {label}",
       "borne": "Paramètres : forme {shape} · lettres {cap} · anneau {ring} · mode {mode}"
     }
+  },
+  "buy": {
+    "cta": "Ajouter au panier",
+    "update": "Mettre à jour le panier",
+    "quantity": "Quantité",
+    "decrease": "Une pièce de moins",
+    "increase": "Une pièce de plus",
+    "unit": "{price} la pièce",
+    "freeShipping": "Livraison offerte en Suisse",
+    "firm": "Prix ferme, livraison comprise.",
+    "added": "Ajouté au panier.",
+    "updated": "Panier mis à jour.",
+    "viewCart": "Voir le panier",
+    "editing": "Vous modifiez une ligne de votre panier.",
+    "cancelEdit": "Annuler la modification",
+    "quoteLead": "Une demande particulière ?",
+    "quoteLink": "Demander un devis",
+    "quoteHint": "Plus de {max} pièces, autre matière ou demande spéciale : l'atelier répond par un devis."
   }
 }

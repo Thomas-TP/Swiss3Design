@@ -11,7 +11,7 @@ import { btnGhost } from "../../_ui";
 export function ReorderButton({ orderId }: { orderId: string }) {
   const t = useTranslations("account");
   const router = useRouter();
-  const { add } = useCart();
+  const { add, addStudio } = useCart();
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -24,7 +24,7 @@ export function ReorderButton({ orderId }: { orderId: string }) {
       setError(t("orderDetail.reorderError"));
       return;
     }
-    if (res.items.length === 0) {
+    if (res.items.length === 0 && res.studioItems.length === 0) {
       setError(t("orderDetail.reorderUnavailable"));
       return;
     }
@@ -44,6 +44,8 @@ export function ReorderButton({ orderId }: { orderId: string }) {
         });
       }
     }
+    // Objets du Studio : la configuration gardée, au prix du jour.
+    for (const item of res.studioItems) addStudio(item);
     router.push("/cart");
   }
 

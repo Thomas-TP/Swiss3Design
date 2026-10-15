@@ -588,7 +588,6 @@ describe("statistiques et vues exactes", () => {
     expect(stats.changes).toBe(3);
     expect(stats.purgeGrams).toBe(2.4);
     expect(stats.printable).toEqual({ status: "ok" });
-    expect(stats.estimate).toBeNull();
     expect(stats.grams).toBeGreaterThan(20);
     expect(stats.grams).toBeLessThan(90);
     expect(stats.minutes).toBeGreaterThan(30);

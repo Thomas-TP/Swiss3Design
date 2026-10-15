@@ -18,6 +18,8 @@ import { markOrderPaid, markQuotePaid } from "./orders";
 import { reserveStock, releaseOrderStock } from "./stock";
 import { drainEmailOutbox, queueEmail } from "./outbox";
 import { consumeRequestLimit } from "./rate-limit";
+import { BORNE_DEFAULT } from "./studio/presets";
+import { studioLineInputSchema, validateStudioLine } from "./studio/purchase";
 
 const database = vi.hoisted(() => ({ current: null as unknown }));
 vi.mock("@/db", () => ({ getDb: async () => database.current }));
@@ -481,6 +483,78 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
     expect(restored[0].imageUrl).toBeNull();
     expect(restored[0].slug).toBe("audit-test-" + f.productId);
   });
+  // Objets du Studio (« Achat direct ») : ligne sans produit ni stock, instantané
+  // en `order_items.studio`, finalisation idempotente.
+  it("une commande du Studio seul se finalise une fois, sans stock, et garde son instantané", async () => {
+    const id = crypto.randomUUID();
+    ids.push(id);
+    const checked = validateStudioLine(
+      studioLineInputSchema.parse({
+        kind: "studio",
+        object: "borne",
+        config: JSON.parse(JSON.stringify(BORNE_DEFAULT)),
+        texts: { text: "Léa" },
+        locale: "fr",
+        quantity: 2,
+      }),
+    );
+    if (!checked.ok) throw new Error("ligne du Studio refusée");
+    const line = checked.line;
+    await db.insert(schema.orders).values({
+      id,
+      orderNumber: "TEST-" + id,
+      email: "audit@example.invalid",
+      subtotalCents: line.lineCents,
+      shippingCents: 0,
+      totalCents: line.lineCents,
+      shippingAddress: JSON.stringify({
+        name: "Audit",
+        street: "Test",
+        npa: "1000",
+        city: "Test",
+        country: "CH",
+      }),
+    });
+    await db.insert(schema.orderItems).values({
+      orderId: id,
+      productId: null,
+      variantId: null,
+      nameSnapshot: "Porte-nom « Borne »",
+      priceCentsSnapshot: line.unitCents,
+      quantity: 2,
+      studio: line.snapshot,
+    });
+    const proof = {
+      id: "pi_test_" + id,
+      amount: line.lineCents,
+      currency: "chf",
+    };
+    await Promise.all([
+      markOrderPaid(db, id, proof),
+      markOrderPaid(db, id, proof),
+    ]);
+    const [order] = await db
+      .select()
+      .from(schema.orders)
+      .where(eq(schema.orders.id, id));
+    expect(order.status).toBe("paid");
+    const [item] = await db
+      .select()
+      .from(schema.orderItems)
+      .where(eq(schema.orderItems.orderId, id));
+    expect(item.productId).toBeNull();
+    expect(item.studio?.object).toBe("borne");
+    expect(item.studio?.texts).toEqual({ text: "Léa" });
+    expect(item.studio?.price.unitCents).toBe(line.unitCents);
+    expect(item.studio?.hash).toBe(line.hash);
+    const messages = await db
+      .select()
+      .from(schema.emailOutbox)
+      .where(eq(schema.emailOutbox.key, "order-confirmation:" + id));
+    expect(messages).toHaveLength(1);
+    expect(messages[0].messageJson).toContain("Léa");
+  });
+
   it("Postgres refuse un total de commande incohérent", async () => {
     const f = await fixture();
     await expect(

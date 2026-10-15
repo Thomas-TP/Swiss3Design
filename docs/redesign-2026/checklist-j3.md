@@ -6,6 +6,11 @@
 > La fusion elle-même n'est lancée que sur votre accord explicite (brief §9.1, §11.2 n° 7).
 > Les règles d'or d'`AGENTS.md` priment sur tout ce qui suit (rappelées là où elles comptent).
 
+> **Mise à jour du 14.10.2026 : achat direct du Studio.** Ce lot ajoute une **migration
+> Postgres** (colonne `order_items.studio`) et change les prix et la livraison : la section
+> **1.4** donne l'**ordre exact** des opérations. Le retour arrière n'est donc plus « de code
+> seulement » (voir 1.4 et la section 4).
+
 **Où en est-on.** La branche `claude/redesign-2026` contient tous les packages, les vagues de
 correctifs R1 et R16 et ce lot WP-99. Elle est **à jour avec `main`** (aucun commit de `main`
 qu'elle n'ait pas, au 09.10.2026) : plus de 500 fichiers, aucun changement de schéma Postgres, de binding Cloudflare,
@@ -27,8 +32,8 @@ Neon `preview`, Stripe en mode test, analytics **non mesurées** : la mesure ne 
 
 | Décision                                                                                        | Défaut appliqué aujourd'hui                                                                                                                                                                                                           | À faire                                                                                                                                      |
 | ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
-| Inventaire réel des bobines (§11.2 n° 2)                                                        | Teintes **indicatives**, mention « Teintes indicatives » dans le Studio                                                                                                                                                               | Fournir marque, nom, hex, matière : `src/lib/studio/filaments.ts`                                                                            |
-| Coefficients de prix (§11.2 n° 3, `PRICING.validated`)                                          | `false` : aucun CHF affiché, seulement grammes, durée, changements                                                                                                                                                                    | Fournir les coefficients pour activer la fourchette                                                                                          |
+| Inventaire réel des bobines (§11.2 n° 2)                                                        | **Fait le 14.10.2026** : Polymaker Panchroma Matte, hex officiels, mention « teinte à l'écran approximative »                                                                                                                         | Confirmer les huit bobines (`src/lib/studio/filaments.ts`)                                                                                   |
+| Coefficients de prix (§11.2 n° 3)                                                               | **Fait le 14.10.2026** : prix ferme par objet (`src/lib/studio/price.ts`), achat direct au panier                                                                                                                                     | Relire les prix par défaut : vase 44.90, montagne 49.90, porte-nom 24.90, carte 17.90 (4.90 pièce à 10)                                      |
 | Mention du **stockage local du Studio** dans la politique de confidentialité (§11.2 n° 4, nLPD) | **Fait le 09.10.2026** : section « Studio et fichiers déposés » dans les 4 langues (créations, textes de session, configuration transmise au devis, cookie technique de 24 h des fichiers déposés), date de mise à jour au 09.10.2026 | Relire la version française, seule à faire foi                                                                                               |
 | Accroches de l'annexe C du brief (§11.2 n° 6)                                                   | Textes de l'annexe C                                                                                                                                                                                                                  | Relire les 4 langues                                                                                                                         |
 | Nom de marque : **« Kreya »** choisi le 08.10.2026                                              | Le site s'appelle encore Swiss3Design partout                                                                                                                                                                                         | Acheter `kreya.ch` (Infomaniak, vous), puis la bascule est un paquet à part **après J3**                                                     |
@@ -79,6 +84,36 @@ Cochez chaque ligne ; notez l'URL et le navigateur si quelque chose cloche.
 - [ ] Console du navigateur (F12) sur 3 pages : aucune erreur rouge, aucune violation CSP.
 - [ ] `/fr/admin` (compte administrateur, clair et sombre) : liste, détail d'une commande, d'un devis
       et d'un produit lisibles, rien ne déborde sur mobile.
+
+### 1.4 Achat direct du Studio : l'ordre exact (vos étapes)
+
+Les objets du Studio s'achètent au panier ; la livraison est offerte partout en Suisse ; les
+filaments sont les Polymaker Panchroma Matte. **Respectez cet ordre** : la migration d'abord
+(le webhook de paiement lit `order_items` : sans la colonne, plus aucune commande n'est
+enregistrée comme payée).
+
+1. **Migration en production, AVANT la fusion** (additive, sans risque pour l'ancien code) :
+   `ALTER TABLE "order_items" ADD COLUMN "studio" jsonb;` (identique à
+   `drizzle-pg/0009_cuddly_viper.sql`). Vérification :
+   `SELECT column_name FROM information_schema.columns WHERE table_name='order_items' AND column_name='studio';`.
+   La branche Neon **preview** l'a déjà reçue (14.10.2026).
+2. **Déploiement** : fusion dans `main` (section 2), puis vérification du déploiement (3.1).
+3. **Réglages de port à 0**, d'abord sur la preview puis en production : `shipping_cents` = `0` et
+   `free_shipping_over_cents` = `0` dans la table `settings`. Hyperdrive met les SELECT en cache
+   **60 s** : comptez une minute avant que le site le voie. Le code n'en dépend pas pour le Studio
+   (une ligne du Studio ne porte jamais de port) ; sans cette étape, un panier **de la boutique seule**
+   paie encore 8.90 CHF alors que les textes annoncent la livraison offerte.
+4. **Vase spirale à 34.90 CHF** (admin → Produits, ou SQL).
+5. **Resynchroniser le flux Stripe** (catalogue agentique) après la bascule du port : le flux ne
+   porte plus de seuil de gratuité ; sans action, le cron le remet à jour (quotidien).
+
+À relire avant la fusion : les textes légaux (CGV, confidentialité, livraison, version française
+qui fait foi ; dates réglées sur le jour du dernier commit, à recaler sur la fusion), la nouvelle
+section CGV « Objets du Studio » et l'engagement de **relecture des textes sous 2 jours ouvrés**.
+
+Parcours de test sur la preview (carte `4242 4242 4242 4242`) : un objet du Studio de chaque type
+(la Cartouche à 1 et à 10 pièces), une commande mixte (boutique + Studio), puis dans l'admin :
+résumé de la ligne, bobines à charger, « Télécharger le STL », « Textes relus ».
 
 ### 1.3 Contrôles techniques (fait par l'agent, à relire dans son compte rendu)
 
@@ -140,7 +175,7 @@ Cochez chaque ligne ; notez l'URL et le navigateur si quelque chose cloche.
 | `https://swiss3design.ch/` → `/fr`                                                                   | redirige vers la langue du navigateur, héros affiché, pas de 5xx    |
 | `/fr`, `/de`, `/it`, `/en`                                                                           | 200, un seul `h1`, texte lisible                                    |
 | `/fr/shop`, `/fr/products/vase-spirale`                                                              | produit, prix en CHF, ajout au panier, vue 3D                       |
-| `/fr/studio`, `/fr/studio/lavaux`, `/fr/studio/cartouche`, `/fr/studio/montagne`, `/fr/studio/borne` | objet réglable, estimation en grammes et durée, aucun CHF           |
+| `/fr/studio`, `/fr/studio/lavaux`, `/fr/studio/cartouche`, `/fr/studio/montagne`, `/fr/studio/borne` | objet réglable, prix ferme en direct, « Ajouter au panier »         |
 | `/fr/custom`, `/fr/a-propos`, `/fr/contact`, `/fr/legal/terms`                                       | 200                                                                 |
 | `/fr/n-importe-quoi`                                                                                 | 404 habillée, statut 404                                            |
 | `/fr/cart`, `/fr/checkout` (avec un article au panier)                                               | le formulaire Stripe en mode **live** s'affiche (ne rien payer ici) |
@@ -170,12 +205,12 @@ Testez dans une fenêtre privée où vous n'êtes jamais allé dans l'admin, et 
 
 Événements attendus (noms et propriétés inchangés par la refonte) et les quatre actions du projet :
 
-| Action PostHog   | Événement sur lequel elle repose                                  | Où il part                                                                             |
-| ---------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
-| Achat            | `Order Completed`                                                 | page de confirmation du paiement (`checkout/success/page.tsx`, dédoublonné par numéro) |
-| Ajout au panier  | `Product Added` (`source` : `product_page`, `catalog`, `buy_now`) | `components/add-to-cart.tsx` (fiche, cartes, planches, favoris, « Acheter »)           |
-| Demande de devis | `Quote Requested` (`source` : `form` ou `studio`, `object`)       | `components/quote/quote-request-form.tsx` (page `/custom` et tiroir du Studio)         |
-| Inscription      | `Signed Up` (`method`, `needs_verification`)                      | `account/register/register-form.tsx`                                                   |
+| Action PostHog   | Événement sur lequel elle repose                                                          | Où il part                                                                             |
+| ---------------- | ----------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- |
+| Achat            | `Order Completed`                                                                         | page de confirmation du paiement (`checkout/success/page.tsx`, dédoublonné par numéro) |
+| Ajout au panier  | `Product Added` (`source` : `product_page`, `catalog`, `buy_now`, `studio` avec `object`) | `components/add-to-cart.tsx` (fiche, cartes, planches, favoris, « Acheter »)           |
+| Demande de devis | `Quote Requested` (`source` : `form` ou `studio`, `object`)                               | `components/quote/quote-request-form.tsx` (page `/custom` et tiroir du Studio)         |
+| Inscription      | `Signed Up` (`method`, `needs_verification`)                                              | `account/register/register-form.tsx`                                                   |
 
 - [ ] Dans PostHog → Activité en direct : après vos parcours de fumée, voir `$pageview`, `Product Viewed`,
       `Product Added`, `Cart Viewed`, `Studio Viewed`, `Studio Configured`, `Studio Sent`, `Quote Requested`,
@@ -192,6 +227,12 @@ Testez dans une fenêtre privée où vous n'êtes jamais allé dans l'admin, et 
 ---
 
 ## 4. Retour arrière
+
+> **Achat direct du Studio (14.10.2026).** La colonne `order_items.studio` est additive : **ne pas la
+> supprimer** en cas de retour arrière (l'ancien code l'ignore, rien ne casse). Une commande du
+> Studio déjà payée reste valide : elle porte son prix et ses textes ; l'ancien admin n'affiche que
+> son nom (objet et dimensions), la configuration complète est dans `order_items.studio` (SQL). Les
+> réglages de port à 0 se remettent à 890 / 6000 dans la table `settings` si l'on veut revenir au tarif.
 
 **Quand** : paiement impossible, 5xx répétés, Studio qui plante au chargement, page blanche, perte de
 commandes. Dans le doute sur le paiement ou une erreur générale, **revenir d'abord, comprendre ensuite**.

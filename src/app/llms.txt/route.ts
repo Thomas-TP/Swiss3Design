@@ -57,7 +57,11 @@ export async function GET() {
 - Company: Swiss3Design, Gland (VD), Switzerland. Contact: contact@swiss3design.ch (reply within 48 hours).
 - Machines: Bambu Lab P1S with AMS 2 Pro (Gland) and Creality K2 with CFS (Pully) — up to 4 filament colours combined in one print, no painting or assembly.
 - Materials: mainly PLA (softens around 50–60 °C); PETG and other materials on request.
-- Shipping: Switzerland only, with Swiss Post. Flat rate ${chf(shipping.shippingCents)}, free from ${chf(shipping.freeOverCents)}. In-stock items leave within 1–3 working days; printed-to-order items after the production time shown on the product page. Tracking number by email.
+- Shipping: Switzerland only, with Swiss Post. ${
+    shipping.shippingCents === 0
+      ? "Free for every order, no minimum."
+      : `Flat rate ${chf(shipping.shippingCents)}, free from ${chf(shipping.freeOverCents)}.`
+  } In-stock items leave within 1–3 working days; printed-to-order items after the production time shown on the product page. Tracking number by email.
 - Returns: catalogue items within 14 days of receipt if unused and in original condition; return shipping paid by the customer. Custom prints are excluded except for manufacturing defects. 2-year Swiss statutory warranty.
 - Payment: TWINT, Visa, Mastercard and Google Pay, processed by Stripe.
 - Custom printing: upload an STL, 3MF, OBJ or STEP file (or describe the idea) and receive a personalised quote within 48 hours.
@@ -69,7 +73,7 @@ ${productLines.join("\n")}
 
 ## Studio
 
-- [Studio](${url(PAGES.studio)}): four original objects designed by the workshop, customisable in 3D and sent for a quote. Pick the shape, the pattern, up to four colors (filament changes at set heights) and, for cards, mountains and name tags, your own text. Every figure on the page (dimensions, grams, print time, printability) is computed; the workshop reviews every request and answers within 48 hours with a firm price. Nothing is paid in the Studio.
+- [Studio](${url(PAGES.studio)}): four original objects designed by the workshop, customisable in 3D and bought directly in the browser (cart, then payment): firm price shown live, delivery included, free shipping in Switzerland, 1 to 20 pieces per line. Pick the shape, the pattern, up to four colors (filament changes at set heights) and, for cards, mountains and name tags, your own text. Every figure on the page (dimensions, grams, print time, printability) is computed; a human reads every printed text before printing (a refused text means the order is cancelled and fully refunded). For more than 20 pieces or a special request, ask for a quote. Agents cannot buy Studio objects: give the customer the configuration link.
 - [Lavaux vase](${url("/studio/lavaux")}): a vase with five profiles, five patterns and up to four colors
 - [Cartouche business card](${url("/studio/cartouche")}): 85 × 55 mm, embossed or engraved text, two colors
 - [Mountain](${url("/studio/montagne")}): a small mountain to stand on a desk or shelf, up to 12 cm tall, coloured by altitude (up to four colors), smooth or terraced like a contour-line model, with your name and an altitude on the plinth

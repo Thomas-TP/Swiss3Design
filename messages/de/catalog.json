@@ -17,8 +17,7 @@
     },
     "studio": {
       "title": "Im Studio zu personalisieren.",
-      "intro": "Vier Objekte aus unserem Atelier, die Sie in 3D personalisieren, bevor Sie sie uns senden. Es sind keine Shop-Artikel: Den verbindlichen Preis bestätigen wir auf Offerte innert 48 Stunden.",
-      "quote": "Auf Offerte",
+      "intro": "Vier von der Werkstatt entworfene Objekte, die Sie in 3D gestalten und direkt bestellen: Fixpreis, Gratis-Lieferung in der Schweiz.",
       "adjust": "Personalisieren",
       "objects": {
         "lavaux": {
@@ -37,7 +36,8 @@
           "name": "Namensschild «Borne»",
           "line": "Ein zweifarbiges Namensschild, erhaben oder graviert, mit oder ohne Ring."
         }
-      }
+      },
+      "startPrice": "Startkonfiguration: {price}"
     },
     "file": {
       "title": "Sie haben schon eine Datei?",

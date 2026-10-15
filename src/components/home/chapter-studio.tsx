@@ -2,7 +2,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Chapter } from "@/components/ui/chapter";
 import { MeasureStrip } from "@/components/ui/measure-strip";
 import { SiteLink } from "@/components/ui/site-link";
-import { formatChfRange } from "@/lib/studio/format";
+import { formatChf } from "@/lib/format";
 import type { StudioObjectId } from "@/lib/studio/types";
 import { getHeroPoster } from "./hero-poster";
 import { HOME_DATA } from "./home-data.generated";
@@ -13,12 +13,11 @@ import styles from "./home.module.css";
 
 // Chapitre 03 « Réglez-le. On l'imprime. » (brief « Strates », §7.5) : quatre
 // cartes d'objet (poster SSR, nom, une ligne, chiffres de la configuration
-// d'exemple, « Sur devis » ou fourchette) puis « Comment ça marche » en
+// d'exemple, prix ferme de la configuration de départ) puis « Comment ça marche » en
 // <ol>. Tout est rendu par le serveur : aucun JavaScript, aucune vue WebGL.
 // Les chiffres sont ceux de `computeStats` (la fonction du Studio), calculés avec
 // les textes d'exemple de chaque langue et figés dans home-data.generated.ts ;
-// un prix n'est affiché que si `PRICING.validated` l'a rendu possible
-// (`estimate`), sinon « Sur devis ».
+// le prix est le prix ferme d'une pièce (`price.ts`), livraison comprise.
 const OBJECTS: StudioObjectId[] = ["lavaux", "cartouche", "montagne", "borne"];
 const STEPS = ["set", "send", "check", "print"] as const;
 
@@ -53,7 +52,7 @@ function Poster({ poster }: { poster: ObjectPoster }) {
   );
 }
 
-export function ChapterStudio({ freeOver }: { freeOver: string }) {
+export function ChapterStudio() {
   const locale = useLocale() as HomeLocale;
   const t = useTranslations("landing.studio");
   const tc = useTranslations("studioCore");
@@ -71,13 +70,9 @@ export function ChapterStudio({ freeOver }: { freeOver: string }) {
         <ul className="s3d-grid gap-y-4">
           {OBJECTS.map((id) => {
             const card = HOME_DATA.objects[locale][id];
-            const price = card.estimate
-              ? formatChfRange(
-                  card.estimate.lowCents,
-                  card.estimate.highCents,
-                  locale,
-                )
-              : tc("measure.onQuote");
+            const price = t("startPrice", {
+              price: formatChf(card.priceCents, locale),
+            });
             return (
               <li
                 key={id}
@@ -134,7 +129,7 @@ export function ChapterStudio({ freeOver }: { freeOver: string }) {
                 {t(`steps.${step}.title`)}
               </p>
               <p className="mt-2 text-sm text-soft">
-                {t(`steps.${step}.text`, { amount: freeOver })}
+                {t(`steps.${step}.text`)}
               </p>
             </li>
           ))}

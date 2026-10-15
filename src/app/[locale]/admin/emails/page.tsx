@@ -34,7 +34,7 @@ export default async function AdminEmailsPage({
     orderNumber: "S3D-DEMO42",
     email: "client@example.ch",
     subtotalCents: 4980,
-    shippingCents: 890,
+    shippingCents: 0,
     totalCents: 5870,
     shippingAddress: JSON.stringify({
       name: "Jean Dupont",

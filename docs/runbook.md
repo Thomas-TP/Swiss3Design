@@ -142,6 +142,23 @@ bun run db:seed:local        # seed local D1 from scripts/seed.sql
      The Stripe.js warning « live integrations must use HTTPS » on `http://localhost`
      is expected. Never put a `pk_live_…` / `sk_live_…` in these files.
 
+### Studio: refusing a text and refunding
+
+The Studio objects carry typed texts that a human reads within 2 working days
+(CGV). Admin → Orders → « Studio à relire » lists them.
+
+1. Open the order. If the texts are fine: « Textes relus, imprimer » (this unlocks
+   `in_production`), then download the STL (browser-generated).
+2. If a text must be refused (third-party brand, insult, unlawful content):
+   « Refuser le texte et annuler ». The order becomes `cancelled` and the customer
+   gets the dedicated email (full refund announced). The admin note says to refund.
+3. **Refund the whole payment by hand** in the Stripe dashboard (the link under the
+   order → Refund → full amount). No button refunds in LIVE. The `charge.refunded`
+   webhook then updates `refunded_cents` on the order.
+4. Check the order page: « Remboursé » equals the total; nothing remains to do.
+
+Never print before the texts are marked as read; never delete the order.
+
 ### Agentic commerce (sales through AI agents)
 
 - **Settings:** Stripe dashboard → Settings → Agentic commerce (Stripe profile,

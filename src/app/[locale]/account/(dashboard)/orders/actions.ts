@@ -84,6 +84,14 @@ export async function submitReview(
   return { success: true };
 }
 
+import type { StudioCartItem } from "@/lib/cart-data";
+import { buildStudioCartLine } from "@/lib/studio/cart-line";
+import { readStudioOrderLine } from "@/lib/studio/order-line";
+import {
+  validateStudioLine,
+  type StudioLineInput,
+} from "@/lib/studio/purchase";
+
 export interface ReorderItem {
   productId: string;
   variantId: string | null;
@@ -103,10 +111,14 @@ export interface ReorderItem {
 // snapshot figé de la commande, pas une source réutilisable pour un nouvel
 // achat. Les lignes dont le produit/variante a disparu ou est en rupture
 // sont silencieusement écartées (unavailableCount les compte pour affichage).
-export async function getReorderItems(
-  orderId: string,
-): Promise<
-  { items: ReorderItem[]; unavailableCount: number } | { error: string }
+export async function getReorderItems(orderId: string): Promise<
+  | {
+      items: ReorderItem[];
+      /** Objets du Studio de la commande, revalidés et repricés au barème du jour. */
+      studioItems: StudioCartItem[];
+      unavailableCount: number;
+    }
+  | { error: string }
 > {
   const session = await getServerSession();
   if (!session) return { error: "unauthorized" };
@@ -169,9 +181,36 @@ export async function getReorderItems(
   }
 
   const items: ReorderItem[] = [];
+  const studioItems: StudioCartItem[] = [];
   let unavailableCount = 0;
 
   for (const line of lines) {
+    // Objet du Studio : la configuration gardée est revalidée (schéma strict,
+    // imprimable) puis repricée au barème du jour, comme à un nouvel achat.
+    const studio = readStudioOrderLine(line.studio);
+    if (studio) {
+      const checked = validateStudioLine({
+        kind: "studio",
+        object: studio.object,
+        config: studio.config as unknown as Record<string, unknown>,
+        texts: studio.texts,
+        locale: studio.locale,
+        quantity: Math.min(20, Math.max(1, line.quantity)),
+      } satisfies StudioLineInput);
+      if (!checked.ok) {
+        unavailableCount++;
+        continue;
+      }
+      studioItems.push(
+        buildStudioCartLine({
+          config: checked.line.config,
+          texts: checked.line.texts,
+          locale: studio.locale,
+          quantity: checked.line.quantity,
+        }),
+      );
+      continue;
+    }
     const product = line.productId
       ? productById.get(line.productId)
       : undefined;
@@ -213,5 +252,5 @@ export async function getReorderItems(
     });
   }
 
-  return { items, unavailableCount };
+  return { items, studioItems, unavailableCount };
 }

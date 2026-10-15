@@ -34,7 +34,7 @@ Use the MCP server at \`${MCP}\` (Streamable HTTP, no authentication) or the RES
 ## Rules
 
 - Never invent prices or stock: always read them from the tools.
-- Shipping: flat rate, free above a threshold — call \`get_store_info\` for the current amounts.
+- Shipping: free everywhere in Switzerland, no minimum — call \`get_store_info\` for the current terms.
 - Only addresses in Switzerland can be delivered.
 `,
   },

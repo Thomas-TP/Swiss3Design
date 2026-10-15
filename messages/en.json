@@ -62,7 +62,8 @@
     "error": "Something went wrong, please try again.",
     "verifyNotice": "Verify your email address to receive your cart on another device.",
     "restored": "Cart restored with current prices and availability. Your other items were kept.",
-    "restoreError": "This cart can no longer be restored. Find available items in the catalogue."
+    "restoreError": "This cart can no longer be restored. Find available items in the catalogue.",
+    "studioNote": "Studio objects are not included in the reminder: they hold your personal texts, which we do not keep."
   },
   "cart": {
     "title": "Cart",
@@ -130,7 +131,9 @@
     "paymentReassurance": "Encrypted payment. Your card details never touch our servers.",
     "errorStock": "Available stock has changed. Return to your cart to adjust quantities.",
     "errorVerifyAgain": "Verify your email address again before paying.",
-    "errorProductChanged": "An item or option has changed. Select it again from the product page."
+    "errorProductChanged": "An item or option has changed. Select it again from the product page.",
+    "errorStudioPrice": "The price of a Studio object was updated. Check the total, then confirm again.",
+    "errorStudioInvalid": "A Studio object in your cart cannot be printed as it is. Reopen it in the Studio from your cart."
   },
   "orderSuccess": {
     "processingTitle": "Payment processing",

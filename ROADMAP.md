@@ -9,6 +9,10 @@
 > Référence technique à jour : [`docs/architecture.md`](docs/architecture.md) ·
 > [`AGENTS.md`](AGENTS.md) · [`README.md`](README.md).
 
+> **14.10.2026 : achat direct du Studio.** Les objets du Studio s'achètent au panier
+> (prix ferme, livraison offerte partout en Suisse, textes relus par l'atelier sous 2
+> jours ouvrés) ; le devis reste pour plus de 20 pièces. Détail : `docs/architecture.md`.
+
 ## ✅ Décisions verrouillées (et livrées)
 
 | Sujet              | Choix                                                                                                                                                                                       |

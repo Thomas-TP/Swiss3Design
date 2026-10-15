@@ -9,9 +9,9 @@ import styles from "./legal-layout.module.css";
 // Dernière mise à jour de chaque document : affichée en tête de page ET
 // reprise comme <lastmod> du sitemap (une seule source, jamais désynchronisées).
 export const LEGAL_UPDATED = {
-  terms: "2026-09-27",
-  privacy: "2026-10-09",
-  shipping: "2026-07-10",
+  terms: "2026-10-14",
+  privacy: "2026-10-14",
+  shipping: "2026-10-14",
 } as const;
 
 export interface LegalSection {

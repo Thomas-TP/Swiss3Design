@@ -17,8 +17,7 @@
     },
     "studio": {
       "title": "To customise in the Studio.",
-      "intro": "Four objects designed by the workshop that you customise in 3D before sending them to us. They are not shop items: the firm price is confirmed on quote within 48 hours.",
-      "quote": "On quote",
+      "intro": "Four objects designed by the workshop, which you customise in 3D and order directly: firm price, free delivery in Switzerland.",
       "adjust": "Customise",
       "objects": {
         "lavaux": {
@@ -37,7 +36,8 @@
           "name": "\"Borne\" name tag",
           "line": "A two-color name tag, embossed or engraved, with or without a ring."
         }
-      }
+      },
+      "startPrice": "Starting configuration: {price}"
     },
     "file": {
       "title": "Already have a file?",

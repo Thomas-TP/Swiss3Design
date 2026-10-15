@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+import { formatChf } from "@/lib/format";
 import { bandStatsFor } from "@/lib/studio/band-stats";
-import { PRICING } from "@/lib/studio/pricing-params";
+import { PRINT } from "@/lib/studio/print-params";
 import {
   BORNE_DEFAULT,
   CARTOUCHE_DEFAULT,
@@ -32,8 +33,8 @@ function input(
   return {
     config,
     texts,
-    stats: computeStats(config, texts, PRICING, locale),
-    bands: bandStatsFor(config, texts, PRICING, locale),
+    stats: computeStats(config, texts, PRINT, locale),
+    bands: bandStatsFor(config, texts, PRINT, locale),
     locale,
     t,
     core,
@@ -64,7 +65,7 @@ describe("demande de devis du Studio (§6.9)", () => {
       /^Couleurs \(changements à la couche\) : Bleu Léman 0–42 mm \(couches 1–210\) · Vert Lavaux 42–108 mm \(couches 211–540\) · Blanc névé 108–150 mm \(couches 541–750\)$/,
     );
     expect(lines[5]).toMatch(
-      /^Estimation affichée : ≈ 92 g · ≈ 3 h 01 · 2 changements$/,
+      /^Chiffres affichés : ≈ 92 g · ≈ 3 h 01 · 2 changements$/,
     );
     expect(lines[6]).toBe("Textes à imprimer : —");
     expect(lines[7]).toBe("Quantité : 1");
@@ -179,9 +180,20 @@ describe("résumé vivant et bande de mesure (§6.7, §6.10)", () => {
       "≈ 3 h 01",
       "2 changements",
       "purge ≈ 1,6 g",
-      "Prix confirmé sous 48 h",
     ]);
-    expect(PRICING.validated).toBe(false);
+    // Avec un prix ferme (une pièce, puis dix), il termine la bande de mesure.
+    expect(
+      measureItems({
+        ...input(LAVAUX_DEFAULT, {}),
+        price: { unitCents: 4490, quantity: 1 },
+      }).at(-1),
+    ).toBe(formatChf(4490, "fr"));
+    expect(
+      measureItems({
+        ...input(LAVAUX_DEFAULT, {}),
+        price: { unitCents: 490, quantity: 10 },
+      }).at(-1),
+    ).toBe(`${formatChf(490, "fr")} × 10`);
     // Un objet sans changement n'affiche pas de purge.
     const mono = {
       ...LAVAUX_DEFAULT,

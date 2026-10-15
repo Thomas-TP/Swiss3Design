@@ -118,9 +118,7 @@
   },
   "measure": {
     "strip": "H {height} · Ø {diameter} · {layers} · ≈ {grams} · ≈ {duration} · {changes} · Spülmenge ≈ {purge}",
-    "hero": "{height} · {layers} · {filaments} · ≈ {grams} · ≈ {duration}",
-    "onQuote": "Auf Offerte",
-    "priceLater": "Preis innert 48 Stunden bestätigt"
+    "hero": "{height} · {layers} · {filaments} · ≈ {grams} · ≈ {duration}"
   },
   "duration": {
     "real": "Reale Dauer ≈ {duration}",

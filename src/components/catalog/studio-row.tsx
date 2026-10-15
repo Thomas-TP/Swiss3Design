@@ -1,14 +1,17 @@
 import { useLocale, useTranslations } from "next-intl";
 import { ButtonLink } from "@/components/ui/button";
 import { ObjectCard } from "@/components/studio/object-card";
+import { formatChf } from "@/lib/format";
+import { DEFAULT_CONFIGS } from "@/lib/studio/presets";
+import { studioPrice } from "@/lib/studio/price-figures";
 import { OBJECT_TEXT_FIELDS } from "@/lib/studio/text/fields";
 import type { StudioObjectId, StudioTexts } from "@/lib/studio/types";
 
 // Rangée « À personnaliser au Studio » (brief « Strates », §7.8) : les quatre
-// objets originaux de l'atelier, personnalisables en 3D puis envoyés pour un
-// devis. Ce ne sont PAS des produits de la boutique : aucun prix ferme (« Sur
-// devis », une fourchette le jour où le propriétaire valide les coefficients),
-// aucun JSON-LD produit, aucune carte d'achat. Chaque carte montre l'objet dans
+// objets originaux de l'atelier, personnalisables en 3D puis COMMANDÉS au
+// panier (14.10.2026) : chaque carte montre le prix ferme de la configuration de
+// départ. Ce ne sont toujours pas des produits du catalogue : aucun JSON-LD
+// produit, aucun stock, l'achat se fait dans le Studio. Chaque carte montre l'objet dans
 // ses couleurs (le même aperçu que l'index du Studio) et mène à
 // `/studio/<objet>` ; les slugs sont des noms propres, identiques dans les 4
 // langues (§1.6).
@@ -56,7 +59,14 @@ export function StudioRow({ className }: { className?: string }) {
                 texts={texts}
                 name={t(`objects.${object}.name`)}
                 tagline={t(`objects.${object}.line`)}
-                price={t("quote")}
+                price={t("startPrice", {
+                  price: formatChf(
+                    studioPrice(DEFAULT_CONFIGS[object], texts, 1, {
+                      locale: locale as "fr" | "de" | "it" | "en",
+                    }).unitCents,
+                    locale,
+                  ),
+                })}
                 cta={t("adjust")}
               />
             </li>

@@ -17,28 +17,39 @@ import {
   customerAddresses,
   discountCodes,
 } from "@/db/schema";
-import { getSetting } from "@/db/queries";
+import { getTranslations } from "next-intl/server";
+import type { Translate } from "@/components/studio/summary";
+import {
+  studioDigest,
+  studioLineInputSchema,
+  type StudioLineInput,
+} from "@/lib/studio/purchase";
+import { resolveStudioLines } from "@/lib/studio/order-lines";
+import { STUDIO_MAX_LINES } from "@/lib/studio/price";
+import { getShippingSettings } from "@/lib/shipping-settings";
 import { getAuth } from "@/lib/auth";
 import { verifyEmailProof } from "@/lib/email-proof";
 import { validateDiscount } from "@/lib/discounts";
 import { rateLimit, tooManyRequests } from "@/lib/rate-limit";
-import { SHIPPING_CENTS, FREE_SHIPPING_OVER_CENTS } from "@/lib/shipping";
+import { shippingForOrder } from "@/lib/shipping";
 import { recordStatusTransition } from "@/lib/status-history";
 import { makeOrderNumber } from "@/lib/order-number";
+
+// Ligne PRODUIT (sans `kind`, comme avant le Studio) ou objet du Studio
+// (`kind: "studio"` : configuration et textes saisis, revalidés plus bas).
+const productLineSchema = z.object({
+  productId: z.string().min(1),
+  variantId: z.string().min(1).optional(),
+  color: z.string().min(1).max(60).optional(),
+  quantity: z.number().int().min(1).max(99),
+});
 
 const bodySchema = z.object({
   attemptId: z.uuid().optional(),
   items: z
-    .array(
-      z.object({
-        productId: z.string().min(1),
-        variantId: z.string().min(1).optional(),
-        color: z.string().min(1).max(60).optional(),
-        quantity: z.number().int().min(1).max(99),
-      }),
-    )
+    .array(z.union([studioLineInputSchema, productLineSchema]))
     .min(1)
-    .max(50),
+    .max(50 + STUDIO_MAX_LINES),
   email: z.email(),
   // Preuve de vérification d'e-mail (invités) émise par /api/checkout/verify-email
   emailProof: z.string().optional(),
@@ -68,7 +79,18 @@ export async function POST(request: Request) {
   if (!parsed.success) {
     return Response.json({ error: "invalid_request" }, { status: 400 });
   }
-  const { items, address, saveAddress, locale } = parsed.data;
+  const { address, saveAddress, locale } = parsed.data;
+  // Deux familles de lignes : les produits de la boutique (stock, prix en base)
+  // et les objets du Studio (configuration revalidée, prix refait ici).
+  const isStudioInput = (
+    line: (typeof parsed.data.items)[number],
+  ): line is StudioLineInput => "kind" in line && line.kind === "studio";
+  const items = parsed.data.items.filter(
+    (line): line is z.infer<typeof productLineSchema> => !isStudioInput(line),
+  );
+  const studioInputs = parsed.data.items.filter(isStudioInput);
+  if (items.length > 50 || studioInputs.length > STUDIO_MAX_LINES)
+    return Response.json({ error: "invalid_request" }, { status: 400 });
 
   // Toute commande exige une identité e-mail fiable : un compte connecté
   // (e-mail déjà vérifié) ou une preuve de vérification par code (invités).
@@ -98,12 +120,22 @@ export async function POST(request: Request) {
   const db = await getDb();
   const attemptKey =
     email.toLowerCase() + ":" + (parsed.data.attemptId ?? crypto.randomUUID());
+  // Les textes saisis n'entrent dans cette colonne en clair que par un condensé
+  // SHA-256. Sans objet du Studio, l'empreinte est exactement celle d'avant : une
+  // tentative ouverte avant le déploiement se reprend.
+  const studioDigests = await Promise.all(
+    studioInputs.map(async (line) => ({
+      d: await studioDigest(line),
+      e: line.expectedUnitCents ?? null,
+    })),
+  );
   const fingerprint = JSON.stringify({
     email,
     items,
     address,
     locale,
     discountCode: parsed.data.discountCode ?? "",
+    ...(studioDigests.length > 0 ? { studio: studioDigests } : {}),
   });
   const [existingAttempt] = await db
     .select()
@@ -114,6 +146,23 @@ export async function POST(request: Request) {
       return Response.json({ error: "checkout_changed" }, { status: 409 });
     return resumeOrderCheckout(db, existingAttempt);
   }
+  // Objets du Studio : validation stricte, prix recalculé, aucun stock. Avant la
+  // moindre écriture : un refus (400, 409 prix, 422 non imprimable) ne laisse rien.
+  let studioLines: Awaited<ReturnType<typeof resolveStudioLines>> = {
+    ok: true,
+    lines: [],
+  };
+  if (studioInputs.length > 0) {
+    const core = (await getTranslations({
+      locale,
+      namespace: "studioCore",
+    })) as unknown as Translate;
+    studioLines = resolveStudioLines(studioInputs, core, locale);
+    if (!studioLines.ok)
+      return Response.json(studioLines.body, { status: studioLines.status });
+  }
+  const studioOrderLines = studioLines.ok ? studioLines.lines : [];
+
   const fallbackTranslation = alias(
     productTranslations,
     "fallback_translation",
@@ -121,44 +170,51 @@ export async function POST(request: Request) {
   const productIds = [...new Set(items.map((i) => i.productId))];
   // Prix et noms relus en base : on ne fait jamais confiance au client.
   // Produits, variantes et couleurs sont des lectures indépendantes → en parallèle.
-  const [dbProducts, dbVariants, dbColors] = await Promise.all([
-    db
-      .select({
-        id: products.id,
-        priceCents: products.priceCents,
-        stock: products.stock,
-        name: sql<string>`coalesce(${productTranslations.name},${fallbackTranslation.name},${products.slug})`,
-      })
-      .from(products)
-      .leftJoin(
-        productTranslations,
-        and(
-          eq(productTranslations.productId, products.id),
-          eq(productTranslations.locale, locale),
-        ),
-      )
-      .leftJoin(
-        fallbackTranslation,
-        and(
-          eq(fallbackTranslation.productId, products.id),
-          eq(fallbackTranslation.locale, "fr"),
-        ),
-      )
-      .where(and(inArray(products.id, productIds), eq(products.active, true))),
-    db
-      .select()
-      .from(productVariants)
-      .where(inArray(productVariants.productId, productIds)),
-    db
-      .select({
-        productId: productColors.productId,
-        name: filamentColors.name,
-        hex: filamentColors.hex,
-      })
-      .from(productColors)
-      .innerJoin(filamentColors, eq(filamentColors.id, productColors.colorId))
-      .where(inArray(productColors.productId, productIds)),
-  ]);
+  const [dbProducts, dbVariants, dbColors] = productIds.length
+    ? await Promise.all([
+        db
+          .select({
+            id: products.id,
+            priceCents: products.priceCents,
+            stock: products.stock,
+            name: sql<string>`coalesce(${productTranslations.name},${fallbackTranslation.name},${products.slug})`,
+          })
+          .from(products)
+          .leftJoin(
+            productTranslations,
+            and(
+              eq(productTranslations.productId, products.id),
+              eq(productTranslations.locale, locale),
+            ),
+          )
+          .leftJoin(
+            fallbackTranslation,
+            and(
+              eq(fallbackTranslation.productId, products.id),
+              eq(fallbackTranslation.locale, "fr"),
+            ),
+          )
+          .where(
+            and(inArray(products.id, productIds), eq(products.active, true)),
+          ),
+        db
+          .select()
+          .from(productVariants)
+          .where(inArray(productVariants.productId, productIds)),
+        db
+          .select({
+            productId: productColors.productId,
+            name: filamentColors.name,
+            hex: filamentColors.hex,
+          })
+          .from(productColors)
+          .innerJoin(
+            filamentColors,
+            eq(filamentColors.id, productColors.colorId),
+          )
+          .where(inArray(productColors.productId, productIds)),
+      ])
+    : [[], [], []];
   const byId = new Map(dbProducts.map((p) => [p.id, p]));
   const variantById = new Map(dbVariants.map((v) => [v.id, v]));
   // Couleurs autorisées par produit : nom → hex (le hex vient de la base, jamais
@@ -231,19 +287,23 @@ export async function POST(request: Request) {
     );
   }
 
-  const subtotalCents = validLines.reduce(
+  const shopSubtotalCents = validLines.reduce(
     (sum, l) => sum + l.priceCents * l.quantity,
     0,
   );
+  const studioSubtotalCents = studioOrderLines.reduce(
+    (sum, l) => sum + l.lineCents,
+    0,
+  );
+  const subtotalCents = shopSubtotalCents + studioSubtotalCents;
 
-  // Les deux réglages de livraison sont indépendants → lus en parallèle.
-  const [shippingSetting, freeOverSetting] = await Promise.all([
-    getSetting("shipping_cents"),
-    getSetting("free_shipping_over_cents"),
-  ]);
-  const shippingFlat = Number(shippingSetting ?? SHIPPING_CENTS);
-  const freeOver = Number(freeOverSetting ?? FREE_SHIPPING_OVER_CENTS);
-  const shippingCents = subtotalCents >= freeOver ? 0 : shippingFlat;
+  // Port : seule la part boutique y est soumise ; le prix d'un objet du Studio
+  // est ferme, livraison comprise (jamais de port sur une ligne du Studio, quels
+  // que soient les réglages en base).
+  const shippingCents = shippingForOrder(
+    { shopCents: shopSubtotalCents, studioCents: studioSubtotalCents },
+    await getShippingSettings(),
+  );
 
   // Remise (code promo) revalidée côté serveur sur le sous-total réel
   let discountCents = 0;
@@ -323,8 +383,8 @@ export async function POST(request: Request) {
         actorId: authSession?.user.id ?? null,
       });
 
-      await tx.insert(orderItems).values(
-        validLines.map((l) => ({
+      await tx.insert(orderItems).values([
+        ...validLines.map((l) => ({
           orderId: order.id,
           productId: l.productId,
           variantId: l.variantId,
@@ -334,7 +394,21 @@ export async function POST(request: Request) {
           priceCentsSnapshot: l.priceCents,
           quantity: l.quantity,
         })),
-      );
+        // Objets du Studio : ni produit, ni variante, ni stock. Le prix unitaire
+        // est celui du serveur ; la configuration et les textes saisis sont dans
+        // `studio` (jamais dans Stripe, ni dans une mesure).
+        ...studioOrderLines.map((l) => ({
+          orderId: order.id,
+          productId: null,
+          variantId: null,
+          nameSnapshot: l.name,
+          colorName: null,
+          colorHex: null,
+          priceCentsSnapshot: l.unitCents,
+          quantity: l.quantity,
+          studio: l.snapshot,
+        })),
+      ]);
 
       await reserveStock(tx, validLines, order.id);
       if (appliedCode) {

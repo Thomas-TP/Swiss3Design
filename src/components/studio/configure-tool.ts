@@ -8,7 +8,7 @@
 // lien ne porte que la configuration (fragment #c=…), exactement ce que fait
 // « Copier le lien ».
 import { FILAMENT_IDS, isFilamentId } from "@/lib/studio/filaments";
-import { PRICING } from "@/lib/studio/pricing-params";
+import { PRINT } from "@/lib/studio/print-params";
 import {
   bandsForPalette,
   defaultConfig,
@@ -24,6 +24,7 @@ import {
   clampRange,
   type Range,
 } from "@/lib/studio/ranges";
+import { studioPrice } from "@/lib/studio/price-figures";
 import { computeStats } from "@/lib/studio/stats";
 import { DEFAULT_TEXTS } from "@/lib/studio/text/fields";
 import {
@@ -204,8 +205,9 @@ export interface ConfigureAnswer {
     grams: number;
     minutes: number;
     changes: number;
-    estimate_chf?: { low: number; high: number };
   };
+  /** Prix ferme d'UNE pièce en CHF, livraison comprise, avec les textes d'exemple. */
+  price_chf: number;
   printable: "ok" | "warn" | "error";
   issues: string[];
   note: string;
@@ -223,9 +225,14 @@ export function describeConfiguration(
   const stats = computeStats(
     config,
     DEFAULT_TEXTS[config.object],
-    PRICING,
+    PRINT,
     locale as "fr" | "de" | "it" | "en",
   );
+  const unitCents = studioPrice(
+    config,
+    DEFAULT_TEXTS[config.object],
+    1,
+  ).unitCents;
   const issues =
     stats.printable.status === "ok"
       ? []
@@ -238,17 +245,10 @@ export function describeConfiguration(
       grams: stats.grams,
       minutes: stats.minutes,
       changes: stats.changes,
-      ...(stats.estimate
-        ? {
-            estimate_chf: {
-              low: stats.estimate.lowCents / 100,
-              high: stats.estimate.highCents / 100,
-            },
-          }
-        : {}),
     },
+    price_chf: unitCents / 100,
     printable: stats.printable.status,
     issues,
-    note: "Open the link to customise the object in 3D and add any text yourself; the workshop reviews every request and answers within 48 hours with a firm price. Texts are never part of the link.",
+    note: "Open the link to customise the object in 3D and add any text yourself, then add it to the cart: the price is firm and delivery in Switzerland is free. price_chf is for one piece with the example text; the final price depends on the text you type and on the quantity, and is shown live in the Studio. A human reads every text before printing. Texts are never part of the link.",
   };
 }

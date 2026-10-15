@@ -33,7 +33,7 @@
     "rulerValue": "Schicht {layer} von {total}, {height} gedruckt"
   },
   "trust": {
-    "shipping": "Gratis Lieferung ab {amount}",
+    "shipping": "Gratis-Lieferung in der Schweiz",
     "made": "Gedruckt in Gland und Pully",
     "payment": "TWINT, Karten, Google Pay"
   },
@@ -58,7 +58,7 @@
   "studio": {
     "eyebrow": "Das Studio",
     "title": "Sie personalisieren. Wir drucken.",
-    "intro": "Vier Originalobjekte, die Sie in 3D personalisieren, bevor Sie sie uns senden. Den verbindlichen Preis bestätigen wir auf Offerte, innert 48 Stunden.",
+    "intro": "Vier Originalobjekte, die Sie in 3D gestalten und online bestellen: Fixpreis, Gratis-Lieferung in der Schweiz.",
     "adjust": "Personalisieren",
     "stepsTitle": "So funktioniert es",
     "steps": {
@@ -67,18 +67,19 @@
         "text": "Form, Muster, Farben, Text: Das Objekt wird in 3D personalisiert, und Gramm und Dauer folgen jeder Bewegung."
       },
       "send": {
-        "title": "Senden",
-        "text": "Ein Klick übermittelt das Stück und seine Konfiguration ans Atelier."
+        "title": "Bestellen",
+        "text": "Legen Sie es in den Warenkorb und bezahlen Sie online, zum angezeigten Fixpreis."
       },
       "check": {
         "title": "Das Atelier prüft",
-        "text": "Ein Mensch liest jeden Text gegen und prüft das Stück: Sie erhalten innert 48 Stunden einen verbindlichen Preis."
+        "text": "Ein Mensch liest jeden Text vor dem Druck gegen; ein abgelehnter Text wird voll erstattet."
       },
       "print": {
         "title": "Gedruckt und geliefert",
-        "text": "Gedruckt in Gland oder Pully, per Schweizer Post versandt, gratis ab {amount}."
+        "text": "In Gland oder Pully gedruckt, mit der Schweizerischen Post verschickt, Lieferung gratis."
       }
-    }
+    },
+    "startPrice": "Startkonfiguration: {price}"
   },
   "shop": {
     "eyebrow": "Der Shop",
@@ -97,7 +98,7 @@
     "pullyMachine": "Creality K2 · CFS",
     "glandCoords": "46°25′N 6°16′E",
     "pullyCoords": "46°31′N 6°40′E",
-    "delivery": "Gratis Lieferung ab {amount}",
+    "delivery": "Gratis-Lieferung in der Schweiz",
     "payment": "TWINT, Karten, Google Pay",
     "visit": "Das Atelier besuchen"
   },

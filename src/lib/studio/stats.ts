@@ -13,7 +13,6 @@
 // chiffre en SSR et côté client. La Montagne et la Borne, pleines et de plus de
 // 3 mm, s'impriment en coque de 0,8 mm + remplissage à 15 % (§6.5) ; la
 // Cartouche, mince, est pleine.
-import { estimate } from "./estimate";
 import {
   borneStrokeFix,
   checkFlatWith,
@@ -35,7 +34,7 @@ import {
   layoutMontagne,
   type Locale,
 } from "./objects/montagne-model";
-import { PRICING, type PricingParams } from "./pricing-params";
+import { PRINT, type PrintParams } from "./print-params";
 import type {
   Band,
   LavauxConfig,
@@ -70,7 +69,7 @@ export function printFigures(
   volumeMm3: number,
   layers: number,
   changes: number,
-  params: PricingParams = PRICING,
+  params: PrintParams = PRINT,
 ) {
   const purgeGrams = changes * params.purgeGrams;
   const grams = (volumeMm3 / 1000) * params.densityGcm3 + purgeGrams;
@@ -82,7 +81,7 @@ export function printFigures(
   return { grams, minutes, purgeGrams };
 }
 
-function lavauxStats(config: LavauxConfig, params: PricingParams): StudioStats {
+function lavauxStats(config: LavauxConfig, params: PrintParams): StudioStats {
   const analysis = analyzeLavaux(config);
   const layers = layerCount(config.h);
   const changes = countChanges(config.bands);
@@ -105,7 +104,6 @@ function lavauxStats(config: LavauxConfig, params: PricingParams): StudioStats {
     purgeGrams: Math.round(purgeGrams * 10) / 10,
     printable: checkLavauxWith(config, analysis),
   };
-  stats.estimate = estimate(stats, params);
   return stats;
 }
 
@@ -126,10 +124,10 @@ export function solidPrintVolume(
 }
 
 function finish(
-  base: Omit<StudioStats, "grams" | "minutes" | "purgeGrams" | "estimate"> & {
+  base: Omit<StudioStats, "grams" | "minutes" | "purgeGrams"> & {
     printVolumeMm3: number;
   },
-  params: PricingParams,
+  params: PrintParams,
 ): StudioStats {
   const { printVolumeMm3, ...rest } = base;
   const { grams, minutes, purgeGrams } = printFigures(
@@ -144,7 +142,6 @@ function finish(
     minutes: Math.round(minutes),
     purgeGrams: Math.round(purgeGrams * 10) / 10,
   };
-  stats.estimate = estimate(stats, params);
   return stats;
 }
 
@@ -152,7 +149,7 @@ function flatStats(
   model: FlatModel,
   printable: Printability,
   solid: boolean,
-  params: PricingParams,
+  params: PrintParams,
 ): StudioStats {
   const analysis = analyzeFlat(model);
   const height = flatHeight(model);
@@ -177,7 +174,7 @@ function montagneStats(
   config: MontagneConfig,
   texts: StudioTexts | undefined,
   locale: Locale | undefined,
-  params: PricingParams,
+  params: PrintParams,
 ): StudioStats {
   const model = layoutMontagne(config, texts, locale);
   const analysis = analyzeMontagne(model);
@@ -199,13 +196,15 @@ function montagneStats(
 /**
  * Statistiques d'une configuration. `texts` n'influe que sur les objets à
  * texte (Cartouche, Montagne, Borne) ; `locale` seulement sur l'étiquette de la
- * Montagne. `params` permet de tester un barème validé sans toucher à
- * PRICING (aucun CHF tant que `PRICING.validated` vaut false).
+ * Montagne : la langue change l'étiquette d'altitude (séparateur de milliers),
+ * donc les grammes de quelques dixièmes ; le PRIX se calcule pour cette raison
+ * toujours avec la langue canonique (`PRICE_LOCALE`, price-figures.ts). `params` :
+ * coefficients physiques (print-params.ts).
  */
 export function computeStats(
   config: StudioConfig,
   texts?: StudioTexts,
-  params: PricingParams = PRICING,
+  params: PrintParams = PRINT,
   locale?: Locale,
 ): StudioStats {
   switch (config.object) {

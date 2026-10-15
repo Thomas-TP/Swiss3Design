@@ -8,9 +8,9 @@
 // La demande de devis est la SEULE sortie qui porte le texte saisi (nom,
 // fonction, contact, sommet) : elle part dans la Server Action de devis
 // (finalité déclarée), jamais dans une URL ni un événement.
+import { formatChf } from "@/lib/format";
 import type { BandSummary } from "@/lib/studio/band-stats";
 import {
-  formatChfRange,
   formatDuration,
   formatGrams,
   formatMm,
@@ -109,9 +109,9 @@ export function quoteDimensions(input: SummaryInput): string {
 
 /**
  * « H 150,0 mm · Ø 96,0 mm · 750 couches · ≈ 92 g · ≈ 3 h 01 · 2 changements ·
- * purge ≈ 1,6 g · Prix confirmé sous 48 h » : chaque élément est calculé par
- * `computeStats` (jamais recopié), le prix n'apparaît que si le barème est
- * validé (`stats.estimate`), sinon la mention « Prix confirmé sous 48 h ».
+ * purge ≈ 1,6 g · CHF 44.90 » : chaque élément est calculé par `computeStats`
+ * (jamais recopié) ; le prix est le prix ferme de la ligne (`price.ts`), à la
+ * quantité choisie (« CHF 4.90 × 10 » dès deux pièces).
  */
 export function measureItems({
   config,
@@ -119,7 +119,10 @@ export function measureItems({
   locale,
   core,
   t,
-}: Pick<SummaryInput, "config" | "stats" | "locale" | "core" | "t">): string[] {
+  price,
+}: Pick<SummaryInput, "config" | "stats" | "locale" | "core" | "t"> & {
+  price?: { unitCents: number; quantity: number };
+}): string[] {
   const items: string[] = [];
   if (config.object === "lavaux") {
     items.push(`H ${formatMm(stats.heightMm, locale, 1)}`);
@@ -141,15 +144,12 @@ export function measureItems({
     items.push(
       `${t("measure.purge")} ≈ ${formatGrams(stats.purgeGrams, locale)}`,
     );
-  items.push(
-    stats.estimate
-      ? formatChfRange(
-          stats.estimate.lowCents,
-          stats.estimate.highCents,
-          locale,
-        )
-      : core("measure.priceLater"),
-  );
+  if (price)
+    items.push(
+      price.quantity > 1
+        ? `${formatChf(price.unitCents, locale)} × ${price.quantity}`
+        : formatChf(price.unitCents, locale),
+    );
   return items;
 }
 
@@ -357,9 +357,6 @@ export function quoteDescription(
       ),
     )
     .join(" · ");
-  const price = stats.estimate
-    ? ` · ${formatChfRange(stats.estimate.lowCents, stats.estimate.highCents, locale)} (${t("quote.indicative")})`
-    : "";
   const shown = plain(
     [
       `≈ ${formatGrams(stats.grams, locale)}`,
@@ -379,7 +376,7 @@ export function quoteDescription(
     ),
     plain(settingsLine(input)),
     plain(t("quote.colors", { colors: bandLines })),
-    plain(t("quote.estimate", { figures: shown })) + price,
+    plain(t("quote.estimate", { figures: shown })),
     plain(t("quote.texts", { texts: textsLine(input) })),
     plain(t("quote.quantity", { count: extras.quantity })),
     plain(

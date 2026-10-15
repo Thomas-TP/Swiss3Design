@@ -58,7 +58,12 @@ export default async function CheckoutPage() {
               la page de retour Stripe (checkout/success) est dessous et n'en
               a pas besoin. `footer` : les mentions sous le bouton de paiement. */}
           <ClientMessages
-            namespaces={["checkout", "footer", "system.checkout"]}
+            namespaces={[
+              "checkout",
+              "footer",
+              "system.checkout",
+              "studioCore.objects",
+            ]}
           >
             <CheckoutFlow
               shippingSettings={await getShippingSettings()}
