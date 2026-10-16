@@ -61,7 +61,7 @@ describe("décor : cadrage de la caméra", () => {
           clearance,
         });
         // Jusqu'à 2,2:1 (bureau), aucun rapprochement : pas de zoom.
-        if (aspect <= 2.2) expect(distance).toBeCloseTo(framed, 6);
+        expect(aspect > 2.2 || Math.abs(distance - framed) < 1e-6).toBe(true);
         // Écran très large : au-delà de 0,80 m de la pièce, la caméra est
         // au-dessus des dossiers (1,04 m).
         const height = targetY + distance * Math.cos(polar);
