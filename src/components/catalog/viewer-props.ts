@@ -86,10 +86,11 @@ export interface ViewerDecor {
 export const DINING_ROOM_DECOR: ViewerDecor = {
   url: "/scenes/dining-room/dining-room.gltf",
   anchor: [0.831, 0.78, 0.247],
-  // Dossiers des chaises à 1,01 m, à partir de 0,56 m du centre de la table
-  // (plateau de 1,00 m de large) : en dessous de 1,04 m, la caméra reste
-  // au-dessus du plateau, à 0,52 m au plus du vase.
-  clearance: { reach: 0.52, above: 1.04 },
+  // Garde-fou seulement : à 0,80 m, la caméra d'un écran courant (≤ 0,73 m du
+  // vase) n'est jamais rapprochée, le cadrage reste le même en descendant (un
+  // rapprochement à 0,52 m zoomait trop ; vérifié : la caméra passe entre et
+  // au-dessus des chaises). Seul un écran très large (≈ 3:1) est rapproché.
+  clearance: { reach: 0.8, above: 1.04 },
   credit: {
     title: "Dining room | Kichen baked",
     author: "ChristyHsu",

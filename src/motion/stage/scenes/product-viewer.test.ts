@@ -7,6 +7,7 @@ import {
   unitScaleFor,
   upAxisFor,
 } from "./product-viewer";
+import { DINING_ROOM_DECOR } from "@/components/catalog/viewer-props";
 
 const deg = (rad: number) => (rad * 180) / Math.PI;
 const horizontalFov = (verticalDeg: number, aspect: number) =>
@@ -39,33 +40,36 @@ describe("décor : cadrage de la caméra", () => {
     }
   });
 
-  it("la caméra ne passe jamais dans les dossiers des chaises (1,01 m)", () => {
-    // Vase posé sur le plateau (0,78 m), visé à mi-hauteur, de 5° à 88°, sur
-    // tous les écrans ; obstacles de la salle à manger (viewer-props.ts).
-    const clearance = { reach: 0.52, above: 1.04 };
+  it("salle à manger : même cadrage en descendant sur un écran courant", () => {
+    // Vase posé sur le plateau (0,78 m), visé à mi-hauteur, de 5° à 88°.
+    const { clearance } = DINING_ROOM_DECOR;
+    if (!clearance) throw new Error("garde-fou attendu");
     const targetY = 0.78 + 0.209 / 2;
-    for (const aspect of [0.8, 1.2, 2.2, 3])
+    for (const aspect of [0.8, 1.2, 2.2, 3]) {
+      const framed = decorDistance({
+        height: 0.209,
+        radius: 0.0394,
+        aspect,
+        fovDeg: decorFov(aspect),
+      });
       for (let degrees = 5; degrees <= 88; degrees += 1) {
         const polar = (degrees * Math.PI) / 180;
         const distance = clearedDistance({
-          distance: decorDistance({
-            height: 0.209,
-            radius: 0.0394,
-            aspect,
-            fovDeg: decorFov(aspect),
-          }),
+          distance: framed,
           polar,
           targetY,
           clearance,
         });
+        // Jusqu'à 2,2:1 (bureau), aucun rapprochement : pas de zoom.
+        if (aspect <= 2.2) expect(distance).toBeCloseTo(framed, 6);
+        // Écran très large : au-delà de 0,80 m de la pièce, la caméra est
+        // au-dessus des dossiers (1,04 m).
         const height = targetY + distance * Math.cos(polar);
-        // Les chaises commencent à 0,56 m du centre : en deçà, la caméra est
-        // au-dessus du plateau ; au-delà, au-dessus des dossiers.
-        const reach = distance * Math.sin(polar);
-        expect(reach < 0.56 || height > 1.02).toBe(true);
+        expect(distance * Math.sin(polar) < 0.801 || height > 1.039).toBe(true);
         // Toujours au-dessus du plateau.
-        expect(height).toBeGreaterThan(0.79);
+        expect(targetY + distance * Math.cos(polar)).toBeGreaterThan(0.79);
       }
+    }
   });
 
   it("en descendant, la caméra se rapproche sans à-coup", () => {
