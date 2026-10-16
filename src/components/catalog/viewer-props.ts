@@ -57,12 +57,6 @@ export interface ViewerDecor {
   polar?: { start: number; min: number; max: number };
   /** Part de la hauteur de la vue occupée par la pièce (défaut 0,62). */
   fill?: number;
-  /**
-   * Obstacles autour de la pièce : sous `above` (m), la caméra reste à moins de
-   * `reach` (m, à l'horizontale) de la pièce, elle s'en rapproche au lieu de
-   * traverser un dossier de chaise.
-   */
-  clearance?: { reach: number; above: number };
   /** Crédit exigé par la licence du décor (rendu sous la vue). */
   credit: {
     title: string;
@@ -86,11 +80,6 @@ export interface ViewerDecor {
 export const DINING_ROOM_DECOR: ViewerDecor = {
   url: "/scenes/dining-room/dining-room.gltf",
   anchor: [0.831, 0.78, 0.247],
-  // Garde-fou seulement : à 0,80 m, la caméra d'un écran courant (≤ 0,73 m du
-  // vase) n'est jamais rapprochée, le cadrage reste le même en descendant (un
-  // rapprochement à 0,52 m zoomait trop ; vérifié : la caméra passe entre et
-  // au-dessus des chaises). Seul un écran très large (≈ 3:1) est rapproché.
-  clearance: { reach: 0.8, above: 1.04 },
   credit: {
     title: "Dining room | Kichen baked",
     author: "ChristyHsu",
