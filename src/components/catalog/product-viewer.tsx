@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type MouseEvent } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  ChevronUp,
+} from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { cfImage } from "@/lib/cf-image";
 import { useMotionBridge } from "@/lib/motion-bridge/store";
@@ -140,13 +145,20 @@ export function ProductViewer({
 
   // Les boutons « Tourner » passent par un événement DOM sur la vue : le DOM
   // n'importe rien du côté lourd, la scène écoute l'élément qu'elle contrôle.
-  const turn = (step: ViewerTurnDetail["step"]) => (event: MouseEvent) => {
-    event.currentTarget.closest("[data-stage-view]")?.dispatchEvent(
-      new CustomEvent<ViewerTurnDetail>(VIEWER_TURN_EVENT, {
-        detail: { step },
-      }),
-    );
-  };
+  const turn =
+    (
+      step: ViewerTurnDetail["step"],
+      axis: ViewerTurnDetail["axis"] = "around",
+    ) =>
+    (event: MouseEvent) => {
+      event.currentTarget.closest("[data-stage-view]")?.dispatchEvent(
+        new CustomEvent<ViewerTurnDetail>(VIEWER_TURN_EVENT, {
+          detail: { step, axis },
+        }),
+      );
+    };
+  const controlClass =
+    "grid h-11 w-11 place-items-center rounded-field border border-ink bg-paper/85 text-ink transition-colors duration-150 ease-strate hover:bg-ink hover:text-paper";
 
   const decorCredit = DINING_ROOM_DECOR.credit;
   const caption = ready
@@ -191,11 +203,29 @@ export function ProductViewer({
                 data-no-orbit=""
                 className="absolute bottom-4 right-[var(--spacing-margin)] flex gap-2"
               >
+                {/* Hauteur : le seul moyen de passer au-dessus de la pièce au
+                  doigt (glisser verticalement fait défiler la page). */}
+                <button
+                  type="button"
+                  onClick={turn(-1, "height")}
+                  aria-label={t("tiltUp")}
+                  className={controlClass}
+                >
+                  <ChevronUp size={18} />
+                </button>
+                <button
+                  type="button"
+                  onClick={turn(1, "height")}
+                  aria-label={t("tiltDown")}
+                  className={controlClass}
+                >
+                  <ChevronDown size={18} />
+                </button>
                 <button
                   type="button"
                   onClick={turn(-1)}
                   aria-label={t("turnLeft")}
-                  className="grid h-11 w-11 place-items-center rounded-field border border-ink bg-paper/85 text-ink transition-colors duration-150 ease-strate hover:bg-ink hover:text-paper"
+                  className={controlClass}
                 >
                   <ChevronLeft size={18} />
                 </button>
@@ -203,7 +233,7 @@ export function ProductViewer({
                   type="button"
                   onClick={turn(1)}
                   aria-label={t("turnRight")}
-                  className="grid h-11 w-11 place-items-center rounded-field border border-ink bg-paper/85 text-ink transition-colors duration-150 ease-strate hover:bg-ink hover:text-paper"
+                  className={controlClass}
                 >
                   <ChevronRight size={18} />
                 </button>

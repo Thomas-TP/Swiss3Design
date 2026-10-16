@@ -57,6 +57,12 @@ export interface ViewerDecor {
   polar?: { start: number; min: number; max: number };
   /** Part de la hauteur de la vue occupée par la pièce (défaut 0,62). */
   fill?: number;
+  /**
+   * Obstacles autour de la pièce : sous `above` (m), la caméra reste à moins de
+   * `reach` (m, à l'horizontale) de la pièce, elle s'en rapproche au lieu de
+   * traverser un dossier de chaise.
+   */
+  clearance?: { reach: number; above: number };
   /** Crédit exigé par la licence du décor (rendu sous la vue). */
   credit: {
     title: string;
@@ -80,6 +86,10 @@ export interface ViewerDecor {
 export const DINING_ROOM_DECOR: ViewerDecor = {
   url: "/scenes/dining-room/dining-room.gltf",
   anchor: [0.831, 0.78, 0.247],
+  // Dossiers des chaises à 1,01 m, à partir de 0,56 m du centre de la table
+  // (plateau de 1,00 m de large) : en dessous de 1,04 m, la caméra reste
+  // au-dessus du plateau, à 0,52 m au plus du vase.
+  clearance: { reach: 0.52, above: 1.04 },
   credit: {
     title: "Dining room | Kichen baked",
     author: "ChristyHsu",
@@ -93,8 +103,12 @@ export const DINING_ROOM_DECOR: ViewerDecor = {
 export const VIEWER_TURN_EVENT = "s3d-viewer-turn";
 
 export interface ViewerTurnDetail {
-  /** −1 : vers la gauche, +1 : vers la droite (un cran = 15°). */
+  /**
+   * Autour (défaut) : −1 vers la gauche, +1 vers la droite (un cran = 15°).
+   * Hauteur : −1 vue plus haute (jusqu'au-dessus de la pièce), +1 plus basse.
+   */
   step: -1 | 1;
+  axis?: "around" | "height";
 }
 
 /** Teinte de repli si le produit ne liste aucune couleur : un blanc neutre. */

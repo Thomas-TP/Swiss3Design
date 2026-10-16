@@ -98,12 +98,14 @@
     "poster": "Foto del pezzo stampato. L'anteprima 3D la sostituisce non appena è pronta (richiede WebGL).",
     "loading": "Caricamento del modello 3D",
     "loadingSize": "Caricamento del modello 3D (≈ {size} MB)",
-    "ready": "Modello 3D pronto. Frecce sinistra e destra per ruotare.",
+    "ready": "Modello 3D pronto. Usi le frecce per ruotare e cambiare altezza.",
     "error": "Anteprima 3D non disponibile. Resta visibile la foto del pezzo.",
     "label": "Anteprima 3D di {name}: frecce per ruotare",
     "turnLeft": "Ruota verso sinistra",
     "turnRight": "Ruota verso destra",
-    "decorCredit": "Ambientazione: <source>«{title}»</source> di {author}, <deed>{license}</deed>, adattata per il web."
+    "decorCredit": "Ambientazione: <source>«{title}»</source> di {author}, <deed>{license}</deed>, adattata per il web.",
+    "tiltUp": "Guardare più dall'alto",
+    "tiltDown": "Guardare più dal basso"
   },
   "cross": {
     "title": "Un vaso nei Suoi colori?",

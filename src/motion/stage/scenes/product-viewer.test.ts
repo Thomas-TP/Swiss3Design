@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   clampPolar,
+  clearedDistance,
   decorDistance,
   decorFov,
   unitScaleFor,
@@ -39,27 +40,51 @@ describe("décor : cadrage de la caméra", () => {
   });
 
   it("la caméra ne passe jamais dans les dossiers des chaises (1,01 m)", () => {
-    // Vase posé sur le plateau (0,78 m), visé à mi-hauteur ; polaire la plus
-    // basse (76°), sur tous les écrans.
-    for (const aspect of [0.8, 1.2, 2.2, 3]) {
-      const distance = decorDistance({
-        height: 0.209,
-        radius: 0.0394,
-        aspect,
-        fovDeg: decorFov(aspect),
-      });
-      const polar = (76 * Math.PI) / 180;
-      const height = 0.78 + 0.209 / 2 + distance * Math.cos(polar);
-      // Les chaises commencent à 0,56 m du centre : en deçà, la caméra est
-      // entre le bord du plateau et les chaises ; au-delà, au-dessus d'elles.
-      const reach = distance * Math.sin(polar);
-      expect(reach < 0.56 || height > 1.02).toBe(true);
-    }
+    // Vase posé sur le plateau (0,78 m), visé à mi-hauteur, de 5° à 88°, sur
+    // tous les écrans ; obstacles de la salle à manger (viewer-props.ts).
+    const clearance = { reach: 0.52, above: 1.04 };
+    const targetY = 0.78 + 0.209 / 2;
+    for (const aspect of [0.8, 1.2, 2.2, 3])
+      for (let degrees = 5; degrees <= 88; degrees += 1) {
+        const polar = (degrees * Math.PI) / 180;
+        const distance = clearedDistance({
+          distance: decorDistance({
+            height: 0.209,
+            radius: 0.0394,
+            aspect,
+            fovDeg: decorFov(aspect),
+          }),
+          polar,
+          targetY,
+          clearance,
+        });
+        const height = targetY + distance * Math.cos(polar);
+        // Les chaises commencent à 0,56 m du centre : en deçà, la caméra est
+        // au-dessus du plateau ; au-delà, au-dessus des dossiers.
+        const reach = distance * Math.sin(polar);
+        expect(reach < 0.56 || height > 1.02).toBe(true);
+        // Toujours au-dessus du plateau.
+        expect(height).toBeGreaterThan(0.79);
+      }
   });
 
-  it("polaire bornée à 45–76° en décor, 6–174° sur le fond neutre", () => {
-    expect(deg(clampPolar(0, true))).toBeCloseTo(45);
-    expect(deg(clampPolar(Math.PI, true))).toBeCloseTo(76);
+  it("en descendant, la caméra se rapproche sans à-coup", () => {
+    const at = (degrees: number) =>
+      clearedDistance({
+        distance: 0.73,
+        polar: (degrees * Math.PI) / 180,
+        targetY: 0.885,
+        clearance: { reach: 0.52, above: 1.04 },
+      });
+    expect(at(40)).toBeCloseTo(0.73, 5);
+    expect(at(88)).toBeLessThan(0.53);
+    for (let degrees = 40; degrees < 88; degrees += 0.5)
+      expect(Math.abs(at(degrees + 0.5) - at(degrees))).toBeLessThan(0.025);
+  });
+
+  it("polaire bornée à 5–88° en décor, 6–174° sur le fond neutre", () => {
+    expect(deg(clampPolar(0, true))).toBeCloseTo(5);
+    expect(deg(clampPolar(Math.PI, true))).toBeCloseTo(88);
     expect(deg(clampPolar(0))).toBeCloseTo(6);
     expect(deg(clampPolar(Math.PI))).toBeCloseTo(174);
   });

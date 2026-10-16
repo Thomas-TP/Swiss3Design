@@ -80,6 +80,8 @@ const AZIMUTH_START = rad(-28);
 /** Un cran de flèche ou de bouton « Tourner ». */
 const TURN_STEP = rad(15);
 const POLAR_STEP = rad(4);
+/** Un cran des boutons de hauteur (plus haut, plus bas). */
+const HEIGHT_STEP = rad(12);
 /** Autorotation lente : 0,6 tr/min, en rad/s. */
 const AUTO_ROTATE = (0.6 / 60) * 2 * Math.PI;
 /** Reprise de l'autorotation après une interaction (s). */
@@ -106,13 +108,13 @@ const DECOR_HFOV_MAX = 55;
 /** Première vue par défaut : depuis le bout de la table, vers la cuisine. */
 const DECOR_AZIMUTH_START_DEG = 70;
 /**
- * Polaire en décor par défaut : de 45° (plongée) à 76°. Plus bas, sur un écran
- * large (caméra à ~0,7 m du vase, au-delà du bord de la table de 1 m), elle
- * passerait dans les dossiers des chaises (1,01 m). Un décor peut la
- * restreindre (tablette au-dessus de la pièce).
+ * Polaire en décor par défaut : de 5° (au-dessus de la pièce, on voit dedans) à
+ * 88° (au ras du plateau). En descendant, la caméra se rapproche de la pièce si
+ * le décor a des obstacles autour (`clearance` : les dossiers des chaises), au
+ * lieu de les traverser. Un décor peut restreindre la plage (tablette au-dessus).
  */
-const DECOR_POLAR_MIN = rad(45);
-const DECOR_POLAR_MAX = rad(76);
+const DECOR_POLAR_MIN = rad(5);
+const DECOR_POLAR_MAX = rad(88);
 const DECOR_POLAR_START = rad(72);
 /** En décor, la pièce occupe 62 % de la hauteur de la vue. */
 const DECOR_FILL = 0.62;
@@ -153,6 +155,34 @@ export function clampPolar(polar: number, decor = false): number {
  */
 export function unitScaleFor(height: number): number {
   return height > 5 ? 0.001 : 1;
+}
+
+/** Raideur du rapprochement (m/rad²) sous l'angle où le rayon frôle les dossiers. */
+const CLEARANCE_RAMP = 10;
+
+/**
+ * Distance de la caméra une fois les obstacles du décor évités (les dossiers des
+ * chaises, hauts de `above` m, à partir de `reach` m de la pièce). Au-dessus de
+ * l'angle où le rayon visé → caméra passe pile au ras des dossiers, n'importe
+ * quelle distance est sûre : le rayon les survole. En dessous, la caméra reste à
+ * `reach` m au plus de la pièce, à l'horizontale, au-dessus du plateau. Entre
+ * les deux, elle se rapproche progressivement (rampe quadratique), sans à-coup :
+ * sûr par construction, quel que soit l'écran (testé).
+ */
+export function clearedDistance(o: {
+  distance: number;
+  polar: number;
+  /** Hauteur (m) du point visé (milieu de la pièce). */
+  targetY: number;
+  clearance: { reach: number; above: number };
+}): number {
+  const { reach, above } = o.clearance;
+  const grazing = Math.atan2(reach, Math.max(0.001, above - o.targetY));
+  const margin = Math.max(0, grazing - o.polar);
+  const allowed =
+    reach / Math.max(0.01, Math.sin(o.polar)) +
+    CLEARANCE_RAMP * margin * margin;
+  return Math.min(o.distance, allowed);
 }
 
 /**
@@ -324,6 +354,8 @@ const create = (
   let azimuth = AZIMUTH_START;
   let azimuthTarget = AZIMUTH_START;
   let polar = POLAR_START;
+  /** Polaire visée par les boutons de hauteur (rejointe en douceur). */
+  let polarTarget = POLAR_START;
   let spin = 0;
   let dragging = false;
   let lastX = 0;
@@ -579,7 +611,7 @@ const create = (
     polarRange = tilt ? [rad(tilt.min), rad(tilt.max)] : null;
     decorPolarStart = tilt ? rad(tilt.start) : DECOR_POLAR_START;
     camera.fov = DECOR_FOV;
-    polar = decorPolarStart;
+    polar = polarTarget = decorPolarStart;
     azimuth = azimuthTarget = rad(span?.start ?? DECOR_AZIMUTH_START_DEG);
     floor.visible = false;
     // Ombre de contact sur le plateau (le décor n'a pas d'ombre pour un objet
@@ -701,7 +733,7 @@ const create = (
     const dAz = dx * RAD_PER_PX;
     azimuth = clampAzimuth(azimuth + dAz);
     azimuthTarget = azimuth;
-    polar = limitPolar(polar - dy * POLAR_PER_PX);
+    polar = polarTarget = limitPolar(polar - dy * POLAR_PER_PX);
     const dt = Math.max(1, now - lastMoveAt) / 1000;
     // Vitesse lissée, reprise à la relâche pour l'inertie.
     spin = spin * 0.6 + (dAz / dt) * 0.4;
@@ -736,12 +768,12 @@ const create = (
         turnTo(TURN_STEP);
         break;
       case "ArrowUp":
-        polar = limitPolar(polar - POLAR_STEP);
+        polar = polarTarget = limitPolar(polar - POLAR_STEP);
         markInteraction();
         ctx.invalidate();
         break;
       case "ArrowDown":
-        polar = limitPolar(polar + POLAR_STEP);
+        polar = polarTarget = limitPolar(polar + POLAR_STEP);
         markInteraction();
         ctx.invalidate();
         break;
@@ -751,7 +783,7 @@ const create = (
           : AZIMUTH_START;
         azimuthTarget = start;
         azimuth = ctx.reduced ? start : azimuth;
-        polar = decor ? decorPolarStart : POLAR_START;
+        polar = polarTarget = decor ? decorPolarStart : POLAR_START;
         spin = 0;
         markInteraction();
         ctx.invalidate();
@@ -770,8 +802,18 @@ const create = (
 
   function onTurn(event: Event) {
     if (state !== "ready") return;
-    const step = (event as CustomEvent<ViewerTurnDetail>).detail?.step;
-    if (step === -1 || step === 1) turnTo(step * TURN_STEP);
+    const detail = (event as CustomEvent<ViewerTurnDetail>).detail;
+    if (detail?.step !== -1 && detail?.step !== 1) return;
+    if (detail.axis !== "height") {
+      turnTo(detail.step * TURN_STEP);
+      return;
+    }
+    // Hauteur : sur un écran tactile, glisser verticalement fait défiler la
+    // page ; ces boutons sont le seul moyen de passer au-dessus de la pièce.
+    markInteraction();
+    polarTarget = limitPolar(polarTarget + detail.step * HEIGHT_STEP);
+    if (ctx.reduced) polar = polarTarget;
+    ctx.invalidate();
   }
 
   return {
@@ -878,6 +920,13 @@ const create = (
           }
         }
       }
+      // Crans de hauteur : rattrapage amorti, comme les crans autour.
+      const tilt = polarTarget - polar;
+      if (Math.abs(tilt) > 0.0005) {
+        polar += tilt * (1 - Math.exp(-dt * 12));
+        again = true;
+      } else polar = polarTarget;
+
       const rect = frame.rect;
       const aspect = rect.width / Math.max(1, rect.height);
       camera.aspect = aspect;
@@ -894,6 +943,14 @@ const create = (
           fovDeg: camera.fov,
           fill: props?.decor?.fill,
         });
+        const clearance = props?.decor?.clearance;
+        if (clearance)
+          distance = clearedDistance({
+            distance,
+            polar,
+            targetY: target.y,
+            clearance,
+          });
         orbit = azimuth;
         camera.near = 0.02;
         camera.far = 30;

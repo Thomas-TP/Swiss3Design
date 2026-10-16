@@ -98,12 +98,14 @@
     "poster": "Foto des gedruckten Stücks. Die 3D-Ansicht ersetzt es, sobald sie bereit ist (WebGL erforderlich).",
     "loading": "3D-Modell wird geladen",
     "loadingSize": "3D-Modell wird geladen (≈ {size} MB)",
-    "ready": "3D-Modell bereit. Mit den Pfeiltasten links und rechts drehen.",
+    "ready": "3D-Modell bereit. Pfeiltasten zum Drehen und zum Ändern der Höhe.",
     "error": "3D-Ansicht nicht verfügbar. Das Foto des Stücks bleibt sichtbar.",
     "label": "3D-Ansicht von {name}: Pfeiltasten zum Drehen",
     "turnLeft": "Nach links drehen",
     "turnRight": "Nach rechts drehen",
-    "decorCredit": "Kulisse: <source>«{title}»</source> von {author}, <deed>{license}</deed>, für das Web angepasst."
+    "decorCredit": "Kulisse: <source>«{title}»</source> von {author}, <deed>{license}</deed>, für das Web angepasst.",
+    "tiltUp": "Von weiter oben ansehen",
+    "tiltDown": "Von weiter unten ansehen"
   },
   "cross": {
     "title": "Eine Vase in Ihren Farben?",

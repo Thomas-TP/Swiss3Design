@@ -98,12 +98,14 @@
     "poster": "Photo de la pièce imprimée. L'aperçu 3D la remplace dès qu'il est prêt (WebGL requis).",
     "loading": "Chargement du modèle 3D",
     "loadingSize": "Chargement du modèle 3D (≈ {size} Mo)",
-    "ready": "Modèle 3D prêt. Flèches gauche et droite pour tourner.",
+    "ready": "Modèle 3D prêt. Flèches pour tourner autour et changer de hauteur.",
     "error": "Aperçu 3D indisponible. La photo de la pièce reste affichée.",
     "label": "Aperçu 3D de {name} : flèches pour tourner",
     "turnLeft": "Tourner vers la gauche",
     "turnRight": "Tourner vers la droite",
-    "decorCredit": "Décor : <source>« {title} »</source> de {author}, <deed>{license}</deed>, adapté pour le web."
+    "decorCredit": "Décor : <source>« {title} »</source> de {author}, <deed>{license}</deed>, adapté pour le web.",
+    "tiltUp": "Voir de plus haut",
+    "tiltDown": "Voir de plus bas"
   },
   "cross": {
     "title": "Un vase à vos couleurs ?",
