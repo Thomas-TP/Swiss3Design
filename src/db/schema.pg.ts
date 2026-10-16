@@ -12,6 +12,7 @@ import {
 } from "drizzle-orm/pg-core";
 import { sql } from "drizzle-orm";
 import type { StudioOrderLine } from "@/lib/studio/order-line";
+import type { ColorProjectSummary } from "@/lib/paint3d/summary";
 
 // Traduction mécanique de schema.ts (D1/SQLite) vers Postgres (Hyperdrive) —
 // mêmes tables/colonnes/contraintes, adaptées aux types natifs Postgres :
@@ -734,6 +735,23 @@ export const filamentQuoteDetails = pgTable(
     ),
   ],
 );
+
+/**
+ * Projet de couleurs joint à une demande de devis par l'atelier 3D de « Sur
+ * mesure » (16.10.2026) : le 3MF peint (prêt pour Bambu Studio, préfixe privé
+ * quotes/ du R2) et son résumé (couleurs dans l'ordre des filaments, parts de
+ * surface, taille, orientation). Table à part (migration 0012, additive) : aucun
+ * select() de quote_requests ne change, et le code tolère son absence (42P01).
+ */
+export const quoteColorProjects = pgTable("quote_color_projects", {
+  quoteId: text("quote_id")
+    .primaryKey()
+    .references(() => quoteRequests.id, { onDelete: "cascade" }),
+  fileKey: text("file_key").notNull(),
+  fileName: text("file_name").notNull(),
+  summary: jsonb("summary").$type<ColorProjectSummary>().notNull(),
+  createdAt: createdAt(),
+});
 
 export const settings = pgTable("settings", {
   key: text("key").primaryKey(),

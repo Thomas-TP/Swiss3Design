@@ -1,0 +1,151 @@
+{
+  "title": "3D-Werkstatt",
+  "done": "Fertig",
+  "close": "Schliessen",
+  "undo": "Rückgängig",
+  "redo": "Wiederholen",
+  "loading": "Ihr Teil wird vorbereitet…",
+  "error": "Diese Datei lässt sich in der 3D-Werkstatt nicht öffnen. Ihre Anfrage bleibt möglich: Beschreiben Sie die gewünschten Farben im Formular.",
+  "unavailable": "Die 3D-Werkstatt braucht WebGL, das auf diesem Gerät oder in diesem Browser fehlt. Beschreiben Sie die gewünschten Farben im Formular.",
+  "viewport": "3D-Ansicht Ihres Teils: auf dem Teil ziehen zum Malen, daneben zum Drehen",
+  "toolsLabel": "Werkzeuge",
+  "panelsLabel": "Einstellungen",
+  "hoverHeight": "Höhe unter dem Zeiger: {z} mm",
+  "clear": "Bemalung löschen",
+  "clearConfirm": "Die gesamte Bemalung des Teils löschen?",
+  "tabs": {
+    "colors": "Farben",
+    "tool": "Werkzeug",
+    "object": "Grösse",
+    "summary": "Übersicht"
+  },
+  "tools": {
+    "orbit": "Ansicht",
+    "brush": "Pinsel",
+    "triangle": "Facette",
+    "fill": "Füllen",
+    "height": "Höhe",
+    "erase": "Radierer",
+    "measure": "Messen",
+    "lay": "Auflegen"
+  },
+  "hints": {
+    "orbit": "Ziehen zum Drehen, Rechtsklick oder Umschalt zum Verschieben, Mausrad oder Zwei-Finger-Geste zum Zoomen.",
+    "brush": "Auf dem Teil ziehen zum Malen. Umschalt: Radierer. [ und ]: Pinselgrösse.",
+    "triangle": "Malt jede berührte Facette des Netzes, ohne sie zu teilen.",
+    "fill": "Darüberfahren zeigt die Fläche, Klicken füllt sie.",
+    "height": "Klicken Sie auf das Teil in der gewünschten Höhe: Ab dieser Schicht wechselt die Farbe.",
+    "erase": "Ziehen, um bemalten Flächen die Grundfarbe zurückzugeben.",
+    "measure": "Klicken Sie zwei Punkte des Teils an, um ihren Abstand zu messen.",
+    "lay": "Klicken Sie die Fläche an, die auf der Druckplatte aufliegen soll."
+  },
+  "brush": {
+    "size": "Pinselgrösse",
+    "through": "Durch das Teil malen (auch verdeckte Flächen)",
+    "paints": "Malt in {name}"
+  },
+  "erase": {
+    "paints": "Setzt die Grundfarbe ({name})"
+  },
+  "fill": {
+    "smooth": "Fläche",
+    "color": "Gleiche Farbe",
+    "part": "Teil",
+    "smoothHint": "Füllt die glatte Fläche bis zu Kanten, die schärfer sind als der gewählte Winkel.",
+    "colorHint": "Färbt die ganze zusammenhängende Fläche gleicher Farbe um.",
+    "partHint": "Füllt das ganze berührte Teil (ein vom Rest getrenntes Volumen).",
+    "angle": "Kantenwinkel"
+  },
+  "height": {
+    "above": "Darüber",
+    "below": "Darunter",
+    "band": "Band",
+    "thickness": "Bandstärke",
+    "at": "Genaue Höhe (mm)",
+    "apply": "Anwenden"
+  },
+  "measure": {
+    "second": "Klicken Sie den zweiten Punkt an.",
+    "result": "Abstand: {distance} mm",
+    "clear": "Messung löschen"
+  },
+  "views": {
+    "iso": "3D",
+    "front": "Vorne",
+    "top": "Oben",
+    "left": "Links",
+    "right": "Rechts",
+    "back": "Hinten",
+    "bottom": "Unten",
+    "fit": "Einpassen",
+    "fitKey": "Einpassen (0)",
+    "clip": "Schnitt",
+    "clipHeight": "Schnitthöhe"
+  },
+  "palette": {
+    "title": "Farben",
+    "base": "Grundfarbe",
+    "share": "{percent} % der Oberfläche",
+    "empty": "Fügen Sie mindestens eine Farbe aus dem Lager hinzu, um zu malen.",
+    "add": "Farbe hinzufügen",
+    "replace": "Diese Farbe ersetzen",
+    "remove": "Diese Farbe entfernen",
+    "makeBase": "Als Grundfarbe verwenden",
+    "noOther": "Keine weitere Farbe in ausreichender Menge an Lager.",
+    "max": "Höchstens {max} Farben: Unsere Drucker laden vier Spulen.",
+    "hint": "Die Grundfarbe (1) färbt alles Unbemalte. Tasten 1 bis 4: Farbe wählen.",
+    "fileOffer": "Ihre Datei gibt {count} Farben an (Bemalung oder Teile), vorerst entfernt.",
+    "useFile": "Die {count} Farben der Datei übernehmen"
+  },
+  "object": {
+    "title": "Grösse und Ausrichtung",
+    "scale": "Massstab",
+    "fits": "Passt auf die Druckplatte ({plate} × {plate} × {plate} mm).",
+    "tooBig": "Grösser als die Druckplatte ({plate} mm): Verkleinern Sie den Massstab, drehen Sie das Teil oder bitten Sie uns, es in mehrere Stücke zu teilen.",
+    "tiny": "Ihr Teil misst weniger als 6 mm: Die Datei ist vielleicht in Zentimetern oder Zoll.",
+    "fromCm": "× 10 (cm → mm)",
+    "fromInch": "× 25,4 (Zoll → mm)",
+    "rotate": "Um eine Vierteldrehung drehen",
+    "turn": "Um {axis} um {angle} drehen",
+    "reset": "Grösse und Ausrichtung der Datei",
+    "note": "Die Werkstatt übernimmt Ihre Ausrichtung und kann sie für Festigkeit oder Stützen anpassen."
+  },
+  "summary": {
+    "title": "Übersicht",
+    "changes": "{count, plural, =0 {Kein Filamentwechsel} one {≈ # Filamentwechsel} other {≈ # Filamentwechsel}}",
+    "purge": "≈ {grams} g Spülmaterial",
+    "time": "≈ {minutes} min länger",
+    "note": "Unverbindliche Schätzung (Schichten von 0,2 mm). Farben nach Höhe zu gruppieren spart Wechsel, also Zeit und Spülmaterial."
+  },
+  "shortcuts": {
+    "title": "Tastenkürzel",
+    "tools": "V Ansicht · B Pinsel · T Facette · F Füllen · H Höhe · E Radierer · M Messen · L Auflegen",
+    "colors": "1 bis 4: aktive Farbe",
+    "brush": "[ und ]: Pinselgrösse · Umschalt + Pinsel: Radierer",
+    "undo": "Strg + Z: rückgängig · Strg + Y oder Strg + Umschalt + Z: wiederholen",
+    "view": "0: einpassen · Mausrad: Zoom zum Zeiger",
+    "mouse": "Rechtsklick oder gedrücktes Mausrad: drehen, verschieben",
+    "touch": "Mit dem Finger: ein Finger malt oder dreht, zwei Finger zoomen und drehen"
+  },
+  "form": {
+    "open": "3D-Werkstatt öffnen",
+    "lead": "Farben pro Zone, Grösse und Ausrichtung: Bereiten Sie Ihr Teil wie in einem Slicer vor.",
+    "colors": "{count, plural, one {# Farbe platziert} other {# Farben platziert}}",
+    "scale": "Massstab {percent} %",
+    "rotated": "Ausrichtung geändert",
+    "attached": "Das Farbprojekt (3MF-Datei, bereit für Bambu Studio) wird Ihrer Anfrage beigelegt.",
+    "multi": "Mehrere Farben gewählt: Platzieren Sie sie in der 3D-Werkstatt oder beschreiben Sie, wohin jede gehört.",
+    "fileColors": "{count, plural, one {Farbe aus Ihrer Datei übernommen} other {# Farben aus Ihrer Datei übernommen}}: Jede erhielt den nächstliegenden Farbton unseres Lagers. Sie können sie ändern oder in der 3D-Werkstatt rückgängig machen.",
+    "fileColorsMerged": "Ihre Datei hatte mehr Farben: Die ähnlichsten wurden zusammengelegt (höchstens 4).",
+    "error": "Die 3D-Werkstatt kann diese Datei nicht öffnen; Ihre Anfrage bleibt möglich.",
+    "unavailable": "Die 3D-Werkstatt braucht WebGL, das hier fehlt.",
+    "preparing": "Farbprojekt wird vorbereitet…",
+    "preparingTriangles": "Farbprojekt wird vorbereitet ({triangles} Dreiecke)…",
+    "uploading": "Farbprojekt wird gesendet…",
+    "uploadingDetail": "Farbprojekt wird gesendet: {size}, {percent}",
+    "tooLarge": "Das Farbprojekt ist grösser als 30 MB: Verringern Sie die feine Bemalung oder senden Sie die Anfrage ohne die Werkstatt.",
+    "fileOffer": "Ihre Datei gibt {count} Farben an: Das Teil ist einfarbig, ausser Sie übernehmen sie (jede erhält den nächstliegenden Farbton unseres Lagers).",
+    "useFile": "Die {count} Farben der Datei übernehmen",
+    "keepOne": "Nur eine Farbe behalten"
+  }
+}

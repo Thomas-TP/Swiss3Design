@@ -51,8 +51,10 @@ import {
 import { STLLoader } from "three/addons/loaders/STLLoader.js";
 import { toCreasedNormals } from "three/addons/utils/BufferGeometryUtils.js";
 import {
+  VIEWER_FALLBACK_COLOR,
   VIEWER_TURN_EVENT,
   type ProductViewerProps,
+  type ViewerPaintedModel,
   type ViewerDecor,
   type ViewerModelFile,
   type ViewerState,
@@ -304,7 +306,9 @@ const create = (
   /** Maillages de la pièce, à peindre quand la bobine est co-extrudée. */
   const meshes: Mesh[] = [];
   /** Teintes déjà peintes en couleurs de sommets (clé), pour ne pas repeindre. */
-  let paintedKey: string | null = null;
+  let paintedKey: string | ViewerPaintedModel | null = null;
+  /** Fichier en mémoire dont la pièce affichée est issue. */
+  let loadedFile: ViewerModelFile | undefined;
   /** Décor chargé (la pièce y est posée), ou null : fond neutre de la page. */
   let decor: Object3D | null = null;
   /** Le décor vit dans sa propre scène : rendu d'abord, la pièce ensuite (même profondeur). */
@@ -360,6 +364,14 @@ const create = (
    * quand elle tourne, comme sur l'objet imprimé).
    */
   function applyColor() {
+    // Pièce peinte (atelier 3D) : ses couleurs par triangle, pas la teinte unique.
+    if (props?.modelFile?.format === "painted") {
+      // Seulement sur ses propres triangles : jamais sur un autre fichier encore
+      // à l'écran (l'ordre des triangles n'est pas le même).
+      if (model && loadedFile === props.modelFile)
+        applyPainted(props.modelFile);
+      return;
+    }
     const tints = props?.colors.length ? props.colors : null;
     if (!tints) return;
     if (tints.length === 1) {
@@ -422,6 +434,66 @@ const create = (
         out[i * 3 + 2] = color.b;
       }
       mesh.geometry.setAttribute("color", new BufferAttribute(out, 3));
+    }
+  }
+
+  /**
+   * Pièce peinte dans l'atelier 3D : la couleur de chaque triangle, une bobine
+   * co-extrudée en secteurs (même règle que paint(), repère de la pièce posée).
+   */
+  function applyPainted(file: ViewerPaintedModel) {
+    if (!model || paintedKey === file) return;
+    paintedKey = file;
+    const slots = (
+      file.palette.length ? file.palette : [[VIEWER_FALLBACK_COLOR]]
+    ).map((hexes) =>
+      (hexes.length ? hexes : [VIEWER_FALLBACK_COLOR]).map(
+        (hex) => new Color(hex),
+      ),
+    );
+    model.updateMatrixWorld(true);
+    const toModel = new Matrix4().copy(model.matrixWorld).invert();
+    const normalMatrix = new Matrix3();
+    const normal = new Vector3();
+    const color = new Color();
+    const mix = new Color();
+    for (const mesh of meshes) {
+      const normals = mesh.geometry.getAttribute("normal");
+      if (!normals) continue;
+      normalMatrix.getNormalMatrix(
+        new Matrix4().multiplyMatrices(toModel, mesh.matrixWorld),
+      );
+      const out = new Float32Array(normals.count * 3);
+      for (let i = 0; i < normals.count; i++) {
+        const state = file.states[Math.floor(i / 3)] ?? 0;
+        const tints = slots[Math.min(slots.length - 1, Math.max(0, state - 1))];
+        if (tints.length === 1) color.copy(tints[0]);
+        else {
+          normal.fromBufferAttribute(normals, i).applyMatrix3(normalMatrix);
+          const blend = coextrudedBlend(
+            normal.x,
+            normal.y,
+            normal.z,
+            tints.length,
+          );
+          mix.setRGB(0, 0, 0);
+          for (const tint of tints) mix.add(tint);
+          mix.multiplyScalar(1 / tints.length);
+          color
+            .copy(tints[blend.a])
+            .lerp(tints[blend.b], blend.t)
+            .lerp(mix, blend.flat);
+        }
+        out[i * 3] = color.r;
+        out[i * 3 + 1] = color.g;
+        out[i * 3 + 2] = color.b;
+      }
+      mesh.geometry.setAttribute("color", new BufferAttribute(out, 3));
+    }
+    material.color.set(0xffffff);
+    if (!material.vertexColors) {
+      material.vertexColors = true;
+      material.needsUpdate = true;
     }
   }
 
@@ -488,19 +560,31 @@ const create = (
   /**
    * Fichier lu dans le navigateur (aperçu de « Sur mesure »). Les matières et
    * couleurs du fichier sont ignorées : la pièce prend la couleur choisie.
+   * L'orientation est celle du fichier, Z vers le haut comme dans un trancheur
+   * (demande du 16.10.2026 : « garde le sens du fichier ») : jamais devinée
+   * d'après la forme, contrairement au modèle d'un produit (upAxisFor).
    */
   async function loadFile(file: ViewerModelFile) {
     report("loading", true);
+    if (file.format === "painted") {
+      const parsed = new BufferGeometry();
+      parsed.setAttribute(
+        "position",
+        new BufferAttribute(file.positions.slice(), 3),
+      );
+      // meshOf garde l'ordre des triangles : l'état i reste celui du triangle i.
+      return place(meshOf(parsed), "z");
+    }
     if (file.format === "triangles") {
       const parsed = new BufferGeometry();
       parsed.setAttribute(
         "position",
         new BufferAttribute(file.positions.slice(), 3),
       );
-      return place(meshOf(parsed), null);
+      return place(meshOf(parsed), "z");
     }
     if (file.format === "stl")
-      return place(meshOf(new STLLoader().parse(file.buffer)), null);
+      return place(meshOf(new STLLoader().parse(file.buffer)), "z");
     const group =
       file.format === "obj"
         ? new (
@@ -522,7 +606,7 @@ const create = (
       part.parent?.add(mesh);
       part.removeFromParent();
     }
-    return place(group, null);
+    return place(group, "z");
   }
 
   async function loadModel(source: ProductViewerProps, signal: AbortSignal) {
@@ -593,16 +677,43 @@ const create = (
     }
   }
 
-  /** Pose la pièce sur le meuble du décor et éclaire-la avec la salle. */
-  function placeInDecor(room: Object3D, decorProps: ViewerDecor) {
+  /** Pose la pièce (à son échelle) sur le meuble du décor, avec son ombre. */
+  function fitToDecor(decorProps: ViewerDecor) {
     const anchor = decorProps.anchor;
-    decor = room;
-    decorScene.add(room);
     unitScale = unitScaleFor(modelHeight);
     pivot.position.set(anchor[0], anchor[1], anchor[2]);
     pivot.scale.setScalar(unitScale);
     pivot.rotation.y = 0;
     target.set(anchor[0], anchor[1] + modelHeight * unitScale * 0.5, anchor[2]);
+    // Ombre de contact sur le plateau (le décor n'a pas d'ombre pour un objet
+    // qu'il ne connaissait pas).
+    const radius = modelRadius * unitScale;
+    shadow.scale.setScalar(radius * 2.9);
+    shadow.position.set(
+      anchor[0] + radius * 0.1,
+      anchor[1] + 0.002,
+      anchor[2] + radius * 0.06,
+    );
+    shadow.visible = true;
+  }
+
+  /** Cyclorama et ombre calés sur l'empreinte réelle de la pièce (sans décor). */
+  function fitToFloor() {
+    target.set(0, modelHeight * 0.5, 0);
+    floor.scale.setScalar(modelRadius * 7);
+    shadow.scale.setScalar(modelRadius * 2.9);
+    // Ombre portée légèrement vers le sud-est : la lumière vient du nord-ouest.
+    shadow.position.set(modelRadius * 0.14, 0.02, modelRadius * 0.08);
+    floor.position.y = 0.01;
+    floor.visible = true;
+    shadow.visible = true;
+  }
+
+  /** Pose la pièce sur le meuble du décor et éclaire-la avec la salle. */
+  function placeInDecor(room: Object3D, decorProps: ViewerDecor) {
+    decor = room;
+    decorScene.add(room);
+    fitToDecor(decorProps);
     // La table (PBR) est éclairée par la fenêtre et par un environnement : celui
     // du Stage le temps de capturer la salle, puis la salle elle-même.
     sun.intensity = 1.1;
@@ -635,16 +746,6 @@ const create = (
     polar = polarTarget = decorPolarStart;
     azimuth = azimuthTarget = rad(span?.start ?? DECOR_AZIMUTH_START_DEG);
     floor.visible = false;
-    // Ombre de contact sur le plateau (le décor n'a pas d'ombre pour un objet
-    // qu'il ne connaissait pas).
-    const radius = modelRadius * unitScale;
-    shadow.scale.setScalar(radius * 2.9);
-    shadow.position.set(
-      anchor[0] + radius * 0.1,
-      anchor[1] + 0.002,
-      anchor[2] + radius * 0.06,
-    );
-    shadow.visible = true;
   }
 
   async function startLoad() {
@@ -658,35 +759,69 @@ const create = (
     const decorProps = props.decor;
     // Le décor se charge en même temps que le fichier de la pièce.
     const room = decorProps ? loadDecor(decorProps.url) : null;
+    // Le fichier en mémoire réellement chargé (props peuvent changer pendant).
+    const source = props.modelFile;
     try {
       const holder = await loadModel(props, signal);
       const loadedRoom = room ? await room : null;
       if (!holder || disposed || signal.aborted) return;
       model = holder;
+      loadedFile = source;
       pivot.add(holder);
       // Bobine co-extrudée choisie avant l'arrivée du modèle : on la peint maintenant.
       applyColor();
       if (loadedRoom && decorProps) {
         placeInDecor(loadedRoom, decorProps);
-      } else {
-        target.set(0, modelHeight * 0.5, 0);
-        // Cyclorama et ombre calés sur l'empreinte réelle de la pièce.
-        floor.scale.setScalar(modelRadius * 7);
-        shadow.scale.setScalar(modelRadius * 2.9);
-        // Ombre portée légèrement vers le sud-est : la lumière vient du nord-ouest.
-        shadow.position.set(modelRadius * 0.14, 0.02, modelRadius * 0.08);
-        floor.position.y = 0.01;
-        floor.visible = true;
-        shadow.visible = true;
-      }
+      } else fitToFloor();
       report("ready", true);
       ctx.invalidate();
+      // Un autre fichier (la pièce peinte) est arrivé pendant le chargement.
+      if (props?.modelFile && props.modelFile !== loadedFile && !swapping)
+        void swapModel(props.modelFile);
     } catch (error) {
       if (signal.aborted || disposed) return;
       console.error("[product-viewer] modèle indisponible", error);
       // La photo reste à l'écran (holdPoster), le DOM annonce l'échec.
       report("error", true);
     }
+  }
+
+  /**
+   * Nouveau fichier en mémoire (la pièce repeinte, redimensionnée ou tournée
+   * dans l'atelier 3D) : seule la pièce est rechargée, le décor et la caméra
+   * restent.
+   */
+  let swapping = false;
+  async function swapModel(file: ViewerModelFile) {
+    swapping = true;
+    try {
+      const old = model;
+      const oldMeshes = meshes.splice(0, meshes.length);
+      const holder = await loadFile(file);
+      if (disposed) return;
+      if (old) pivot.remove(old);
+      for (const mesh of oldMeshes) {
+        mesh.geometry.dispose();
+        const at = ownedGeometries.indexOf(mesh.geometry);
+        if (at >= 0) ownedGeometries.splice(at, 1);
+      }
+      model = holder;
+      loadedFile = file;
+      pivot.add(holder);
+      paintedKey = null;
+      applyColor();
+      if (decor && props?.decor) fitToDecor(props.decor);
+      else fitToFloor();
+      report("ready", true);
+      ctx.invalidate();
+    } catch (error) {
+      console.error("[product-viewer] modèle indisponible", error);
+    } finally {
+      swapping = false;
+    }
+    // Un autre fichier est arrivé pendant le chargement : on le prend.
+    if (props?.modelFile && props.modelFile !== file && !disposed)
+      void swapModel(props.modelFile);
   }
 
   // ── Interaction : rotation seulement ──
@@ -885,7 +1020,15 @@ const create = (
       report("idle", true);
     },
     update(next) {
+      const previous = props;
       props = next;
+      if (
+        model &&
+        next.modelFile &&
+        previous?.modelFile !== next.modelFile &&
+        !swapping
+      )
+        void swapModel(next.modelFile);
       applyColor();
       ctx.invalidate();
     },

@@ -15,7 +15,14 @@ export default function StudioLayout({
 }) {
   return (
     <ClientMessages
-      namespaces={["studio", "studioCore", "quote", "custom", "catalog.viewer"]}
+      namespaces={[
+        "studio",
+        "studioCore",
+        "quote",
+        "custom",
+        "catalog.viewer",
+        "paint",
+      ]}
     >
       {children}
     </ClientMessages>

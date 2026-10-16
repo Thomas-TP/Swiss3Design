@@ -917,6 +917,8 @@ export function adminNewQuoteEmail(
     /** Formulaire de /custom : quantité et poids estimé d'UNE pièce (navigateur, indicatif). */
     quantity?: number | null;
     estGrams?: number | null;
+    /** Atelier 3D : résumé du projet de couleurs joint (3MF peint), une ligne. */
+    colorProject?: string | null;
   },
   adminEmails: string[],
 ): EmailMessage {
@@ -925,6 +927,7 @@ export function adminNewQuoteEmail(
     ["Couleurs", quote.colors],
     ["Dimensions", quote.dimensions],
     ["Fichier 3D", quote.fileName],
+    ["Projet couleurs", quote.colorProject ?? null],
     [
       "Quantité",
       quote.quantity && quote.quantity > 1 ? String(quote.quantity) : null,

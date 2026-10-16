@@ -11,6 +11,7 @@ import { updateQuote } from "../actions";
 import { StatusHistory } from "../../status-history";
 import { QuoteFilamentPanel } from "../../filaments/consumption-panel";
 import { loadQuotePanel } from "@/lib/filament/panel-data";
+import { loadQuoteColorProject } from "@/lib/paint3d/admin-data";
 import {
   QUOTE_STATUSES,
   QUOTE_STATUS_FR,
@@ -53,7 +54,10 @@ export default async function AdminQuoteDetailPage({
       .orderBy(desc(statusEvents.createdAt)),
   ]);
 
-  const filamentPanel = await loadQuotePanel(db, id);
+  const [filamentPanel, colorProject] = await Promise.all([
+    loadQuotePanel(db, id),
+    loadQuoteColorProject(db, id),
+  ]);
 
   const specs = [
     ["Matière", quote.material],
@@ -124,6 +128,50 @@ export default async function AdminQuoteDetailPage({
               {quote.fileName ?? "télécharger"} ⬇
             </a>
           </p>
+        )}
+        {colorProject && (
+          <div className="mt-3 border-t border-line pt-3">
+            <p>
+              Projet couleurs (atelier 3D) :{" "}
+              <a
+                href={`/api/admin/files/${colorProject.fileKey}`}
+                className="font-medium underline"
+              >
+                {colorProject.fileName} ⬇
+              </a>
+            </p>
+            <p className="mt-1 text-xs text-soft">
+              3MF peint : s&apos;ouvre peint dans Bambu Studio (et OrcaSlicer,
+              PrusaSlicer). Filament n du trancheur = couleur n ci-dessous ; la
+              pièce est déjà à la taille et dans l&apos;orientation choisies,
+              posée au centre du plateau.
+            </p>
+            {colorProject.summary.colors.length > 0 && (
+              <ol className="mt-2 space-y-0.5 text-soft">
+                {colorProject.summary.colors.map((color, i) => (
+                  <li key={color.ref}>
+                    Filament {i + 1}
+                    {i === 0 ? " (base)" : ""} : {colorProject.names[i]} —{" "}
+                    {Math.round(color.share * 100)} % de la surface
+                  </li>
+                ))}
+              </ol>
+            )}
+            <p className="mt-2 text-soft">
+              {colorProject.summary.size.join(" × ")} mm
+              {colorProject.summary.scale !== 1
+                ? ` · échelle ${Math.round(colorProject.summary.scale * 1000) / 10} %`
+                : ""}
+              {colorProject.summary.rotated ? " · orientation modifiée" : ""}
+              {colorProject.summary.changes > 0
+                ? ` · ≈ ${colorProject.summary.changes} changements de filament`
+                : ""}
+              {colorProject.summary.origin === "file" ||
+              colorProject.summary.origin === "both"
+                ? " · couleurs reprises du fichier du client"
+                : ""}
+            </p>
+          </div>
         )}
       </section>
 

@@ -1,4 +1,5 @@
-// Registre des scènes du Stage (brief « Strates », §4.4) : quatre scènes v1,
+// Registre des scènes du Stage (brief « Strates », §4.4) : quatre scènes v1 et
+// l'atelier 3D de « Sur mesure »,
 // un chunk chacune, chargé à la première vue qui le demande. Chaque package a
 // livré le fichier de sa scène sans toucher à ce registre (la scène témoin de
 // WP-00 a été retirée par WP-99).
@@ -10,6 +11,7 @@ export const SCENES: Record<SceneId, () => Promise<SceneModule<unknown>>> = {
   "contour-field": () => import("./contour-field"),
   "studio-object": () => import("./studio-object"),
   "product-viewer": () => import("./product-viewer"),
+  "paint-editor": () => import("./paint-editor"),
 };
 
 // Un module par scène, partagé par toutes ses vues et par le service bake.

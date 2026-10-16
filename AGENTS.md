@@ -311,6 +311,48 @@ put` on an environment with real users without `--env <name>` explicitly
     `scripts/seed-preview-shop-pla.sql` (by hand, never in a deploy). Worker gzip with the shop colours: 2 536 KiB
     (2 528.56 before, same path length, 2026-10-15).
 
+14. **Atelier 3D de « Sur mesure » (16.10.2026) : peinture par zone au format des
+    trancheurs.** Le moteur est du TypeScript pur, testé, dans
+    [`src/lib/paint3d/`](src/lib/paint3d/) (document, BVH, outils, lecture et écriture
+    3MF). Une peinture = un arbre par triangle d'origine, au format `TriangleSelector`
+    (attributs `paint_color` de Bambu Studio et OrcaSlicer, `slic3rpe:mmu_segmentation`
+    de PrusaSlicer). Vérifié le 16.10.2026 avec Bambu Studio 02.08 en ligne de commande :
+    - il réécrit nos chaînes à l'octet près ;
+    - un cube peint tranché change de filament aux hauteurs peintes ;
+    - le Benchy 4 couleurs de MakerWorld, repassé par l'atelier, garde ses grammes par
+      couleur à ±7 %.
+
+    Ne touchez pas à `selector.ts` sans refaire ce contrôle.
+
+    Côté code :
+    - **Chargement.** Les panneaux (`src/components/paint`) ne sont chargés que par
+      `paint-studio-lazy.tsx` (`ssr: false`, hors du Worker) ; la 3D est la scène
+      `paint-editor` du registre du Stage.
+    - **Affichage.** L'atelier est un `<dialog>` modal plein écran dont le centre est
+      transparent. Pendant qu'il est ouvert, `body[data-stage-front]` fait passer le
+      canvas du Stage au-dessus de la page (`globals.css`) : toujours un seul contexte
+      WebGL.
+    - **Couleurs d'un 3MF peint** (Bambu, Orca, Prusa : peinture et filament par pièce).
+      Elles sont reprises d'office, chacune associée à la couleur du stock la plus
+      proche (un filament uni l'emporte sur une bobine co-extrudée). Cette reprise est
+      une étape annulable, et « Garder une seule couleur » la retire.
+    - **Orientation.** L'aperçu d'un fichier du visiteur garde celle du fichier (Z vers
+      le haut), jamais `upAxisFor`, qui ne sert qu'aux modèles des produits.
+
+    Côté devis :
+    - **Fichier.** Le 3MF peint passe par `/api/quote-upload` (30 Mo, compte dans le
+      quota de 10 envois par heure).
+    - **Résumé.** Il est revalidé par zod (`lib/paint3d/summary.ts`). Le projet n'est
+      enregistré que si ses couleurs sont exactement les références choisies, dans le
+      même ordre (= filaments 1 à 4 du 3MF).
+    - **Table.** Il est enregistré dans `quote_color_projects` : migration
+      **`drizzle-pg/0012`**, additive, à appliquer AVANT le déploiement ; le code tolère
+      son absence (42P01).
+    - **Poids et dimensions.** Le poids estimé suit le cube de l'échelle, et les
+      dimensions la boîte tournée.
+
+    Worker gzip avec l'atelier : 2 544 KiB (2 536 avant, même chemin, 16.10.2026).
+
 ## Tech stack
 
 | Area                      | Choice                                                                                                                                                                                                                                        |

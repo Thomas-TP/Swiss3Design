@@ -20,6 +20,7 @@ export const NAMESPACES = [
   "atelier", // WP-ABOUT : Atelier et contact
   "system", // WP-UTILITY : panier, succès, suivi, favoris, 404, erreur
   "accountUi", // WP-ACCOUNT : seulement si un texte nouveau est nécessaire
+  "paint", // atelier 3D de « Sur mesure » (peinture par zone, 16.10.2026)
 ] as const;
 
 export type Namespace = (typeof NAMESPACES)[number];

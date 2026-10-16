@@ -341,6 +341,14 @@ body {
   z-index: -1;
   pointer-events: none;
 }
+/* Atelier 3D de « Sur mesure » (dialog modal plein écran, top layer) : tant
+   qu'il est ouvert, le canvas du Stage passe au-dessus du contenu de la page,
+   toujours sous le dialog, et se voit à travers la fenêtre transparente de
+   l'atelier (src/components/paint/paint-dialog.tsx). Le style en ligne posé
+   par stage-root.tsx (z-index −1) cède à !important. */
+body[data-stage-front] .s3d-stage-anchor {
+  z-index: 2147483000 !important;
+}
 [data-stage-view] {
   position: relative;
 }

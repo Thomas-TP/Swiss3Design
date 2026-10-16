@@ -1,0 +1,151 @@
+{
+  "title": "Laboratorio 3D",
+  "done": "Fine",
+  "close": "Chiudi",
+  "undo": "Annulla",
+  "redo": "Ripristina",
+  "loading": "Preparazione del Suo pezzo…",
+  "error": "Questo file non si apre nel laboratorio 3D. La Sua richiesta resta possibile: descriva i colori desiderati nel modulo.",
+  "unavailable": "Il laboratorio 3D richiede WebGL, non disponibile su questo dispositivo o browser. Descriva i colori desiderati nel modulo.",
+  "viewport": "Vista 3D del Suo pezzo: trascini sul pezzo per dipingere, altrove per ruotare",
+  "toolsLabel": "Strumenti",
+  "panelsLabel": "Impostazioni",
+  "hoverHeight": "Altezza sotto il puntatore: {z} mm",
+  "clear": "Cancella la pittura",
+  "clearConfirm": "Cancellare tutta la pittura del pezzo?",
+  "tabs": {
+    "colors": "Colori",
+    "tool": "Strumento",
+    "object": "Dimensioni",
+    "summary": "Riepilogo"
+  },
+  "tools": {
+    "orbit": "Vista",
+    "brush": "Pennello",
+    "triangle": "Faccetta",
+    "fill": "Riempi",
+    "height": "Altezza",
+    "erase": "Gomma",
+    "measure": "Misura",
+    "lay": "Appoggia"
+  },
+  "hints": {
+    "orbit": "Trascini per ruotare, clic destro o Maiusc per spostare, rotella o due dita per lo zoom.",
+    "brush": "Trascini sul pezzo per dipingere. Maiusc: gomma. [ e ]: dimensione del pennello.",
+    "triangle": "Dipinge ogni faccetta della mesh toccata, senza suddividerla.",
+    "fill": "Passi sopra per vedere la zona, clicchi per riempirla.",
+    "height": "Clicchi sul pezzo all'altezza desiderata: il colore cambia da quello strato.",
+    "erase": "Trascini per riportare al colore di base le superfici dipinte.",
+    "measure": "Clicchi due punti del pezzo per misurarne la distanza.",
+    "lay": "Clicchi la faccia che deve appoggiare sul piatto."
+  },
+  "brush": {
+    "size": "Dimensione del pennello",
+    "through": "Attraversare il pezzo (dipingere anche le facce nascoste)",
+    "paints": "Dipinge in {name}"
+  },
+  "erase": {
+    "paints": "Riporta la base ({name})"
+  },
+  "fill": {
+    "smooth": "Superficie",
+    "color": "Stesso colore",
+    "part": "Pezzo",
+    "smoothHint": "Riempie la superficie liscia, fino agli spigoli più vivi dell'angolo scelto.",
+    "colorHint": "Ridipinge tutta la zona contigua dello stesso colore.",
+    "partHint": "Riempie tutto il pezzo toccato (un volume separato dal resto).",
+    "angle": "Angolo degli spigoli"
+  },
+  "height": {
+    "above": "Sopra",
+    "below": "Sotto",
+    "band": "Fascia",
+    "thickness": "Spessore della fascia",
+    "at": "Altezza precisa (mm)",
+    "apply": "Applica"
+  },
+  "measure": {
+    "second": "Clicchi il secondo punto.",
+    "result": "Distanza: {distance} mm",
+    "clear": "Cancella la misura"
+  },
+  "views": {
+    "iso": "3D",
+    "front": "Fronte",
+    "top": "Sopra",
+    "left": "Sinistra",
+    "right": "Destra",
+    "back": "Retro",
+    "bottom": "Sotto",
+    "fit": "Inquadra",
+    "fitKey": "Inquadra (0)",
+    "clip": "Sezione",
+    "clipHeight": "Altezza della sezione"
+  },
+  "palette": {
+    "title": "Colori",
+    "base": "Base",
+    "share": "{percent} % della superficie",
+    "empty": "Aggiunga almeno un colore dello stock per dipingere.",
+    "add": "Aggiungi un colore",
+    "replace": "Sostituisci questo colore",
+    "remove": "Rimuovi questo colore",
+    "makeBase": "Usare come base",
+    "noOther": "Nessun altro colore disponibile in quantità sufficiente.",
+    "max": "Al massimo {max} colori: le nostre stampanti caricano quattro bobine.",
+    "hint": "La base (1) colora tutto ciò che non è dipinto. Tasti da 1 a 4: scegliere il colore.",
+    "fileOffer": "Il Suo file dichiara {count} colori (pittura o parti), per ora rimossi.",
+    "useFile": "Riprendi i {count} colori del file"
+  },
+  "object": {
+    "title": "Dimensioni e orientamento",
+    "scale": "Scala",
+    "fits": "Sta sul piatto ({plate} × {plate} × {plate} mm).",
+    "tooBig": "Più grande del piatto ({plate} mm): riduca la scala, ruoti il pezzo o ci chieda di dividerlo in più parti.",
+    "tiny": "Il Suo pezzo misura meno di 6 mm: forse il file è in centimetri o in pollici.",
+    "fromCm": "× 10 (cm → mm)",
+    "fromInch": "× 25,4 (pollici → mm)",
+    "rotate": "Ruotare di un quarto di giro",
+    "turn": "Ruotare attorno a {axis} di {angle}",
+    "reset": "Dimensioni e orientamento del file",
+    "note": "Il laboratorio mantiene il Suo orientamento e può adattarlo per la solidità o i supporti."
+  },
+  "summary": {
+    "title": "Riepilogo",
+    "changes": "{count, plural, =0 {Nessun cambio di filamento} one {≈ # cambio di filamento} other {≈ # cambi di filamento}}",
+    "purge": "≈ {grams} g di spurgo",
+    "time": "≈ {minutes} min in più",
+    "note": "Stima indicativa (strati di 0,2 mm). Raggruppare i colori per altezza riduce i cambi, quindi la durata e lo spurgo."
+  },
+  "shortcuts": {
+    "title": "Scorciatoie",
+    "tools": "V vista · B pennello · T faccetta · F riempi · H altezza · E gomma · M misura · L appoggia",
+    "colors": "Da 1 a 4: colore attivo",
+    "brush": "[ e ]: dimensione del pennello · Maiusc + pennello: gomma",
+    "undo": "Ctrl + Z: annulla · Ctrl + Y o Ctrl + Maiusc + Z: ripristina",
+    "view": "0: inquadra · rotella: zoom verso il puntatore",
+    "mouse": "Clic destro o rotella premuta: ruotare, spostare",
+    "touch": "Col dito: un dito dipinge o ruota, due dita zoomano e ruotano"
+  },
+  "form": {
+    "open": "Apri il laboratorio 3D",
+    "lead": "Colori per zona, dimensioni e orientamento: prepari il Suo pezzo come in uno slicer.",
+    "colors": "{count, plural, one {# colore posizionato} other {# colori posizionati}}",
+    "scale": "scala {percent} %",
+    "rotated": "orientamento modificato",
+    "attached": "Il progetto dei colori (file 3MF pronto per Bambu Studio) sarà allegato alla Sua richiesta.",
+    "multi": "Più colori scelti: li posizioni nel laboratorio 3D, oppure descriva dove va ciascuno.",
+    "fileColors": "{count, plural, one {Colore ripreso dal Suo file} other {# colori ripresi dal Suo file}}: ognuno ha preso la tinta più vicina del nostro stock. Può cambiarli o annullare nel laboratorio 3D.",
+    "fileColorsMerged": "Il Suo file aveva più colori: i più vicini sono stati riuniti (al massimo 4).",
+    "error": "Il laboratorio 3D non può aprire questo file; la Sua richiesta resta possibile.",
+    "unavailable": "Il laboratorio 3D richiede WebGL, qui non disponibile.",
+    "preparing": "Preparazione del progetto dei colori…",
+    "preparingTriangles": "Preparazione del progetto dei colori ({triangles} triangoli)…",
+    "uploading": "Invio del progetto dei colori…",
+    "uploadingDetail": "Invio del progetto dei colori: {size}, {percent}",
+    "tooLarge": "Il progetto dei colori supera i 30 MB: riduca la pittura fine o invii la richiesta senza il laboratorio.",
+    "fileOffer": "Il Suo file dichiara {count} colori: il pezzo è di un solo colore, a meno che non li riprenda (ognuno prenderà la tinta più vicina del nostro stock).",
+    "useFile": "Riprendi i {count} colori del file",
+    "keepOne": "Tenere un solo colore"
+  }
+}

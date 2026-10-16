@@ -1,0 +1,151 @@
+{
+  "title": "3D workshop",
+  "done": "Done",
+  "close": "Close",
+  "undo": "Undo",
+  "redo": "Redo",
+  "loading": "Preparing your part…",
+  "error": "This file can't be opened in the 3D workshop. You can still send your request: describe the colours you want in the form.",
+  "unavailable": "The 3D workshop needs WebGL, which isn't available on this device or browser. Describe the colours you want in the form.",
+  "viewport": "3D view of your part: drag on the part to paint, elsewhere to rotate",
+  "toolsLabel": "Tools",
+  "panelsLabel": "Settings",
+  "hoverHeight": "Height under the pointer: {z} mm",
+  "clear": "Clear the paint",
+  "clearConfirm": "Clear all the paint on the part?",
+  "tabs": {
+    "colors": "Colours",
+    "tool": "Tool",
+    "object": "Size",
+    "summary": "Summary"
+  },
+  "tools": {
+    "orbit": "View",
+    "brush": "Brush",
+    "triangle": "Facet",
+    "fill": "Fill",
+    "height": "Height",
+    "erase": "Eraser",
+    "measure": "Measure",
+    "lay": "Lay flat"
+  },
+  "hints": {
+    "orbit": "Drag to rotate, right-click or Shift to pan, scroll wheel or pinch to zoom.",
+    "brush": "Drag on the part to paint. Shift: eraser. [ and ]: brush size.",
+    "triangle": "Paints each mesh facet you touch, without splitting it.",
+    "fill": "Hover to see the area, click to fill it.",
+    "height": "Click the part at the height you want: the colour changes from that layer.",
+    "erase": "Drag to give painted surfaces back the base colour.",
+    "measure": "Click two points on the part to measure the distance between them.",
+    "lay": "Click the face that should rest on the build plate."
+  },
+  "brush": {
+    "size": "Brush size",
+    "through": "Paint through the part (hidden faces too)",
+    "paints": "Paints in {name}"
+  },
+  "erase": {
+    "paints": "Restores the base ({name})"
+  },
+  "fill": {
+    "smooth": "Surface",
+    "color": "Same colour",
+    "part": "Part",
+    "smoothHint": "Fills the smooth surface, up to edges sharper than the chosen angle.",
+    "colorHint": "Repaints the whole connected area of the same colour.",
+    "partHint": "Fills the whole part you touch (a volume separate from the rest).",
+    "angle": "Edge angle"
+  },
+  "height": {
+    "above": "Above",
+    "below": "Below",
+    "band": "Band",
+    "thickness": "Band thickness",
+    "at": "Exact height (mm)",
+    "apply": "Apply"
+  },
+  "measure": {
+    "second": "Click the second point.",
+    "result": "Distance: {distance} mm",
+    "clear": "Clear the measurement"
+  },
+  "views": {
+    "iso": "3D",
+    "front": "Front",
+    "top": "Top",
+    "left": "Left",
+    "right": "Right",
+    "back": "Back",
+    "bottom": "Bottom",
+    "fit": "Frame",
+    "fitKey": "Frame (0)",
+    "clip": "Cut",
+    "clipHeight": "Cut height"
+  },
+  "palette": {
+    "title": "Colours",
+    "base": "Base",
+    "share": "{percent} % of the surface",
+    "empty": "Add at least one colour from our stock to paint.",
+    "add": "Add a colour",
+    "replace": "Replace this colour",
+    "remove": "Remove this colour",
+    "makeBase": "Make it the base",
+    "noOther": "No other colour in stock in sufficient quantity.",
+    "max": "{max} colours at most: our printers load four spools.",
+    "hint": "The base (1) colours everything that isn't painted. Keys 1 to 4: pick the colour.",
+    "fileOffer": "Your file declares {count} colours (paint or parts), removed for now.",
+    "useFile": "Use the file's {count} colours"
+  },
+  "object": {
+    "title": "Size and orientation",
+    "scale": "Scale",
+    "fits": "Fits on the build plate ({plate} × {plate} × {plate} mm).",
+    "tooBig": "Larger than the build plate ({plate} mm): reduce the scale, turn the part, or ask us to split it into several pieces.",
+    "tiny": "Your part is smaller than 6 mm: the file may be in centimetres or inches.",
+    "fromCm": "× 10 (cm → mm)",
+    "fromInch": "× 25.4 (inches → mm)",
+    "rotate": "Turn by a quarter turn",
+    "turn": "Turn around {axis} by {angle}",
+    "reset": "File size and orientation",
+    "note": "The workshop keeps your orientation and may adjust it for strength or supports."
+  },
+  "summary": {
+    "title": "Summary",
+    "changes": "{count, plural, =0 {No filament change} one {≈ # filament change} other {≈ # filament changes}}",
+    "purge": "≈ {grams} g of purge",
+    "time": "≈ {minutes} min longer",
+    "note": "Rough estimate (0.2 mm layers). Grouping colours by height means fewer changes, so a shorter print and less purge."
+  },
+  "shortcuts": {
+    "title": "Shortcuts",
+    "tools": "V view · B brush · T facet · F fill · H height · E eraser · M measure · L lay flat",
+    "colors": "1 to 4: active colour",
+    "brush": "[ and ]: brush size · Shift + brush: eraser",
+    "undo": "Ctrl + Z: undo · Ctrl + Y or Ctrl + Shift + Z: redo",
+    "view": "0: frame · scroll wheel: zoom towards the pointer",
+    "mouse": "Right-click or pressed wheel: rotate, pan",
+    "touch": "Touch: one finger paints or rotates, two fingers zoom and rotate"
+  },
+  "form": {
+    "open": "Open the 3D workshop",
+    "lead": "Colours by area, size and orientation: prepare your part as you would in a slicer.",
+    "colors": "{count, plural, one {# colour placed} other {# colours placed}}",
+    "scale": "scale {percent} %",
+    "rotated": "orientation changed",
+    "attached": "The colour project (a 3MF file ready for Bambu Studio) will be attached to your request.",
+    "multi": "Several colours chosen: place them in the 3D workshop, or describe where each one goes.",
+    "fileColors": "{count, plural, one {Colour taken from your file} other {# colours taken from your file}}: each took the closest shade in our stock. You can change them, or undo in the 3D workshop.",
+    "fileColorsMerged": "Your file had more colours: the closest ones were merged (4 at most).",
+    "error": "The 3D workshop can't open this file; you can still send your request.",
+    "unavailable": "The 3D workshop needs WebGL, which isn't available here.",
+    "preparing": "Preparing the colour project…",
+    "preparingTriangles": "Preparing the colour project ({triangles} triangles)…",
+    "uploading": "Sending the colour project…",
+    "uploadingDetail": "Sending the colour project: {size}, {percent}",
+    "tooLarge": "The colour project is larger than 30 MB: reduce the fine painting, or send the request without the workshop.",
+    "fileOffer": "Your file declares {count} colours: the part is a single colour unless you use them (each will take the closest shade in our stock).",
+    "useFile": "Use the file's {count} colours",
+    "keepOne": "Keep a single colour"
+  }
+}

@@ -1,0 +1,151 @@
+{
+  "title": "Atelier 3D",
+  "done": "Terminer",
+  "close": "Fermer",
+  "undo": "Annuler",
+  "redo": "Rétablir",
+  "loading": "Préparation de votre pièce…",
+  "error": "Ce fichier ne s'ouvre pas dans l'atelier 3D. Votre demande reste possible : décrivez les couleurs voulues dans le formulaire.",
+  "unavailable": "L'atelier 3D a besoin de WebGL, indisponible sur cet appareil ou ce navigateur. Décrivez les couleurs voulues dans le formulaire.",
+  "viewport": "Vue 3D de votre pièce : glisser sur la pièce pour peindre, ailleurs pour tourner",
+  "toolsLabel": "Outils",
+  "panelsLabel": "Réglages",
+  "hoverHeight": "Hauteur sous le pointeur : {z} mm",
+  "clear": "Effacer la peinture",
+  "clearConfirm": "Effacer toute la peinture de la pièce ?",
+  "tabs": {
+    "colors": "Couleurs",
+    "tool": "Outil",
+    "object": "Taille",
+    "summary": "Bilan"
+  },
+  "tools": {
+    "orbit": "Vue",
+    "brush": "Pinceau",
+    "triangle": "Facette",
+    "fill": "Remplir",
+    "height": "Hauteur",
+    "erase": "Gomme",
+    "measure": "Mesure",
+    "lay": "Poser"
+  },
+  "hints": {
+    "orbit": "Glisser pour tourner, clic droit ou Maj pour déplacer, molette ou pincement pour zoomer.",
+    "brush": "Glisser sur la pièce pour peindre. Maj : gomme. [ et ] : taille du pinceau.",
+    "triangle": "Peint chaque facette du maillage touchée, sans la découper.",
+    "fill": "Survolez pour voir la zone, cliquez pour la remplir.",
+    "height": "Cliquez sur la pièce à la hauteur voulue : la couleur change à cette couche.",
+    "erase": "Glisser pour rendre à la base la couleur des surfaces peintes.",
+    "measure": "Cliquez deux points de la pièce pour mesurer leur distance.",
+    "lay": "Cliquez la face qui doit reposer sur le plateau."
+  },
+  "brush": {
+    "size": "Taille du pinceau",
+    "through": "Traverser la pièce (peindre aussi les faces cachées)",
+    "paints": "Peint en {name}"
+  },
+  "erase": {
+    "paints": "Rend la base ({name})"
+  },
+  "fill": {
+    "smooth": "Surface",
+    "color": "Même couleur",
+    "part": "Pièce",
+    "smoothHint": "Remplit la surface lisse, jusqu'aux arêtes plus vives que l'angle choisi.",
+    "colorHint": "Repeint toute la zone d'une même couleur.",
+    "partHint": "Remplit toute la pièce touchée (un volume séparé du reste).",
+    "angle": "Angle des arêtes"
+  },
+  "height": {
+    "above": "Au-dessus",
+    "below": "En dessous",
+    "band": "Bande",
+    "thickness": "Épaisseur de la bande",
+    "at": "Hauteur précise (mm)",
+    "apply": "Appliquer"
+  },
+  "measure": {
+    "second": "Cliquez le second point.",
+    "result": "Distance : {distance} mm",
+    "clear": "Effacer la mesure"
+  },
+  "views": {
+    "iso": "3D",
+    "front": "Face",
+    "top": "Dessus",
+    "left": "Gauche",
+    "right": "Droite",
+    "back": "Dos",
+    "bottom": "Dessous",
+    "fit": "Recadrer",
+    "fitKey": "Recadrer (0)",
+    "clip": "Coupe",
+    "clipHeight": "Hauteur de la coupe"
+  },
+  "palette": {
+    "title": "Couleurs",
+    "base": "Base",
+    "share": "{percent} % de la surface",
+    "empty": "Ajoutez au moins une couleur du stock pour peindre.",
+    "add": "Ajouter une couleur",
+    "replace": "Remplacer cette couleur",
+    "remove": "Retirer cette couleur",
+    "makeBase": "En faire la base",
+    "noOther": "Aucune autre couleur en stock en quantité suffisante.",
+    "max": "{max} couleurs au plus : nos imprimantes chargent quatre bobines.",
+    "hint": "La base (1) colore tout ce qui n'est pas peint. Touches 1 à 4 : choisir la couleur.",
+    "fileOffer": "Votre fichier déclare {count} couleurs (peinture ou pièces), retirées pour l'instant.",
+    "useFile": "Reprendre les {count} couleurs du fichier"
+  },
+  "object": {
+    "title": "Taille et orientation",
+    "scale": "Échelle",
+    "fits": "Tient sur le plateau ({plate} × {plate} × {plate} mm).",
+    "tooBig": "Plus grand que le plateau ({plate} mm) : réduisez l'échelle, tournez la pièce, ou demandez-nous de la couper en plusieurs morceaux.",
+    "tiny": "Votre pièce mesure moins de 6 mm : le fichier est peut-être en centimètres ou en pouces.",
+    "fromCm": "× 10 (cm → mm)",
+    "fromInch": "× 25,4 (pouces → mm)",
+    "rotate": "Tourner d'un quart de tour",
+    "turn": "Tourner autour de {axis} de {angle}",
+    "reset": "Taille et orientation du fichier",
+    "note": "L'atelier garde votre orientation, et peut l'ajuster pour la solidité ou les supports."
+  },
+  "summary": {
+    "title": "Bilan",
+    "changes": "{count, plural, =0 {Aucun changement de filament} one {≈ # changement de filament} other {≈ # changements de filament}}",
+    "purge": "≈ {grams} g de purge",
+    "time": "≈ {minutes} min de plus",
+    "note": "Estimation indicative (couches de 0,2 mm). Grouper les couleurs par hauteur réduit les changements, donc la durée et la purge."
+  },
+  "shortcuts": {
+    "title": "Raccourcis",
+    "tools": "V vue · B pinceau · T facette · F remplir · H hauteur · E gomme · M mesure · L poser",
+    "colors": "1 à 4 : couleur active",
+    "brush": "[ et ] : taille du pinceau · Maj + pinceau : gomme",
+    "undo": "Ctrl + Z : annuler · Ctrl + Y ou Ctrl + Maj + Z : rétablir",
+    "view": "0 : recadrer · molette : zoom vers le pointeur",
+    "mouse": "Clic droit ou molette enfoncée : tourner, déplacer",
+    "touch": "Au doigt : un doigt peint ou tourne, deux doigts zooment et tournent"
+  },
+  "form": {
+    "open": "Ouvrir l'atelier 3D",
+    "lead": "Couleurs par zone, taille et orientation : préparez votre pièce comme dans un trancheur.",
+    "colors": "{count, plural, one {# couleur placée} other {# couleurs placées}}",
+    "scale": "échelle {percent} %",
+    "rotated": "orientation modifiée",
+    "attached": "Le projet de couleurs (fichier 3MF prêt pour Bambu Studio) sera joint à votre demande.",
+    "multi": "Plusieurs couleurs choisies : placez-les dans l'atelier 3D, ou décrivez où va chacune.",
+    "fileColors": "{count, plural, one {Couleur reprise de votre fichier} other {# couleurs reprises de votre fichier}} : chacune a pris la teinte la plus proche de notre stock. Vous pouvez les changer, ou annuler dans l'atelier 3D.",
+    "fileColorsMerged": "Votre fichier avait plus de couleurs : les plus proches ont été réunies (4 au plus).",
+    "error": "L'atelier 3D ne peut pas ouvrir ce fichier ; votre demande reste possible.",
+    "unavailable": "L'atelier 3D a besoin de WebGL, indisponible ici.",
+    "preparing": "Préparation du projet de couleurs…",
+    "preparingTriangles": "Préparation du projet de couleurs ({triangles} triangles)…",
+    "uploading": "Envoi du projet de couleurs…",
+    "uploadingDetail": "Envoi du projet de couleurs : {size}, {percent}",
+    "tooLarge": "Le projet de couleurs dépasse 30 Mo : réduisez la peinture fine, ou envoyez la demande sans l'atelier.",
+    "fileOffer": "Votre fichier déclare {count} couleurs : la pièce est d'une seule couleur, sauf si vous les reprenez (chacune prendra la teinte la plus proche de notre stock).",
+    "useFile": "Reprendre les {count} couleurs du fichier",
+    "keepOne": "Garder une seule couleur"
+  }
+}

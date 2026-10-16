@@ -12,7 +12,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
-import { CheckCircle2, Send } from "lucide-react";
+import { CheckCircle2, Palette, Send } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   submitQuoteRequest,
@@ -24,6 +24,11 @@ import { withDot } from "@/components/ui/dot-title";
 import { Field, fieldClass, fieldIds } from "@/components/ui/field";
 import { track } from "@/lib/analytics";
 import { useSession } from "@/lib/auth-client";
+import { useMotionBridge } from "@/lib/motion-bridge/store";
+import {
+  QUOTE_UPLOAD_MAX_BYTES,
+  uploadQuoteFile,
+} from "@/lib/quote-upload-client";
 import type { StudioObjectId } from "@/lib/studio/types";
 import {
   QUOTE_CONTACT_EMAIL,
@@ -50,6 +55,12 @@ import {
   useCustomStock,
 } from "./quote-color-picker";
 import type { EstimateResult } from "@/lib/mesh-weight/client";
+import { PaintStudio } from "@/components/paint/paint-studio-lazy";
+import type {
+  PaintNotice,
+  PaintProject,
+  PaintSourceFile,
+} from "@/components/paint/types";
 import {
   CUSTOM_MATERIAL,
   QUOTE_COLORS_MAX,
@@ -111,6 +122,8 @@ export interface QuotePrefill {
 
 export interface QuoteUploadProgress {
   phase: "prepare" | "upload" | "submit";
+  /** Ce qui est préparé ou envoyé : le fichier (défaut) ou le projet de couleurs. */
+  subject?: "file" | "project";
   /** Octets envoyés et total (phase « upload »). */
   loaded?: number;
   total?: number;
@@ -170,6 +183,9 @@ type EstimateState =
       step: boolean;
     };
 
+/** Côté du plateau (mm) : P1S 256 mm, K2 260 mm, on garde le plus petit. */
+const PLATE_MM = 256;
+
 /** Message (clé de `quote.file.*`) d'un fichier que l'on n'a pas pu lire : jamais d'estimation inventée. */
 function estimateErrorKey(state: Extract<EstimateState, { status: "error" }>) {
   if (state.reason === "timeout") return "file.timeout";
@@ -201,6 +217,7 @@ export function QuoteRequestForm({
   successActions,
 }: QuoteRequestFormProps) {
   const t = useTranslations("quote");
+  const tPaint = useTranslations("paint");
   const tCustom = useTranslations("custom");
   const tShell = useTranslations("shell.cta");
   const locale = useLocale();
@@ -243,7 +260,6 @@ export function QuoteRequestForm({
   const progress =
     activity && activity.since === state ? activity.progress : null;
   const busy = pending || progress !== null;
-  const steps = submitSteps(Boolean(attachment?.prepare && !attachment.key));
 
   const email = typedEmail ?? authSession?.user.email ?? "";
 
@@ -285,6 +301,23 @@ export function QuoteRequestForm({
     key: string;
     file: ViewerModelFile;
   } | null>(null);
+  // Atelier 3D (peinture par zone, taille, orientation) : son dernier état, remonté
+  // à chaque fermeture, et le projet déjà envoyé (un « Réessayer » ne le renvoie pas).
+  const [project, setProject] = useState<PaintProject | null>(null);
+  const [paintOpen, setPaintOpen] = useState(false);
+  const [paintNotice, setPaintNotice] = useState<PaintNotice | null>(null);
+  const sentProject = useRef<{
+    version: string;
+    key: string;
+    name: string;
+  } | null>(null);
+  const stageAvailable = useMotionBridge(
+    (s) => s.capability >= 1 && !s.contextLost,
+  );
+  const steps = submitSteps(
+    Boolean(attachment?.prepare && !attachment.key) ||
+      Boolean(showFileField && project?.matters),
+  );
   const [quantityText, setQuantityText] = useState("1");
   const [colorRefs, setColorRefs] = useState<string[]>([]);
   const customStock = useCustomStock(showFileField);
@@ -292,10 +325,21 @@ export function QuoteRequestForm({
     QUOTE_QUANTITY_MAX,
     Math.max(1, Number.parseInt(quantityText, 10) || 1),
   );
-  const gramsPerPiece = estimate.status === "ok" ? estimate.grams : null;
-  // Dimensions : calculées depuis le fichier (boîte englobante), jamais demandées.
+  // Poids d'UNE pièce : celui du fichier, au cube de l'échelle choisie dans l'atelier.
+  const fileGrams = estimate.status === "ok" ? estimate.grams : null;
+  const projectScale = project?.scale ?? 1;
+  const gramsPerPiece =
+    fileGrams === null
+      ? null
+      : Math.max(1, Math.round(fileGrams * projectScale ** 3));
+  // Dimensions : calculées depuis le fichier (boîte englobante, ou celle de la
+  // pièce tournée et mise à l'échelle dans l'atelier), jamais demandées.
   const measured =
-    estimate.status === "ok" ? formatSize(estimate.size, locale) : null;
+    estimate.status !== "ok"
+      ? null
+      : project?.summary && project.matters
+        ? formatSize(project.summary.size, locale)
+        : formatSize(estimate.size, locale);
   const selectableIds = useMemo(
     () =>
       customStock.status === "ready"
@@ -330,17 +374,25 @@ export function QuoteRequestForm({
           },
     );
   }, []);
+  function resetProject() {
+    setProject(null);
+    setPaintNotice(null);
+    setPaintOpen(false);
+    sentProject.current = null;
+  }
   function pickFile(next: File) {
     file.select(next);
     setEstimateTarget(next);
     setEstimate({ status: "running" });
     setPreview(null);
+    resetProject();
   }
   function clearFile() {
     file.clear();
     setEstimateTarget(null);
     setEstimate({ status: "idle" });
     setPreview(null);
+    resetProject();
   }
   // Fichier lisible (poids estimé) : un STL, OBJ ou 3MF est relu pour l'aperçu.
   useEffect(() => {
@@ -415,6 +467,48 @@ export function QuoteRequestForm({
         name = result.name;
       }
 
+      // Projet de couleurs de l'atelier 3D : le 3MF peint (prêt pour Bambu
+      // Studio), écrit dans le navigateur puis envoyé comme le fichier.
+      let colorProject: { key: string; name: string } | null = null;
+      if (showFileField && project?.matters) {
+        const version = `${project.version}:${chosenRefs.join(",")}`;
+        if (sentProject.current?.version === version)
+          colorProject = sentProject.current;
+        else {
+          setActivity({
+            since,
+            progress: { phase: "prepare", subject: "project" },
+          });
+          const blob = await project.export3mf();
+          if (blob.size > QUOTE_UPLOAD_MAX_BYTES) {
+            setActivity(null);
+            setSubmitError(tPaint("form.tooLarge"));
+            return;
+          }
+          const base = (name ?? "piece").replace(/\.[^.]+$/, "").slice(0, 60);
+          const uploaded = await uploadQuoteFile(
+            blob,
+            ({ loaded, total }) =>
+              setActivity({
+                since,
+                progress: {
+                  phase: "upload",
+                  subject: "project",
+                  loaded,
+                  total,
+                },
+              }),
+            { fileName: `${base}-couleurs.3mf` },
+          );
+          sentProject.current = {
+            version,
+            key: uploaded.key,
+            name: uploaded.fileName,
+          };
+          colorProject = sentProject.current;
+        }
+      }
+
       const data = new FormData(form);
       // Champs techniques de React pour l'envoi natif : inutiles ici.
       for (const field of Array.from(data.keys()))
@@ -422,6 +516,11 @@ export function QuoteRequestForm({
       if (key) {
         data.set("fileKey", key);
         if (name) data.set("fileName", name);
+      }
+      if (colorProject && project) {
+        data.set("colorProjectKey", colorProject.key);
+        data.set("colorProjectName", colorProject.name);
+        data.set("colorProject", JSON.stringify(project.summary));
       }
       sent.current = {
         material: String(data.get("material") ?? ""),
@@ -530,6 +629,22 @@ export function QuoteRequestForm({
     announce: string;
   } | null {
     if (!current || steps === 1) return null;
+    if (current.subject === "project" && current.phase === "prepare")
+      return {
+        announce: tPaint("form.preparing"),
+        visible: tPaint("form.preparing"),
+      };
+    if (current.subject === "project" && current.phase === "upload")
+      return {
+        announce: tPaint("form.uploading"),
+        visible:
+          current.loaded === undefined || !current.total
+            ? tPaint("form.uploading")
+            : tPaint("form.uploadingDetail", {
+                size: formatBytes(current.total, locale),
+                percent: formatPercent(current.loaded / current.total, locale),
+              }),
+      };
     if (current.phase === "prepare")
       return {
         announce: t("progress.prepare"),
@@ -629,21 +744,123 @@ export function QuoteRequestForm({
             <ProductViewer
               key={preview.key}
               name={estimateTarget?.name ?? t("preview.title")}
-              modelFile={preview.file}
+              // La pièce peinte, tournée et mise à l'échelle dans l'atelier ;
+              // sinon le fichier tel quel, dans la première couleur choisie.
+              modelFile={project?.preview ?? preview.file}
               colors={previewTints}
               // Le visiteur vient de choisir son fichier : il regarde la vue.
               eager
             />
           </div>
+          <div className="flex flex-col gap-3 border-t border-line bg-surface px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
+            <div className="min-w-0 text-sm" aria-live="polite">
+              {project?.matters ? (
+                <p className="font-semibold text-ink">
+                  {[
+                    project.summary.colors.length > 1
+                      ? tPaint("form.colors", {
+                          count: project.summary.colors.length,
+                        })
+                      : null,
+                    project.scale !== 1
+                      ? tPaint("form.scale", {
+                          percent: formatCount(project.scale * 100, locale),
+                        })
+                      : null,
+                    project.summary.rotated ? tPaint("form.rotated") : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" · ")}
+                </p>
+              ) : (
+                <p className="text-ink">{tPaint("form.lead")}</p>
+              )}
+              {paintNotice?.kind === "fileColorsApplied" ? (
+                <div className="mt-1 text-soft">
+                  <p>
+                    {tPaint("form.fileColors", { count: paintNotice.count })}
+                    {paintNotice.merged
+                      ? ` ${tPaint("form.fileColorsMerged")}`
+                      : ""}
+                  </p>
+                  <Button
+                    variant="text"
+                    size="sm"
+                    className="mt-1"
+                    onClick={paintNotice.revert}
+                  >
+                    {tPaint("form.keepOne")}
+                  </Button>
+                </div>
+              ) : paintNotice?.kind === "fileColors" ? (
+                <div className="mt-1 text-soft">
+                  <p>
+                    {tPaint("form.fileOffer", { count: paintNotice.count })}
+                  </p>
+                  <Button
+                    variant="text"
+                    size="sm"
+                    className="mt-1"
+                    onClick={paintNotice.apply}
+                  >
+                    {tPaint("form.useFile", { count: paintNotice.count })}
+                  </Button>
+                </div>
+              ) : paintNotice?.kind === "error" ? (
+                <p className="mt-1 text-soft">{tPaint("form.error")}</p>
+              ) : null}
+              {project?.matters ? (
+                <p className="mt-1 text-soft">{tPaint("form.attached")}</p>
+              ) : chosenRefs.length > 1 ? (
+                <p className="mt-1 text-soft">{tPaint("form.multi")}</p>
+              ) : null}
+              {!stageAvailable ? (
+                <p className="mt-1 text-soft">{tPaint("form.unavailable")}</p>
+              ) : null}
+            </div>
+            <Button
+              variant="secondary"
+              onClick={() => setPaintOpen(true)}
+              disabled={!stageAvailable || paintNotice?.kind === "error"}
+              className="shrink-0"
+            >
+              <Palette size={16} strokeWidth={1.5} aria-hidden="true" />
+              {tPaint("form.open")}
+            </Button>
+          </div>
           <figcaption className="border-t border-line bg-surface px-5 py-3 sm:px-8">
             <ViewerCredits
               caption={
-                chosenRefs.length > 1
+                chosenRefs.length > 1 && !project?.preview
                   ? t("preview.captionFirstColor")
                   : t("preview.caption")
               }
             />
           </figcaption>
+          {preview.file.format !== "painted" ? (
+            <PaintStudio
+              source={preview.file as PaintSourceFile}
+              sourceKey={preview.key}
+              fileName={estimateTarget?.name ?? ""}
+              stock={
+                customStock.status === "ready"
+                  ? customStock.colors
+                  : customStock.status === "error"
+                    ? []
+                    : null
+              }
+              selectable={selectableIds}
+              refs={chosenRefs}
+              onRefsChange={setColorRefs}
+              maxColors={QUOTE_COLORS_MAX}
+              gramsPerPiece={fileGrams}
+              plate={PLATE_MM}
+              open={paintOpen}
+              onClose={() => setPaintOpen(false)}
+              onProject={setProject}
+              onNotice={setPaintNotice}
+            />
+          ) : null}
         </figure>
       ) : null}
 

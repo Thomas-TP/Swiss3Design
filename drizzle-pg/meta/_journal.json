@@ -85,6 +85,13 @@
       "when": 1792075592148,
       "tag": "0011_shop_colors",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1792185606577,
+      "tag": "0012_quote_color_projects",
+      "breakpoints": true
     }
   ]
 }

@@ -26,7 +26,22 @@ export interface ViewerStatus {
  */
 export type ViewerModelFile =
   | { format: "stl" | "obj" | "3mf"; buffer: ArrayBuffer }
-  | { format: "triangles"; positions: Float32Array };
+  | { format: "triangles"; positions: Float32Array }
+  | ViewerPaintedModel;
+
+/**
+ * Pièce peinte dans l'atelier 3D de « Sur mesure » : ses triangles posés sur le
+ * plateau (mm, Z en haut, à la taille et dans l'orientation choisies) et l'état
+ * de chacun (0 = la base, n = la couleur n de la palette). Remplacer l'objet
+ * repeint la vue sans recharger le décor.
+ */
+export interface ViewerPaintedModel {
+  format: "painted";
+  positions: Float32Array;
+  states: Uint8Array;
+  /** Teintes de chaque couleur de la palette (1 à 3 : bobine co-extrudée). */
+  palette: readonly (readonly string[])[];
+}
 
 export interface ProductViewerProps {
   /** STL (ou GLB) du produit, même origine que la page (`/api/files/…`). */

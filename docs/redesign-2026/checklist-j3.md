@@ -19,6 +19,10 @@
 > les **mêmes couleurs que « Sur mesure »** (les références du stock), la matière est **PLA
 > partout**, et la page admin « Palette boutique » n'existe plus. Troisième migration additive
 > (`0011`, deux tables) : section **1.4**, étape 2, ordre **0010, 0011, seed des références**.
+>
+> **Mise à jour du 16.10.2026 : atelier 3D de « Sur mesure ».** Peinture par zone, taille et
+> orientation ; le devis reçoit un 3MF peint (prêt pour Bambu Studio). Quatrième migration
+> additive (`0012`, une table `quote_color_projects`) : section **1.4**, étape 2 bis.
 
 **Où en est-on.** La branche `claude/redesign-2026` contient tous les packages, les vagues de
 correctifs R1 et R16 et ce lot WP-99. Elle est **à jour avec `main`** (aucun commit de `main`
@@ -120,6 +124,10 @@ enregistrée comme payée).
    plus `scripts/seed-filament-stock-preview.sql` (stock de test, **jamais en production**) ;
    la 0011 et **`scripts/seed-preview-shop-pla.sql`** (articles de démo en PLA, poids,
    une exclusion de démonstration) sont à y jouer à la main.
+   **2 bis. Atelier 3D (projets de couleurs des devis), AVANT la fusion** : `drizzle-pg/0012_quote_color_projects.sql` (une table, référence `quote_requests`).
+   Vérification : `SELECT to_regclass('public.quote_color_projects');` rend le nom. Sans elle, une
+   demande avec projet de couleurs passe quand même (le 3MF reste dans le R2, le résumé est perdu).
+   La preview l'a reçue le 16.10.2026.
    **Production : matière.** `SELECT material, count(*) FROM products GROUP BY 1;` ; si autre chose
    que `PLA` apparaît, `UPDATE products SET material = 'PLA' WHERE material <> 'PLA';` (le formulaire
    admin impose désormais PLA à chaque enregistrement ; la boutique l'affiche telle quelle).
@@ -295,9 +303,9 @@ commandes. Dans le doute sur le paiement ou une erreur générale, **revenir d'a
 1. **Revenir** (instantané, sans reconstruction) : dashboard Cloudflare → `swiss3design` → **Deployments** →
    le déploiement précédent la fusion → **Rollback**. Ou, depuis une machine connectée :
    `bunx wrangler rollback` (en visant le Worker `swiss3design`, **jamais** `--env preview` par erreur).
-2. **Base de données : rien à défaire.** Les trois migrations de la refonte (`0009`, colonne
+2. **Base de données : rien à défaire.** Les quatre migrations de la refonte (`0009`, colonne
    `order_items.studio` ; `0010`, tables `filament_*` ; `0011`, tables `product_filament_exclusions` et
-   `order_item_filaments`) sont additives : l'ancien code les ignore, on les laisse en place. Les anciennes
+   `order_item_filaments` ; `0012`, table `quote_color_projects`) sont additives : l'ancien code les ignore, on les laisse en place. Les anciennes
    tables de la palette de la boutique (`materials`, `filament_colors`, `product_colors`) n'ont jamais été
    touchées : l'ancien code retrouve sa palette et ses couleurs de produits tels qu'ils étaient.
    Les commandes passées entre-temps gardent leur couleur (nom et hex figés dans `order_items`)

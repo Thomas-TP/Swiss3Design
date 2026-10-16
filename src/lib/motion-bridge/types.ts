@@ -11,12 +11,16 @@ import type { StudioConfig, StudioTexts } from "@/lib/studio/types";
  */
 export type Capability = 0 | 1 | 2;
 
-/** Les quatre scènes v1 du Stage (brief §4.4). */
+/**
+ * Les quatre scènes v1 du Stage (brief §4.4), plus l'atelier 3D de « Sur
+ * mesure » (peinture par zone, 16.10.2026 ; ajout permis au contrat).
+ */
 export type SceneId =
   | "print-hero"
   | "contour-field"
   | "studio-object"
-  | "product-viewer";
+  | "product-viewer"
+  | "paint-editor";
 
 export interface StageViewDescriptor<P = unknown> {
   /** useId() du composant hôte. */
