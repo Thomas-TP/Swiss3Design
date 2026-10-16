@@ -192,8 +192,9 @@ export function paintSphere(
 ): number {
   const [cx, cy, cz] = center;
   const cursor = sphereCursor(cx, cy, cz, options.radius);
-  // Un trait rond sur un maillage grossier : coupe jusqu'au quart du rayon.
-  const limit = Math.max(options.radius / 4, 1e-4);
+  // Un trait rond sur un maillage grossier : coupe jusqu'au huitième du rayon
+  // (au quart, le bord d'une pastille restait crénelé).
+  const limit = Math.max(options.radius / 8, 1e-4);
   const normals = doc.topology.faceNormals;
   let changed = 0;
   queryBvhSphere(doc.bvh, cx, cy, cz, options.radius, (t) => {
