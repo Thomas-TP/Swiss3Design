@@ -504,7 +504,10 @@ export function QuoteRequestForm({
     quantity: `${uid}-quantity`,
   };
   const page = variant === "page";
-  const sectionClass = page ? "px-5 py-6 sm:px-8" : "";
+  // Page : le fond est posé section par section (et non sur la carte) pour que
+  // la bande de l'aperçu 3D reste transparente : la scène est peinte par le
+  // canvas du Stage, DERRIÈRE la page, un fond au-dessus la cacherait.
+  const sectionClass = page ? "bg-surface px-5 py-6 sm:px-8" : "";
   const legendClass =
     "s3d-label float-left mb-5 w-full text-soft [&+*]:clear-both";
 
@@ -557,7 +560,7 @@ export function QuoteRequestForm({
   const body = (
     <>
       {attachment?.summary ? (
-        <div className={page ? "px-5 pt-6 sm:px-8" : undefined}>
+        <div className={page ? "bg-surface px-5 pt-6 sm:px-8" : undefined}>
           <StudioAttachmentCard {...attachment.summary} />
         </div>
       ) : null}
@@ -571,11 +574,7 @@ export function QuoteRequestForm({
             </span>
             {t("sheet.file")}
           </legend>
-          <div
-            className={cx(
-              preview && "grid items-start gap-6 md:grid-cols-2 md:gap-8",
-            )}
-          >
+          <div>
             <div className="min-w-0">
               <QuoteFileField
                 id={ids.file}
@@ -617,34 +616,35 @@ export function QuoteRequestForm({
                 )}
               </div>
             </div>
-            {preview ? (
-              // Aperçu : la pièce du visiteur, à l'échelle, posée sur la même
-              // table que les articles de la boutique, dans la couleur choisie.
-              <figure className="m-0 min-w-0">
-                {/* Sans fond : la scène est peinte derrière la page (Stage). */}
-                <div className="relative aspect-square overflow-hidden rounded-card border border-line">
-                  <ProductViewer
-                    key={preview.key}
-                    name={estimateTarget?.name ?? t("preview.title")}
-                    modelFile={preview.file}
-                    colors={previewTints}
-                    // Le visiteur vient de choisir son fichier : il regarde la vue.
-                    eager
-                  />
-                </div>
-                <figcaption className="mt-3">
-                  <ViewerCredits
-                    caption={
-                      chosenRefs.length > 1
-                        ? t("preview.captionFirstColor")
-                        : t("preview.caption")
-                    }
-                  />
-                </figcaption>
-              </figure>
-            ) : null}
           </div>
         </fieldset>
+      ) : null}
+
+      {showFileField && preview ? (
+        // Aperçu : la pièce du visiteur, à l'échelle, posée sur la même table que
+        // les articles de la boutique, dans la couleur choisie, sur toute la
+        // largeur du formulaire. Bande transparente (voir `sectionClass`).
+        <figure className="m-0 border-t border-line">
+          <div className="relative aspect-[4/3] sm:aspect-[16/10]">
+            <ProductViewer
+              key={preview.key}
+              name={estimateTarget?.name ?? t("preview.title")}
+              modelFile={preview.file}
+              colors={previewTints}
+              // Le visiteur vient de choisir son fichier : il regarde la vue.
+              eager
+            />
+          </div>
+          <figcaption className="border-t border-line bg-surface px-5 py-3 sm:px-8">
+            <ViewerCredits
+              caption={
+                chosenRefs.length > 1
+                  ? t("preview.captionFirstColor")
+                  : t("preview.caption")
+              }
+            />
+          </figcaption>
+        </figure>
       ) : null}
 
       {locked ? (
@@ -921,7 +921,7 @@ export function QuoteRequestForm({
       aria-busy={busy}
       className={cx(
         page
-          ? "rounded-card border border-line bg-surface"
+          ? "overflow-hidden rounded-card border border-line"
           : "flex flex-col gap-6",
       )}
     >
