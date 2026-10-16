@@ -40,6 +40,11 @@ import { QuoteFileField, useQuoteFile } from "./quote-file-field";
 import { StudioAttachmentCard } from "./studio-attachment-card";
 import { MeshEstimator } from "./mesh-estimator";
 import {
+  ProductViewer,
+  ViewerCredits,
+} from "@/components/catalog/product-viewer";
+import type { ViewerModelFile } from "@/components/catalog/viewer-props";
+import {
   QuoteColorPicker,
   selectableColorIds,
   useCustomStock,
@@ -274,6 +279,12 @@ export function QuoteRequestForm({
   // (variante « page » sans pièce jointe du Studio seulement)
   const [estimateTarget, setEstimateTarget] = useState<File | null>(null);
   const [estimate, setEstimate] = useState<EstimateState>({ status: "idle" });
+  // Aperçu 3D du fichier (lu dans le navigateur, jamais envoyé pour cela) : les
+  // triangles d'un STEP viennent de sa conversion ; un STL, OBJ ou 3MF est relu.
+  const [preview, setPreview] = useState<{
+    key: string;
+    file: ViewerModelFile;
+  } | null>(null);
   const [quantityText, setQuantityText] = useState("1");
   const [colorRefs, setColorRefs] = useState<string[]>([]);
   const customStock = useCustomStock(showFileField);
@@ -295,6 +306,11 @@ export function QuoteRequestForm({
   // Une couleur qui ne suffit plus (fichier lu, quantité en hausse) sort de la sélection.
   const chosenRefs = colorRefs.filter((id) => selectableIds.has(id));
   const onEstimate = useCallback((result: EstimateResult) => {
+    if (result.ok && result.positions)
+      setPreview({
+        key: `step-${result.positions.length}`,
+        file: { format: "triangles", positions: result.positions },
+      });
     setEstimate(
       result.ok
         ? {
@@ -318,12 +334,45 @@ export function QuoteRequestForm({
     file.select(next);
     setEstimateTarget(next);
     setEstimate({ status: "running" });
+    setPreview(null);
   }
   function clearFile() {
     file.clear();
     setEstimateTarget(null);
     setEstimate({ status: "idle" });
+    setPreview(null);
   }
+  // Fichier lisible (poids estimé) : un STL, OBJ ou 3MF est relu pour l'aperçu.
+  useEffect(() => {
+    if (estimate.status !== "ok" || !estimateTarget) return;
+    const format = /\.(stl|obj|3mf)$/i.exec(estimateTarget.name)?.[1];
+    if (!format) return;
+    let alive = true;
+    const key = `${estimateTarget.name}-${estimateTarget.size}-${estimateTarget.lastModified}`;
+    void estimateTarget.arrayBuffer().then(
+      (buffer) => {
+        if (alive)
+          setPreview({
+            key,
+            file: {
+              format: format.toLowerCase() as "stl" | "obj" | "3mf",
+              buffer,
+            },
+          });
+      },
+      () => undefined,
+    );
+    return () => {
+      alive = false;
+    };
+  }, [estimate.status, estimateTarget]);
+  // Teintes de l'aperçu : la première couleur choisie (ses 1 à 3 teintes), sinon
+  // le blanc neutre du viewer.
+  const previewTints = useMemo(() => {
+    if (customStock.status !== "ready") return undefined;
+    const first = customStock.colors.find((c) => c.id === chosenRefs[0]);
+    return first?.hexes.length ? first.hexes : undefined;
+  }, [customStock, chosenRefs]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     // JavaScript actif : c'est nous qui envoyons (voir l'en-tête du fichier).
@@ -522,44 +571,78 @@ export function QuoteRequestForm({
             </span>
             {t("sheet.file")}
           </legend>
-          <QuoteFileField
-            id={ids.file}
-            state={file.state}
-            onSelect={pickFile}
-            onClear={clearFile}
-          />
-          {/* Lecture du fichier dans le navigateur : poids estimé d'UNE pièce. */}
-          {estimateTarget && estimate.status === "running" ? (
-            <MeshEstimator
-              key={`${estimateTarget.name}-${estimateTarget.size}-${estimateTarget.lastModified}`}
-              file={estimateTarget}
-              onResult={onEstimate}
-            />
-          ) : null}
-          <div className="mt-3 min-h-5 text-sm" aria-live="polite">
-            {estimate.status === "running" ? (
-              <p className="text-soft">{t("file.estimating")}</p>
-            ) : estimate.status === "ok" ? (
-              <p className="ph-no-capture text-ink">
-                {t("file.size", { size: measured ?? "" })}
-                {" · "}
-                {t("file.estimate", {
-                  grams: `${formatCount(estimate.grams, locale)} g`,
-                })}
-                {estimate.approximate ? (
-                  <span className="text-soft">
-                    {" "}
-                    · {t("file.estimateApprox")}
-                  </span>
-                ) : null}
-              </p>
-            ) : estimate.status === "error" ? (
-              <p role="alert" className="font-medium text-accent-text">
-                {t(estimateErrorKey(estimate))}
-              </p>
-            ) : (
-              <p className="text-soft">{t("file.required")}</p>
+          <div
+            className={cx(
+              preview && "grid items-start gap-6 md:grid-cols-2 md:gap-8",
             )}
+          >
+            <div className="min-w-0">
+              <QuoteFileField
+                id={ids.file}
+                state={file.state}
+                onSelect={pickFile}
+                onClear={clearFile}
+              />
+              {/* Lecture du fichier dans le navigateur : poids estimé d'UNE pièce. */}
+              {estimateTarget && estimate.status === "running" ? (
+                <MeshEstimator
+                  key={`${estimateTarget.name}-${estimateTarget.size}-${estimateTarget.lastModified}`}
+                  file={estimateTarget}
+                  onResult={onEstimate}
+                />
+              ) : null}
+              <div className="mt-3 min-h-5 text-sm" aria-live="polite">
+                {estimate.status === "running" ? (
+                  <p className="text-soft">{t("file.estimating")}</p>
+                ) : estimate.status === "ok" ? (
+                  <p className="ph-no-capture text-ink">
+                    {t("file.size", { size: measured ?? "" })}
+                    {" · "}
+                    {t("file.estimate", {
+                      grams: `${formatCount(estimate.grams, locale)} g`,
+                    })}
+                    {estimate.approximate ? (
+                      <span className="text-soft">
+                        {" "}
+                        · {t("file.estimateApprox")}
+                      </span>
+                    ) : null}
+                  </p>
+                ) : estimate.status === "error" ? (
+                  <p role="alert" className="font-medium text-accent-text">
+                    {t(estimateErrorKey(estimate))}
+                  </p>
+                ) : (
+                  <p className="text-soft">{t("file.required")}</p>
+                )}
+              </div>
+            </div>
+            {preview ? (
+              // Aperçu : la pièce du visiteur, à l'échelle, posée sur la même
+              // table que les articles de la boutique, dans la couleur choisie.
+              <figure className="m-0 min-w-0">
+                {/* Sans fond : la scène est peinte derrière la page (Stage). */}
+                <div className="relative aspect-square overflow-hidden rounded-card border border-line">
+                  <ProductViewer
+                    key={preview.key}
+                    name={estimateTarget?.name ?? t("preview.title")}
+                    modelFile={preview.file}
+                    colors={previewTints}
+                    // Le visiteur vient de choisir son fichier : il regarde la vue.
+                    eager
+                  />
+                </div>
+                <figcaption className="mt-3">
+                  <ViewerCredits
+                    caption={
+                      chosenRefs.length > 1
+                        ? t("preview.captionFirstColor")
+                        : t("preview.caption")
+                    }
+                  />
+                </figcaption>
+              </figure>
+            ) : null}
           </div>
         </fieldset>
       ) : null}

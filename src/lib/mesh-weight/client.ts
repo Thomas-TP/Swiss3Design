@@ -29,6 +29,8 @@ export type EstimateResult =
       issue: EstimateIssue | null;
       stats: MeshStats;
       format: "mesh" | "step";
+      /** STEP : ses triangles en mm (aperçu 3D), convertis une seule fois. */
+      positions?: Float32Array;
     }
   | { ok: false; reason: EstimateFailure; format: "mesh" | "step" };
 
@@ -45,6 +47,7 @@ type StepResponse =
       areaMm2: number;
       bbox: MeshStats["bbox"];
       triangles: number;
+      positions?: Float32Array;
     }
   | { id: number; ok: false; reason: "unreadable" };
 
@@ -98,7 +101,8 @@ export async function estimateFile(
   try {
     const answer = await run<MeshResponse | StepResponse>(
       worker,
-      { id: 1, name: file.name, buffer },
+      // STEP : les triangles reviennent aussi, pour l'aperçu 3D.
+      { id: 1, name: file.name, buffer, mesh: step },
       [buffer],
       timeoutMs,
     );
@@ -127,6 +131,7 @@ export async function estimateFile(
       issue: estimate.issue,
       stats,
       format,
+      positions: "positions" in answer ? answer.positions : undefined,
     };
   } finally {
     worker.terminate();

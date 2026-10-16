@@ -50,6 +50,11 @@ export function ProductColorProvider({
   );
 }
 
+/** La couleur de la fiche, ou null hors d'une fiche (aperçu de « Sur mesure »). */
+export function useOptionalProductColor(): ProductColorValue | null {
+  return useContext(ProductColorContext);
+}
+
 export function useProductColor(): ProductColorValue {
   const ctx = useContext(ProductColorContext);
   if (!ctx) {

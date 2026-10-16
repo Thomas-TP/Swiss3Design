@@ -18,9 +18,21 @@ export interface ViewerStatus {
   totalBytes: number | null;
 }
 
+/**
+ * Fichier lu dans le navigateur plutôt que téléchargé (aperçu de « Sur mesure » :
+ * le fichier du visiteur, jamais envoyé pour cela) : le tampon d'un STL, OBJ ou
+ * 3MF, ou les triangles d'un STEP déjà convertis par le Worker d'OpenCascade
+ * (positions en mm, trois sommets par triangle).
+ */
+export type ViewerModelFile =
+  | { format: "stl" | "obj" | "3mf"; buffer: ArrayBuffer }
+  | { format: "triangles"; positions: Float32Array };
+
 export interface ProductViewerProps {
   /** STL (ou GLB) du produit, même origine que la page (`/api/files/…`). */
-  modelUrl: string;
+  modelUrl?: string;
+  /** Ou un fichier déjà en mémoire : il l'emporte sur `modelUrl`. */
+  modelFile?: ViewerModelFile;
   /**
    * Teintes (hex) de la bobine choisie à l'achat : une seule, ou 2 à 3 pour une
    * bobine co-extrudée (bicolore, tricolore), rendue en secteurs autour de la pièce.

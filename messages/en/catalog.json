@@ -60,7 +60,6 @@
     "rail": "Product chapters",
     "chapters": {
       "object": "Object",
-      "turn": "Rotation",
       "specs": "Measures",
       "credit": "License",
       "reviews": "Customers",
@@ -68,7 +67,6 @@
       "related": "Next"
     },
     "titles": {
-      "turn": "Turn it.",
       "specs": "Specifications.",
       "credit": "Design credit.",
       "reviews": "Customer reviews.",
@@ -105,7 +103,9 @@
     "turnRight": "Rotate right",
     "decorCredit": "Setting: <source>“{title}”</source> by {author}, <deed>{license}</deed>, adapted for the web.",
     "tiltUp": "View from higher",
-    "tiltDown": "View from lower"
+    "tiltDown": "View from lower",
+    "hint": "Drag to turn",
+    "view3d": "3D view"
   },
   "cross": {
     "title": "A vase in your colors?",

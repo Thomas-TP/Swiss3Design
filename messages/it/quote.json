@@ -104,5 +104,10 @@
     "approximate": "tinta approssimativa",
     "limit": "Al massimo {max} colori.",
     "short": "scorta insufficiente"
+  },
+  "preview": {
+    "title": "Il Suo oggetto",
+    "caption": "Anteprima del Suo file, letto nel Suo browser, in scala reale e nel colore scelto.",
+    "captionFirstColor": "Anteprima del Suo file, letto nel Suo browser, in scala reale e nel primo colore scelto."
   }
 }

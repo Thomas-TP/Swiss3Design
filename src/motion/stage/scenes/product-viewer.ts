@@ -54,6 +54,7 @@ import {
   VIEWER_TURN_EVENT,
   type ProductViewerProps,
   type ViewerDecor,
+  type ViewerModelFile,
   type ViewerState,
   type ViewerTurnDetail,
 } from "@/components/catalog/viewer-props";
@@ -470,7 +471,64 @@ const create = (
     return holder;
   }
 
-  async function loadModel(url: string, signal: AbortSignal) {
+  /** Maillage de la pièce : normales adoucies (45°), positions inchangées. */
+  function meshOf(parsed: BufferGeometry): Mesh {
+    if (parsed.getAttribute("position")?.count === 0)
+      throw new Error("maillage vide");
+    // Normales adoucies pour les courbes douces, nettes aux arêtes vives (45°) ;
+    // les positions sont recopiées telles quelles.
+    const geometry = toCreasedNormals(parsed, rad(45));
+    parsed.dispose();
+    ownedGeometries.push(geometry);
+    const mesh = new Mesh(geometry, material);
+    meshes.push(mesh);
+    return mesh;
+  }
+
+  /**
+   * Fichier lu dans le navigateur (aperçu de « Sur mesure »). Les matières et
+   * couleurs du fichier sont ignorées : la pièce prend la couleur choisie.
+   */
+  async function loadFile(file: ViewerModelFile) {
+    report("loading", true);
+    if (file.format === "triangles") {
+      const parsed = new BufferGeometry();
+      parsed.setAttribute(
+        "position",
+        new BufferAttribute(file.positions.slice(), 3),
+      );
+      return place(meshOf(parsed), null);
+    }
+    if (file.format === "stl")
+      return place(meshOf(new STLLoader().parse(file.buffer)), null);
+    const group =
+      file.format === "obj"
+        ? new (
+            await import("three/addons/loaders/OBJLoader.js")
+          ).OBJLoader().parse(new TextDecoder().decode(file.buffer))
+        : new (
+            await import("three/addons/loaders/3MFLoader.js")
+          ).ThreeMFLoader().parse(file.buffer);
+    const parts: Mesh[] = [];
+    group.traverse((child) => {
+      if ((child as Mesh).isMesh) parts.push(child as Mesh);
+    });
+    if (parts.length === 0) throw new Error("maillage vide");
+    for (const part of parts) {
+      const mesh = meshOf(part.geometry);
+      mesh.position.copy(part.position);
+      mesh.quaternion.copy(part.quaternion);
+      mesh.scale.copy(part.scale);
+      part.parent?.add(mesh);
+      part.removeFromParent();
+    }
+    return place(group, null);
+  }
+
+  async function loadModel(source: ProductViewerProps, signal: AbortSignal) {
+    if (source.modelFile) return loadFile(source.modelFile);
+    const url = source.modelUrl;
+    if (!url) throw new Error("aucun modèle");
     const buffer = await download(url, signal);
     if (signal.aborted) return null;
     const extension = url.split("?")[0].split(".").pop()?.toLowerCase();
@@ -489,17 +547,7 @@ const create = (
       // glTF : Y vers le haut par convention, rien à redresser.
       return place(gltf.scene, "y");
     }
-    const parsed = new STLLoader().parse(buffer);
-    if (parsed.getAttribute("position")?.count === 0)
-      throw new Error("STL vide");
-    // Normales adoucies pour les courbes douces, nettes aux arêtes vives (45°) ;
-    // les positions sont recopiées telles quelles.
-    const geometry = toCreasedNormals(parsed, rad(45));
-    parsed.dispose();
-    ownedGeometries.push(geometry);
-    const mesh = new Mesh(geometry, material);
-    meshes.push(mesh);
-    return place(mesh, null);
+    return place(meshOf(new STLLoader().parse(buffer)), null);
   }
 
   /**
@@ -611,7 +659,7 @@ const create = (
     // Le décor se charge en même temps que le fichier de la pièce.
     const room = decorProps ? loadDecor(decorProps.url) : null;
     try {
-      const holder = await loadModel(props.modelUrl, signal);
+      const holder = await loadModel(props, signal);
       const loadedRoom = room ? await room : null;
       if (!holder || disposed || signal.aborted) return;
       model = holder;

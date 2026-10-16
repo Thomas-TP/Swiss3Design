@@ -60,7 +60,6 @@
     "rail": "Capitoli della scheda",
     "chapters": {
       "object": "Oggetto",
-      "turn": "Rotazione",
       "specs": "Misure",
       "credit": "Licenza",
       "reviews": "Clienti",
@@ -68,7 +67,6 @@
       "related": "Seguito"
     },
     "titles": {
-      "turn": "Lo faccia ruotare.",
       "specs": "Scheda tecnica.",
       "credit": "Crediti del design.",
       "reviews": "Recensioni dei clienti.",
@@ -105,7 +103,9 @@
     "turnRight": "Ruota verso destra",
     "decorCredit": "Ambientazione: <source>«{title}»</source> di {author}, <deed>{license}</deed>, adattata per il web.",
     "tiltUp": "Guardare più dall'alto",
-    "tiltDown": "Guardare più dal basso"
+    "tiltDown": "Guardare più dal basso",
+    "hint": "Trascini per ruotare",
+    "view3d": "Vista 3D"
   },
   "cross": {
     "title": "Un vaso nei Suoi colori?",

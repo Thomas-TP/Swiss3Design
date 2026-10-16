@@ -33,7 +33,8 @@ import { StarRating } from "@/components/star-rating";
 import { AttributionBlock } from "@/components/catalog/attribution-block";
 import { getCardExtras } from "@/components/catalog/card-extras";
 import { ProductMotion } from "@/components/catalog/product-motion";
-import { ProductViewer } from "@/components/catalog/product-viewer";
+import { ProductMedia } from "@/components/catalog/product-media";
+import { MODEL_SIZE_HINTS } from "@/components/catalog/viewer-props";
 import { Chapter } from "@/components/ui/chapter";
 import { ChapterRail, type RailChapter } from "@/components/ui/chapter-rail";
 import { ButtonLink } from "@/components/ui/button";
@@ -108,17 +109,6 @@ export async function generateMetadata({
     images,
     imageAlt: t("ogImageAlt"),
   });
-}
-
-// Modèle 3D : la photo qui le précède tant qu'il n'est pas rendu (et seule là où
-// la 3D n'est pas possible). De préférence le « rendu 3D » de la galerie s'il y
-// en a un (sa légende le dit), sinon la première photo.
-function posterOf(images: { url: string; alt: string | null }[]) {
-  return (
-    images.find((i) => /\b(3d|rendu|render|rendering)\b/i.test(i.alt ?? "")) ??
-    images[0] ??
-    null
-  );
 }
 
 export default async function ProductPage({
@@ -222,16 +212,13 @@ export default async function ProductPage({
     .map((p) => p.trim())
     .filter(Boolean);
 
-  // Chapitres (brief « Strates », §7.9) : 01 Objet, 02 Tourner, 03 Fiche
-  // technique, 04 Crédit, 05 Avis, 06 « Un vase à vos couleurs ? », 07 Produits
-  // liés. Numérotés dans l'ordre de ceux qui existent pour CE produit (sans
-  // modèle 3D, ni crédit, ni avis, la suite se resserre), ce qui donne la
-  // numérotation du brief pour le Vase spirale.
-  const hasViewer = Boolean(product.model3dUrl);
+  // Chapitres (brief « Strates », §7.9) : 01 Objet (la 3D y est, en tête, depuis
+  // le 16.10.2026), 02 Fiche technique, 03 Crédit, 04 Avis, 05 « Un vase à vos
+  // couleurs ? », 06 Produits liés. Numérotés dans l'ordre de ceux qui existent
+  // pour CE produit (sans crédit ni avis, la suite se resserre).
   const hasSpecs = specs.length > 0 || paragraphs.length > 1;
   const sections = [
     { key: "object", id: "objet", present: true },
-    { key: "turn", id: "tourner", present: hasViewer },
     { key: "specs", id: "mesures", present: hasSpecs },
     { key: "credit", id: "credit", present: attribution !== null },
     { key: "reviews", id: "avis", present: productReviews.length > 0 },
@@ -294,11 +281,24 @@ export default async function ProductPage({
 
           <div className="s3d-grid items-start gap-y-10">
             <div className="col-span-full md:col-span-4 lg:col-span-7">
-              <ProductGallery
-                images={product.images}
-                name={product.name}
-                slug={product.slug}
-              />
+              {product.model3dUrl ? (
+                // La pièce en 3D en tête, à côté du choix de la couleur (qui la
+                // repeint en direct), les photos en vignettes dessous.
+                <ProductMedia
+                  images={product.images}
+                  name={product.name}
+                  slug={product.slug}
+                  modelUrl={product.model3dUrl}
+                  sizeHint={MODEL_SIZE_HINTS[product.slug]}
+                  author={attribution?.author ?? "Swiss3Design"}
+                />
+              ) : (
+                <ProductGallery
+                  images={product.images}
+                  name={product.name}
+                  slug={product.slug}
+                />
+              )}
             </div>
 
             <div className="col-span-full flex flex-col md:col-span-4 md:[@media(min-height:800px)]:sticky md:[@media(min-height:800px)]:top-24 lg:col-span-5">
@@ -396,25 +396,6 @@ export default async function ProductPage({
             </div>
           </div>
         </section>
-
-        {/* 02 · Tourner : le fichier original, que l'on fait tourner. */}
-        {hasViewer && product.model3dUrl && (
-          <Chapter
-            id={chapter("turn").id}
-            number={chapter("turn").number}
-            title={tCat("product.titles.turn")}
-            eyebrow={chapter("turn").label}
-            className="border-t border-line"
-          >
-            <ProductViewer
-              slug={product.slug}
-              name={product.name}
-              modelUrl={product.model3dUrl}
-              poster={posterOf(product.images)}
-              author={attribution?.author ?? "Swiss3Design"}
-            />
-          </Chapter>
-        )}
       </ProductColorProvider>
 
       {/* 03 · Fiche technique : <dl> rendu serveur + la suite de la description. */}

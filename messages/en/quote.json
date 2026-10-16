@@ -104,5 +104,10 @@
     "approximate": "approximate shade",
     "limit": "{max} colours at most.",
     "short": "not enough stock"
+  },
+  "preview": {
+    "title": "Your piece",
+    "caption": "Preview of your file, read in your browser, at real scale and in the chosen colour.",
+    "captionFirstColor": "Preview of your file, read in your browser, at real scale and in the first chosen colour."
   }
 }

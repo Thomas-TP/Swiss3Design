@@ -104,5 +104,10 @@
     "approximate": "teinte approximative",
     "limit": "{max} couleurs au maximum.",
     "short": "stock insuffisant"
+  },
+  "preview": {
+    "title": "Votre pièce",
+    "caption": "Aperçu de votre fichier, lu dans votre navigateur, à l'échelle réelle et dans la couleur choisie.",
+    "captionFirstColor": "Aperçu de votre fichier, lu dans votre navigateur, à l'échelle réelle et dans la première couleur choisie."
   }
 }

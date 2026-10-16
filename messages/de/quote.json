@@ -104,5 +104,10 @@
     "approximate": "ungefährer Farbton",
     "limit": "Höchstens {max} Farben.",
     "short": "Lagerbestand reicht nicht"
+  },
+  "preview": {
+    "title": "Ihr Objekt",
+    "caption": "Vorschau Ihrer Datei, in Ihrem Browser gelesen, in Originalgrösse und in der gewählten Farbe.",
+    "captionFirstColor": "Vorschau Ihrer Datei, in Ihrem Browser gelesen, in Originalgrösse und in der ersten gewählten Farbe."
   }
 }

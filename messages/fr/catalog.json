@@ -60,7 +60,6 @@
     "rail": "Chapitres de la fiche",
     "chapters": {
       "object": "Objet",
-      "turn": "Rotation",
       "specs": "Mesures",
       "credit": "Licence",
       "reviews": "Clients",
@@ -68,7 +67,6 @@
       "related": "Suite"
     },
     "titles": {
-      "turn": "Tournez-le.",
       "specs": "Fiche technique.",
       "credit": "Crédit du design.",
       "reviews": "Avis clients.",
@@ -105,7 +103,9 @@
     "turnRight": "Tourner vers la droite",
     "decorCredit": "Décor : <source>« {title} »</source> de {author}, <deed>{license}</deed>, adapté pour le web.",
     "tiltUp": "Voir de plus haut",
-    "tiltDown": "Voir de plus bas"
+    "tiltDown": "Voir de plus bas",
+    "hint": "Glissez pour tourner",
+    "view3d": "Vue 3D"
   },
   "cross": {
     "title": "Un vase à vos couleurs ?",

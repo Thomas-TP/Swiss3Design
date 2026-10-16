@@ -60,7 +60,6 @@
     "rail": "Kapitel der Produktseite",
     "chapters": {
       "object": "Objekt",
-      "turn": "Drehen",
       "specs": "Masse",
       "credit": "Lizenz",
       "reviews": "Kunden",
@@ -68,7 +67,6 @@
       "related": "Weiter"
     },
     "titles": {
-      "turn": "Drehen Sie es.",
       "specs": "Datenblatt.",
       "credit": "Urheber des Designs.",
       "reviews": "Kundenbewertungen.",
@@ -105,7 +103,9 @@
     "turnRight": "Nach rechts drehen",
     "decorCredit": "Kulisse: <source>«{title}»</source> von {author}, <deed>{license}</deed>, für das Web angepasst.",
     "tiltUp": "Von weiter oben ansehen",
-    "tiltDown": "Von weiter unten ansehen"
+    "tiltDown": "Von weiter unten ansehen",
+    "hint": "Zum Drehen ziehen",
+    "view3d": "3D-Ansicht"
   },
   "cross": {
     "title": "Eine Vase in Ihren Farben?",
