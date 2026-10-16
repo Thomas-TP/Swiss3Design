@@ -71,10 +71,11 @@ export interface ViewerDecor {
  * La salle à manger de ChristyHsu (« Dining room | Kichen baked », Sketchfab,
  * CC BY 4.0), adaptée pour le web : vase et bouquet d'origine retirés, table
  * ramenée de 1,61 × 2,60 m à 1,00 × 1,80 m en chêne haute définition (« Oak
- * Veneer 01 », Poly Haven, CC0) et chaises rapprochées, petits objets du plan de
- * travail simplifiés, matériaux sans éclairage ailleurs (la lumière est dans les
- * textures), textures en WebP ≤ 2048 px. 44 Mo → 5,3 Mo. Source et licence hors
- * du dépôt (sources-3d/), script : scripts/optimize-decor.mjs.
+ * Veneer 01 », Poly Haven, CC0) et chaises rapprochées, tissu des chaises en
+ * velours rose poudré (« Velour Velvet », Poly Haven, CC0), petits objets du plan
+ * de travail simplifiés, matériaux sans éclairage ailleurs (la lumière est dans
+ * les textures), textures en WebP ≤ 2048 px. 44 Mo → 5,9 Mo. Source et licence
+ * hors du dépôt (sources-3d/), script : scripts/optimize-decor.mjs.
  * Le produit est posé au centre de la table (plateau à 0,78 m).
  */
 export const DINING_ROOM_DECOR: ViewerDecor = {

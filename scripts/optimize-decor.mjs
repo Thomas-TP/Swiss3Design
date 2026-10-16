@@ -5,8 +5,9 @@
 // Outil ponctuel, hors des dépendances du dépôt : dans un dossier à part,
 //   bun add @gltf-transform/core@4 @gltf-transform/functions@4 \
 //     @gltf-transform/extensions@4 meshoptimizer sharp
-//   bun optimize-decor.mjs <source.glb> <dossier de sortie> <dossier du chêne>
-// (chêne : textures 2k « oak_veneer_01 » de Poly Haven, CC0 : diff, nor_gl, arm)
+//   bun optimize-decor.mjs <source.glb> <sortie> <dossier du chêne> <dossier du velours>
+// (Poly Haven, CC0 : chêne « oak_veneer_01 » 2k : diff, nor_gl, arm ; velours
+// « velour_velvet » 1k : Diffuse, nor_gl, arm)
 // Source (GLB 4k de Sketchfab, 44 Mo) et licence : hors du dépôt
 // (sources-3d/dining-room-christyhsu/ chez le propriétaire).
 //
@@ -17,7 +18,11 @@
 // même origine (pas de blob: dans connect-src).
 import { mkdirSync, readFileSync } from "node:fs";
 import { NodeIO } from "@gltf-transform/core";
-import { ALL_EXTENSIONS, KHRMaterialsUnlit } from "@gltf-transform/extensions";
+import {
+  ALL_EXTENSIONS,
+  KHRMaterialsSheen,
+  KHRMaterialsUnlit,
+} from "@gltf-transform/extensions";
 import {
   dedup,
   prune,
@@ -63,9 +68,14 @@ for (const material of root.listMaterials()) {
   material.setNormalTexture(null);
   material.setOcclusionTexture(null);
 }
+const UPHOLSTERY = "seat_Leather_0";
+const keepNormals = root
+  .listNodes()
+  .find((n) => n.getName() === UPHOLSTERY)
+  ?.getMesh();
 for (const mesh of root.listMeshes())
   for (const prim of mesh.listPrimitives()) {
-    prim.setAttribute("NORMAL", null);
+    if (mesh !== keepNormals) prim.setAttribute("NORMAL", null);
     prim.setAttribute("TANGENT", null);
   }
 
@@ -250,6 +260,91 @@ for (const name of ["seat_Leather_0", "seat_Material5_0"]) {
         apply(local, [w[0] + best.move[0], w[1], w[2] + best.move[1]]),
       );
     }
+  }
+}
+
+// 3 bis. Tissu des chaises (dossier et assise ; les pieds gardent leur texture
+// précalculée) : l'atlas d'origine, flou et bruité de près, devient un velours
+// (« Velour Velvet », Poly Haven, CC0, 1k) passé en gris et teinté du rose
+// poudré d'origine, avec le reflet satiné du velours (KHR_materials_sheen) ;
+// éclairé par la pièce, comme la table. UV « en boîte » en mètres réels.
+const VELVET = process.argv[5]; // dossier des textures velour_velvet_*_1k.jpg
+if (!VELVET)
+  throw new Error("dossier des textures de velours manquant (4e argument)");
+/** Taille d'une répétition du velours (son échantillon fait 28 cm). */
+const VELVET_TILE = 0.28;
+{
+  const node = nodeNamed(UPHOLSTERY);
+  const world = node.getWorldMatrix();
+  // 512 px suffisent pour un grain répété tous les 28 cm (18 px/cm).
+  const read = (file) =>
+    sharp(readFileSync(`${VELVET}/${file}`))
+      .resize(512, 512)
+      .jpeg({ quality: 90 })
+      .toBuffer();
+  // Couleur du velours rouge ramenée au gris (le grain reste), la teinte vient
+  // du facteur : le rose poudré des chaises d'origine (sRGB 214, 178, 172).
+  // Deux passes : sharp applique ses opérations dans son ordre à lui (linear
+  // avant normalise), un seul appel annulait l'éclaircissement.
+  const stretched = await sharp(await read("velour_velvet_Diffuse_1k.jpg"))
+    .grayscale()
+    .normalise({ lower: 2, upper: 98 })
+    .toBuffer();
+  const grey = await sharp(stretched)
+    .linear(0.25, 180)
+    .jpeg({ quality: 90 })
+    .toBuffer();
+  const texture = (name, image) =>
+    doc.createTexture(name).setImage(image).setMimeType("image/jpeg");
+  const arm = texture("velvet_arm", await read("velour_velvet_arm_1k.jpg"));
+  const srgb = (c) => ((c / 255 + 0.055) / 1.055) ** 2.4;
+  const sheen = doc.createExtension(KHRMaterialsSheen);
+  const velvet = doc
+    .createMaterial("velour_velvet")
+    .setBaseColorTexture(texture("velvet_diffuse", grey))
+    .setBaseColorFactor([srgb(214), srgb(178), srgb(172), 1])
+    .setNormalTexture(
+      texture("velvet_normal", await read("velour_velvet_nor_gl_1k.jpg")),
+    )
+    // Sans l'occlusion de l'échantillon : à 28 cm de répétition, elle ne fait
+    // qu'assombrir le tissu (les dossiers face à nous ne reçoivent que la
+    // lumière ambiante, la fenêtre est derrière eux).
+    .setMetallicRoughnessTexture(arm)
+    .setMetallicFactor(1)
+    .setRoughnessFactor(1)
+    // Comme le matériau d'origine : le tissu est vu des deux côtés (dossier
+    // fin, faces orientées vers l'intérieur par endroits).
+    .setDoubleSided(true)
+    .setExtension(
+      "KHR_materials_sheen",
+      sheen
+        .createSheen()
+        .setSheenColorFactor([srgb(235), srgb(205), srgb(200)])
+        .setSheenRoughnessFactor(0.45),
+    );
+  const buffer = root.listBuffers()[0];
+  for (const prim of node.getMesh().listPrimitives()) {
+    const positions = prim.getAttribute("POSITION");
+    const normals = prim.getAttribute("NORMAL");
+    const count = positions.getCount();
+    const uvs = new Float32Array(count * 2);
+    for (let i = 0; i < count; i++) {
+      const w = apply(world, positions.getElement(i, []));
+      const n = normalize(apply(world, normals.getElement(i, []), 0));
+      const [ax, ay, az] = n.map(Math.abs);
+      const uv =
+        ay >= ax && ay >= az
+          ? [w[0], w[2]]
+          : ax >= az
+            ? [w[2], w[1]]
+            : [w[0], w[1]];
+      uvs.set([uv[0] / VELVET_TILE, uv[1] / VELVET_TILE], i * 2);
+    }
+    prim.setAttribute(
+      "TEXCOORD_0",
+      doc.createAccessor().setType("VEC2").setArray(uvs).setBuffer(buffer),
+    );
+    prim.setMaterial(velvet);
   }
 }
 
