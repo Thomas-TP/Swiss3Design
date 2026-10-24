@@ -78,7 +78,7 @@ of truth.
 
 - **quote_requests** — `email`, `description`, `material`/`colors`/`dimensions`,
   `fileUrl`/`fileName` (R2 STL/3MF), `status` (`received → quoted →
-revision_requested → accepted/declined → paid → in_production → done`, plus
+  revision_requested → accepted/declined → paid → in_production → done`, plus
   `rejected`), `quotedPriceCents`, `adminMessage`, `validUntil` (+30 days at
   quoting), `adminNote`, `locale`.
 - **quote_messages** — threaded customer ↔ workshop conversation; an admin message

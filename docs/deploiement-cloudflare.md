@@ -45,10 +45,10 @@ Ce document explique comment le site est déployé et comment (re)connecter GitH
 > **🔴 Deuxième panne, trouvée juste après la première (2026-07-09)** : une
 > fois la variable Hyperdrive posée au bon endroit, `next build` réussissait
 > enfin — mais le déploiement échouait ensuite avec `duplicate column name:
-failed_verification_count: SQLITE_ERROR`. Cause : le **Deploy command** du
+> failed_verification_count: SQLITE_ERROR`. Cause : le **Deploy command** du
 > Worker `swiss3design` (Settings → Build → Build configuration), configuré
 > avant le pivot Postgres, contenait encore `npx wrangler d1 migrations apply
-swiss3design-db --remote && npx wrangler deploy` — la partie migrations D1
+> swiss3design-db --remote && npx wrangler deploy` — la partie migrations D1
 > tentait de réappliquer une migration déjà passée sur la base D1 (inactive)
 > et bloquait tout le reste. **Fix** : Deploy command simplifié en
 > `npx wrangler deploy` (retrait complet de l'étape migrations D1, qui n'a
@@ -126,7 +126,7 @@ swiss3design-db --remote && npx wrangler deploy` — la partie migrations D1
 > schéma incohérent. **Ce n'est plus le cas** : le Deploy command est
 > aujourd'hui un simple `npx wrangler deploy`, la ligne `d1 migrations apply`
 > a été retirée (elle causait un vrai échec de déploiement, `duplicate column
-name`, voir l'avertissement 🔴 plus haut). Postgres/Hyperdrive n'a
+> name`, voir l'avertissement 🔴 plus haut). Postgres/Hyperdrive n'a
 > **aucune** étape de migration dans ce pipeline — volontairement, voir
 > `AGENTS.md` § Deployment et « Postgres schema changes » dans `runbook.md`.
 
@@ -312,7 +312,7 @@ après le merge, puis confirmé via `git log --oneline main -- <fichier connu>`.
    directement contournerait ce contrôle. Fermer ensuite les PR intermédiaires
    manuellement sur GitHub (elles n'ont plus de diff).
 2. Ou re-cibler chaque PR sur `main` avant de merger (`gh pr edit N --base
-main`) — fonctionne mais casse la lecture en pile sur GitHub (chaque PR
+   main`) — fonctionne mais casse la lecture en pile sur GitHub (chaque PR
    affichera alors _tout_ le diff cumulé, pas juste sa propre phase).
 
 **Avant de merger quoi que ce soit** : vérifier avec `git log --oneline main --
@@ -372,7 +372,7 @@ pas la cause cette fois) :
   secret partagé par plusieurs comptes réels) **sur un environnement qui a déjà
   des utilisateurs actifs**, sauf rotation planifiée et assumée (voir plus bas).
 - Toute commande `wrangler secret put` doit **explicitement** porter `--env
-preview` quand elle vise la preview — jamais de commande « nue » en espérant
+  preview` quand elle vise la preview — jamais de commande « nue » en espérant
   qu'elle vise le bon environnement par défaut.
 - Avant toute commande touchant un secret : relire la commande à voix haute
   (ou la faire relire) en vérifiant le nom du Worker cible, comme pour un

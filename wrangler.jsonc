@@ -9,7 +9,7 @@
   // Pas plus récente que le runtime local (workerd livré avec wrangler) : au-delà,
   // `preview` retombe sur la date de workerd, avec un avertissement, et ne reflète
   // plus la prod. À remonter à chaque mise à jour de wrangler.
-  "compatibility_date": "2026-09-25",
+  "compatibility_date": "2026-10-24",
   // Redondant depuis la date 2026-08-04 (Node.js activé par défaut), gardé
   // pour rester explicite : inoffensif selon Cloudflare.
   "compatibility_flags": ["nodejs_compat"],

@@ -95,6 +95,7 @@ export function Footer() {
         {/* Barre basse : copyright + crédit agence + paiement sécurisé */}
         <div className="mt-12 flex flex-col gap-4 border-t border-line py-6 text-xs text-soft sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
+            {/* oxlint-disable-next-line purity -- composant serveur, rendu une fois par requête */}
             <p>{t("copyright", { year: new Date().getFullYear() })}</p>
             <a
               href="https://calyroc.com/"
