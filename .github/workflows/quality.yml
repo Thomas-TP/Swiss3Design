@@ -37,4 +37,9 @@ jobs:
       - run: bun run typecheck
       - run: bun scripts/ci-migrate.ts
       - run: bun run test
-      - run: bun audit --audit-level=high
+      # Deux avis ignorés (24.10.2026), outils de build seulement, jamais dans le
+      # Worker : GHSA-5j98-mcp5-4vw2 vise la CLI de glob (-c/--cmd), que
+      # @node-minify/core (via @opennextjs/aws) n'appelle pas ; GHSA-xjj6-f33q-929c
+      # vise undici 7.29, épinglé par miniflare (wrangler dev en local). À retirer
+      # dès qu'OpenNext et wrangler publient des versions qui les remontent.
+      - run: bun audit --audit-level=high --ignore=GHSA-5j98-mcp5-4vw2 --ignore=GHSA-xjj6-f33q-929c
