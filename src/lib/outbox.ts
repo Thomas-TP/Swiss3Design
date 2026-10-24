@@ -16,12 +16,18 @@ export async function queueEmail(
 }
 export async function drainEmailOutbox(db: Db, limit = 10, onlyKey?: string) {
   const now = new Date();
+  // Comparaisons à l'heure de la base, pas à celle du Worker : la ligne vient
+  // d'être écrite avec available_at = now() de Postgres, et un SELECT sans
+  // fonction STABLE peut sortir du cache Hyperdrive (règle d'or 6c). Avant, le
+  // drain lancé juste après queueEmail ne voyait pas la ligne : les e-mails
+  // attendaient la maintenance horaire (20 à 36 min en prod), et la preview,
+  // sans cron, ne les envoyait jamais.
   const available = and(
     isNull(emailOutbox.sentAt),
-    lte(emailOutbox.availableAt, now),
+    lte(emailOutbox.availableAt, sql`now()`),
     or(
       isNull(emailOutbox.lockedAt),
-      lt(emailOutbox.lockedAt, new Date(now.getTime() - 120000)),
+      lt(emailOutbox.lockedAt, sql`now() - interval '2 minutes'`),
     ),
   );
   const rows = await db
