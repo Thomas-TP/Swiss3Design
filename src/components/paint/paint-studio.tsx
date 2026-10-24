@@ -11,6 +11,11 @@ import {
   projectMatters,
   projectSummary,
 } from "@/lib/paint3d/project";
+import {
+  bambuPresetFor,
+  GENERIC_PRESET,
+  type BambuTemplate,
+} from "@/lib/paint3d/bambu-project";
 import { write3mf } from "@/lib/paint3d/write3mf";
 import { VIEWER_FALLBACK_COLOR } from "@/components/catalog/viewer-props";
 import { PaintDialog } from "./paint-dialog";
@@ -145,13 +150,31 @@ export function PaintStudio({
         matters,
         scale: current.scale,
         version: current.version,
-        export3mf: (onProgress) =>
-          write3mf(current, {
+        export3mf: async (onProgress) => {
+          // Teinte de chaque filament (la première d'une bobine co-extrudée).
+          const colors = paletteOf(ids).map((hexes) => hexes[0]);
+          const stockNow = latest.current.stock ?? [];
+          // Projet Bambu Studio : chaque filament avec le profil de sa
+          // référence. Le modèle de réglages (≈ 7 Ko compressés) n'est chargé
+          // qu'au moment d'envoyer.
+          const { default: template } =
+            await import("@/lib/paint3d/bambu-template.json");
+          const filaments = colors.map((hex, i) => {
+            const ref = stockNow.find((c) => c.id === ids[i]);
+            return {
+              hex,
+              preset: ref
+                ? bambuPresetFor(ref.brand, ref.range)
+                : GENERIC_PRESET,
+            };
+          });
+          return write3mf(current, {
             title,
             onProgress,
-            // Teinte de chaque filament (la première d'une bobine co-extrudée).
-            colors: ids.length ? paletteOf(ids).map((hexes) => hexes[0]) : [],
-          }),
+            colors: ids.length ? colors : [],
+            bambu: { template: template as BambuTemplate, filaments },
+          });
+        },
       });
     },
     [paletteOf],

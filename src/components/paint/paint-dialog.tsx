@@ -66,8 +66,12 @@ import { paintHeightRange, type FillMode } from "@/lib/paint3d/tools";
 
 /** Purge d'un changement de filament (≈ 280 mm³ de PLA, réglage par défaut des AMS). */
 const PURGE_GRAMS = 0.35;
-/** Durée d'un changement de filament sur une imprimante à AMS (s). */
-const CHANGE_SECONDS = 45;
+/**
+ * Durée d'un changement de filament sur une P1S à AMS (s) : déchargement,
+ * chargement et purge. Mesuré par Bambu Studio 02.08 sur un cube de 45 mm peint
+ * en 3 couleurs (233 changements, 19 057 s de purge) : ≈ 82 s.
+ */
+const CHANGE_SECONDS = 80;
 /** Taille du pinceau (mm) : bornes du curseur logarithmique. */
 const BRUSH_MIN = 0.3;
 const BRUSH_MAX = 60;

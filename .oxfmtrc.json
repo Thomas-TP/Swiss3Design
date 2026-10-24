@@ -24,6 +24,7 @@
     "public/**",
     "workers/**",
     "cloudflare-env.d.ts",
-    "next-env.d.ts"
+    "next-env.d.ts",
+    "src/lib/paint3d/bambu-template.json"
   ]
 }

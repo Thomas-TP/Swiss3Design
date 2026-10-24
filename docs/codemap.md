@@ -317,6 +317,7 @@ hexagonal), lissée ou en strates, colorée par altitude. Pure TypeScript comme 
 | `admin/filaments/consumption-panel.tsx`                     | Décompte d'une commande ou d'un devis (pages admin commande et devis)                                                     |
 | `lib/mesh-weight/` · `components/quote/`                    | Poids d'un fichier 3D dans le navigateur (STL, OBJ, 3MF, STEP) ; couleurs du devis                                        |
 | `lib/paint3d/`                                              | Atelier 3D : peinture par triangle au format des trancheurs (`selector.ts`), document et historique, BVH, outils, 3MF     |
+| `lib/paint3d/bambu-project.ts` · `bambu-template.json`      | 3MF du devis en projet Bambu Studio (filaments, couleurs, profils) ; modèle : `scripts/bambu/build-project-template.ts`   |
 | `components/paint/` · `motion/stage/scenes/paint-editor.ts` | Atelier 3D : panneaux (chargés par `paint-studio-lazy.tsx`, `ssr: false`) et scène du Stage                               |
 | `lib/paint3d/summary.ts` · `admin-data.ts`                  | Résumé du projet de couleurs (zod, Server Action) ; fiche admin du devis (`quote_color_projects`, migration 0012)         |
 | `public/vendor/occt/`                                       | occt-import-js (STEP, LGPL-2.1) et son Worker : fichiers statiques, jamais dans le Worker                                 |

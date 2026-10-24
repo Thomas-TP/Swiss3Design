@@ -340,6 +340,19 @@ which for a multi-line hook body is rarely the line you'd expect.
       le haut), jamais `upAxisFor`, qui ne sert qu'aux modèles des produits.
 
     Côté devis :
+    - **Projet Bambu Studio (24.10.2026).** Le 3MF du devis est un projet Bambu
+      (`lib/paint3d/bambu-project.ts`) : à l'ouverture, Bambu Studio crée lui-même les
+      filaments, avec leurs couleurs et leurs profils. Un 3MF « d'un autre logiciel » ne
+      garde pas la peinture d'un filament absent du projet ouvert, même si on l'ajoute
+      ensuite.
+      - Les réglages viennent de `lib/paint3d/bambu-template.json`, généré par
+        `bun scripts/bambu/build-project-template.ts` depuis les profils de Bambu Studio
+        (P1S 0.4, 0.20mm Standard, Textured PEI). La ligne de commande de Bambu ne
+        résout pas l'héritage des profils : ne pas reprendre ses valeurs.
+      - Vérifié en ligne de commande : 3 filaments, profils reconnus, filament 3
+        tranché, aucun profil marqué « modifié ».
+      - Regénérer le modèle après une mise à jour majeure de Bambu Studio ou un
+        changement de machine.
     - **Fichier.** Le 3MF peint passe par `/api/quote-upload` (30 Mo, compte dans le
       quota de 10 envois par heure).
     - **Résumé.** Il est revalidé par zod (`lib/paint3d/summary.ts`). Le projet n'est
