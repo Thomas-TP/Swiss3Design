@@ -137,7 +137,7 @@ which for a multi-line hook body is rarely the line you'd expect.
 7. **Never commit secrets.** Local secrets live in `.dev.vars`; prod secrets in
    Cloudflare (`wrangler secret put` / dashboard). The committed `.env.*` files
    hold only the **public** Stripe publishable key. **Never run `wrangler secret
-put` on an environment with real users without `--env <name>` explicitly
+   put` on an environment with real users without `--env <name>` explicitly
    set and double-checked** — a shared secret like `BETTER_AUTH_SECRET`
    encrypts existing 2FA/backup-code data; overwriting it silently locks users
    out with no self-service recovery (real incident, see

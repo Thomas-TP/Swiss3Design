@@ -292,7 +292,7 @@ les exports `./react`, `./react-m`, `./react-mini`, `./react-animate-view`,
 ### Shaders GLSL : techniques retenues et sources libres
 
 - **Shaders en littéraux TypeScript** (`/* glsl */ \`...\``), sans loader
-`.glsl`. Ça marche aussi bien avec Turbopack en dev qu'avec webpack pour le
+  `.glsl`. Ça marche aussi bien avec Turbopack en dev qu'avec webpack pour le
   build OpenNext, sans configuration.
 - **Bruit :** simplex, curl et FBM d'Ashima/Stefan Gustavson (MIT), à copier
   dans `src/motion/stage/glsl/noise.ts`, ou le paquet `glsl-noise` (celui
@@ -335,7 +335,7 @@ D'après `node_modules/next/dist/docs/01-app/02-guides/view-transitions.md` et
   `createNavigation` déclarent `transitionTypes?: string[]`.
 - Patterns :
   - **Morph partagé :** `name={\`product-${id}\`}`identique sur la carte de
-la grille et sur le héros de la fiche, avec`share="morph"`et`default="none"`. Le morph ne joue que si la destination est rendue dans
+    la grille et sur le héros de la fiche, avec`share="morph"`et`default="none"`. Le morph ne joue que si la destination est rendue dans
     le même commit (pages préchargées). Sinon c'est l'animation d'entrée qui
     joue.
   - **Révélation de Suspense :** `exit="slide-down"` sur le fallback,

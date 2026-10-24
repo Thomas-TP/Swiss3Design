@@ -53,6 +53,7 @@ export default async function AgentClaimPage({
   let expectedEmail: string | null = null;
   if (token && session) {
     const reg = await findClaimAttempt(token);
+    // oxlint-disable-next-line purity -- page serveur : l'instant de la requête
     state = checkClaimAttempt(reg, session.user.email, new Date());
     expectedEmail = reg?.claimEmail ? maskEmail(reg.claimEmail) : null;
   }

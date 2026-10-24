@@ -426,7 +426,11 @@ describe.skipIf(!url)("Paiements sur Postgres preview isolé", () => {
         const payment = await stripe.paymentIntents.create({
           amount: order.totalCents,
           currency: "chf",
-          payment_method_types: ["card"],
+          // API Endive (stripe 23) : payment_method_types n'existe plus.
+          automatic_payment_methods: {
+            enabled: true,
+            allow_redirects: "never",
+          },
           payment_method: "pm_card_visa",
           confirm: true,
           metadata: { audit: "preview-validation" },

@@ -459,10 +459,10 @@ on _every_ page at once.
   `Studio Configured` (first adjustment per object and session, `control` =
   short control name), `Studio Sent` (after a successful upload: object, bands,
   triangles, bytes, estimate in CHF decimals when displayed), `Studio Link
-Copied`, `Studio Saved`; the home hero fires `Hero Customized` once per
+  Copied`, `Studio Saved`; the home hero fires `Hero Customized` once per
   session. **The PostHog actions rely on event names only** (Achat = `Order
-Completed`, Ajout au panier = `Product Added`, Demande de devis = `Quote
-Requested`, Inscription = `Signed Up`): never rename them, and fire them from
+  Completed`, Ajout au panier = `Product Added`, Demande de devis = `Quote
+  Requested`, Inscription = `Signed Up`): never rename them, and fire them from
   every journey that leads to the same outcome (shop card, product page,
   « Acheter », favourites; `/custom` and the Studio drawer share one form).
 - **Never send personal data.** No email, name, address or payment message goes

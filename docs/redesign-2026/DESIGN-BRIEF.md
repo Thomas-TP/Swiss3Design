@@ -1074,7 +1074,7 @@ Interdits : import de gsap / lenis / three / postprocessing hors src/motion/** ;
 
 - **`src/motion/**`** : seul endroit qui importe `gsap`, `gsap/*`, `@gsap/react`, `lenis`,
   `three`, `three/*`, `postprocessing`. Atteint **uniquement** par `next/dynamic(() => import(...),
-{ ssr: false })` déclaré dans un fichier de `src/gates/**`. Avec `ssr: false`, le transform de
+  { ssr: false })` déclaré dans un fichier de `src/gates/**`. Avec `ssr: false`, le transform de
   Next retire l'import du build serveur : le Worker ne voit jamais ces paquets. (Un simple
   `await import("three")` dans un effet d'un composant rendu côté serveur **reste** dans le
   Worker, voir `research/critique.md` §2.2 : c'est interdit.)
@@ -1261,7 +1261,10 @@ contenu par la version ci-dessous (thème inchangé + mouvement) :
 // src/lib/motion-bridge/types.ts (WP-00)
 export type Capability = 0 | 1 | 2;
 export type SceneId =
-  "print-hero" | "contour-field" | "studio-object" | "product-viewer";
+  | "print-hero"
+  | "contour-field"
+  | "studio-object"
+  | "product-viewer";
 
 export interface StageViewDescriptor<P = unknown> {
   id: string; // useId()
@@ -1785,7 +1788,7 @@ retire déjà). **Stockage local ajouté** : `s3d-motion`, `s3d-creations-v1` (l
   **« Régler un objet »** (seul bouton rouge, vers `/studio/lavaux#c=…` avec la configuration
   courante), « Boutique » (contour, `/shop`), « J'ai un fichier » (lien texte, `/custom`).
 - Colonnes 7–12 : boîte visuelle `aspect-[4/5]`, hauteur `min(78svh, 820px)` = `<StageView
-scene="print-hero">` avec, en enfants, les deux posters SVG inline (§5.7), l'étiquette
+  scene="print-hero">` avec, en enfants, les deux posters SVG inline (§5.7), l'étiquette
   d'honnêteté en bas à gauche (« Objet Studio · configuration d'exemple · rendu temps réel ») et la
   **bande de mesure** en bas (§5.5).
 - Cadre de carte (`MapFrame`) sur les bords gauche et bas de la section ; coordonnées en haut à
@@ -2104,7 +2107,10 @@ export interface BorneConfig {
   ink: FilamentId; // texte : StudioTexts.text
 }
 export type StudioConfig =
-  LavauxConfig | CartoucheConfig | MontagneConfig | BorneConfig;
+  | LavauxConfig
+  | CartoucheConfig
+  | MontagneConfig
+  | BorneConfig;
 
 export type IssueCode =
   | "overhang"
@@ -2203,7 +2209,7 @@ exactement deux triangles d'orientations opposées, par composante connexe), `ke
   3,6 mm de capitale, une Bold (~15 %) seulement vers 5,5 mm.
 - **Format maison** `public/studio/glyphs/s3d-relief-v1.json` (script `scripts/fonts/build-glyphs.ts`,
   opentype.js) : `{ v: 1, family: "S3D Relief", unitsPerEm, ascender, descender, capHeight, stem,
-glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0–00FF, U+0100–017F, plus
+  glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0–00FF, U+0100–017F, plus
   ’ – — ; famille renommée (clause RFN de l'OFL), `OFL.txt` à côté. ≤ 45 Ko gzip.
 - **Chaîne** : chemins → polylignes (quadratiques 6 segments, cubiques 8, adaptatifs à la
   longueur) → classement extérieur/trou par inclusion → mise en page (hauteur de capitale en mm,
@@ -2257,7 +2263,7 @@ glyphs: { "A": { adv, d: "M…L…Q…C…Z" } } }`, jeu U+0020–007E, U+00A0�
   altitude) à la plus grande capitale commune qui tienne dans la corde du socle, sinon `text-fit`.
   Aucun préfixe automatique (POINTE / PIZ…) : le nom d'exemple de chaque langue le porte (« Pointe
   Léa », « Piz Léa », « Pizzo Léa », « Mount Léa »). **Altitude** fictive = `1800 + (fnv1a(nom
-normalisé) mod 2600)` m, ou saisie (0–8 848 m). **Style lissé** : grille régulière (diagonale sur
+  normalisé) mod 2600)` m, ou saisie (0–8 848 m). **Style lissé** : grille régulière (diagonale sur
   la plus faible différence d'altitude), coupée EXACTEMENT aux frontières de bande (sommets de coupe
   calculés une fois par arête de grille), dessous plat refermé par les lignes de niveau (même
   sommets : coque fermée sans jonction en T) ; hauteurs à 0,02 mm d'une frontière ramenées dessus ;
@@ -2682,7 +2688,7 @@ l'habillage change. Toute page de `(site)` enveloppe son contenu dans `<PageCut>
   `style={{ viewTransitionName: "site-header" }}`. À gauche : mark 28 px + wordmark
   « **Swiss**3Design » en Geist (inchangé). Au centre (≥ lg) : **Boutique · Studio · Sur mesure ·
   Atelier** en texte 14 px ; actif = encre + soulignement rouge 2 px (`view-transition-name:
-nav-mark`) ; survol = soulignement qui se trace. À droite : thème, langue, favoris (cœur +
+  nav-mark`) ; survol = soulignement qui se trace. À droite : thème, langue, favoris (cœur +
   compteur), compte (≥ md), panier (≥ md) « Panier » + compteur.
 - **Bord inférieur** : filet de progression `.s3d-progress` (pages de `(site)`), buse d'attente
   `.s3d-pending` pendant `navPending`.
@@ -2787,7 +2793,7 @@ mobile. i18n : `studio`, `studioCore`.
   `sort=new|price_asc|price_desc`, `q`), `getUsedFilters(locale)`, `getProducts(locale, {…})`,
   canonical `/shop`, `collectionJsonLd` **seulement** sans filtre, `TrackEvent`
   `Products Searched {query, results}` et `Product List Filtered {category, material, color,
-multicolor, sort, results}`, état vide utile, aucun nouveau paramètre d'URL (sinon robots et
+  multicolor, sort, results}`, état vide utile, aucun nouveau paramètre d'URL (sinon robots et
   `KEPT_PARAMS`).
 - **i18n** : `shop.*` + `catalog`.
 
@@ -2816,16 +2822,16 @@ multicolor, sort, results}`, état vide utile, aucun nouveau paramètre d'URL (s
   - **07 Produits liés** (s'il y en a).
 - **`AttributionBlock`** (SSR, 4 langues, `src/components/catalog/attribution-block.tsx`), données
   `src/lib/attribution.ts` (`attributionFor(slug)` ; `vase-spirale` → `{ title: "Vase", author: "Ian",
-platform: "MakerWorld", url: "https://makerworld.com/fr/models/1262112-vase", license: "CC BY-ND 4.0",
-licenseUrl: "https://creativecommons.org/licenses/by-nd/4.0/", modified: false }`, deed localisé
+  platform: "MakerWorld", url: "https://makerworld.com/fr/models/1262112-vase", license: "CC BY-ND 4.0",
+  licenseUrl: "https://creativecommons.org/licenses/by-nd/4.0/", modified: false }`, deed localisé
   `…/by-nd/4.0/deed.fr|de|it|en`). Texte FR : « Design : **Ian**, « Vase », publié sur MakerWorld
   (lien). Licence **Creative Commons BY-ND 4.0** (lien vers le deed). Swiss3Design imprime ce modèle
   **sans aucune modification**. Cette mention n'implique aucune approbation de Swiss3Design par
   l'auteur. » (DE/IT/EN en annexe C). Jamais de formulation laissant croire à un partenariat.
 - **JSON-LD** : `productJsonLd` gagne une entrée facultative `design` qui ajoute au `Product`
   `subjectOf: { "@type": "3DModel", name: "Vase", creator: { "@type": "Person", name: "Ian" }, url:
-"https://makerworld.com/fr/models/1262112-vase", license: "https://creativecommons.org/licenses/by-nd/4.0/",
-isAccessibleForFree: true }` (**pas** `isBasedOn` sur `Product`, invalide).
+  "https://makerworld.com/fr/models/1262112-vase", license: "https://creativecommons.org/licenses/by-nd/4.0/",
+  isAccessibleForFree: true }` (**pas** `isBasedOn` sur `Product`, invalide).
 - **À préserver** : `cache(getProductBySlug)` partagé metadata/page ; `notFound()` avant tout ;
   `generateMetadata` (titre `seo.productTitle` si nom ≤ 20 car., `productMetaDescription`, OG
   jusqu'à 4 photos `cfOgImage`, SVG exclus) ; `productJsonLd` + `breadcrumbJsonLd` ;
@@ -2905,7 +2911,7 @@ formulaire reste un `<form action={formAction}>` (Server Action, amélioration p
 - **À préserver** : contenu `ABOUT_CONTENT` (JSX par langue) intact ; `pageMetadata` tiré du
   contenu ; `webPageJsonLd({ type: "AboutPage" })` + `faqJsonLd(c.faq)` avec la FAQ **visible en
   SSR** (`<details class="faq-item">`, sans JS) ; ancres `equipment, process, materials, trust,
-faq, contact` + `scroll-mt-32` ; `AboutNav` **enfant direct** du conteneur racine (sinon le sticky
+  faq, contact` + `scroll-mt-32` ; `AboutNav` **enfant direct** du conteneur racine (sinon le sticky
   se décolle) ; `DETECTION_LINE` alignée sur le header de 64 px ; `ContactForm` ; interactions du
   schéma (survol ↔ légende, focus, épinglage). `scrollIntoView` remplacé par `bridge.scroll.to`
   quand Lenis est là. La photo `about/p1s-ams2-pro.jpg` reste inutilisée (droits non vérifiés).
@@ -2968,7 +2974,7 @@ faq, contact` + `scroll-mt-32` ; `AboutNav` **enfant direct** du conteneur racin
   confirmation « s'imprime » une fois (`.s3d-print`, en CSS) ; ticket mono (n°, montant).
 - **À préserver** : `stripe.checkout.sessions.retrieve` + `settleSession()` idempotent, statuts
   `succeeded | processing | failed`, `ClearCart`, `TrackEvent "Order Completed"` (`onceKey =
-order_id`, `revenue` port compris), `AttributionQuestion`, conversion invité → compte
+  order_id`, `revenue` port compris), `AttributionQuestion`, conversion invité → compte
   (`/account/register?email=`), lien `/track?order=`.
 - **i18n** : `orderSuccess.*`, `attribution.*` + `system`.
 
@@ -3218,7 +3224,7 @@ jamais dessus.
 
 1. **Mesures de référence** sur `claude/redesign-2026` avant tout changement :
    `bunx opennextjs-cloudflare build` puis `bunx wrangler deploy --dry-run` (noter `Total Upload …
-gzip`) ; `bun scripts/chunk-report.ts` ; Lighthouse mobile de `/fr`, `/fr/shop`,
+   gzip`) ; `bun scripts/chunk-report.ts` ; Lighthouse mobile de `/fr`, `/fr/shop`,
    `/fr/products/vase-spirale` sur `bun run preview`. Consigner dans le compte rendu.
 2. **Paquets** (§4.7), puis `bun run typecheck`.
 3. **Garde-fous** : `.oxlintrc.json` (§4.6), `src/gates/boundary.test.ts`, les deux scripts.
@@ -3666,7 +3672,7 @@ héros. Rendu seulement quand le scroll bouge ou que `uReveal` change.
 
 - Couches : `ceil(h / 0,2)` ; une frontière de bande `z` tombe à la couche `round(z / 0,2) + 1`.
 - Masse : `V(cm³) × 1,24 + changements × 0,8 g`. Durée : `V(mm³) / 8 + couches × 1,5 s +
-changements × 110 s + 360 s`.
+  changements × 110 s + 360 s`.
 - Prix : `max(900, 400 + 8 × g + 300 × h + 60 × changements) × marge` centimes, fourchette ±15 %,
   arrondi à 50 centimes, jamais sous le plancher (valeurs à valider, `PRICING.validated`).
 - STL binaire : `84 + 50 × triangles` octets. Pour viser 1–3 Mo : 20 000 à 60 000 triangles.

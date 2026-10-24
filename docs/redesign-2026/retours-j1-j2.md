@@ -70,7 +70,7 @@ Chaque point : symptôme rapporté → piste et fichiers → critère de fin.
 - **R15 · Une navigation ne remet pas en haut de la page** → à l'arrivée sur une nouvelle page
   (pas une ancre), `scrollY` doit valoir 0. Piste : Lenis garde sa cible de défilement à travers
   la navigation ; dans `onRoute()` de `src/motion/runtime.tsx`, `lenis.scrollTo(0, { immediate:
-true, force: true })` quand le chemin change sans ancre ; vérifier aussi hors `(site)` (sans
+  true, force: true })` quand le chemin change sans ancre ; vérifier aussi hors `(site)` (sans
   Lenis) et en mouvement réduit, où le problème pourrait venir de la View Transition ou d'un
   `scroll={false}`. Fin : depuis le bas de `/fr`, un clic vers `/fr/shop` arrive en haut, dans
   les 3 modes (Lenis, natif, mouvement réduit), retour arrière compris (restauration native).

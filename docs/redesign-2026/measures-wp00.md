@@ -317,7 +317,7 @@ https`. **Plus de boucle de 308** : tout est servi en HTTP sur `127.0.0.1:8787`.
   défilée jusqu'en bas : aucune violation CSP (console et `securitypolicyviolation`), aucune
   erreur (hydratation comprise), aucune réponse 4xx (les posters du footer sont servis).
   Seul avertissement, sur chaque page : `navigator.modelContext is deprecated. Please use
-document.modelContext instead.` (`src/components/webmcp-tools.tsx`, ligne 59, antérieur à
+  document.modelContext instead.` (`src/components/webmcp-tools.tsx`, ligne 59, antérieur à
   la refonte).
 - **`html.lenis`** : présent sur les six pages vitrine ; absent sur `/fr/cart`,
   `/fr/checkout`, `/fr/account` (→ `/fr/account/login`), `/fr/legal/terms`, `/fr/track`,

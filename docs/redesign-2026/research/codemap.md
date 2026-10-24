@@ -55,7 +55,7 @@
     touche aussi l'admin, le checkout et le compte → prévoir un groupe de
     routes `(site)` ou des exclusions par pathname.
 12. **Les jetons de thème sont un contrat** : `paper surface elevated ink soft
-line accent accent-dark night night-soft night-line swatch-ring` +
+    line accent accent-dark night night-soft night-line swatch-ring` +
     `rounded-card`. Utilisés par **116 fichiers** dont **27 fichiers admin** sur
     48 (`rounded-card` : 110 occurrences). Renommer = casser l'admin (hors
     scope) → garder les noms (on peut changer leurs valeurs) ou migrer l'admin.
@@ -263,7 +263,7 @@ transition de page, aucun shader aujourd'hui.
   wordmark caché `< 360px`. « À propos » n'est pas dans la BottomNav → bouton
   dédié `md:hidden` dans le hero de l'accueil.
 - **ConsentBanner** : `fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))]
-z-40` (au-dessus de la BottomNav), `lg:bottom-6 lg:left-6`, masquée sur
+  z-40` (au-dessus de la BottomNav), `lg:bottom-6 lg:left-6`, masquée sur
   `/checkout*` et `/admin*`.
 - Offsets dépendants de la hauteur du header (64 px) : `AboutNav` `top-16` +
   `DETECTION_LINE = 150`, sections `scroll-mt-32`, colonnes sticky `top-24`
@@ -345,7 +345,7 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   couleur : `<span class="sr-only">{nom}</span>` (a11y + SEO).
 - JSON-LD `collectionJsonLd` **seulement** si catalogue non filtré.
 - Events : `Products Searched {query, results}`, `Product List Filtered
-{category, material, color, multicolor, sort, results}` (via `TrackEvent`).
+  {category, material, color, multicolor, sort, results}` (via `TrackEvent`).
 - Canonical toujours `/shop` ; facettes `sort/material/color/q` en `Disallow`
   dans `robots.txt` → ne pas inventer de nouveau paramètre sans l'ajouter
   (robots + `KEPT_PARAMS` analytics).
@@ -389,7 +389,7 @@ Légende priorité : **core** (à redessiner en profondeur), **secondary**,
   cachés `fileKey`/`fileName`. E-mail prérempli via `useSession()`.
 - Event `Quote Requested {material, has_file, signed_in}` au succès.
 - À préserver : champs `email, description (min 10), material, colors,
-dimensions, locale`, états succès/erreur, labels `htmlFor`.
+  dimensions, locale`, états succès/erreur, labels `htmlFor`.
 - Le doc `docs/refonte-plateforme-2026.md` (non implémenté) décrit une
   « Forge » (devis instantané, analyse de fichier, viewer 3D sur upload).
 
@@ -440,8 +440,8 @@ dimensions, locale`, états succès/erreur, labels `htmlFor`.
   `checkout.confirm()` puis `router.push('/checkout/success?session_id=…')`.
   Stripe.js préchargé en idle (`@stripe/stripe-js/pure`).
 - Events : `Checkout Started`, `Coupon Applied/Denied`, `Checkout Step
-Viewed {step:2,…}`, `Payment Info Entered`, `Payment Failed {error_code,
-decline_code}`.
+  Viewed {step:2,…}`, `Payment Info Entered`, `Payment Failed {error_code,
+  decline_code}`.
 - **Légal** : mention `checkout.termsPrefix` + lien CGV `/legal/terms` sous
   le bouton payer, « Sécurisé par Stripe ». `ph-mask` sur l'e-mail affiché.
 - ⚠ `window.scrollTo({ top: 0, behavior: "smooth" })` au passage à l'étape 2
@@ -525,9 +525,9 @@ decline_code}`.
 - Liste des événements à conserver (noms = spec e-commerce PostHog) :
   `Product Viewed`, `Products Searched`, `Product List Filtered`,
   `Product Added` (source `product_page|catalog|buy_now`), `Product Added to
-Wishlist`, `Product Removed from Wishlist`, `Cart Viewed`, `Product Removed`,
+  Wishlist`, `Product Removed from Wishlist`, `Cart Viewed`, `Product Removed`,
   `Checkout Started`, `Checkout Step Viewed`, `Coupon Applied`, `Coupon
-Denied`, `Payment Info Entered`, `Payment Failed`, `Order Completed`
+  Denied`, `Payment Info Entered`, `Payment Failed`, `Order Completed`
   (onceKey), `Attribution Survey Answered`, `Quote Requested`, `Signed Up`,
   `Page Not Found`, + `trackException` (error boundary).
 - `ph-mask` sur toute donnée perso affichée ; inputs masqués d'office.
@@ -580,7 +580,7 @@ Denied`, `Payment Info Entered`, `Payment Failed`, `Order Completed`
   hreflang 4 langues + `x-default` → FR, OG complet (fusion superficielle de
   Next !), Twitter. `JsonLd` lit lui-même le nonce et échappe `<`.
 - `sitemap.xml/route.ts` `STATIC_PAGES` : `"" /shop /custom /a-propos /contact
-/legal/terms /legal/privacy /legal/shipping` (+ produits). Nouvelle page
+  /legal/terms /legal/privacy /legal/shipping` (+ produits). Nouvelle page
   publique ⇒ l'y ajouter (+ `llms.txt` si utile).
 - `robots.txt` (route écrite à la main) : Disallow account/admin/checkout/
   cart/track/favorites + facettes ; `Allow /api/files/products/` (images
@@ -662,7 +662,7 @@ Conséquences :
   `cartReminder.consent` (nLPD).
 - Checkout : lien CGV avant paiement, « Suisse uniquement », mentions de
   sécurité ; moyens de paiement du footer (`TWINT, Visa, Mastercard, Google
-Pay`), copyright `footer.copyright`, crédit « Site créé par » + logo
+  Pay`), copyright `footer.copyright`, crédit « Site créé par » + logo
   Calyroc (`public/credits/calyroc-logo.png`, lien externe).
 - Footer : colonnes Boutique (shop, custom, favoris, suivi), Compte & aide
   (compte, à propos, contact), Informations (CGV, confidentialité, livraison

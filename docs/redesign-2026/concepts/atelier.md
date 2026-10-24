@@ -478,7 +478,7 @@ couches, prix) avec une bascule vers une grille.
 **Éléments globaux**
 
 - **Header** : 64 px, wordmark et mark raster. Nav : `Boutique · Studio · Sur mesure ·
-Atelier`. La barre Z sert d'indicateur de progression.
+  Atelier`. La barre Z sert d'indicateur de progression.
 - **BottomNav** : Accueil, Boutique, **Studio** (à la place de Sur mesure, accessible
   depuis le Studio et le footer), Panier, Compte. On corrige le trou `md`/`lg`.
 - **Footer** : wordmark géant **en texte**, tracé en contour puis rempli de hachures. On y

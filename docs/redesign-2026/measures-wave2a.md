@@ -180,7 +180,7 @@ produit et `/a-propos` en portent plusieurs, d'où 5 et 7.)
   `/fr/contact` est même sous la production d'avant la refonte (21,4 KiB gzip, 85,3 brut).
   Le HTML le plus lourd est `/fr/a-propos` (32,1 KiB gzip : FAQ de 10 `<details>`, JSON-LD).
 - **404 d'une URL sans route** (`/fr/zzz-inconnu`, `/de/zzz`) : statut 404, `<meta name="robots"
-content="noindex">` (pas d'en-tête `X-Robots-Tag`, le `noindex` passe par la balise), et
+  content="noindex">` (pas d'en-tête `X-Robots-Tag`, le `noindex` passe par la balise), et
   **un header, un `<main>`, un h1 et un footer dans le HTML brut** (961 caractères de texte
   visible hors scripts : « Point non coté », « Page introuvable. », « Altitude 404 m… ») :
   la correction de `fix-w1` tient en production-like. Le `<title>` est « Page introuvable ·
@@ -199,7 +199,7 @@ content="noindex">` (pas d'en-tête `X-Robots-Tag`, le `noindex` passe par la ba
   0 écart, de 2 à 6 scripts inline par page) et chaque `<script src>` aussi (5 à 22). **Le
   script anti-flash du nouveau layout racine `src/app/layout.tsx` porte le nonce sur les 15
   pages**, repli d'erreur de la fiche supprimée compris. `script-src 'self' 'nonce-…'
-https://js.stripe.com https://static.cloudflareinsights.com https://*.posthog.com`.
+  https://js.stripe.com https://static.cloudflareinsights.com https://*.posthog.com`.
 
 ### 3.2 Console, CSP, hydratation, 4xx
 
@@ -376,7 +376,7 @@ Faite au commit `4ab94a2` (la première moitié de ce passage), contrôlée ici 
   et leurs `-model`, `objects/{flat,flat-model}`, `poster-flat.ts`, `band-stats.ts`,
   **`ranges.ts` (plages et bornage sans zod, qui garde zod hors des générateurs, des
   statistiques et des garde-fous ; `schemas.ts` le ré-exporte)**, `scripts/fonts/{build-glyphs,
-gen-relief-posters}.ts`, `public/studio/glyphs/*`, `public/posters/relief-default-*.svg` et
+  gen-relief-posters}.ts`, `public/studio/glyphs/*`, `public/posters/relief-default-*.svg` et
   les trois fichiers de test.
 - `docs/redesign-2026/DESIGN-BRIEF.md` : note du 01.10.2026 au §6.3.3 (anticollision des
   glyphes : `pairExtraUnits`, table `GLYPH_HOOKS`, pas un crénage) et au §6.3.4 (sept écarts
