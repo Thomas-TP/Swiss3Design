@@ -17,16 +17,18 @@ import { SiteLink } from "./ui/site-link";
 // page : importé ici parce que le header est rendu sur toutes les pages.
 import "./ui/page-cut.css";
 
-// Header « pilule » (25.10.2026, refonte du chrome inspirée des barres
-// flottantes récentes — barre d'onglets d'iOS 26, printlab3d.ch) : une barre
-// arrondie posée à 8 px du haut, papier translucide + flou, filet fin. Encombrement
-// total inchangé : 8 px + 56 px = 64 px (offsets top-16, top-24, scroll-mt-32 des
-// pages). Ancrée pendant la transition de page (view-transition-name: site-header).
-//
-// Au défilement (> 24 px), `data-scrolled` : la pilule se resserre, prend une ombre
-// douce et un fond plus dense, et une puce de statut (« Devis sous 48 h », point
-// rouge qui respire) s'ouvre à côté du logo (≥ xl). Tout est en transitions CSS ;
-// le seul JS est un écouteur de défilement passif, regroupé par image.
+// Header qui se « rétracte » (25.10.2026, d'après printlab3d.ch et la barre
+// d'onglets d'iOS 26) : en haut de page, pas de barre — logo, menu et actions
+// posés à plat sur la page, sans fond ni filet, sur toute la largeur. Dès qu'on
+// défile (> 24 px, `data-scrolled`), la barre se rétracte en pilule flottante :
+// largeur réduite, coins arrondis, fond papier flouté, filet et ombre douce, posée
+// à 8 px du haut, sur un ressort (léger dépassement puis retour, `--ease-spring`)
+// ; une puce de statut (« Devis sous 48 h », point rouge qui respire) s'ouvre à
+// côté du logo (≥ xl). Encombrement constant de 64 px (à plat : 64 ; pilule :
+// 8 + 56), donc aucun saut de la page et des offsets top-16, top-24, scroll-mt-32.
+// Tout est en transitions CSS (globals.css, `.s3d-hdr`) ; le seul JS est un
+// écouteur de défilement passif, regroupé par image. Ancré pendant la transition
+// de page (view-transition-name: site-header).
 //
 // Centre (≥ lg) : Boutique · Studio · Sur mesure · Atelier. Actif = une pastille
 // d'encre claire nommée `nav-mark`, qui glisse d'un lien à l'autre pendant la
@@ -82,7 +84,7 @@ export function Header({ hasSession = false }: { hasSession?: boolean }) {
   return (
     <header
       data-scrolled={scrolled ? "" : undefined}
-      className="group/hdr sticky top-0 z-40 px-2 pt-2 sm:px-3"
+      className="group/hdr sticky top-0 z-40 h-16"
       style={{ viewTransitionName: "site-header" }}
     >
       {/* Second lien d'évitement (le premier, « Aller au contenu », est dans
@@ -94,7 +96,7 @@ export function Header({ hasSession = false }: { hasSession?: boolean }) {
       >
         {shell("skip.footer")}
       </a>
-      <div className="s3d-hdr relative mx-auto flex h-14 max-w-[88rem] items-center justify-between gap-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] rounded-card border border-line bg-paper/80 px-3 backdrop-blur-lg sm:px-4 group-data-scrolled/hdr:max-w-[76rem] group-data-scrolled/hdr:bg-paper/95 group-data-scrolled/hdr:shadow-[0_10px_30px_-18px_rgb(26_22_20/0.45)]">
+      <div className="s3d-hdr relative flex items-center justify-between gap-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
         <div className="flex min-w-0 items-center gap-4">
           <SiteLink
             eager

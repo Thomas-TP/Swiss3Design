@@ -156,6 +156,36 @@
   --text-label--letter-spacing: 0.06em;
 
   --ease-strate: cubic-bezier(0.16, 0.84, 0.3, 1);
+  /* Ressort doux (léger dépassement, ~6 %, puis retour) : header qui se rétracte. */
+  --ease-spring: linear(
+    0,
+    0.041 3.8%,
+    0.141 7.7%,
+    0.273 11.5%,
+    0.416 15.4%,
+    0.555 19.2%,
+    0.682 23.1%,
+    0.791 26.9%,
+    0.879 30.8%,
+    0.947 34.6%,
+    0.996 38.5%,
+    1.029 42.3%,
+    1.049 46.2%,
+    1.058 50%,
+    1.06 53.8%,
+    1.057 57.7%,
+    1.05 61.5%,
+    1.042 65.4%,
+    1.033 69.2%,
+    1.025 73.1%,
+    1.018 76.9%,
+    1.011 80.8%,
+    1.006 84.6%,
+    1.003 88.5%,
+    1 92.3%,
+    0.998 96.2%,
+    1
+  );
   --ease-buse: cubic-bezier(0.45, 0, 0.55, 1);
   --ease-purge: cubic-bezier(0.3, 1.35, 0.6, 1);
   --ease-carte: cubic-bezier(0.7, 0, 0.2, 1);
@@ -394,16 +424,57 @@ body[data-stage-front] .s3d-stage-anchor {
 }
 
 /* ── Chrome 2026 : pilule du header, pied de page (25.10.2026) ─────────── */
-/* Pilule : elle se resserre au défilement (header.tsx, data-scrolled). Seules
-   largeur, fond et ombre changent, en 500 ms sur la courbe de la marque. */
+/* Header qui se rétracte (header.tsx, data-scrolled), d'après printlab3d.ch :
+   à plat en haut de page (sans fond, filet ni ombre, pleine largeur, 64 px),
+   pilule flottante dès qu'on défile (8 px du haut, 56 px, coins de 20 px, papier
+   flouté, filet, ombre douce). La géométrie suit un ressort (--ease-spring :
+   léger dépassement puis retour, 520 ms), les couleurs un fondu court. Mouvement
+   réduit : changement immédiat (règles globales plus bas). */
 .s3d-hdr {
+  width: 100%;
+  max-width: 90rem;
+  height: 4rem;
+  margin: 0 auto;
+  padding-inline: var(--spacing-margin);
+  border: 1px solid transparent;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: 0 0 0 0 transparent;
   transition:
-    max-width 500ms var(--ease-strate),
-    background-color 300ms ease,
-    box-shadow 500ms var(--ease-strate);
+    width 520ms var(--ease-spring),
+    max-width 520ms var(--ease-spring),
+    height 520ms var(--ease-spring),
+    margin-top 520ms var(--ease-spring),
+    border-radius 520ms var(--ease-spring),
+    padding 520ms var(--ease-spring),
+    background-color 220ms ease-out,
+    border-color 220ms ease-out,
+    box-shadow 360ms ease-out,
+    backdrop-filter 220ms ease-out;
+}
+[data-scrolled] > .s3d-hdr {
+  width: calc(100% - 1.25rem);
+  max-width: 74rem;
+  height: 3.5rem;
+  margin-top: 0.5rem;
+  padding-inline: 0.75rem 0.5rem;
+  border-color: var(--line);
+  border-radius: 1.25rem;
+  background-color: color-mix(in oklab, var(--paper) 86%, transparent);
+  -webkit-backdrop-filter: blur(16px) saturate(1.3);
+  backdrop-filter: blur(16px) saturate(1.3);
+  box-shadow: 0 14px 34px -20px rgb(26 22 20 / 0.5);
 }
 .s3d-hdr > .s3d-progress {
   inset-inline: 1.25rem;
+  opacity: 0;
+  transition: opacity 220ms ease-out;
+}
+[data-scrolled] > .s3d-hdr > .s3d-progress {
+  opacity: 1;
+}
+html[data-motion="reduce"] .s3d-hdr {
+  transition: none;
 }
 /* Point « en direct » (statut de l'atelier) : il respire, sans clignoter. */
 .s3d-live-dot {
@@ -446,22 +517,9 @@ html:not([data-motion="reduce"]) .s3d-live-dot::after {
 .s3d-link-sweep:focus-visible {
   background-size: 100% 1px;
 }
-/* « Kreya » géant du pied de page, découpé en 9 couches d'impression (un
-   masque de filets horizontaux) et qui s'imprime de bas en haut quand le pied
+/* « Kreya » géant du pied de page : il s'imprime de bas en haut quand le pied
    de page entre à l'écran, au rythme du défilement (animation liée au
    défilement : rien en JS). Sans support ou en mouvement réduit : complet. */
-.s3d-footer-mark {
-  -webkit-mask-image: repeating-linear-gradient(
-    to bottom,
-    #000 0 calc(100% / 9 - 3px),
-    transparent calc(100% / 9 - 3px) calc(100% / 9)
-  );
-  mask-image: repeating-linear-gradient(
-    to bottom,
-    #000 0 calc(100% / 9 - 3px),
-    transparent calc(100% / 9 - 3px) calc(100% / 9)
-  );
-}
 @supports (animation-timeline: view()) {
   html[data-motion="full"] .s3d-footer-mark {
     animation: s3d-print linear both;
