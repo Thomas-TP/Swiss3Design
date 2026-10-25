@@ -122,7 +122,7 @@ export function SiteLink({
         ? false
         : intent
           ? true
-          : eager
+          : eager && isSitePath(target)
             ? null
             : false;
   const markIntent = () => {
