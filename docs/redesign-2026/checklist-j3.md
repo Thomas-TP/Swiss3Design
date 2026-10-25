@@ -245,7 +245,23 @@ Agentic Commerce s'il pointe vers l'ancien domaine. 4. Worker cron (`workers/cro
 de maintenance pointe désormais vers kreya.ch). 5. Flux catalogue Stripe : resynchroniser (les liens produits passent sur kreya.ch). 6. Connexion Google : tester une connexion sur kreya.ch (origines et redirection déjà ajoutées par
 vous le 09.10.2026). 7. Passkeys : elles sont liées au domaine. Les 2 passkeys existantes (un seul compte) ne marchent
 plus sur kreya.ch : se connecter par e-mail, puis en recréer une dans le compte. 8. Sessions : chacun est déconnecté une fois (les cookies de swiss3design.ch ne valent pas sur
-kreya.ch). 9. Google Search Console : outil « Changement d'adresse » de swiss3design.ch vers kreya.ch, puis
+kreya.ch). 6 bis. **Google Auth Platform** (console Google Cloud du projet OAuth, à faire par vous) →
+**Branding** :
+
+- nom de l'application : **Kreya** ;
+- logo : `public/brand/app/kreya-oauth-120.png` (120 × 120 px, aussi dans le dossier
+  « Kreya - identité visuellepp ») ;
+- e-mail d'assistance : `contact@kreya.ch` ;
+- page d'accueil `https://kreya.ch`, confidentialité `https://kreya.ch/fr/legal/privacy`,
+  conditions `https://kreya.ch/fr/legal/terms` ;
+- domaines autorisés : ajouter **kreya.ch** (garder swiss3design.ch tant que l'ancien domaine
+  sert encore des requêtes).
+
+Dans **Clients**, les origines et l'URI de redirection `https://kreya.ch/api/auth/callback/google`
+sont déjà là depuis le 09.10.2026 (à revérifier). Google peut demander une **vérification de la
+marque** après un changement de nom ou de logo (quelques jours) : la page d'accueil doit alors
+être en ligne sur kreya.ch, d'où cette étape après le déploiement. La connexion Google
+continue de fonctionner pendant l'examen. 9. Google Search Console : outil « Changement d'adresse » de swiss3design.ch vers kreya.ch, puis
 soumettre `https://kreya.ch/sitemap.xml`. 10. PostHog (projet 285063) : ajouter kreya.ch aux URL autorisées ; la mesure ne démarre que sur
 kreya.ch (`ANALYTICS_HOSTNAME`). 11. Annonce : bandeau du site pendant 2 semaines et e-mail aux clients (admin → E-mails →
 Annonces). 12. Garder swiss3design.ch (et son renouvellement) au moins 2 ans : liens, e-mails et favoris
