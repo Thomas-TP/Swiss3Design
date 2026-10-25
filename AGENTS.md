@@ -341,9 +341,13 @@ which for a multi-line hook body is rarely the line you'd expect.
       ajouter, retirer une couleur s'annule (Ctrl+Z ou « Annuler »), zones comprises.
       Passer d'une à plusieurs couleurs n'est qu'un interrupteur. Deux emplacements de
       même couleur sont réunis à l'export et dans le résumé (`printedPalette`).
-    - **Un seul endroit pour les couleurs multiples : l'atelier.** La page /custom
-      n'a que la grille « une couleur » et, en plusieurs couleurs, un résumé et le
-      bouton qui ouvre l'atelier (`quote-colors.tsx`).
+    - **Fenêtre de l'atelier DÉSACTIVÉE (25.10.2026, choix du propriétaire).** Plus
+      de peinture, de taille ni d'orientation côté client : `PaintStudio` reste monté
+      (jamais ouvert) pour lire les couleurs d'un 3MF, l'aperçu et le 3MF du devis.
+      La page (`quote-colors.tsx`) : « Une couleur » (grille) ou, seulement pour un
+      fichier déjà en couleurs, « Plusieurs couleurs » = les couleurs du fichier, à
+      changer une à une (ni ajout ni retrait). La couleur unique (`single`) et celles
+      du fichier (`refs`) sont indépendantes : passer de l'une à l'autre ne change rien.
     - **Couleurs d'un 3MF peint** (Bambu, Orca, Prusa : peinture et filament par pièce).
       Ses zones sont reprises telles quelles, un emplacement par filament, chacun
       dans la couleur du stock la plus proche (un filament uni l'emporte sur une

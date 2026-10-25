@@ -10,13 +10,18 @@ export type PaintSourceFile =
   | { format: "triangles"; positions: Float32Array };
 
 /**
- * Couleurs d'une demande. `refs` : la couleur du stock de chaque emplacement
- * (filament 1 à 4, la principale en tête), tenue par le document de l'atelier
- * dès qu'un fichier est ouvert (son historique couvre la palette). `several` :
- * plusieurs couleurs imprimées ; faux, la pièce est imprimée dans la couleur 1,
- * les autres couleurs et leurs zones restent gardées.
+ * Couleurs d'une demande (25.10.2026 : l'atelier 3D est désactivé, la page seule
+ * choisit les couleurs). Deux réglages INDÉPENDANTS, pour que passer de l'un à
+ * l'autre ne change jamais rien :
+ * - `single` : la couleur de la pièce en « une couleur » ;
+ * - `refs` : en « plusieurs couleurs », la couleur du stock de chaque couleur du
+ *   fichier (un 3MF déjà en couleurs), dans l'ordre de ses filaments. On ne fait
+ *   que changer ces couleurs : ni ajout ni retrait, les zones sont celles du
+ *   fichier.
+ * `several` : plusieurs couleurs imprimées (possible seulement avec `refs`).
  */
 export interface ColorSetup {
+  single: string | null;
   refs: string[];
   several: boolean;
 }

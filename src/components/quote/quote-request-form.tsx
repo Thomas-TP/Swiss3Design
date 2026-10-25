@@ -24,7 +24,6 @@ import { withDot } from "@/components/ui/dot-title";
 import { Field, fieldClass, fieldIds } from "@/components/ui/field";
 import { track } from "@/lib/analytics";
 import { useSession } from "@/lib/auth-client";
-import { useMotionBridge } from "@/lib/motion-bridge/store";
 import {
   QUOTE_UPLOAD_MAX_BYTES,
   uploadQuoteFile,
@@ -300,19 +299,17 @@ export function QuoteRequestForm({
     key: string;
     file: ViewerModelFile;
   } | null>(null);
-  // Atelier 3D (peinture par zone, taille, orientation) : son dernier état, remonté
-  // à chaque fermeture, et le projet déjà envoyé (un « Réessayer » ne le renvoie pas).
+  // Projet de couleurs d'un 3MF déjà en couleurs (zones du fichier, couleurs du
+  // stock choisies) et le projet déjà envoyé (un « Réessayer » ne le renvoie
+  // pas). La fenêtre de l'atelier 3D est désactivée depuis le 25.10.2026 :
+  // le studio ne fait plus que lire le fichier et écrire le 3MF du devis.
   const [project, setProject] = useState<PaintProject | null>(null);
-  const [paintOpen, setPaintOpen] = useState(false);
   const [paintNotice, setPaintNotice] = useState<PaintNotice | null>(null);
   const sentProject = useRef<{
     version: string;
     key: string;
     name: string;
   } | null>(null);
-  const stageAvailable = useMotionBridge(
-    (s) => s.capability >= 1 && !s.contextLost,
-  );
   const steps = submitSteps(
     Boolean(attachment?.prepare && !attachment.key) ||
       Boolean(showFileField && project?.matters),
@@ -322,6 +319,7 @@ export function QuoteRequestForm({
   // Rien n'est retiré en silence : une couleur dont le stock ne suffit plus
   // reste affichée, signalée, et bloque l'envoi jusqu'à ce qu'on la change.
   const [colorSetup, setColorSetup] = useState<ColorSetup>({
+    single: null,
     refs: [],
     several: false,
   });
@@ -383,7 +381,6 @@ export function QuoteRequestForm({
   function resetProject() {
     setProject(null);
     setPaintNotice(null);
-    setPaintOpen(false);
     sentProject.current = null;
   }
   function pickFile(next: File) {
@@ -424,23 +421,6 @@ export function QuoteRequestForm({
       alive = false;
     };
   }, [estimate.status, estimateTarget]);
-  // Couleurs effectivement placées sur la pièce dans l'atelier, et ajustements
-  // (échelle, orientation) à rappeler sous le choix des couleurs.
-  const placedColors = project?.matters
-    ? project.summary.colors.filter((c) => c.share > 0).length
-    : 0;
-  const adjustments = project?.matters
-    ? [
-        project.scale !== 1
-          ? tPaint("form.scale", {
-              percent: formatCount(project.scale * 100, locale),
-            })
-          : null,
-        project.summary.rotated ? tPaint("form.rotated") : null,
-      ]
-        .filter(Boolean)
-        .join(" · ") || null
-    : null;
   // Teintes de l'aperçu : la première couleur choisie (ses 1 à 3 teintes), sinon
   // le blanc neutre du viewer.
   const previewTints = useMemo(() => {
@@ -809,8 +789,8 @@ export function QuoteRequestForm({
               maxColors={QUOTE_COLORS_MAX}
               gramsPerPiece={fileGrams}
               plate={PLATE_MM}
-              open={paintOpen}
-              onClose={() => setPaintOpen(false)}
+              open={false}
+              onClose={() => undefined}
               onProject={setProject}
               onNotice={setPaintNotice}
             />
@@ -874,17 +854,8 @@ export function QuoteRequestForm({
                 onChange={setColorSetup}
                 max={QUOTE_COLORS_MAX}
                 weighed={gramsPerPiece !== null}
-                hasFile={estimateTarget !== null}
                 shares={project?.slotShares ?? null}
-                placed={placedColors}
-                adjustments={adjustments}
                 notice={paintNotice}
-                canPlace={
-                  Boolean(preview) &&
-                  stageAvailable &&
-                  paintNotice?.kind !== "error"
-                }
-                onPlace={() => setPaintOpen(true)}
               />
             </fieldset>
           ) : null}

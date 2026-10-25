@@ -1,23 +1,22 @@
 "use client";
 
-import { useId } from "react";
-import { AlertTriangle, Check, Palette } from "lucide-react";
+import { useId, useState } from "react";
 import { useTranslations } from "next-intl";
 import { FilamentChip } from "@/components/filament-chip";
 import { FilamentSwatches } from "@/components/filament-swatches";
 import type { ColorSetup, PaintNotice } from "@/components/paint/types";
-import { Button } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
 import type { CustomStock } from "./quote-color-picker";
 
-// Couleurs d'une demande « Sur mesure », juste sous l'aperçu 3D (25.10.2026).
-// UN SEUL endroit choisit les couleurs d'une pièce multicolore : l'atelier 3D,
-// comme la liste des filaments de Bambu Studio ou de Creality Print. La page ne
-// fait que deux choses :
+// Couleurs d'une demande « Sur mesure », juste sous l'aperçu 3D (25.10.2026,
+// l'atelier 3D est désactivé) :
 // - « Une couleur » : la grille des couleurs du stock, l'aperçu prend sa teinte ;
-// - « Plusieurs couleurs » : un résumé (couleurs choisies, part de la surface)
-//   et un bouton qui ouvre l'atelier. Un 3MF déjà peint y arrive avec ses zones.
-// Passer de l'un à l'autre ne perd rien : c'est un interrupteur.
+// - « Plusieurs couleurs » : seulement pour un fichier déjà en couleurs (3MF de
+//   Bambu Studio, OrcaSlicer, PrusaSlicer, MakerWorld). Chaque couleur du
+//   fichier garde ses zones ; on choisit pour elle une couleur du stock (comme
+//   le mapping des filaments de Bambu Handy). Ni ajout ni retrait.
+// Les deux réglages sont indépendants : changer la couleur unique ne touche
+// jamais aux couleurs multiples, et inversement.
 
 interface Props {
   stock: CustomStock;
@@ -28,18 +27,9 @@ interface Props {
   max: number;
   /** Le poids de la pièce est-il connu (fichier lu) ? */
   weighed: boolean;
-  /** Un fichier 3D est-il choisi ? */
-  hasFile: boolean;
-  /** Part de la surface de chaque couleur (emplacement), ou null. */
+  /** Part de la surface de chaque couleur du fichier, ou null. */
   shares: readonly number[] | null;
-  /** Couleurs effectivement placées sur la pièce (0 : aucune peinture). */
-  placed: number;
-  /** Ajustements de l'atelier à rappeler (échelle, orientation), ou null. */
-  adjustments: string | null;
   notice: PaintNotice | null;
-  /** L'atelier peut-il s'ouvrir (WebGL, fichier lisible et lu) ? */
-  canPlace: boolean;
-  onPlace: () => void;
 }
 
 export function QuoteColors({
@@ -49,18 +39,18 @@ export function QuoteColors({
   onChange,
   max,
   weighed,
-  hasFile,
   shares,
-  placed,
-  adjustments,
   notice,
-  canPlace,
-  onPlace,
 }: Props) {
   const t = useTranslations("paint.colors");
   const tq = useTranslations("quote.colorsPicker");
   const titleId = useId();
-  const { refs, several } = setup;
+  /** Couleur du fichier dont la grille est ouverte. */
+  const [editing, setEditing] = useState<number | null>(null);
+  const { single, refs } = setup;
+  // Plusieurs couleurs : seulement avec un fichier qui en porte plusieurs.
+  const fileColors = refs.length > 1;
+  const several = setup.several && fileColors;
 
   const colors = stock.status === "ready" ? stock.colors : [];
   const colorOf = (id: string) => colors.find((c) => c.id === id);
@@ -72,10 +62,7 @@ export function QuoteColors({
         : selectable.size === 0
           ? tq("none")
           : null;
-  const fromFile = notice?.kind === "fileColors" ? notice : null;
-  const main = refs[0] ?? null;
-  const visible = several ? refs : refs.slice(0, 1);
-  const short = visible.filter((id) => !selectable.has(id));
+  const merged = notice?.kind === "fileColors" && notice.merged;
 
   return (
     <section aria-labelledby={titleId} className="space-y-4">
@@ -85,29 +72,40 @@ export function QuoteColors({
 
       {/* Une ou plusieurs couleurs : un interrupteur, rien ne s'efface */}
       <div className="grid grid-cols-2 gap-2">
-        {[false, true].map((value) => (
-          <button
-            key={String(value)}
-            type="button"
-            aria-pressed={several === value}
-            onClick={() => {
-              if (value !== several) onChange({ ...setup, several: value });
-            }}
-            className={cx(
-              "rounded-field border px-3 py-2.5 text-left transition-colors",
-              several === value
-                ? "border-ink bg-surface outline outline-2 outline-ink"
-                : "border-line bg-surface hover:border-ink",
-            )}
-          >
-            <span className="block text-sm font-semibold text-ink">
-              {value ? t("several") : t("one")}
-            </span>
-            <span className="mt-0.5 block text-xs leading-snug text-soft">
-              {value ? t("severalHint", { max }) : t("oneHint")}
-            </span>
-          </button>
-        ))}
+        {[false, true].map((value) => {
+          const disabled = value && !fileColors;
+          return (
+            <button
+              key={String(value)}
+              type="button"
+              aria-pressed={several === value}
+              disabled={disabled}
+              onClick={() => {
+                setEditing(null);
+                if (value !== setup.several)
+                  onChange({ ...setup, several: value });
+              }}
+              className={cx(
+                "rounded-field border px-3 py-2.5 text-left transition-colors",
+                several === value
+                  ? "border-ink bg-surface outline outline-2 outline-ink"
+                  : "border-line bg-surface hover:border-ink",
+                disabled && "cursor-not-allowed opacity-55 hover:border-line",
+              )}
+            >
+              <span className="block text-sm font-semibold text-ink">
+                {value ? t("several") : t("one")}
+              </span>
+              <span className="mt-0.5 block text-xs leading-snug text-soft">
+                {value
+                  ? fileColors
+                    ? t("severalHint", { count: refs.length })
+                    : t("severalFileOnly")
+                  : t("oneHint")}
+              </span>
+            </button>
+          );
+        })}
       </div>
 
       {stockMessage ? (
@@ -117,143 +115,114 @@ export function QuoteColors({
       {!several ? (
         // ── Une couleur : la grille, directement ──
         <>
-          {fromFile && refs.length > 1 ? (
-            <div className="rounded-field border border-line bg-paper p-3 text-sm">
-              <p className="text-ink">{t("fileOffer")}</p>
-              <Button
-                variant="text"
-                size="sm"
-                className="mt-1"
-                onClick={() => onChange({ ...setup, several: true })}
-              >
-                {t("useFile", { count: refs.length })}
-              </Button>
-            </div>
-          ) : null}
           <p
             className={cx(
               "text-sm",
-              main && short.includes(main)
+              single && !selectable.has(single)
                 ? "font-semibold text-accent-text"
                 : "text-soft",
             )}
           >
-            {main
-              ? short.includes(main)
-                ? t("short", { name: colorOf(main)?.name ?? "" })
-                : t("chosen", { name: colorOf(main)?.name ?? "" })
+            {single
+              ? !selectable.has(single)
+                ? t("short", { name: colorOf(single)?.name ?? "" })
+                : t("chosen", { name: colorOf(single)?.name ?? "" })
               : t("pickOne")}
             {weighed ? "" : ` ${tq("pending")}`}
           </p>
           <FilamentSwatches
             colors={colors}
             selectable={selectable}
-            current={main}
-            onPick={(id) =>
-              onChange({ ...setup, refs: [id, ...refs.slice(1)] })
-            }
+            current={single}
+            onPick={(id) => onChange({ ...setup, single: id })}
             shortLabel={tq("short")}
             approximateLabel={tq("approximate")}
           />
         </>
-      ) : !hasFile ? (
-        // ── Plusieurs couleurs, sans fichier : l'atelier a besoin de la pièce ──
-        <p className="rounded-field border border-line bg-paper p-3 text-sm text-soft">
-          {t("needFile")}
-        </p>
       ) : (
-        // ── Plusieurs couleurs : résumé, et l'atelier pour tout le reste ──
-        <div className="rounded-field border border-line bg-paper p-4">
-          {fromFile ? (
-            <p className="mb-3 text-sm text-ink">
-              {t("fromFile", { count: fromFile.count })}
-              {fromFile.merged ? ` ${t("fromFileMerged", { max })}` : ""}
-            </p>
-          ) : null}
-          {visible.length > 0 ? (
-            <ol className="mb-3 flex flex-wrap gap-2">
-              {visible.map((id, index) => {
-                const color = colorOf(id);
-                const isShort = short.includes(id);
-                return (
-                  <li
-                    key={index}
+        // ── Plusieurs couleurs : celles du fichier, à changer une à une ──
+        <>
+          <p className="text-sm text-ink">
+            {t("fromFile", { count: refs.length })}
+            {merged ? ` ${t("fromFileMerged", { max })}` : ""}
+          </p>
+          <ol className="space-y-2">
+            {refs.map((id, index) => {
+              const color = colorOf(id);
+              const open = editing === index;
+              const short = !selectable.has(id);
+              return (
+                <li key={index}>
+                  <div
                     className={cx(
-                      "flex items-center gap-2 rounded-full border bg-surface py-1 pl-1 pr-3 text-sm",
-                      isShort ? "border-accent-text" : "border-line",
+                      "flex items-center gap-3 rounded-field border px-3 py-2",
+                      open ? "border-ink" : "border-line",
                     )}
                   >
-                    <span className="grid h-5 w-5 place-items-center rounded-full bg-ink text-[0.625rem] font-semibold text-paper">
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-paper">
                       {index + 1}
                     </span>
-                    <FilamentChip hexes={color?.hexes ?? []} size={18} />
-                    <span className="text-ink">{color?.name ?? id}</span>
-                    {shares && visible.length > 1 ? (
-                      <span className="tabular-nums text-soft">
-                        {Math.round((shares[index] ?? 0) * 100)} %
+                    <FilamentChip hexes={color?.hexes ?? []} size={26} />
+                    <span className="min-w-0 flex-1 leading-tight">
+                      <span className="block truncate text-sm text-ink">
+                        {color?.name ?? id}
                       </span>
-                    ) : null}
-                    {isShort ? (
-                      <AlertTriangle
-                        size={14}
-                        strokeWidth={2}
-                        className="text-accent-text"
-                        aria-label={tq("short")}
+                      <span
+                        className={cx(
+                          "block text-xs",
+                          short
+                            ? "font-semibold text-accent-text"
+                            : "text-soft",
+                        )}
+                      >
+                        {short
+                          ? tq("short")
+                          : shares
+                            ? t("share", {
+                                percent: Math.round((shares[index] ?? 0) * 100),
+                              })
+                            : t("slot", { n: index + 1 })}
+                      </span>
+                    </span>
+                    <button
+                      type="button"
+                      aria-expanded={open}
+                      onClick={() => setEditing(open ? null : index)}
+                      className="h-9 shrink-0 rounded-field border border-line px-3 text-sm font-semibold text-ink hover:border-ink"
+                    >
+                      {open ? t("cancel") : t("change")}
+                    </button>
+                  </div>
+                  {open ? (
+                    <div className="mt-2 rounded-field border border-line bg-paper p-3">
+                      <p className="mb-2 text-xs text-soft">
+                        {t("choosing", { n: index + 1 })}
+                      </p>
+                      <FilamentSwatches
+                        colors={colors}
+                        selectable={selectable}
+                        current={id}
+                        onPick={(next) => {
+                          onChange({
+                            ...setup,
+                            refs: refs.map((ref, i) =>
+                              i === index ? next : ref,
+                            ),
+                          });
+                          setEditing(null);
+                        }}
+                        shortLabel={tq("short")}
+                        approximateLabel={tq("approximate")}
                       />
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ol>
-          ) : null}
-          {short.length > 0 ? (
-            <p className="mb-3 text-sm font-semibold text-accent-text">
-              {t("shortSeveral")}
-            </p>
-          ) : null}
-          {!canPlace ? (
-            <p className="text-sm text-soft">{t("noWebgl")}</p>
-          ) : (
-            <>
-              <p
-                className={cx(
-                  "mb-3 flex items-center gap-2 text-sm",
-                  placed > 1 ? "font-semibold text-ink" : "text-soft",
-                )}
-              >
-                {placed > 1 ? (
-                  <Check size={16} strokeWidth={2} aria-hidden="true" />
-                ) : null}
-                {placed > 1
-                  ? t("placed", { count: placed })
-                  : visible.length < 2
-                    ? t("intro")
-                    : t("notPlaced")}
-              </p>
-              <Button
-                variant={placed > 1 ? "secondary" : "ink"}
-                size="sm"
-                onClick={onPlace}
-              >
-                <Palette size={16} strokeWidth={1.5} aria-hidden="true" />
-                {placed > 1 ? t("edit") : t("place")}
-              </Button>
-            </>
-          )}
-        </div>
+                    </div>
+                  ) : null}
+                </li>
+              );
+            })}
+          </ol>
+          <p className="text-xs text-soft">{t("sameColor")}</p>
+        </>
       )}
-
-      {/* Taille et orientation (l'atelier, même en une couleur) */}
-      {canPlace && !several ? (
-        <p className="text-sm text-soft">
-          {adjustments ? `${adjustments} · ` : ""}
-          <Button variant="text" size="sm" onClick={onPlace}>
-            {t("size")}
-          </Button>
-        </p>
-      ) : adjustments && several ? (
-        <p className="text-sm text-soft">{adjustments}</p>
-      ) : null}
     </section>
   );
 }

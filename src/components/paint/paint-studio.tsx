@@ -30,6 +30,11 @@ import type {
 // du visiteur (src/lib/paint3d), le garde d'une ouverture à l'autre et remonte au
 // formulaire l'aperçu peint, le résumé et l'export 3MF.
 //
+// 25.10.2026 : la fenêtre de l'atelier (peinture, taille, orientation) est
+// DÉSACTIVÉE (choix du propriétaire) ; le formulaire ne l'ouvre plus. Le
+// composant reste monté pour lire les couleurs d'un 3MF, montrer l'aperçu dans
+// les couleurs choisies et écrire le projet Bambu Studio joint au devis.
+//
 // Le document tient AUSSI la palette (couleur de chaque emplacement, teinte
 // d'origine du fichier), dans son historique (25.10.2026) : une couleur ajoutée,
 // changée ou retirée s'annule comme un coup de pinceau. Les zones appartiennent
@@ -197,8 +202,12 @@ export function PaintStudio({
           const current = latest.current.setup;
           if (opened.fileRefs) {
             // Les zones du fichier sont en place : un emplacement par filament.
+            // La couleur unique, si elle n'est pas encore choisie, part de la
+            // première couleur du fichier ; ensuite les deux restent séparées.
+            const refs = refsOf(opened.doc);
             latest.current.onSetupChange({
-              refs: refsOf(opened.doc),
+              single: current.single ?? refs[0] ?? null,
+              refs,
               several: true,
             });
             latest.current.onNotice?.({
@@ -207,11 +216,13 @@ export function PaintStudio({
               merged: opened.merged,
             });
           } else {
-            // Fichier d'une couleur : la palette reprend les couleurs choisies.
-            opened.doc.palette = current.refs.map((ref) => ({
-              ref,
-              origin: null,
-            }));
+            // Fichier d'une seule couleur : pas de couleurs multiples.
+            if (current.refs.length > 0 || current.several)
+              latest.current.onSetupChange({
+                ...current,
+                refs: [],
+                several: false,
+              });
             latest.current.onNotice?.(null);
           }
           setDoc(opened.doc);
