@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PublicCustomColor } from "@/lib/filament/public-stock";
 import type { PaintDocument } from "@/lib/paint3d/document";
-import { printedPalette, slotRemap } from "@/lib/paint3d/palette";
+import { printedPalette } from "@/lib/paint3d/palette";
 import {
   openProject,
   paintedPreview,
@@ -19,7 +19,6 @@ import {
 import { write3mf } from "@/lib/paint3d/write3mf";
 import { VIEWER_FALLBACK_COLOR } from "@/components/catalog/viewer-props";
 import { PaintDialog } from "./paint-dialog";
-import { newSlot } from "./slots";
 import type {
   ColorSetup,
   PaintNotice,
@@ -29,14 +28,15 @@ import type {
 
 // Atelier 3D de « Sur mesure » : il possède le document de peinture du fichier
 // du visiteur (src/lib/paint3d), le garde d'une ouverture à l'autre et remonte au
-// formulaire, à chaque changement, l'aperçu peint, le résumé et l'export 3MF.
+// formulaire l'aperçu peint, le résumé et l'export 3MF.
 //
-// Les zones appartiennent aux EMPLACEMENTS (filaments 1 à 4), jamais aux
-// couleurs (25.10.2026, comme Bambu Studio) : changer la couleur d'un
-// emplacement, passer d'une à plusieurs couleurs et revenir ne touchent pas à la
-// peinture. Seul le retrait d'un emplacement rend ses zones à la couleur
-// principale. Un 3MF déjà peint (MakerWorld) s'ouvre avec ses zones, un
-// emplacement par filament, chacun dans la couleur du stock la plus proche.
+// Le document tient AUSSI la palette (couleur de chaque emplacement, teinte
+// d'origine du fichier), dans son historique (25.10.2026) : une couleur ajoutée,
+// changée ou retirée s'annule comme un coup de pinceau. Les zones appartiennent
+// aux emplacements, jamais aux couleurs. Le formulaire suit la palette du
+// document ; il ne la change lui-même que pour la couleur unique (emplacement 1).
+// Un 3MF déjà peint (MakerWorld) s'ouvre avec ses zones, un emplacement par
+// filament, chacun dans la couleur du stock la plus proche.
 
 /** Teintes de chaque emplacement (le blanc neutre du viewer sans couleur choisie). */
 function tintsOf(
@@ -48,6 +48,8 @@ function tintsOf(
     ...(stock?.find((c) => c.id === id)?.hexes ?? [VIEWER_FALLBACK_COLOR]),
   ]);
 }
+
+const refsOf = (doc: PaintDocument) => doc.palette.map((entry) => entry.ref);
 
 export interface PaintStudioProps {
   source: PaintSourceFile;
@@ -97,6 +99,7 @@ export function PaintStudio({
     onSetupChange,
     onNotice,
     fileName,
+    open,
   });
   useEffect(() => {
     latest.current = {
@@ -106,17 +109,16 @@ export function PaintStudio({
       onSetupChange,
       onNotice,
       fileName,
+      open,
     };
   });
-  /** Emplacements (identifiants) dont les états du document suivent l'ordre. */
-  const applied = useRef<readonly number[]>([]);
   const origin = useRef({ file: false, painted: false });
   const openedAt = useRef<number | null>(null);
   const stockReady = stock !== null;
 
   const report = useCallback((current: PaintDocument) => {
     const { setup: now, fileName: name } = latest.current;
-    const slotRefs = now.slots.map((slot) => slot.ref);
+    const slotRefs = refsOf(current);
     const { refs, states } = printedPalette(slotRefs, now.several);
     const matters = projectMatters(current, slotRefs, now.several);
     const from = origin.current;
@@ -190,22 +192,26 @@ export function PaintStudio({
       openProject(source, colors, maxColors).then(
         (opened) => {
           if (!alive) return;
-          origin.current = { file: false, painted: false };
+          origin.current = { file: Boolean(opened.fileRefs), painted: false };
           setFailed(false);
+          const current = latest.current.setup;
           if (opened.fileRefs) {
             // Les zones du fichier sont en place : un emplacement par filament.
-            const slots = opened.fileRefs.map(newSlot);
-            applied.current = slots.map((slot) => slot.id);
-            origin.current.file = true;
-            latest.current.setup = { slots, several: true };
-            latest.current.onSetupChange({ slots, several: true });
+            latest.current.onSetupChange({
+              refs: refsOf(opened.doc),
+              several: true,
+            });
             latest.current.onNotice?.({
               kind: "fileColors",
               count: opened.fileRefs.length,
               merged: opened.merged,
             });
           } else {
-            applied.current = latest.current.setup.slots.map((s) => s.id);
+            // Fichier d'une couleur : la palette reprend les couleurs choisies.
+            opened.doc.palette = current.refs.map((ref) => ({
+              ref,
+              origin: null,
+            }));
             latest.current.onNotice?.(null);
           }
           setDoc(opened.doc);
@@ -227,21 +233,39 @@ export function PaintStudio({
   }, [sourceKey, stockReady]);
   // oxlint-enable exhaustive-deps
 
-  // Emplacement retiré : ses zones reviennent à la couleur principale, les
-  // suivants descendent d'un cran. Une couleur changée ne touche à rien.
-  const idsKey = setup.slots.map((slot) => slot.id).join(",");
-  const refsKey = setup.slots.map((slot) => slot.ref).join(",");
+  // Document → formulaire : la palette du document (ajout, changement, retrait,
+  // annulation) devient celle du formulaire ; le résumé suit, atelier fermé.
   useEffect(() => {
     if (!doc) return;
-    const after = idsKey ? idsKey.split(",").map(Number) : [];
-    const before = applied.current;
-    if (before.join(",") !== idsKey) {
-      applied.current = after;
-      const map = slotRemap(before, after);
-      if (map.some((to, from) => to !== from)) doc.remapStates(map);
-    }
-    if (!open) report(doc);
-  }, [doc, idsKey, refsKey, setup.several, open, report]);
+    return doc.subscribe(() => {
+      const refs = refsOf(doc);
+      const now = latest.current.setup;
+      if (refs.join(",") !== now.refs.join(","))
+        latest.current.onSetupChange({ ...now, refs });
+      if (!latest.current.open) report(doc);
+    });
+  }, [doc, report]);
+
+  // Formulaire → document : la couleur unique choisie sur la page (seul
+  // changement de palette fait hors de l'atelier).
+  const refsKey = setup.refs.join(",");
+  useEffect(() => {
+    if (!doc) return;
+    const current = refsOf(doc);
+    if (current.join(",") === refsKey) return;
+    const refs = refsKey ? refsKey.split(",") : [];
+    doc.setPalette(
+      refs.map((ref, i) => ({
+        ref,
+        origin: doc.palette[i]?.origin ?? null,
+      })),
+    );
+  }, [doc, refsKey]);
+
+  // Une ou plusieurs couleurs : le résumé change (atelier fermé).
+  useEffect(() => {
+    if (doc && !open) report(doc);
+  }, [doc, setup.several, open, report]);
 
   // Fermeture : le formulaire reçoit l'état du projet.
   useEffect(() => {
@@ -257,13 +281,7 @@ export function PaintStudio({
   }, [open, doc, report]);
 
   const palette = useMemo(
-    () =>
-      tintsOf(
-        stock,
-        setup.several
-          ? setup.slots.map((slot) => slot.ref)
-          : setup.slots.slice(0, 1).map((slot) => slot.ref),
-      ),
+    () => tintsOf(stock, setup.several ? setup.refs : setup.refs.slice(0, 1)),
     [stock, setup],
   );
 
@@ -275,12 +293,12 @@ export function PaintStudio({
       fileName={fileName}
       stock={stock ?? []}
       selectable={selectable}
-      setup={setup}
+      several={setup.several}
       palette={palette}
       maxColors={maxColors}
       gramsPerPiece={gramsPerPiece}
       plate={plate}
-      onSetupChange={onSetupChange}
+      onSeveralChange={(several) => onSetupChange({ ...setup, several })}
       onClose={onClose}
     />
   );

@@ -1,24 +1,23 @@
 "use client";
 
-import { useId, useState } from "react";
-import { Check, Palette, Plus, X } from "lucide-react";
+import { useId } from "react";
+import { AlertTriangle, Check, Palette } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { FilamentChip } from "@/components/filament-chip";
 import { FilamentSwatches } from "@/components/filament-swatches";
-import { newSlot } from "@/components/paint/slots";
 import type { ColorSetup, PaintNotice } from "@/components/paint/types";
 import { Button } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
 import type { CustomStock } from "./quote-color-picker";
 
-// Couleurs d'une demande « Sur mesure », juste sous l'aperçu 3D. Un seul endroit,
-// deux modes, et RIEN ne se perd en passant de l'un à l'autre (25.10.2026) :
-// - « Une couleur » : une pastille à choisir, l'aperçu prend sa teinte ;
-// - « Plusieurs couleurs » : des emplacements numérotés (les filaments 1 à 4 ;
-//   la couleur 1 couvre toute la pièce sauf les zones d'une autre couleur) et un
-//   seul bouton, « Placer les couleurs sur la pièce », qui ouvre l'atelier.
-// Les zones appartiennent aux emplacements : changer une couleur ne déplace
-// rien. Un 3MF déjà peint arrive avec ses filaments (un emplacement chacun).
+// Couleurs d'une demande « Sur mesure », juste sous l'aperçu 3D (25.10.2026).
+// UN SEUL endroit choisit les couleurs d'une pièce multicolore : l'atelier 3D,
+// comme la liste des filaments de Bambu Studio ou de Creality Print. La page ne
+// fait que deux choses :
+// - « Une couleur » : la grille des couleurs du stock, l'aperçu prend sa teinte ;
+// - « Plusieurs couleurs » : un résumé (couleurs choisies, part de la surface)
+//   et un bouton qui ouvre l'atelier. Un 3MF déjà peint y arrive avec ses zones.
+// Passer de l'un à l'autre ne perd rien : c'est un interrupteur.
 
 interface Props {
   stock: CustomStock;
@@ -29,14 +28,16 @@ interface Props {
   max: number;
   /** Le poids de la pièce est-il connu (fichier lu) ? */
   weighed: boolean;
-  /** Part de la surface de chaque emplacement (atelier), ou null. */
+  /** Un fichier 3D est-il choisi ? */
+  hasFile: boolean;
+  /** Part de la surface de chaque couleur (emplacement), ou null. */
   shares: readonly number[] | null;
   /** Couleurs effectivement placées sur la pièce (0 : aucune peinture). */
   placed: number;
   /** Ajustements de l'atelier à rappeler (échelle, orientation), ou null. */
   adjustments: string | null;
   notice: PaintNotice | null;
-  /** L'atelier peut-il s'ouvrir (WebGL, fichier lisible) ? */
+  /** L'atelier peut-il s'ouvrir (WebGL, fichier lisible et lu) ? */
   canPlace: boolean;
   onPlace: () => void;
 }
@@ -48,6 +49,7 @@ export function QuoteColors({
   onChange,
   max,
   weighed,
+  hasFile,
   shares,
   placed,
   adjustments,
@@ -56,12 +58,9 @@ export function QuoteColors({
   onPlace,
 }: Props) {
   const t = useTranslations("paint.colors");
-  const ts = useTranslations("paint.slots");
   const tq = useTranslations("quote.colorsPicker");
   const titleId = useId();
-  /** Emplacement dont la grille est ouverte (au-delà de la liste : un nouveau). */
-  const [editing, setEditing] = useState<number | null>(null);
-  const { slots, several } = setup;
+  const { refs, several } = setup;
 
   const colors = stock.status === "ready" ? stock.colors : [];
   const colorOf = (id: string) => colors.find((c) => c.id === id);
@@ -73,41 +72,10 @@ export function QuoteColors({
         : selectable.size === 0
           ? tq("none")
           : null;
-
-  const setMode = (next: boolean) => {
-    setEditing(null);
-    if (next !== several) onChange({ ...setup, several: next });
-  };
-
-  /** Couleur de l'emplacement `index` (au-delà de la liste : un emplacement de plus). */
-  const pickFor = (index: number, id: string) => {
-    if (index < slots.length)
-      onChange({
-        ...setup,
-        slots: slots.map((slot, i) =>
-          i === index ? { ...slot, ref: id } : slot,
-        ),
-      });
-    else if (slots.length < max)
-      onChange({ ...setup, slots: [...slots, newSlot(id)] });
-    setEditing(null);
-  };
-
-  const remove = (index: number) => {
-    if (
-      (shares?.[index] ?? 0) > 0 &&
-      !window.confirm(ts("removeConfirm", { n: index + 1 }))
-    )
-      return;
-    setEditing(null);
-    onChange({ ...setup, slots: slots.filter((_, i) => i !== index) });
-  };
-
-  const slotName = (index: number) =>
-    index === 0 ? t("slotMain") : t("slot", { n: index + 1 });
-  // En plusieurs couleurs : au moins deux lignes (la seconde à choisir).
-  const rows = Math.min(max, Math.max(2, slots.length));
   const fromFile = notice?.kind === "fileColors" ? notice : null;
+  const main = refs[0] ?? null;
+  const visible = several ? refs : refs.slice(0, 1);
+  const short = visible.filter((id) => !selectable.has(id));
 
   return (
     <section aria-labelledby={titleId} className="space-y-4">
@@ -122,7 +90,9 @@ export function QuoteColors({
             key={String(value)}
             type="button"
             aria-pressed={several === value}
-            onClick={() => setMode(value)}
+            onClick={() => {
+              if (value !== several) onChange({ ...setup, several: value });
+            }}
             className={cx(
               "rounded-field border px-3 py-2.5 text-left transition-colors",
               several === value
@@ -140,30 +110,6 @@ export function QuoteColors({
         ))}
       </div>
 
-      {/* Couleurs d'un fichier déjà peint */}
-      {fromFile ? (
-        <div className="rounded-field border border-line bg-paper p-3 text-sm">
-          {several ? (
-            <p className="text-ink">
-              {t("fromFile", { count: fromFile.count })}
-              {fromFile.merged ? ` ${t("fromFileMerged", { max })}` : ""}
-            </p>
-          ) : (
-            <>
-              <p className="text-ink">{t("fileOffer")}</p>
-              <Button
-                variant="text"
-                size="sm"
-                className="mt-1"
-                onClick={() => setMode(true)}
-              >
-                {t("useFile", { count: Math.max(2, slots.length) })}
-              </Button>
-            </>
-          )}
-        </div>
-      ) : null}
-
       {stockMessage ? (
         <p className="text-sm text-soft">{stockMessage}</p>
       ) : null}
@@ -171,180 +117,142 @@ export function QuoteColors({
       {!several ? (
         // ── Une couleur : la grille, directement ──
         <>
+          {fromFile && refs.length > 1 ? (
+            <div className="rounded-field border border-line bg-paper p-3 text-sm">
+              <p className="text-ink">{t("fileOffer")}</p>
+              <Button
+                variant="text"
+                size="sm"
+                className="mt-1"
+                onClick={() => onChange({ ...setup, several: true })}
+              >
+                {t("useFile", { count: refs.length })}
+              </Button>
+            </div>
+          ) : null}
           <p
             className={cx(
               "text-sm",
-              slots[0] && !selectable.has(slots[0].ref)
+              main && short.includes(main)
                 ? "font-semibold text-accent-text"
                 : "text-soft",
             )}
           >
-            {slots[0]
-              ? !selectable.has(slots[0].ref)
-                ? t("short", { name: colorOf(slots[0].ref)?.name ?? "" })
-                : t("chosen", { name: colorOf(slots[0].ref)?.name ?? "" })
+            {main
+              ? short.includes(main)
+                ? t("short", { name: colorOf(main)?.name ?? "" })
+                : t("chosen", { name: colorOf(main)?.name ?? "" })
               : t("pickOne")}
             {weighed ? "" : ` ${tq("pending")}`}
           </p>
           <FilamentSwatches
             colors={colors}
             selectable={selectable}
-            current={slots[0]?.ref ?? null}
-            onPick={(id) => pickFor(0, id)}
+            current={main}
+            onPick={(id) =>
+              onChange({ ...setup, refs: [id, ...refs.slice(1)] })
+            }
             shortLabel={tq("short")}
             approximateLabel={tq("approximate")}
           />
         </>
+      ) : !hasFile ? (
+        // ── Plusieurs couleurs, sans fichier : l'atelier a besoin de la pièce ──
+        <p className="rounded-field border border-line bg-paper p-3 text-sm text-soft">
+          {t("needFile")}
+        </p>
       ) : (
-        // ── Plusieurs couleurs : emplacements numérotés ──
-        <>
-          <ol className="space-y-2">
-            {Array.from({ length: rows }, (_, index) => {
-              const slot = slots[index];
-              const color = slot ? colorOf(slot.ref) : undefined;
-              const open = editing === index;
-              const short = slot ? !selectable.has(slot.ref) : false;
-              return (
-                <li key={slot?.id ?? `new-${index}`}>
-                  <div
+        // ── Plusieurs couleurs : résumé, et l'atelier pour tout le reste ──
+        <div className="rounded-field border border-line bg-paper p-4">
+          {fromFile ? (
+            <p className="mb-3 text-sm text-ink">
+              {t("fromFile", { count: fromFile.count })}
+              {fromFile.merged ? ` ${t("fromFileMerged", { max })}` : ""}
+            </p>
+          ) : null}
+          {visible.length > 0 ? (
+            <ol className="mb-3 flex flex-wrap gap-2">
+              {visible.map((id, index) => {
+                const color = colorOf(id);
+                const isShort = short.includes(id);
+                return (
+                  <li
+                    key={index}
                     className={cx(
-                      "flex items-center gap-3 rounded-field border px-3 py-2",
-                      open ? "border-ink" : "border-line",
+                      "flex items-center gap-2 rounded-full border bg-surface py-1 pl-1 pr-3 text-sm",
+                      isShort ? "border-accent-text" : "border-line",
                     )}
                   >
-                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-paper">
+                    <span className="grid h-5 w-5 place-items-center rounded-full bg-ink text-[0.625rem] font-semibold text-paper">
                       {index + 1}
                     </span>
-                    {color ? (
-                      <FilamentChip hexes={color.hexes} size={26} />
-                    ) : (
-                      <span className="h-[26px] w-[26px] shrink-0 rounded-full border border-dashed border-line" />
-                    )}
-                    <span className="min-w-0 flex-1 leading-tight">
-                      <span className="block truncate text-sm text-ink">
-                        {color?.name ?? slotName(index)}
+                    <FilamentChip hexes={color?.hexes ?? []} size={18} />
+                    <span className="text-ink">{color?.name ?? id}</span>
+                    {shares && visible.length > 1 ? (
+                      <span className="tabular-nums text-soft">
+                        {Math.round((shares[index] ?? 0) * 100)} %
                       </span>
-                      <span
-                        className={cx(
-                          "block text-xs",
-                          short
-                            ? "font-semibold text-accent-text"
-                            : "text-soft",
-                        )}
-                      >
-                        {short
-                          ? tq("short")
-                          : [
-                              color ? slotName(index) : null,
-                              index === 0 ? t("slotMainHint") : null,
-                            ]
-                              .filter(Boolean)
-                              .join(" · ")}
-                      </span>
-                    </span>
-                    <Button
-                      variant="secondary"
-                      size="sm"
-                      onClick={() => setEditing(open ? null : index)}
-                      aria-expanded={open}
-                      disabled={!slot && index > slots.length}
-                    >
-                      {open ? t("cancel") : slot ? t("change") : t("pick")}
-                    </Button>
-                    {index > 0 && slot ? (
-                      <button
-                        type="button"
-                        onClick={() => remove(index)}
-                        aria-label={ts("remove", { n: index + 1 })}
-                        title={ts("remove", { n: index + 1 })}
-                        className="grid h-9 w-9 shrink-0 place-items-center rounded-field text-soft hover:bg-line/60 hover:text-ink"
-                      >
-                        <X size={16} strokeWidth={1.75} aria-hidden="true" />
-                      </button>
                     ) : null}
-                  </div>
-                  {open ? (
-                    <div className="mt-2 rounded-field border border-line bg-paper p-3">
-                      <p className="mb-2 text-xs text-soft">
-                        {t("choosing", { slot: slotName(index) })}
-                      </p>
-                      <FilamentSwatches
-                        colors={colors}
-                        selectable={selectable}
-                        current={slot?.ref ?? null}
-                        onPick={(id) => pickFor(index, id)}
-                        shortLabel={tq("short")}
-                        approximateLabel={tq("approximate")}
+                    {isShort ? (
+                      <AlertTriangle
+                        size={14}
+                        strokeWidth={2}
+                        className="text-accent-text"
+                        aria-label={tq("short")}
                       />
-                    </div>
-                  ) : null}
-                </li>
-              );
-            })}
-          </ol>
-          {slots.length >= 2 && slots.length < max ? (
-            <Button
-              variant="text"
-              size="sm"
-              onClick={() => setEditing(slots.length)}
-            >
-              <Plus size={15} strokeWidth={1.75} aria-hidden="true" />
-              {t("add")}
-            </Button>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ol>
           ) : null}
-          {editing !== null && editing >= rows ? (
-            <div className="rounded-field border border-line bg-paper p-3">
-              <p className="mb-2 text-xs text-soft">
-                {t("choosing", { slot: slotName(editing) })}
-              </p>
-              <FilamentSwatches
-                colors={colors}
-                selectable={selectable}
-                current={null}
-                onPick={(id) => pickFor(editing, id)}
-                shortLabel={tq("short")}
-                approximateLabel={tq("approximate")}
-              />
-            </div>
+          {short.length > 0 ? (
+            <p className="mb-3 text-sm font-semibold text-accent-text">
+              {t("shortSeveral")}
+            </p>
           ) : null}
-
-          {/* Placement sur la pièce */}
-          <div className="rounded-field border border-line bg-paper p-3">
-            {slots.length < 2 ? (
-              <p className="text-sm text-soft">{t("needTwo")}</p>
-            ) : placed > 1 ? (
-              <p className="flex items-center gap-2 text-sm font-semibold text-ink">
-                <Check size={16} strokeWidth={2} aria-hidden="true" />
-                {t("placed", { count: placed })}
+          {!canPlace ? (
+            <p className="text-sm text-soft">{t("noWebgl")}</p>
+          ) : (
+            <>
+              <p
+                className={cx(
+                  "mb-3 flex items-center gap-2 text-sm",
+                  placed > 1 ? "font-semibold text-ink" : "text-soft",
+                )}
+              >
+                {placed > 1 ? (
+                  <Check size={16} strokeWidth={2} aria-hidden="true" />
+                ) : null}
+                {placed > 1
+                  ? t("placed", { count: placed })
+                  : visible.length < 2
+                    ? t("intro")
+                    : t("notPlaced")}
               </p>
-            ) : (
-              <p className="text-sm text-soft">
-                {canPlace ? t("notPlaced") : t("noWebgl")}
-              </p>
-            )}
-            {canPlace && slots.length >= 2 ? (
               <Button
                 variant={placed > 1 ? "secondary" : "ink"}
                 size="sm"
-                className="mt-2"
                 onClick={onPlace}
               >
                 <Palette size={16} strokeWidth={1.5} aria-hidden="true" />
                 {placed > 1 ? t("edit") : t("place")}
               </Button>
-            ) : null}
-          </div>
-        </>
+            </>
+          )}
+        </div>
       )}
 
       {/* Taille et orientation (l'atelier, même en une couleur) */}
-      {canPlace ? (
+      {canPlace && !several ? (
         <p className="text-sm text-soft">
           {adjustments ? `${adjustments} · ` : ""}
           <Button variant="text" size="sm" onClick={onPlace}>
             {t("size")}
           </Button>
         </p>
+      ) : adjustments && several ? (
+        <p className="text-sm text-soft">{adjustments}</p>
       ) : null}
     </section>
   );

@@ -9,11 +9,17 @@
 // de l'emplacement n (n = 1 : la base, peinte explicitement). À l'export,
 // l'état n devient le filament n, et 0 le filament par défaut de l'objet (1) :
 // exactement la convention des trancheurs.
+//
+// La palette (couleur du stock de chaque emplacement, et teinte d'origine du
+// fichier) fait partie du document et de son historique (25.10.2026) : ajouter,
+// changer ou retirer une couleur s'annule comme un coup de pinceau, et une
+// couleur retirée retrouve ses zones à l'annulation, comme dans les trancheurs.
 import { buildBvh, type Bvh } from "./bvh";
 import {
   cloneNode,
   collapse,
   isSplit,
+  remapNode,
   type PaintNode,
   type PaintSplit,
 } from "./selector";
@@ -117,12 +123,22 @@ export interface PaintPart {
   count: number;
 }
 
+/** Couleur d'un emplacement (filament) : référence du stock et teinte du fichier. */
+export interface PaletteEntry {
+  /** Couleur du stock choisie (identifiant de référence). */
+  ref: string;
+  /** Teinte du filament dans le fichier d'origine (« #RRGGBB »), ou null. */
+  origin: string | null;
+}
+
 export interface PaintSourceMesh {
   /** 9 nombres par triangle, en mm, dans le repère du fichier. */
   positions: Float32Array;
   parts?: PaintPart[];
   /** Peinture initiale (fichier déjà peint), en états du document. */
   paint?: ReadonlyMap<number, PaintNode>;
+  /** Palette initiale (emplacement 1 en tête). */
+  palette?: readonly PaletteEntry[];
 }
 
 interface Transform {
@@ -136,7 +152,13 @@ interface Step {
   after: PaintNode[];
   transformBefore?: Transform;
   transformAfter?: Transform;
+  paletteBefore?: readonly PaletteEntry[];
+  paletteAfter?: readonly PaletteEntry[];
 }
+
+const samePalette = (a: readonly PaletteEntry[], b: readonly PaletteEntry[]) =>
+  a.length === b.length &&
+  a.every((entry, i) => entry.ref === b[i].ref && entry.origin === b[i].origin);
 
 export interface WorldBounds {
   min: [number, number, number];
@@ -163,6 +185,8 @@ export class PaintDocument {
 
   rotation: Mat3 = IDENTITY3;
   scale = 1;
+  /** Couleur de chaque emplacement (filament), dans l'ordre. */
+  palette: readonly PaletteEntry[] = [];
   /** Décalage du repère du fichier vers le plateau (centré, posé à z = 0). */
   private offset: [number, number, number] = [0, 0, 0];
   private bounds: WorldBounds;
@@ -178,6 +202,7 @@ export class PaintDocument {
   private redoStack: Step[] = [];
   private current: Map<number, PaintNode> | null = null;
   private currentTransform: Transform | null = null;
+  private currentPalette: readonly PaletteEntry[] | null = null;
   private readonly listeners = new Set<() => void>();
 
   constructor(source: PaintSourceMesh) {
@@ -199,6 +224,7 @@ export class PaintDocument {
     }
     this.states = new Uint8Array(this.triangleCount);
     this.changeMark = new Uint8Array(this.triangleCount);
+    this.palette = source.palette ? [...source.palette] : [];
     if (source.paint)
       for (const [t, node] of source.paint) {
         if (t < 0 || t >= this.triangleCount) continue;
@@ -271,19 +297,24 @@ export class PaintDocument {
     if (this.current) this.endStep();
     this.current = new Map();
     this.currentTransform = { rotation: this.rotation, scale: this.scale };
+    this.currentPalette = this.palette;
   }
 
   /** Ferme l'étape : elle entre dans l'historique si elle a changé quelque chose. */
   endStep(): boolean {
     const before = this.current;
     const transformBefore = this.currentTransform;
+    const paletteBefore = this.currentPalette;
     this.current = null;
     this.currentTransform = null;
+    this.currentPalette = null;
     if (!before) return false;
     const transformChanged =
       transformBefore !== null &&
       (transformBefore.scale !== this.scale ||
         transformBefore.rotation.some((v, i) => v !== this.rotation[i]));
+    const paletteChanged =
+      paletteBefore !== null && !samePalette(paletteBefore, this.palette);
     const triangles: number[] = [];
     const prior: PaintNode[] = [];
     const after: PaintNode[] = [];
@@ -294,7 +325,8 @@ export class PaintDocument {
       prior.push(node);
       after.push(cloneNode(now));
     }
-    if (triangles.length === 0 && !transformChanged) return false;
+    if (triangles.length === 0 && !transformChanged && !paletteChanged)
+      return false;
     this.undoStack.push({
       triangles,
       before: prior,
@@ -304,6 +336,9 @@ export class PaintDocument {
             transformBefore,
             transformAfter: { rotation: this.rotation, scale: this.scale },
           }
+        : {}),
+      ...(paletteChanged && paletteBefore
+        ? { paletteBefore, paletteAfter: this.palette }
         : {}),
     });
     if (this.undoStack.length > HISTORY_LIMIT) this.undoStack.shift();
@@ -325,7 +360,12 @@ export class PaintDocument {
     if (this.current) this.endStep();
     const step = this.undoStack.pop();
     if (!step) return false;
-    this.apply(step.triangles, step.before, step.transformBefore);
+    this.apply(
+      step.triangles,
+      step.before,
+      step.transformBefore,
+      step.paletteBefore,
+    );
     this.redoStack.push(step);
     return true;
   }
@@ -333,7 +373,12 @@ export class PaintDocument {
   redo(): boolean {
     const step = this.redoStack.pop();
     if (!step) return false;
-    this.apply(step.triangles, step.after, step.transformAfter);
+    this.apply(
+      step.triangles,
+      step.after,
+      step.transformAfter,
+      step.paletteAfter,
+    );
     this.undoStack.push(step);
     return true;
   }
@@ -342,11 +387,13 @@ export class PaintDocument {
     triangles: readonly number[],
     nodes: readonly PaintNode[],
     transform?: Transform,
+    palette?: readonly PaletteEntry[],
   ) {
     for (let i = 0; i < triangles.length; i++)
       this.write(triangles[i], cloneNode(nodes[i]));
     if (triangles.length > 0) this.paintVersion++;
     if (transform) this.writeTransform(transform.rotation, transform.scale);
+    if (palette) this.palette = palette;
     this.bump();
   }
 
@@ -360,31 +407,40 @@ export class PaintDocument {
     this.endStep();
   }
 
+  // ── Palette ──────────────────────────────────────────────────────────────
+
+  /** Remplace la palette (dans une étape : annulable). */
+  setPalette(next: readonly PaletteEntry[]) {
+    if (samePalette(next, this.palette)) return;
+    const own = !this.current;
+    if (own) this.beginStep();
+    this.palette = [...next];
+    if (own) this.endStep();
+  }
+
   /**
-   * Renumérote les états (`map[ancien] = nouveau`) : couleur retirée de la
-   * palette, couleurs réordonnées. Hors historique (la palette n'en a pas).
+   * Retire l'emplacement `index` (≥ 1) : ses zones reprennent la couleur
+   * principale, les suivants descendent d'un cran. Une seule étape : « Annuler »
+   * rend la couleur ET ses zones.
    */
-  remapStates(map: ArrayLike<number>) {
-    const remap = (s: number) => (s < map.length ? map[s] : s);
-    for (let t = 0; t < this.triangleCount; t++) {
-      const split = this.splits.get(t);
-      if (split) {
-        const visit = (node: PaintNode): PaintNode =>
-          isSplit(node) ? { ...node, c: node.c.map(visit) } : remap(node);
-        this.write(t, collapse(visit(split)));
-      } else if (this.states[t] !== 0) {
-        const next = remap(this.states[t]);
-        if (next !== this.states[t]) this.write(t, next);
-      }
-    }
-    const fix = (node: PaintNode): PaintNode =>
-      isSplit(node) ? collapse({ ...node, c: node.c.map(fix) }) : remap(node);
-    for (const step of [...this.undoStack, ...this.redoStack]) {
-      step.before = step.before.map(fix);
-      step.after = step.after.map(fix);
-    }
-    this.paintVersion++;
-    this.bump();
+  removeSlot(index: number) {
+    if (index < 1 || index >= this.palette.length) return;
+    const own = !this.current;
+    if (own) this.beginStep();
+    const removed = index + 1;
+    const map = Array.from({ length: 256 }, (_, s) =>
+      s === removed ? 0 : s > removed ? s - 1 : s,
+    );
+    const touches = (node: PaintNode): boolean =>
+      isSplit(node) ? node.c.some(touches) : node >= removed;
+    for (const t of Array.from(this.splits.keys()))
+      if (touches(this.splits.get(t)!))
+        this.setNode(t, remapNode(this.node(t), map));
+    for (let t = 0; t < this.triangleCount; t++)
+      if (!this.splits.has(t) && this.states[t] >= removed)
+        this.setNode(t, map[this.states[t]]);
+    this.palette = this.palette.filter((_, i) => i !== index);
+    if (own) this.endStep();
   }
 
   /** États présents (au moins une feuille), sans géométrie. */

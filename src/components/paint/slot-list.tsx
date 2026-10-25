@@ -7,12 +7,14 @@ import { FilamentChip } from "@/components/filament-chip";
 import { FilamentSwatches } from "@/components/filament-swatches";
 import { cx } from "@/components/ui/cx";
 import type { PublicCustomColor } from "@/lib/filament/public-stock";
-import type { ColorSlot } from "./types";
+import type { PaletteEntry } from "@/lib/paint3d/document";
 
 // Filaments de l'atelier 3D, comme la liste des filaments de Bambu Studio : un
 // emplacement par ligne (numéro, couleur, part de la surface). Cliquer une ligne
 // la choisit pour peindre ; « Changer » remplace SA couleur sans toucher à ses
-// zones ; × retire l'emplacement (ses zones reprennent la couleur principale).
+// zones ; × retire l'emplacement (ses zones reprennent la couleur principale,
+// « Annuler » les rend). Un fichier peint montre la teinte d'origine de chaque
+// filament à côté de la couleur du stock choisie (comme le mapping de Bambu).
 
 export function SlotList({
   slots,
@@ -26,7 +28,7 @@ export function SlotList({
   onRemove,
   onAdd,
 }: {
-  slots: readonly ColorSlot[];
+  slots: readonly PaletteEntry[];
   stock: readonly PublicCustomColor[];
   selectable: ReadonlySet<string>;
   /** Emplacement choisi pour peindre (null : aucun, une seule couleur). */
@@ -71,7 +73,7 @@ export function SlotList({
           const on = active === index;
           const short = !selectable.has(slot.ref);
           return (
-            <li key={slot.id}>
+            <li key={index}>
               <div
                 className={cx(
                   "flex items-center gap-1 rounded-field border pr-1 transition-colors",
@@ -98,10 +100,19 @@ export function SlotList({
                     </span>
                     <span
                       className={cx(
-                        "block truncate text-xs",
+                        "flex items-center gap-1.5 truncate text-xs",
                         short ? "font-semibold text-accent-text" : "text-soft",
                       )}
                     >
+                      {slot.origin && !short ? (
+                        // Teinte d'origine du filament dans le fichier peint.
+                        <span
+                          className="inline-block h-2.5 w-2.5 shrink-0 rounded-full border border-line"
+                          style={{ backgroundColor: slot.origin }}
+                          title={t("origin", { hex: slot.origin })}
+                          aria-hidden="true"
+                        />
+                      ) : null}
                       {short
                         ? tq("short")
                         : [

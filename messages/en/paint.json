@@ -148,26 +148,20 @@
     "severalHint": "Up to {max}, placed by area on the piece.",
     "pickOne": "Choose the colour of your piece.",
     "chosen": "Your piece will be printed in {name}.",
-    "slotMain": "Main colour",
-    "slotMainHint": "the whole piece, except areas in another colour",
-    "slot": "Colour {n}",
-    "pick": "Choose",
-    "change": "Change",
-    "cancel": "Close",
-    "add": "Add a colour",
-    "choosing": "{slot}: choose a colour.",
-    "needTwo": "Choose at least two colours, then place them on the piece.",
     "notPlaced": "Colours not placed yet. Open your piece and click the areas to colour (or describe it in your project).",
     "noWebgl": "3D placement isn't available on this device: describe in your project where each colour goes.",
-    "place": "Place the colours on the piece",
-    "edit": "Edit the placement",
+    "place": "Choose and place the colours",
+    "edit": "Edit the colours",
     "placed": "{count, plural, one {# colour placed on the piece} other {# colours placed on the piece}}",
     "size": "Size and orientation",
-    "fromFile": "The {count} colours of your file are kept with their areas, each in the closest shade from our stock. Change them below.",
+    "fromFile": "The {count} colours of your file are kept with their areas, each in the closest shade from our stock. You can change them in the workshop.",
     "fromFileMerged": "It had more than {max}: the closest ones were merged.",
     "fileOffer": "Your file's colours are kept with their areas.",
     "useFile": "Print the {count} colours",
-    "short": "{name} is no longer in stock in sufficient quantity for your piece: choose another one."
+    "short": "{name} is no longer in stock in sufficient quantity for your piece: choose another one.",
+    "needFile": "Add your file first (step 01): you will then choose your colours and place them right on the piece.",
+    "intro": "Choose your colours and place them on the piece, in the workshop.",
+    "shortSeveral": "A colour is no longer in stock in sufficient quantity for your piece: change it in the workshop."
   },
   "simple": {
     "title": "Place the colours",
@@ -187,7 +181,14 @@
     "fit": "Fit view",
     "single": "A single colour",
     "singleHint": "The whole piece is printed in this colour. Your other colours and their areas are kept.",
-    "toSeveral": "Place several colours"
+    "toSeveral": "Place several colours",
+    "colorHint": "Click a colour on the piece: its whole connected area takes the chosen colour.",
+    "bandHint": "Click at the height you want: a band of the chosen thickness takes the colour.",
+    "angle": "Stop at edges sharper than",
+    "fill": {
+      "zone": "Up to edges",
+      "color": "Whole colour"
+    }
   },
   "slots": {
     "unknown": "Colour to choose",
@@ -198,6 +199,7 @@
     "remove": "Remove colour {n}",
     "add": "Add a colour",
     "max": "{max} colours at most: our printers load four spools.",
-    "removeConfirm": "The areas of colour {n} will go back to the main colour. Continue?"
+    "removed": "Colour {n} ({name}) removed: its areas went back to colour 1. To replace a colour without losing its areas, use “Change”.",
+    "origin": "File shade: {hex}"
   }
 }

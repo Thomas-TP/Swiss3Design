@@ -52,8 +52,6 @@ import { printedPalette } from "@/lib/paint3d/palette";
 import { paintStats } from "@/lib/paint3d/stats";
 import { paintHeightRange, type FillMode } from "@/lib/paint3d/tools";
 import { SlotList } from "./slot-list";
-import { newSlot } from "./slots";
-import type { ColorSetup } from "./types";
 
 // Fenêtre de l'atelier 3D : un <dialog> modal plein écran (top layer : focus
 // piégé, Échap, page inerte). Le centre est TRANSPARENT : c'est une vue du Stage
@@ -118,12 +116,12 @@ export function PaintDialog({
   fileName,
   stock,
   selectable,
-  setup,
+  several,
   palette,
   maxColors,
   gramsPerPiece,
   plate,
-  onSetupChange,
+  onSeveralChange,
   onClose,
 }: {
   doc: PaintDocument | null;
@@ -131,14 +129,14 @@ export function PaintDialog({
   fileName: string;
   stock: readonly PublicCustomColor[];
   selectable: ReadonlySet<string>;
-  /** Emplacements de couleur (filaments) et une ou plusieurs couleurs. */
-  setup: ColorSetup;
+  /** Plusieurs couleurs imprimées (faux : la couleur 1 seule). */
+  several: boolean;
   /** Teintes affichées de chaque emplacement (une seule en une couleur). */
   palette: readonly (readonly string[])[];
   maxColors: number;
   gramsPerPiece: number | null;
   plate: number;
-  onSetupChange: (setup: ColorSetup) => void;
+  onSeveralChange: (several: boolean) => void;
   onClose: () => void;
 }) {
   const t = useTranslations("paint");
@@ -153,18 +151,33 @@ export function PaintDialog({
     (s) => s.capability >= 1 && !s.contextLost,
   );
   const version = useDocVersion(doc);
-  // Couleurs peintes : les emplacements en plusieurs couleurs, la principale
-  // seule sinon (la peinture reste gardée, mais rien ne se peint).
-  const refs = setup.several
-    ? setup.slots.map((slot) => slot.ref)
-    : setup.slots.slice(0, 1).map((slot) => slot.ref);
-  const painting = setup.several && refs.length > 1;
+  // Mode simple par défaut (25.10.2026) : couleurs, trois façons de les placer
+  // (zone, hauteur, pinceau) et la taille. « Plus d'outils » ouvre l'atelier
+  // complet (facette, gomme, mesure, poser, vues, coupe, réglages fins).
+  const [advanced, setAdvanced] = useState(false);
+  // Palette du document (relue à chaque version : son historique la couvre).
+  // Couleurs peintes : tous les emplacements en plusieurs couleurs, la
+  // principale seule sinon (la peinture reste gardée, mais rien ne se peint).
+  const entries = doc?.palette ?? [];
+  const allRefs = entries.map((entry) => entry.ref);
+  const refs = several ? allRefs : allRefs.slice(0, 1);
+  const painting = several && refs.length > 1;
 
-  const [tool, setTool] = useState<PaintTool>(painting ? "fill" : "orbit");
+  const [chosenTool, setTool] = useState<PaintTool>("orbit");
+  // « Vue » n'est pas un outil du mode simple : dès qu'on peut peindre, le
+  // remplissage « Zone » est l'outil par défaut.
+  const tool: PaintTool =
+    chosenTool === "orbit" && painting && !advanced ? "fill" : chosenTool;
   const [slot, setSlot] = useState(Math.min(1, Math.max(0, refs.length - 1)));
   const [brush, setBrush] = useState<number | null>(null);
   const [through, setThrough] = useState(false);
   const [fillMode, setFillMode] = useState<FillMode>("zone");
+  /** Dernière couleur retirée, « Annuler » tant que rien d'autre n'a changé. */
+  const [removed, setRemoved] = useState<{
+    n: number;
+    name: string;
+    version: number;
+  } | null>(null);
   const [fillAngle, setFillAngle] = useState(30);
   const [heightMode, setHeightMode] = useState<HeightMode>("above");
   const [bandHeight, setBandHeight] = useState(5);
@@ -175,10 +188,6 @@ export function PaintDialog({
   const [measure, setMeasure] = useState<PaintMeasure | null>(null);
   const [tab, setTab] = useState<Tab>("colors");
   const [help, setHelp] = useState(false);
-  // Mode simple par défaut (25.10.2026) : couleurs, trois façons de les placer
-  // (zone, hauteur, pinceau) et la taille. « Plus d'outils » ouvre l'atelier
-  // complet (facette, gomme, mesure, poser, vues, coupe, réglages fins).
-  const [advanced, setAdvanced] = useState(false);
 
   const number = useCallback(
     (value: number, digits = 1) =>
@@ -315,10 +324,10 @@ export function PaintDialog({
 
   // Bilan des couleurs imprimées (emplacements de même couleur réunis) et part
   // de chaque emplacement.
+  const refsKey = allRefs.join(",");
   const printed = useMemo(
-    () => printedPalette(refs, setup.several),
-    // oxlint-disable-next-line exhaustive-deps -- refs dérivé de setup
-    [setup],
+    () => printedPalette(refsKey ? refsKey.split(",") : [], several),
+    [refsKey, several],
   );
   const stats = useMemo(
     () =>
@@ -327,12 +336,16 @@ export function PaintDialog({
         : null,
     [doc, version, printed],
   );
+  const slotCount = entries.length;
   const slotShares = useMemo(() => {
     if (!doc || version < 0) return null;
-    const perSlot = paintStats(doc, Math.max(1, setup.slots.length));
+    const perSlot = paintStats(doc, Math.max(1, slotCount));
     const total = perSlot.totalArea || 1;
-    return setup.slots.map((_, i) => (perSlot.areaBySlot[i] ?? 0) / total);
-  }, [doc, version, setup.slots]);
+    return Array.from(
+      { length: slotCount },
+      (_, i) => (perSlot.areaBySlot[i] ?? 0) / total,
+    );
+  }, [doc, version, slotCount]);
 
   // ── Emplacements ──
   const colorOf = (id: string) => stock.find((c) => c.id === id);
@@ -341,46 +354,63 @@ export function PaintDialog({
     if (tool === "orbit" || tool === "measure" || tool === "lay")
       setTool("fill");
   };
+  // Toutes les opérations passent par le document : elles s'annulent.
   const changeColor = (index: number, ref: string) =>
-    onSetupChange({
-      ...setup,
-      slots: setup.slots.map((slot, i) =>
-        i === index ? { ...slot, ref } : slot,
-      ),
-    });
+    doc?.setPalette(
+      entries.map((entry, i) => (i === index ? { ...entry, ref } : entry)),
+    );
   const addColor = (ref: string) => {
-    if (setup.slots.length >= maxColors) return;
-    onSetupChange({ several: true, slots: [...setup.slots, newSlot(ref)] });
-    setSlot(setup.slots.length);
-    if (tool === "orbit") setTool("fill");
+    if (!doc || entries.length >= maxColors) return;
+    doc.setPalette([...entries, { ref, origin: null }]);
+    // La première couleur est la principale ; la deuxième passe en plusieurs.
+    if (entries.length >= 1) {
+      if (!several) onSeveralChange(true);
+      setSlot(entries.length);
+      if (chosenTool === "orbit") setTool("fill");
+    }
   };
   const removeSlot = (index: number) => {
-    if (
-      (slotShares?.[index] ?? 0) > 0 &&
-      !window.confirm(t("slots.removeConfirm", { n: index + 1 }))
-    )
-      return;
-    onSetupChange({
-      ...setup,
-      slots: setup.slots.filter((_, i) => i !== index),
-    });
+    if (!doc) return;
+    const name = colorOf(entries[index]?.ref ?? "")?.name ?? "";
+    doc.removeSlot(index);
+    setRemoved({ n: index + 1, name, version: doc.version });
     setSlot((current) =>
       current >= index ? Math.max(0, current - 1) : current,
     );
   };
+  const undoRemoval = () => {
+    doc?.undo();
+    setRemoved(null);
+  };
+  const removedNotice =
+    removed && doc && doc.version === removed.version ? (
+      <div className="mt-2 flex items-center justify-between gap-2 rounded-field bg-ink px-3 py-2 text-sm text-paper">
+        <span>{t("slots.removed", { n: removed.n, name: removed.name })}</span>
+        <button
+          type="button"
+          onClick={undoRemoval}
+          className="shrink-0 font-semibold underline underline-offset-2"
+        >
+          {t("undo")}
+        </button>
+      </div>
+    ) : null;
   const slotList = (
-    <SlotList
-      slots={setup.several ? setup.slots : setup.slots.slice(0, 1)}
-      stock={stock}
-      selectable={selectable}
-      active={painting ? slotClamped : null}
-      shares={setup.several ? slotShares : null}
-      max={setup.several ? maxColors : 1}
-      onSelect={selectSlot}
-      onChangeColor={changeColor}
-      onRemove={removeSlot}
-      onAdd={addColor}
-    />
+    <>
+      <SlotList
+        slots={several ? entries : entries.slice(0, 1)}
+        stock={stock}
+        selectable={selectable}
+        active={painting ? slotClamped : null}
+        shares={several ? slotShares : null}
+        max={several ? maxColors : 1}
+        onSelect={selectSlot}
+        onChangeColor={changeColor}
+        onRemove={removeSlot}
+        onAdd={addColor}
+      />
+      {removedNotice}
+    </>
   );
 
   // ── Taille et orientation ──
@@ -569,22 +599,26 @@ export function PaintDialog({
     tool === "height"
       ? heightMode === "below"
         ? t("simple.heightBelowHint")
-        : t("simple.heightAboveHint")
+        : heightMode === "band"
+          ? t("simple.bandHint")
+          : t("simple.heightAboveHint")
       : tool === "brush"
         ? t("simple.brushHint")
-        : t("simple.zoneHint");
+        : fillMode === "color"
+          ? t("simple.colorHint")
+          : t("simple.zoneHint");
   const leaveAdvanced = () => {
     setAdvanced(false);
-    if (!["fill", "height", "brush", "orbit"].includes(tool))
+    if (!["fill", "height", "brush", "orbit"].includes(chosenTool))
       setTool(painting ? "fill" : "orbit");
-    if (heightMode === "band") setHeightMode("above");
-    if (fillMode !== "zone") setFillMode("zone");
+    // « Surface » et « Pièce » n'existent qu'en mode complet.
+    if (fillMode !== "zone" && fillMode !== "color") setFillMode("zone");
   };
 
   const simplePanel = (
     <div className="space-y-6 px-4 py-4">
       {/* 1 · la couleur */}
-      {setup.several ? (
+      {several ? (
         <section aria-labelledby={`${titleId}-pick`}>
           <h3 id={`${titleId}-pick`} className={label}>
             {t("simple.stepColor")}
@@ -605,7 +639,7 @@ export function PaintDialog({
             size="sm"
             variant="secondary"
             className="mt-3"
-            onClick={() => onSetupChange({ ...setup, several: true })}
+            onClick={() => onSeveralChange(true)}
           >
             {t("simple.toSeveral")}
           </Button>
@@ -637,10 +671,26 @@ export function PaintDialog({
               </button>
             ))}
           </div>
-          <p className="mt-3 text-sm text-ink">{simpleHint}</p>
+          {tool === "fill" ? (
+            // Les deux réglages du pot de peinture de Bambu Studio : arrêt aux
+            // arêtes (détection des arêtes) ou toute la couleur d'un tenant.
+            <div className="mt-3 flex gap-1">
+              {(["zone", "color"] as const).map((mode) => (
+                <button
+                  key={mode}
+                  type="button"
+                  aria-pressed={fillMode === mode}
+                  onClick={() => setFillMode(mode)}
+                  className={segment(fillMode === mode)}
+                >
+                  {t(`simple.fill.${mode}`)}
+                </button>
+              ))}
+            </div>
+          ) : null}
           {tool === "height" ? (
             <div className="mt-3 flex gap-1">
-              {(["above", "below"] as const).map((mode) => (
+              {(["above", "below", "band"] as const).map((mode) => (
                 <button
                   key={mode}
                   type="button"
@@ -652,6 +702,29 @@ export function PaintDialog({
                 </button>
               ))}
             </div>
+          ) : null}
+          <p className="mt-3 text-sm text-ink">{simpleHint}</p>
+          {tool === "fill" && fillMode === "zone" ? (
+            <RangeField
+              label={t("simple.angle")}
+              value={fillAngle}
+              display={`${fillAngle}°`}
+              min={5}
+              max={90}
+              step={1}
+              onChange={setFillAngle}
+            />
+          ) : null}
+          {tool === "height" && heightMode === "band" ? (
+            <RangeField
+              label={t("height.thickness")}
+              value={bandHeight}
+              display={`${number(bandHeight)} mm`}
+              min={0.2}
+              max={Math.max(1, Math.round((bounds?.size[2] ?? 50) * 10) / 10)}
+              step={0.2}
+              onChange={setBandHeight}
+            />
           ) : null}
           {tool === "brush" ? (
             <RangeField
@@ -723,7 +796,7 @@ export function PaintDialog({
     >
       <div
         className={cx(
-          "grid h-full lg:grid-rows-[auto_minmax(0,1fr)]",
+          "grid h-full grid-cols-[minmax(0,1fr)] lg:grid-rows-[auto_minmax(0,1fr)]",
           advanced
             ? "grid-rows-[auto_minmax(0,1fr)_auto_auto] lg:grid-cols-[4.75rem_minmax(0,1fr)_22.5rem]"
             : "grid-rows-[auto_minmax(0,1fr)_auto] lg:grid-cols-[minmax(0,1fr)_22.5rem]",
@@ -1027,12 +1100,12 @@ export function PaintDialog({
                   {t("palette.title")}
                 </h3>
                 {slotList}
-                {!setup.several ? (
+                {!several ? (
                   <Button
                     size="sm"
                     variant="secondary"
                     className="mt-3"
-                    onClick={() => onSetupChange({ ...setup, several: true })}
+                    onClick={() => onSeveralChange(true)}
                   >
                     {t("simple.toSeveral")}
                   </Button>

@@ -335,11 +335,15 @@ which for a multi-line hook body is rarely the line you'd expect.
       canvas du Stage au-dessus de la page (`globals.css`) : toujours un seul contexte
       WebGL.
     - **Zones = emplacements, jamais couleurs (25.10.2026).** Une zone peinte
-      appartient à un emplacement (filament 1 à 4, identifiant stable,
-      `components/paint/slots.ts`) ; changer sa couleur, passer d'une à plusieurs
-      couleurs et revenir ne touchent pas à la peinture. Seul le retrait d'un
-      emplacement rend ses zones à la couleur principale. Deux emplacements de même
-      couleur sont réunis à l'export et dans le résumé (`printedPalette`).
+      appartient à un emplacement (filament 1 à 4). La palette (couleur du stock et
+      teinte d'origine du fichier de chaque emplacement) vit DANS le document et son
+      historique (`PaintDocument.palette`, `setPalette`, `removeSlot`) : changer,
+      ajouter, retirer une couleur s'annule (Ctrl+Z ou « Annuler »), zones comprises.
+      Passer d'une à plusieurs couleurs n'est qu'un interrupteur. Deux emplacements de
+      même couleur sont réunis à l'export et dans le résumé (`printedPalette`).
+    - **Un seul endroit pour les couleurs multiples : l'atelier.** La page /custom
+      n'a que la grille « une couleur » et, en plusieurs couleurs, un résumé et le
+      bouton qui ouvre l'atelier (`quote-colors.tsx`).
     - **Couleurs d'un 3MF peint** (Bambu, Orca, Prusa : peinture et filament par pièce).
       Ses zones sont reprises telles quelles, un emplacement par filament, chacun
       dans la couleur du stock la plus proche (un filament uni l'emporte sur une

@@ -2,12 +2,7 @@ import { describe, expect, it } from "vitest";
 import { buildBvh, queryBvhSphere, raycastBvh } from "./bvh";
 import { PaintDocument, quarterTurn, rotationBetween } from "./document";
 import { cubePositions, gridPositions } from "./fixtures";
-import {
-  mapFileFilaments,
-  nearestColor,
-  printedPalette,
-  slotRemap,
-} from "./palette";
+import { mapFileFilaments, nearestColor, printedPalette } from "./palette";
 import {
   openProject,
   paintedPreview,
@@ -218,8 +213,39 @@ describe("palette", () => {
     expect(single.states.slice(0, 4)).toEqual([0, 0, 0, 0]);
   });
 
-  it("un emplacement retiré rend ses zones à la base, les suivants descendent", () => {
-    expect(slotRemap([10, 11, 12], [10, 12])).toEqual([0, 1, 0, 2]);
+  it("retirer une couleur rend ses zones à la base, et « Annuler » les rend", () => {
+    const doc = new PaintDocument({
+      positions: cubePositions(10),
+      palette: [
+        { ref: "white", origin: null },
+        { ref: "red", origin: "#FF0000" },
+        { ref: "blue", origin: null },
+      ],
+    });
+    doc.beginStep();
+    paintTriangles(doc, [2, 3], 2);
+    paintTriangles(doc, [4, 5], 3);
+    // Une tache sur la face de droite (triangles 8 et 9) : des feuilles.
+    paintSphere(doc, [10, 5, 5], { state: 2, radius: 2, facing: null });
+    doc.endStep();
+    const painted = Array.from({ length: 12 }, (_, t) => doc.node(t));
+    doc.removeSlot(1);
+    expect(doc.palette.map((p) => p.ref)).toEqual(["white", "blue"]);
+    expect(doc.node(2)).toBe(0);
+    expect(doc.node(4)).toBe(2);
+    expect(doc.undo()).toBe(true);
+    expect(doc.palette.map((p) => p.ref)).toEqual(["white", "red", "blue"]);
+    for (let t = 0; t < 12; t++) expect(doc.node(t)).toEqual(painted[t]);
+    expect(doc.redo()).toBe(true);
+    expect(doc.palette).toHaveLength(2);
+    // Changer une couleur : une étape, sans toucher aux zones.
+    doc.setPalette([
+      { ref: "black", origin: null },
+      { ref: "blue", origin: null },
+    ]);
+    expect(doc.node(4)).toBe(2);
+    expect(doc.undo()).toBe(true);
+    expect(doc.palette[0].ref).toBe("white");
   });
 });
 

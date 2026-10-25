@@ -10,23 +10,14 @@ export type PaintSourceFile =
   | { format: "triangles"; positions: Float32Array };
 
 /**
- * Emplacement de couleur (un filament, 1 à 4) : un identifiant stable et la
- * couleur du stock choisie. Les zones peintes appartiennent à l'emplacement :
- * changer sa couleur ne touche jamais à la peinture (comme la liste des
- * filaments de Bambu Studio). Deux emplacements peuvent avoir la même couleur.
+ * Couleurs d'une demande. `refs` : la couleur du stock de chaque emplacement
+ * (filament 1 à 4, la principale en tête), tenue par le document de l'atelier
+ * dès qu'un fichier est ouvert (son historique couvre la palette). `several` :
+ * plusieurs couleurs imprimées ; faux, la pièce est imprimée dans la couleur 1,
+ * les autres couleurs et leurs zones restent gardées.
  */
-export interface ColorSlot {
-  id: number;
-  ref: string;
-}
-
-/** Couleurs d'une demande : les emplacements, et une couleur ou plusieurs. */
 export interface ColorSetup {
-  slots: ColorSlot[];
-  /**
-   * Plusieurs couleurs imprimées. Faux : la pièce est imprimée dans la couleur
-   * de l'emplacement 1 ; les autres emplacements et la peinture restent gardés.
-   */
+  refs: string[];
   several: boolean;
 }
 

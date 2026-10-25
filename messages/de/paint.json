@@ -148,26 +148,20 @@
     "severalHint": "Bis zu {max}, zonenweise auf dem Teil platziert.",
     "pickOne": "Wählen Sie die Farbe Ihres Teils.",
     "chosen": "Ihr Teil wird in {name} gedruckt.",
-    "slotMain": "Hauptfarbe",
-    "slotMainHint": "das ganze Teil, ausser den Zonen in einer anderen Farbe",
-    "slot": "Farbe {n}",
-    "pick": "Wählen",
-    "change": "Ändern",
-    "cancel": "Schliessen",
-    "add": "Farbe hinzufügen",
-    "choosing": "{slot}: Wählen Sie eine Farbe.",
-    "needTwo": "Wählen Sie mindestens zwei Farben und platzieren Sie sie dann auf dem Teil.",
     "notPlaced": "Farben noch nicht platziert. Öffnen Sie Ihr Teil und klicken Sie die zu färbenden Zonen an (oder beschreiben Sie es in Ihrem Projekt).",
     "noWebgl": "Die 3D-Platzierung ist auf diesem Gerät nicht verfügbar: Beschreiben Sie in Ihrem Projekt, wohin jede Farbe kommt.",
-    "place": "Farben auf dem Teil platzieren",
-    "edit": "Platzierung ändern",
+    "place": "Farben wählen und platzieren",
+    "edit": "Farben ändern",
     "placed": "{count, plural, one {# Farbe auf dem Teil platziert} other {# Farben auf dem Teil platziert}}",
     "size": "Grösse und Ausrichtung",
-    "fromFile": "Die {count} Farben Ihrer Datei werden mit ihren Zonen übernommen, jede im nächstliegenden Farbton unseres Lagers. Ändern Sie sie unten.",
+    "fromFile": "Die {count} Farben Ihrer Datei werden mit ihren Zonen übernommen, jede im nächstliegenden Farbton unseres Lagers. Sie können sie in der Werkstatt ändern.",
     "fromFileMerged": "Sie hatte mehr als {max}: Die ähnlichsten wurden zusammengefasst.",
     "fileOffer": "Die Farben Ihrer Datei bleiben mit ihren Zonen erhalten.",
     "useFile": "Die {count} Farben drucken",
-    "short": "{name} ist für Ihr Teil nicht mehr ausreichend auf Lager: Wählen Sie eine andere."
+    "short": "{name} ist für Ihr Teil nicht mehr ausreichend auf Lager: Wählen Sie eine andere.",
+    "needFile": "Fügen Sie zuerst Ihre Datei hinzu (Schritt 01): Danach wählen Sie Ihre Farben und platzieren sie direkt auf dem Teil.",
+    "intro": "Wählen Sie Ihre Farben und platzieren Sie sie in der Werkstatt auf dem Teil.",
+    "shortSeveral": "Eine Farbe ist für Ihr Teil nicht mehr ausreichend auf Lager: Ändern Sie sie in der Werkstatt."
   },
   "simple": {
     "title": "Farben platzieren",
@@ -187,7 +181,14 @@
     "fit": "Einpassen",
     "single": "Eine einzige Farbe",
     "singleHint": "Das ganze Teil wird in dieser Farbe gedruckt. Ihre anderen Farben und deren Zonen bleiben erhalten.",
-    "toSeveral": "Mehrere Farben platzieren"
+    "toSeveral": "Mehrere Farben platzieren",
+    "colorHint": "Klicken Sie eine Farbe auf dem Teil an: Ihre ganze zusammenhängende Zone nimmt die gewählte Farbe an.",
+    "bandHint": "Klicken Sie auf die gewünschte Höhe: Ein Band der gewählten Dicke nimmt die Farbe an.",
+    "angle": "An Kanten anhalten ab",
+    "fill": {
+      "zone": "Bis zu den Kanten",
+      "color": "Die ganze Farbe"
+    }
   },
   "slots": {
     "unknown": "Farbe wählen",
@@ -198,6 +199,7 @@
     "remove": "Farbe {n} entfernen",
     "add": "Farbe hinzufügen",
     "max": "Höchstens {max} Farben: Unsere Drucker laden vier Spulen.",
-    "removeConfirm": "Die Zonen der Farbe {n} erhalten wieder die Hauptfarbe. Fortfahren?"
+    "removed": "Farbe {n} ({name}) entfernt: Ihre Zonen haben wieder Farbe 1. Um eine Farbe zu ersetzen, ohne ihre Zonen zu verlieren, verwenden Sie « Ändern ».",
+    "origin": "Farbton der Datei: {hex}"
   }
 }

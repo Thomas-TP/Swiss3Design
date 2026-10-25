@@ -143,6 +143,10 @@ export async function openProject(
       positions: loaded.positions,
       parts: loaded.parts,
       paint,
+      palette: mapping.refs.map((ref, i) => ({
+        ref,
+        origin: mapping.origins[i],
+      })),
     }),
     fileRefs: mapping.refs,
     merged: mapping.merged,

@@ -148,26 +148,20 @@
     "severalHint": "Jusqu'à {max}, placées par zone sur la pièce.",
     "pickOne": "Choisissez la couleur de votre pièce.",
     "chosen": "Votre pièce sera imprimée en {name}.",
-    "slotMain": "Couleur principale",
-    "slotMainHint": "toute la pièce, sauf les zones d'une autre couleur",
-    "slot": "Couleur {n}",
-    "pick": "Choisir",
-    "change": "Changer",
-    "cancel": "Fermer",
-    "add": "Ajouter une couleur",
-    "choosing": "{slot} : choisissez une couleur.",
-    "needTwo": "Choisissez au moins deux couleurs, puis placez-les sur la pièce.",
     "notPlaced": "Couleurs pas encore placées. Ouvrez votre pièce et cliquez les zones à colorer (ou décrivez-le dans votre projet).",
     "noWebgl": "Le placement en 3D n'est pas disponible sur cet appareil : décrivez où va chaque couleur dans votre projet.",
-    "place": "Placer les couleurs sur la pièce",
-    "edit": "Modifier le placement",
+    "place": "Choisir et placer les couleurs",
+    "edit": "Modifier les couleurs",
     "placed": "{count, plural, one {# couleur placée sur la pièce} other {# couleurs placées sur la pièce}}",
     "size": "Taille et orientation",
-    "fromFile": "Les {count} couleurs de votre fichier sont reprises avec leurs zones, chacune dans la teinte la plus proche de notre stock. Changez-les ci-dessous.",
+    "fromFile": "Les {count} couleurs de votre fichier sont reprises avec leurs zones, chacune dans la teinte la plus proche de notre stock. Vous pouvez les changer dans l'atelier.",
     "fromFileMerged": "Il en avait plus de {max} : les plus proches ont été réunies.",
     "fileOffer": "Les couleurs de votre fichier restent gardées avec leurs zones.",
     "useFile": "Imprimer les {count} couleurs",
-    "short": "{name} n'est plus assez en stock pour votre pièce : choisissez-en une autre."
+    "short": "{name} n'est plus assez en stock pour votre pièce : choisissez-en une autre.",
+    "needFile": "Ajoutez d'abord votre fichier (étape 01) : vous choisirez ensuite vos couleurs et les placerez directement sur la pièce.",
+    "intro": "Choisissez vos couleurs et placez-les sur la pièce, dans l'atelier.",
+    "shortSeveral": "Une couleur n'est plus assez en stock pour votre pièce : changez-la dans l'atelier."
   },
   "simple": {
     "title": "Placer les couleurs",
@@ -187,7 +181,14 @@
     "fit": "Recadrer",
     "single": "Une seule couleur",
     "singleHint": "Toute la pièce est imprimée dans cette couleur. Vos autres couleurs et leurs zones restent gardées.",
-    "toSeveral": "Placer plusieurs couleurs"
+    "toSeveral": "Placer plusieurs couleurs",
+    "colorHint": "Cliquez une couleur sur la pièce : toute sa zone d'un seul tenant prend la couleur choisie.",
+    "bandHint": "Cliquez à la hauteur voulue : une bande de l'épaisseur choisie prend la couleur.",
+    "angle": "S'arrêter aux arêtes de plus de",
+    "fill": {
+      "zone": "Jusqu'aux arêtes",
+      "color": "Toute la couleur"
+    }
   },
   "slots": {
     "unknown": "Couleur à choisir",
@@ -198,6 +199,7 @@
     "remove": "Retirer la couleur {n}",
     "add": "Ajouter une couleur",
     "max": "{max} couleurs au plus : nos imprimantes chargent quatre bobines.",
-    "removeConfirm": "Les zones de la couleur {n} reprendront la couleur principale. Continuer ?"
+    "removed": "Couleur {n} ({name}) retirée : ses zones ont repris la couleur 1. Pour remplacer une couleur sans perdre ses zones, utilisez « Changer ».",
+    "origin": "Teinte du fichier : {hex}"
   }
 }

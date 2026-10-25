@@ -4,7 +4,7 @@
 // dans Bambu Studio), jamais aux couleurs : changer la couleur d'un emplacement
 // ne touche pas à la peinture. Ici : correspondance des filaments d'un fichier
 // déjà peint avec le stock (teinte la plus proche, ΔE CIE76 en Lab), couleurs
-// réellement imprimées, et renumérotation quand un emplacement disparaît.
+// réellement imprimées.
 
 /** « #RRGGBB » → Lab (D65). */
 export function hexToLab(hex: string): [number, number, number] {
@@ -89,6 +89,8 @@ export interface FilamentMapping {
    * distinctes, le visiteur change l'une sans toucher à l'autre.
    */
   refs: string[];
+  /** Teinte du fichier de chaque filament gardé (« #RRGGBB »), ou null. */
+  origins: (string | null)[];
   /** Emplacement (état du document) de chaque filament du fichier. */
   stateOf: Map<number, number>;
   /** Plus de `max` filaments : les moins présents ont rejoint le plus proche. */
@@ -137,8 +139,10 @@ export function mapFileFilaments(
     }
   }
   const refs: string[] = [];
+  const origins: (string | null)[] = [];
   const stateOf = new Map<number, number>();
   kept.forEach((f, slot) => {
+    origins.push(f.hex);
     // Sans teinte connue : une couleur du stock pas encore prise (le visiteur
     // corrigera), pour que les zones se distinguent à l'écran.
     const color = f.hex
@@ -148,7 +152,7 @@ export function mapFileFilaments(
     stateOf.set(f.filament, slot + 1);
   });
   for (const [from, to] of into) stateOf.set(from, stateOf.get(to)!);
-  return { refs, stateOf, merged };
+  return { refs, origins, stateOf, merged };
 }
 
 /**
@@ -176,22 +180,4 @@ export function printedPalette(
   // Un état au-delà des emplacements (emplacement retiré) : la base.
   for (let s = slots.length + 1; s < states.length; s++) states[s] = 0;
   return { refs, states };
-}
-
-/**
- * Table de renumérotation des états quand des emplacements disparaissent ou
- * changent de place (`before`, `after` : identifiants stables des emplacements,
- * dans l'ordre) : un emplacement retiré redevient la base (0), un emplacement
- * déplacé suit sa nouvelle place.
- */
-export function slotRemap(
-  before: readonly number[],
-  after: readonly number[],
-): number[] {
-  const map = [0];
-  for (let slot = 0; slot < before.length; slot++) {
-    const next = after.indexOf(before[slot]);
-    map.push(next < 0 ? 0 : next + 1);
-  }
-  return map;
 }

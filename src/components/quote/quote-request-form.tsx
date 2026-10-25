@@ -322,7 +322,7 @@ export function QuoteRequestForm({
   // Rien n'est retiré en silence : une couleur dont le stock ne suffit plus
   // reste affichée, signalée, et bloque l'envoi jusqu'à ce qu'on la change.
   const [colorSetup, setColorSetup] = useState<ColorSetup>({
-    slots: [],
+    refs: [],
     several: false,
   });
   const customStock = useCustomStock(showFileField);
@@ -874,6 +874,7 @@ export function QuoteRequestForm({
                 onChange={setColorSetup}
                 max={QUOTE_COLORS_MAX}
                 weighed={gramsPerPiece !== null}
+                hasFile={estimateTarget !== null}
                 shares={project?.slotShares ?? null}
                 placed={placedColors}
                 adjustments={adjustments}

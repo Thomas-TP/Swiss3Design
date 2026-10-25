@@ -148,26 +148,20 @@
     "severalHint": "Fino a {max}, posizionati per zone sul pezzo.",
     "pickOne": "Scelga il colore del Suo pezzo.",
     "chosen": "Il Suo pezzo sarà stampato in {name}.",
-    "slotMain": "Colore principale",
-    "slotMainHint": "tutto il pezzo, tranne le zone di un altro colore",
-    "slot": "Colore {n}",
-    "pick": "Scegli",
-    "change": "Cambia",
-    "cancel": "Chiudi",
-    "add": "Aggiungi un colore",
-    "choosing": "{slot}: scelga un colore.",
-    "needTwo": "Scelga almeno due colori, poi li posizioni sul pezzo.",
     "notPlaced": "Colori non ancora posizionati. Apra il Suo pezzo e clicchi le zone da colorare (oppure lo descriva nel Suo progetto).",
     "noWebgl": "Il posizionamento in 3D non è disponibile su questo dispositivo: descriva nel Suo progetto dove va ogni colore.",
-    "place": "Posiziona i colori sul pezzo",
-    "edit": "Modifica il posizionamento",
+    "place": "Scegliere e posizionare i colori",
+    "edit": "Modificare i colori",
     "placed": "{count, plural, one {# colore posizionato sul pezzo} other {# colori posizionati sul pezzo}}",
     "size": "Dimensioni e orientamento",
-    "fromFile": "I {count} colori del Suo file sono ripresi con le loro zone, ciascuno nella tinta più vicina del nostro stock. Li cambi qui sotto.",
+    "fromFile": "I {count} colori del Suo file sono ripresi con le loro zone, ciascuno nella tinta più vicina del nostro stock. Può cambiarli nel laboratorio.",
     "fromFileMerged": "Ne aveva più di {max}: i più vicini sono stati riuniti.",
     "fileOffer": "I colori del Suo file restano conservati con le loro zone.",
     "useFile": "Stampare i {count} colori",
-    "short": "{name} non è più abbastanza in stock per il Suo pezzo: ne scelga un altro."
+    "short": "{name} non è più abbastanza in stock per il Suo pezzo: ne scelga un altro.",
+    "needFile": "Aggiunga prima il Suo file (passo 01): poi sceglierà i colori e li posizionerà direttamente sul pezzo.",
+    "intro": "Scelga i colori e li posizioni sul pezzo, nel laboratorio.",
+    "shortSeveral": "Un colore non è più abbastanza in stock per il Suo pezzo: lo cambi nel laboratorio."
   },
   "simple": {
     "title": "Posiziona i colori",
@@ -187,7 +181,14 @@
     "fit": "Inquadra",
     "single": "Un solo colore",
     "singleHint": "Tutto il pezzo è stampato in questo colore. Gli altri colori e le loro zone restano conservati.",
-    "toSeveral": "Posiziona più colori"
+    "toSeveral": "Posiziona più colori",
+    "colorHint": "Clicchi un colore sul pezzo: tutta la sua zona continua prende il colore scelto.",
+    "bandHint": "Clicchi all'altezza voluta: una fascia dello spessore scelto prende il colore.",
+    "angle": "Fermarsi agli spigoli oltre",
+    "fill": {
+      "zone": "Fino agli spigoli",
+      "color": "Tutto il colore"
+    }
   },
   "slots": {
     "unknown": "Colore da scegliere",
@@ -198,6 +199,7 @@
     "remove": "Rimuovi il colore {n}",
     "add": "Aggiungi un colore",
     "max": "Al massimo {max} colori: le nostre stampanti caricano quattro bobine.",
-    "removeConfirm": "Le zone del colore {n} riprenderanno il colore principale. Continuare?"
+    "removed": "Colore {n} ({name}) rimosso: le sue zone hanno ripreso il colore 1. Per sostituire un colore senza perdere le sue zone, usi « Cambia ».",
+    "origin": "Tinta del file: {hex}"
   }
 }
