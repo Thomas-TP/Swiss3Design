@@ -18,7 +18,23 @@
     "legend": "Contour interval 0.2 mm · Scale 1:1",
     "gland": "46°25′N 6°16′E · Gland",
     "pully": "46°31′N 6°40′E · Pully",
-    "preferences": "Preferences"
+    "preferences": "Preferences",
+    "madeIn": "Made in Switzerland",
+    "top": "Back to top",
+    "spec": {
+      "status": "Status",
+      "statusValue": "Quote within 48 h · working days",
+      "workshops": "Workshops",
+      "workshopsValue": "Gland and Pully, Lake Geneva region (VD)",
+      "machine": "Machines",
+      "machineValue": "Bambu Lab P1S + AMS 2 Pro · 256 mm bed",
+      "material": "Material",
+      "materialValue": "PLA · up to 4 colours per piece",
+      "delivery": "Delivery",
+      "deliveryValue": "By Swiss Post, anywhere in Switzerland",
+      "write": "Write",
+      "payment": "Payment"
+    }
   },
   "motion": {
     "toggle": "Reduce motion",
@@ -42,5 +58,8 @@
   "ui": {
     "close": "Close",
     "dismiss": "Dismiss message"
+  },
+  "header": {
+    "status": "Quote within 48 h"
   }
 }

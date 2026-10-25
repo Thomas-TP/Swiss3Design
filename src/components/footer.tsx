@@ -1,30 +1,30 @@
 import { useTranslations } from "next-intl";
-import { MapPin, ShieldCheck } from "lucide-react";
-import { BrandLogo } from "./brand-mark";
+import { ArrowUp, ArrowUpRight, ShieldCheck } from "lucide-react";
+import { BrandWordmark } from "./brand-mark";
 import { MotionToggle } from "./motion-toggle";
+import { buttonClass } from "./ui/button";
 import { withDot } from "./ui/dot-title";
-import { MapFrame } from "./ui/map-frame";
 import { SiteLink } from "./ui/site-link";
 
 /*
- * Pied de page « Strates » (brief §7.3). Composant serveur : tout le texte et
- * tous les liens sont dans le HTML ; deux îlots client seulement, SiteLink
- * (« Coupe » et buse d'attente) et MotionToggle (préférence de mouvement).
+ * Pied de page (25.10.2026, refonte du chrome ; inspirations : printlab3d.ch et
+ * les pieds de page « fiche technique + marque géante » des sites primés). Composant
+ * serveur : tout le texte et tous les liens sont dans le HTML ; deux îlots client
+ * seulement, SiteLink et MotionToggle. Trois temps, de haut en bas :
  *
- * - Cartouche (le bloc titre d'une carte) : mark + wordmark Geist (la marque,
- *   pas de nouveau wordmark), accroche, légende mono « Équidistance 0,2 mm ·
- *   Échelle 1:1 », coordonnées de Gland et de Pully, isolignes SVG statiques
- *   en fond (public/posters/field-footer-{light,dark}.svg, une par thème),
- *   graduations de carte en marge dès lg (MapFrame). Légende en mono sans
- *   majuscules : « 0,2 MM » fausserait l'unité.
- * - Trois colonnes : Boutique (boutique, Studio, sur mesure, favoris, suivi),
- *   Compte et aide (compte, Atelier, contact), Informations (légal).
- * - Préférences : « Réduire les animations ».
- * - Barre basse inchangée : copyright, crédit Calyroc, paiement sécurisé.
+ * 1. Appel : la devise en grand (« Personnalisez-le. On l'imprime. ») et les deux
+ *    portes d'entrée, Studio et fichier.
+ * 2. Fiche technique de l'atelier, en lignes mono comme une fiche de machine :
+ *    statut (point rouge qui respire), ateliers et coordonnées, machine, matière,
+ *    livraison, contact, paiement (logos officiels). À droite : les liens en nuage,
+ *    le légal en gris, la préférence de mouvement.
+ * 3. « Kreya » sur toute la largeur, découpé en couches d'impression, qui s'imprime
+ *    de bas en haut quand on arrive en bas de page (CSS seul, animation liée au
+ *    défilement, `.s3d-footer-mark`) ; immobile et complet en mouvement réduit ou
+ *    sans support. Puis la barre basse : copyright, crédit, retour en haut.
  *
- * `relative z-[1]` : au-dessus du canvas du Stage. `pb-24 lg:pb-0` : la
- * BottomNav existe jusqu'à lg (et non md : il restait un trou entre les deux).
- * `id="site-footer"` + tabIndex -1 : cible du lien d'évitement du header.
+ * `relative z-[1]` : au-dessus du canvas du Stage. `pb-24 lg:pb-0` : la BottomNav
+ * existe jusqu'à lg. `id="site-footer"` + tabIndex -1 : cible du lien d'évitement.
  */
 
 // Logos officiels des moyens de paiement actifs dans Stripe (configuration
@@ -41,33 +41,38 @@ const PAYMENT_METHODS = [
   { name: "PayPal", file: "paypal" },
 ];
 
-function FooterColumn({
-  title,
+const CONTACT_EMAIL = "contact@kreya.ch";
+
+/** Ligne de la fiche technique : intitulé mono à gauche, valeur à droite. */
+function SpecRow({
+  label,
   children,
 }: {
-  title: string;
+  label: string;
   children: React.ReactNode;
 }) {
   return (
-    <nav aria-label={title}>
-      <p className="s3d-label text-soft">{title}</p>
-      <ul className="mt-4 space-y-2.5 text-sm font-medium">{children}</ul>
-    </nav>
+    <div className="grid grid-cols-[7.5rem_minmax(0,1fr)] gap-4 border-t border-line py-3 sm:grid-cols-[9rem_minmax(0,1fr)]">
+      <dt className="s3d-label pt-0.5 text-soft">{label}</dt>
+      <dd className="min-w-0 text-sm text-ink">{children}</dd>
+    </div>
   );
 }
 
 function FooterLink({
   href,
   children,
+  muted = false,
 }: {
   href: string;
   children: React.ReactNode;
+  muted?: boolean;
 }) {
   return (
     <li>
       <SiteLink
         href={href}
-        className="text-soft underline decoration-transparent decoration-1 underline-offset-4 transition-colors duration-150 hover:text-ink hover:decoration-ink"
+        className={`s3d-link-sweep ${muted ? "text-soft hover:text-ink" : "text-ink"}`}
       >
         {children}
       </SiteLink>
@@ -84,67 +89,126 @@ export function Footer() {
     <footer
       id="site-footer"
       tabIndex={-1}
-      className="relative z-[1] mt-20 border-t border-line bg-surface pb-24 focus:outline-none lg:pb-0"
+      className="relative z-[1] mt-20 overflow-hidden border-t border-line bg-surface pb-24 focus:outline-none lg:pb-0"
     >
       <div className="s3d-page">
-        <div className="grid gap-10 py-12 lg:grid-cols-12 lg:gap-8 lg:py-16">
-          {/* Cartouche */}
-          <div className="relative overflow-hidden rounded-hair border border-line bg-paper bg-[url(/posters/field-footer-light.svg)] bg-cover bg-center p-6 lg:col-span-5 lg:p-8 dark:bg-[url(/posters/field-footer-dark.svg)]">
-            <MapFrame sides={["left", "bottom"]} />
-            <p className="text-ink">
-              <BrandLogo title="Kreya" className="h-8 w-auto" />
-            </p>
-            <p className="mt-3 max-w-sm text-sm leading-relaxed text-soft">
-              {t("tagline")}
-            </p>
-            <p className="mt-6 font-display text-title text-ink">
-              {withDot(shell("footer.motto"))}
-            </p>
-            <p className="mt-5 flex items-start gap-2 text-sm leading-snug text-soft">
-              <MapPin
-                size={15}
-                strokeWidth={1.5}
-                className="mt-0.5 shrink-0 text-accent-text"
-              />
-              {t("madeIn")}
-            </p>
-            <div className="mt-6 grid gap-1.5 border-t border-line pt-4 text-soft">
-              <p className="s3d-label normal-case text-ink">
-                {shell("footer.legend")}
-              </p>
-              <p className="s3d-label normal-case">{shell("footer.gland")}</p>
-              <p className="s3d-label normal-case">{shell("footer.pully")}</p>
-            </div>
-          </div>
-
-          <div className="grid gap-10 sm:grid-cols-3 lg:col-span-7 lg:gap-8 lg:pl-8">
-            <FooterColumn title={t("shop")}>
-              <FooterLink href="/shop">{shell("nav.shop")}</FooterLink>
-              <FooterLink href="/studio">{shell("nav.studio")}</FooterLink>
-              <FooterLink href="/custom">{shell("nav.custom")}</FooterLink>
-              <FooterLink href="/favorites">{tNav("favorites")}</FooterLink>
-              <FooterLink href="/track">{t("track")}</FooterLink>
-            </FooterColumn>
-
-            <FooterColumn title={t("helpTitle")}>
-              <FooterLink href="/account">{tNav("account")}</FooterLink>
-              <FooterLink href="/a-propos">{shell("nav.atelier")}</FooterLink>
-              <FooterLink href="/contact">{t("contact")}</FooterLink>
-            </FooterColumn>
-
-            <FooterColumn title={t("legalTitle")}>
-              <FooterLink href="/legal/terms">{t("terms")}</FooterLink>
-              <FooterLink href="/legal/privacy">{t("privacy")}</FooterLink>
-              <FooterLink href="/legal/shipping">
-                {t("shippingReturns")}
-              </FooterLink>
-            </FooterColumn>
-
-            {/* Préférences : îlot client, sous les colonnes. */}
-            <section
-              aria-labelledby="footer-preferences"
-              className="border-t border-line pt-6 sm:col-span-3"
+        {/* 1 · Appel */}
+        <div className="flex flex-col gap-6 py-12 sm:py-16 lg:flex-row lg:items-end lg:justify-between">
+          <p className="max-w-3xl font-display text-[2rem] font-extrabold leading-[0.95] tracking-[-0.03em] text-ink min-[420px]:text-display">
+            {withDot(shell("footer.motto"))}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            <SiteLink
+              href="/studio"
+              className={buttonClass({ variant: "ink", size: "lg" })}
             >
+              {shell("cta.studio")}
+              <ArrowUpRight size={18} strokeWidth={1.75} aria-hidden="true" />
+            </SiteLink>
+            <SiteLink
+              href="/custom"
+              className={buttonClass({ variant: "secondary", size: "lg" })}
+            >
+              {shell("cta.file")}
+            </SiteLink>
+          </div>
+        </div>
+
+        {/* 2 · Fiche technique et liens */}
+        <div className="grid gap-12 pb-12 lg:grid-cols-12 lg:gap-10">
+          <dl className="lg:col-span-7">
+            <SpecRow label={shell("footer.spec.status")}>
+              <span className="flex items-center gap-2.5">
+                <span className="s3d-live-dot" aria-hidden="true" />
+                {shell("footer.spec.statusValue")}
+              </span>
+            </SpecRow>
+            <SpecRow label={shell("footer.spec.workshops")}>
+              {shell("footer.spec.workshopsValue")}
+              <span className="mt-1 block font-mono text-xs text-soft">
+                {shell("footer.gland")} · {shell("footer.pully")}
+              </span>
+            </SpecRow>
+            <SpecRow label={shell("footer.spec.machine")}>
+              {shell("footer.spec.machineValue")}
+            </SpecRow>
+            <SpecRow label={shell("footer.spec.material")}>
+              {shell("footer.spec.materialValue")}
+            </SpecRow>
+            <SpecRow label={shell("footer.spec.delivery")}>
+              {shell("footer.spec.deliveryValue")}
+            </SpecRow>
+            <SpecRow label={shell("footer.spec.write")}>
+              <a
+                href={`mailto:${CONTACT_EMAIL}`}
+                className="s3d-link-sweep text-ink"
+              >
+                {CONTACT_EMAIL}
+              </a>
+            </SpecRow>
+            <SpecRow label={shell("footer.spec.payment")}>
+              <span className="sr-only">{t("securePayment")} : </span>
+              <ul className="flex flex-wrap items-center gap-1.5">
+                {PAYMENT_METHODS.map((m) => (
+                  <li key={m.file}>
+                    <img
+                      src={`/payment/${m.file}.svg`}
+                      alt={m.name}
+                      title={m.name}
+                      width={38}
+                      height={24}
+                      loading="lazy"
+                      className="block h-6 w-[38px]"
+                    />
+                  </li>
+                ))}
+                <li className="ml-1 flex items-center gap-1.5 text-xs text-soft">
+                  <ShieldCheck
+                    size={14}
+                    strokeWidth={1.5}
+                    className="text-accent-text"
+                    aria-hidden="true"
+                  />
+                  {t("securePayment")}
+                </li>
+              </ul>
+            </SpecRow>
+          </dl>
+
+          <div className="flex flex-col gap-10 lg:col-span-5 lg:pl-6">
+            <nav aria-label={t("shop")}>
+              <p className="s3d-label text-soft">{t("shop")}</p>
+              <ul className="mt-4 flex flex-wrap gap-x-6 gap-y-3 text-lg font-medium">
+                <FooterLink href="/shop">{shell("nav.shop")}</FooterLink>
+                <FooterLink href="/studio">{shell("nav.studio")}</FooterLink>
+                <FooterLink href="/custom">{shell("nav.custom")}</FooterLink>
+                <FooterLink href="/a-propos">{shell("nav.atelier")}</FooterLink>
+                <FooterLink href="/contact">{t("contact")}</FooterLink>
+              </ul>
+            </nav>
+            <nav aria-label={t("helpTitle")}>
+              <p className="s3d-label text-soft">{t("helpTitle")}</p>
+              <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2.5 text-sm">
+                <FooterLink href="/account">{tNav("account")}</FooterLink>
+                <FooterLink href="/favorites">{tNav("favorites")}</FooterLink>
+                <FooterLink href="/track">{t("track")}</FooterLink>
+              </ul>
+            </nav>
+            <nav aria-label={t("legalTitle")}>
+              <p className="s3d-label text-soft">{t("legalTitle")}</p>
+              <ul className="mt-4 flex flex-wrap gap-x-5 gap-y-2.5 text-sm">
+                <FooterLink href="/legal/terms" muted>
+                  {t("terms")}
+                </FooterLink>
+                <FooterLink href="/legal/privacy" muted>
+                  {t("privacy")}
+                </FooterLink>
+                <FooterLink href="/legal/shipping" muted>
+                  {t("shippingReturns")}
+                </FooterLink>
+              </ul>
+            </nav>
+            <section aria-labelledby="footer-preferences">
               <p id="footer-preferences" className="s3d-label text-soft">
                 {shell("footer.preferences")}
               </p>
@@ -153,8 +217,13 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Barre basse : copyright + crédit agence + paiement sécurisé */}
-        <div className="flex flex-col gap-4 border-t border-line py-6 text-xs text-soft sm:flex-row sm:items-center sm:justify-between">
+        {/* 3 · La marque, qui s'imprime couche par couche */}
+        <div className="border-t border-line pt-8 sm:pt-12" aria-hidden="true">
+          <BrandWordmark className="s3d-footer-mark block h-auto w-full text-ink" />
+        </div>
+
+        {/* Barre basse */}
+        <div className="flex flex-col gap-3 py-6 text-xs text-soft sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-col gap-1.5 sm:flex-row sm:items-center sm:gap-3">
             {/* oxlint-disable-next-line purity -- composant serveur, rendu une fois par requête */}
             <p>{t("copyright", { year: new Date().getFullYear() })}</p>
@@ -173,30 +242,20 @@ export function Footer() {
               />
             </a>
           </div>
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="mr-1 flex items-center gap-1.5 font-medium">
-              <ShieldCheck
+          <div className="flex items-center gap-4">
+            <span className="s3d-label">{shell("footer.madeIn")}</span>
+            <a
+              href="#main-content"
+              className="group inline-flex items-center gap-1.5 font-medium text-ink"
+            >
+              {shell("footer.top")}
+              <ArrowUp
                 size={14}
-                strokeWidth={1.5}
-                className="text-accent-text"
+                strokeWidth={1.75}
+                aria-hidden="true"
+                className="transition-transform duration-200 ease-strate group-hover:-translate-y-0.5"
               />
-              {t("securePayment")}
-            </span>
-            <ul className="flex flex-wrap items-center gap-1.5">
-              {PAYMENT_METHODS.map((m) => (
-                <li key={m.file}>
-                  <img
-                    src={`/payment/${m.file}.svg`}
-                    alt={m.name}
-                    title={m.name}
-                    width={38}
-                    height={24}
-                    loading="lazy"
-                    className="block h-6 w-[38px]"
-                  />
-                </li>
-              ))}
-            </ul>
+            </a>
           </div>
         </div>
       </div>

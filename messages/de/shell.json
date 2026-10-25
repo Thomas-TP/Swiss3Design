@@ -18,7 +18,23 @@
     "legend": "Äquidistanz 0.2 mm · Massstab 1:1",
     "gland": "46°25′N 6°16′O · Gland",
     "pully": "46°31′N 6°40′O · Pully",
-    "preferences": "Einstellungen"
+    "preferences": "Einstellungen",
+    "madeIn": "Hergestellt in der Schweiz",
+    "top": "Nach oben",
+    "spec": {
+      "status": "Status",
+      "statusValue": "Offerte in 48 h · Werktage",
+      "workshops": "Werkstätten",
+      "workshopsValue": "Gland und Pully, Genferseeregion (VD)",
+      "machine": "Maschinen",
+      "machineValue": "Bambu Lab P1S + AMS 2 Pro · Druckbett 256 mm",
+      "material": "Material",
+      "materialValue": "PLA · bis zu 4 Farben pro Teil",
+      "delivery": "Lieferung",
+      "deliveryValue": "Mit der Post, in die ganze Schweiz",
+      "write": "Schreiben",
+      "payment": "Zahlung"
+    }
   },
   "motion": {
     "toggle": "Animationen reduzieren",
@@ -42,5 +58,8 @@
   "ui": {
     "close": "Schliessen",
     "dismiss": "Meldung ausblenden"
+  },
+  "header": {
+    "status": "Offerte in 48 h"
   }
 }

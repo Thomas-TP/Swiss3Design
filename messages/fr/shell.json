@@ -18,7 +18,23 @@
     "legend": "Équidistance 0,2 mm · Échelle 1:1",
     "gland": "46°25′N 6°16′E · Gland",
     "pully": "46°31′N 6°40′E · Pully",
-    "preferences": "Préférences"
+    "preferences": "Préférences",
+    "madeIn": "Fabriqué en Suisse",
+    "top": "Haut de page",
+    "spec": {
+      "status": "Statut",
+      "statusValue": "Devis sous 48 h · jours ouvrés",
+      "workshops": "Ateliers",
+      "workshopsValue": "Gland et Pully, arc lémanique (VD)",
+      "machine": "Machines",
+      "machineValue": "Bambu Lab P1S + AMS 2 Pro · plateau 256 mm",
+      "material": "Matière",
+      "materialValue": "PLA · jusqu'à 4 couleurs par pièce",
+      "delivery": "Livraison",
+      "deliveryValue": "Par La Poste, partout en Suisse",
+      "write": "Écrire",
+      "payment": "Paiement"
+    }
   },
   "motion": {
     "toggle": "Réduire les animations",
@@ -42,5 +58,8 @@
   "ui": {
     "close": "Fermer",
     "dismiss": "Masquer le message"
+  },
+  "header": {
+    "status": "Devis sous 48 h"
   }
 }

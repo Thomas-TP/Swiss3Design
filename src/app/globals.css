@@ -393,6 +393,83 @@ body[data-stage-front] .s3d-stage-anchor {
   height: 100%;
 }
 
+/* ── Chrome 2026 : pilule du header, pied de page (25.10.2026) ─────────── */
+/* Pilule : elle se resserre au défilement (header.tsx, data-scrolled). Seules
+   largeur, fond et ombre changent, en 500 ms sur la courbe de la marque. */
+.s3d-hdr {
+  transition:
+    max-width 500ms var(--ease-strate),
+    background-color 300ms ease,
+    box-shadow 500ms var(--ease-strate);
+}
+.s3d-hdr > .s3d-progress {
+  inset-inline: 1.25rem;
+}
+/* Point « en direct » (statut de l'atelier) : il respire, sans clignoter. */
+.s3d-live-dot {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+}
+html:not([data-motion="reduce"]) .s3d-live-dot::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: inherit;
+  animation: s3d-live 2.4s ease-out infinite;
+}
+@keyframes s3d-live {
+  from {
+    opacity: 0.55;
+    scale: 1;
+  }
+  to {
+    opacity: 0;
+    scale: 2.6;
+  }
+}
+/* Lien du pied de page : un trait se trace de gauche à droite au survol. */
+.s3d-link-sweep {
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 1px
+    no-repeat;
+  padding-bottom: 2px;
+  transition:
+    background-size 320ms var(--ease-strate),
+    color 150ms ease;
+}
+.s3d-link-sweep:hover,
+.s3d-link-sweep:focus-visible {
+  background-size: 100% 1px;
+}
+/* « Kreya » géant du pied de page, découpé en 9 couches d'impression (un
+   masque de filets horizontaux) et qui s'imprime de bas en haut quand le pied
+   de page entre à l'écran, au rythme du défilement (animation liée au
+   défilement : rien en JS). Sans support ou en mouvement réduit : complet. */
+.s3d-footer-mark {
+  -webkit-mask-image: repeating-linear-gradient(
+    to bottom,
+    #000 0 calc(100% / 9 - 3px),
+    transparent calc(100% / 9 - 3px) calc(100% / 9)
+  );
+  mask-image: repeating-linear-gradient(
+    to bottom,
+    #000 0 calc(100% / 9 - 3px),
+    transparent calc(100% / 9 - 3px) calc(100% / 9)
+  );
+}
+@supports (animation-timeline: view()) {
+  html[data-motion="full"] .s3d-footer-mark {
+    animation: s3d-print linear both;
+    animation-timeline: view();
+    animation-range: entry 5% entry 100%;
+  }
+}
+
 /* ── Header : filet de progression et buse d'attente ──────────────────── */
 .s3d-progress {
   position: absolute;
