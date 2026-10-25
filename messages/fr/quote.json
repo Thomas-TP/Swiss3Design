@@ -17,7 +17,8 @@
     "title": "Votre demande",
     "project": "Projet",
     "file": "Fichier 3D",
-    "contact": "Coordonnées"
+    "contact": "Coordonnées",
+    "colors": "Couleurs"
   },
   "facts": {
     "formats": "Formats",

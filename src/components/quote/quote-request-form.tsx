@@ -12,7 +12,7 @@ import {
   type FormEvent,
   type ReactNode,
 } from "react";
-import { CheckCircle2, Palette, Send } from "lucide-react";
+import { CheckCircle2, Send } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import {
   submitQuoteRequest,
@@ -49,11 +49,8 @@ import {
   ViewerCredits,
 } from "@/components/catalog/product-viewer";
 import type { ViewerModelFile } from "@/components/catalog/viewer-props";
-import {
-  QuoteColorPicker,
-  selectableColorIds,
-  useCustomStock,
-} from "./quote-color-picker";
+import { selectableColorIds, useCustomStock } from "./quote-color-picker";
+import { QuoteColors } from "./quote-colors";
 import type { EstimateResult } from "@/lib/mesh-weight/client";
 import { PaintStudio } from "@/components/paint/paint-studio-lazy";
 import type {
@@ -418,6 +415,23 @@ export function QuoteRequestForm({
       alive = false;
     };
   }, [estimate.status, estimateTarget]);
+  // Couleurs effectivement placées sur la pièce dans l'atelier, et ajustements
+  // (échelle, orientation) à rappeler sous le choix des couleurs.
+  const placedColors = project?.matters
+    ? project.summary.colors.filter((c) => c.share > 0).length
+    : 0;
+  const adjustments = project?.matters
+    ? [
+        project.scale !== 1
+          ? tPaint("form.scale", {
+              percent: formatCount(project.scale * 100, locale),
+            })
+          : null,
+        project.summary.rotated ? tPaint("form.rotated") : null,
+      ]
+        .filter(Boolean)
+        .join(" · ") || null
+    : null;
   // Teintes de l'aperçu : la première couleur choisie (ses 1 à 3 teintes), sinon
   // le blanc neutre du viewer.
   const previewTints = useMemo(() => {
@@ -613,8 +627,9 @@ export function QuoteRequestForm({
   // Numéro de section : 01 fichier (si présent), puis projet, puis contact.
   const sectionNumbers = {
     file: "01",
-    project: showFileField ? "02" : "01",
-    contact: showFileField ? "03" : "02",
+    colors: "02",
+    project: showFileField ? "03" : "01",
+    contact: showFileField ? "04" : "02",
   };
 
   const narration = narrate(progress);
@@ -752,82 +767,6 @@ export function QuoteRequestForm({
               eager
             />
           </div>
-          <div className="flex flex-col gap-3 border-t border-line bg-surface px-5 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-8">
-            <div className="min-w-0 text-sm" aria-live="polite">
-              {project?.matters ? (
-                <p className="font-semibold text-ink">
-                  {[
-                    project.summary.colors.length > 1
-                      ? tPaint("form.colors", {
-                          count: project.summary.colors.length,
-                        })
-                      : null,
-                    project.scale !== 1
-                      ? tPaint("form.scale", {
-                          percent: formatCount(project.scale * 100, locale),
-                        })
-                      : null,
-                    project.summary.rotated ? tPaint("form.rotated") : null,
-                  ]
-                    .filter(Boolean)
-                    .join(" · ")}
-                </p>
-              ) : (
-                <p className="text-ink">{tPaint("form.lead")}</p>
-              )}
-              {paintNotice?.kind === "fileColorsApplied" ? (
-                <div className="mt-1 text-soft">
-                  <p>
-                    {tPaint("form.fileColors", { count: paintNotice.count })}
-                    {paintNotice.merged
-                      ? ` ${tPaint("form.fileColorsMerged")}`
-                      : ""}
-                  </p>
-                  <Button
-                    variant="text"
-                    size="sm"
-                    className="mt-1"
-                    onClick={paintNotice.revert}
-                  >
-                    {tPaint("form.keepOne")}
-                  </Button>
-                </div>
-              ) : paintNotice?.kind === "fileColors" ? (
-                <div className="mt-1 text-soft">
-                  <p>
-                    {tPaint("form.fileOffer", { count: paintNotice.count })}
-                  </p>
-                  <Button
-                    variant="text"
-                    size="sm"
-                    className="mt-1"
-                    onClick={paintNotice.apply}
-                  >
-                    {tPaint("form.useFile", { count: paintNotice.count })}
-                  </Button>
-                </div>
-              ) : paintNotice?.kind === "error" ? (
-                <p className="mt-1 text-soft">{tPaint("form.error")}</p>
-              ) : null}
-              {project?.matters ? (
-                <p className="mt-1 text-soft">{tPaint("form.attached")}</p>
-              ) : chosenRefs.length > 1 ? (
-                <p className="mt-1 text-soft">{tPaint("form.multi")}</p>
-              ) : null}
-              {!stageAvailable ? (
-                <p className="mt-1 text-soft">{tPaint("form.unavailable")}</p>
-              ) : null}
-            </div>
-            <Button
-              variant="secondary"
-              onClick={() => setPaintOpen(true)}
-              disabled={!stageAvailable || paintNotice?.kind === "error"}
-              className="shrink-0"
-            >
-              <Palette size={16} strokeWidth={1.5} aria-hidden="true" />
-              {tPaint("form.open")}
-            </Button>
-          </div>
           <figcaption className="border-t border-line bg-surface px-5 py-3 sm:px-8">
             <ViewerCredits
               caption={
@@ -898,159 +837,174 @@ export function QuoteRequestForm({
           />
         </>
       ) : (
-        <fieldset
-          className={cx(
-            "m-0 min-w-0 border-0",
-            sectionClass,
-            showFileField && "border-t border-line",
-          )}
-        >
-          <legend className={legendClass}>
-            <span className="text-ink">{sectionNumbers.project}</span>
-            <span aria-hidden="true" className="mx-2 text-iso-index">
-              ·
-            </span>
-            {t("sheet.project")}
-          </legend>
-          <div className="space-y-5">
-            <Field
-              label={tCustom("description")}
-              htmlFor={ids.description}
-              hint={t("hints.description", {
-                min: QUOTE_LIMITS.descriptionMin,
-              })}
-              required
+        <>
+          {showFileField ? (
+            <fieldset
+              className={cx(
+                "m-0 min-w-0 border-0 border-t border-line",
+                sectionClass,
+              )}
             >
-              <textarea
-                id={ids.description}
-                name="description"
-                required
-                minLength={QUOTE_LIMITS.descriptionMin}
-                maxLength={QUOTE_LIMITS.description}
-                rows={5}
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                placeholder={tCustom("descriptionPlaceholder")}
-                aria-describedby={fieldIds(ids.description).hint}
-                className={cx(fieldClass, "min-h-32 resize-y")}
+              <legend className={legendClass}>
+                <span className="text-ink">{sectionNumbers.colors}</span>
+                <span aria-hidden="true" className="mx-2 text-iso-index">
+                  ·
+                </span>
+                {t("sheet.colors")}
+              </legend>
+              <QuoteColors
+                stock={customStock}
+                selectable={selectableIds}
+                selected={chosenRefs}
+                onChange={setColorRefs}
+                max={QUOTE_COLORS_MAX}
+                weighed={gramsPerPiece !== null}
+                placed={placedColors}
+                adjustments={adjustments}
+                notice={paintNotice}
+                canPlace={
+                  Boolean(preview) &&
+                  stageAvailable &&
+                  paintNotice?.kind !== "error"
+                }
+                onPlace={() => setPaintOpen(true)}
               />
-            </Field>
+            </fieldset>
+          ) : null}
+          <fieldset
+            className={cx(
+              "m-0 min-w-0 border-0",
+              sectionClass,
+              showFileField && "border-t border-line",
+            )}
+          >
+            <legend className={legendClass}>
+              <span className="text-ink">{sectionNumbers.project}</span>
+              <span aria-hidden="true" className="mx-2 text-iso-index">
+                ·
+              </span>
+              {t("sheet.project")}
+            </legend>
+            <div className="space-y-5">
+              <Field
+                label={tCustom("description")}
+                htmlFor={ids.description}
+                hint={t("hints.description", {
+                  min: QUOTE_LIMITS.descriptionMin,
+                })}
+                required
+              >
+                <textarea
+                  id={ids.description}
+                  name="description"
+                  required
+                  minLength={QUOTE_LIMITS.descriptionMin}
+                  maxLength={QUOTE_LIMITS.description}
+                  rows={5}
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder={tCustom("descriptionPlaceholder")}
+                  aria-describedby={fieldIds(ids.description).hint}
+                  className={cx(fieldClass, "min-h-32 resize-y")}
+                />
+              </Field>
 
-            {/* /custom avec fichier : matière (PLA, sans choix) et quantité côte à côte. */}
-            <div
-              className={cx("grid gap-5", showFileField && "sm:grid-cols-2")}
-            >
-              {showFileField ? (
-                <div className="flex flex-col gap-2">
-                  <span className="s3d-label text-soft">
-                    {t("fields.material")}
-                  </span>
-                  <p className="flex min-h-11 flex-wrap items-center gap-x-2 text-ink">
-                    {CUSTOM_MATERIAL}
-                    <span className="text-sm text-soft">
-                      · {t("fields.materialOnly")}
+              {/* /custom avec fichier : matière (PLA, sans choix) et quantité côte à côte. */}
+              <div
+                className={cx("grid gap-5", showFileField && "sm:grid-cols-2")}
+              >
+                {showFileField ? (
+                  <div className="flex flex-col gap-2">
+                    <span className="s3d-label text-soft">
+                      {t("fields.material")}
                     </span>
-                  </p>
-                </div>
-              ) : null}
-              <input type="hidden" name="material" value={material} />
-              {showFileField ? (
-                <Field
-                  label={t("fields.quantity")}
-                  htmlFor={ids.quantity}
-                  hint={t("hints.quantity", { max: QUOTE_QUANTITY_MAX })}
-                >
-                  <input
-                    id={ids.quantity}
-                    name="quantity"
-                    type="number"
-                    inputMode="numeric"
-                    min={1}
-                    max={QUOTE_QUANTITY_MAX}
-                    value={quantityText}
-                    onChange={(e) => setQuantityText(e.target.value)}
-                    aria-describedby={fieldIds(ids.quantity).hint}
-                    className={fieldClass}
-                  />
-                </Field>
+                    <p className="flex min-h-11 flex-wrap items-center gap-x-2 text-ink">
+                      {CUSTOM_MATERIAL}
+                      <span className="text-sm text-soft">
+                        · {t("fields.materialOnly")}
+                      </span>
+                    </p>
+                  </div>
+                ) : null}
+                <input type="hidden" name="material" value={material} />
+                {showFileField ? (
+                  <Field
+                    label={t("fields.quantity")}
+                    htmlFor={ids.quantity}
+                    hint={t("hints.quantity", { max: QUOTE_QUANTITY_MAX })}
+                  >
+                    <input
+                      id={ids.quantity}
+                      name="quantity"
+                      type="number"
+                      inputMode="numeric"
+                      min={1}
+                      max={QUOTE_QUANTITY_MAX}
+                      value={quantityText}
+                      onChange={(e) => setQuantityText(e.target.value)}
+                      aria-describedby={fieldIds(ids.quantity).hint}
+                      className={fieldClass}
+                    />
+                  </Field>
+                ) : (
+                  <Field
+                    label={
+                      <>
+                        {tCustom("colors")}{" "}
+                        <span className="normal-case">
+                          ({tCustom("optional")})
+                        </span>
+                      </>
+                    }
+                    htmlFor={ids.colors}
+                  >
+                    <input
+                      id={ids.colors}
+                      name="colors"
+                      maxLength={QUOTE_LIMITS.colors}
+                      value={colors}
+                      onChange={(e) => setColors(e.target.value)}
+                      placeholder={tCustom("colorsPlaceholder")}
+                      className={fieldClass}
+                    />
+                  </Field>
+                )}
+              </div>
+
+              {page ? (
+                // Page : dimensions mesurées dans le fichier (ou venues du Studio),
+                // jamais demandées au visiteur.
+                <input
+                  type="hidden"
+                  name="dimensions"
+                  value={measured ?? dimensions}
+                />
               ) : (
                 <Field
                   label={
                     <>
-                      {tCustom("colors")}{" "}
+                      {tCustom("dimensions")}{" "}
                       <span className="normal-case">
                         ({tCustom("optional")})
                       </span>
                     </>
                   }
-                  htmlFor={ids.colors}
+                  htmlFor={ids.dimensions}
                 >
                   <input
-                    id={ids.colors}
-                    name="colors"
-                    maxLength={QUOTE_LIMITS.colors}
-                    value={colors}
-                    onChange={(e) => setColors(e.target.value)}
-                    placeholder={tCustom("colorsPlaceholder")}
+                    id={ids.dimensions}
+                    name="dimensions"
+                    maxLength={QUOTE_LIMITS.dimensions}
+                    value={dimensions}
+                    onChange={(e) => setDimensions(e.target.value)}
+                    placeholder={tCustom("dimensionsPlaceholder")}
                     className={fieldClass}
                   />
                 </Field>
               )}
             </div>
-
-            {showFileField ? (
-              <QuoteColorPicker
-                stock={customStock}
-                gramsPerPiece={gramsPerPiece}
-                quantity={quantity}
-                selected={chosenRefs}
-                onChange={setColorRefs}
-                max={QUOTE_COLORS_MAX}
-                labels={{
-                  legend: t("colorsPicker.legend"),
-                  hint: t("colorsPicker.hint", { max: QUOTE_COLORS_MAX }),
-                  pending: t("colorsPicker.pending"),
-                  none: t("colorsPicker.none"),
-                  loading: t("colorsPicker.loading"),
-                  unavailable: t("colorsPicker.unavailable"),
-                  approximate: t("colorsPicker.approximate"),
-                  limit: t("colorsPicker.limit", { max: QUOTE_COLORS_MAX }),
-                  short: t("colorsPicker.short"),
-                }}
-              />
-            ) : null}
-
-            {page ? (
-              // Page : dimensions mesurées dans le fichier (ou venues du Studio),
-              // jamais demandées au visiteur.
-              <input
-                type="hidden"
-                name="dimensions"
-                value={measured ?? dimensions}
-              />
-            ) : (
-              <Field
-                label={
-                  <>
-                    {tCustom("dimensions")}{" "}
-                    <span className="normal-case">({tCustom("optional")})</span>
-                  </>
-                }
-                htmlFor={ids.dimensions}
-              >
-                <input
-                  id={ids.dimensions}
-                  name="dimensions"
-                  maxLength={QUOTE_LIMITS.dimensions}
-                  value={dimensions}
-                  onChange={(e) => setDimensions(e.target.value)}
-                  placeholder={tCustom("dimensionsPlaceholder")}
-                  className={fieldClass}
-                />
-              </Field>
-            )}
-          </div>
-        </fieldset>
+          </fieldset>
+        </>
       )}
 
       <fieldset

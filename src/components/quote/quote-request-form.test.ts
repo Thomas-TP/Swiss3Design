@@ -133,9 +133,12 @@ describe("QuoteRequestForm : /custom, un fichier 3D d'abord", () => {
     expect(page).not.toContain('name="estGrams"');
   });
 
-  it("le champ libre « couleurs » est remplacé par les pastilles du stock", () => {
+  it("les couleurs ont leur étape (02), le champ libre « couleurs » n'existe plus", () => {
     expect(page).not.toContain('name="colors"');
-    expect(page).toContain("colorsPicker.legend");
+    expect(page).toContain("sheet.colors");
+    // Une couleur ou plusieurs : le choix est posé d'emblée.
+    expect(page).toContain("oneHint");
+    expect(page).toContain("severalHint");
   });
 
   it("le tiroir du Studio envoie sa source et garde ses champs, sans fichier à choisir ni quantité propre", () => {

@@ -17,7 +17,8 @@
     "title": "Your request",
     "project": "Project",
     "file": "3D file",
-    "contact": "Contact"
+    "contact": "Contact",
+    "colors": "Colours"
   },
   "facts": {
     "formats": "Formats",
