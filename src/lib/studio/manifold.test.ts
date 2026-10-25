@@ -523,7 +523,7 @@ describe("STL binaire", () => {
     const bytes = new Uint8Array(stl.buffer);
     const header = new TextDecoder("ascii").decode(bytes.slice(0, 80));
     expect(header.startsWith("solid")).toBe(false);
-    expect(header.startsWith("Swiss3Design Studio v1 lavaux ")).toBe(true);
+    expect(header.startsWith("Kreya Studio v1 lavaux ")).toBe(true);
     expect(header.endsWith(" ")).toBe(true);
     expect(header).toHaveLength(80);
     const view = new DataView(stl.buffer);

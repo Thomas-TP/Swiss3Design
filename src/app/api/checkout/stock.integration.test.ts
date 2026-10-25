@@ -101,7 +101,7 @@ describe.skipIf(!url)(
     }
 
     function checkout(to: string, items: object[]) {
-      return new Request("https://swiss3design.ch/api/checkout", {
+      return new Request("https://kreya.ch/api/checkout", {
         method: "POST",
         headers: { "content-type": "application/json", "x-test-email": to },
         body: JSON.stringify({

@@ -29,11 +29,11 @@ describe("outil WebMCP studio_configure (§6.13)", () => {
     ).toEqual(["encre", "gris-molasse", "blanc-neve"]);
     const answer = describeConfiguration(
       result.config,
-      "https://swiss3design.ch",
+      "https://kreya.ch",
       "fr",
     );
     expect(answer.link).toMatch(
-      /^https:\/\/swiss3design\.ch\/fr\/studio\/lavaux#c=v1\.[A-Za-z0-9_-]+$/,
+      /^https:\/\/kreya\.ch\/fr\/studio\/lavaux#c=v1\.[A-Za-z0-9_-]+$/,
     );
     expect(answer.stats.height_mm).toBe(180);
     expect(answer.stats.layers).toBe(900);
@@ -141,7 +141,7 @@ describe("outil WebMCP studio_configure (§6.13)", () => {
     expect(nearVaseSpirale(result.config)).toBe(true);
     const answer = describeConfiguration(
       result.config,
-      "https://swiss3design.ch",
+      "https://kreya.ch",
       "fr",
     );
     expect(answer.printable).toBe("error");

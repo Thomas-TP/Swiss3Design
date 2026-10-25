@@ -85,7 +85,7 @@ const schemas = {
       .min(3)
       .max(40)
       .describe(
-        "Order number from the confirmation email: S3D- followed by letters and digits, e.g. S3D-MFZ3K2Q1A7BX (case-insensitive)",
+        "Order number from the confirmation email: KRY- (S3D- before the rename) followed by letters and digits, e.g. KRY-MFZ3K2Q1A7BX (case-insensitive)",
       ),
     email: z.email().describe("Email address used for the order"),
   }),
@@ -252,7 +252,7 @@ const handlers: { [N in ToolName]: Handler<N> } = {
       subtotal: price(subtotal),
       estimatedShipping: price(shippingCents),
       estimatedTotal: price(subtotal + shippingCents),
-      note: "Open cartUrl in a browser: the items are added to the cart, then the customer pays on swiss3design.ch (TWINT, cards, Google Pay). Prices are re-checked at checkout.",
+      note: "Open cartUrl in a browser: the items are added to the cart, then the customer pays on kreya.ch (TWINT, cards, Google Pay). Prices are re-checked at checkout.",
     };
   },
 };
@@ -266,7 +266,7 @@ const meta: Record<ToolName, ToolMeta> = {
   search_products: {
     title: "Search products",
     description:
-      "Search the Swiss3Design catalogue of 3D-printed design objects. The query matches product names and descriptions (case-insensitive) in the requested language, falling back to French. Returns active products, out-of-stock ones included, each with name, description (up to 240 characters), CHF price, availability (in_stock, made_to_order with productionDays, or out_of_stock), material, colours, image and product URL. Use get_product for variants, colour options and dimensions.",
+      "Search the Kreya catalogue of 3D-printed design objects. The query matches product names and descriptions (case-insensitive) in the requested language, falling back to French. Returns active products, out-of-stock ones included, each with name, description (up to 240 characters), CHF price, availability (in_stock, made_to_order with productionDays, or out_of_stock), material, colours, image and product URL. Use get_product for variants, colour options and dimensions.",
   },
   get_product: {
     title: "Get product details",
@@ -290,7 +290,7 @@ const meta: Record<ToolName, ToolMeta> = {
   build_cart_link: {
     title: "Build a cart link",
     description:
-      "Validate up to 20 items and return a swiss3design.ch link that fills the customer's cart, with line prices, subtotal, estimated shipping and estimated total in CHF. Nothing is reserved or charged: the customer opens the link and pays on the website, where prices are re-checked. Returns invalid_arguments when a product is out of stock or a required variant or colour is missing (the message lists the valid choices), and not_found for an unknown slug.",
+      "Validate up to 20 items and return a kreya.ch link that fills the customer's cart, with line prices, subtotal, estimated shipping and estimated total in CHF. Nothing is reserved or charged: the customer opens the link and pays on the website, where prices are re-checked. Returns invalid_arguments when a product is out of stock or a required variant or colour is missing (the message lists the valid choices), and not_found for an unknown slug.",
   },
 };
 

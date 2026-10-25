@@ -20,6 +20,13 @@
 > partout**, et la page admin « Palette boutique » n'existe plus. Troisième migration additive
 > (`0011`, deux tables) : section **1.4**, étape 2, ordre **0010, 0011, seed des références**.
 >
+> **Mise à jour du 25.10.2026 : la boutique devient Kreya.** Nom, logo « Pic en strates »,
+> icônes, e-mails (`shop@`, `account@`, `studio@`, `news@` sur kreya.ch), textes en 4 langues,
+> identité légale, numéros de commande `KRY-` (les `S3D-` restent valables). La fusion attache
+> **kreya.ch** au Worker de production et fait de swiss3design.ch une redirection 301 : c'est
+> une **bascule de domaine**, à dérouler avec la section **2 bis** (Stripe, cron, Google, PostHog,
+> annonce aux clients).
+>
 > **Mise à jour du 16.10.2026 : atelier 3D de « Sur mesure ».** Peinture par zone, taille et
 > orientation ; le devis reçoit un 3MF peint (prêt pour Bambu Studio). Quatrième migration
 > additive (`0012`, une table `quote_color_projects`) : section **1.4**, étape 2 bis.
@@ -212,6 +219,40 @@ résumé de la ligne, bobines à charger, « Télécharger le STL », « Textes 
    `git log --oneline origin/main -- docs/redesign-2026/checklist-j3.md`.
 6. **Ne jamais s'arrêter là** : la section suivante est obligatoire (règle d'or 9, la fusion ne prouve
    pas le déploiement ; Cloudflare s'est déjà trompé de Worker ou n'est pas parti).
+
+---
+
+## 2 bis. Bascule vers kreya.ch (la même séance que la fusion)
+
+Ce que la fusion fait seule : `wrangler.jsonc` rattache **kreya.ch** et **www.kreya.ch** au Worker
+`swiss3design` (domaines personnalisés : Cloudflare crée les enregistrements DNS), garde
+swiss3design.ch, et `src/middleware.ts` redirige toute page lue sur l'ancien domaine (GET, HEAD) en
+**301 vers la même adresse sur kreya.ch**. L'ancien domaine sert encore, sans redirection, les
+webhooks Stripe, le cron, les Server Actions et MCP (un 301 sur un POST les casserait).
+
+**Avant la fusion**
+
+1. Zone Cloudflare kreya.ch : aucun enregistrement A, AAAA ou CNAME sur `kreya.ch` ni
+   `www.kreya.ch` (le déploiement les crée ; un enregistrement existant le ferait échouer). Les
+   enregistrements e-mail (MX, SPF, DKIM, DMARC) ne gênent pas.
+2. Stripe (live), à faire par l'agent avec votre accord ou par vous au dashboard :
+   nom public et libellé de relevé **KREYA**, nom de marque « Kreya » ; domaine de moyens de
+   paiement **kreya.ch** ajouté (Apple Pay, Google Pay, Link).
+
+**Juste après le déploiement (3.1)** 3. Webhook Stripe live : changer son URL vers `https://kreya.ch/api/stripe/webhook`. Une
+modification d'URL **garde le même secret** : rien à changer côté Cloudflare. Idem pour le hook
+Agentic Commerce s'il pointe vers l'ancien domaine. 4. Worker cron (`workers/cron`, déployé à part) : `cd workers/cron && bunx wrangler deploy` (l'URL
+de maintenance pointe désormais vers kreya.ch). 5. Flux catalogue Stripe : resynchroniser (les liens produits passent sur kreya.ch). 6. Connexion Google : tester une connexion sur kreya.ch (origines et redirection déjà ajoutées par
+vous le 09.10.2026). 7. Passkeys : elles sont liées au domaine. Les 2 passkeys existantes (un seul compte) ne marchent
+plus sur kreya.ch : se connecter par e-mail, puis en recréer une dans le compte. 8. Sessions : chacun est déconnecté une fois (les cookies de swiss3design.ch ne valent pas sur
+kreya.ch). 9. Google Search Console : outil « Changement d'adresse » de swiss3design.ch vers kreya.ch, puis
+soumettre `https://kreya.ch/sitemap.xml`. 10. PostHog (projet 285063) : ajouter kreya.ch aux URL autorisées ; la mesure ne démarre que sur
+kreya.ch (`ANALYTICS_HOSTNAME`). 11. Annonce : bandeau du site pendant 2 semaines et e-mail aux clients (admin → E-mails →
+Annonces). 12. Garder swiss3design.ch (et son renouvellement) au moins 2 ans : liens, e-mails et favoris
+anciens.
+
+**Retour arrière de la bascule** : revenir au commit précédent suffit pour le code ; remettre l'URL
+du webhook Stripe sur swiss3design.ch (même secret).
 
 ---
 

@@ -3,7 +3,7 @@ import { jsonResponse, preflight } from "@/lib/agent/config";
 import { oauthIssuer, protectedResourceMetadata } from "@/lib/agent/oauth";
 
 // Métadonnées de ressource protégée (RFC 9728), une par identifiant :
-//   /.well-known/oauth-protected-resource             → https://swiss3design.ch
+//   /.well-known/oauth-protected-resource             → https://kreya.ch
 //   /.well-known/oauth-protected-resource/mcp/account → serveur MCP compte
 //   /.well-known/oauth-protected-resource/fr (de, it, en) → racines de langue
 // Le champ `resource` reprend toujours exactement l'identifiant demandé.

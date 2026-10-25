@@ -37,9 +37,9 @@ describe("SEO — hreflang et canonical", () => {
     });
     const og = meta.openGraph as Record<string, unknown>;
     expect(og.url).toBe("/it/contact");
-    expect(og.title).toBe("Contatti · Swiss3Design");
+    expect(og.title).toBe("Contatti · Kreya");
     expect(og.locale).toBe("it_CH");
-    expect(og.siteName).toBe("Swiss3Design");
+    expect(og.siteName).toBe("Kreya");
     expect(Array.isArray(og.images) && og.images.length).toBe(1);
     expect(meta.alternates?.canonical).toBe("/it/contact");
   });
@@ -48,12 +48,12 @@ describe("SEO — hreflang et canonical", () => {
     const meta = pageMetadata({
       locale: "fr",
       path: "",
-      title: "Swiss3Design — Impression 3D multicolore en Suisse",
+      title: "Kreya — Impression 3D multicolore en Suisse",
       description: "x".repeat(120),
       absoluteTitle: true,
     });
     expect(meta.title).toEqual({
-      absolute: "Swiss3Design — Impression 3D multicolore en Suisse",
+      absolute: "Kreya — Impression 3D multicolore en Suisse",
     });
   });
 });
@@ -113,7 +113,7 @@ describe("SEO — données structurées", () => {
       cheap.offers.shippingDetails.deliveryTime.handlingTime.minValue,
     ).toBe(3);
     expect(cheap.offers.hasMerchantReturnPolicy.merchantReturnLink).toBe(
-      "https://swiss3design.ch/fr/legal/shipping",
+      "https://kreya.ch/fr/legal/shipping",
     );
     expect(
       productJsonLd({ ...base, priceCents: 2400, stock: 0 }, "fr", shipping)
@@ -124,9 +124,7 @@ describe("SEO — données structurées", () => {
       cheap.offers.shippingDetails.shippingDestination.addressCountry,
     ).toBe("CH");
     expect(cheap.offers.hasMerchantReturnPolicy.merchantReturnDays).toBe(14);
-    expect(cheap.image).toEqual([
-      "https://swiss3design.ch/api/files/products/a.webp",
-    ]);
+    expect(cheap.image).toEqual(["https://kreya.ch/api/files/products/a.webp"]);
     const pricey = productJsonLd({ ...base, priceCents: 9000 }, "fr", shipping);
     expect(pricey.offers.shippingDetails.shippingRate.value).toBe("0.00");
   });

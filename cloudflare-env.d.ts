@@ -9,7 +9,8 @@ interface __BaseEnv_CloudflareEnv {
 	AI: Ai;
 	ASSETS: Fetcher;
 	APP_ENV?: "preview";
-	EMAIL_FROM: "Swiss3Design Preview <commandes@swiss3design.ch>" | "Swiss3Design <commandes@swiss3design.ch>";
+	EMAIL_FROM: "Kreya Preview <shop@kreya.ch>" | "Kreya <shop@kreya.ch>";
+	EMAIL_SENDER_DOMAIN?: "swiss3design.ch";
 	STRIPE_PAYMENT_METHOD_CONFIGURATION: "" | "pmc_1TgkcKK4o7ey3lG5alpRZU3l";
 	STRIPE_PUBLISHABLE_KEY: "pk_test_51TgkbnK4o7ey3lG5CAqK0NBqFazy43LthNOQ0IKgmiTwv6ni7Cd4yiuaM6M0gb5XHF3HI4PAlYCFlqFr9BNIMND000iDY9eEiF" | "pk_live_51TgkbnK4o7ey3lG5X2NE0ujxVeMTP1YdHK6gxgefCazQEeX6m5MMDAWPJKWMndMXrcS6tvxR8oXMJ00AxPqnJARb00q2dn8APu";
 	STRIPE_CATALOG_SYNC: "on";
@@ -44,7 +45,8 @@ declare namespace Cloudflare {
 		AI: Ai;
 		ASSETS: Fetcher;
 		APP_ENV: "preview";
-		EMAIL_FROM: "Swiss3Design Preview <commandes@swiss3design.ch>";
+		EMAIL_FROM: "Kreya Preview <shop@kreya.ch>";
+		EMAIL_SENDER_DOMAIN: "swiss3design.ch";
 		STRIPE_PAYMENT_METHOD_CONFIGURATION: "";
 		STRIPE_PUBLISHABLE_KEY: "pk_test_51TgkbnK4o7ey3lG5CAqK0NBqFazy43LthNOQ0IKgmiTwv6ni7Cd4yiuaM6M0gb5XHF3HI4PAlYCFlqFr9BNIMND000iDY9eEiF";
 		STRIPE_CATALOG_SYNC: "on";
@@ -74,7 +76,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "APP_ENV" | "EMAIL_FROM" | "STRIPE_PAYMENT_METHOD_CONFIGURATION" | "STRIPE_PUBLISHABLE_KEY" | "STRIPE_CATALOG_SYNC" | "STRIPE_PROFILE_ID" | "STRIPE_SECRET_KEY" | "STRIPE_WEBHOOK_SECRET" | "BETTER_AUTH_SECRET" | "BETTER_AUTH_URL" | "ADMIN_EMAILS" | "DATABASE_URL" | "RESEND_API_KEY" | "GOOGLE_CLIENT_ID" | "GOOGLE_CLIENT_SECRET" | "APPLE_CLIENT_ID" | "APPLE_CLIENT_SECRET" | "FACEBOOK_CLIENT_ID" | "FACEBOOK_CLIENT_SECRET" | "CRON_SECRET" | "WEB_BOT_AUTH_PRIVATE_KEY" | "STRIPE_ACS_HOOK_SECRET">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "APP_ENV" | "EMAIL_FROM" | "EMAIL_SENDER_DOMAIN" | "STRIPE_PAYMENT_METHOD_CONFIGURATION" | "STRIPE_PUBLISHABLE_KEY" | "STRIPE_CATALOG_SYNC" | "STRIPE_PROFILE_ID" | "STRIPE_SECRET_KEY" | "STRIPE_WEBHOOK_SECRET" | "BETTER_AUTH_SECRET" | "BETTER_AUTH_URL" | "ADMIN_EMAILS" | "DATABASE_URL" | "RESEND_API_KEY" | "GOOGLE_CLIENT_ID" | "GOOGLE_CLIENT_SECRET" | "APPLE_CLIENT_ID" | "APPLE_CLIENT_SECRET" | "FACEBOOK_CLIENT_ID" | "FACEBOOK_CLIENT_SECRET" | "CRON_SECRET" | "WEB_BOT_AUTH_PRIVATE_KEY" | "STRIPE_ACS_HOOK_SECRET">> {}
 }
 
 // Begin runtime types

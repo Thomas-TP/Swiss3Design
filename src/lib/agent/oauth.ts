@@ -57,7 +57,7 @@ export const POST_CLAIM_SCOPES = [
 
 // Ressources protégées (RFC 8707 / RFC 9728). La ressource canonique est le
 // serveur MCP compte client ; l'origine et les racines de langue en sont des
-// alias, car un agent qui part de https://swiss3design.ch/ (redirigé vers
+// alias, car un agent qui part de https://kreya.ch/ (redirigé vers
 // /fr) cherche les métadonnées sous /.well-known/oauth-protected-resource/fr
 // et y exige `resource` identique à l'URL de départ (RFC 9728 § 3.3). Un jeton
 // émis pour n'importe lequel de ces identifiants est accepté par /mcp/account.
@@ -78,7 +78,7 @@ export function protectedResourceMetadata(issuer: string, resource: string) {
   if (!protectedResources(issuer).includes(resource)) return null;
   return {
     resource,
-    resource_name: "Swiss3Design customer account (MCP)",
+    resource_name: "Kreya customer account (MCP)",
     resource_documentation: `${issuer}${PATHS.authMd}`,
     resource_logo_uri: `${issuer}/brand/app/icon-192.png`,
     authorization_servers: [issuer],

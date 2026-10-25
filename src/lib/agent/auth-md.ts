@@ -51,9 +51,9 @@ export function authMdDocument(issuer: string): string {
     (scope) => `| \`${scope}\` | ${SCOPE_DOC[scope]} |`,
   ).join("\n");
 
-  return `# Swiss3Design auth.md
+  return `# Kreya auth.md
 
-You are an agent. This document tells you how to act for a Swiss3Design customer — read their orders, quote requests and profile — without ever handling their password. ${STORE.name} is a Swiss online store of 3D-printed design objects (prices in CHF, shipping within Switzerland only).
+You are an agent. This document tells you how to act for a Kreya customer — read their orders, quote requests and profile — without ever handling their password. ${STORE.name} is a Swiss online store of 3D-printed design objects (prices in CHF, shipping within Switzerland only).
 
 Public data (catalogue, prices, store policies, order tracking by order number and email) needs no authentication: see ${issuer}${PATHS.agentsDoc}. Everything below is only needed to read a customer's own account. All access is read-only: no agent can order, pay or change data through it.
 
@@ -62,7 +62,7 @@ Public data (catalogue, prices, store policies, order tracking by order number a
 | You are… | Use |
 | --- | --- |
 | An MCP client or an app that can send the customer to a browser (Claude, ChatGPT, Cursor, MCP Inspector…) | **Path A** — OAuth 2.1 authorization code + PKCE, with dynamic client registration |
-| An agent that cannot handle a browser redirect (CLI, background agent, chat bot) | **Path B** — auth.md agent registration: the customer confirms a 6-digit code on swiss3design.ch |
+| An agent that cannot handle a browser redirect (CLI, background agent, chat bot) | **Path B** — auth.md agent registration: the customer confirms a 6-digit code on kreya.ch |
 
 Both paths end with the same kind of access token, for the same API (Step 6).
 
@@ -100,7 +100,7 @@ Content-Type: application/json
 }
 \`\`\`
 
-2. **Authorize**: send the customer to \`${base}/oauth2/authorize\` with \`response_type=code\`, \`client_id\`, \`redirect_uri\`, \`scope\`, \`state\`, \`code_challenge\` + \`code_challenge_method=S256\` (PKCE is required) and \`resource=${resource}\`. The customer signs in on swiss3design.ch and approves on a consent screen that lists your scopes.
+2. **Authorize**: send the customer to \`${base}/oauth2/authorize\` with \`response_type=code\`, \`client_id\`, \`redirect_uri\`, \`scope\`, \`state\`, \`code_challenge\` + \`code_challenge_method=S256\` (PKCE is required) and \`resource=${resource}\`. The customer signs in on kreya.ch and approves on a consent screen that lists your scopes.
 3. **Token**: \`POST ${AUTH_BASE_PATH}/oauth2/token\` (form-encoded) with \`grant_type=authorization_code\`, \`code\`, \`code_verifier\`, \`redirect_uri\`, \`client_id\` and \`resource=${resource}\`.
 4. **Refresh**: \`grant_type=refresh_token\` (request \`offline_access\` to get one). Refresh tokens rotate.
 
@@ -160,10 +160,10 @@ The response has a \`claim_attempt\` block (same shape as \`claim\` above). Only
 
 **4b. Hand off to the customer**, in one message:
 
-> Open this link, sign in to swiss3design.ch (or create an account), and enter this 6-digit code: **123456**
+> Open this link, sign in to kreya.ch (or create an account), and enter this 6-digit code: **123456**
 > ${issuer}${PATHS.agentClaim}?claim_attempt_token=…
 
-The code goes into the page on swiss3design.ch, never back to you. The customer can also decline.
+The code goes into the page on kreya.ch, never back to you. The customer can also decline.
 
 **4c. Poll** every \`interval\` seconds:
 
@@ -223,7 +223,7 @@ Path B scopes: anonymous before claim = \`${PRE_CLAIM_SCOPES.join(" ")}\`; after
 
 ## Revocation
 
-The customer can remove any agent or application at any time on swiss3design.ch (My account → AI agents). It takes effect immediately: the API rejects the tokens with \`401 invalid_token\`, and Path B assertions stop being exchangeable. On a \`401\` from a token that used to work: Path A → refresh once; Path B → if a claim was under way, poll Step 4c first (pre-claim tokens stop working as soon as the customer confirms the code), otherwise retry Step 5 once; if that fails too, start over at Step 1. Refresh tokens can also be revoked with RFC 7009 at ${base}/oauth2/revoke.
+The customer can remove any agent or application at any time on kreya.ch (My account → AI agents). It takes effect immediately: the API rejects the tokens with \`401 invalid_token\`, and Path B assertions stop being exchangeable. On a \`401\` from a token that used to work: Path A → refresh once; Path B → if a claim was under way, poll Step 4c first (pre-claim tokens stop working as soon as the customer confirms the code), otherwise retry Step 5 once; if that fails too, start over at Step 1. Refresh tokens can also be revoked with RFC 7009 at ${base}/oauth2/revoke.
 
 ## Errors
 
@@ -242,6 +242,6 @@ The customer can remove any agent or application at any time on swiss3design.ch 
 
 ## Privacy
 
-Swiss3Design is subject to the Swiss Federal Act on Data Protection (nLPD). The account API never exposes postal addresses or payment details. Privacy policy: ${issuer}/en/legal/privacy — contact: ${STORE.email}.
+Kreya is subject to the Swiss Federal Act on Data Protection (nLPD). The account API never exposes postal addresses or payment details. Privacy policy: ${issuer}/en/legal/privacy — contact: ${STORE.email}.
 `;
 }

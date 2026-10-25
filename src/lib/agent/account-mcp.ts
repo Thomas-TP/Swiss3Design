@@ -199,7 +199,7 @@ export function missingScope(
 }
 
 export const ACCOUNT_MCP_INSTRUCTIONS =
-  "Swiss3Design customer account (read-only), acting for the customer who authorized you: their orders with Swiss Post tracking, their custom 3D print quote requests and their profile, alongside the public catalogue and store tools. tools/list returns only the account tools your token's scopes allow; a token from an auth.md registration the customer has not claimed yet gets the public tools only (see /auth.md). Never ask the customer for their password: access is granted through OAuth.";
+  "Kreya customer account (read-only), acting for the customer who authorized you: their orders with Swiss Post tracking, their custom 3D print quote requests and their profile, alongside the public catalogue and store tools. tools/list returns only the account tools your token's scopes allow; a token from an auth.md registration the customer has not claimed yet gets the public tools only (see /auth.md). Never ask the customer for their password: access is granted through OAuth.";
 
 function negotiate(requested: unknown): string {
   return typeof requested === "string" &&
@@ -228,8 +228,8 @@ export function accountMcpDispatcher(
           capabilities: { tools: { listChanged: false } },
           serverInfo: {
             ...MCP_SERVER_INFO,
-            name: "swiss3design-account",
-            title: "Swiss3Design customer account",
+            name: "kreya-account",
+            title: "Kreya customer account",
           },
           instructions: ACCOUNT_MCP_INSTRUCTIONS,
         };

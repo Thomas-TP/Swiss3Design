@@ -29,7 +29,7 @@ export function AuthShell({
   return (
     <div className="mx-auto max-w-md px-margin py-14 md:py-20">
       <div className="flex justify-center">
-        {icon ?? <BrandMark className="h-10 w-10" />}
+        {icon ?? <BrandMark className="h-10 w-auto" />}
       </div>
       <h1 className="mt-5 break-words text-center font-display text-title text-ink">
         {title}

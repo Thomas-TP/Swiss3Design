@@ -58,16 +58,16 @@ const link =
 
 export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   fr: {
-    // Sans la marque : le gabarit du layout ajoute « · Swiss3Design ».
+    // Sans la marque : le gabarit du layout ajoute « · Kreya ».
     metaTitle: "À propos : nos ateliers d’impression 3D",
     metaDescription:
-      "Les ateliers d'impression 3D Swiss3Design dans l'arc lémanique : nos deux machines multicolores, notre procédé, nos matières et les réponses à vos questions.",
+      "Les ateliers d'impression 3D Kreya dans l'arc lémanique : nos deux machines multicolores, notre procédé, nos matières et les réponses à vos questions.",
 
     badge: "Deux ateliers dans l’arc lémanique",
     title: "Derrière chaque pièce, deux ateliers suisses.",
     intro: (
       <>
-        Swiss3Design, ce sont deux ateliers d’impression 3D dans{" "}
+        Kreya, ce sont deux ateliers d’impression 3D dans{" "}
         <strong>l’arc lémanique</strong>, entre Gland et Pully. Deux machines
         multicolores, des matières choisies avec soin, et à chaque fois
         quelqu’un qui contrôle la pièce à la main avant de vous l’envoyer. Pas
@@ -387,13 +387,13 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   de: {
     metaTitle: "Über uns: unsere 3D-Druck-Ateliers",
     metaDescription:
-      "Die 3D-Druck-Ateliers von Swiss3Design in der Genferseeregion: unsere zwei Mehrfarbdrucker, unser Verfahren, unsere Materialien und Antworten auf Ihre Fragen.",
+      "Die 3D-Druck-Ateliers von Kreya in der Genferseeregion: unsere zwei Mehrfarbdrucker, unser Verfahren, unsere Materialien und Antworten auf Ihre Fragen.",
 
     badge: "Zwei Ateliers in der Genferseeregion",
     title: "Hinter jedem Stück stehen zwei Schweizer Ateliers.",
     intro: (
       <>
-        Swiss3Design, das sind zwei 3D-Druck-Ateliers in der{" "}
+        Kreya, das sind zwei 3D-Druck-Ateliers in der{" "}
         <strong>Genferseeregion</strong>, zwischen Gland und Pully. Zwei
         Mehrfarbdrucker, sorgfältig ausgewählte Materialien und jedes Mal ein
         Mensch, der das Stück von Hand kontrolliert, bevor es zu Ihnen kommt.
@@ -711,13 +711,13 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   it: {
     metaTitle: "Chi siamo: i nostri atelier di stampa 3D",
     metaDescription:
-      "Gli atelier di stampa 3D Swiss3Design nell’arco lemanico: le nostre due stampanti multicolore, il procedimento, i materiali e le risposte alle Sue domande.",
+      "Gli atelier di stampa 3D Kreya nell’arco lemanico: le nostre due stampanti multicolore, il procedimento, i materiali e le risposte alle Sue domande.",
 
     badge: "Due atelier nell’arco lemanico",
     title: "Dietro ogni pezzo, due atelier svizzeri.",
     intro: (
       <>
-        Swiss3Design sono due atelier di stampa 3D nell’
+        Kreya sono due atelier di stampa 3D nell’
         <strong>arco lemanico</strong>, tra Gland e Pully. Due stampanti
         multicolore, materiali scelti con cura e ogni volta una persona che
         controlla il pezzo a mano prima di spedirGlielo. Nessuna fabbrica,
@@ -1036,13 +1036,13 @@ export const ABOUT_CONTENT: Record<Locale, AboutContent> = {
   en: {
     metaTitle: "About us: our 3D printing workshops",
     metaDescription:
-      "The Swiss3Design 3D-printing workshops in the Lake Geneva region: our two multicolour printers, our process, our materials and answers to your questions.",
+      "The Kreya 3D-printing workshops in the Lake Geneva region: our two multicolour printers, our process, our materials and answers to your questions.",
 
     badge: "Two workshops in the Lake Geneva region",
     title: "Behind every piece, two Swiss workshops.",
     intro: (
       <>
-        Swiss3Design is two 3D-printing workshops in the{" "}
+        Kreya is two 3D-printing workshops in the{" "}
         <strong>Lake Geneva region</strong>, between Gland and Pully. Two
         multicolour printers, carefully chosen materials, and every time a
         person who checks the piece by hand before sending it to you. No

@@ -1,7 +1,7 @@
 // Preview publique (APP_ENV = "preview") : sa clé Resend envoie de vrais e-mails,
 // donc seules les adresses autorisées en reçoivent et peuvent ouvrir un compte.
 // Sans cela, n'importe quel visiteur de l'URL *.workers.dev ferait partir des
-// e-mails au nom de swiss3design.ch vers l'adresse de son choix.
+// e-mails au nom de kreya.ch vers l'adresse de son choix.
 // Liste : secret PREVIEW_EMAIL_ALLOWLIST (adresses séparées par des virgules,
 // posé avec `wrangler secret put PREVIEW_EMAIL_ALLOWLIST --env preview` : dépôt
 // public, comme ADMIN_EMAILS), plus les adresses d'ADMIN_EMAILS. Secret absent

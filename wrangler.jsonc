@@ -25,7 +25,12 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS",
   },
+  // kreya.ch est le domaine canonique ; swiss3design.ch reste rattaché pour
+  // rediriger les pages (301) et servir les webhooks et le cron qui y
+  // pointent encore (middleware.ts).
   "routes": [
+    { "pattern": "kreya.ch", "custom_domain": true },
+    { "pattern": "www.kreya.ch", "custom_domain": true },
     { "pattern": "swiss3design.ch", "custom_domain": true },
     { "pattern": "www.swiss3design.ch", "custom_domain": true },
   ],
@@ -78,9 +83,10 @@
   // (`wrangler secret put ADMIN_EMAILS`) plutôt qu'en var en clair — même
   // interface `env.ADMIN_EMAILS` côté code, voir AGENTS.md.
   "vars": {
-    "BETTER_AUTH_URL": "https://swiss3design.ch",
-    // Alias Infomaniak : les réponses des clients arrivent dans contact@swiss3design.ch
-    "EMAIL_FROM": "Swiss3Design <commandes@swiss3design.ch>",
+    "BETTER_AUTH_URL": "https://kreya.ch",
+    // Domaine kreya.ch vérifié chez Resend ; les réponses des clients arrivent
+    // par le routage e-mail Cloudflare (catch-all *@kreya.ch).
+    "EMAIL_FROM": "Kreya <shop@kreya.ch>",
     // « Payment method configuration » Stripe (dashboard → Paramètres de
     // paiement) appliquée aux PaymentIntents. Id public, pas un secret.
     // Vide ou invalide → repli sur la config par défaut (cf. lib/stripe.ts).
@@ -163,7 +169,10 @@
         // Lu par middleware.ts pour désindexer (X-Robots-Tag) tout l'environnement.
         "APP_ENV": "preview",
         "BETTER_AUTH_URL": "https://swiss3design-preview.thomastp.workers.dev",
-        "EMAIL_FROM": "Swiss3Design Preview <commandes@swiss3design.ch>",
+        "EMAIL_FROM": "Kreya Preview <shop@kreya.ch>",
+        // La clé Resend de la preview n'envoie que depuis swiss3design.ch :
+        // le domaine des expéditeurs y est remplacé (lib/email.ts).
+        "EMAIL_SENDER_DOMAIN": "swiss3design.ch",
         // Vide : la preview (clés Stripe test) garde la config par défaut
         "STRIPE_PAYMENT_METHOD_CONFIGURATION": "",
         // Clé publiable TEST (même compte que la prod) — appairée avec le

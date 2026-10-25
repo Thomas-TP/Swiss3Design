@@ -108,7 +108,7 @@ export async function submitQuoteRequest(
 ): Promise<QuoteFormState> {
   if (
     !(await rateLimit(
-      new Request("https://swiss3design.ch", { headers: await headers() }),
+      new Request("https://kreya.ch", { headers: await headers() }),
       "quote-submit",
       { limit: 5, windowS: 600 },
     ))

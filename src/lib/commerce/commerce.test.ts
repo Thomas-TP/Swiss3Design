@@ -137,7 +137,7 @@ describe("catalogue vendable (SKU)", () => {
 
   it("sert les photos en JPEG via la transformation d'images Cloudflare", () => {
     expect(feedImageUrl("/api/files/products/a.webp")).toBe(
-      "https://swiss3design.ch/cdn-cgi/image/format=jpeg,width=1200,fit=scale-down,quality=85/api/files/products/a.webp",
+      "https://kreya.ch/cdn-cgi/image/format=jpeg,width=1200,fit=scale-down,quality=85/api/files/products/a.webp",
     );
   });
 });
@@ -179,9 +179,7 @@ describe("flux CSV Stripe", () => {
       { ...index.get("boite--rouge-brique")!, imageUrls: ["/products/x.svg"] },
       rule,
     );
-    expect(row.image_link).toBe(
-      "https://swiss3design.ch/brand/social/og-image.png",
-    );
+    expect(row.image_link).toBe("https://kreya.ch/brand/social/og-image.png");
     expect(row.additional_image_link).toBe("");
   });
 
@@ -190,7 +188,7 @@ describe("flux CSV Stripe", () => {
     expect(row.availability).toBe("out_of_stock");
     expect(row.inventory_quantity).toBe(0);
     expect(row.model_3d_link).toBe(
-      "https://swiss3design.ch/api/files/models/lampe.glb",
+      "https://kreya.ch/api/files/models/lampe.glb",
     );
   });
 

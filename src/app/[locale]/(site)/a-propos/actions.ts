@@ -32,7 +32,7 @@ export async function submitContactMessage(
 ): Promise<ContactFormState> {
   if (
     !(await rateLimit(
-      new Request("https://swiss3design.ch", { headers: await headers() }),
+      new Request("https://kreya.ch", { headers: await headers() }),
       "contact",
       { limit: 5, windowS: 600 },
     ))
@@ -63,7 +63,7 @@ export async function submitContactMessage(
     // de contact publique pour ne jamais perdre un message.
     const adminEmails = await getAdminEmails();
     const recipients =
-      adminEmails.length > 0 ? adminEmails : ["contact@swiss3design.ch"];
+      adminEmails.length > 0 ? adminEmails : ["contact@kreya.ch"];
 
     const db = await getDb();
     const key = "contact:" + crypto.randomUUID();

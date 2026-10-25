@@ -290,7 +290,7 @@ export default async function ProductPage({
                   slug={product.slug}
                   modelUrl={product.model3dUrl}
                   sizeHint={MODEL_SIZE_HINTS[product.slug]}
-                  author={attribution?.author ?? "Swiss3Design"}
+                  author={attribution?.author ?? "Kreya"}
                 />
               ) : (
                 <ProductGallery

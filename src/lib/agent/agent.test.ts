@@ -42,11 +42,11 @@ describe("négociation Markdown", () => {
       `<main><h1>Vase <b>multicolore</b></h1><p>Prix &amp;lt; 50 CHF</p>
        <scr<script>x</script>ipt>alert(1)</script>
        <a href="/fr/shop">Boutique</a></main>`,
-      "https://swiss3design.ch",
+      "https://kreya.ch",
     );
     expect(md).toContain("# Vase multicolore");
     expect(md).toContain("Prix &lt; 50 CHF");
-    expect(md).toContain("[Boutique](https://swiss3design.ch/fr/shop)");
+    expect(md).toContain("[Boutique](https://kreya.ch/fr/shop)");
     expect(md).not.toMatch(/[<>]/);
     expect(extractTitle("<title>A &amp;amp; B</title>")).toBe("A &amp; B");
   });
@@ -193,7 +193,7 @@ describe("agent A2A", () => {
 
   it("publie une carte v0.3 et v1.0", () => {
     const card = agentCard();
-    expect(card.url).toBe("https://swiss3design.ch/a2a");
+    expect(card.url).toBe("https://kreya.ch/a2a");
     expect(card.supportedInterfaces[0]).toMatchObject({
       protocolBinding: "JSONRPC",
       protocolVersion: "1.0",
@@ -205,23 +205,21 @@ describe("agent A2A", () => {
 describe("documents de découverte", () => {
   it("décrivent les vrais points d'entrée", () => {
     const card = mcpServerCard();
-    expect(card.serverInfo.name).toBe("swiss3design");
-    expect(card.transport.endpoint).toBe("https://swiss3design.ch/mcp");
+    expect(card.serverInfo.name).toBe("kreya");
+    expect(card.transport.endpoint).toBe("https://kreya.ch/mcp");
     expect(card.remotes[0].url).toBe(card.transport.endpoint);
     expect(card.tools).toHaveLength(toolDefinitions().length);
     expect(apiCatalog().linkset.map((l) => l.anchor)).toEqual([
-      "https://swiss3design.ch/api/v1",
-      "https://swiss3design.ch/mcp",
-      "https://swiss3design.ch/a2a",
-      "https://swiss3design.ch/api/acp",
-      "https://swiss3design.ch/api/ucp",
-      "https://swiss3design.ch/mcp/account",
+      "https://kreya.ch/api/v1",
+      "https://kreya.ch/mcp",
+      "https://kreya.ch/a2a",
+      "https://kreya.ch/api/acp",
+      "https://kreya.ch/api/ucp",
+      "https://kreya.ch/mcp/account",
     ]);
     const ard = aiCatalog();
     expect(
-      ard.entries.every((e) =>
-        e.identifier.startsWith("urn:air:swiss3design.ch:"),
-      ),
+      ard.entries.every((e) => e.identifier.startsWith("urn:air:kreya.ch:")),
     ).toBe(true);
     expect(ard.entries.every((e) => e.representativeQueries.length >= 2)).toBe(
       true,

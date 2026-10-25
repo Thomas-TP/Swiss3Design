@@ -2,7 +2,7 @@ import { preflight } from "@/lib/agent/config";
 import { toolResponse } from "@/lib/agent/http";
 
 // POST /api/v1/cart-links {"items":[{"slug":"vase-spirale","color":"Ivory White"}]}
-// → lien swiss3design.ch qui remplit le panier du client.
+// → lien kreya.ch qui remplit le panier du client.
 export const dynamic = "force-dynamic";
 
 export async function POST(request: Request) {

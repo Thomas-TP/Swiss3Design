@@ -6,7 +6,7 @@ import { user as userTable } from "@/db/schema";
 // Identité Stripe du client, créée paresseusement au premier checkout
 // connecté (jamais à l'inscription — beaucoup de comptes n'achètent jamais).
 // Permet à Stripe Link de proposer en 1 clic les cartes déjà enregistrées
-// par ce client sur d'autres achats Swiss3Design, sans coffre-fort maison
+// par ce client sur d'autres achats Kreya, sans coffre-fort maison
 // (pas de stockage de moyen de paiement côté serveur — voir docs/codemap.md).
 export async function getOrCreateStripeCustomer(
   stripe: Stripe,

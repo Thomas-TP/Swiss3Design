@@ -5,7 +5,7 @@
 Merci de signaler toute faille de sécurité **en privé**, sans la divulguer
 publiquement tant qu'un correctif n'est pas en ligne.
 
-- 📧 Contact : **contact@swiss3design.ch**
+- 📧 Contact : **contact@kreya.ch**
 - 🔎 Coordonnées machine : [`/.well-known/security.txt`](public/.well-known/security.txt)
 
 Indiquez si possible : description, étapes de reproduction, impact estimé, et
@@ -16,7 +16,7 @@ l'URL/route concernée. Une première réponse est visée sous **72 h**.
 
 ## Périmètre
 
-En lien : `swiss3design.ch` (et `www`), l'application Cloudflare Workers et ses
+En lien : `kreya.ch` et l'ancien domaine `swiss3design.ch` (et leurs `www`), l'application Cloudflare Workers et ses
 API. Hors périmètre : déni de service, ingénierie sociale, et les services tiers
 (Stripe, Cloudflare, Google, Resend, Infomaniak) qui relèvent de leurs propres
 programmes.

@@ -28,27 +28,25 @@ describe("sanitizeUrl", () => {
   it("garde campagnes, recherche et filtres, retire le reste", () => {
     expect(
       sanitizeUrl(
-        "https://swiss3design.ch/fr/shop?q=vase&utm_source=chatgpt.com&session_id=cs_live_123&email=a%40b.ch",
+        "https://kreya.ch/fr/shop?q=vase&utm_source=chatgpt.com&session_id=cs_live_123&email=a%40b.ch",
       ),
-    ).toBe("https://swiss3design.ch/fr/shop?q=vase&utm_source=chatgpt.com");
+    ).toBe("https://kreya.ch/fr/shop?q=vase&utm_source=chatgpt.com");
   });
 
   it("garde les marqueurs de provenance (IA, Google Shopping, régies)", () => {
     expect(
       sanitizeUrl(
-        "https://swiss3design.ch/fr?utm_source=chatgpt.com&srsltid=AfmBOo&gad_source=1&token=secret",
+        "https://kreya.ch/fr?utm_source=chatgpt.com&srsltid=AfmBOo&gad_source=1&token=secret",
       ),
     ).toBe(
-      "https://swiss3design.ch/fr?utm_source=chatgpt.com&srsltid=AfmBOo&gad_source=1",
+      "https://kreya.ch/fr?utm_source=chatgpt.com&srsltid=AfmBOo&gad_source=1",
     );
   });
 
   it("vide complètement la requête de la confirmation Stripe", () => {
     expect(
-      sanitizeUrl(
-        "https://swiss3design.ch/fr/checkout/success?session_id=cs_live_1",
-      ),
-    ).toBe("https://swiss3design.ch/fr/checkout/success");
+      sanitizeUrl("https://kreya.ch/fr/checkout/success?session_id=cs_live_1"),
+    ).toBe("https://kreya.ch/fr/checkout/success");
   });
 
   it("traite aussi les liens relatifs (href capturés)", () => {
@@ -67,8 +65,8 @@ describe("sanitizeUrl", () => {
 
   it("retire le fragment de configuration du Studio (#c=)", () => {
     expect(
-      sanitizeUrl("https://swiss3design.ch/fr/studio/lavaux#c=v1.eyJoIjoxNTB9"),
-    ).toBe("https://swiss3design.ch/fr/studio/lavaux");
+      sanitizeUrl("https://kreya.ch/fr/studio/lavaux#c=v1.eyJoIjoxNTB9"),
+    ).toBe("https://kreya.ch/fr/studio/lavaux");
     expect(sanitizeUrl("/de/studio/montagne#c=v1.e30")).toBe(
       "/de/studio/montagne",
     );
@@ -78,9 +76,9 @@ describe("sanitizeUrl", () => {
     // Avec une requête : la liste blanche s'applique toujours.
     expect(
       sanitizeUrl(
-        "https://swiss3design.ch/fr/studio/lavaux?utm_source=chatgpt.com&h=150#c=v1.e30",
+        "https://kreya.ch/fr/studio/lavaux?utm_source=chatgpt.com&h=150#c=v1.e30",
       ),
-    ).toBe("https://swiss3design.ch/fr/studio/lavaux?utm_source=chatgpt.com");
+    ).toBe("https://kreya.ch/fr/studio/lavaux?utm_source=chatgpt.com");
   });
 
   it("garde les autres ancres (#studio de /custom, sections)", () => {
@@ -105,15 +103,14 @@ describe("sanitizeEvent", () => {
     const out = sanitizeEvent(
       event({
         $pathname: "/fr/checkout/success",
-        $current_url:
-          "https://swiss3design.ch/fr/checkout/success?session_id=cs_1",
-        $referrer: "https://swiss3design.ch/fr/checkout?email=a%40b.ch",
+        $current_url: "https://kreya.ch/fr/checkout/success?session_id=cs_1",
+        $referrer: "https://kreya.ch/fr/checkout?email=a%40b.ch",
         $el_text: "Connecté : jean.dupont@example.ch",
       }),
     );
     expect(out?.properties).toMatchObject({
-      $current_url: "https://swiss3design.ch/fr/checkout/success",
-      $referrer: "https://swiss3design.ch/fr/checkout",
+      $current_url: "https://kreya.ch/fr/checkout/success",
+      $referrer: "https://kreya.ch/fr/checkout",
       $el_text: "Connecté : [email]",
     });
   });
@@ -148,7 +145,7 @@ describe("sanitizeEvent", () => {
       event(
         {
           $pathname: "/fr/studio/lavaux",
-          $current_url: "https://swiss3design.ch/fr/studio/lavaux#c=v1.e30",
+          $current_url: "https://kreya.ch/fr/studio/lavaux#c=v1.e30",
           $elements: [
             { tag_name: "a", attr__href: "/fr/studio/lavaux#c=v1.e30" },
           ],
@@ -159,7 +156,7 @@ describe("sanitizeEvent", () => {
       ),
     );
     expect(out?.properties).toMatchObject({
-      $current_url: "https://swiss3design.ch/fr/studio/lavaux",
+      $current_url: "https://kreya.ch/fr/studio/lavaux",
       $elements: [{ tag_name: "a", attr__href: "/fr/studio/lavaux" }],
       $elements_chain:
         'a:attr__href="/fr/studio/lavaux"href="/fr/studio/lavaux"',
@@ -172,13 +169,13 @@ describe("sanitizeEvent", () => {
         { $pathname: "/fr" },
         {
           $set: {
-            $initial_current_url: "https://swiss3design.ch/?email=x@y.ch",
+            $initial_current_url: "https://kreya.ch/?email=x@y.ch",
           },
         },
       ),
     );
     expect(withSet?.$set).toEqual({
-      $initial_current_url: "https://swiss3design.ch/",
+      $initial_current_url: "https://kreya.ch/",
     });
     const snapshot = event(
       { $snapshot_data: [{ x: "a@b.ch" }] },

@@ -100,22 +100,22 @@ describe("MPP — schéma Payment (méthode stripe)", () => {
   it("émet un défi lié, puis reconnaît la preuve de paiement correspondante", async () => {
     const secret = await challengeSecret("sk_test_example");
     const challenge = await createChallenge(secret, {
-      realm: "swiss3design.ch",
+      realm: "kreya.ch",
       method: "stripe",
       intent: "charge",
       request: {
         amount: "3290",
         currency: "chf",
-        description: "Swiss3Design — 1 item(s)",
+        description: "Kreya — 1 item(s)",
         externalId: "abc",
         methodDetails: { networkId: "profile_x", paymentMethodTypes: ["card"] },
       },
-      description: "Swiss3Design — 1 item(s)",
+      description: "Kreya — 1 item(s)",
       expires: new Date(Date.now() + 60_000).toISOString(),
     });
     const header = serializeChallenge(challenge);
     expect(header).toMatch(
-      /^Payment id="[\w-]+", realm="swiss3design.ch", method="stripe", intent="charge", request="[\w-]+"/,
+      /^Payment id="[\w-]+", realm="kreya.ch", method="stripe", intent="charge", request="[\w-]+"/,
     );
     expect(header).toContain("\\u2014"); // tiret long échappé (en-tête Latin-1)
 
@@ -136,9 +136,9 @@ describe("MPP — schéma Payment (méthode stripe)", () => {
     const parsed = parseCredential(credential)!;
     expect(parsed.payload.spt).toBe("spt_test_123");
     expect(parsed.challenge.request.amount).toBe("3290");
-    expect(
-      await verifyChallenge(secret, parsed.challenge, "swiss3design.ch"),
-    ).toBe("ok");
+    expect(await verifyChallenge(secret, parsed.challenge, "kreya.ch")).toBe(
+      "ok",
+    );
 
     // Montant altéré, autre domaine, défi expiré : refusés.
     expect(
@@ -148,7 +148,7 @@ describe("MPP — schéma Payment (méthode stripe)", () => {
           ...parsed.challenge,
           request: { ...parsed.challenge.request, amount: "1" },
         },
-        "swiss3design.ch",
+        "kreya.ch",
       ),
     ).toBe("invalid");
     expect(
@@ -158,9 +158,7 @@ describe("MPP — schéma Payment (méthode stripe)", () => {
       ...challenge,
       expires: new Date(Date.now() - 1000).toISOString(),
     });
-    expect(await verifyChallenge(secret, expired, "swiss3design.ch")).toBe(
-      "expired",
-    );
+    expect(await verifyChallenge(secret, expired, "kreya.ch")).toBe("expired");
   });
 
   it("ignore un en-tête sans schéma Payment et produit un reçu lisible", () => {
@@ -325,7 +323,7 @@ describe("sessions ACP/UCP", () => {
       config: { network_business_profile: "profile_x", environment: "test" },
     });
     const ucp = ucpCheckoutView(session("ucp"), baseState, ev, {
-      origin: "https://swiss3design.ch",
+      origin: "https://kreya.ch",
       networkId: "profile_x",
       live: false,
     });
@@ -362,7 +360,7 @@ describe("sessions ACP/UCP", () => {
     expect(acp.totals.find((t) => t.type === "total")?.amount).toBe(3290);
     expect(acp.fulfillment_options[0].totals[0].amount).toBe(890);
     const ucp = ucpCheckoutView(session("ucp"), state, ev, {
-      origin: "https://swiss3design.ch",
+      origin: "https://kreya.ch",
       networkId: "profile_x",
       live: true,
     });
@@ -418,18 +416,18 @@ describe("sessions ACP/UCP", () => {
   });
 
   it("publie des documents de découverte conformes", () => {
-    expect(acpDiscovery("https://swiss3design.ch/api/acp")).toMatchObject({
+    expect(acpDiscovery("https://kreya.ch/api/acp")).toMatchObject({
       protocol: {
         name: "acp",
         version: "2026-04-17",
         supported_versions: ["2026-04-17"],
       },
-      api_base_url: "https://swiss3design.ch/api/acp",
+      api_base_url: "https://kreya.ch/api/acp",
       transports: ["rest"],
       capabilities: { services: ["checkout"] },
     });
     const profile = ucpProfile({
-      origin: "https://swiss3design.ch",
+      origin: "https://kreya.ch",
       networkId: "profile_x",
       live: true,
       keys: [{ kty: "OKP", crv: "Ed25519", x: "abc", kid: "k1" }],
@@ -437,7 +435,7 @@ describe("sessions ACP/UCP", () => {
     expect(profile.ucp.version).toBe("2026-08-25");
     expect(profile.ucp.services["dev.ucp.shopping"][0]).toMatchObject({
       transport: "rest",
-      endpoint: "https://swiss3design.ch/api/ucp",
+      endpoint: "https://kreya.ch/api/ucp",
     });
     expect(Object.keys(profile.ucp.payment_handlers)).toEqual([
       "ch.swiss3design.stripe_spt",

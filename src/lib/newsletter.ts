@@ -99,7 +99,7 @@ export async function loadAnnouncementProducts(
       name: r.name,
       priceCents: r.priceCents,
       imageUrl: firstImage.get(r.id) ?? null,
-      url: `https://swiss3design.ch/fr/products/${r.slug}`,
+      url: `https://kreya.ch/fr/products/${r.slug}`,
     }));
 }
 

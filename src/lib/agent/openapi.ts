@@ -139,11 +139,11 @@ export function openApiDocument() {
   return {
     openapi: "3.1.0",
     info: {
-      title: "Swiss3Design Store API",
+      title: "Kreya Store API",
       version: AGENT_SURFACE_VERSION,
-      summary: "Public API of the Swiss3Design online store.",
+      summary: "Public API of the Kreya online store.",
       description:
-        "Catalogue, store policies, order tracking, cart links and direct purchases (Machine Payments Protocol, card via a Stripe Shared Payment Token) of Swiss3Design, a Swiss store of multicolour 3D-printed design objects (prices in CHF, shipping within Switzerland only). No API key needed. The same tools are available over MCP (https://swiss3design.ch/mcp) and A2A (https://swiss3design.ch/a2a); checkout is also available over ACP (/.well-known/acp.json) and UCP (/.well-known/ucp).",
+        "Catalogue, store policies, order tracking, cart links and direct purchases (Machine Payments Protocol, card via a Stripe Shared Payment Token) of Kreya, a Swiss store of multicolour 3D-printed design objects (prices in CHF, shipping within Switzerland only). No API key needed. The same tools are available over MCP (https://kreya.ch/mcp) and A2A (https://kreya.ch/a2a); checkout is also available over ACP (/.well-known/acp.json) and UCP (/.well-known/ucp).",
       contact: { name: STORE.name, email: STORE.email, url: STORE.url },
       termsOfService: `${STORE.url}/en/legal/terms`,
     },
@@ -282,8 +282,7 @@ export function openApiDocument() {
         post: {
           operationId: "buildCartLink",
           tags: ["cart"],
-          summary:
-            "Build a link that fills the customer's cart on swiss3design.ch",
+          summary: "Build a link that fills the customer's cart on kreya.ch",
           requestBody: {
             required: true,
             content: json(toolInputSchema("build_cart_link")),

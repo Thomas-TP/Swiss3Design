@@ -1220,7 +1220,7 @@ export const oauthClientAssertion = pgTable("oauth_client_assertion", {
 
 // ── Enregistrement d'agents « auth.md » (profil WorkOS v0.6) ────────────────
 // Un agent sans compte s'enregistre (anonyme, ou avec l'e-mail du client), puis
-// le client — connecté sur swiss3design.ch — confirme en saisissant le code à
+// le client — connecté sur kreya.ch — confirme en saisissant le code à
 // 6 chiffres que l'agent lui a montré (cérémonie de revendication). Chaque
 // enregistrement possède son client OAuth public : les jetons sont émis par le
 // même serveur OAuth que pour les applications (src/lib/agent/agent-auth.ts).

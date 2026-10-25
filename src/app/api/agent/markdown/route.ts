@@ -59,7 +59,7 @@ export async function GET(request: Request) {
   const page = await env.WORKER_SELF_REFERENCE.fetch(pageUrl, {
     headers: {
       accept: "text/html",
-      "user-agent": "Swiss3Design-Markdown/1.0",
+      "user-agent": "Kreya-Markdown/1.0",
     },
   });
   const html = await page.text();

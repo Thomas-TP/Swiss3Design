@@ -1147,7 +1147,7 @@ describe("Groupes de triangles des objets plats (une couleur par bande)", () => 
 });
 
 describe("Export STL des objets plats", () => {
-  it("84 + 50 × n octets, en-tête « Swiss3Design Studio v1 <objet> <empreinte> », déterministe, sensible au texte", () => {
+  it("84 + 50 × n octets, en-tête « Kreya Studio v1 <objet> <empreinte> », déterministe, sensible au texte", () => {
     for (const object of ["cartouche", "montagne", "borne"] as const) {
       const config = PRESETS[object][0].config;
       const texts = DEFAULT_TEXTS[object];
@@ -1158,7 +1158,7 @@ describe("Export STL des objets plats", () => {
       const header = new TextDecoder("ascii").decode(
         new Uint8Array(a.buffer).slice(0, 80),
       );
-      expect(header.startsWith(`Swiss3Design Studio v1 ${object} `)).toBe(true);
+      expect(header.startsWith(`Kreya Studio v1 ${object} `)).toBe(true);
       expect(header.startsWith("solid")).toBe(false);
       expect(a.hash).toBe(b.hash);
       expect(

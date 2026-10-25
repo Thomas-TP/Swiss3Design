@@ -17,6 +17,14 @@ import { isMarkdownPath, prefersMarkdown } from "./lib/agent/markdown";
 // déployable sur Cloudflare Workers.
 const intlMiddleware = createMiddleware(routing);
 
+// Domaine canonique depuis le passage de Swiss3Design à Kreya. L'ancien domaine
+// reste rattaché au même Worker (wrangler.jsonc) : il redirige les pages et
+// sert encore les requêtes qui ne doivent pas l'être (voir plus bas).
+const CANONICAL_HOST = "kreya.ch";
+const SITE_ORIGIN = `https://${CANONICAL_HOST}`;
+const CANONICAL_HOSTS = new Set([CANONICAL_HOST, `www.${CANONICAL_HOST}`]);
+const OLD_HOSTS = new Set(["swiss3design.ch", "www.swiss3design.ch"]);
+
 // En-têtes de sécurité de base (Cloudflare ne les ajoute pas par défaut)
 const SECURITY_HEADERS: Record<string, string> = {
   "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
@@ -153,13 +161,28 @@ async function relayToPostHog(request: NextRequest, url: URL) {
 
 export default function middleware(request: NextRequest) {
   const original = new URL(request.url);
+  const oldDomain = OLD_HOSTS.has(original.hostname);
   if (
-    ["swiss3design.ch", "www.swiss3design.ch"].includes(original.hostname) &&
+    (oldDomain || CANONICAL_HOSTS.has(original.hostname)) &&
     original.protocol === "http:"
   ) {
     original.protocol = "https:";
-    original.hostname = "swiss3design.ch";
+    original.hostname = oldDomain ? original.hostname : CANONICAL_HOST;
     return NextResponse.redirect(original, 308);
+  }
+  // Ancien domaine (Swiss3Design → Kreya, 2026) : toute page lue (GET, HEAD)
+  // part en 301 vers la même adresse sur kreya.ch, ce qui transmet le
+  // référencement. Le reste y est encore servi sans redirection : webhooks
+  // Stripe, tâche cron, Server Actions d'une page ouverte avant la bascule,
+  // clients MCP (un 301 sur un POST les casserait), et toute route /api/
+  // (liens de désinscription des anciens e-mails compris).
+  if (
+    oldDomain &&
+    (request.method === "GET" || request.method === "HEAD") &&
+    !original.pathname.startsWith("/api/")
+  ) {
+    const target = new URL(original.pathname + original.search, SITE_ORIGIN);
+    return withSecurityHeaders(NextResponse.redirect(target, 301));
   }
   if (
     original.pathname === ANALYTICS_RELAY_PATH ||
@@ -172,7 +195,7 @@ export default function middleware(request: NextRequest) {
   if (original.pathname.startsWith("/api/")) {
     return withSecurityHeaders(NextResponse.next());
   }
-  // www.swiss3design.ch → swiss3design.ch (canonique). La redirection porte
+  // www.kreya.ch → kreya.ch (canonique). La redirection porte
   // elle aussi HSTS : sans lui, le sous-domaine www était signalé « ne
   // supporte pas HSTS » (Semrush), le preload exigeant l'en-tête partout.
   const host = request.headers.get("host") ?? "";

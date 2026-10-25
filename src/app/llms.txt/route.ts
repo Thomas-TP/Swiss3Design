@@ -47,14 +47,14 @@ export async function GET() {
     return `- [${p.name}](${url(`/products/${p.slug}`)}): ${chf(p.priceCents)}, ${p.material}${p.multicolor ? ", multicolour" : ""}, ${sale}`;
   });
 
-  const body = `# Swiss3Design
+  const body = `# Kreya
 
 > Swiss online store for 3D-printed design objects in up to 4 colours in a single piece, made in two workshops in the Lake Geneva region (Gland and Pully, canton of Vaud) and shipped only within Switzerland. Prices in CHF. Also offers custom 3D printing on quote from your own file or idea.
 
 ## Key facts
 
 - Website: ${SITE_URL} — French (default), German, Italian and English versions under /fr, /de, /it and /en.
-- Company: Swiss3Design, Gland (VD), Switzerland. Contact: contact@swiss3design.ch (reply within 48 hours).
+- Company: Kreya, Gland (VD), Switzerland. Contact: contact@kreya.ch (reply within 48 hours).
 - Machines: Bambu Lab P1S with AMS 2 Pro (Gland) and Creality K2 with CFS (Pully) — up to 4 filament colours combined in one print, no painting or assembly.
 - Materials: PLA only (softens around 50–60 °C).
 - Colours: every catalogue item comes in the same range of PLA colours as custom printing (the \`colorOptions\` of the product API, one is required per item); a colour can be unavailable for a while when its filament is out of stock.

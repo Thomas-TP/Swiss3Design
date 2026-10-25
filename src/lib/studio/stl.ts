@@ -1,5 +1,5 @@
 // Écriture du STL binaire (brief « Strates », §6.9, point 3) :
-//  - en-tête de 80 octets ASCII `Swiss3Design Studio v1 lavaux <hash8>`
+//  - en-tête de 80 octets ASCII `Kreya Studio v1 lavaux <hash8>`
 //    complété d'espaces ; il ne commence JAMAIS par « solid » (un STL binaire
 //    dont l'en-tête commence par « solid » est pris pour de l'ASCII par
 //    certains lecteurs, et refusé par /api/quote-upload) ;
@@ -47,7 +47,7 @@ export function stlFileName(config: StudioConfig, hash: string): string {
 
 /** En-tête de 80 octets ASCII : jamais « solid » en tête. */
 export function stlHeader(object: string, hash: string): string {
-  const text = `Swiss3Design Studio v1 ${object} ${hash}`;
+  const text = `Kreya Studio v1 ${object} ${hash}`;
   return text.padEnd(STL_HEADER_BYTES, " ").slice(0, STL_HEADER_BYTES);
 }
 

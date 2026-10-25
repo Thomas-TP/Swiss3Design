@@ -3,7 +3,7 @@
 // importer : le middleware le charge, et un import de posthog-js ici finirait
 // dans le bundle du Worker (plafond de 3 Mio, AGENTS.md règle 10).
 
-// Relais first-party : le navigateur n'appelle que swiss3design.ch, que le
+// Relais first-party : le navigateur n'appelle que kreya.ch, que le
 // middleware relaie vers PostHog. Les bloqueurs de pub ciblent les domaines
 // de mesure connus, pas un chemin propre au site. Sous /api/ : jamais de
 // redirection de langue ni de www, et déjà exclu par robots.txt.
@@ -15,4 +15,4 @@ export const POSTHOG_ASSET_HOST = "https://eu-assets.i.posthog.com";
 export const POSTHOG_UI_HOST = "https://eu.posthog.com";
 
 // Seul le domaine canonique mesure : ni dev, ni preview *.workers.dev.
-export const ANALYTICS_HOSTNAME = "swiss3design.ch";
+export const ANALYTICS_HOSTNAME = "kreya.ch";

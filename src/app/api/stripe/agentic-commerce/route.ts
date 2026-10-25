@@ -80,7 +80,7 @@ export async function POST(request: Request) {
           ? { type: "approved" }
           : { type: "declined", declined: { reason: decision.reason } },
         // Propagé dans les métadonnées de la Checkout Session.
-        metadata: { validated_by: "swiss3design" },
+        metadata: { validated_by: "kreya" },
       });
     }
     case "v1.delegated_checkout.customize_checkout":

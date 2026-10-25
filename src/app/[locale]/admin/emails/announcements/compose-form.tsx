@@ -401,7 +401,7 @@ export function ComposeForm({ products }: { products: Product[] }) {
           <input
             value={ctaUrl}
             onChange={(e) => setCtaUrl(e.target.value)}
-            placeholder="https://swiss3design.ch/fr/shop"
+            placeholder="https://kreya.ch/fr/shop"
             className={FIELD}
           />
         </div>

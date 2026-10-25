@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
 import { MapPin, ShieldCheck } from "lucide-react";
-import { BrandMark } from "./brand-mark";
+import { BrandLogo } from "./brand-mark";
 import { MotionToggle } from "./motion-toggle";
 import { withDot } from "./ui/dot-title";
 import { MapFrame } from "./ui/map-frame";
@@ -79,12 +79,8 @@ export function Footer() {
           {/* Cartouche */}
           <div className="relative overflow-hidden rounded-hair border border-line bg-paper bg-[url(/posters/field-footer-light.svg)] bg-cover bg-center p-6 lg:col-span-5 lg:p-8 dark:bg-[url(/posters/field-footer-dark.svg)]">
             <MapFrame sides={["left", "bottom"]} />
-            <p className="flex items-center gap-2.5 text-ink">
-              <BrandMark className="h-8 w-8" />
-              <span className="text-[17px] tracking-tight">
-                <span className="font-medium">Swiss</span>
-                <span className="font-bold">3Design</span>
-              </span>
+            <p className="text-ink">
+              <BrandLogo title="Kreya" className="h-8 w-auto" />
             </p>
             <p className="mt-3 max-w-sm text-sm leading-relaxed text-soft">
               {t("tagline")}

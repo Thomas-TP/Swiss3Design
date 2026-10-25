@@ -118,7 +118,7 @@ export function agenticOrderDraft(
   ).toLowerCase();
   if (!email) {
     notes.push("E-mail de l'acheteur absent : le retrouver dans Stripe.");
-    email = "contact@swiss3design.ch";
+    email = "contact@kreya.ch";
   }
   const paymentIntent = session.payment_intent;
   return {
@@ -210,7 +210,7 @@ export function decideFinalize(
     return {
       approved: false,
       reason: country
-        ? "Swiss3Design ships to Switzerland only."
+        ? "Kreya ships to Switzerland only."
         : "A Swiss shipping address is required.",
     };
   const lines = data.line_item_details ?? [];

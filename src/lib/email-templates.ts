@@ -6,11 +6,15 @@ import type { EmailMessage } from "./email";
 
 type Locale = "fr" | "de" | "it" | "en";
 
-// Expéditeurs : commandes@ pour tout ce qui touche aux ventes,
-// contact@ pour le compte client et les devis.
-const FROM_ORDERS = "Swiss3Design <commandes@swiss3design.ch>";
-const FROM_CONTACT = "Swiss3Design <contact@swiss3design.ch>";
-const SITE_URL = "https://swiss3design.ch";
+// Expéditeurs (tableau d'adresses du 09.10.2026, domaine kreya.ch vérifié chez
+// Resend) : chaque usage a son adresse, toutes reçues par le routage e-mail
+// Cloudflare (catch-all *@kreya.ch) : une réponse du client arrive toujours.
+const FROM_ORDERS = "Kreya <shop@kreya.ch>";
+const FROM_ACCOUNT = "Kreya <account@kreya.ch>";
+const FROM_STUDIO = "Kreya <studio@kreya.ch>";
+const FROM_NEWS = "Kreya <news@kreya.ch>";
+const FROM_CONTACT = "Kreya <contact@kreya.ch>";
+const SITE_URL = "https://kreya.ch";
 
 // Suivi Poste suisse
 function trackingUrl(trackingNumber: string): string {
@@ -25,7 +29,7 @@ function trackingUrl(trackingNumber: string): string {
 export function withUtm(url: string, campaign: string): string {
   if (!url.startsWith(`${SITE_URL}/`)) return url;
   const target = new URL(url);
-  target.searchParams.set("utm_source", "swiss3design");
+  target.searchParams.set("utm_source", "kreya");
   target.searchParams.set("utm_medium", "email");
   target.searchParams.set("utm_campaign", campaign);
   return target.toString();
@@ -74,10 +78,10 @@ function layout(title: string, body: string, footer: string): string {
     <table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;">
       <tr>
         <td style="padding-right:9px;line-height:0;vertical-align:middle;">
-          <img src="${SITE_URL}/brand/png/icon-64.png" alt="" width="30" height="30" style="display:block;border:0;outline:none;width:30px;height:30px;" />
+          <img src="${SITE_URL}/brand/png/icon-64.png" alt="" width="30" height="30" style="display:block;border:0;outline:none;width:30px;height:30px;object-fit:contain;" />
         </td>
         <td class="s3d-brand" style="vertical-align:middle;font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:17px;letter-spacing:-0.2px;color:#1c1917;">
-          <span style="font-weight:500;">Swiss</span><span style="font-weight:700;">3Design</span>
+          <span style="font-weight:800;letter-spacing:-0.4px;">Kreya</span>
         </td>
       </tr>
     </table>
@@ -86,7 +90,7 @@ function layout(title: string, body: string, footer: string): string {
       ${body}
     </div>
     <p class="s3d-footer" style="color:#78716c;font-size:12px;line-height:1.6;margin:20px 4px 0;">
-      ${footer}<br/>Swiss3Design — Gland, Suisse
+      ${footer}<br/>Kreya — Gland, Suisse
     </p>
   </div>
 </body>
@@ -316,7 +320,7 @@ const ORDER_TEXTS: Record<
   }
 > = {
   fr: {
-    subject: "Commande {n} confirmée — Swiss3Design",
+    subject: "Commande {n} confirmée — Kreya",
     title: "Merci pour votre commande ! 🎉",
     intro:
       "Nous avons bien reçu votre paiement. Votre commande <strong>{n}</strong> part en préparation dans notre atelier de Gland.",
@@ -329,7 +333,7 @@ const ORDER_TEXTS: Record<
       "Commande passée par l'intermédiaire de votre agent IA. Pour toute question, répondez simplement à cet e-mail.",
   },
   de: {
-    subject: "Bestellung {n} bestätigt — Swiss3Design",
+    subject: "Bestellung {n} bestätigt — Kreya",
     title: "Vielen Dank für Ihre Bestellung! 🎉",
     intro:
       "Wir haben Ihre Zahlung erhalten. Ihre Bestellung <strong>{n}</strong> wird in unserem Atelier in Gland vorbereitet.",
@@ -342,7 +346,7 @@ const ORDER_TEXTS: Record<
       "Diese Bestellung wurde über Ihren KI-Agenten aufgegeben. Bei Fragen antworten Sie einfach auf diese E-Mail.",
   },
   it: {
-    subject: "Ordine {n} confermato — Swiss3Design",
+    subject: "Ordine {n} confermato — Kreya",
     title: "Grazie per il Suo ordine! 🎉",
     intro:
       "Abbiamo ricevuto il pagamento. Il Suo ordine <strong>{n}</strong> è in preparazione nel nostro atelier di Gland.",
@@ -355,7 +359,7 @@ const ORDER_TEXTS: Record<
       "Ordine effettuato tramite il Suo agente IA. Per qualsiasi domanda, risponda semplicemente a questa e-mail.",
   },
   en: {
-    subject: "Order {n} confirmed — Swiss3Design",
+    subject: "Order {n} confirmed — Kreya",
     title: "Thank you for your order! 🎉",
     intro:
       "We've received your payment. Your order <strong>{n}</strong> is now being prepared in our Gland workshop.",
@@ -644,7 +648,7 @@ const QUOTE_TEXTS: Record<
   }
 > = {
   fr: {
-    subject: "Votre devis Swiss3Design est prêt",
+    subject: "Votre devis Kreya est prêt",
     title: "Votre devis est prêt ✨",
     intro:
       "Nous avons étudié votre projet d'impression sur mesure. Voici notre proposition :",
@@ -655,7 +659,7 @@ const QUOTE_TEXTS: Record<
     review: "Voir mon devis",
   },
   de: {
-    subject: "Ihre Swiss3Design-Offerte ist bereit",
+    subject: "Ihre Kreya-Offerte ist bereit",
     title: "Ihre Offerte ist bereit ✨",
     intro: "Wir haben Ihr Projekt geprüft. Hier unser Vorschlag:",
     price: "Angebotener Preis",
@@ -665,7 +669,7 @@ const QUOTE_TEXTS: Record<
     review: "Meine Offerte ansehen",
   },
   it: {
-    subject: "Il Suo preventivo Swiss3Design è pronto",
+    subject: "Il Suo preventivo Kreya è pronto",
     title: "Il Suo preventivo è pronto ✨",
     intro: "Abbiamo esaminato il Suo progetto. Ecco la nostra proposta:",
     price: "Prezzo proposto",
@@ -675,7 +679,7 @@ const QUOTE_TEXTS: Record<
     review: "Vedi il mio preventivo",
   },
   en: {
-    subject: "Your Swiss3Design quote is ready",
+    subject: "Your Kreya quote is ready",
     title: "Your quote is ready ✨",
     intro: "We've reviewed your custom printing project. Here is our proposal:",
     price: "Quoted price",
@@ -729,7 +733,7 @@ export function quoteReplyEmail(quote: {
     <p style="margin:0;font-size:13px;color:#78716c;line-height:1.6;">${t.cta}</p>`;
   return {
     to: quote.email,
-    from: FROM_CONTACT,
+    from: FROM_STUDIO,
     subject: t.subject,
     html: layout(t.title, body, FOOTER[locale]),
   };
@@ -748,37 +752,37 @@ const QUOTE_REJECTED_TEXTS: Record<
   }
 > = {
   fr: {
-    subject: "Votre demande de devis — Swiss3Design",
+    subject: "Votre demande de devis — Kreya",
     title: "Concernant votre demande de devis",
     intro:
-      "Merci pour l'intérêt que vous portez à Swiss3Design. Après étude attentive de votre projet, nous ne sommes malheureusement pas en mesure d'y donner suite.",
+      "Merci pour l'intérêt que vous portez à Kreya. Après étude attentive de votre projet, nous ne sommes malheureusement pas en mesure d'y donner suite.",
     reason: "Notre message",
     outro:
       "Cela ne remet pas en cause vos futurs projets : n'hésitez pas à nous soumettre une nouvelle demande, nous l'étudierons avec plaisir. Pour toute question, répondez simplement à cet e-mail.",
   },
   de: {
-    subject: "Ihre Offerten-Anfrage — Swiss3Design",
+    subject: "Ihre Offerten-Anfrage — Kreya",
     title: "Zu Ihrer Offerten-Anfrage",
     intro:
-      "Vielen Dank für Ihr Interesse an Swiss3Design. Nach sorgfältiger Prüfung Ihres Projekts können wir Ihre Anfrage leider nicht umsetzen.",
+      "Vielen Dank für Ihr Interesse an Kreya. Nach sorgfältiger Prüfung Ihres Projekts können wir Ihre Anfrage leider nicht umsetzen.",
     reason: "Unsere Nachricht",
     outro:
       "Das gilt nicht für künftige Projekte: Reichen Sie gerne eine neue Anfrage ein — wir prüfen sie mit Freude. Bei Fragen antworten Sie einfach auf diese E-Mail.",
   },
   it: {
-    subject: "La Sua richiesta di preventivo — Swiss3Design",
+    subject: "La Sua richiesta di preventivo — Kreya",
     title: "Riguardo alla Sua richiesta",
     intro:
-      "Grazie per l'interesse verso Swiss3Design. Dopo un attento esame del Suo progetto, purtroppo non siamo in grado di realizzarlo.",
+      "Grazie per l'interesse verso Kreya. Dopo un attento esame del Suo progetto, purtroppo non siamo in grado di realizzarlo.",
     reason: "Il nostro messaggio",
     outro:
       "Questo non vale per i progetti futuri: non esiti a inviarci una nuova richiesta, la esamineremo con piacere. Per qualsiasi domanda, risponda a questa e-mail.",
   },
   en: {
-    subject: "Your quote request — Swiss3Design",
+    subject: "Your quote request — Kreya",
     title: "About your quote request",
     intro:
-      "Thank you for your interest in Swiss3Design. After carefully reviewing your project, we are unfortunately unable to take it on.",
+      "Thank you for your interest in Kreya. After carefully reviewing your project, we are unfortunately unable to take it on.",
     reason: "Our message",
     outro:
       "This doesn't apply to future projects: feel free to submit a new request and we'll gladly review it. For any question, just reply to this email.",
@@ -805,7 +809,7 @@ export function quoteRejectedEmail(quote: {
     <p style="margin:0;font-size:13px;color:#78716c;line-height:1.6;">${t.outro}</p>`;
   return {
     to: quote.email,
-    from: FROM_CONTACT,
+    from: FROM_STUDIO,
     subject: t.subject,
     html: layout(t.title, body, FOOTER[locale]),
   };
@@ -899,7 +903,7 @@ export function adminNewOrderEmail(
     html: layout(
       `Nouvelle commande ${order.orderNumber}`,
       body,
-      "Notification interne Swiss3Design — répondre écrit directement au client.",
+      "Notification interne Kreya — répondre écrit directement au client.",
     ),
   };
 }
@@ -951,13 +955,13 @@ export function adminNewQuoteEmail(
 
   return {
     to: adminEmails,
-    from: FROM_CONTACT,
+    from: FROM_STUDIO,
     replyTo: quote.email,
     subject: `📐 Nouvelle demande de devis — ${quote.email}`,
     html: layout(
       "Nouvelle demande de devis",
       body,
-      "Notification interne Swiss3Design — répondre écrit directement au client.",
+      "Notification interne Kreya — répondre écrit directement au client.",
     ),
   };
 }
@@ -983,13 +987,13 @@ export function adminQuotePaidEmail(
     ${button(`${SITE_URL}/fr/admin/quotes/${quote.id}`, "Voir le devis")}`;
   return {
     to: adminEmails,
-    from: FROM_CONTACT,
+    from: FROM_STUDIO,
     replyTo: quote.email,
     subject: `💳 Devis payé — ${quote.email} (${amount})`,
     html: layout(
       "Devis payé",
       body,
-      "Notification interne Swiss3Design — répondre écrit directement au client.",
+      "Notification interne Kreya — répondre écrit directement au client.",
     ),
   };
 }
@@ -1016,13 +1020,13 @@ export function adminQuoteRevisionEmail(
     ${button(`${SITE_URL}/fr/admin/quotes/${quote.id}`, "Re-chiffrer le devis")}`;
   return {
     to: adminEmails,
-    from: FROM_CONTACT,
+    from: FROM_STUDIO,
     replyTo: quote.email,
     subject: `✏️ Modification demandée — ${quote.email}`,
     html: layout(
       "Demande de modification",
       body,
-      "Notification interne Swiss3Design — répondre écrit directement au client.",
+      "Notification interne Kreya — répondre écrit directement au client.",
     ),
   };
 }
@@ -1054,13 +1058,13 @@ export function adminQuoteDeclinedEmail(
     ${button(`${SITE_URL}/fr/admin/quotes/${quote.id}`, "Voir le devis")}`;
   return {
     to: adminEmails,
-    from: FROM_CONTACT,
+    from: FROM_STUDIO,
     replyTo: quote.email,
     subject: `🚫 Devis refusé — ${quote.email}`,
     html: layout(
       "Devis refusé par le client",
       body,
-      "Notification interne Swiss3Design — répondre écrit directement au client.",
+      "Notification interne Kreya — répondre écrit directement au client.",
     ),
   };
 }
@@ -1072,7 +1076,7 @@ const CHECKOUT_CODE_TEXTS: Record<
   { subject: string; title: string; intro: string; expiry: string }
 > = {
   fr: {
-    subject: "{code} — votre code de vérification Swiss3Design",
+    subject: "{code} — votre code de vérification Kreya",
     title: "Votre code de vérification",
     intro:
       "Saisissez ce code sur la page de commande pour confirmer votre adresse e-mail :",
@@ -1080,7 +1084,7 @@ const CHECKOUT_CODE_TEXTS: Record<
       "Ce code expire dans 10 minutes. Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.",
   },
   de: {
-    subject: "{code} — Ihr Swiss3Design-Bestätigungscode",
+    subject: "{code} — Ihr Kreya-Bestätigungscode",
     title: "Ihr Bestätigungscode",
     intro:
       "Geben Sie diesen Code auf der Bestellseite ein, um Ihre E-Mail-Adresse zu bestätigen:",
@@ -1088,7 +1092,7 @@ const CHECKOUT_CODE_TEXTS: Record<
       "Dieser Code läuft in 10 Minuten ab. Falls Sie das nicht angefordert haben, ignorieren Sie diese E-Mail.",
   },
   it: {
-    subject: "{code} — il Suo codice di verifica Swiss3Design",
+    subject: "{code} — il Suo codice di verifica Kreya",
     title: "Il Suo codice di verifica",
     intro:
       "Inserisca questo codice nella pagina dell'ordine per confermare il Suo indirizzo e-mail:",
@@ -1096,7 +1100,7 @@ const CHECKOUT_CODE_TEXTS: Record<
       "Questo codice scade tra 10 minuti. Se non ha richiesto nulla, ignori questa e-mail.",
   },
   en: {
-    subject: "{code} — your Swiss3Design verification code",
+    subject: "{code} — your Kreya verification code",
     title: "Your verification code",
     intro:
       "Enter this code on the checkout page to confirm your email address:",
@@ -1133,7 +1137,7 @@ export function checkoutCodeEmail(
 export function resetPasswordEmail(to: string, url: string): EmailMessage {
   const body = `
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
-      Vous avez demandé à réinitialiser votre mot de passe Swiss3Design.
+      Vous avez demandé à réinitialiser votre mot de passe Kreya.
       Cliquez sur le bouton ci-dessous pour en choisir un nouveau.
       Ce lien expire dans une heure.
     </p>
@@ -1149,8 +1153,8 @@ export function resetPasswordEmail(to: string, url: string): EmailMessage {
     </p>`;
   return {
     to,
-    from: FROM_CONTACT,
-    subject: "Réinitialisation de votre mot de passe — Swiss3Design",
+    from: FROM_ACCOUNT,
+    subject: "Réinitialisation de votre mot de passe — Kreya",
     html: layout("Nouveau mot de passe", body, FOOTER.fr),
   };
 }
@@ -1161,18 +1165,18 @@ export function magicLinkEmail(to: string, url: string): EmailMessage {
   const body = `
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
       Cliquez sur le bouton ci-dessous pour vous connecter à votre compte
-      Swiss3Design. Ce lien expire dans 5 minutes et ne sert qu'une fois.
+      Kreya. Ce lien expire dans 5 minutes et ne sert qu'une fois.
     </p>
     ${button(url, "Me connecter")}
     <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">
-      Click the button above to sign in to your Swiss3Design account (link expires in 5 minutes).<br/>
+      Click the button above to sign in to your Kreya account (link expires in 5 minutes).<br/>
       Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.
     </p>`;
   return {
     to,
-    from: FROM_CONTACT,
-    subject: "Votre lien de connexion — Swiss3Design",
-    html: layout("Connexion à Swiss3Design", body, FOOTER.fr),
+    from: FROM_ACCOUNT,
+    subject: "Votre lien de connexion — Kreya",
+    html: layout("Connexion à Kreya", body, FOOTER.fr),
   };
 }
 
@@ -1183,12 +1187,12 @@ export function otpEmail(
 ): EmailMessage {
   const intro =
     type === "sign-in"
-      ? "Voici votre code de connexion Swiss3Design :"
+      ? "Voici votre code de connexion Kreya :"
       : type === "forget-password"
-        ? "Voici votre code pour réinitialiser votre mot de passe Swiss3Design :"
+        ? "Voici votre code pour réinitialiser votre mot de passe Kreya :"
         : type === "change-email"
           ? "Voici votre code pour confirmer votre nouvelle adresse e-mail :"
-          : "Voici votre code de vérification Swiss3Design :";
+          : "Voici votre code de vérification Kreya :";
   const body = `
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">${intro}</p>
     <p style="margin:0 0 18px;text-align:center;">
@@ -1197,13 +1201,13 @@ export function otpEmail(
       </span>
     </p>
     <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">
-      Here is your Swiss3Design verification code (valid 5 minutes).<br/>
+      Here is your Kreya verification code (valid 5 minutes).<br/>
       Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail.
     </p>`;
   return {
     to,
-    from: FROM_CONTACT,
-    subject: `${code} — votre code Swiss3Design`,
+    from: FROM_ACCOUNT,
+    subject: `${code} — votre code Kreya`,
     html: layout("Votre code de vérification", body, FOOTER.fr),
   };
 }
@@ -1213,7 +1217,7 @@ export function otpEmail(
 export function verificationEmail(to: string, url: string): EmailMessage {
   const body = `
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
-      Bienvenue chez Swiss3Design ! Cliquez sur le bouton ci-dessous pour confirmer
+      Bienvenue chez Kreya ! Cliquez sur le bouton ci-dessous pour confirmer
       votre adresse e-mail et activer votre compte.
     </p>
     <p style="margin:0 0 18px;text-align:center;">
@@ -1222,13 +1226,13 @@ export function verificationEmail(to: string, url: string): EmailMessage {
       </a>
     </p>
     <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">
-      Welcome to Swiss3Design! Click the button above to confirm your email address.<br/>
+      Welcome to Kreya! Click the button above to confirm your email address.<br/>
       Si vous n'êtes pas à l'origine de cette inscription, ignorez cet e-mail.
     </p>`;
   return {
     to,
-    from: FROM_CONTACT,
-    subject: "Confirmez votre e-mail — Swiss3Design",
+    from: FROM_ACCOUNT,
+    subject: "Confirmez votre e-mail — Kreya",
     html: layout("Confirmez votre adresse", body, FOOTER.fr),
   };
 }
@@ -1238,21 +1242,21 @@ export function verificationEmail(to: string, url: string): EmailMessage {
 export function deleteAccountEmail(to: string, url: string): EmailMessage {
   const body = `
     <p style="margin:0 0 18px;color:#44403c;line-height:1.6;">
-      Vous avez demandé la suppression de votre compte Swiss3Design. Cliquez
+      Vous avez demandé la suppression de votre compte Kreya. Cliquez
       sur le bouton ci-dessous pour confirmer : votre compte et vos données
       personnelles seront effacés. Vos commandes restent conservées 10 ans
       pour des raisons comptables (art. 958f CO). Ce lien expire dans 1 heure.
     </p>
     ${button(url, "Supprimer définitivement mon compte")}
     <p style="margin:0;font-size:12px;color:#78716c;line-height:1.6;">
-      You requested deletion of your Swiss3Design account — click the button above to confirm (link expires in 1 hour).<br/>
+      You requested deletion of your Kreya account — click the button above to confirm (link expires in 1 hour).<br/>
       Si vous n'êtes pas à l'origine de cette demande, ignorez cet e-mail :
       votre compte reste inchangé.
     </p>`;
   return {
     to,
-    from: FROM_CONTACT,
-    subject: "Confirmez la suppression de votre compte — Swiss3Design",
+    from: FROM_ACCOUNT,
+    subject: "Confirmez la suppression de votre compte — Kreya",
     html: layout("Suppression de compte", body, FOOTER.fr),
   };
 }
@@ -1298,7 +1302,7 @@ export function adminContactEmail(
     html: layout(
       "Nouveau message de contact",
       body,
-      "Notification interne Swiss3Design — répondre écrit directement au client.",
+      "Notification interne Kreya — répondre écrit directement au client.",
     ),
   };
 }
@@ -1310,28 +1314,28 @@ const CONTACT_CONFIRM_TEXTS: Record<
   { subject: string; title: string; intro: string; yourMessage: string }
 > = {
   fr: {
-    subject: "Nous avons bien reçu votre message — Swiss3Design",
+    subject: "Nous avons bien reçu votre message — Kreya",
     title: "Message bien reçu ✅",
     intro:
       "Merci de nous avoir écrit ! Nous avons bien reçu votre message et revenons vers vous au plus vite, généralement sous 24 à 48 h. Voici une copie de votre message :",
     yourMessage: "Votre message",
   },
   de: {
-    subject: "Wir haben Ihre Nachricht erhalten — Swiss3Design",
+    subject: "Wir haben Ihre Nachricht erhalten — Kreya",
     title: "Nachricht erhalten ✅",
     intro:
       "Danke für Ihre Nachricht! Wir haben sie erhalten und melden uns so rasch wie möglich, in der Regel innert 24 bis 48 Std. Hier eine Kopie Ihrer Nachricht:",
     yourMessage: "Ihre Nachricht",
   },
   it: {
-    subject: "Abbiamo ricevuto il Suo messaggio — Swiss3Design",
+    subject: "Abbiamo ricevuto il Suo messaggio — Kreya",
     title: "Messaggio ricevuto ✅",
     intro:
       "Grazie per averci scritto! Abbiamo ricevuto il Suo messaggio e Le risponderemo al più presto, di solito entro 24–48 h. Ecco una copia del Suo messaggio:",
     yourMessage: "Il Suo messaggio",
   },
   en: {
-    subject: "We’ve received your message — Swiss3Design",
+    subject: "We’ve received your message — Kreya",
     title: "Message received ✅",
     intro:
       "Thanks for writing to us! We’ve received your message and will get back to you as soon as possible, usually within 24 to 48 hours. Here’s a copy of your message:",
@@ -1421,11 +1425,11 @@ export function newsletterAnnouncementEmail(params: {
     : "";
 
   const body = `${banner}${paragraphs}${productCards}${cta}`;
-  const footer = `Vous recevez cet e-mail car vous êtes inscrit·e aux communications Swiss3Design.<br/><a href="${params.unsubscribeUrl}" style="color:#78716c;text-decoration:underline;">Se désabonner en un clic</a>`;
+  const footer = `Vous recevez cet e-mail car vous êtes inscrit·e aux communications Kreya.<br/><a href="${params.unsubscribeUrl}" style="color:#78716c;text-decoration:underline;">Se désabonner en un clic</a>`;
 
   return {
     to: params.to,
-    from: FROM_ORDERS,
+    from: FROM_NEWS,
     subject: params.subject,
     html: layout(params.subject, body, footer),
   };

@@ -137,7 +137,7 @@ export function PaintStudio({
               : "none",
       );
       const showPainted = matters || from.file;
-      const title = name.replace(/\.[^.]+$/, "") || "Swiss3Design";
+      const title = name.replace(/\.[^.]+$/, "") || "Kreya";
       latest.current.onProject({
         preview: showPainted
           ? {

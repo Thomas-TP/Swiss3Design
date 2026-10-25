@@ -53,7 +53,7 @@ export interface ExportedStl extends StlResult {
 
 /**
  * Export STL (LOD `export`, jamais de bouchons d'éclaté) : `84 + 50 × n`
- * octets, en-tête `Swiss3Design Studio v1 <objet> <hash8>`.
+ * octets, en-tête `Kreya Studio v1 <objet> <hash8>`.
  */
 export function exportStl(
   config: StudioConfig,

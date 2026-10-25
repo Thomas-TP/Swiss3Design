@@ -85,10 +85,10 @@ export function apiCatalog() {
 export function mcpServerCard() {
   const endpoint = abs(PATHS.mcp);
   return {
-    name: "ch.swiss3design/shop",
+    name: "ch.kreya/shop",
     title: MCP_SERVER_INFO.title,
     description:
-      "Catalogue search, product details, store policies, order tracking and cart links for Swiss3Design, a Swiss store of multicolour 3D-printed design objects (CHF, shipping within Switzerland).",
+      "Catalogue search, product details, store policies, order tracking and cart links for Kreya, a Swiss store of multicolour 3D-printed design objects (CHF, shipping within Switzerland).",
     version: AGENT_SURFACE_VERSION,
     websiteUrl: STORE.url,
     icons: MCP_SERVER_INFO.icons,
@@ -122,8 +122,8 @@ export function aiCatalog() {
     },
     entries: [
       {
-        identifier: "urn:air:swiss3design.ch:server:shop",
-        displayName: "Swiss3Design MCP server",
+        identifier: "urn:air:kreya.ch:server:shop",
+        displayName: "Kreya MCP server",
         description:
           "MCP tools to search the catalogue, read store policies, track orders and build cart links.",
         type: "application/mcp-server-card+json",
@@ -131,66 +131,66 @@ export function aiCatalog() {
         representativeQueries: [
           "find a multicolour 3D-printed vase under 50 CHF",
           "what does shipping cost in Switzerland",
-          "track my Swiss3Design order",
+          "track my Kreya order",
         ],
       },
       {
-        identifier: "urn:air:swiss3design.ch:agent:shop-assistant",
-        displayName: "Swiss3Design Shop Assistant (A2A)",
+        identifier: "urn:air:kreya.ch:agent:shop-assistant",
+        displayName: "Kreya Shop Assistant (A2A)",
         description:
-          "A2A agent answering product, shipping and order questions for Swiss3Design.",
+          "A2A agent answering product, shipping and order questions for Kreya.",
         type: "application/a2a-agent-card+json",
         url: abs(PATHS.agentCard),
         representativeQueries: [
           "recommend a 3D-printed desk organiser made in Switzerland",
-          "where is order S3D-MFZ3K2Q1A7BX",
+          "where is order KRY-MFZ3K2Q1A7BX",
         ],
       },
       {
-        identifier: "urn:air:swiss3design.ch:skills:index",
-        displayName: "Swiss3Design agent skills",
+        identifier: "urn:air:kreya.ch:skills:index",
+        displayName: "Kreya agent skills",
         description: "How to shop, track orders and request custom 3D prints.",
         type: "application/agent-skills+json",
         url: abs(PATHS.agentSkills),
         representativeQueries: [
-          "how to buy from swiss3design.ch as an agent",
+          "how to buy from kreya.ch as an agent",
           "request a custom 3D print quote in Switzerland",
         ],
       },
       {
-        identifier: "urn:air:swiss3design.ch:auth:customer-account",
-        displayName: "Swiss3Design customer account access (OAuth, auth.md)",
+        identifier: "urn:air:kreya.ch:auth:customer-account",
+        displayName: "Kreya customer account access (OAuth, auth.md)",
         description:
           "How an agent gets the customer's consent to read their orders and quotes: OAuth 2.1 with dynamic client registration, or auth.md agent registration with a 6-digit confirmation code.",
         type: "text/markdown",
         url: abs(PATHS.authMd),
         representativeQueries: [
-          "where is my Swiss3Design order",
-          "connect my Swiss3Design account to my assistant",
+          "where is my Kreya order",
+          "connect my Kreya account to my assistant",
         ],
       },
       {
-        identifier: "urn:air:swiss3design.ch:commerce:checkout",
-        displayName: "Swiss3Design agentic checkout (UCP, ACP, MPP)",
+        identifier: "urn:air:kreya.ch:commerce:checkout",
+        displayName: "Kreya agentic checkout (UCP, ACP, MPP)",
         description:
           "Buy directly as an agent: UCP and ACP checkout sessions, or a one-call machine payment (MPP), paid with a Stripe Shared Payment Token. CHF, shipping within Switzerland.",
         type: "application/json",
         url: abs("/.well-known/ucp"),
         representativeQueries: [
-          "buy a 3D-printed vase from Swiss3Design for delivery in Switzerland",
-          "order a Swiss3Design product and pay with my agent wallet",
+          "buy a 3D-printed vase from Kreya for delivery in Switzerland",
+          "order a Kreya product and pay with my agent wallet",
         ],
       },
       {
-        identifier: "urn:air:swiss3design.ch:api:store",
-        displayName: "Swiss3Design Store API",
+        identifier: "urn:air:kreya.ch:api:store",
+        displayName: "Kreya Store API",
         description:
           "Public REST API (OpenAPI 3.1): catalogue, store info, order tracking, cart links.",
         type: "application/vnd.oai.openapi+json",
         url: abs(PATHS.openapi),
         representativeQueries: [
-          "list Swiss3Design products with prices in CHF",
-          "Swiss3Design product catalogue API",
+          "list Kreya products with prices in CHF",
+          "Kreya product catalogue API",
         ],
       },
     ],

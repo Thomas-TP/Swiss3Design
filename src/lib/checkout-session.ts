@@ -74,7 +74,7 @@ export async function getOrderCheckout(db: Db, order: Order) {
         {
           price_data: {
             currency: "chf",
-            product_data: { name: "Swiss3Design " + order.orderNumber },
+            product_data: { name: "Kreya " + order.orderNumber },
             unit_amount: order.totalCents,
           },
           quantity: 1,

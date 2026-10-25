@@ -1,10 +1,10 @@
-# Swiss3Design — Feuille de route
+# Kreya — Feuille de route
 
 > Boutique en ligne d'impressions 3D · Basée à Gland (VD) · **Livraison Suisse uniquement**
 > Imprimante : Bambu Lab P1S + AMS 2 Pro (multicolor jusqu'à 4 couleurs)
 > Hébergement & données : **100 % Cloudflare**
 >
-> ✅ **EN PRODUCTION sur [swiss3design.ch](https://swiss3design.ch)** — Stripe en mode LIVE.
+> ✅ **EN PRODUCTION sur [kreya.ch](https://kreya.ch)** — Stripe en mode LIVE.
 > Ce document retrace les décisions, l'état réel du projet et la suite envisagée.
 > Référence technique à jour : [`docs/architecture.md`](docs/architecture.md) ·
 > [`AGENTS.md`](AGENTS.md) · [`README.md`](README.md).
@@ -26,7 +26,7 @@
 | Frais de port      | **Tarif unique Suisse** + **gratuit dès un seuil** (réglable en admin)                                                                                                                      |
 | Modèle de vente    | **Hybride** : stock pré-imprimé + impression à la demande (délai affiché)                                                                                                                   |
 | Devis sur mesure   | **Oui** : upload STL/3MF (R2) + fil de discussion client ↔ atelier + paiement du devis                                                                                                      |
-| Domaine            | **swiss3design.ch** (réservé, en ligne, `www` → apex)                                                                                                                                       |
+| Domaine            | **kreya.ch** (canonique, `www` → apex) ; **swiss3design.ch** (ancien nom) redirigé en 301                                                                                                   |
 | Implémentation     | **L'IA code l'intégralité**                                                                                                                                                                 |
 
 ---
@@ -56,7 +56,7 @@
 | Auth clients & admin          | **Better Auth** (Postgres/Drizzle via Hyperdrive) — rôle `admin` via `ADMIN_EMAILS`                                                                                                          |
 | Paiement                      | **Stripe Payment Element** (PaymentIntents + webhook) en CHF                                                                                                                                 |
 | i18n                          | **next-intl** (routing `/fr` `/de` `/it` `/en`, détection auto)                                                                                                                              |
-| Emails                        | **Resend** (réponses clients vers l'alias Infomaniak `contact@swiss3design.ch`)                                                                                                              |
+| Emails                        | **Resend** (réponses clients vers `contact@kreya.ch` (routage e-mail Cloudflare))                                                                                                            |
 | UI                            | **Tailwind CSS 4** + composants maison + **Lucide** (pas de shadcn/ui)                                                                                                                       |
 | Sécurité                      | En-têtes durcis + **CSP à nonce par requête** (prod) + rate-limiting KV                                                                                                                      |
 | Analytics                     | **PostHog Cloud EU** au régime suisse (information + refus, relais `/api/relay`) ; Cloudflare Web Analytics (sans cookie) activé avant                                                       |

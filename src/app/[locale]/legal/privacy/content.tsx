@@ -12,10 +12,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Responsable du traitement",
       body: (
         <p>
-          Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
-          (Vaud), Suisse — contact@swiss3design.ch. La présente politique décrit
-          le traitement des données personnelles conformément à la loi fédérale
-          sur la protection des données (nLPD).
+          Kreya, entreprise individuelle de Thomas Prud’homme, Chemin de
+          l’Aubépine 9B, 1196 Gland (Vaud), Suisse — contact@kreya.ch. La
+          présente politique décrit le traitement des données personnelles
+          conformément à la loi fédérale sur la protection des données (nLPD).
         </p>
       ),
     },
@@ -269,11 +269,11 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           format usuel. Un export instantané de vos données (profil, commandes,
           devis, adresses) est disponible depuis{" "}
           <strong>Mon compte → Confidentialité</strong> ; pour toute autre
-          demande, écrivez à contact@swiss3design.ch. Vous pouvez également
-          saisir le Préposé fédéral à la protection des données et à la
-          transparence (PFPDT). Nous répondons en principe dans les 30 jours et
-          pouvons demander une preuve d’identité avant de donner suite, afin de
-          protéger vos données.
+          demande, écrivez à contact@kreya.ch. Vous pouvez également saisir le
+          Préposé fédéral à la protection des données et à la transparence
+          (PFPDT). Nous répondons en principe dans les 30 jours et pouvons
+          demander une preuve d’identité avant de donner suite, afin de protéger
+          vos données.
         </p>
       ),
     },
@@ -313,10 +313,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Verantwortlicher",
       body: (
         <p>
-          Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
-          (Waadt), Schweiz — contact@swiss3design.ch. Die vorliegende Erklärung
-          beschreibt die Bearbeitung von Personendaten gemäss dem Bundesgesetz
-          über den Datenschutz (revDSG).
+          Kreya, Einzelunternehmen von Thomas Prud’homme, Chemin de l’Aubépine
+          9B, 1196 Gland (Waadt), Schweiz — contact@kreya.ch. Die vorliegende
+          Erklärung beschreibt die Bearbeitung von Personendaten gemäss dem
+          Bundesgesetz über den Datenschutz (revDSG).
         </p>
       ),
     },
@@ -570,8 +570,8 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           verlangen. Ein sofortiger Export Ihrer Daten (Profil, Bestellungen,
           Offerten, Adressen) steht unter{" "}
           <strong>Mein Konto → Datenschutz</strong> zur Verfügung; für alle
-          weiteren Anliegen schreiben Sie an contact@swiss3design.ch. Sie können
-          sich zudem an den Eidgenössischen Datenschutz- und
+          weiteren Anliegen schreiben Sie an contact@kreya.ch. Sie können sich
+          zudem an den Eidgenössischen Datenschutz- und
           Öffentlichkeitsbeauftragten (EDÖB) wenden. Wir antworten grundsätzlich
           innert 30 Tagen und können vor der Bearbeitung einen
           Identitätsnachweis verlangen, um Ihre Daten zu schützen.
@@ -615,10 +615,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Titolare del trattamento",
       body: (
         <p>
-          Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
-          (Vaud), Svizzera — contact@swiss3design.ch. La presente informativa
-          descrive il trattamento dei dati personali conformemente alla legge
-          federale sulla protezione dei dati (nLPD).
+          Kreya, impresa individuale di Thomas Prud’homme, Chemin de l’Aubépine
+          9B, 1196 Gland (Vaud), Svizzera — contact@kreya.ch. La presente
+          informativa descrive il trattamento dei dati personali conformemente
+          alla legge federale sulla protezione dei dati (nLPD).
         </p>
       ),
     },
@@ -871,7 +871,7 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           un formato corrente. Un’esportazione immediata dei Suoi dati (profilo,
           ordini, preventivi, indirizzi) è disponibile da{" "}
           <strong>Il mio conto → Riservatezza</strong>; per qualsiasi altra
-          richiesta, scriva a contact@swiss3design.ch. Può inoltre rivolgersi
+          richiesta, scriva a contact@kreya.ch. Può inoltre rivolgersi
           all’Incaricato federale della protezione dei dati e della trasparenza
           (IFPDT). Rispondiamo in linea di principio entro 30 giorni e possiamo
           richiedere una prova d’identità prima di dar seguito, al fine di
@@ -915,10 +915,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
       title: "Data controller",
       body: (
         <p>
-          Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
-          (Vaud), Switzerland — contact@swiss3design.ch. This policy describes
-          how personal data is processed in accordance with the Swiss Federal
-          Act on Data Protection (FADP).
+          Kreya, sole proprietorship of Thomas Prud’homme, Chemin de l’Aubépine
+          9B, 1196 Gland (Vaud), Switzerland — contact@kreya.ch. This policy
+          describes how personal data is processed in accordance with the Swiss
+          Federal Act on Data Protection (FADP).
         </p>
       ),
     },
@@ -1151,10 +1151,10 @@ export const PRIVACY_CONTENT: Record<Locale, LegalSection[]> = {
           common format. An instant export of your data (profile, orders,
           quotes, addresses) is available from{" "}
           <strong>My account → Privacy</strong>; for any other request, write to
-          contact@swiss3design.ch. You may also contact the Federal Data
-          Protection and Information Commissioner (FDPIC). We generally respond
-          within 30 days and may request proof of identity before acting, in
-          order to protect your data.
+          contact@kreya.ch. You may also contact the Federal Data Protection and
+          Information Commissioner (FDPIC). We generally respond within 30 days
+          and may request proof of identity before acting, in order to protect
+          your data.
         </p>
       ),
     },

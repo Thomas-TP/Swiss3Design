@@ -37,7 +37,7 @@ export function ExportButton() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = `swiss3design-mes-donnees-${new Date().toISOString().slice(0, 10)}.json`;
+    a.download = `kreya-mes-donnees-${new Date().toISOString().slice(0, 10)}.json`;
     a.click();
     URL.revokeObjectURL(url);
   }

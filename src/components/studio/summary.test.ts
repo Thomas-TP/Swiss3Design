@@ -47,7 +47,7 @@ const norm = (text: string) => text.replace(/[\u00a0\u202f]/g, " ");
 const LEFTOVER = /\{[a-zA-Z]+\}|\bstudio(Core)?\.[a-z]/;
 
 describe("demande de devis du Studio (§6.9)", () => {
-  const link = "https://swiss3design.ch/fr/studio/lavaux#c=v1.eyJ";
+  const link = "https://kreya.ch/fr/studio/lavaux#c=v1.eyJ";
 
   it("le vase par défaut : les lignes du brief, la ligne machine en dernier", () => {
     const lines = quoteDescription(input(LAVAUX_DEFAULT, {}), {
@@ -97,7 +97,7 @@ describe("demande de devis du Studio (§6.9)", () => {
   it("le texte saisi n'est que dans la ligne « Textes à imprimer », jamais dans le lien ni la ligne machine", () => {
     const texts = { name: "Zoé Sentinelle", role: "Cheffe de projet" };
     const lines = quoteDescription(input(CARTOUCHE_DEFAULT, texts), {
-      link: `https://swiss3design.ch/fr/studio/cartouche${configFragment(CARTOUCHE_DEFAULT)}`,
+      link: `https://kreya.ch/fr/studio/cartouche${configFragment(CARTOUCHE_DEFAULT)}`,
       quantity: 1,
       remark: "",
     }).split("\n");

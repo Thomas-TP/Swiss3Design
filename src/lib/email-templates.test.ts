@@ -11,16 +11,16 @@ import { studioLineInputSchema, validateStudioLine } from "./studio/purchase";
 describe("withUtm", () => {
   it("marque les liens du site pour le canal Email", () => {
     expect(
-      withUtm("https://swiss3design.ch/fr/cart?restore=abc", "cart_reminder"),
+      withUtm("https://kreya.ch/fr/cart?restore=abc", "cart_reminder"),
     ).toBe(
-      "https://swiss3design.ch/fr/cart?restore=abc&utm_source=swiss3design&utm_medium=email&utm_campaign=cart_reminder",
+      "https://kreya.ch/fr/cart?restore=abc&utm_source=kreya&utm_medium=email&utm_campaign=cart_reminder",
     );
   });
 
   it("laisse intacts les liens vers d'autres sites", () => {
     const post = "https://service.post.ch/ekp-web/ui/entry/search/99.00";
-    expect(withUtm("https://swiss3design.ch.evil.test/x", "x")).toBe(
-      "https://swiss3design.ch.evil.test/x",
+    expect(withUtm("https://kreya.ch.evil.test/x", "x")).toBe(
+      "https://kreya.ch.evil.test/x",
     );
     expect(withUtm(post, "shipping")).toBe(post);
   });
@@ -82,11 +82,7 @@ describe("e-mails d'une commande avec un objet du Studio", () => {
   });
 
   it("la notification de l'atelier demande la relecture des textes", () => {
-    const html = adminNewOrderEmail(
-      order,
-      [item],
-      ["atelier@swiss3design.ch"],
-    ).html;
+    const html = adminNewOrderEmail(order, [item], ["atelier@kreya.ch"]).html;
     expect(html).toContain("Textes du Studio à relire");
     expect(html).toContain("A&lt;b&gt;&amp;&quot;Léa&quot;");
   });

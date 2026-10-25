@@ -1,4 +1,4 @@
--- Données de démonstration Swiss3Design (idempotent)
+-- Données de démonstration Kreya (idempotent)
 
 -- Catégories
 INSERT OR REPLACE INTO categories (id, slug, sort_order) VALUES

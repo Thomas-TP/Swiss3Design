@@ -14,7 +14,7 @@ const NOW = Date.UTC(2026, 8, 28, 12);
 function installBrowser({ quota = Infinity } = {}) {
   const store = new Map<string, string>();
   vi.stubGlobal("window", {});
-  vi.stubGlobal("location", { origin: "https://swiss3design.ch" });
+  vi.stubGlobal("location", { origin: "https://kreya.ch" });
   vi.stubGlobal("sessionStorage", {
     getItem: (k: string) => store.get(k) ?? null,
     setItem: (k: string, v: string) => {
@@ -154,13 +154,13 @@ describe("validation (donnée non fiable)", () => {
   });
 
   it("accepte l'URL absolue de la même origine", () => {
-    const link = "https://swiss3design.ch/fr/studio/lavaux#c=v1.e30";
+    const link = "https://kreya.ch/fr/studio/lavaux#c=v1.e30";
     expect(parseQuoteHandoff(handoff({ link }), NOW)?.link).toBe(link);
   });
 
   it("vignette hors format : omise, le reste passe", () => {
     const parsed = parseQuoteHandoff(
-      handoff({ thumbnail: "blob:https://swiss3design.ch/1" }),
+      handoff({ thumbnail: "blob:https://kreya.ch/1" }),
       NOW,
     );
     expect(parsed).not.toBeNull();

@@ -246,7 +246,7 @@ export function swissAddress(
   if (country !== "CH")
     throw new CheckoutError(
       "region_restricted",
-      "Swiss3Design ships to Switzerland only",
+      "Kreya ships to Switzerland only",
       `${param}.country`,
     );
   const clean = (value: string | null | undefined, max: number) =>
@@ -510,7 +510,7 @@ export async function payOrderWithSpt(
         currency: "chf",
         confirm: true,
         automatic_payment_methods: { enabled: true, allow_redirects: "never" },
-        description: `Swiss3Design ${order.orderNumber}`,
+        description: `Kreya ${order.orderNumber}`,
         metadata: {
           orderId: order.id,
           orderNumber: order.orderNumber,

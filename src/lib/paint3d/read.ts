@@ -398,7 +398,7 @@ export async function read3mf(buffer: ArrayBuffer): Promise<LoadedMesh> {
   );
   // Un 3MF de l'atelier 3D porte ses teintes en métadonnée propre.
   const own = new RegExp(
-    `<metadata name="Swiss3Design:FilamentColours">([^<]*)</metadata>`,
+    `<metadata name="(?:Kreya|Swiss3Design):FilamentColours">([^<]*)</metadata>`,
   ).exec(textOf(files.get(mainPath)) ?? "")?.[1];
   const filamentColors = sliced.length
     ? sliced

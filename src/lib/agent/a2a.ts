@@ -1,6 +1,7 @@
 import type { Locale } from "@/i18n/routing";
 import { searchProducts, toLocale, type AgentProductSummary } from "./catalog";
 import { AGENT_SURFACE_VERSION, PATHS, STORE, abs } from "./config";
+import { ORDER_NUMBER_PATTERN } from "@/lib/order-number";
 import { RpcError } from "./jsonrpc";
 import {
   TOOL_NAMES,
@@ -14,7 +15,7 @@ import {
 
 // Agent A2A (Agent2Agent) de la boutique : un autre agent lui écrit en texte
 // libre (« un vase multicolore à moins de 50 CHF », « où en est la commande
-// S3D-MFZ3K2Q1A7BX, jean@exemple.ch ») ou appelle directement une
+// KRY-MFZ3K2Q1A7BX, jean@exemple.ch ») ou appelle directement une
 // compétence via une partie `data` ({ "skill": "search_products", … }).
 // Réponses déterministes, construites sur les mêmes outils que le serveur
 // MCP — aucun LLM côté serveur, donc rien d'inventé.
@@ -50,7 +51,7 @@ const SKILL_EXAMPLES: Record<ToolName, string[]> = {
     "What is your return policy?",
   ],
   track_order: [
-    "Where is my order S3D-MFZ3K2Q1A7BX? My email is jean@example.ch",
+    "Where is my order KRY-MFZ3K2Q1A7BX? My email is jean@example.ch",
   ],
   build_cart_link: [
     '{"skill":"build_cart_link","items":[{"slug":"vase-spirale","quantity":1,"color":"Ivory White"}]}',
@@ -61,9 +62,9 @@ export function agentCard() {
   const url = abs(PATHS.a2a);
   return {
     protocolVersion: "0.3.0",
-    name: "Swiss3Design Shop Assistant",
+    name: "Kreya Shop Assistant",
     description:
-      "Shopping assistant of Swiss3Design, a Swiss store of multicolour 3D-printed design objects (CHF, shipping within Switzerland). Searches the catalogue, answers shipping/returns/payment questions, tracks orders and prepares ready-to-pay cart links.",
+      "Shopping assistant of Kreya, a Swiss store of multicolour 3D-printed design objects (CHF, shipping within Switzerland). Searches the catalogue, answers shipping/returns/payment questions, tracks orders and prepares ready-to-pay cart links.",
     version: AGENT_SURFACE_VERSION,
     provider: { organization: STORE.name, url: STORE.url },
     url,
@@ -136,9 +137,10 @@ export function keywords(text: string): string[] {
   );
 }
 
-// Format réel (lib/order-number.ts) : « S3D- » + horodatage base 36 + 4
-// caractères aléatoires, donc des lettres ET des chiffres après le tiret.
-const ORDER_NUMBER = /\bS3D-[A-Z0-9]{8,16}\b/i;
+// Format réel (lib/order-number.ts) : « KRY- » (« S3D- » avant le passage à
+// Kreya) + horodatage base 36 + 4 caractères aléatoires, donc des lettres ET
+// des chiffres après le tiret.
+const ORDER_NUMBER = ORDER_NUMBER_PATTERN;
 const EMAIL = /[\w.+-]+@[\w-]+(\.[\w-]+)+/;
 const STORE_INFO =
   /\b(ship|shipping|deliver|delivery|livraison|livrer|versand|lieferung|spedizione|consegna|return|retour|rueckgabe|reso|payment|paiement|zahlung|pagamento|twint|contact|kontakt|contatto|warranty|garantie|custom|sur mesure|devis|quote|angebot|preventivo|stl|3mf)\b/i;

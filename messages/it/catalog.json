@@ -81,7 +81,7 @@
   "attribution": {
     "short": "Design: {author} · {license}",
     "seeCredit": "vedi i crediti",
-    "body": "Design: <strong>{author}</strong>, «{title}», pubblicato su <model>{platform}</model>. Licenza <deed>Creative Commons BY-ND 4.0</deed>. Swiss3Design stampa questo modello senza alcuna modifica. Questa menzione non implica alcuna approvazione di Swiss3Design da parte dell'autore.",
+    "body": "Design: <strong>{author}</strong>, «{title}», pubblicato su <model>{platform}</model>. Licenza <deed>Creative Commons BY-ND 4.0</deed>. Kreya stampa questo modello senza alcuna modifica. Questa menzione non implica alcuna approvazione di Kreya da parte dell'autore.",
     "dl": {
       "author": "Autore",
       "model": "Modello originale",

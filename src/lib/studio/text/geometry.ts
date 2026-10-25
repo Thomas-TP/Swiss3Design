@@ -7,7 +7,7 @@
 // `kernel/extrude.ts` les oriente, les nettoie et les triangule.
 //
 // JAMAIS de croix suisse ni d'armoiries (brief §6.3.4) ; la forme « pic » est un
-// triangle arrondi générique, ni le mark de Swiss3Design ni une croix.
+// triangle arrondi générique, ni le mark de Kreya ni une croix.
 import { ringArea, ringPerimeter, type Polygon } from "../kernel/extrude";
 import type { Vec2 } from "../kernel/simplify";
 

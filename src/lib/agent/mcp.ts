@@ -24,15 +24,15 @@ export const MCP_PROTOCOL_VERSIONS = [
 ] as const;
 
 export const MCP_SERVER_INFO = {
-  name: "swiss3design",
-  title: "Swiss3Design",
+  name: "kreya",
+  title: "Kreya",
   version: AGENT_SURFACE_VERSION,
   websiteUrl: STORE.url,
   icons: [{ src: STORE.logo, mimeType: "image/png", sizes: ["192x192"] }],
 };
 
 export const MCP_INSTRUCTIONS =
-  "Tools for Swiss3Design, a Swiss online store of 3D-printed design objects (prices in CHF, shipping to Switzerland only). Use search_products and get_product to find items, get_store_info for shipping/returns/payment, track_order to follow an order, and build_cart_link to hand the customer a ready-to-pay cart on swiss3design.ch.";
+  "Tools for Kreya, a Swiss online store of 3D-printed design objects (prices in CHF, shipping to Switzerland only). Use search_products and get_product to find items, get_store_info for shipping/returns/payment, track_order to follow an order, and build_cart_link to hand the customer a ready-to-pay cart on kreya.ch.";
 
 function negotiate(requested: unknown): string {
   return typeof requested === "string" &&

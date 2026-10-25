@@ -14,7 +14,7 @@ import {
 } from "@/lib/agent/jsonrpc";
 
 // Serveur MCP « compte client » (Streamable HTTP, sans état) :
-// https://swiss3design.ch/mcp/account. Protégé par OAuth 2.1 — voir
+// https://kreya.ch/mcp/account. Protégé par OAuth 2.1 — voir
 // /.well-known/oauth-protected-resource/mcp/account et /auth.md.
 export const dynamic = "force-dynamic";
 

@@ -29,7 +29,7 @@ import { SITE_URL } from "@/lib/seo";
 // Agentmap : pointe le catalogue ARD (ce que les agents peuvent utiliser ici).
 // /api/v1/ reste ouvert (API publique pour agents) ; le reste de /api/ non.
 export function GET() {
-  const body = `# Swiss3Design — ${SITE_URL}
+  const body = `# Kreya — ${SITE_URL}
 # AI agents: ${abs(PATHS.agentsDoc)} · ${abs(PATHS.llms)}
 
 User-agent: *

@@ -125,7 +125,7 @@ export async function GET() {
   return json(
     {
       description:
-        "Buy Swiss3Design products with a Machine Payments Protocol (MPP) payment: POST the order below without payment to get a 402 challenge (method=stripe, card via a Stripe Shared Payment Token, e.g. from the Link agent wallet), then retry the same POST with the Authorization: Payment credential.",
+        "Buy Kreya products with a Machine Payments Protocol (MPP) payment: POST the order below without payment to get a 402 challenge (method=stripe, card via a Stripe Shared Payment Token, e.g. from the Link agent wallet), then retry the same POST with the Authorization: Payment credential.",
       method: "POST",
       example: {
         items: [{ slug: "vase-spirale", color: "Ivory White", quantity: 1 }],
@@ -221,7 +221,7 @@ export async function POST(request: Request) {
   const realm = new URL(env.BETTER_AUTH_URL).hostname;
   const secret = await challengeSecret(env.STRIPE_SECRET_KEY);
   const externalId = await orderFingerprint({ quote, address, email });
-  const description = `Swiss3Design — ${quote.lines.reduce((n, l) => n + l.quantity, 0)} item(s), shipping to Switzerland`;
+  const description = `Kreya — ${quote.lines.reduce((n, l) => n + l.quantity, 0)} item(s), shipping to Switzerland`;
   const challengeResponse = async (type: ProblemType, detail: string) => {
     const challenge = await createChallenge(secret, {
       realm,

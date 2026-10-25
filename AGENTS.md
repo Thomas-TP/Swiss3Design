@@ -10,7 +10,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 ---
 
-# Swiss3Design — Agent guide
+# Kreya (ex-Swiss3Design) — Agent guide
 
 > Operational brief for AI coding agents. Keep it short and high-signal.
 > **Need to locate code? Read [`docs/codemap.md`](docs/codemap.md) first** — it maps
@@ -44,7 +44,9 @@ _is_ the actual source of truth Claude Code loads every session.
 ## What this is
 
 Swiss e-commerce store for **multicolour 3D prints**, **LIVE in production** at
-**swiss3design.ch**. Solo project; the AI writes essentially all the code.
+**kreya.ch** (renamed from Swiss3Design in October 2026; the old domain
+**swiss3design.ch** stays attached to the same Worker and 301-redirects pages
+to kreya.ch, see `src/middleware.ts`). Solo project; the AI writes essentially all the code.
 B2C, **shipping to Switzerland only**, prices in **CHF**, UI in **fr/de/it/en**.
 Runs entirely on **Cloudflare Workers** (Next.js 16 via OpenNext) with
 **Postgres (Neon) via Cloudflare Hyperdrive**, **R2** (files), **KV**
@@ -103,10 +105,10 @@ which for a multi-line hook body is rarely the line you'd expect.
    `bun run dev` will NOT reveal this — verify with `bun run preview`.
    `bun run preview` passes `--upstream-protocol https` to `wrangler dev` on
    purpose: wrangler gives `request.url` the host of the first route
-   (`swiss3design.ch`) with the local protocol, so over plain http the
+   (`kreya.ch`) with the local protocol, so over plain http the
    middleware's http→https 308 fired on every page, and wrangler rewrote its
    `Location` back to `localhost` — an endless 308 loop. With the flag the
-   Worker sees `https://swiss3design.ch/…` exactly as in production (the
+   Worker sees `https://kreya.ch/…` exactly as in production (the
    middleware is untouched). Running `opennextjs-cloudflare preview` by hand
    needs the same `-- --upstream-protocol https`.
 5. **Money is always integer centimes CHF** (`*_cents`). Never floats, never a
@@ -563,15 +565,24 @@ exist yet.
 
 ## Brand constraints
 
-Brand red `#E5231C`, over warm neutral ink/paper. Logo = layered geometric peak
-(stacked print layers + alpine nod), **brand red only — no white or black inside
-the mark**, so a single asset works on both the light and the dark theme. No
-"3", no "S". Brand kit in `public/brand/`; the previous logo (isometric cube,
-180° symmetry, ink + red) is archived under `public/brand/old-logo/` — kept for
-reference, never referenced by the app.
+**Name: « Kreya »** (only the K capitalised), chosen 2026-10-08; legal identity
+« Kreya — entreprise individuelle de Thomas Prud'homme ». Infrastructure
+identifiers keep the old name on purpose (Workers `swiss3design` /
+`swiss3design-preview`, R2/D1/KV names, `s3d-*` storage keys and CSS classes,
+the `S3D-STUDIO v1` quote line, the published UCP handler
+`ch.swiss3design.stripe_spt`): renaming them breaks data or clients for no
+visible gain. New order numbers start with `KRY-`; `S3D-` ones stay valid
+(`ORDER_NUMBER_PATTERN`).
 
-The mark is a **raster** image (`public/brand/webp/mark.webp`, rendered by
-[`src/components/brand-mark.tsx`](src/components/brand-mark.tsx)), unlike the
-old inline-SVG mark: it can't be recoloured with `currentColor`, and it does
-not scale to a legible 16 px favicon on its own — see golden rule 10 before
-regenerating the icon set. **Any new visual must be validated before use.**
+Brand red `#E5231C`, over warm neutral ink `#1A1614` / paper `#F4F0E8`. Logo
+« A · Pic en strates » (validated 2026-10-09): a two-peak silhouette sliced into
+5 print layers (3 under 24 px), **always brand red**, and the « Kreya »
+wordmark (Archivo SemiExpanded 800, outlined) in the text colour. Master kit:
+`public/brand/svg` (copy of the owner's « Kreya - identité visuelle » folder),
+icons in `public/brand/app`, social images in `public/brand/social`.
+[`src/components/brand-mark.tsx`](src/components/brand-mark.tsx) is GENERATED
+from those SVGs (inline paths: `BrandMark`, `BrandWordmark`, `BrandLogo`);
+`animated` stacks the layers once (CSS `.k-print`, off under reduced motion).
+Previous logos are archived under `public/brand/old-logo/` (isometric cube, then
+the raster peak in `pic-swiss3design/`) — never referenced by the app. Icons stay
+in `public/` (golden rule 10). **Any new visual must be validated before use.**

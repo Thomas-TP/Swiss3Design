@@ -39,7 +39,7 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(SITE_URL),
     title: {
       default: title,
-      template: "%s · Swiss3Design",
+      template: "%s · Kreya",
     },
     description: t("homeDescription"),
     // Icônes déclarées à la main (et non via les conventions app/icon.png &
@@ -50,6 +50,9 @@ export async function generateMetadata(): Promise<Metadata> {
     // donc leur poids n'entre plus jamais dans ce plafond.
     icons: {
       icon: [
+        // Symbole vectoriel en premier : net à toutes les tailles d'onglet
+        // (version 16 px du kit, 3 strates).
+        { url: "/brand/app/favicon.svg", type: "image/svg+xml" },
         { url: "/brand/app/icon.webp", type: "image/webp" },
         { url: "/brand/app/icon-192.png", type: "image/png" },
       ],
@@ -58,7 +61,7 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     openGraph: {
       type: "website",
-      siteName: "Swiss3Design",
+      siteName: "Kreya",
       title,
       description: t("homeDescription"),
       images: [

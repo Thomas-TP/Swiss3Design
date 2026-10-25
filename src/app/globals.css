@@ -320,6 +320,27 @@ body {
     translate: 0 0;
   }
 }
+/* Marque Kreya (components/brand-mark.tsx, `animated`) : au premier affichage,
+   les strates du symbole se posent de la base au sommet, chacune descendant de
+   quelques pixels en apparaissant, comme une couche imprimée. Courbe continue,
+   une seule fois (l'en-tête survit aux navigations), rien si le visiteur réduit
+   les animations (règles globales plus bas). */
+html:not([data-motion="reduce"]) .k-print path[style] {
+  transform-box: fill-box;
+  animation: k-print 0.55s var(--ease-strate) both;
+  animation-delay: calc(var(--k-layer, 0) * 110ms + 120ms);
+}
+@keyframes k-print {
+  from {
+    opacity: 0;
+    translate: 0 -35%;
+  }
+  to {
+    opacity: 1;
+    translate: 0 0;
+  }
+}
+
 /* « S'imprime » de bas en haut : le bord de la découpe monte d'un seul geste
    continu (la courbe est posée par l'appelant : révélation au défilement,
    transition de page « Coupe »). */

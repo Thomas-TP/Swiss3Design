@@ -31,7 +31,7 @@ export default async function AdminEmailsPage({
 
   const sampleOrder = {
     id: "demo",
-    orderNumber: "S3D-DEMO42",
+    orderNumber: "KRY-DEMO42",
     email: "client@example.ch",
     subtotalCents: 4980,
     shippingCents: 0,

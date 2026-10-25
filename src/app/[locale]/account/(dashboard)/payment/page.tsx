@@ -21,7 +21,7 @@ export default async function PaymentTab() {
 
   // Lecture seule : aucune gestion (ajout/suppression) de carte ici. Les
   // moyens de paiement sont gérés par le client lui-même via son compte
-  // Stripe Link — Swiss3Design ne stocke jamais de numéro de carte (PCI =
+  // Stripe Link — Kreya ne stocke jamais de numéro de carte (PCI =
   // Stripe). Voir la décision de scope dans le plan Phase 4.
   let cards: {
     brand: string;

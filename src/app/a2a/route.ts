@@ -8,7 +8,7 @@ import {
   rpcHttpResponse,
 } from "@/lib/agent/jsonrpc";
 
-// Point d'entrée A2A (JSON-RPC) : https://swiss3design.ch/a2a.
+// Point d'entrée A2A (JSON-RPC) : https://kreya.ch/a2a.
 // Décrit par /.well-known/agent-card.json.
 export const dynamic = "force-dynamic";
 

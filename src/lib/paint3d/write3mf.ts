@@ -75,7 +75,7 @@ export interface Export3mfOptions {
 }
 
 /** Nom de la métadonnée des teintes (lue par read.ts). */
-export const COLORS_METADATA = "Swiss3Design:FilamentColours";
+export const COLORS_METADATA = "Kreya:FilamentColours";
 
 /** Encodeur de texte par paquets d'≈ 1 Mo (le XML est produit au fil de l'eau). */
 function chunker() {
@@ -188,7 +188,7 @@ async function* plainModelChunks(
   out.write(`<?xml version="1.0" encoding="UTF-8"?>
 <model unit="millimeter" xml:lang="fr-CH" xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02" xmlns:slic3rpe="http://schemas.slic3r.org/3mf/2017/06">
  <metadata name="Title">${xmlEscape(options.title)}</metadata>
- <metadata name="Application">Swiss3Design - Atelier 3D</metadata>${colorsMetadata(options)}
+ <metadata name="Application">Kreya - Atelier 3D</metadata>${colorsMetadata(options)}
  <resources>
 `);
   const [cx, cy] = PLATE_CENTER;

@@ -9,8 +9,8 @@ import styles from "./legal-layout.module.css";
 // Dernière mise à jour de chaque document : affichée en tête de page ET
 // reprise comme <lastmod> du sitemap (une seule source, jamais désynchronisées).
 export const LEGAL_UPDATED = {
-  terms: "2026-10-14",
-  privacy: "2026-10-14",
+  terms: "2026-10-25",
+  privacy: "2026-10-25",
   shipping: "2026-10-14",
 } as const;
 
@@ -59,7 +59,7 @@ export function LegalPage({
     <div className={styles.page}>
       <h1 className="break-words font-display text-title text-ink">{title}</h1>
       <p className="mt-3 text-sm text-soft">
-        Swiss3Design — Gland (VD), {header.country} · {header.updated}{" "}
+        Kreya — Gland (VD), {header.country} · {header.updated}{" "}
         <time dateTime={updated}>{updatedLabel}</time>
       </p>
       {notice && <p className={styles.notice}>{notice}</p>}

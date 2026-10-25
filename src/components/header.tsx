@@ -5,7 +5,7 @@ import { useTranslations } from "next-intl";
 import { usePathname } from "@/i18n/navigation";
 import { useCart } from "@/lib/cart";
 import { useFavorites } from "@/lib/favorites";
-import { BrandMark } from "./brand-mark";
+import { BrandLogo, BrandMark } from "./brand-mark";
 import { LocaleSwitcher } from "./locale-switcher";
 import { SessionAvatar } from "./session-avatar";
 import { ThemeToggle } from "./theme-toggle";
@@ -69,13 +69,14 @@ export function Header({ hasSession = false }: { hasSession?: boolean }) {
         <SiteLink
           href="/"
           className="flex items-center gap-2 sm:gap-2.5"
-          aria-label="Swiss3Design"
+          aria-label="Kreya"
         >
-          <BrandMark className="h-7 w-7" />
-          <span className="hidden text-[15px] tracking-tight text-ink min-[360px]:inline sm:text-[17px]">
-            <span className="font-medium">Swiss</span>
-            <span className="font-bold">3Design</span>
-          </span>
+          {/* Logo complet dès 360 px ; en dessous, le symbole seul. */}
+          <BrandMark className="h-7 w-auto min-[360px]:hidden" />
+          <BrandLogo
+            animated
+            className="hidden h-[26px] w-auto text-ink min-[360px]:block sm:h-[28px]"
+          />
         </SiteLink>
 
         <nav

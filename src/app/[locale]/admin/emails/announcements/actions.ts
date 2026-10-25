@@ -87,14 +87,14 @@ export async function previewAnnouncement(
   ]);
 
   const email = newsletterAnnouncementEmail({
-    to: "apercu@swiss3design.ch",
+    to: "apercu@kreya.ch",
     subject: input.subject,
     bodyText: input.bodyText,
     bannerImageUrl: input.bannerImageUrl,
     products: selectedProducts,
     cta: buildCta(input),
     unsubscribeUrl:
-      "https://swiss3design.ch/api/newsletter/unsubscribe?u=apercu&t=apercu",
+      "https://kreya.ch/api/newsletter/unsubscribe?u=apercu&t=apercu",
   });
 
   return {
@@ -122,7 +122,7 @@ export async function sendTestEmail(
     products: selectedProducts,
     cta: buildCta(input),
     unsubscribeUrl:
-      "https://swiss3design.ch/api/newsletter/unsubscribe?u=apercu&t=apercu",
+      "https://kreya.ch/api/newsletter/unsubscribe?u=apercu&t=apercu",
   });
 
   const ok = await sendEmail(email);
@@ -153,7 +153,7 @@ export async function sendAnnouncement(
   const messages = await Promise.all(
     recipients.map(async (r) => {
       const token = await createUnsubscribeToken(r.id, env.BETTER_AUTH_SECRET!);
-      const unsubscribeUrl = `https://swiss3design.ch/api/newsletter/unsubscribe?u=${r.id}&t=${token}`;
+      const unsubscribeUrl = `https://kreya.ch/api/newsletter/unsubscribe?u=${r.id}&t=${token}`;
       return newsletterAnnouncementEmail({
         to: r.email,
         subject: input.subject,

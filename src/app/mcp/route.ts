@@ -8,7 +8,7 @@ import {
 } from "@/lib/agent/jsonrpc";
 import { mcpDispatcher } from "@/lib/agent/mcp";
 
-// Point d'entrée MCP (Streamable HTTP) : https://swiss3design.ch/mcp.
+// Point d'entrée MCP (Streamable HTTP) : https://kreya.ch/mcp.
 // Décrit par /.well-known/mcp/server-card.json.
 export const dynamic = "force-dynamic";
 

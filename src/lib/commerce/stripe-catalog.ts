@@ -33,8 +33,8 @@ async function uploadFeed(stripe: Stripe, file: FeedFile): Promise<string> {
     feed_type: file.type,
     mode: file.mode,
     metadata: {
-      file_name: `swiss3design-${file.type}-${new Date().toISOString()}.csv`,
-      source: "swiss3design.ch",
+      file_name: `kreya-${file.type}-${new Date().toISOString()}.csv`,
+      source: "kreya.ch",
     },
   });
   const url = created.status_details?.awaiting_upload?.upload_url.url;

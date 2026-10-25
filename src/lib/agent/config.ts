@@ -14,11 +14,11 @@ export const abs = (path: string) => `${SITE_URL}${path}`;
 export const STORE = {
   name: SITE_NAME,
   url: SITE_URL,
-  email: "contact@swiss3design.ch",
+  email: "contact@kreya.ch",
   country: "CH",
   currency: "CHF",
   // Identifiant stable de l'hôte pour ARD (did:web = le domaine lui-même).
-  did: "did:web:swiss3design.ch",
+  did: "did:web:kreya.ch",
   logo: `${SITE_URL}/brand/app/icon-192.png`,
   description:
     "Swiss online store for 3D-printed design objects in up to 4 colours in a single piece, made in the Lake Geneva region and shipped only within Switzerland. Prices in CHF. Also offers custom 3D printing on quote.",

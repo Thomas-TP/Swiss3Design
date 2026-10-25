@@ -8,16 +8,16 @@ import { SITE_URL } from "@/lib/seo";
 
 // Spécification publique du handler de paiement UCP maison (référencée par
 // le profil /.well-known/ucp) : comment une plateforme paie un checkout
-// Swiss3Design avec un Shared Payment Token Stripe.
+// Kreya avec un Shared Payment Token Stripe.
 export const dynamic = "force-static";
 
 const doc = `# Payment handler \`${UCP_HANDLER_KEY}\` — Stripe Shared Payment Token
 
-Version ${UCP_HANDLER_VERSION} · Business: Swiss3Design (${SITE_URL}) · UCP ${UCP_VERSION}
+Version ${UCP_HANDLER_VERSION} · Business: Kreya (${SITE_URL}) · UCP ${UCP_VERSION}
 
 ## Purpose
 
-Lets a UCP platform pay a Swiss3Design checkout with a Stripe **Shared Payment
+Lets a UCP platform pay a Kreya checkout with a Stripe **Shared Payment
 Token** (SPT): a single-use, amount-limited credential scoped to the business's
 Stripe profile. Card data never reaches the business.
 

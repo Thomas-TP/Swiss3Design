@@ -3,7 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { ButtonLink } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
 
-const CONTACT_EMAIL = "contact@swiss3design.ch";
+const CONTACT_EMAIL = "contact@kreya.ch";
 
 // Les deux sorties de secours du formulaire, sur l'Atelier (chapitre 06) comme
 // sur /contact : écrire directement (mailto) ou passer par le sur-mesure. Un

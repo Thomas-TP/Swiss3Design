@@ -109,12 +109,21 @@ export async function getAuth() {
   const agentAuth = { issuer, jwtOptions };
 
   return betterAuth({
+    // Nom affiché par les passkeys (rpName) et les applications 2FA.
+    appName: "Kreya",
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins:
       env.APP_ENV === "preview"
         ? [env.BETTER_AUTH_URL]
-        : ["https://swiss3design.ch", "https://www.swiss3design.ch"],
+        : [
+            "https://kreya.ch",
+            "https://www.kreya.ch",
+            // Ancien domaine : il redirige vers kreya.ch, mais un formulaire
+            // ouvert avant la bascule poste encore depuis lui.
+            "https://swiss3design.ch",
+            "https://www.swiss3design.ch",
+          ],
     // Cloudflare remplace cet en-tête à l'edge : Better Auth peut donc limiter
     // chaque visiteur séparément au lieu de partager un seul quota par route.
     advanced: {
@@ -292,7 +301,7 @@ export async function getAuth() {
       },
     },
     plugins: [
-      twoFactor({ issuer: "Swiss3Design" }),
+      twoFactor({ issuer: "Kreya" }),
       magicLink({
         expiresIn: 60 * 5,
         sendMagicLink: async ({ email, url }) => {

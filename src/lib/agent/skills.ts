@@ -16,12 +16,12 @@ const API = abs(PATHS.api);
 
 export const SKILLS: Skill[] = [
   {
-    name: "shop-swiss3design",
+    name: "shop-kreya",
     description:
-      "Find and buy 3D-printed design objects on swiss3design.ch: search the catalogue, compare prices in CHF, check availability and hand the customer a ready-to-pay cart link.",
-    body: `# Shop on Swiss3Design
+      "Find and buy 3D-printed design objects on kreya.ch: search the catalogue, compare prices in CHF, check availability and hand the customer a ready-to-pay cart link.",
+    body: `# Shop on Kreya
 
-Swiss3Design (${STORE.url}) sells multicolour 3D-printed design objects made in Switzerland. Prices are in CHF; shipping is within Switzerland only.
+Kreya (${STORE.url}) sells multicolour 3D-printed design objects made in Switzerland. Prices are in CHF; shipping is within Switzerland only.
 
 ## Tools
 
@@ -29,7 +29,7 @@ Use the MCP server at \`${MCP}\` (Streamable HTTP, no authentication) or the RES
 
 1. \`search_products\` (\`GET ${API}/products?query=vase&max_price_chf=50&language=en\`) — find products. Check \`availability\`: \`in_stock\`, \`made_to_order\` (see \`productionDays\`) or \`out_of_stock\`.
 2. \`get_product\` (\`GET ${API}/products/{slug}\`) — details, \`colorOptions\` and \`variants\`.
-3. \`build_cart_link\` (\`POST ${API}/cart-links\`) — send \`{"items":[{"slug":"…","quantity":1,"color":"…"}]}\`. A colour (\`id\`, \`name\` or \`officialName\` from \`colorOptions\`) is required when the product has \`colorOptions\`, a variant when it has \`variants\`. Give the returned \`cartUrl\` to the customer: it fills their cart on swiss3design.ch, where they pay with TWINT, Visa, Mastercard or Google Pay.
+3. \`build_cart_link\` (\`POST ${API}/cart-links\`) — send \`{"items":[{"slug":"…","quantity":1,"color":"…"}]}\`. A colour (\`id\`, \`name\` or \`officialName\` from \`colorOptions\`) is required when the product has \`colorOptions\`, a variant when it has \`variants\`. Give the returned \`cartUrl\` to the customer: it fills their cart on kreya.ch, where they pay with TWINT, Visa, Mastercard or Google Pay.
 
 ## Rules
 
@@ -39,12 +39,12 @@ Use the MCP server at \`${MCP}\` (Streamable HTTP, no authentication) or the RES
 `,
   },
   {
-    name: "track-swiss3design-order",
+    name: "track-kreya-order",
     description:
-      "Check the status and Swiss Post tracking link of a Swiss3Design order from its order number and the email address used to place it.",
-    body: `# Track a Swiss3Design order
+      "Check the status and Swiss Post tracking link of a Kreya order from its order number and the email address used to place it.",
+    body: `# Track a Kreya order
 
-Ask the customer for their **order number** (in the confirmation email: \`S3D-\` followed by letters and digits, e.g. \`S3D-MFZ3K2Q1A7BX\`) and the **email address** used for the order.
+Ask the customer for their **order number** (in the confirmation email: \`KRY-\` followed by letters and digits, e.g. \`KRY-MFZ3K2Q1A7BX\`; orders placed before the rename start with \`S3D-\`) and the **email address** used for the order.
 
 - MCP: call \`track_order\` on \`${MCP}\` with \`{"order_number":"…","email":"…"}\`.
 - REST: \`POST ${API}/orders/track\` with the same JSON body.
@@ -57,10 +57,10 @@ Customers can also follow their order on ${STORE.url}/en/track.
   {
     name: "custom-3d-print-quote",
     description:
-      "Help a customer request a custom 3D print from Swiss3Design: accepted file formats, materials, colours and how to get a quote within 48 hours.",
+      "Help a customer request a custom 3D print from Kreya: accepted file formats, materials, colours and how to get a quote within 48 hours.",
     body: `# Request a custom 3D print
 
-Swiss3Design prints custom parts and objects from the customer's own file or idea, in up to 4 colours in one piece.
+Kreya prints custom parts and objects from the customer's own file or idea, in up to 4 colours in one piece.
 
 - Accepted files: STL, 3MF, OBJ, STEP (or a description of the idea).
 - Materials: PLA only.

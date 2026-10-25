@@ -230,7 +230,7 @@ describe("export STL d'envoi (§6.9)", () => {
     expect(file.bytes).toBeLessThan(3_000_000);
     const header = new TextDecoder().decode(new Uint8Array(file.buffer, 0, 80));
     expect(header.startsWith("solid")).toBe(false);
-    expect(header).toMatch(/^Swiss3Design Studio v1 lavaux [0-9a-f]{8}/);
+    expect(header).toMatch(/^Kreya Studio v1 lavaux [0-9a-f]{8}/);
     expect(new DataView(file.buffer).getUint32(80, true)).toBe(file.triangles);
     expect(file.fileName).toBe(`s3d-lavaux-${file.hash}.stl`);
   });

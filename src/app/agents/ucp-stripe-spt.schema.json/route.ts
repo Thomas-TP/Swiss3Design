@@ -8,7 +8,7 @@ export const dynamic = "force-static";
 const schema = {
   $schema: "https://json-schema.org/draft/2020-12/schema",
   $id: `${SITE_URL}${UCP_HANDLER_SCHEMA_PATH}`,
-  title: "Swiss3Design Stripe Shared Payment Token instrument",
+  title: "Kreya Stripe Shared Payment Token instrument",
   type: "object",
   required: ["id", "handler_id", "type", "credential"],
   properties: {

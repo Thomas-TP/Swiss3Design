@@ -1,6 +1,6 @@
 "Dining room | Kichen baked" (https://skfb.ly/owqH6) by ChristyHsu is licensed under Creative Commons Attribution 4.0 (https://creativecommons.org/licenses/by/4.0/).
 
-Adapted for swiss3design.ch: original vase and flowers removed, dining table resized from 1.61 x 2.60 m to 1.00 x 1.80 m and chairs moved closer, small countertop objects simplified, unlit materials (lighting baked into the textures), textures re-encoded as WebP (max. 2048 px).
+Adapted for kreya.ch: original vase and flowers removed, dining table resized from 1.61 x 2.60 m to 1.00 x 1.80 m and chairs moved closer, small countertop objects simplified, unlit materials (lighting baked into the textures), textures re-encoded as WebP (max. 2048 px).
 
 Table surface: "Oak Veneer 01" by Poly Haven (https://polyhaven.com/a/oak_veneer_01), CC0.
 Chair upholstery: "Velour Velvet" by Poly Haven (https://polyhaven.com/a/velour_velvet), CC0, desaturated and tinted dusty pink.

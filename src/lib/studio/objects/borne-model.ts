@@ -6,7 +6,7 @@
 // rétrécissent jusqu'à 5 mm, puis erreur `text-fit` (« Texte trop long »).
 //
 // JAMAIS de croix suisse ni d'armoiries ; la forme « pic » n'est ni le mark de
-// Swiss3Design ni une croix : un triangle générique aux sommets arrondis.
+// Kreya ni une croix : un triangle générique aux sommets arrondis.
 //
 // Toute la géométrie se calcule pour l'anneau à GAUCHE ; « droite » est la
 // symétrie du contour (le texte, lui, se lit toujours de gauche à droite).

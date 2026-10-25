@@ -12,16 +12,16 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Les présentes conditions générales de vente (« CGV ») régissent les
-          commandes passées sur la boutique en ligne{" "}
-          <strong>swiss3design.ch</strong>, exploitée par{" "}
+          commandes passées sur la boutique en ligne <strong>kreya.ch</strong>,
+          exploitée par{" "}
           <strong>
-            Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
-            (Vaud), Suisse
+            Kreya, entreprise individuelle de Thomas Prud’homme, Chemin de
+            l’Aubépine 9B, 1196 Gland (Vaud), Suisse
           </strong>{" "}
-          (« l’exploitant »), joignable à l’adresse contact@swiss3design.ch. En
-          passant commande, le client accepte les présentes CGV dans leur
-          version en vigueur au moment de la commande. Le client confirme être
-          majeur ou agir avec l’accord de son représentant légal.
+          (« l’exploitant »), joignable à l’adresse contact@kreya.ch. En passant
+          commande, le client accepte les présentes CGV dans leur version en
+          vigueur au moment de la commande. Le client confirme être majeur ou
+          agir avec l’accord de son représentant légal.
         </p>
       ),
     },
@@ -97,7 +97,7 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
             peuvent être reformulées ou dater de quelques minutes : font foi le
             prix et les frais confirmés lors du paiement. Si l’agent a commis
             une erreur manifeste (article, quantité ou adresse non voulus), le
-            client la signale sans délai à contact@swiss3design.ch : tant que la
+            client la signale sans délai à contact@kreya.ch : tant que la
             production ou l’expédition n’a pas commencé, la commande est annulée
             et intégralement remboursée ; ensuite, les règles de la section «
             Retours » s’appliquent. Une commande à livrer hors de Suisse est
@@ -134,9 +134,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           En cas de désaccord sur une commande, le client est invité à contacter
-          l’exploitant à contact@swiss3design.ch avant toute contestation
-          directe auprès de sa banque ou de Stripe. Une contestation de paiement
-          (« chargeback ») manifestement infondée — notamment pour une commande
+          l’exploitant à contact@kreya.ch avant toute contestation directe
+          auprès de sa banque ou de Stripe. Une contestation de paiement («
+          chargeback ») manifestement infondée — notamment pour une commande
           livrée et conforme, preuve de suivi à l’appui — peut entraîner la
           suspension du compte concerné et la facturation des frais qu’elle
           engendre (frais de contestation du prestataire de paiement, frais de
@@ -245,8 +245,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           La garantie légale pour les défauts de la chose vendue (art. 197 ss
           CO) s’applique pendant deux ans dès la livraison. Le client signale
-          tout défaut dans les meilleurs délais à contact@swiss3design.ch,
-          photos à l’appui. L’exploitant propose en priorité la réparation ou le
+          tout défaut dans les meilleurs délais à contact@kreya.ch, photos à
+          l’appui. L’exploitant propose en priorité la réparation ou le
           remplacement ; si cela s’avère impossible ou disproportionné, le
           client conserve ses droits légaux (réduction du prix ou
           remboursement).
@@ -289,9 +289,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Les contenus du site (textes, photographies, mise en page, identité
-          visuelle et logo Swiss3Design) sont protégés et ne peuvent être
-          reproduits sans autorisation. La vente porte sur un objet physique :
-          elle ne confère au client aucun droit sur les modèles 3D numériques
+          visuelle et logo Kreya) sont protégés et ne peuvent être reproduits
+          sans autorisation. La vente porte sur un objet physique : elle ne
+          confère au client aucun droit sur les modèles 3D numériques
           sous-jacents, ni aucune licence de reproduction, de réédition ou de
           revente en série. Les droits de propriété intellectuelle relatifs aux
           modèles imprimés demeurent réservés à leurs titulaires respectifs.
@@ -338,13 +338,12 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Die vorliegenden Allgemeinen Geschäftsbedingungen («AGB») gelten für
-          Bestellungen im Online-Shop <strong>swiss3design.ch</strong>,
-          betrieben von{" "}
+          Bestellungen im Online-Shop <strong>kreya.ch</strong>, betrieben von{" "}
           <strong>
-            Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
-            (Waadt), Schweiz
+            Kreya, Einzelunternehmen von Thomas Prud’homme, Chemin de l’Aubépine
+            9B, 1196 Gland (Waadt), Schweiz
           </strong>{" "}
-          («der Betreiber»), erreichbar unter contact@swiss3design.ch. Mit der
+          («der Betreiber»), erreichbar unter contact@kreya.ch. Mit der
           Bestellung akzeptiert der Kunde diese AGB in der zum Zeitpunkt der
           Bestellung gültigen Fassung. Der Kunde bestätigt, volljährig zu sein
           oder mit Zustimmung seiner gesetzlichen Vertretung zu handeln.
@@ -427,8 +426,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
             Massgebend sind der bei der Zahlung bestätigte Preis und die
             bestätigten Kosten. Hat der Agent einen offensichtlichen Fehler
             begangen (ungewollter Artikel, Menge oder Adresse), meldet der Kunde
-            dies unverzüglich an contact@swiss3design.ch: Solange Produktion
-            oder Versand nicht begonnen haben, wird die Bestellung storniert und
+            dies unverzüglich an contact@kreya.ch: Solange Produktion oder
+            Versand nicht begonnen haben, wird die Bestellung storniert und
             vollständig zurückerstattet; danach gelten die Regeln des Abschnitts
             «Rücksendungen». Eine Bestellung mit Lieferadresse ausserhalb der
             Schweiz wird storniert und zurückerstattet.
@@ -465,12 +464,12 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Bei Unstimmigkeiten zu einer Bestellung wird der Kunde gebeten, den
-          Betreiber unter contact@swiss3design.ch zu kontaktieren, bevor er sich
-          direkt an seine Bank oder Stripe wendet. Eine offensichtlich
-          unbegründete Zahlungsanfechtung («Chargeback») — insbesondere bei
-          einer nachweislich gelieferten und vertragsgemässen Bestellung, belegt
-          durch die Sendungsverfolgung — kann zur Sperrung des betroffenen
-          Kontos sowie zur Verrechnung der dadurch entstehenden Kosten führen
+          Betreiber unter contact@kreya.ch zu kontaktieren, bevor er sich direkt
+          an seine Bank oder Stripe wendet. Eine offensichtlich unbegründete
+          Zahlungsanfechtung («Chargeback») — insbesondere bei einer
+          nachweislich gelieferten und vertragsgemässen Bestellung, belegt durch
+          die Sendungsverfolgung — kann zur Sperrung des betroffenen Kontos
+          sowie zur Verrechnung der dadurch entstehenden Kosten führen
           (Anfechtungsgebühren des Zahlungsdienstleisters, Inkassokosten),
           unbeschadet einer gerichtlichen Geltendmachung.
         </p>
@@ -581,10 +580,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           Es gilt die gesetzliche Gewährleistung für Mängel der Kaufsache (Art.
           197 ff. OR) während zwei Jahren ab Lieferung. Der Kunde meldet jeden
-          Mangel so rasch wie möglich an contact@swiss3design.ch, mit Fotos als
-          Beleg. Der Betreiber bietet vorrangig Nachbesserung oder Ersatz an;
-          erweist sich dies als unmöglich oder unverhältnismässig, behält der
-          Kunde seine gesetzlichen Rechte (Minderung oder Rückerstattung).
+          Mangel so rasch wie möglich an contact@kreya.ch, mit Fotos als Beleg.
+          Der Betreiber bietet vorrangig Nachbesserung oder Ersatz an; erweist
+          sich dies als unmöglich oder unverhältnismässig, behält der Kunde
+          seine gesetzlichen Rechte (Minderung oder Rückerstattung).
         </p>
       ),
     },
@@ -625,13 +624,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Die Inhalte der Website (Texte, Fotografien, Layout, visuelle
-          Identität und Logo Swiss3Design) sind geschützt und dürfen ohne
-          Genehmigung nicht reproduziert werden. Der Verkauf betrifft einen
-          physischen Gegenstand: Er verleiht dem Kunden keinerlei Rechte an den
-          zugrunde liegenden digitalen 3D-Modellen und keine Lizenz zur
-          Vervielfältigung, Neuauflage oder zum Weiterverkauf in Serie. Die
-          Rechte des geistigen Eigentums an den gedruckten Modellen bleiben
-          ihren jeweiligen Inhabern vorbehalten.
+          Identität und Logo Kreya) sind geschützt und dürfen ohne Genehmigung
+          nicht reproduziert werden. Der Verkauf betrifft einen physischen
+          Gegenstand: Er verleiht dem Kunden keinerlei Rechte an den zugrunde
+          liegenden digitalen 3D-Modellen und keine Lizenz zur Vervielfältigung,
+          Neuauflage oder zum Weiterverkauf in Serie. Die Rechte des geistigen
+          Eigentums an den gedruckten Modellen bleiben ihren jeweiligen Inhabern
+          vorbehalten.
         </p>
       ),
     },
@@ -675,13 +674,13 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           Le presenti condizioni generali di vendita («CGV») disciplinano gli
-          ordini effettuati sul negozio online <strong>swiss3design.ch</strong>,
+          ordini effettuati sul negozio online <strong>kreya.ch</strong>,
           gestito da{" "}
           <strong>
-            Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
-            (Vaud), Svizzera
+            Kreya, impresa individuale di Thomas Prud’homme, Chemin de
+            l’Aubépine 9B, 1196 Gland (Vaud), Svizzera
           </strong>{" "}
-          («il gestore»), raggiungibile all’indirizzo contact@swiss3design.ch.
+          («il gestore»), raggiungibile all’indirizzo contact@kreya.ch.
           Effettuando un ordine, il cliente accetta le presenti CGV nella
           versione in vigore al momento dell’ordine. Il cliente conferma di
           essere maggiorenne o di agire con il consenso del proprio
@@ -763,11 +762,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
             prima: fanno fede il prezzo e le spese confermati al momento del
             pagamento. Se l’agente ha commesso un errore manifesto (articolo,
             quantità o indirizzo non voluti), il cliente lo segnala senza
-            indugio a contact@swiss3design.ch: finché la produzione o la
-            spedizione non sono iniziate, l’ordine viene annullato e interamente
-            rimborsato; in seguito si applicano le regole della sezione «Resi».
-            Un ordine da consegnare fuori dalla Svizzera viene annullato e
-            rimborsato.
+            indugio a contact@kreya.ch: finché la produzione o la spedizione non
+            sono iniziate, l’ordine viene annullato e interamente rimborsato; in
+            seguito si applicano le regole della sezione «Resi». Un ordine da
+            consegnare fuori dalla Svizzera viene annullato e rimborsato.
           </p>
           <p>
             Il gestore non risponde del funzionamento dell’agente o della
@@ -800,7 +798,7 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           In caso di disaccordo su un ordine, il cliente è invitato a contattare
-          il gestore all’indirizzo contact@swiss3design.ch prima di qualsiasi
+          il gestore all’indirizzo contact@kreya.ch prima di qualsiasi
           contestazione diretta presso la propria banca o Stripe. Una
           contestazione di pagamento («chargeback») manifestamente infondata —
           in particolare per un ordine consegnato e conforme, comprovato dal
@@ -913,11 +911,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
         <p>
           La garanzia legale per i difetti della cosa venduta (art. 197 segg.
           CO) si applica per due anni dalla consegna. Il cliente segnala
-          qualsiasi difetto il prima possibile a contact@swiss3design.ch,
-          allegando fotografie. Il gestore propone in via prioritaria la
-          riparazione o la sostituzione; qualora ciò risulti impossibile o
-          sproporzionato, il cliente conserva i propri diritti legali (riduzione
-          del prezzo o rimborso).
+          qualsiasi difetto il prima possibile a contact@kreya.ch, allegando
+          fotografie. Il gestore propone in via prioritaria la riparazione o la
+          sostituzione; qualora ciò risulti impossibile o sproporzionato, il
+          cliente conserva i propri diritti legali (riduzione del prezzo o
+          rimborso).
         </p>
       ),
     },
@@ -958,12 +956,12 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           I contenuti del sito (testi, fotografie, impaginazione, identità
-          visiva e logo Swiss3Design) sono protetti e non possono essere
-          riprodotti senza autorizzazione. La vendita riguarda un oggetto
-          fisico: non conferisce al cliente alcun diritto sui modelli 3D
-          digitali sottostanti, né alcuna licenza di riproduzione, riedizione o
-          rivendita in serie. I diritti di proprietà intellettuale relativi ai
-          modelli stampati restano riservati ai rispettivi titolari.
+          visiva e logo Kreya) sono protetti e non possono essere riprodotti
+          senza autorizzazione. La vendita riguarda un oggetto fisico: non
+          conferisce al cliente alcun diritto sui modelli 3D digitali
+          sottostanti, né alcuna licenza di riproduzione, riedizione o rivendita
+          in serie. I diritti di proprietà intellettuale relativi ai modelli
+          stampati restano riservati ai rispettivi titolari.
         </p>
       ),
     },
@@ -1007,16 +1005,15 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           These general terms and conditions of sale (“GTC”) govern orders
-          placed on the online shop <strong>swiss3design.ch</strong>, operated
-          by{" "}
+          placed on the online shop <strong>kreya.ch</strong>, operated by{" "}
           <strong>
-            Swiss3Design, Thomas Prud’homme, Chemin de l’Aubépine 9B, 1196 Gland
-            (Vaud), Switzerland
+            Kreya, sole proprietorship of Thomas Prud’homme, Chemin de
+            l’Aubépine 9B, 1196 Gland (Vaud), Switzerland
           </strong>{" "}
-          (the “Operator”), reachable at contact@swiss3design.ch. By placing an
-          order, the customer accepts these GTC in the version in force at the
-          time of the order. The customer confirms that they are of legal age or
-          are acting with the consent of their legal representative.
+          (the “Operator”), reachable at contact@kreya.ch. By placing an order,
+          the customer accepts these GTC in the version in force at the time of
+          the order. The customer confirms that they are of legal age or are
+          acting with the consent of their legal representative.
         </p>
       ),
     },
@@ -1090,10 +1087,10 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
             or a few minutes old: the price and charges confirmed at payment
             prevail. If the agent made an obvious mistake (unwanted item,
             quantity or address), the customer reports it without delay to
-            contact@swiss3design.ch: as long as production or shipping has not
-            started, the order is cancelled and fully refunded; after that, the
-            “Returns” section applies. An order to be delivered outside
-            Switzerland is cancelled and refunded.
+            contact@kreya.ch: as long as production or shipping has not started,
+            the order is cancelled and fully refunded; after that, the “Returns”
+            section applies. An order to be delivered outside Switzerland is
+            cancelled and refunded.
           </p>
           <p>
             The Operator is not liable for the functioning of the agent or
@@ -1124,11 +1121,11 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           In the event of a disagreement over an order, the customer is invited
-          to contact the Operator at contact@swiss3design.ch before raising any
-          dispute directly with their bank or Stripe. A manifestly unfounded
-          payment dispute ("chargeback") — in particular for an order delivered
-          as agreed, supported by tracking evidence — may result in suspension
-          of the account concerned and the billing of any costs it generates
+          to contact the Operator at contact@kreya.ch before raising any dispute
+          directly with their bank or Stripe. A manifestly unfounded payment
+          dispute ("chargeback") — in particular for an order delivered as
+          agreed, supported by tracking evidence — may result in suspension of
+          the account concerned and the billing of any costs it generates
           (payment-provider dispute fees, collection costs), without prejudice
           to legal action.
         </p>
@@ -1232,8 +1229,8 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
           The statutory warranty for defects in the goods sold (Art. 197 et seq.
           of the Swiss Code of Obligations) applies for two years from delivery.
           The customer shall report any defect as soon as possible to
-          contact@swiss3design.ch, with supporting photos. The Operator will
-          primarily offer repair or replacement; if this proves impossible or
+          contact@kreya.ch, with supporting photos. The Operator will primarily
+          offer repair or replacement; if this proves impossible or
           disproportionate, the customer retains their statutory rights (price
           reduction or refund).
         </p>
@@ -1273,9 +1270,9 @@ export const TERMS_CONTENT: Record<Locale, LegalSection[]> = {
       body: (
         <p>
           The contents of the site (texts, photographs, layout, visual identity
-          and the Swiss3Design logo) are protected and may not be reproduced
-          without authorisation. The sale concerns a physical object: it grants
-          the customer no rights in the underlying digital 3D models, nor any
+          and the Kreya logo) are protected and may not be reproduced without
+          authorisation. The sale concerns a physical object: it grants the
+          customer no rights in the underlying digital 3D models, nor any
           licence to reproduce, re-edit or resell in series. The
           intellectual-property rights in the printed models remain reserved to
           their respective holders.

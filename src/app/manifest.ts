@@ -3,8 +3,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "Swiss3Design",
-    short_name: "Swiss3Design",
+    name: "Kreya",
+    short_name: "Kreya",
     description:
       "Objets design imprimés en 3D jusqu'à 4 couleurs, fabriqués dans l'arc lémanique et livrés dans toute la Suisse.",
     lang: "fr",
@@ -27,6 +27,12 @@ export default function manifest(): MetadataRoute.Manifest {
         sizes: "512x512",
         type: "image/png",
         purpose: "any",
+      },
+      {
+        src: "/brand/app/icon-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable",
       },
     ],
   };

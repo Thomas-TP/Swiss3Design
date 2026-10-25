@@ -6,7 +6,7 @@ import {
 } from "@/lib/quote-upload-client";
 
 /** Boîte de contact de l'atelier (la même que la page Contact). */
-export const QUOTE_CONTACT_EMAIL = "contact@swiss3design.ch";
+export const QUOTE_CONTACT_EMAIL = "contact@kreya.ch";
 
 /** Bornes du schéma de submitQuoteRequest (custom/actions.ts), pour maxLength. */
 export const QUOTE_LIMITS = {

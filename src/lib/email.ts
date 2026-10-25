@@ -13,6 +13,18 @@ export interface EmailMessage {
   replyTo?: string;
 }
 
+/**
+ * Expéditeur effectif. EMAIL_SENDER_DOMAIN (preview seulement) remplace le
+ * domaine de l'adresse : la clé Resend de la preview n'a le droit d'envoyer que
+ * depuis swiss3design.ch, la production depuis kreya.ch.
+ */
+export function senderAddress(
+  from: string,
+  senderDomain: string | undefined,
+): string {
+  return senderDomain ? from.replace(/@[^>\s]+/, `@${senderDomain}`) : from;
+}
+
 // Envoi via l'API REST Resend. Sans RESEND_API_KEY, l'envoi est ignoré
 // silencieusement (loggé) — le site reste fonctionnel sans e-mails.
 export async function sendEmail(
@@ -43,10 +55,10 @@ export async function sendEmail(
       ...(idempotencyKey ? { "Idempotency-Key": idempotencyKey } : {}),
     },
     body: JSON.stringify({
-      from:
-        message.from ||
-        env.EMAIL_FROM ||
-        "Swiss3Design <onboarding@resend.dev>",
+      from: senderAddress(
+        message.from || env.EMAIL_FROM || "Kreya <onboarding@resend.dev>",
+        env.EMAIL_SENDER_DOMAIN,
+      ),
       to,
       subject: message.subject,
       html: message.html,
@@ -94,8 +106,10 @@ export async function sendBulkEmail(all: EmailMessage[]): Promise<number> {
       },
       body: JSON.stringify(
         chunk.map((m) => ({
-          from:
-            m.from || env.EMAIL_FROM || "Swiss3Design <onboarding@resend.dev>",
+          from: senderAddress(
+            m.from || env.EMAIL_FROM || "Kreya <onboarding@resend.dev>",
+            env.EMAIL_SENDER_DOMAIN,
+          ),
           to: m.to,
           subject: m.subject,
           html: m.html,

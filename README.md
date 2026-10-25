@@ -1,15 +1,15 @@
 <div align="center">
 
-<img alt="Swiss3Design" src="public/brand/app/icon-512.png" width="120" />
+<img alt="Kreya" src="public/brand/app/icon-512.png" width="120" />
 
 ### Impression 3D multicolore en Suisse
 
 Boutique e-commerce d'objets design imprimés en 3D jusqu'à **4 couleurs**,
 fabriqués à **Gland (VD)** et livrés dans toute la Suisse.
 
-🌐 **[swiss3design.ch](https://swiss3design.ch)**
+🌐 **[kreya.ch](https://kreya.ch)**
 
-[![Site en ligne](https://img.shields.io/website?url=https%3A%2F%2Fswiss3design.ch&label=swiss3design.ch&up_message=en%20ligne&down_message=hors%20ligne&color=E5231C&style=flat-square)](https://swiss3design.ch)
+[![Site en ligne](https://img.shields.io/website?url=https%3A%2F%2Fkreya.ch&label=kreya.ch&up_message=en%20ligne&down_message=hors%20ligne&color=E5231C&style=flat-square)](https://kreya.ch)
 
 <br />
 
@@ -37,9 +37,9 @@ fabriqués à **Gland (VD)** et livrés dans toute la Suisse.
 
 ## Aperçu
 
-Swiss3Design est une boutique en ligne complète : catalogue, panier, paiement,
+Kreya est une boutique en ligne complète : catalogue, panier, paiement,
 devis sur mesure, comptes clients et back-office d'administration. Le site est
-**en production** sur [swiss3design.ch](https://swiss3design.ch), déployé sur
+**en production** sur [kreya.ch](https://kreya.ch), déployé sur
 **Cloudflare Workers** et alimenté par **Postgres (Neon)** via **Cloudflare
 Hyperdrive**, un stockage de fichiers **R2** et un cache **KV** — 100 %
 Cloudflare côté hébergement, sans process Node persistant.
@@ -219,11 +219,11 @@ Le **kit de marque** est versionné dans [`public/brand/`](public/brand) :
 - **better-auth + Google OAuth** — sessions, comptes, rôle admin attribué
   automatiquement aux adresses de `ADMIN_EMAILS`.
 - **Cloudflare** — Hyperdrive → Postgres/Neon, R2 (`swiss3design-files`), KV,
-  D1 (`swiss3design-db`, filet de secours), domaine personnalisé `swiss3design.ch`.
+  D1 (`swiss3design-db`, filet de secours), domaines personnalisés `kreya.ch` (canonique) et `swiss3design.ch` (ancien nom, redirigé).
 - **Neon Postgres** — base active (`swiss3design`), branche `preview` isolée
   pour l'environnement de test (jamais de données clients réelles).
 - **Resend** — e-mails transactionnels (confirmations, devis, comptes). Les
-  réponses clients arrivent sur l'alias **Infomaniak** `contact@swiss3design.ch`.
+  réponses clients arrivent sur le routage e-mail Cloudflare de `kreya.ch` (`contact@kreya.ch`).
 
 ---
 
@@ -347,10 +347,10 @@ bindings Cloudflare (Hyperdrive, R2, KV) via OpenNext.
 
 <br />
 
-| Variable          | Valeur                    |
-| ----------------- | ------------------------- |
-| `BETTER_AUTH_URL` | `https://swiss3design.ch` |
-| `EMAIL_FROM`      | Expéditeur des e-mails    |
+| Variable          | Valeur                 |
+| ----------------- | ---------------------- |
+| `BETTER_AUTH_URL` | `https://kreya.ch`     |
+| `EMAIL_FROM`      | Expéditeur des e-mails |
 
 Bindings : `HYPERDRIVE` (Postgres actif) · `DB` (D1, filet de secours) ·
 `R2` (fichiers) · `KV` (cache / rate-limit) · `ASSETS` ·
@@ -438,7 +438,7 @@ obligatoire) déclenche, côté Cloudflare et avec ses propres identifiants :
 bun run deploy   # build + déploiement depuis la machine locale
 ```
 
-Le domaine `swiss3design.ch` (et `www`) est routé en _custom domain_ dans
+Les domaines `kreya.ch` et `swiss3design.ch` (et leurs `www`) sont routés en _custom domain_ dans
 [`wrangler.jsonc`](wrangler.jsonc).
 
 ---
@@ -484,12 +484,12 @@ reflétée dans l'URL (`/fr`, `/de`, `/it`, `/en`). Les traductions vivent dans
 
 ## Propriété & licences
 
-Projet **privé** — © 2026 Swiss3Design. **Tous droits réservés.** Aucune reprise,
+Projet **privé** — © 2026 Kreya. **Tous droits réservés.** Aucune reprise,
 modification, redistribution ou contribution externe n'est autorisée — voir
 [`LICENSE.md`](LICENSE.md).
 
 Les modèles 3D proposés à la vente sont des **produits tiers sous licence** (libres
-pour un usage commercial) : ils **n'appartiennent pas** à Swiss3Design et restent
+pour un usage commercial) : ils **n'appartiennent pas** à Kreya et restent
 soumis à la licence de leurs auteurs ; chacune doit autoriser la vente
 d'impressions physiques.
 
@@ -515,6 +515,6 @@ Le **Vase spirale** vendu à la boutique est une œuvre de **Ian** (MakerWorld, 
 
 ---
 
-Fait avec ❤️ en Suisse · [swiss3design.ch](https://swiss3design.ch)
+Fait avec ❤️ en Suisse · [kreya.ch](https://kreya.ch)
 
 </div>

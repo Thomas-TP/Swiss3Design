@@ -71,7 +71,7 @@ export async function ensureProtectedResources(issuer: string) {
       protectedResources(issuer).map((identifier) => ({
         id: crypto.randomUUID(),
         identifier,
-        name: "Swiss3Design customer account (MCP)",
+        name: "Kreya customer account (MCP)",
         disabled: false,
         dpopBoundAccessTokensRequired: false,
         policyVersion: 1,
@@ -191,7 +191,7 @@ export function agentAuthPlugin(options: AgentAuthOptions) {
             throw agentError(
               "BAD_REQUEST",
               "invalid_login_hint",
-              "login_hint must be the email address of the user's Swiss3Design account.",
+              "login_hint must be the email address of the user's Kreya account.",
             );
 
           const now = new Date();

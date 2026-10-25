@@ -9,7 +9,7 @@ import { chipClass } from "@/components/ui/chip";
 const SOURCES = ["google", "ai", "social", "friend", "other"] as const;
 const noSubscription = () => () => {};
 
-// « Comment avez-vous découvert Swiss3Design ? », une fois la commande payée.
+// « Comment avez-vous découvert Kreya ? », une fois la commande payée.
 // Beaucoup de visites envoyées par ChatGPT & co. arrivent sans référent et
 // comptent en « direct » : seule la réponse de l'acheteur les révèle. Un
 // clic, facultatif, envoyé comme événement anonyme (aucun consentement

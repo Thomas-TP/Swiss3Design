@@ -1,6 +1,6 @@
 # Licence — Tous droits réservés
 
-**© 2026 Thomas Prud'homme — Swiss3Design. Tous droits réservés.**
+**© 2026 Thomas Prud'homme — Kreya (anciennement Swiss3Design). Tous droits réservés.**
 
 ## 1. Propriété
 
@@ -43,7 +43,7 @@ présente licence **ne s'applique pas** à ces modèles.
 
 ## 6. Marques & identité
 
-« Swiss3Design », le logo et l'identité visuelle associée sont des éléments
+« Kreya », l'ancien nom « Swiss3Design », le logo et l'identité visuelle associée sont des éléments
 distinctifs du Propriétaire et ne peuvent être utilisés sans autorisation écrite.
 
 ## 7. Absence de garantie
@@ -75,4 +75,4 @@ listées dans `package.json`, chacune sous sa licence.
 
 ## 9. Contact
 
-Toute demande d'autorisation doit être adressée à : **contact@swiss3design.ch**
+Toute demande d'autorisation doit être adressée à : **contact@kreya.ch**

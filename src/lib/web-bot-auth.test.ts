@@ -59,37 +59,33 @@ describe("Web Bot Auth", () => {
     const headers = await botRequestHeaders(
       key,
       "https://api.indexnow.org/indexnow",
-      "https://swiss3design.ch",
+      "https://kreya.ch",
     );
-    expect(headers["Signature-Agent"]).toBe('"https://swiss3design.ch"');
+    expect(headers["Signature-Agent"]).toBe('"https://kreya.ch"');
     expect(headers["Signature-Input"]).toMatch(
       /^sig1=\("@authority" "signature-agent"\);created=\d+;keyid="[\w-]+";alg="ed25519";expires=\d+;nonce="[^"]+";tag="web-bot-auth"$/,
     );
     expect(
       await verify(
         headers,
-        ["api.indexnow.org", '"https://swiss3design.ch"'],
+        ["api.indexnow.org", '"https://kreya.ch"'],
         publicKey,
       ),
     ).toBe(true);
     // Une signature ne vaut que pour son domaine.
     expect(
-      await verify(
-        headers,
-        ["evil.example", '"https://swiss3design.ch"'],
-        publicKey,
-      ),
+      await verify(headers, ["evil.example", '"https://kreya.ch"'], publicKey),
     ).toBe(false);
   });
 
   it("signe la réponse du répertoire pour l'hôte demandé", async () => {
     const { secret, publicKey } = await newKeySecret();
     const key = (await loadBotKey(secret))!;
-    const headers = await directoryResponseHeaders(key, "swiss3design.ch");
+    const headers = await directoryResponseHeaders(key, "kreya.ch");
     expect(headers["Signature-Input"]).toContain(
       'tag="http-message-signatures-directory"',
     );
     expect(headers["Signature-Input"]).toContain(`keyid="${key.keyid}"`);
-    expect(await verify(headers, ["swiss3design.ch"], publicKey)).toBe(true);
+    expect(await verify(headers, ["kreya.ch"], publicKey)).toBe(true);
   });
 });

@@ -24,7 +24,7 @@ import {
   protectedResources,
 } from "./oauth";
 
-const ISSUER = "https://swiss3design.ch";
+const ISSUER = "https://kreya.ch";
 const NOW = new Date("2026-09-27T12:00:00Z");
 const later = (s: number) => new Date(NOW.getTime() + s * 1000);
 
@@ -264,6 +264,6 @@ describe("/auth.md", () => {
     expect(doc).toContain(
       "https://swiss3design-preview.example.dev/api/auth/oauth2/authorize",
     );
-    expect(doc).not.toContain("https://swiss3design.ch/api");
+    expect(doc).not.toContain("https://kreya.ch/api");
   });
 });

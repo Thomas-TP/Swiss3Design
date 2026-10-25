@@ -10,7 +10,7 @@ interface Env {
   CRON_SECRET: string;
 }
 
-const MAINTENANCE_URL = "https://swiss3design.ch/api/cron/maintenance";
+const MAINTENANCE_URL = "https://kreya.ch/api/cron/maintenance";
 
 export default {
   async scheduled(

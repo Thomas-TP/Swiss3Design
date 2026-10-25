@@ -19,7 +19,7 @@ import { getServerSession } from "@/lib/session";
 import { isSessionFresh } from "@/lib/session-freshness";
 
 // Export de mes données (droit d'accès nLPD/RGPD) : agrège les données
-// personnelles détenues par Swiss3Design en un objet JSON téléchargeable
+// personnelles détenues par Kreya en un objet JSON téléchargeable
 // côté client. N'inclut pas de champs internes (rôle, hash de mot de
 // passe…) — uniquement ce qui concerne directement le client.
 export async function exportMyData(): Promise<

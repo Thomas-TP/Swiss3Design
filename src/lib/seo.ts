@@ -6,9 +6,9 @@ import { handlingDays, TRANSIT_DAYS } from "./shipping";
 // URL canonique de production. Les `metadataBase` du layout résout déjà les
 // chemins relatifs des métadonnées Open Graph ; on garde l'absolu ici pour le
 // JSON-LD (qui exige des URL complètes) et le sitemap.
-export const SITE_URL = "https://swiss3design.ch";
-export const SITE_NAME = "Swiss3Design";
-const CONTACT_EMAIL = "contact@swiss3design.ch";
+export const SITE_URL = "https://kreya.ch";
+export const SITE_NAME = "Kreya";
+const CONTACT_EMAIL = "contact@kreya.ch";
 
 // Identifiants stables des nœuds JSON-LD : chaque page référence la même
 // entreprise / le même site par `@id` au lieu de les redéclarer, ce qui donne
@@ -78,7 +78,7 @@ export interface OgImage {
  * site_name, locale…) — une page qui ne poserait que `openGraph.title`
  * perdrait son image de partage (constaté en audit Ahrefs).
  *
- * @param title titre SANS la marque : le gabarit « %s · Swiss3Design » du
+ * @param title titre SANS la marque : le gabarit « %s · Kreya » du
  *              layout l'ajoute (sauf `absoluteTitle`, réservé à l'accueil)
  */
 export function pageMetadata({
