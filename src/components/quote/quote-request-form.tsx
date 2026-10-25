@@ -53,7 +53,9 @@ import { selectableColorIds, useCustomStock } from "./quote-color-picker";
 import { QuoteColors } from "./quote-colors";
 import type { EstimateResult } from "@/lib/mesh-weight/client";
 import { PaintStudio } from "@/components/paint/paint-studio-lazy";
+import { printedRefs } from "@/components/paint/slots";
 import type {
+  ColorSetup,
   PaintNotice,
   PaintProject,
   PaintSourceFile,
@@ -316,7 +318,13 @@ export function QuoteRequestForm({
       Boolean(showFileField && project?.matters),
   );
   const [quantityText, setQuantityText] = useState("1");
-  const [colorRefs, setColorRefs] = useState<string[]>([]);
+  // Couleurs : emplacements (filaments 1 à 4) et une ou plusieurs couleurs.
+  // Rien n'est retiré en silence : une couleur dont le stock ne suffit plus
+  // reste affichée, signalée, et bloque l'envoi jusqu'à ce qu'on la change.
+  const [colorSetup, setColorSetup] = useState<ColorSetup>({
+    slots: [],
+    several: false,
+  });
   const customStock = useCustomStock(showFileField);
   const quantity = Math.min(
     QUOTE_QUANTITY_MAX,
@@ -344,8 +352,9 @@ export function QuoteRequestForm({
         : new Set<string>(),
     [customStock, gramsPerPiece, quantity],
   );
-  // Une couleur qui ne suffit plus (fichier lu, quantité en hausse) sort de la sélection.
-  const chosenRefs = colorRefs.filter((id) => selectableIds.has(id));
+  // Couleurs réellement imprimées (doublons réunis ; une seule en « une couleur »).
+  const printed = useMemo(() => printedRefs(colorSetup), [colorSetup]);
+  const shortRefs = printed.filter((id) => !selectableIds.has(id));
   const onEstimate = useCallback((result: EstimateResult) => {
     if (result.ok && result.positions)
       setPreview({
@@ -436,9 +445,9 @@ export function QuoteRequestForm({
   // le blanc neutre du viewer.
   const previewTints = useMemo(() => {
     if (customStock.status !== "ready") return undefined;
-    const first = customStock.colors.find((c) => c.id === chosenRefs[0]);
+    const first = customStock.colors.find((c) => c.id === printed[0]);
     return first?.hexes.length ? first.hexes : undefined;
-  }, [customStock, chosenRefs]);
+  }, [customStock, printed]);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     // JavaScript actif : c'est nous qui envoyons (voir l'en-tête du fichier).
@@ -469,6 +478,12 @@ export function QuoteRequestForm({
           );
           return;
         }
+        // Une couleur choisie ne suffit plus pour la pièce : le serveur la
+        // refuserait, autant le dire avant d'envoyer.
+        if (shortRefs.length > 0 && customStock.status === "ready") {
+          setSubmitError(t("errors.color"));
+          return;
+        }
       }
       if (!key && attachment?.prepare) {
         const result =
@@ -485,7 +500,7 @@ export function QuoteRequestForm({
       // Studio), écrit dans le navigateur puis envoyé comme le fichier.
       let colorProject: { key: string; name: string } | null = null;
       if (showFileField && project?.matters) {
-        const version = `${project.version}:${chosenRefs.join(",")}`;
+        const version = `${project.version}:${printed.join(",")}:${colorSetup.several}`;
         if (sentProject.current?.version === version)
           colorProject = sentProject.current;
         else {
@@ -770,7 +785,7 @@ export function QuoteRequestForm({
           <figcaption className="border-t border-line bg-surface px-5 py-3 sm:px-8">
             <ViewerCredits
               caption={
-                chosenRefs.length > 1 && !project?.preview
+                printed.length > 1 && !project?.preview
                   ? t("preview.captionFirstColor")
                   : t("preview.caption")
               }
@@ -789,8 +804,8 @@ export function QuoteRequestForm({
                     : null
               }
               selectable={selectableIds}
-              refs={chosenRefs}
-              onRefsChange={setColorRefs}
+              setup={colorSetup}
+              onSetupChange={setColorSetup}
               maxColors={QUOTE_COLORS_MAX}
               gramsPerPiece={fileGrams}
               plate={PLATE_MM}
@@ -855,10 +870,11 @@ export function QuoteRequestForm({
               <QuoteColors
                 stock={customStock}
                 selectable={selectableIds}
-                selected={chosenRefs}
-                onChange={setColorRefs}
+                setup={colorSetup}
+                onChange={setColorSetup}
                 max={QUOTE_COLORS_MAX}
                 weighed={gramsPerPiece !== null}
+                shares={project?.slotShares ?? null}
                 placed={placedColors}
                 adjustments={adjustments}
                 notice={paintNotice}
@@ -1103,7 +1119,7 @@ export function QuoteRequestForm({
           <input
             type="hidden"
             name="colorRefs"
-            value={JSON.stringify(chosenRefs)}
+            value={JSON.stringify(printed)}
           />
           {gramsPerPiece !== null ? (
             <input type="hidden" name="estGrams" value={gramsPerPiece} />

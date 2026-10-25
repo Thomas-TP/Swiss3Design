@@ -334,10 +334,19 @@ which for a multi-line hook body is rarely the line you'd expect.
       transparent. Pendant qu'il est ouvert, `body[data-stage-front]` fait passer le
       canvas du Stage au-dessus de la page (`globals.css`) : toujours un seul contexte
       WebGL.
+    - **Zones = emplacements, jamais couleurs (25.10.2026).** Une zone peinte
+      appartient à un emplacement (filament 1 à 4, identifiant stable,
+      `components/paint/slots.ts`) ; changer sa couleur, passer d'une à plusieurs
+      couleurs et revenir ne touchent pas à la peinture. Seul le retrait d'un
+      emplacement rend ses zones à la couleur principale. Deux emplacements de même
+      couleur sont réunis à l'export et dans le résumé (`printedPalette`).
     - **Couleurs d'un 3MF peint** (Bambu, Orca, Prusa : peinture et filament par pièce).
-      Elles sont reprises d'office, chacune associée à la couleur du stock la plus
-      proche (un filament uni l'emporte sur une bobine co-extrudée). Cette reprise est
-      une étape annulable, et « Garder une seule couleur » la retire.
+      Ses zones sont reprises telles quelles, un emplacement par filament, chacun
+      dans la couleur du stock la plus proche (un filament uni l'emporte sur une
+      bobine co-extrudée) ; seul un fichier de plus de 4 filaments en réunit.
+    - **Remplissage « Zone ».** Au niveau des feuilles de la peinture, même couleur
+      et arêtes de plus de 30°, comme le pot de peinture de Bambu Studio
+      (`lib/paint3d/bucket.ts`) : jamais de débordement sur une autre couleur.
     - **Orientation.** L'aperçu d'un fichier du visiteur garde celle du fichier (Z vers
       le haut), jamais `upAxisFor`, qui ne sert qu'aux modèles des produits.
 

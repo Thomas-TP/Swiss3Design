@@ -48,10 +48,12 @@
     "paints": "Riporta la base ({name})"
   },
   "fill": {
-    "smooth": "Superficie",
+    "zone": "Zona",
+    "zoneHint": "Ricolora la zona toccata: stesso colore, fino agli spigoli più vivi dell'angolo scelto.",
+    "surface": "Superficie",
+    "surfaceHint": "Riempie la superficie liscia fino agli spigoli vivi, sopra gli altri colori.",
     "color": "Stesso colore",
     "part": "Pezzo",
-    "smoothHint": "Riempie la superficie liscia, fino agli spigoli più vivi dell'angolo scelto.",
     "colorHint": "Ridipinge tutta la zona contigua dello stesso colore.",
     "partHint": "Riempie tutto il pezzo toccato (un volume separato dal resto).",
     "angle": "Angolo degli spigoli"
@@ -84,18 +86,8 @@
   },
   "palette": {
     "title": "Colori",
-    "base": "Base",
-    "share": "{percent} % della superficie",
     "empty": "Aggiunga almeno un colore dello stock per dipingere.",
-    "add": "Aggiungi un colore",
-    "replace": "Sostituisci questo colore",
-    "remove": "Rimuovi questo colore",
-    "makeBase": "Usare come base",
-    "noOther": "Nessun altro colore disponibile in quantità sufficiente.",
-    "max": "Al massimo {max} colori: le nostre stampanti caricano quattro bobine.",
-    "hint": "La base (1) colora tutto ciò che non è dipinto. Tasti da 1 a 4: scegliere il colore.",
-    "fileOffer": "Il Suo file dichiara {count} colori (pittura o parti), per ora rimossi.",
-    "useFile": "Riprendi i {count} colori del file"
+    "hint": "La base (1) colora tutto ciò che non è dipinto. Tasti da 1 a 4: scegliere il colore."
   },
   "object": {
     "title": "Dimensioni e orientamento",
@@ -162,7 +154,6 @@
     "pick": "Scegli",
     "change": "Cambia",
     "cancel": "Chiudi",
-    "remove": "Rimuovi {name}",
     "add": "Aggiungi un colore",
     "choosing": "{slot}: scelga un colore.",
     "needTwo": "Scelga almeno due colori, poi li posizioni sul pezzo.",
@@ -172,18 +163,18 @@
     "edit": "Modifica il posizionamento",
     "placed": "{count, plural, one {# colore posizionato sul pezzo} other {# colori posizionati sul pezzo}}",
     "size": "Dimensioni e orientamento",
-    "fromFile": "Colori ripresi dal Suo file, ciascuno nella tinta più vicina del nostro stock.",
+    "fromFile": "I {count} colori del Suo file sono ripresi con le loro zone, ciascuno nella tinta più vicina del nostro stock. Li cambi qui sotto.",
     "fromFileMerged": "Ne aveva più di {max}: i più vicini sono stati riuniti.",
-    "useOne": "Un solo colore invece",
-    "fileOffer": "Il Suo file contiene {count} colori.",
-    "useFile": "Riprendi i suoi {count} colori"
+    "fileOffer": "I colori del Suo file restano conservati con le loro zone.",
+    "useFile": "Stampare i {count} colori",
+    "short": "{name} non è più abbastanza in stock per il Suo pezzo: ne scelga un altro."
   },
   "simple": {
     "title": "Posiziona i colori",
     "stepColor": "1 · Scelga un colore",
     "stepHow": "2 · Poi clicchi sul pezzo",
     "zone": "Zona",
-    "zoneHint": "Clicchi una superficie: prende il colore scelto.",
+    "zoneHint": "Clicchi una zona: prende il colore scelto, fino agli spigoli e agli altri colori.",
     "height": "Altezza",
     "heightAboveHint": "Clicchi all'altezza voluta: tutto ciò che sta sopra prende il colore.",
     "heightBelowHint": "Clicchi all'altezza voluta: tutto ciò che sta sotto prende il colore.",
@@ -193,6 +184,20 @@
     "onlyOne": "Un solo colore scelto: ne aggiunga un altro per posizionarlo.",
     "more": "Altri strumenti",
     "less": "Modalità semplice",
-    "fit": "Inquadra"
+    "fit": "Inquadra",
+    "single": "Un solo colore",
+    "singleHint": "Tutto il pezzo è stampato in questo colore. Gli altri colori e le loro zone restano conservati.",
+    "toSeveral": "Posiziona più colori"
+  },
+  "slots": {
+    "unknown": "Colore da scegliere",
+    "main": "principale",
+    "share": "{percent} % della superficie",
+    "change": "Cambia",
+    "close": "Chiudi",
+    "remove": "Rimuovi il colore {n}",
+    "add": "Aggiungi un colore",
+    "max": "Al massimo {max} colori: le nostre stampanti caricano quattro bobine.",
+    "removeConfirm": "Le zone del colore {n} riprenderanno il colore principale. Continuare?"
   }
 }

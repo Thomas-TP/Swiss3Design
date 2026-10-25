@@ -3,14 +3,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { PublicCustomColor } from "@/lib/filament/public-stock";
 import type { PaintDocument } from "@/lib/paint3d/document";
-import { paletteRemap } from "@/lib/paint3d/palette";
+import { printedPalette, slotRemap } from "@/lib/paint3d/palette";
 import {
-  applyFilePaint,
   openProject,
   paintedPreview,
   projectMatters,
   projectSummary,
 } from "@/lib/paint3d/project";
+import { paintStats } from "@/lib/paint3d/stats";
 import {
   bambuPresetFor,
   GENERIC_PRESET,
@@ -19,23 +19,32 @@ import {
 import { write3mf } from "@/lib/paint3d/write3mf";
 import { VIEWER_FALLBACK_COLOR } from "@/components/catalog/viewer-props";
 import { PaintDialog } from "./paint-dialog";
-import type { PaintNotice, PaintProject, PaintSourceFile } from "./types";
+import { newSlot } from "./slots";
+import type {
+  ColorSetup,
+  PaintNotice,
+  PaintProject,
+  PaintSourceFile,
+} from "./types";
 
 // Atelier 3D de « Sur mesure » : il possède le document de peinture du fichier
-// du visiteur (src/lib/paint3d), le garde d'une ouverture à l'autre, suit la
-// palette choisie dans le formulaire (une couleur retirée redevient la base,
-// une couleur déplacée garde ses zones) et remonte au formulaire, à chaque
-// fermeture, l'aperçu peint, le résumé et l'export 3MF. Monté dès que le fichier
-// est lu : un 3MF déjà peint (MakerWorld) montre ses couleurs tout de suite,
-// associées aux couleurs du stock.
+// du visiteur (src/lib/paint3d), le garde d'une ouverture à l'autre et remonte au
+// formulaire, à chaque changement, l'aperçu peint, le résumé et l'export 3MF.
+//
+// Les zones appartiennent aux EMPLACEMENTS (filaments 1 à 4), jamais aux
+// couleurs (25.10.2026, comme Bambu Studio) : changer la couleur d'un
+// emplacement, passer d'une à plusieurs couleurs et revenir ne touchent pas à la
+// peinture. Seul le retrait d'un emplacement rend ses zones à la couleur
+// principale. Un 3MF déjà peint (MakerWorld) s'ouvre avec ses zones, un
+// emplacement par filament, chacun dans la couleur du stock la plus proche.
 
 /** Teintes de chaque emplacement (le blanc neutre du viewer sans couleur choisie). */
-function paletteFrom(
+function tintsOf(
   stock: readonly PublicCustomColor[] | null,
-  ids: readonly string[],
+  refs: readonly string[],
 ): string[][] {
-  if (ids.length === 0) return [[VIEWER_FALLBACK_COLOR]];
-  return ids.map((id) => [
+  if (refs.length === 0) return [[VIEWER_FALLBACK_COLOR]];
+  return refs.map((id) => [
     ...(stock?.find((c) => c.id === id)?.hexes ?? [VIEWER_FALLBACK_COLOR]),
   ]);
 }
@@ -49,9 +58,8 @@ export interface PaintStudioProps {
   stock: readonly PublicCustomColor[] | null;
   /** Couleurs assez fournies pour la pièce. */
   selectable: ReadonlySet<string>;
-  /** Palette (ids du stock), dans l'ordre des emplacements : la 1re est la base. */
-  refs: readonly string[];
-  onRefsChange: (refs: string[]) => void;
+  setup: ColorSetup;
+  onSetupChange: (setup: ColorSetup) => void;
   maxColors: number;
   /** Poids estimé d'une pièce à la taille du fichier (g), ou null. */
   gramsPerPiece: number | null;
@@ -69,8 +77,8 @@ export function PaintStudio({
   fileName,
   stock,
   selectable,
-  refs,
-  onRefsChange,
+  setup,
+  onSetupChange,
   maxColors,
   gramsPerPiece,
   plate,
@@ -81,106 +89,95 @@ export function PaintStudio({
 }: PaintStudioProps) {
   const [doc, setDoc] = useState<PaintDocument | null>(null);
   const [failed, setFailed] = useState(false);
-  /** Couleurs du fichier proposées dans l'atelier (null : aucune, ou reprises). */
-  const [fileOffer, setFileOffer] = useState<{
-    count: number;
-    apply: () => void;
-  } | null>(null);
   // Dernières valeurs lues par les rappels (sans relancer les effets).
   const latest = useRef({
-    refs,
+    setup,
     stock,
     onProject,
-    onRefsChange,
+    onSetupChange,
     onNotice,
     fileName,
   });
   useEffect(() => {
     latest.current = {
-      refs,
+      setup,
       stock,
       onProject,
-      onRefsChange,
+      onSetupChange,
       onNotice,
       fileName,
     };
   });
-  /** Palette déjà appliquée aux états du document. */
-  const applied = useRef<readonly string[]>([]);
-  /** Palette du dernier projet remonté au formulaire. */
-  const reported = useRef<string | null>(null);
+  /** Emplacements (identifiants) dont les états du document suivent l'ordre. */
+  const applied = useRef<readonly number[]>([]);
   const origin = useRef({ file: false, painted: false });
   const openedAt = useRef<number | null>(null);
   const stockReady = stock !== null;
 
-  const paletteOf = useCallback(
-    (ids: readonly string[]) => paletteFrom(latest.current.stock, ids),
-    [],
-  );
-  const palette = useMemo(() => paletteFrom(stock, refs), [stock, refs]);
+  const report = useCallback((current: PaintDocument) => {
+    const { setup: now, fileName: name } = latest.current;
+    const slotRefs = now.slots.map((slot) => slot.ref);
+    const { refs, states } = printedPalette(slotRefs, now.several);
+    const matters = projectMatters(current, slotRefs, now.several);
+    const from = origin.current;
+    const summary = projectSummary(
+      current,
+      slotRefs,
+      now.several,
+      from.file && from.painted
+        ? "both"
+        : from.file
+          ? "file"
+          : from.painted
+            ? "painted"
+            : "none",
+    );
+    const perSlot = paintStats(current, Math.max(1, slotRefs.length));
+    const total = perSlot.totalArea || 1;
+    const title = name.replace(/\.[^.]+$/, "") || "Kreya";
+    latest.current.onProject({
+      preview: matters
+        ? {
+            format: "painted",
+            ...paintedPreview(current, states),
+            palette: tintsOf(latest.current.stock, refs),
+          }
+        : null,
+      summary,
+      matters,
+      scale: current.scale,
+      slotShares: slotRefs.map((_, i) => (perSlot.areaBySlot[i] ?? 0) / total),
+      version: current.version,
+      export3mf: async (onProgress) => {
+        // Teinte de chaque filament imprimé (la première d'une bobine co-extrudée).
+        const colors = tintsOf(latest.current.stock, refs).map(
+          (hexes) => hexes[0],
+        );
+        const stockNow = latest.current.stock ?? [];
+        // Projet Bambu Studio : chaque filament avec le profil de sa
+        // référence. Le modèle de réglages (≈ 7 Ko compressés) n'est chargé
+        // qu'au moment d'envoyer.
+        const { default: template } =
+          await import("@/lib/paint3d/bambu-template.json");
+        const filaments = colors.map((hex, i) => {
+          const ref = stockNow.find((c) => c.id === refs[i]);
+          return {
+            hex,
+            preset: ref ? bambuPresetFor(ref.brand, ref.range) : GENERIC_PRESET,
+          };
+        });
+        return write3mf(current, {
+          title,
+          onProgress,
+          colors: refs.length ? colors : [],
+          states,
+          bambu: { template: template as BambuTemplate, filaments },
+        });
+      },
+    });
+  }, []);
 
-  const report = useCallback(
-    (current: PaintDocument) => {
-      const { refs: ids, fileName: name } = latest.current;
-      reported.current = ids.join(",");
-      const matters = projectMatters(current, ids);
-      const from = origin.current;
-      const summary = projectSummary(
-        current,
-        ids,
-        from.file && from.painted
-          ? "both"
-          : from.file
-            ? "file"
-            : from.painted
-              ? "painted"
-              : "none",
-      );
-      const showPainted = matters || from.file;
-      const title = name.replace(/\.[^.]+$/, "") || "Kreya";
-      latest.current.onProject({
-        preview: showPainted
-          ? {
-              format: "painted",
-              ...paintedPreview(current),
-              palette: paletteOf(ids),
-            }
-          : null,
-        summary,
-        matters,
-        scale: current.scale,
-        version: current.version,
-        export3mf: async (onProgress) => {
-          // Teinte de chaque filament (la première d'une bobine co-extrudée).
-          const colors = paletteOf(ids).map((hexes) => hexes[0]);
-          const stockNow = latest.current.stock ?? [];
-          // Projet Bambu Studio : chaque filament avec le profil de sa
-          // référence. Le modèle de réglages (≈ 7 Ko compressés) n'est chargé
-          // qu'au moment d'envoyer.
-          const { default: template } =
-            await import("@/lib/paint3d/bambu-template.json");
-          const filaments = colors.map((hex, i) => {
-            const ref = stockNow.find((c) => c.id === ids[i]);
-            return {
-              hex,
-              preset: ref
-                ? bambuPresetFor(ref.brand, ref.range)
-                : GENERIC_PRESET,
-            };
-          });
-          return write3mf(current, {
-            title,
-            onProgress,
-            colors: ids.length ? colors : [],
-            bambu: { template: template as BambuTemplate, filaments },
-          });
-        },
-      });
-    },
-    [paletteOf],
-  );
-
-  // Ouverture du fichier (une fois le stock connu : les couleurs d'un fichier
+  // Ouverture du fichier (une fois le stock connu : les filaments d'un fichier
   // peint prennent la teinte du stock la plus proche).
   // oxlint-disable exhaustive-deps -- un document par fichier ; le stock et les couleurs choisies sont lus à cet instant
   useEffect(() => {
@@ -194,52 +191,24 @@ export function PaintStudio({
         (opened) => {
           if (!alive) return;
           origin.current = { file: false, painted: false };
-          applied.current = latest.current.refs;
-          setDoc(opened.doc);
           setFailed(false);
-          const { fileRefs, filePaint, merged } = opened;
-          if (fileRefs && filePaint) {
-            // Couleurs du fichier (MakerWorld : peinture, filament par pièce)
-            // reprises d'office, une étape annulable ; « Garder une seule
-            // couleur » les retire, « Reprendre » les remet.
-            const notify = (notice: PaintNotice) =>
-              latest.current.onNotice?.(notice);
-            const apply = () => {
-              applyFilePaint(opened.doc, filePaint);
-              origin.current.file = true;
-              applied.current = fileRefs;
-              setFileOffer(null);
-              latest.current.onRefsChange(fileRefs);
-              notify({
-                kind: "fileColorsApplied",
-                count: fileRefs.length,
-                merged,
-                revert,
-              });
-              window.setTimeout(() => report(opened.doc), 0);
-            };
-            const revert = () => {
-              opened.doc.beginStep();
-              for (const t of filePaint.keys()) opened.doc.setNode(t, 0);
-              opened.doc.endStep();
-              origin.current.file = false;
-              const single = fileRefs.slice(0, 1);
-              applied.current = single;
-              setFileOffer({ count: fileRefs.length, apply });
-              latest.current.onRefsChange(single);
-              notify({
-                kind: "fileColors",
-                count: fileRefs.length,
-                merged,
-                apply,
-              });
-              window.setTimeout(() => report(opened.doc), 0);
-            };
-            apply();
+          if (opened.fileRefs) {
+            // Les zones du fichier sont en place : un emplacement par filament.
+            const slots = opened.fileRefs.map(newSlot);
+            applied.current = slots.map((slot) => slot.id);
+            origin.current.file = true;
+            latest.current.setup = { slots, several: true };
+            latest.current.onSetupChange({ slots, several: true });
+            latest.current.onNotice?.({
+              kind: "fileColors",
+              count: opened.fileRefs.length,
+              merged: opened.merged,
+            });
           } else {
-            setFileOffer(null);
+            applied.current = latest.current.setup.slots.map((s) => s.id);
             latest.current.onNotice?.(null);
           }
+          setDoc(opened.doc);
           report(opened.doc);
         },
         (error: unknown) => {
@@ -258,19 +227,21 @@ export function PaintStudio({
   }, [sourceKey, stockReady]);
   // oxlint-enable exhaustive-deps
 
-  // Palette changée dans le formulaire : les zones suivent leur couleur.
-  const refsKey = refs.join(",");
+  // Emplacement retiré : ses zones reviennent à la couleur principale, les
+  // suivants descendent d'un cran. Une couleur changée ne touche à rien.
+  const idsKey = setup.slots.map((slot) => slot.id).join(",");
+  const refsKey = setup.slots.map((slot) => slot.ref).join(",");
   useEffect(() => {
     if (!doc) return;
+    const after = idsKey ? idsKey.split(",").map(Number) : [];
     const before = applied.current;
-    if (before.join(",") !== refsKey) {
-      const after = refsKey ? refsKey.split(",") : [];
+    if (before.join(",") !== idsKey) {
       applied.current = after;
-      doc.remapStates(paletteRemap(before, after));
+      const map = slotRemap(before, after);
+      if (map.some((to, from) => to !== from)) doc.remapStates(map);
     }
-    // Couleurs reprises du fichier, remplacées, ajoutées : le formulaire suit.
-    if (!open && reported.current !== refsKey) report(doc);
-  }, [doc, refsKey, open, report]);
+    if (!open) report(doc);
+  }, [doc, idsKey, refsKey, setup.several, open, report]);
 
   // Fermeture : le formulaire reçoit l'état du projet.
   useEffect(() => {
@@ -285,14 +256,16 @@ export function PaintStudio({
     report(doc);
   }, [open, doc, report]);
 
-  /** Remplace la couleur d'un emplacement : ses zones gardent leur place. */
-  const replaceRef = useCallback((slot: number, id: string) => {
-    const next = [...latest.current.refs];
-    if (slot >= next.length || next.includes(id)) return;
-    next[slot] = id;
-    applied.current = next;
-    latest.current.onRefsChange(next);
-  }, []);
+  const palette = useMemo(
+    () =>
+      tintsOf(
+        stock,
+        setup.several
+          ? setup.slots.map((slot) => slot.ref)
+          : setup.slots.slice(0, 1).map((slot) => slot.ref),
+      ),
+    [stock, setup],
+  );
 
   if (!open) return null;
   return (
@@ -302,14 +275,12 @@ export function PaintStudio({
       fileName={fileName}
       stock={stock ?? []}
       selectable={selectable}
-      refs={refs}
+      setup={setup}
       palette={palette}
       maxColors={maxColors}
       gramsPerPiece={gramsPerPiece}
       plate={plate}
-      onRefsChange={onRefsChange}
-      onReplaceRef={replaceRef}
-      fileOffer={fileOffer}
+      onSetupChange={onSetupChange}
       onClose={onClose}
     />
   );

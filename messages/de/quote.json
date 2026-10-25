@@ -96,14 +96,11 @@
     "materialOnly": "das einzige Material der Werkstatt"
   },
   "colorsPicker": {
-    "legend": "Farben am Lager (optional)",
-    "hint": "Bis zu {max} Farben, aus jenen, deren Lagerbestand für Ihr Teil reicht.",
     "pending": "Sobald Ihre Datei gelesen ist, werden jene, die nicht reichen, ausgegraut.",
     "none": "Keine Farbe am Lager reicht für dieses Teil. Beschreiben Sie die gewünschte Farbe in Ihrem Projekt: Das Atelier antwortet Ihnen.",
     "loading": "Lagerbestand wird gelesen …",
     "unavailable": "Der Lagerbestand konnte nicht gelesen werden. Beschreiben Sie die gewünschte Farbe in Ihrem Projekt.",
     "approximate": "ungefährer Farbton",
-    "limit": "Höchstens {max} Farben.",
     "short": "Lagerbestand reicht nicht"
   },
   "preview": {

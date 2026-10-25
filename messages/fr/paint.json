@@ -48,10 +48,12 @@
     "paints": "Rend la base ({name})"
   },
   "fill": {
-    "smooth": "Surface",
+    "zone": "Zone",
+    "zoneHint": "Repeint la zone touchée : même couleur, jusqu'aux arêtes plus vives que l'angle choisi.",
+    "surface": "Surface",
+    "surfaceHint": "Remplit la surface lisse jusqu'aux arêtes vives, par-dessus les autres couleurs.",
     "color": "Même couleur",
     "part": "Pièce",
-    "smoothHint": "Remplit la surface lisse, jusqu'aux arêtes plus vives que l'angle choisi.",
     "colorHint": "Repeint toute la zone d'une même couleur.",
     "partHint": "Remplit toute la pièce touchée (un volume séparé du reste).",
     "angle": "Angle des arêtes"
@@ -84,18 +86,8 @@
   },
   "palette": {
     "title": "Couleurs",
-    "base": "Base",
-    "share": "{percent} % de la surface",
     "empty": "Ajoutez au moins une couleur du stock pour peindre.",
-    "add": "Ajouter une couleur",
-    "replace": "Remplacer cette couleur",
-    "remove": "Retirer cette couleur",
-    "makeBase": "En faire la base",
-    "noOther": "Aucune autre couleur en stock en quantité suffisante.",
-    "max": "{max} couleurs au plus : nos imprimantes chargent quatre bobines.",
-    "hint": "La base (1) colore tout ce qui n'est pas peint. Touches 1 à 4 : choisir la couleur.",
-    "fileOffer": "Votre fichier déclare {count} couleurs (peinture ou pièces), retirées pour l'instant.",
-    "useFile": "Reprendre les {count} couleurs du fichier"
+    "hint": "La base (1) colore tout ce qui n'est pas peint. Touches 1 à 4 : choisir la couleur."
   },
   "object": {
     "title": "Taille et orientation",
@@ -162,7 +154,6 @@
     "pick": "Choisir",
     "change": "Changer",
     "cancel": "Fermer",
-    "remove": "Retirer {name}",
     "add": "Ajouter une couleur",
     "choosing": "{slot} : choisissez une couleur.",
     "needTwo": "Choisissez au moins deux couleurs, puis placez-les sur la pièce.",
@@ -172,18 +163,18 @@
     "edit": "Modifier le placement",
     "placed": "{count, plural, one {# couleur placée sur la pièce} other {# couleurs placées sur la pièce}}",
     "size": "Taille et orientation",
-    "fromFile": "Couleurs reprises de votre fichier, chacune dans la teinte la plus proche de notre stock.",
+    "fromFile": "Les {count} couleurs de votre fichier sont reprises avec leurs zones, chacune dans la teinte la plus proche de notre stock. Changez-les ci-dessous.",
     "fromFileMerged": "Il en avait plus de {max} : les plus proches ont été réunies.",
-    "useOne": "Une seule couleur à la place",
-    "fileOffer": "Votre fichier contient {count} couleurs.",
-    "useFile": "Reprendre ses {count} couleurs"
+    "fileOffer": "Les couleurs de votre fichier restent gardées avec leurs zones.",
+    "useFile": "Imprimer les {count} couleurs",
+    "short": "{name} n'est plus assez en stock pour votre pièce : choisissez-en une autre."
   },
   "simple": {
     "title": "Placer les couleurs",
     "stepColor": "1 · Choisissez une couleur",
     "stepHow": "2 · Puis cliquez sur la pièce",
     "zone": "Zone",
-    "zoneHint": "Cliquez une surface : elle prend la couleur choisie.",
+    "zoneHint": "Cliquez une zone : elle prend la couleur choisie, jusqu'aux arêtes et aux autres couleurs.",
     "height": "Hauteur",
     "heightAboveHint": "Cliquez à la hauteur voulue : tout ce qui est au-dessus prend la couleur.",
     "heightBelowHint": "Cliquez à la hauteur voulue : tout ce qui est en dessous prend la couleur.",
@@ -193,6 +184,20 @@
     "onlyOne": "Une seule couleur choisie : ajoutez-en une autre pour la placer.",
     "more": "Plus d'outils",
     "less": "Mode simple",
-    "fit": "Recadrer"
+    "fit": "Recadrer",
+    "single": "Une seule couleur",
+    "singleHint": "Toute la pièce est imprimée dans cette couleur. Vos autres couleurs et leurs zones restent gardées.",
+    "toSeveral": "Placer plusieurs couleurs"
+  },
+  "slots": {
+    "unknown": "Couleur à choisir",
+    "main": "principale",
+    "share": "{percent} % de la surface",
+    "change": "Changer",
+    "close": "Fermer",
+    "remove": "Retirer la couleur {n}",
+    "add": "Ajouter une couleur",
+    "max": "{max} couleurs au plus : nos imprimantes chargent quatre bobines.",
+    "removeConfirm": "Les zones de la couleur {n} reprendront la couleur principale. Continuer ?"
   }
 }

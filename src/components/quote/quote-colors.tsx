@@ -4,31 +4,33 @@ import { useId, useState } from "react";
 import { Check, Palette, Plus, X } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { FilamentChip } from "@/components/filament-chip";
-import type { PaintNotice } from "@/components/paint/types";
+import { FilamentSwatches } from "@/components/filament-swatches";
+import { newSlot } from "@/components/paint/slots";
+import type { ColorSetup, PaintNotice } from "@/components/paint/types";
 import { Button } from "@/components/ui/button";
 import { cx } from "@/components/ui/cx";
-import type { PublicCustomColor } from "@/lib/filament/public-stock";
 import type { CustomStock } from "./quote-color-picker";
 
-// Couleurs d'une demande « Sur mesure », juste sous l'aperçu 3D (25.10.2026 :
-// l'ancien choix, une liste de cases à cocher plus bas dans le formulaire et un
-// second choix dans l'atelier 3D, n'était pas compréhensible). Un seul endroit :
+// Couleurs d'une demande « Sur mesure », juste sous l'aperçu 3D. Un seul endroit,
+// deux modes, et RIEN ne se perd en passant de l'un à l'autre (25.10.2026) :
 // - « Une couleur » : une pastille à choisir, l'aperçu prend sa teinte ;
-// - « Plusieurs couleurs » : des emplacements nommés (la couleur principale
-//   couvre toute la pièce sauf les zones peintes, puis les couleurs 2 à 4) et
-//   un seul bouton, « Placer les couleurs sur la pièce », qui ouvre l'atelier.
-// L'ordre des emplacements est celui des filaments du 3MF envoyé (1 = principale).
+// - « Plusieurs couleurs » : des emplacements numérotés (les filaments 1 à 4 ;
+//   la couleur 1 couvre toute la pièce sauf les zones d'une autre couleur) et un
+//   seul bouton, « Placer les couleurs sur la pièce », qui ouvre l'atelier.
+// Les zones appartiennent aux emplacements : changer une couleur ne déplace
+// rien. Un 3MF déjà peint arrive avec ses filaments (un emplacement chacun).
 
 interface Props {
   stock: CustomStock;
   /** Couleurs dont le stock suffit pour la pièce (toutes tant que le poids est inconnu). */
   selectable: ReadonlySet<string>;
-  /** Couleurs choisies, dans l'ordre des emplacements. */
-  selected: readonly string[];
-  onChange: (ids: string[]) => void;
+  setup: ColorSetup;
+  onChange: (setup: ColorSetup) => void;
   max: number;
   /** Le poids de la pièce est-il connu (fichier lu) ? */
   weighed: boolean;
+  /** Part de la surface de chaque emplacement (atelier), ou null. */
+  shares: readonly number[] | null;
   /** Couleurs effectivement placées sur la pièce (0 : aucune peinture). */
   placed: number;
   /** Ajustements de l'atelier à rappeler (échelle, orientation), ou null. */
@@ -39,15 +41,14 @@ interface Props {
   onPlace: () => void;
 }
 
-type Editing = { slot: number } | null;
-
 export function QuoteColors({
   stock,
   selectable,
-  selected,
+  setup,
   onChange,
   max,
   weighed,
+  shares,
   placed,
   adjustments,
   notice,
@@ -55,13 +56,12 @@ export function QuoteColors({
   onPlace,
 }: Props) {
   const t = useTranslations("paint.colors");
+  const ts = useTranslations("paint.slots");
   const tq = useTranslations("quote.colorsPicker");
   const titleId = useId();
-  // Plusieurs couleurs : choisi par le visiteur, ou imposé par la sélection
-  // (couleurs reprises d'un fichier peint).
-  const [wantsSeveral, setWantsSeveral] = useState(false);
-  const several = wantsSeveral || selected.length > 1;
-  const [editing, setEditing] = useState<Editing>(null);
+  /** Emplacement dont la grille est ouverte (au-delà de la liste : un nouveau). */
+  const [editing, setEditing] = useState<number | null>(null);
+  const { slots, several } = setup;
 
   const colors = stock.status === "ready" ? stock.colors : [];
   const colorOf = (id: string) => colors.find((c) => c.id === id);
@@ -76,37 +76,38 @@ export function QuoteColors({
 
   const setMode = (next: boolean) => {
     setEditing(null);
-    setWantsSeveral(next);
-    // Retour à une couleur : la principale reste, les autres partent (leurs
-    // zones redeviennent principales ; l'atelier sait l'annuler).
-    if (!next && selected.length > 1) onChange([selected[0]]);
+    if (next !== several) onChange({ ...setup, several: next });
   };
 
-  const pick = (id: string) => {
-    if (!several) {
-      onChange([id]);
+  /** Couleur de l'emplacement `index` (au-delà de la liste : un emplacement de plus). */
+  const pickFor = (index: number, id: string) => {
+    if (index < slots.length)
+      onChange({
+        ...setup,
+        slots: slots.map((slot, i) =>
+          i === index ? { ...slot, ref: id } : slot,
+        ),
+      });
+    else if (slots.length < max)
+      onChange({ ...setup, slots: [...slots, newSlot(id)] });
+    setEditing(null);
+  };
+
+  const remove = (index: number) => {
+    if (
+      (shares?.[index] ?? 0) > 0 &&
+      !window.confirm(ts("removeConfirm", { n: index + 1 }))
+    )
       return;
-    }
-    if (!editing) return;
-    const next = [...selected];
-    const existing = next.indexOf(id);
-    if (existing >= 0 && existing !== editing.slot) {
-      // Couleur déjà dans un autre emplacement : on échange les deux.
-      next[existing] = next[editing.slot];
-    }
-    if (editing.slot < next.length) next[editing.slot] = id;
-    else next.push(id);
-    onChange(next.filter(Boolean));
     setEditing(null);
+    onChange({ ...setup, slots: slots.filter((_, i) => i !== index) });
   };
 
-  const remove = (slot: number) => {
-    setEditing(null);
-    onChange(selected.filter((_, i) => i !== slot));
-  };
-
-  const slotName = (slot: number) =>
-    slot === 0 ? t("slotMain") : t("slot", { n: slot + 1 });
+  const slotName = (index: number) =>
+    index === 0 ? t("slotMain") : t("slot", { n: index + 1 });
+  // En plusieurs couleurs : au moins deux lignes (la seconde à choisir).
+  const rows = Math.min(max, Math.max(2, slots.length));
+  const fromFile = notice?.kind === "fileColors" ? notice : null;
 
   return (
     <section aria-labelledby={titleId} className="space-y-4">
@@ -114,7 +115,7 @@ export function QuoteColors({
         {t("legend")}
       </h3>
 
-      {/* Une ou plusieurs couleurs */}
+      {/* Une ou plusieurs couleurs : un interrupteur, rien ne s'efface */}
       <div className="grid grid-cols-2 gap-2">
         {[false, true].map((value) => (
           <button
@@ -140,39 +141,26 @@ export function QuoteColors({
       </div>
 
       {/* Couleurs d'un fichier déjà peint */}
-      {notice?.kind === "fileColorsApplied" ? (
+      {fromFile ? (
         <div className="rounded-field border border-line bg-paper p-3 text-sm">
-          <p className="text-ink">
-            {t("fromFile")}
-            {notice.merged ? ` ${t("fromFileMerged", { max })}` : ""}
-          </p>
-          <Button
-            variant="text"
-            size="sm"
-            className="mt-1"
-            onClick={() => {
-              setWantsSeveral(false);
-              setEditing(null);
-              notice.revert();
-            }}
-          >
-            {t("useOne")}
-          </Button>
-        </div>
-      ) : notice?.kind === "fileColors" ? (
-        <div className="rounded-field border border-line bg-paper p-3 text-sm">
-          <p className="text-ink">{t("fileOffer", { count: notice.count })}</p>
-          <Button
-            variant="text"
-            size="sm"
-            className="mt-1"
-            onClick={() => {
-              setWantsSeveral(true);
-              notice.apply();
-            }}
-          >
-            {t("useFile", { count: notice.count })}
-          </Button>
+          {several ? (
+            <p className="text-ink">
+              {t("fromFile", { count: fromFile.count })}
+              {fromFile.merged ? ` ${t("fromFileMerged", { max })}` : ""}
+            </p>
+          ) : (
+            <>
+              <p className="text-ink">{t("fileOffer")}</p>
+              <Button
+                variant="text"
+                size="sm"
+                className="mt-1"
+                onClick={() => setMode(true)}
+              >
+                {t("useFile", { count: Math.max(2, slots.length) })}
+              </Button>
+            </>
+          )}
         </div>
       ) : null}
 
@@ -183,112 +171,146 @@ export function QuoteColors({
       {!several ? (
         // ── Une couleur : la grille, directement ──
         <>
-          <p className="text-sm text-soft">
-            {selected[0]
-              ? t("chosen", { name: colorOf(selected[0])?.name ?? "" })
+          <p
+            className={cx(
+              "text-sm",
+              slots[0] && !selectable.has(slots[0].ref)
+                ? "font-semibold text-accent-text"
+                : "text-soft",
+            )}
+          >
+            {slots[0]
+              ? !selectable.has(slots[0].ref)
+                ? t("short", { name: colorOf(slots[0].ref)?.name ?? "" })
+                : t("chosen", { name: colorOf(slots[0].ref)?.name ?? "" })
               : t("pickOne")}
             {weighed ? "" : ` ${tq("pending")}`}
           </p>
-          <SwatchGrid
+          <FilamentSwatches
             colors={colors}
             selectable={selectable}
-            current={selected[0] ?? null}
-            onPick={pick}
+            current={slots[0]?.ref ?? null}
+            onPick={(id) => pickFor(0, id)}
             shortLabel={tq("short")}
             approximateLabel={tq("approximate")}
           />
         </>
       ) : (
-        // ── Plusieurs couleurs : emplacements nommés ──
+        // ── Plusieurs couleurs : emplacements numérotés ──
         <>
           <ol className="space-y-2">
-            {Array.from(
-              { length: Math.min(max, Math.max(2, selected.length)) },
-              (_, slot) => {
-                const id = selected[slot];
-                const color = id ? colorOf(id) : undefined;
-                const open = editing?.slot === slot;
-                return (
-                  <li key={slot}>
-                    <div
-                      className={cx(
-                        "flex items-center gap-3 rounded-field border px-3 py-2",
-                        open ? "border-ink" : "border-line",
-                      )}
-                    >
-                      <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-paper">
-                        {slot + 1}
+            {Array.from({ length: rows }, (_, index) => {
+              const slot = slots[index];
+              const color = slot ? colorOf(slot.ref) : undefined;
+              const open = editing === index;
+              const short = slot ? !selectable.has(slot.ref) : false;
+              return (
+                <li key={slot?.id ?? `new-${index}`}>
+                  <div
+                    className={cx(
+                      "flex items-center gap-3 rounded-field border px-3 py-2",
+                      open ? "border-ink" : "border-line",
+                    )}
+                  >
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-paper">
+                      {index + 1}
+                    </span>
+                    {color ? (
+                      <FilamentChip hexes={color.hexes} size={26} />
+                    ) : (
+                      <span className="h-[26px] w-[26px] shrink-0 rounded-full border border-dashed border-line" />
+                    )}
+                    <span className="min-w-0 flex-1 leading-tight">
+                      <span className="block truncate text-sm text-ink">
+                        {color?.name ?? slotName(index)}
                       </span>
-                      {color ? (
-                        <FilamentChip hexes={color.hexes} size={26} />
-                      ) : (
-                        <span className="h-[26px] w-[26px] shrink-0 rounded-full border border-dashed border-line" />
-                      )}
-                      <span className="min-w-0 flex-1 leading-tight">
-                        <span className="block truncate text-sm text-ink">
-                          {color?.name ?? slotName(slot)}
-                        </span>
-                        <span className="block text-xs text-soft">
-                          {color ? slotName(slot) : ""}
-                          {slot === 0
-                            ? `${color ? " · " : ""}${t("slotMainHint")}`
-                            : ""}
-                        </span>
-                      </span>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => setEditing(open ? null : { slot })}
-                        aria-expanded={open}
+                      <span
+                        className={cx(
+                          "block text-xs",
+                          short
+                            ? "font-semibold text-accent-text"
+                            : "text-soft",
+                        )}
                       >
-                        {open ? t("cancel") : color ? t("change") : t("pick")}
-                      </Button>
-                      {slot > 0 && id ? (
-                        <button
-                          type="button"
-                          onClick={() => remove(slot)}
-                          aria-label={t("remove", { name: color?.name ?? "" })}
-                          title={t("remove", { name: color?.name ?? "" })}
-                          className="grid h-9 w-9 shrink-0 place-items-center rounded-field text-soft hover:bg-line/60 hover:text-ink"
-                        >
-                          <X size={16} strokeWidth={1.75} aria-hidden="true" />
-                        </button>
-                      ) : null}
-                    </div>
-                    {open ? (
-                      <div className="mt-2 rounded-field border border-line bg-paper p-3">
-                        <p className="mb-2 text-xs text-soft">
-                          {t("choosing", { slot: slotName(slot) })}
-                        </p>
-                        <SwatchGrid
-                          colors={colors}
-                          selectable={selectable}
-                          current={id ?? null}
-                          onPick={pick}
-                          shortLabel={tq("short")}
-                          approximateLabel={tq("approximate")}
-                        />
-                      </div>
+                        {short
+                          ? tq("short")
+                          : [
+                              color ? slotName(index) : null,
+                              index === 0 ? t("slotMainHint") : null,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                      </span>
+                    </span>
+                    <Button
+                      variant="secondary"
+                      size="sm"
+                      onClick={() => setEditing(open ? null : index)}
+                      aria-expanded={open}
+                      disabled={!slot && index > slots.length}
+                    >
+                      {open ? t("cancel") : slot ? t("change") : t("pick")}
+                    </Button>
+                    {index > 0 && slot ? (
+                      <button
+                        type="button"
+                        onClick={() => remove(index)}
+                        aria-label={ts("remove", { n: index + 1 })}
+                        title={ts("remove", { n: index + 1 })}
+                        className="grid h-9 w-9 shrink-0 place-items-center rounded-field text-soft hover:bg-line/60 hover:text-ink"
+                      >
+                        <X size={16} strokeWidth={1.75} aria-hidden="true" />
+                      </button>
                     ) : null}
-                  </li>
-                );
-              },
-            )}
+                  </div>
+                  {open ? (
+                    <div className="mt-2 rounded-field border border-line bg-paper p-3">
+                      <p className="mb-2 text-xs text-soft">
+                        {t("choosing", { slot: slotName(index) })}
+                      </p>
+                      <FilamentSwatches
+                        colors={colors}
+                        selectable={selectable}
+                        current={slot?.ref ?? null}
+                        onPick={(id) => pickFor(index, id)}
+                        shortLabel={tq("short")}
+                        approximateLabel={tq("approximate")}
+                      />
+                    </div>
+                  ) : null}
+                </li>
+              );
+            })}
           </ol>
-          {selected.length >= 2 && selected.length < max ? (
+          {slots.length >= 2 && slots.length < max ? (
             <Button
               variant="text"
               size="sm"
-              onClick={() => setEditing({ slot: selected.length })}
+              onClick={() => setEditing(slots.length)}
             >
               <Plus size={15} strokeWidth={1.75} aria-hidden="true" />
               {t("add")}
             </Button>
           ) : null}
+          {editing !== null && editing >= rows ? (
+            <div className="rounded-field border border-line bg-paper p-3">
+              <p className="mb-2 text-xs text-soft">
+                {t("choosing", { slot: slotName(editing) })}
+              </p>
+              <FilamentSwatches
+                colors={colors}
+                selectable={selectable}
+                current={null}
+                onPick={(id) => pickFor(editing, id)}
+                shortLabel={tq("short")}
+                approximateLabel={tq("approximate")}
+              />
+            </div>
+          ) : null}
 
           {/* Placement sur la pièce */}
           <div className="rounded-field border border-line bg-paper p-3">
-            {selected.length < 2 ? (
+            {slots.length < 2 ? (
               <p className="text-sm text-soft">{t("needTwo")}</p>
             ) : placed > 1 ? (
               <p className="flex items-center gap-2 text-sm font-semibold text-ink">
@@ -300,7 +322,7 @@ export function QuoteColors({
                 {canPlace ? t("notPlaced") : t("noWebgl")}
               </p>
             )}
-            {canPlace && selected.length >= 2 ? (
+            {canPlace && slots.length >= 2 ? (
               <Button
                 variant={placed > 1 ? "secondary" : "ink"}
                 size="sm"
@@ -325,63 +347,5 @@ export function QuoteColors({
         </p>
       ) : null}
     </section>
-  );
-}
-
-function SwatchGrid({
-  colors,
-  selectable,
-  current,
-  onPick,
-  shortLabel,
-  approximateLabel,
-}: {
-  colors: readonly PublicCustomColor[];
-  selectable: ReadonlySet<string>;
-  current: string | null;
-  onPick: (id: string) => void;
-  shortLabel: string;
-  approximateLabel: string;
-}) {
-  if (colors.length === 0) return null;
-  return (
-    <ul className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-      {colors.map((color) => {
-        const on = color.id === current;
-        const short = !selectable.has(color.id);
-        return (
-          <li key={color.id}>
-            <button
-              type="button"
-              aria-pressed={on}
-              disabled={short}
-              onClick={() => onPick(color.id)}
-              title={short ? shortLabel : undefined}
-              className={cx(
-                "flex min-h-12 w-full items-center gap-2.5 rounded-field border px-2.5 py-1.5 text-left transition-colors",
-                on
-                  ? "border-ink bg-surface outline outline-2 outline-ink"
-                  : "border-line bg-surface hover:border-ink",
-                short && "cursor-not-allowed opacity-45",
-              )}
-            >
-              <FilamentChip hexes={color.hexes} size={24} />
-              <span className="min-w-0 leading-tight">
-                <span className="block truncate text-sm text-ink">
-                  {color.name}
-                </span>
-                <span className="block truncate text-xs text-soft">
-                  {short
-                    ? shortLabel
-                    : color.approximate
-                      ? approximateLabel
-                      : color.range}
-                </span>
-              </span>
-            </button>
-          </li>
-        );
-      })}
-    </ul>
   );
 }

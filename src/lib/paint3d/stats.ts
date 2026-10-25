@@ -23,7 +23,20 @@ export interface PaintStats {
 /** Hauteur de couche de l'estimation (mm). */
 export const STATS_LAYER_HEIGHT = 0.2;
 
-export function paintStats(doc: PaintDocument, slots = 4): PaintStats {
+/**
+ * Bilan par emplacement. `states` (facultatif) renumérote d'abord les états
+ * (couleurs réellement imprimées : doublons réunis, voir printedPalette).
+ */
+export function paintStats(
+  doc: PaintDocument,
+  slots = 4,
+  states?: ArrayLike<number>,
+): PaintStats {
+  const slotOf = (state: number) =>
+    Math.min(
+      slots - 1,
+      slotOfState(states && state < states.length ? states[state] : state),
+    );
   const s2 = doc.scale * doc.scale;
   const areas = doc.topology.areas;
   const areaBySlot = Array.from({ length: slots }, () => 0);
@@ -56,13 +69,13 @@ export function paintStats(doc: PaintDocument, slots = 4): PaintStats {
     totalArea += area;
     const node = doc.node(t);
     if (!isSplit(node)) {
-      const slot = Math.min(slots - 1, slotOfState(node));
+      const slot = slotOf(node);
       areaBySlot[slot] += area;
       mark(slot, doc.corners(t));
       continue;
     }
     forEachLeaf(node, doc.corners(t), (corners, state, share) => {
-      const slot = Math.min(slots - 1, slotOfState(state));
+      const slot = slotOf(state);
       areaBySlot[slot] += area * share;
       mark(slot, corners);
     });

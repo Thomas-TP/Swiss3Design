@@ -58,9 +58,17 @@ import type {
   PaintMeasure,
   ViewPreset,
 } from "@/lib/paint3d/editor-contract";
+import {
+  bucketRegion,
+  forEachSelectedLeaf,
+  inSelection,
+  leafAt,
+  paintSelection,
+  type LeafSelection,
+} from "@/lib/paint3d/bucket";
 import { forEachLeaf, isSplit, leafCount } from "@/lib/paint3d/selector";
 import {
-  fillRegion,
+  fillOptions,
   paintHeightRange,
   paintSphere,
   paintTriangles,
@@ -188,7 +196,22 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
   const overlay = new Mesh(new BufferGeometry(), material);
   base.frustumCulled = false;
   overlay.frustumCulled = false;
-  object.add(base, overlay);
+  // Aperçu du remplissage : les feuilles de la zone, redessinées par-dessus la
+  // pièce (décalage de profondeur) dans la couleur qu'elles vont prendre.
+  const highlightMaterial = new MeshStandardMaterial({
+    vertexColors: true,
+    roughness: 0.6,
+    metalness: 0,
+    side: DoubleSide,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -4,
+  });
+  const highlight = new Mesh(new BufferGeometry(), highlightMaterial);
+  highlight.frustumCulled = false;
+  highlight.visible = false;
+  highlight.renderOrder = 1;
+  object.add(base, overlay, highlight);
 
   // Plateau et volume d'impression.
   const plateMaterial = new MeshBasicMaterial({ toneMapped: false });
@@ -275,13 +298,8 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
   let tints: Color[][] = [];
   let transformVersion = -1;
   let rotation: readonly number[] = [1, 0, 0, 0, 1, 0, 0, 0, 1];
-  /** Prévisualisation du remplissage : zone et couleur montrée. */
-  let preview: {
-    region: Uint32Array;
-    mask: Uint8Array;
-    seed: number;
-    key: string;
-  } | null = null;
+  /** Aperçu du remplissage : la zone sous le pointeur (feuilles). */
+  let preview: { selection: LeafSelection; key: string } | null = null;
   let measure: PaintMeasure | null = null;
   let ready = false;
   const disposers: (() => void)[] = [];
@@ -324,6 +342,7 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
 
   const scratch = new Color();
   const white = new Color(1, 1, 1);
+  const shade = new Color(0.18, 0.2, 0.26);
 
   /** Couleur (linéaire) d'un état sous une normale du fichier. */
   function colorOf(
@@ -333,7 +352,7 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
     nz: number,
     out: Float32Array,
     o: number,
-    previewing: boolean,
+    lighten = 0,
   ) {
     const slot = Math.min(tints.length - 1, Math.max(0, state - 1));
     const tint = tints[slot];
@@ -353,7 +372,14 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
         scratch.lerp(mix, blend.flat);
       }
     }
-    if (previewing) scratch.lerp(white, 0.2);
+    if (lighten > 0) {
+      // Aperçu : éclairci, ou assombri pour une teinte déjà claire (une zone
+      // blanche sur du blanc doit se voir).
+      const luminance =
+        0.2126 * scratch.r + 0.7152 * scratch.g + 0.0722 * scratch.b;
+      if (luminance > 0.55) scratch.lerp(shade, lighten);
+      else scratch.lerp(white, lighten);
+    }
     out[o] = scratch.r;
     out[o + 1] = scratch.g;
     out[o + 2] = scratch.b;
@@ -366,12 +392,11 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
   function writeBaseColors(t: number) {
     if (!doc) return;
     const node = doc.node(t);
-    const previewing = preview?.mask[t] === 1;
-    const state = previewing ? previewState() : isSplit(node) ? 0 : node;
+    const state = isSplit(node) ? 0 : node;
     const n = doc.cornerNormals;
     for (let i = 0; i < 3; i++) {
       const o = t * 9 + i * 3;
-      colorOf(state, n[o], n[o + 1], n[o + 2], colors, o, previewing);
+      colorOf(state, n[o], n[o + 1], n[o + 2], colors, o);
     }
   }
 
@@ -379,17 +404,13 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
     overlayDirty = false;
     if (!doc) return;
     let leaves = 0;
-    for (const t of doc.splitTriangles()) {
-      if (preview?.mask[t] === 1) continue;
-      leaves += leafCount(doc.node(t));
-    }
+    for (const t of doc.splitTriangles()) leaves += leafCount(doc.node(t));
     const positions = new Float32Array(leaves * 9);
     const normals = new Float32Array(leaves * 9);
     const leafColors = new Float32Array(leaves * 9);
     let o = 0;
     const n = doc.cornerNormals;
     for (const t of doc.splitTriangles()) {
-      if (preview?.mask[t] === 1) continue;
       const corners = doc.corners(t);
       const no = t * 9;
       forEachLeaf(doc.node(t), corners, (leaf, state) => {
@@ -411,7 +432,7 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
           normals[o] = nx;
           normals[o + 1] = ny;
           normals[o + 2] = nz;
-          colorOf(state, nx, ny, nz, leafColors, o, false);
+          colorOf(state, nx, ny, nz, leafColors, o);
           o += 3;
         }
       });
@@ -696,99 +717,94 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
     });
   }
 
-  function clearPreview() {
-    if (!preview || !doc) return;
-    const old = preview;
-    preview = null;
-    let hadSplit = false;
-    for (const t of old.region) {
-      writeBaseColors(t);
-      if (doc.isSplit(t)) hadSplit = true;
-    }
-    markAllColors(old.region);
-    if (hadSplit) overlayDirty = true;
-  }
-
-  function markAllColors(region: Uint32Array) {
-    if (!baseGeometry || region.length === 0) return;
-    let min = Infinity;
-    let max = -Infinity;
-    for (const t of region) {
-      if (t < min) min = t;
-      if (t > max) max = t;
-    }
-    const attribute = baseGeometry.getAttribute("color") as BufferAttribute;
-    attribute.clearUpdateRanges();
-    attribute.addUpdateRange(min * 9, (max - min + 1) * 9);
-    attribute.needsUpdate = true;
-  }
-
   function fillKey(): string {
     return props
       ? `${props.fillMode}:${props.fillAngle}:${props.slot}:${props.tool}:${props.clipZ}:${doc?.paintVersion}`
       : "";
   }
 
-  /** Montre la zone que remplirait un clic sur `seed`. */
-  function showFillPreview(seed: number) {
-    if (!doc || !props) return;
-    const key = fillKey();
-    if (preview && preview.key === key && preview.mask[seed] === 1) return;
-    clearPreview();
+  /** Zone d'un remplissage depuis le point touché (feuille sous le pointeur). */
+  function fillSelection(
+    found: NonNullable<ReturnType<typeof pick>>,
+  ): LeafSelection | null {
+    if (!doc || !props) return null;
+    const t = found.hit.triangle;
+    const leaf = leafAt(doc, t, [found.model.x, found.model.y, found.model.z]);
+    if (
+      preview &&
+      preview.key === fillKey() &&
+      inSelection(preview.selection, t, leaf)
+    )
+      return preview.selection;
     const clipZ = props.clipZ;
     const current = doc;
-    const region = fillRegion(
-      current,
-      seed,
-      props.fillMode,
-      props.fillAngle,
-      clipZ === null
-        ? undefined
-        : (t) => {
-            const c = current.corners(t);
-            return current.worldZ(c[0], c[1], c[2]) <= clipZ;
-          },
-    );
-    const mask = new Uint8Array(current.triangleCount);
-    let hasSplit = false;
-    for (const t of region) {
-      mask[t] = 1;
-      if (current.isSplit(t)) {
-        hasSplit = true;
-        // Le triangle coupé se montre entier, à la couleur du remplissage.
-        index[t * 3] = t * 3;
-        index[t * 3 + 1] = t * 3 + 1;
-        index[t * 3 + 2] = t * 3 + 2;
-      }
-    }
-    preview = { region, mask, seed, key };
-    for (const t of region) writeBaseColors(t);
-    markAllColors(region);
-    if (hasSplit) {
-      overlayDirty = true;
-      baseGeometry!.getIndex()!.clearUpdateRanges();
-      baseGeometry!.getIndex()!.needsUpdate = true;
-    }
+    return bucketRegion(current, t, leaf, {
+      ...fillOptions(props.fillMode, props.fillAngle),
+      accept:
+        clipZ === null
+          ? undefined
+          : (u) => {
+              const c = current.corners(u);
+              return current.worldZ(c[0], c[1], c[2]) <= clipZ;
+            },
+    });
   }
 
-  function restoreSplitIndices() {
-    if (!doc || !baseGeometry) return;
-    let changed = false;
-    for (const t of doc.splitTriangles())
-      if (index[t * 3 + 1] !== 0 || index[t * 3 + 2] !== 0) {
-        index[t * 3] = index[t * 3 + 1] = index[t * 3 + 2] = 0;
-        changed = true;
+  /** Montre la zone que remplirait un clic au point touché. */
+  function showFillPreview(found: NonNullable<ReturnType<typeof pick>>) {
+    if (!doc || !props) return;
+    const selection = fillSelection(found);
+    if (!selection) return;
+    const key = fillKey();
+    if (preview && preview.selection === selection && preview.key === key)
+      return;
+    preview = { selection, key };
+    let count = 0;
+    forEachSelectedLeaf(doc, selection, () => count++);
+    const positions = new Float32Array(count * 9);
+    const normals = new Float32Array(count * 9);
+    const tint = new Float32Array(count * 9);
+    const state = previewState();
+    let o = 0;
+    forEachSelectedLeaf(doc, selection, (c) => {
+      // Normale de la feuille (celle de son triangle d'origine).
+      const ax = c[3] - c[0];
+      const ay = c[4] - c[1];
+      const az = c[5] - c[2];
+      const bx = c[6] - c[0];
+      const by = c[7] - c[1];
+      const bz = c[8] - c[2];
+      let nx = ay * bz - az * by;
+      let ny = az * bx - ax * bz;
+      let nz = ax * by - ay * bx;
+      const length = Math.hypot(nx, ny, nz) || 1;
+      nx /= length;
+      ny /= length;
+      nz /= length;
+      for (let i = 0; i < 9; i += 3) {
+        positions[o + i] = c[i];
+        positions[o + i + 1] = c[i + 1];
+        positions[o + i + 2] = c[i + 2];
+        normals[o + i] = nx;
+        normals[o + i + 1] = ny;
+        normals[o + i + 2] = nz;
+        colorOf(state, nx, ny, nz, tint, o + i, 0.28);
       }
-    if (changed) {
-      baseGeometry.getIndex()!.clearUpdateRanges();
-      baseGeometry.getIndex()!.needsUpdate = true;
-    }
+      o += 9;
+    });
+    highlight.geometry.dispose();
+    const geometry = new BufferGeometry();
+    geometry.setAttribute("position", new BufferAttribute(positions, 3));
+    geometry.setAttribute("normal", new BufferAttribute(normals, 3));
+    geometry.setAttribute("color", new BufferAttribute(tint, 3));
+    highlight.geometry = geometry;
+    highlight.visible = count > 0;
   }
 
   function dropPreview() {
     if (!preview) return;
-    clearPreview();
-    restoreSplitIndices();
+    preview = null;
+    highlight.visible = false;
   }
 
   function updateHover(clientX: number, clientY: number) {
@@ -805,7 +821,7 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
     if (tool === "brush" || tool === "erase")
       showRing(found.world, found.hit.triangle);
     if (tool === "height") showHeight(found.world.z);
-    if (tool === "fill") showFillPreview(found.hit.triangle);
+    if (tool === "fill") showFillPreview(found);
     else dropPreview();
     ctx.invalidate();
   }
@@ -876,26 +892,11 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
     if (!found) return;
     const state = props.slot + 1;
     if (tool === "fill") {
+      const selection = fillSelection(found);
       dropPreview();
+      if (!selection) return;
       doc.beginStep();
-      const clipZ = props.clipZ;
-      const current = doc;
-      paintTriangles(
-        doc,
-        fillRegion(
-          doc,
-          found.hit.triangle,
-          props.fillMode,
-          props.fillAngle,
-          clipZ === null
-            ? undefined
-            : (t) => {
-                const c = current.corners(t);
-                return current.worldZ(c[0], c[1], c[2]) <= clipZ;
-              },
-        ),
-        state,
-      );
+      paintSelection(doc, selection, state);
       if (doc.endStep()) props.onEdit?.();
     } else if (tool === "height") {
       const z = found.world.z;
@@ -1217,6 +1218,7 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
       if (measure) syncMeasure();
       const clipZ = props.clipZ;
       material.clippingPlanes = clipZ === null ? null : clipPlanes;
+      highlightMaterial.clippingPlanes = material.clippingPlanes;
       clipPlane.constant = clipZ ?? 0;
       const clipping = current.renderer.localClippingEnabled;
       current.renderer.localClippingEnabled = clipZ !== null;
@@ -1232,6 +1234,8 @@ const create = (ctx: StageContext): StageScene<PaintEditorProps> => {
       for (const off of disposers.splice(0)) off();
       baseGeometry?.dispose();
       overlayGeometry?.dispose();
+      highlight.geometry.dispose();
+      highlightMaterial.dispose();
       plateTex?.dispose();
       material.dispose();
       plateMaterial.dispose();

@@ -1,6 +1,5 @@
-// Outils de l'atelier 3D, à la manière des trancheurs : pinceau (sphère), triangle,
-// remplissages (surface lisse, même couleur, pièce entière) et bandes de
-// hauteur. Ils agissent sur le document dans l'étape ouverte par l'appelant
+// Outils de l'atelier 3D, à la manière des trancheurs : pinceau (sphère), triangle
+// et bandes de hauteur ; les remplissages sont dans bucket.ts. Ils agissent sur le document dans l'étape ouverte par l'appelant
 // (un trait = une étape = un « annuler »). Le pinceau et les hauteurs coupent les
 // grands triangles le long de leur bord (selector.ts) : un trait reste rond et une
 // bande horizontale nette sur un maillage grossier, sans toucher à la géométrie.
@@ -14,7 +13,6 @@ import {
   splitRule,
   type PaintNode,
 } from "./selector";
-import { floodTriangles } from "./topology";
 
 // ── Géométrie ────────────────────────────────────────────────────────────────
 
@@ -236,65 +234,25 @@ export function paintTriangles(
 
 // ── Remplissages ─────────────────────────────────────────────────────────────
 
-export type FillMode = "smooth" | "color" | "part";
-
-/** État dominant (par l'aire) d'un triangle, coupé ou non. */
-export function dominantState(doc: PaintDocument, t: number): number {
-  const node = doc.node(t);
-  if (!isSplit(node)) return node;
-  const shares = new Map<number, number>();
-  const visit = (n: PaintNode, share: number) => {
-    if (!isSplit(n)) {
-      shares.set(n, (shares.get(n) ?? 0) + share);
-      return;
-    }
-    const part =
-      n.s === 1
-        ? [0.5, 0.5]
-        : n.s === 2
-          ? [0.25, 0.25, 0.5]
-          : [0.25, 0.25, 0.25, 0.25];
-    n.c.forEach((child, i) => visit(child, share * part[i]));
-  };
-  visit(node, 1);
-  let best = 0;
-  let bestShare = -1;
-  for (const [state, share] of shares)
-    if (share > bestShare) {
-      best = state;
-      bestShare = share;
-    }
-  return best;
-}
-
 /**
- * Zone d'un remplissage depuis le triangle `seed` :
- *  - « smooth » : surface lisse, jusqu'aux arêtes plus vives que `angleDeg` ;
- *  - « color » : la zone de même couleur (et, si `angleDeg` < 180, lisse) ;
+ * Modes du remplissage (bucket.ts, au niveau des feuilles de la peinture) :
+ *  - « zone » : la même couleur, jusqu'aux arêtes plus vives que l'angle (le pot
+ *    de peinture de Bambu Studio, « détection des arêtes ») ;
+ *  - « color » : toute la zone de même couleur, sans limite d'angle ;
+ *  - « surface » : la surface lisse, quelles que soient les couleurs (le
+ *    « remplissage intelligent » des trancheurs) ;
  *  - « part » : toute la pièce (les triangles reliés par des arêtes).
  */
-export function fillRegion(
-  doc: PaintDocument,
-  seed: number,
+export type FillMode = "zone" | "color" | "surface" | "part";
+
+export function fillOptions(
   mode: FillMode,
   angleDeg: number,
-  accept?: (t: number) => boolean,
-): Uint32Array {
-  const normals = doc.topology.faceNormals;
-  const cos =
-    Math.cos((Math.min(180, Math.max(0, angleDeg)) * Math.PI) / 180) - 1e-6;
-  const seedState = mode === "color" ? dominantState(doc, seed) : 0;
-  return floodTriangles(doc.topology, seed, (from, to) => {
-    if (accept && !accept(to)) return false;
-    if (mode === "part") return true;
-    if (mode === "color" && dominantState(doc, to) !== seedState) return false;
-    if (mode === "color" && angleDeg >= 180) return true;
-    const dot =
-      normals[from * 3] * normals[to * 3] +
-      normals[from * 3 + 1] * normals[to * 3 + 1] +
-      normals[from * 3 + 2] * normals[to * 3 + 2];
-    return Math.min(1, Math.max(0, dot)) >= cos;
-  });
+): { sameColor: boolean; angle: number | null } {
+  return {
+    sameColor: mode === "zone" || mode === "color",
+    angle: mode === "zone" || mode === "surface" ? angleDeg : null,
+  };
 }
 
 // ── Bandes de hauteur ────────────────────────────────────────────────────────

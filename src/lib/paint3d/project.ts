@@ -4,7 +4,7 @@
 // projet et le 3MF à envoyer. Pur TypeScript (la lecture des fichiers et la
 // géométrie restent hors de three).
 import { PaintDocument } from "./document";
-import { mapFileFilaments, type PaletteColor } from "./palette";
+import { mapFileFilaments, printedPalette, type PaletteColor } from "./palette";
 import { readMesh, readTriangles, type LoadedMesh } from "./read";
 import {
   accumulateShares,
@@ -22,13 +22,14 @@ export type PaintSource =
   | { format: "triangles"; positions: Float32Array };
 
 export interface OpenedProject {
-  /** Le document, sans peinture : celle du fichier est appliquée par l'appelant (applyFilePaint). */
+  /** Le document, avec les zones du fichier (une par filament) déjà en place. */
   doc: PaintDocument;
-  /** Couleurs du fichier associées au stock (ids, dans l'ordre), ou null. */
+  /**
+   * Couleur du stock de chaque filament du fichier (emplacements 1 à 4, dans
+   * l'ordre ; doublons possibles), ou null : fichier d'une seule couleur.
+   */
   fileRefs: string[] | null;
-  /** Peinture du fichier en états du document (à appliquer si le visiteur l'accepte). */
-  filePaint: Map<number, PaintNode> | null;
-  /** Des couleurs du fichier ont été fusionnées (plus de quatre, même teinte). */
+  /** Plus de quatre filaments : les moins présents ont été réunis. */
   merged: boolean;
   producer: LoadedMesh["producer"];
 }
@@ -73,9 +74,9 @@ function filamentAreas(loaded: LoadedMesh): Map<number, number> {
 
 /**
  * Ouvre le fichier du visiteur. Un 3MF qui porte plusieurs couleurs (peinture,
- * filament par pièce) les rend à part : chaque filament est associé à la couleur
- * du stock la plus proche, et la peinture correspondante est appliquée par
- * l'appelant en une étape (applyFilePaint), que le visiteur peut retirer.
+ * filament par pièce) garde ses zones telles quelles : chaque filament devient
+ * un emplacement, associé à la couleur du stock la plus proche ; le visiteur ne
+ * fait que changer ces couleurs (ou repasse en une couleur, sans rien perdre).
  */
 export async function openProject(
   source: PaintSource,
@@ -95,7 +96,6 @@ export async function openProject(
         parts: loaded.parts,
       }),
       fileRefs: null,
-      filePaint: null,
       merged: false,
       producer: loaded.producer,
     };
@@ -116,7 +116,6 @@ export async function openProject(
         parts: loaded.parts,
       }),
       fileRefs: null,
-      filePaint: null,
       merged: false,
       producer: loaded.producer,
     };
@@ -143,9 +142,9 @@ export async function openProject(
     doc: new PaintDocument({
       positions: loaded.positions,
       parts: loaded.parts,
+      paint,
     }),
     fileRefs: mapping.refs,
-    filePaint: paint,
     merged: mapping.merged,
     producer: loaded.producer,
   };
@@ -153,16 +152,20 @@ export async function openProject(
 
 /**
  * Feuilles peintes, sur le plateau (mm, Z en haut), pour la vue « salle à
- * manger » : 9 positions et un état par triangle.
+ * manger » : 9 positions et un état par triangle (renuméroté par `states`,
+ * table de printedPalette).
  */
-export function paintedPreview(doc: PaintDocument): {
+export function paintedPreview(
+  doc: PaintDocument,
+  states?: ArrayLike<number>,
+): {
   positions: Float32Array;
   states: Uint8Array;
 } {
   let count = 0;
   for (let t = 0; t < doc.triangleCount; t++) count += leafCount(doc.node(t));
   const positions = new Float32Array(count * 9);
-  const states = new Uint8Array(count);
+  const out = new Uint8Array(count);
   let i = 0;
   const put = (c: ArrayLike<number>, state: number) => {
     for (let k = 0; k < 9; k += 3) {
@@ -171,36 +174,43 @@ export function paintedPreview(doc: PaintDocument): {
       positions[i * 9 + k + 1] = y;
       positions[i * 9 + k + 2] = z;
     }
-    states[i++] = state;
+    out[i++] = states && state < states.length ? states[state] : state;
   };
   for (let t = 0; t < doc.triangleCount; t++) {
     const node = doc.node(t);
     if (isSplit(node)) forEachLeaf(node, doc.corners(t), put);
     else put(doc.corners(t), node);
   }
-  return { positions, states };
+  return { positions, states: out };
 }
 
-/** Le projet diffère-t-il du fichier (plusieurs couleurs, taille, orientation) ? */
+/**
+ * Le projet diffère-t-il du fichier (plusieurs couleurs réellement placées,
+ * taille, orientation) ? `slots` : la couleur de chaque emplacement.
+ */
 export function projectMatters(
   doc: PaintDocument,
-  refs: readonly string[],
+  slots: readonly string[],
+  several: boolean,
 ): boolean {
   if (doc.transformed) return true;
+  const { refs, states } = printedPalette(slots, several);
   if (refs.length < 2) return false;
   const used = new Set<number>();
   for (const state of doc.usedStates())
-    used.add(Math.min(refs.length - 1, slotOfState(state)));
+    used.add(Math.min(refs.length - 1, slotOfState(states[state] ?? 0)));
   return used.size > 1;
 }
 
-/** Résumé du projet pour la demande de devis. */
+/** Résumé du projet pour la demande de devis (couleurs imprimées, distinctes). */
 export function projectSummary(
   doc: PaintDocument,
-  refs: readonly string[],
+  slots: readonly string[],
+  several: boolean,
   origin: ColorProjectSummary["origin"],
 ): ColorProjectSummary {
-  const stats = paintStats(doc, Math.max(1, refs.length));
+  const { refs, states } = printedPalette(slots, several);
+  const stats = paintStats(doc, Math.max(1, refs.length), states);
   const total = stats.totalArea || 1;
   const bounds = doc.worldBounds();
   const round = (v: number) => Math.round(v * 10) / 10;
@@ -217,14 +227,4 @@ export function projectSummary(
     changes: refs.length > 1 ? stats.changes : 0,
     origin,
   };
-}
-
-/** Applique la peinture d'un fichier (une étape : « Annuler » la retire). */
-export function applyFilePaint(
-  doc: PaintDocument,
-  paint: ReadonlyMap<number, PaintNode>,
-): void {
-  doc.beginStep();
-  for (const [t, node] of paint) doc.setNode(t, node);
-  doc.endStep();
 }

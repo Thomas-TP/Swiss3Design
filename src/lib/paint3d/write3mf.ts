@@ -18,7 +18,7 @@ import {
   type BambuTemplate,
 } from "./bambu-project";
 import type { PaintDocument } from "./document";
-import { encodePaint } from "./selector";
+import { encodePaint, remapNode } from "./selector";
 import { writeZip } from "./zip";
 
 /** Centre du plateau (mm) : P1S et K2, 256 et 260 mm de côté. */
@@ -67,6 +67,12 @@ export interface Export3mfOptions {
    * retrouve ses couleurs.
    */
   colors?: readonly string[];
+  /**
+   * Renumérotation des états à l'écriture (index = état du document) : les
+   * emplacements de même couleur réunis, ou tout au filament 1 pour une pièce
+   * d'une seule couleur (printedPalette). Absente : les états tels quels.
+   */
+  states?: ArrayLike<number>;
   /**
    * Projet Bambu Studio : modèle de réglages (bambu-template.json, chargé à la
    * demande par l'appelant) et filaments, dans l'ordre (filament 1 = base).
@@ -155,7 +161,10 @@ async function* meshChunks(
       const a = local[vertexOf[t * 3]];
       const b = local[vertexOf[t * 3 + 1]];
       const c = local[vertexOf[t * 3 + 2]];
-      const paint = encodePaint(doc.node(t));
+      const node = doc.node(t);
+      const paint = encodePaint(
+        options.states ? remapNode(node, options.states) : node,
+      );
       out.write(
         paint
           ? `     <triangle v1="${a}" v2="${b}" v3="${c}" paint_color="${paint}" slic3rpe:mmu_segmentation="${paint}"/>\n`

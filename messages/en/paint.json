@@ -48,10 +48,12 @@
     "paints": "Restores the base ({name})"
   },
   "fill": {
-    "smooth": "Surface",
+    "zone": "Area",
+    "zoneHint": "Recolours the area you touch: same colour, up to edges sharper than the chosen angle.",
+    "surface": "Surface",
+    "surfaceHint": "Fills the smooth surface up to sharp edges, over the other colours.",
     "color": "Same colour",
     "part": "Part",
-    "smoothHint": "Fills the smooth surface, up to edges sharper than the chosen angle.",
     "colorHint": "Repaints the whole connected area of the same colour.",
     "partHint": "Fills the whole part you touch (a volume separate from the rest).",
     "angle": "Edge angle"
@@ -84,18 +86,8 @@
   },
   "palette": {
     "title": "Colours",
-    "base": "Base",
-    "share": "{percent} % of the surface",
     "empty": "Add at least one colour from our stock to paint.",
-    "add": "Add a colour",
-    "replace": "Replace this colour",
-    "remove": "Remove this colour",
-    "makeBase": "Make it the base",
-    "noOther": "No other colour in stock in sufficient quantity.",
-    "max": "{max} colours at most: our printers load four spools.",
-    "hint": "The base (1) colours everything that isn't painted. Keys 1 to 4: pick the colour.",
-    "fileOffer": "Your file declares {count} colours (paint or parts), removed for now.",
-    "useFile": "Use the file's {count} colours"
+    "hint": "The base (1) colours everything that isn't painted. Keys 1 to 4: pick the colour."
   },
   "object": {
     "title": "Size and orientation",
@@ -162,7 +154,6 @@
     "pick": "Choose",
     "change": "Change",
     "cancel": "Close",
-    "remove": "Remove {name}",
     "add": "Add a colour",
     "choosing": "{slot}: choose a colour.",
     "needTwo": "Choose at least two colours, then place them on the piece.",
@@ -172,18 +163,18 @@
     "edit": "Edit the placement",
     "placed": "{count, plural, one {# colour placed on the piece} other {# colours placed on the piece}}",
     "size": "Size and orientation",
-    "fromFile": "Colours taken from your file, each in the closest shade from our stock.",
+    "fromFile": "The {count} colours of your file are kept with their areas, each in the closest shade from our stock. Change them below.",
     "fromFileMerged": "It had more than {max}: the closest ones were merged.",
-    "useOne": "A single colour instead",
-    "fileOffer": "Your file contains {count} colours.",
-    "useFile": "Use its {count} colours"
+    "fileOffer": "Your file's colours are kept with their areas.",
+    "useFile": "Print the {count} colours",
+    "short": "{name} is no longer in stock in sufficient quantity for your piece: choose another one."
   },
   "simple": {
     "title": "Place the colours",
     "stepColor": "1 · Choose a colour",
     "stepHow": "2 · Then click on the piece",
     "zone": "Area",
-    "zoneHint": "Click a surface: it takes the chosen colour.",
+    "zoneHint": "Click an area: it takes the chosen colour, up to the edges and the other colours.",
     "height": "Height",
     "heightAboveHint": "Click at the height you want: everything above takes the colour.",
     "heightBelowHint": "Click at the height you want: everything below takes the colour.",
@@ -193,6 +184,20 @@
     "onlyOne": "Only one colour chosen: add another one to place it.",
     "more": "More tools",
     "less": "Simple mode",
-    "fit": "Fit view"
+    "fit": "Fit view",
+    "single": "A single colour",
+    "singleHint": "The whole piece is printed in this colour. Your other colours and their areas are kept.",
+    "toSeveral": "Place several colours"
+  },
+  "slots": {
+    "unknown": "Colour to choose",
+    "main": "main",
+    "share": "{percent} % of the surface",
+    "change": "Change",
+    "close": "Close",
+    "remove": "Remove colour {n}",
+    "add": "Add a colour",
+    "max": "{max} colours at most: our printers load four spools.",
+    "removeConfirm": "The areas of colour {n} will go back to the main colour. Continue?"
   }
 }

@@ -1,8 +1,10 @@
 // Palette du projet de couleurs : jusqu'à 4 couleurs du stock (l'AMS 2 Pro et le
 // CFS chargent quatre bobines), l'emplacement 1 étant la base (surfaces non
-// peintes). Ici : correspondance des couleurs d'un fichier déjà peint avec le
-// stock (teinte la plus proche, ΔE CIE76 en Lab), et renumérotation des états
-// quand la palette change.
+// peintes). Les zones appartiennent aux EMPLACEMENTS (les filaments 1 à 4, comme
+// dans Bambu Studio), jamais aux couleurs : changer la couleur d'un emplacement
+// ne touche pas à la peinture. Ici : correspondance des filaments d'un fichier
+// déjà peint avec le stock (teinte la plus proche, ΔE CIE76 en Lab), couleurs
+// réellement imprimées, et renumérotation quand un emplacement disparaît.
 
 /** « #RRGGBB » → Lab (D65). */
 export function hexToLab(hex: string): [number, number, number] {
@@ -81,20 +83,24 @@ export interface FileFilament {
 }
 
 export interface FilamentMapping {
-  /** Couleurs de la palette, dans l'ordre des emplacements. */
+  /**
+   * Couleur du stock de chaque filament gardé, dans l'ordre (filament 1 en
+   * tête). Deux filaments peuvent recevoir la même couleur : leurs zones restent
+   * distinctes, le visiteur change l'une sans toucher à l'autre.
+   */
   refs: string[];
-  /** État du document pour chaque filament du fichier (index = n° de filament). */
+  /** Emplacement (état du document) de chaque filament du fichier. */
   stateOf: Map<number, number>;
-  /** Des filaments ont été fusionnés (plus de `max` couleurs, ou même teinte du stock). */
+  /** Plus de `max` filaments : les moins présents ont rejoint le plus proche. */
   merged: boolean;
 }
 
 /**
- * Associe les filaments d'un fichier peint aux couleurs du stock : chacun prend
- * la teinte la plus proche ; deux filaments sur la même couleur fusionnent ;
- * au-delà de `max`, les moins présents rejoignent la couleur gardée la plus
- * proche. Les emplacements suivent l'ordre des filaments du fichier (le 1 reste
- * la base quand il est utilisé).
+ * Filaments d'un fichier peint → emplacements de l'atelier (25.10.2026, comme la
+ * liste des filaments de Bambu Studio) : chaque filament utilisé garde SA zone
+ * et prend la couleur du stock la plus proche de sa teinte. Rien n'est fusionné
+ * pour une couleur identique ; seul un fichier de plus de `max` filaments voit
+ * ses moins présents rejoindre le filament gardé de teinte la plus proche.
  */
 export function mapFileFilaments(
   used: readonly FileFilament[],
@@ -102,68 +108,85 @@ export function mapFileFilaments(
   max = 4,
 ): FilamentMapping | null {
   if (used.length === 0 || stock.length === 0) return null;
-  const byRef = new Map<
-    string,
-    { area: number; filaments: number[]; first: number }
-  >();
-  for (const f of [...used].sort((a, b) => a.filament - b.filament)) {
-    // Sans teinte connue : une couleur du stock pas encore prise (le visiteur
-    // corrigera), pour garder les zones distinctes.
-    const color = f.hex
-      ? nearestColor(f.hex, stock)
-      : (stock.find((c) => !byRef.has(c.id)) ?? stock[0]);
-    if (!color) continue;
-    const group = byRef.get(color.id) ?? {
-      area: 0,
-      filaments: [],
-      first: f.filament,
-    };
-    group.area += f.area;
-    group.filaments.push(f.filament);
-    byRef.set(color.id, group);
-  }
-  let groups = [...byRef.entries()];
-  let merged = groups.length < used.length;
-  if (groups.length > max) {
+  const ordered = [...used].sort((a, b) => a.filament - b.filament);
+  let kept = ordered;
+  let merged = false;
+  const into = new Map<number, number>();
+  if (ordered.length > max) {
     merged = true;
-    const kept = [...groups]
-      .sort((a, b) => b[1].area - a[1].area)
-      .slice(0, max);
-    const keptIds = new Set(kept.map(([id]) => id));
-    const hexOf = (id: string) =>
-      stock.find((c) => c.id === id)?.hexes[0] ?? "#FFFFFF";
-    for (const [id, group] of groups) {
-      if (keptIds.has(id)) continue;
+    const keptSet = new Set(
+      [...ordered]
+        .sort((a, b) => b.area - a.area)
+        .slice(0, max)
+        .map((f) => f.filament),
+    );
+    kept = ordered.filter((f) => keptSet.has(f.filament));
+    for (const f of ordered) {
+      if (keptSet.has(f.filament)) continue;
       let target = kept[0];
       let best = Infinity;
       for (const candidate of kept) {
-        const d = deltaE(hexOf(id), hexOf(candidate[0]));
+        const d =
+          f.hex && candidate.hex ? deltaE(f.hex, candidate.hex) : Infinity;
         if (d < best) {
           best = d;
           target = candidate;
         }
       }
-      target[1].filaments.push(...group.filaments);
-      target[1].area += group.area;
+      into.set(f.filament, target.filament);
     }
-    groups = kept;
   }
-  groups.sort((a, b) => a[1].first - b[1].first);
+  const refs: string[] = [];
   const stateOf = new Map<number, number>();
-  groups.forEach(([, group], slot) => {
-    for (const filament of group.filaments) stateOf.set(filament, slot + 1);
+  kept.forEach((f, slot) => {
+    // Sans teinte connue : une couleur du stock pas encore prise (le visiteur
+    // corrigera), pour que les zones se distinguent à l'écran.
+    const color = f.hex
+      ? nearestColor(f.hex, stock)
+      : (stock.find((c) => !refs.includes(c.id)) ?? stock[0]);
+    refs.push(color?.id ?? stock[0].id);
+    stateOf.set(f.filament, slot + 1);
   });
-  return { refs: groups.map(([id]) => id), stateOf, merged };
+  for (const [from, to] of into) stateOf.set(from, stateOf.get(to)!);
+  return { refs, stateOf, merged };
 }
 
 /**
- * Table de renumérotation des états quand la palette passe de `before` à
- * `after` (ids dans l'ordre des emplacements) : une couleur retirée redevient
- * la base (0), une couleur déplacée suit sa nouvelle place.
+ * Couleurs réellement imprimées : les emplacements (une couleur du stock
+ * chacun, doublons permis) ramenés aux couleurs distinctes, dans l'ordre de
+ * première apparition, et la table état du document → filament exporté. Une
+ * seule couleur (`several` faux) : tout devient le filament 1, la peinture est
+ * gardée dans l'atelier mais pas imprimée.
  */
-export function paletteRemap(
-  before: readonly string[],
-  after: readonly string[],
+export function printedPalette(
+  slots: readonly string[],
+  several: boolean,
+): { refs: string[]; states: number[] } {
+  const states = Array.from({ length: 256 }, (_, s) => s);
+  if (!several || slots.length <= 1) {
+    states.fill(0);
+    return { refs: slots.slice(0, 1), states };
+  }
+  const refs: string[] = [];
+  slots.forEach((ref, slot) => {
+    let index = refs.indexOf(ref);
+    if (index < 0) index = refs.push(ref) - 1;
+    states[slot + 1] = index + 1;
+  });
+  // Un état au-delà des emplacements (emplacement retiré) : la base.
+  for (let s = slots.length + 1; s < states.length; s++) states[s] = 0;
+  return { refs, states };
+}
+
+/**
+ * Table de renumérotation des états quand des emplacements disparaissent ou
+ * changent de place (`before`, `after` : identifiants stables des emplacements,
+ * dans l'ordre) : un emplacement retiré redevient la base (0), un emplacement
+ * déplacé suit sa nouvelle place.
+ */
+export function slotRemap(
+  before: readonly number[],
+  after: readonly number[],
 ): number[] {
   const map = [0];
   for (let slot = 0; slot < before.length; slot++) {

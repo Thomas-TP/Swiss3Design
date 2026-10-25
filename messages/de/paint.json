@@ -48,10 +48,12 @@
     "paints": "Setzt die Grundfarbe ({name})"
   },
   "fill": {
-    "smooth": "Fläche",
+    "zone": "Zone",
+    "zoneHint": "Färbt die berührte Zone neu: gleiche Farbe, bis zu Kanten, die schärfer sind als der gewählte Winkel.",
+    "surface": "Fläche",
+    "surfaceHint": "Füllt die glatte Fläche bis zu den scharfen Kanten, über die anderen Farben hinweg.",
     "color": "Gleiche Farbe",
     "part": "Teil",
-    "smoothHint": "Füllt die glatte Fläche bis zu Kanten, die schärfer sind als der gewählte Winkel.",
     "colorHint": "Färbt die ganze zusammenhängende Fläche gleicher Farbe um.",
     "partHint": "Füllt das ganze berührte Teil (ein vom Rest getrenntes Volumen).",
     "angle": "Kantenwinkel"
@@ -84,18 +86,8 @@
   },
   "palette": {
     "title": "Farben",
-    "base": "Grundfarbe",
-    "share": "{percent} % der Oberfläche",
     "empty": "Fügen Sie mindestens eine Farbe aus dem Lager hinzu, um zu malen.",
-    "add": "Farbe hinzufügen",
-    "replace": "Diese Farbe ersetzen",
-    "remove": "Diese Farbe entfernen",
-    "makeBase": "Als Grundfarbe verwenden",
-    "noOther": "Keine weitere Farbe in ausreichender Menge an Lager.",
-    "max": "Höchstens {max} Farben: Unsere Drucker laden vier Spulen.",
-    "hint": "Die Grundfarbe (1) färbt alles Unbemalte. Tasten 1 bis 4: Farbe wählen.",
-    "fileOffer": "Ihre Datei gibt {count} Farben an (Bemalung oder Teile), vorerst entfernt.",
-    "useFile": "Die {count} Farben der Datei übernehmen"
+    "hint": "Die Grundfarbe (1) färbt alles Unbemalte. Tasten 1 bis 4: Farbe wählen."
   },
   "object": {
     "title": "Grösse und Ausrichtung",
@@ -162,7 +154,6 @@
     "pick": "Wählen",
     "change": "Ändern",
     "cancel": "Schliessen",
-    "remove": "{name} entfernen",
     "add": "Farbe hinzufügen",
     "choosing": "{slot}: Wählen Sie eine Farbe.",
     "needTwo": "Wählen Sie mindestens zwei Farben und platzieren Sie sie dann auf dem Teil.",
@@ -172,18 +163,18 @@
     "edit": "Platzierung ändern",
     "placed": "{count, plural, one {# Farbe auf dem Teil platziert} other {# Farben auf dem Teil platziert}}",
     "size": "Grösse und Ausrichtung",
-    "fromFile": "Farben aus Ihrer Datei übernommen, jede im nächstliegenden Farbton unseres Lagers.",
+    "fromFile": "Die {count} Farben Ihrer Datei werden mit ihren Zonen übernommen, jede im nächstliegenden Farbton unseres Lagers. Ändern Sie sie unten.",
     "fromFileMerged": "Sie hatte mehr als {max}: Die ähnlichsten wurden zusammengefasst.",
-    "useOne": "Stattdessen eine einzige Farbe",
-    "fileOffer": "Ihre Datei enthält {count} Farben.",
-    "useFile": "Ihre {count} Farben übernehmen"
+    "fileOffer": "Die Farben Ihrer Datei bleiben mit ihren Zonen erhalten.",
+    "useFile": "Die {count} Farben drucken",
+    "short": "{name} ist für Ihr Teil nicht mehr ausreichend auf Lager: Wählen Sie eine andere."
   },
   "simple": {
     "title": "Farben platzieren",
     "stepColor": "1 · Wählen Sie eine Farbe",
     "stepHow": "2 · Dann klicken Sie auf das Teil",
     "zone": "Zone",
-    "zoneHint": "Klicken Sie eine Fläche an: Sie nimmt die gewählte Farbe an.",
+    "zoneHint": "Klicken Sie eine Zone an: Sie nimmt die gewählte Farbe an, bis zu den Kanten und den anderen Farben.",
     "height": "Höhe",
     "heightAboveHint": "Klicken Sie auf die gewünschte Höhe: Alles darüber nimmt die Farbe an.",
     "heightBelowHint": "Klicken Sie auf die gewünschte Höhe: Alles darunter nimmt die Farbe an.",
@@ -193,6 +184,20 @@
     "onlyOne": "Nur eine Farbe gewählt: Fügen Sie eine weitere hinzu, um sie zu platzieren.",
     "more": "Weitere Werkzeuge",
     "less": "Einfacher Modus",
-    "fit": "Einpassen"
+    "fit": "Einpassen",
+    "single": "Eine einzige Farbe",
+    "singleHint": "Das ganze Teil wird in dieser Farbe gedruckt. Ihre anderen Farben und deren Zonen bleiben erhalten.",
+    "toSeveral": "Mehrere Farben platzieren"
+  },
+  "slots": {
+    "unknown": "Farbe wählen",
+    "main": "Hauptfarbe",
+    "share": "{percent} % der Oberfläche",
+    "change": "Ändern",
+    "close": "Schliessen",
+    "remove": "Farbe {n} entfernen",
+    "add": "Farbe hinzufügen",
+    "max": "Höchstens {max} Farben: Unsere Drucker laden vier Spulen.",
+    "removeConfirm": "Die Zonen der Farbe {n} erhalten wieder die Hauptfarbe. Fortfahren?"
   }
 }

@@ -20,9 +20,7 @@ import {
   Move3d,
   PaintBucket,
   Paintbrush,
-  Plus,
   Redo2,
-  RotateCcw,
   Ruler,
   Scissors,
   Trash2,
@@ -50,8 +48,12 @@ import type {
   PaintTool,
   ViewPreset,
 } from "@/lib/paint3d/editor-contract";
+import { printedPalette } from "@/lib/paint3d/palette";
 import { paintStats } from "@/lib/paint3d/stats";
 import { paintHeightRange, type FillMode } from "@/lib/paint3d/tools";
+import { SlotList } from "./slot-list";
+import { newSlot } from "./slots";
+import type { ColorSetup } from "./types";
 
 // Fenêtre de l'atelier 3D : un <dialog> modal plein écran (top layer : focus
 // piégé, Échap, page inerte). Le centre est TRANSPARENT : c'est une vue du Stage
@@ -116,14 +118,12 @@ export function PaintDialog({
   fileName,
   stock,
   selectable,
-  refs,
+  setup,
   palette,
   maxColors,
   gramsPerPiece,
   plate,
-  onRefsChange,
-  onReplaceRef,
-  fileOffer,
+  onSetupChange,
   onClose,
 }: {
   doc: PaintDocument | null;
@@ -131,15 +131,14 @@ export function PaintDialog({
   fileName: string;
   stock: readonly PublicCustomColor[];
   selectable: ReadonlySet<string>;
-  refs: readonly string[];
+  /** Emplacements de couleur (filaments) et une ou plusieurs couleurs. */
+  setup: ColorSetup;
+  /** Teintes affichées de chaque emplacement (une seule en une couleur). */
   palette: readonly (readonly string[])[];
   maxColors: number;
   gramsPerPiece: number | null;
   plate: number;
-  onRefsChange: (refs: string[]) => void;
-  onReplaceRef: (slot: number, id: string) => void;
-  /** Couleurs du fichier, proposées (reprendre en un clic, annulable). */
-  fileOffer: { count: number; apply: () => void } | null;
+  onSetupChange: (setup: ColorSetup) => void;
   onClose: () => void;
 }) {
   const t = useTranslations("paint");
@@ -154,14 +153,18 @@ export function PaintDialog({
     (s) => s.capability >= 1 && !s.contextLost,
   );
   const version = useDocVersion(doc);
+  // Couleurs peintes : les emplacements en plusieurs couleurs, la principale
+  // seule sinon (la peinture reste gardée, mais rien ne se peint).
+  const refs = setup.several
+    ? setup.slots.map((slot) => slot.ref)
+    : setup.slots.slice(0, 1).map((slot) => slot.ref);
+  const painting = setup.several && refs.length > 1;
 
-  const [tool, setTool] = useState<PaintTool>(
-    refs.length > 1 ? "fill" : "orbit",
-  );
+  const [tool, setTool] = useState<PaintTool>(painting ? "fill" : "orbit");
   const [slot, setSlot] = useState(Math.min(1, Math.max(0, refs.length - 1)));
   const [brush, setBrush] = useState<number | null>(null);
   const [through, setThrough] = useState(false);
-  const [fillMode, setFillMode] = useState<FillMode>("smooth");
+  const [fillMode, setFillMode] = useState<FillMode>("zone");
   const [fillAngle, setFillAngle] = useState(30);
   const [heightMode, setHeightMode] = useState<HeightMode>("above");
   const [bandHeight, setBandHeight] = useState(5);
@@ -310,33 +313,75 @@ export function PaintDialog({
   });
   // oxlint-enable exhaustive-deps
 
+  // Bilan des couleurs imprimées (emplacements de même couleur réunis) et part
+  // de chaque emplacement.
+  const printed = useMemo(
+    () => printedPalette(refs, setup.several),
+    // oxlint-disable-next-line exhaustive-deps -- refs dérivé de setup
+    [setup],
+  );
   const stats = useMemo(
     () =>
-      doc && version >= 0 ? paintStats(doc, Math.max(1, refs.length)) : null,
-    [doc, version, refs.length],
+      doc && version >= 0
+        ? paintStats(doc, Math.max(1, printed.refs.length), printed.states)
+        : null,
+    [doc, version, printed],
   );
+  const slotShares = useMemo(() => {
+    if (!doc || version < 0) return null;
+    const perSlot = paintStats(doc, Math.max(1, setup.slots.length));
+    const total = perSlot.totalArea || 1;
+    return setup.slots.map((_, i) => (perSlot.areaBySlot[i] ?? 0) / total);
+  }, [doc, version, setup.slots]);
 
-  // ── Palette ──
+  // ── Emplacements ──
   const colorOf = (id: string) => stock.find((c) => c.id === id);
-  const addable = stock.filter(
-    (c) => selectable.has(c.id) && !refs.includes(c.id),
+  const selectSlot = (index: number) => {
+    setSlot(index);
+    if (tool === "orbit" || tool === "measure" || tool === "lay")
+      setTool("fill");
+  };
+  const changeColor = (index: number, ref: string) =>
+    onSetupChange({
+      ...setup,
+      slots: setup.slots.map((slot, i) =>
+        i === index ? { ...slot, ref } : slot,
+      ),
+    });
+  const addColor = (ref: string) => {
+    if (setup.slots.length >= maxColors) return;
+    onSetupChange({ several: true, slots: [...setup.slots, newSlot(ref)] });
+    setSlot(setup.slots.length);
+    if (tool === "orbit") setTool("fill");
+  };
+  const removeSlot = (index: number) => {
+    if (
+      (slotShares?.[index] ?? 0) > 0 &&
+      !window.confirm(t("slots.removeConfirm", { n: index + 1 }))
+    )
+      return;
+    onSetupChange({
+      ...setup,
+      slots: setup.slots.filter((_, i) => i !== index),
+    });
+    setSlot((current) =>
+      current >= index ? Math.max(0, current - 1) : current,
+    );
+  };
+  const slotList = (
+    <SlotList
+      slots={setup.several ? setup.slots : setup.slots.slice(0, 1)}
+      stock={stock}
+      selectable={selectable}
+      active={painting ? slotClamped : null}
+      shares={setup.several ? slotShares : null}
+      max={setup.several ? maxColors : 1}
+      onSelect={selectSlot}
+      onChangeColor={changeColor}
+      onRemove={removeSlot}
+      onAdd={addColor}
+    />
   );
-  const addColor = (id: string) => {
-    if (refs.length >= maxColors) return;
-    onRefsChange([...refs, id]);
-    setSlot(refs.length);
-    if (tool === "orbit" && refs.length >= 1) setTool("fill");
-  };
-  const removeColor = (index: number) => {
-    onRefsChange(refs.filter((_, i) => i !== index));
-    setSlot((current) => Math.max(0, current >= index ? current - 1 : current));
-  };
-  const makeBase = (index: number) => {
-    const next = [refs[index], ...refs.filter((_, i) => i !== index)];
-    onRefsChange(next);
-    setSlot(0);
-  };
-  const [replacing, setReplacing] = useState<number | null>(null);
 
   // ── Taille et orientation ──
   const setScale = (scale: number) => {
@@ -399,7 +444,7 @@ export function PaintDialog({
 
   const totalGrams =
     gramsPerPiece !== null && doc ? gramsPerPiece * doc.scale ** 3 : null;
-  const changes = stats && refs.length > 1 ? stats.changes : 0;
+  const changes = stats && printed.refs.length > 1 ? stats.changes : 0;
 
   // Taille et orientation : panneau du mode complet, repli du mode simple.
   const objectContent =
@@ -531,95 +576,44 @@ export function PaintDialog({
   const leaveAdvanced = () => {
     setAdvanced(false);
     if (!["fill", "height", "brush", "orbit"].includes(tool))
-      setTool(refs.length > 1 ? "fill" : "orbit");
+      setTool(painting ? "fill" : "orbit");
     if (heightMode === "band") setHeightMode("above");
-    if (fillMode !== "smooth") setFillMode("smooth");
+    if (fillMode !== "zone") setFillMode("zone");
   };
 
   const simplePanel = (
     <div className="space-y-6 px-4 py-4">
       {/* 1 · la couleur */}
-      <section aria-labelledby={`${titleId}-pick`}>
-        <h3 id={`${titleId}-pick`} className={label}>
-          {t("simple.stepColor")}
-        </h3>
-        {fileOffer ? (
-          <div className="mb-3 rounded-field border border-line bg-paper p-3 text-sm">
-            <p className="text-soft">
-              {t("palette.fileOffer", { count: fileOffer.count })}
-            </p>
-            <Button
-              size="sm"
-              variant="secondary"
-              className="mt-2"
-              onClick={fileOffer.apply}
-            >
-              {t("palette.useFile", { count: fileOffer.count })}
-            </Button>
-          </div>
-        ) : null}
-        <div className="grid grid-cols-2 gap-2">
-          {refs.map((id, index) => {
-            const color = colorOf(id);
-            const active = index === slotClamped;
-            const share =
-              stats && stats.totalArea > 0
-                ? (stats.areaBySlot[index] ?? 0) / stats.totalArea
-                : 0;
-            return (
-              <button
-                key={id}
-                type="button"
-                aria-pressed={active}
-                onClick={() => {
-                  setSlot(index);
-                  if (tool === "orbit" && refs.length > 1) setTool("fill");
-                }}
-                className={cx(
-                  "flex min-w-0 items-center gap-2.5 rounded-field border px-2.5 py-2 text-left transition-colors",
-                  active
-                    ? "border-ink bg-paper outline outline-2 outline-ink"
-                    : "border-line hover:border-ink",
-                )}
-              >
-                <span className="relative shrink-0">
-                  <FilamentChip hexes={color?.hexes ?? []} size={30} />
-                  <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-ink text-[0.625rem] font-semibold text-paper">
-                    {index + 1}
-                  </span>
-                </span>
-                <span className="min-w-0 leading-tight">
-                  <span className="block truncate text-sm">
-                    {color?.name ?? id}
-                  </span>
-                  <span className="block text-xs tabular-nums text-soft">
-                    {refs.length > 1 ? `${number(share * 100, 0)} %` : ""}
-                  </span>
-                </span>
-              </button>
-            );
-          })}
-        </div>
-        {refs.length < 2 ? (
-          <p className="mt-3 text-sm text-soft">{t("simple.onlyOne")}</p>
-        ) : null}
-        {refs.length < maxColors ? (
-          <details className="mt-3">
-            <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold">
-              <Plus size={16} strokeWidth={1.75} aria-hidden="true" />
-              {t("palette.add")}
-            </summary>
-            <ColorList
-              colors={addable}
-              empty={t("palette.noOther")}
-              onPick={addColor}
-            />
-          </details>
-        ) : null}
-      </section>
+      {setup.several ? (
+        <section aria-labelledby={`${titleId}-pick`}>
+          <h3 id={`${titleId}-pick`} className={label}>
+            {t("simple.stepColor")}
+          </h3>
+          {slotList}
+          {refs.length < 2 ? (
+            <p className="mt-3 text-sm text-soft">{t("simple.onlyOne")}</p>
+          ) : null}
+        </section>
+      ) : (
+        <section aria-labelledby={`${titleId}-pick`}>
+          <h3 id={`${titleId}-pick`} className={label}>
+            {t("simple.single")}
+          </h3>
+          {slotList}
+          <p className="mt-3 text-sm text-soft">{t("simple.singleHint")}</p>
+          <Button
+            size="sm"
+            variant="secondary"
+            className="mt-3"
+            onClick={() => onSetupChange({ ...setup, several: true })}
+          >
+            {t("simple.toSeveral")}
+          </Button>
+        </section>
+      )}
 
       {/* 2 · comment la placer */}
-      {refs.length > 1 ? (
+      {painting ? (
         <section aria-labelledby={`${titleId}-how`}>
           <h3 id={`${titleId}-how`} className={label}>
             {t("simple.stepHow")}
@@ -689,7 +683,7 @@ export function PaintDialog({
       {/* Taille et orientation, repliée */}
       <details
         className="rounded-field border border-line"
-        open={refs.length < 2 ? true : undefined}
+        open={painting ? undefined : true}
       >
         <summary className="cursor-pointer list-none px-3 py-2.5 text-sm font-semibold">
           {t("object.title")}
@@ -698,17 +692,21 @@ export function PaintDialog({
       </details>
 
       <div className="flex flex-wrap items-center justify-between gap-2">
-        <Button
-          size="sm"
-          variant="ghost"
-          onClick={clearPaint}
-          disabled={
-            !doc || (stats?.areaBySlot.slice(1).every((a) => a === 0) ?? true)
-          }
-        >
-          <Trash2 size={15} strokeWidth={1.5} aria-hidden="true" />
-          {t("clear")}
-        </Button>
+        {painting ? (
+          <Button
+            size="sm"
+            variant="ghost"
+            onClick={clearPaint}
+            disabled={
+              !doc || (slotShares?.slice(1).every((a) => a === 0) ?? true)
+            }
+          >
+            <Trash2 size={15} strokeWidth={1.5} aria-hidden="true" />
+            {t("clear")}
+          </Button>
+        ) : (
+          <span />
+        )}
         <Button size="sm" variant="text" onClick={() => setAdvanced(true)}>
           {t("simple.more")}
         </Button>
@@ -772,7 +770,12 @@ export function PaintDialog({
           <Button
             variant="ink"
             size="sm"
-            onClick={() => dialogRef.current?.close()}
+            onClick={() => {
+              // L'événement « close » du dialog arrive après coup (et pas du
+              // tout dans un onglet en arrière-plan) : on ferme sans l'attendre.
+              dialogRef.current?.close();
+              onCloseRef.current();
+            }}
           >
             <Check size={16} strokeWidth={1.75} aria-hidden="true" />
             {t("done")}
@@ -1023,141 +1026,17 @@ export function PaintDialog({
                 <h3 id={`${titleId}-colors`} className={label}>
                   {t("palette.title")}
                 </h3>
-                {fileOffer ? (
-                  <div className="mb-3 rounded-field border border-line bg-paper p-3 text-sm">
-                    <p className="text-soft">
-                      {t("palette.fileOffer", { count: fileOffer.count })}
-                    </p>
-                    <Button
-                      size="sm"
-                      variant="secondary"
-                      className="mt-2"
-                      onClick={fileOffer.apply}
-                    >
-                      {t("palette.useFile", { count: fileOffer.count })}
-                    </Button>
-                  </div>
+                {slotList}
+                {!setup.several ? (
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    className="mt-3"
+                    onClick={() => onSetupChange({ ...setup, several: true })}
+                  >
+                    {t("simple.toSeveral")}
+                  </Button>
                 ) : null}
-                {refs.length === 0 ? (
-                  <p className="mb-3 text-sm text-soft">{t("palette.empty")}</p>
-                ) : null}
-                <ul className="space-y-1.5">
-                  {refs.map((id, index) => {
-                    const color = colorOf(id);
-                    const share =
-                      stats && stats.totalArea > 0
-                        ? (stats.areaBySlot[index] ?? 0) / stats.totalArea
-                        : 0;
-                    const active = index === slotClamped;
-                    return (
-                      <li key={id}>
-                        <div
-                          className={cx(
-                            "flex items-center gap-2 rounded-field border px-2 py-1.5",
-                            active ? "border-ink" : "border-line",
-                          )}
-                        >
-                          <button
-                            type="button"
-                            aria-pressed={active}
-                            onClick={() => {
-                              setSlot(index);
-                              if (
-                                tool === "orbit" ||
-                                tool === "measure" ||
-                                tool === "lay"
-                              )
-                                setTool("brush");
-                            }}
-                            className="flex min-w-0 flex-1 items-center gap-2.5 text-left"
-                          >
-                            <span className="relative">
-                              <FilamentChip
-                                hexes={color?.hexes ?? []}
-                                size={26}
-                              />
-                              <span className="absolute -right-1 -top-1 grid h-4 w-4 place-items-center rounded-full bg-ink text-[0.625rem] font-semibold text-paper">
-                                {index + 1}
-                              </span>
-                            </span>
-                            <span className="min-w-0 leading-tight">
-                              <span className="block truncate text-sm">
-                                {color?.name ?? id}
-                              </span>
-                              <span className="block text-xs text-soft">
-                                {index === 0 ? `${t("palette.base")} · ` : ""}
-                                {t("palette.share", {
-                                  percent: number(share * 100, 0),
-                                })}
-                                {totalGrams !== null && refs.length > 1
-                                  ? ` · ≈ ${number(totalGrams * share, 0)} g`
-                                  : ""}
-                              </span>
-                            </span>
-                          </button>
-                          <div className="flex shrink-0 items-center gap-0.5">
-                            {index > 0 ? (
-                              <IconButton
-                                label={t("palette.makeBase")}
-                                onClick={() => makeBase(index)}
-                                size="sm"
-                              >
-                                <ArrowDownToLine
-                                  size={14}
-                                  strokeWidth={1.5}
-                                  className="rotate-180"
-                                />
-                              </IconButton>
-                            ) : null}
-                            <IconButton
-                              label={t("palette.replace")}
-                              onClick={() =>
-                                setReplacing(replacing === index ? null : index)
-                              }
-                              size="sm"
-                            >
-                              <RotateCcw size={14} strokeWidth={1.5} />
-                            </IconButton>
-                            <IconButton
-                              label={t("palette.remove")}
-                              onClick={() => removeColor(index)}
-                              size="sm"
-                            >
-                              <Trash2 size={14} strokeWidth={1.5} />
-                            </IconButton>
-                          </div>
-                        </div>
-                        {replacing === index ? (
-                          <ColorList
-                            colors={addable}
-                            empty={t("palette.noOther")}
-                            onPick={(next) => {
-                              onReplaceRef(index, next);
-                              setReplacing(null);
-                            }}
-                          />
-                        ) : null}
-                      </li>
-                    );
-                  })}
-                </ul>
-                {refs.length < maxColors ? (
-                  <details className="mt-3">
-                    <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold">
-                      <Plus size={16} strokeWidth={1.75} aria-hidden="true" />
-                      {t("palette.add")}
-                    </summary>
-                    <ColorList
-                      colors={addable}
-                      empty={t("palette.noOther")}
-                      onPick={addColor}
-                    />
-                  </details>
-                ) : (
-                  <p className="mt-3 text-xs text-soft">
-                    {t("palette.max", { max: maxColors })}
-                  </p>
-                )}
                 <p className="mt-3 text-xs text-soft">{t("palette.hint")}</p>
               </section>
 
@@ -1197,28 +1076,30 @@ export function PaintDialog({
                 {tool === "fill" ? (
                   <>
                     <div className="flex gap-1">
-                      {(["smooth", "color", "part"] as const).map((mode) => (
-                        <button
-                          key={mode}
-                          type="button"
-                          aria-pressed={fillMode === mode}
-                          onClick={() => setFillMode(mode)}
-                          className={segment(fillMode === mode)}
-                        >
-                          {t(`fill.${mode}`)}
-                        </button>
-                      ))}
+                      {(["zone", "color", "surface", "part"] as const).map(
+                        (mode) => (
+                          <button
+                            key={mode}
+                            type="button"
+                            aria-pressed={fillMode === mode}
+                            onClick={() => setFillMode(mode)}
+                            className={segment(fillMode === mode)}
+                          >
+                            {t(`fill.${mode}`)}
+                          </button>
+                        ),
+                      )}
                     </div>
                     <p className="mt-2 text-xs text-soft">
                       {t(`fill.${fillMode}Hint`)}
                     </p>
-                    {fillMode !== "part" ? (
+                    {fillMode === "zone" || fillMode === "surface" ? (
                       <RangeField
                         label={t("fill.angle")}
                         value={fillAngle}
                         display={`${fillAngle}°`}
                         min={1}
-                        max={fillMode === "color" ? 180 : 90}
+                        max={90}
                         step={1}
                         onChange={setFillAngle}
                       />
@@ -1335,10 +1216,10 @@ export function PaintDialog({
                 <h3 id={`${titleId}-summary`} className={label}>
                   {t("summary.title")}
                 </h3>
-                {stats && refs.length > 0 ? (
+                {stats && printed.refs.length > 0 ? (
                   <>
                     <ul className="space-y-1 text-sm">
-                      {refs.map((id, index) => {
+                      {printed.refs.map((id, index) => {
                         const share =
                           stats.totalArea > 0
                             ? (stats.areaBySlot[index] ?? 0) / stats.totalArea
@@ -1359,7 +1240,7 @@ export function PaintDialog({
                         );
                       })}
                     </ul>
-                    {refs.length > 1 ? (
+                    {printed.refs.length > 1 ? (
                       <p className="mt-3 text-sm">
                         {t("summary.changes", { count: changes })}
                         {changes > 0 ? (
@@ -1392,8 +1273,7 @@ export function PaintDialog({
                   className="mt-3"
                   onClick={clearPaint}
                   disabled={
-                    !doc ||
-                    (stats?.areaBySlot.slice(1).every((a) => a === 0) ?? true)
+                    !doc || (slotShares?.slice(1).every((a) => a === 0) ?? true)
                   }
                 >
                   <Trash2 size={15} strokeWidth={1.5} aria-hidden="true" />
@@ -1440,35 +1320,6 @@ function IconButton({
     >
       {children}
     </button>
-  );
-}
-
-function ColorList({
-  colors,
-  empty,
-  onPick,
-}: {
-  colors: readonly PublicCustomColor[];
-  empty: string;
-  onPick: (id: string) => void;
-}) {
-  if (colors.length === 0)
-    return <p className="mt-2 text-xs text-soft">{empty}</p>;
-  return (
-    <ul className="mt-2 grid grid-cols-2 gap-1.5">
-      {colors.map((color) => (
-        <li key={color.id}>
-          <button
-            type="button"
-            onClick={() => onPick(color.id)}
-            className="flex w-full items-center gap-2 rounded-field border border-line px-2 py-1.5 text-left text-xs hover:border-ink"
-          >
-            <FilamentChip hexes={color.hexes} size={18} />
-            <span className="truncate">{color.name}</span>
-          </button>
-        </li>
-      ))}
-    </ul>
   );
 }
 

@@ -2,9 +2,13 @@ import { describe, expect, it } from "vitest";
 import { buildBvh, queryBvhSphere, raycastBvh } from "./bvh";
 import { PaintDocument, quarterTurn, rotationBetween } from "./document";
 import { cubePositions, gridPositions } from "./fixtures";
-import { mapFileFilaments, nearestColor, paletteRemap } from "./palette";
 import {
-  applyFilePaint,
+  mapFileFilaments,
+  nearestColor,
+  printedPalette,
+  slotRemap,
+} from "./palette";
+import {
   openProject,
   paintedPreview,
   projectMatters,
@@ -15,7 +19,6 @@ import { isSplit, leafCount } from "./selector";
 import { paintStats } from "./stats";
 import { parseColorProject } from "./summary";
 import {
-  fillRegion,
   paintHeightRange,
   paintSphere,
   paintTriangles,
@@ -124,19 +127,6 @@ describe("outils de peinture", () => {
     expect(doc.canRedo()).toBe(false);
   });
 
-  it("remplit une face plane sans passer l'arête vive", () => {
-    const doc = new PaintDocument({ positions: cubePositions() });
-    const region = fillRegion(doc, 2, "smooth", 30);
-    expect(Array.from(region).sort()).toEqual([2, 3]);
-    expect(fillRegion(doc, 2, "part", 30)).toHaveLength(12);
-    doc.beginStep();
-    paintTriangles(doc, region, 2);
-    doc.endStep();
-    expect(
-      Array.from(fillRegion(doc, 4, "color", 180)).sort((a, b) => a - b),
-    ).toEqual([0, 1, 4, 5, 6, 7, 8, 9, 10, 11]);
-  });
-
   it("peint une bande de hauteur nette, même sur de grands triangles", () => {
     const doc = new PaintDocument({ positions: cubePositions(20) });
     doc.beginStep();
@@ -183,7 +173,7 @@ describe("palette", () => {
     expect(nearestColor("#FF0000", stock)?.id).toBe("red");
   });
 
-  it("fusionne au-delà de quatre couleurs et garde l'ordre des filaments", () => {
+  it("un filament du fichier = un emplacement, même si deux ont la même couleur du stock", () => {
     const mapping = mapFileFilaments(
       [
         { filament: 1, area: 100, hex: "#FFFFFF" },
@@ -193,14 +183,43 @@ describe("palette", () => {
       ],
       stock,
     )!;
-    expect(mapping.refs).toEqual(["white", "black", "red"]);
-    expect(mapping.stateOf.get(3)).toBe(1);
-    expect(mapping.stateOf.get(4)).toBe(3);
-    expect(mapping.merged).toBe(true);
+    // Blanc et gris très clair tombent sur « white » : deux zones quand même.
+    expect(mapping.refs).toEqual(["white", "black", "white", "red"]);
+    expect([1, 2, 3, 4].map((f) => mapping.stateOf.get(f))).toEqual([
+      1, 2, 3, 4,
+    ]);
+    expect(mapping.merged).toBe(false);
   });
 
-  it("renumérote les états quand la palette change", () => {
-    expect(paletteRemap(["a", "b", "c"], ["c", "a"])).toEqual([0, 2, 0, 1]);
+  it("au-delà de quatre filaments, les moins présents rejoignent la teinte la plus proche", () => {
+    const mapping = mapFileFilaments(
+      [
+        { filament: 1, area: 100, hex: "#FFFFFF" },
+        { filament: 2, area: 50, hex: "#111111" },
+        { filament: 3, area: 5, hex: "#EEEEEE" },
+        { filament: 4, area: 30, hex: "#D0302A" },
+        { filament: 6, area: 20, hex: "#3050C0" },
+      ],
+      stock,
+    )!;
+    expect(mapping.refs).toHaveLength(4);
+    expect(mapping.merged).toBe(true);
+    // Le gris clair (filament 3) rejoint le blanc (filament 1, emplacement 1).
+    expect(mapping.stateOf.get(3)).toBe(1);
+    expect(mapping.stateOf.get(6)).toBe(4);
+  });
+
+  it("couleurs imprimées : doublons réunis, une seule couleur = tout au filament 1", () => {
+    const printed = printedPalette(["white", "red", "white", "blue"], true);
+    expect(printed.refs).toEqual(["white", "red", "blue"]);
+    expect(printed.states.slice(0, 6)).toEqual([0, 1, 2, 1, 3, 0]);
+    const single = printedPalette(["white", "red"], false);
+    expect(single.refs).toEqual(["white"]);
+    expect(single.states.slice(0, 4)).toEqual([0, 0, 0, 0]);
+  });
+
+  it("un emplacement retiré rend ses zones à la base, les suivants descendent", () => {
+    expect(slotRemap([10, 11, 12], [10, 12])).toEqual([0, 1, 0, 2]);
   });
 });
 
@@ -262,7 +281,7 @@ describe("projet de couleurs (fichier ↔ atelier)", () => {
     { id: "blue", hexes: ["#39699E"] },
   ];
 
-  it("retrouve les couleurs d'un 3MF de l'atelier, proposées puis appliquées", async () => {
+  it("retrouve les zones et les couleurs d'un 3MF de l'atelier", async () => {
     const positions = new Float32Array([
       ...cubePositions(10),
       ...cubePositions(4),
@@ -292,12 +311,28 @@ describe("projet de couleurs (fichier ↔ atelier)", () => {
       4,
     );
     expect(opened.fileRefs).toEqual(["white", "red", "blue"]);
-    // Le document s'ouvre d'une couleur ; la peinture du fichier attend.
-    expect(opened.doc.node(2)).toBe(0);
-    applyFilePaint(opened.doc, opened.filePaint!);
+    // Les zones du fichier sont en place d'office, hors de l'historique.
     for (let t = 0; t < 24; t++) expect(opened.doc.node(t)).toBe(doc.node(t));
-    expect(opened.doc.undo()).toBe(true);
-    expect(opened.doc.node(2)).toBe(0);
+    expect(opened.doc.canUndo()).toBe(false);
+  });
+
+  it("l'export réunit deux emplacements de même couleur", async () => {
+    const doc = new PaintDocument({ positions: cubePositions(10) });
+    doc.beginStep();
+    paintTriangles(doc, [2, 3], 2);
+    paintTriangles(doc, [4, 5], 3);
+    doc.endStep();
+    const { states } = printedPalette(["white", "red", "red"], true);
+    const blob = await write3mf(doc, { title: "Doublon", states });
+    const loaded = await read3mf(await blob.arrayBuffer());
+    expect(loaded.paint.get(2)).toBe(2);
+    expect(loaded.paint.get(4)).toBe(2);
+    // Une seule couleur : aucune peinture écrite.
+    const plain = await write3mf(doc, {
+      title: "Uni",
+      states: printedPalette(["white", "red"], false).states,
+    });
+    expect((await read3mf(await plain.arrayBuffer())).paint.size).toBe(0);
   });
 
   it("résume le projet et le relit côté serveur", () => {
@@ -306,8 +341,8 @@ describe("projet de couleurs (fichier ↔ atelier)", () => {
     paintTriangles(doc, [2, 3], 2);
     doc.endStep();
     doc.setTransform(quarterTurn("x", 1), 1.5);
-    expect(projectMatters(doc, ["white", "red"])).toBe(true);
-    const summary = projectSummary(doc, ["white", "red"], "painted");
+    expect(projectMatters(doc, ["white", "red"], true)).toBe(true);
+    const summary = projectSummary(doc, ["white", "red"], true, "painted");
     expect(summary.size).toEqual([15, 15, 15]);
     expect(summary.rotated).toBe(true);
     expect(summary.colors.map((c) => c.ref)).toEqual(["white", "red"]);
@@ -317,6 +352,15 @@ describe("projet de couleurs (fichier ↔ atelier)", () => {
     expect(parseColorProject("pas du json")).toBeNull();
     const preview = paintedPreview(doc);
     expect(preview.states.length).toBe(12);
+    // Une seule couleur : la peinture reste dans l'atelier, le résumé n'en a qu'une.
+    const single = projectSummary(doc, ["white", "red"], false, "painted");
+    expect(single.colors.map((c) => c.ref)).toEqual(["white"]);
+    expect(single.changes).toBe(0);
+    // Deux emplacements de même couleur : une seule couleur imprimée.
+    const twins = projectSummary(doc, ["red", "red"], true, "painted");
+    expect(twins.colors).toEqual([{ ref: "red", share: 1 }]);
+    expect(projectMatters(doc, ["red", "red"], true)).toBe(true); // tournée
+
     expect(
       Math.min(...preview.positions.filter((_, i) => i % 3 === 2)),
     ).toBeCloseTo(0);

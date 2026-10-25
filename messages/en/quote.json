@@ -96,14 +96,11 @@
     "materialOnly": "the workshop's only material"
   },
   "colorsPicker": {
-    "legend": "Colours in stock (optional)",
-    "hint": "Up to {max} colours, among those with enough stock for your piece.",
     "pending": "Once your file is read, those that fall short are greyed out.",
     "none": "No colour in stock is enough for this piece. Describe the colour you want in your project: the workshop will reply.",
     "loading": "Reading the stock…",
     "unavailable": "The stock could not be read. Describe the colour you want in your project.",
     "approximate": "approximate shade",
-    "limit": "{max} colours at most.",
     "short": "not enough stock"
   },
   "preview": {

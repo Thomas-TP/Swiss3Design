@@ -96,14 +96,11 @@
     "materialOnly": "la seule matière de l'atelier"
   },
   "colorsPicker": {
-    "legend": "Couleurs en stock (facultatif)",
-    "hint": "Jusqu'à {max} couleurs, parmi celles dont le stock suffit pour votre pièce.",
     "pending": "Dès votre fichier lu, celles qui ne suffisent pas sont grisées.",
     "none": "Aucune couleur du stock ne suffit pour cette pièce. Décrivez la couleur souhaitée dans votre projet : l'atelier vous répond.",
     "loading": "Lecture du stock…",
     "unavailable": "Le stock n'a pas pu être lu. Décrivez la couleur souhaitée dans votre projet.",
     "approximate": "teinte approximative",
-    "limit": "{max} couleurs au maximum.",
     "short": "stock insuffisant"
   },
   "preview": {

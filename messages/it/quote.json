@@ -96,14 +96,11 @@
     "materialOnly": "l'unico materiale del laboratorio"
   },
   "colorsPicker": {
-    "legend": "Colori in magazzino (facoltativo)",
-    "hint": "Fino a {max} colori, tra quelli la cui scorta basta per il Suo pezzo.",
     "pending": "Appena letto il Suo file, quelli che non bastano vengono disattivati.",
     "none": "Nessun colore in magazzino basta per questo pezzo. Descriva il colore desiderato nel progetto: l'atelier Le risponde.",
     "loading": "Lettura del magazzino…",
     "unavailable": "Non è stato possibile leggere il magazzino. Descriva il colore desiderato nel progetto.",
     "approximate": "tinta approssimativa",
-    "limit": "Al massimo {max} colori.",
     "short": "scorta insufficiente"
   },
   "preview": {
