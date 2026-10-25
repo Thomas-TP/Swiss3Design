@@ -27,7 +27,19 @@ import { SiteLink } from "./ui/site-link";
  * `id="site-footer"` + tabIndex -1 : cible du lien d'évitement du header.
  */
 
-const PAYMENT_METHODS = ["TWINT", "Visa", "Mastercard", "Google Pay"];
+// Logos officiels des moyens de paiement actifs dans Stripe (configuration
+// « Default »), dans public/payment (ressources statiques, hors du Worker :
+// règle d'or 10). Jeu « payment_icons » de Shopify/Active Merchant : même
+// carte 38 × 24 pour toutes les marques. Klarna et Link sont actifs mais
+// absents ici : Klarna se montre sur le produit et le panier, Link rassure peu.
+const PAYMENT_METHODS = [
+  { name: "TWINT", file: "twint" },
+  { name: "Visa", file: "visa" },
+  { name: "Mastercard", file: "mastercard" },
+  { name: "Apple Pay", file: "apple-pay" },
+  { name: "Google Pay", file: "google-pay" },
+  { name: "PayPal", file: "paypal" },
+];
 
 function FooterColumn({
   title,
@@ -170,14 +182,21 @@ export function Footer() {
               />
               {t("securePayment")}
             </span>
-            {PAYMENT_METHODS.map((m) => (
-              <span
-                key={m}
-                className="rounded-hair border border-line bg-paper px-2 py-1 font-medium"
-              >
-                {m}
-              </span>
-            ))}
+            <ul className="flex flex-wrap items-center gap-1.5">
+              {PAYMENT_METHODS.map((m) => (
+                <li key={m.file}>
+                  <img
+                    src={`/payment/${m.file}.svg`}
+                    alt={m.name}
+                    title={m.name}
+                    width={38}
+                    height={24}
+                    loading="lazy"
+                    className="block h-6 w-[38px]"
+                  />
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </div>
