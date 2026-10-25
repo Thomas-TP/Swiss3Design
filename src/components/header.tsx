@@ -67,6 +67,7 @@ export function Header({ hasSession = false }: { hasSession?: boolean }) {
       </a>
       <div className="s3d-page relative flex h-16 items-center justify-between gap-3">
         <SiteLink
+          eager
           href="/"
           className="flex items-center gap-2 sm:gap-2.5"
           aria-label="Kreya"
@@ -91,6 +92,7 @@ export function Header({ hasSession = false }: { hasSession?: boolean }) {
               return (
                 <li key={key}>
                   <SiteLink
+                    eager
                     href={href}
                     aria-current={active ? "page" : undefined}
                     className={`group relative flex h-16 items-center text-sm font-medium transition-colors duration-150 ${
@@ -121,6 +123,7 @@ export function Header({ hasSession = false }: { hasSession?: boolean }) {
           <ThemeToggle />
           <LocaleSwitcher />
           <SiteLink
+            eager
             href="/favorites"
             aria-label={shell("nav.favoritesCount", { count: favCount })}
             className="relative inline-flex h-10 w-10 items-center justify-center rounded-field text-soft transition-colors duration-150 hover:bg-line/60 hover:text-ink"
@@ -132,6 +135,7 @@ export function Header({ hasSession = false }: { hasSession?: boolean }) {
             />
           </SiteLink>
           <SiteLink
+            eager
             href="/account"
             aria-label={t("account")}
             className="hidden h-10 w-10 items-center justify-center rounded-field text-soft transition-colors duration-150 hover:bg-line/60 hover:text-ink md:inline-flex"
@@ -143,6 +147,7 @@ export function Header({ hasSession = false }: { hasSession?: boolean }) {
             )}
           </SiteLink>
           <SiteLink
+            eager
             href="/cart"
             aria-label={shell("nav.cartCount", { count })}
             className="hidden h-10 items-center gap-2 rounded-field px-2.5 text-sm font-medium text-ink transition-colors duration-150 hover:bg-line/60 md:inline-flex"

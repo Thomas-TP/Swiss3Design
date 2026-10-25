@@ -1,7 +1,7 @@
 "use client";
 
 import { useLinkStatus } from "next/link";
-import { useEffect, useId, type ComponentProps } from "react";
+import { useEffect, useId, useState, type ComponentProps } from "react";
 import { Link, usePathname } from "@/i18n/navigation";
 import { motionBridge, useMotionBridge } from "@/lib/motion-bridge/store";
 
@@ -19,9 +19,15 @@ import { motionBridge, useMotionBridge } from "@/lib/motion-bridge/store";
 //    ramenées à 0 par le CSS, ~200 ms, deux instantanés), mais rien ne
 //    s'anime ni ne se voit. Le bouton retour du navigateur n'a jamais de
 //    type : pas d'animation, par design.
-// 2. Attente serveur : prefetch coupé et pages dynamiques, un clic peut
-//    attendre le Worker. useLinkStatus() (seul import toléré de next/link) le
-//    signale au pont (navPending), et le header fait courir sa buse rouge.
+// 2. Attente serveur : les pages vitrine sont dynamiques, un clic peut attendre
+//    le Worker. useLinkStatus() (seul import toléré de next/link) le signale
+//    au pont (navPending), et le header fait courir sa buse rouge.
+// 3. Préchargement à l'intention (25.10.2026, navigation trop lente) : dès
+//    que le pointeur survole le lien, qu'il prend le focus ou qu'un doigt le
+//    touche, la page entière est demandée (prefetch={true}) ; au clic, elle
+//    est souvent déjà là. Les liens du chrome (`eager`) préchargent en plus,
+//    dès qu'ils sont visibles, l'écran de chargement de leur page
+//    ((site)/loading.tsx) : même sans survol (mobile), le clic l'affiche aussitôt.
 
 const COUPE = ["s3d-coupe"];
 
@@ -81,15 +87,19 @@ function PendingSignal() {
 export type SiteLinkProps = LinkProps & {
   /** false : jamais de « Coupe » depuis ce lien (l'attente reste signalée). */
   coupe?: boolean;
+  /** Lien du chrome : précharge l'écran de chargement dès qu'il est visible. */
+  eager?: boolean;
 };
 
 export function SiteLink({
   coupe = true,
+  eager = false,
   transitionTypes,
   children,
   ...props
 }: SiteLinkProps) {
   const pathname = usePathname();
+  const [intent, setIntent] = useState(false);
   const reduced = useMotionBridge((s) => s.reduced);
   const target = targetPath(props.href);
   const types =
@@ -103,8 +113,40 @@ export function SiteLink({
       ? COUPE
       : undefined);
 
+  // Préchargement : demandé par l'appelant, sinon la page entière dès
+  // l'intention, l'écran de chargement pour un lien du chrome, rien d'autre.
+  const prefetch =
+    props.prefetch !== undefined
+      ? props.prefetch
+      : target === null || target === pathname
+        ? false
+        : intent
+          ? true
+          : eager
+            ? null
+            : false;
+  const markIntent = () => {
+    if (!intent) setIntent(true);
+  };
+
   return (
-    <Link {...props} transitionTypes={types}>
+    <Link
+      {...props}
+      prefetch={prefetch}
+      transitionTypes={types}
+      onPointerEnter={(event) => {
+        markIntent();
+        props.onPointerEnter?.(event);
+      }}
+      onFocus={(event) => {
+        markIntent();
+        props.onFocus?.(event);
+      }}
+      onTouchStart={(event) => {
+        markIntent();
+        props.onTouchStart?.(event);
+      }}
+    >
       {children}
       <PendingSignal />
     </Link>

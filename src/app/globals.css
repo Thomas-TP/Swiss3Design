@@ -473,14 +473,51 @@ html.lenis body {
 ::view-transition-group(.s3d-coupe) {
   z-index: 2;
 }
-/* La nouvelle page monte de bas en haut par-dessus l'ancienne en une découpe
-   continue (--ease-strate, 480 ms) : plus de paliers (retour R07, 07.10.2026).
-   Pas de fondu : l'ancienne page ne bouge ni ne s'efface (brief §3.1, 2). */
-::view-transition-new(.s3d-coupe) {
-  animation: s3d-print var(--dur-page) var(--ease-strate) both;
-}
+/* 25.10.2026 (retour du propriétaire : la découpe en clip-path saccadait et
+   laissait voir l'ancienne page, transparente, sous la nouvelle) : la page
+   change en n'animant QUE l'opacité et la position, que le navigateur confie
+   au compositeur — fluide même pendant l'hydratation et le rendu du Stage.
+   L'ancienne page s'efface vite en remontant à peine ; la nouvelle arrive
+   juste après, en montant de quelques pixels. Jamais les deux ensemble. */
 ::view-transition-old(.s3d-coupe-out) {
-  animation: none;
+  animation: s3d-page-out 150ms ease-in both;
+}
+::view-transition-new(.s3d-coupe) {
+  animation: s3d-page-in 320ms var(--ease-strate) 110ms both;
+}
+@keyframes s3d-page-out {
+  to {
+    opacity: 0;
+    translate: 0 -6px;
+  }
+}
+@keyframes s3d-page-in {
+  from {
+    opacity: 0;
+    translate: 0 12px;
+  }
+}
+
+/* Squelette de chargement des pages vitrine ((site)/loading.tsx) : des blocs
+   de la teinte des filets qui respirent doucement ; immobiles en mouvement
+   réduit. */
+.s3d-skeleton > *,
+.s3d-skeleton > * > * {
+  background: color-mix(in oklab, var(--line) 70%, transparent);
+}
+.s3d-skeleton > .grid {
+  background: none;
+}
+html:not([data-motion="reduce"]) .s3d-skeleton {
+  animation: s3d-breathe 1.4s ease-in-out infinite alternate;
+}
+@keyframes s3d-breathe {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0.55;
+  }
 }
 ::view-transition-group(nav-mark) {
   animation-duration: var(--dur-ui);

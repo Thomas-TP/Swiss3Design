@@ -96,6 +96,7 @@ export function BottomNav({ hasSession = false }: { hasSession?: boolean }) {
           return (
             <li key={href} className="h-full">
               <SiteLink
+                eager
                 href={href}
                 aria-current={active ? "page" : undefined}
                 aria-label={
